@@ -2,6 +2,7 @@ package com.sap.sse.security;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -177,6 +178,16 @@ public interface SecurityService extends ReplicableWithObjectInputStream<Replica
     void removeRoleDefintionFromUserGroup(UserGroup group, RoleDefinition roleDefinition);
 
     void deleteUserGroup(UserGroup userGroup) throws UserGroupManagementException;
+
+    /**
+     * Releases the lock applied on IP due to user creation abuse.
+     */
+    void releaseUserCreationLockOnIp(String ip);
+
+    /**
+     * Releases the lock applied on IP due to user creation abuse.
+     */
+    void releaseBearerTokenLockOnIp(String ip);
 
     Iterable<User> getUserList();
 
@@ -930,4 +941,8 @@ public interface SecurityService extends ReplicableWithObjectInputStream<Replica
      */
     Iterable<User> getUsersToInformAboutReplicaSet(String serverName,
             Optional<com.sap.sse.security.shared.HasPermissions.Action> alsoSendToAllUsersWithThisPermissionOnReplicaSet);
+
+    HashMap<String, TimedLock> getClientIPBasedTimedLocksForUserCreation();
+
+    HashMap<String, TimedLock> getClientIPBasedTimedLocksForBearerTokenAbuse();
 }

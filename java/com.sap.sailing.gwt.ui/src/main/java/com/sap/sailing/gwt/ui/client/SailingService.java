@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -104,6 +105,7 @@ import com.sap.sse.common.PairingListCreationException;
 import com.sap.sse.common.Speed;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.TimeRange;
+import com.sap.sse.common.TimedLock;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.Util.Triple;
@@ -598,4 +600,8 @@ public interface SailingService extends RemoteService, RemoteReplicationService 
     List<CourseAreaDTO> getCourseAreaForEventOfLeaderboard(String leaderboardName);
 
     String getGoogleMapsLoaderAuthenticationParams();
+    
+    HashMap<String,TimedLock> getClientIPBasedTimedLocksForUserCreation();
+    
+    HashMap<String,TimedLock> getClientIPBasedTimedLocksForBearerTokenAbuse();
 }

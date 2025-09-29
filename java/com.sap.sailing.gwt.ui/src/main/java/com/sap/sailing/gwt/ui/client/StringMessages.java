@@ -1559,6 +1559,7 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     String selectResultImportProvider();
     String buildVersion();
     String serverConfiguration();
+    String ipsLockedForBearerTokenAbuse();
     String standaloneServer();
     String passId();
     String createdAt();

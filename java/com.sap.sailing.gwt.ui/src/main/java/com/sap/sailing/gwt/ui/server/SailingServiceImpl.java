@@ -465,6 +465,7 @@ import com.sap.sse.common.Speed;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.TimeRange;
 import com.sap.sse.common.Timed;
+import com.sap.sse.common.TimedLock;
 import com.sap.sse.common.TransformationException;
 import com.sap.sse.common.TypeBasedServiceFinder;
 import com.sap.sse.common.TypeBasedServiceFinderFactory;
@@ -6101,5 +6102,15 @@ public class SailingServiceImpl extends ResultCachingProxiedRemoteServiceServlet
 
     protected IgtimiConnection createIgtimiConnection() {
         return getIgtimiConnectionFactory().getOrCreateConnection(()->getSecurityService().getCurrentUser() != null ? getSecurityService().getAccessToken(getSecurityService().getCurrentUser().getName()) : null);
+    }
+
+    @Override
+    public HashMap<String, TimedLock> getClientIPBasedTimedLocksForUserCreation() {
+        return getSecurityService().getClientIPBasedTimedLocksForUserCreation();
+    }
+
+    @Override
+    public HashMap<String, TimedLock> getClientIPBasedTimedLocksForBearerTokenAbuse() {
+        return getSecurityService().getClientIPBasedTimedLocksForBearerTokenAbuse();
     }
 }

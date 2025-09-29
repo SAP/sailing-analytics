@@ -133,4 +133,8 @@ public interface ReplicableSecurityService extends SecurityService {
     TimedLock internalFailedBearerTokenAuthentication(String clientIP);
 
     TimedLock internalRecordUserCreationFromClientIP(String clientIP);
+
+    void internalReleaseUserCreationLockOnIp(String ip);
+
+    void internalReleaseBearerTokenLockOnIp(String ip);
 }

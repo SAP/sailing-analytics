@@ -141,6 +141,8 @@ import com.sap.sse.security.operations.DeleteRoleDefinitionOperation;
 import com.sap.sse.security.operations.DeleteUserGroupOperation;
 import com.sap.sse.security.operations.DeleteUserOperation;
 import com.sap.sse.security.operations.PutRoleDefinitionToUserGroupOperation;
+import com.sap.sse.security.operations.ReleaseBearerTokenLockOnIpOperation;
+import com.sap.sse.security.operations.ReleaseUserCreationLockOnIpOperation;
 import com.sap.sse.security.operations.RemoveAccessTokenOperation;
 import com.sap.sse.security.operations.RemovePermissionForUserOperation;
 import com.sap.sse.security.operations.RemoveRoleDefinitionFromUserGroupOperation;
@@ -997,6 +999,18 @@ implements ReplicableSecurityService, ClearStateTestSupport {
     }
     
     @Override
+    public void releaseUserCreationLockOnIp(String ip) {
+        logger.info("Releasing timed lock for user creation at IP "+ip);
+        apply(new ReleaseUserCreationLockOnIpOperation(ip));
+    }
+    
+    @Override
+    public void releaseBearerTokenLockOnIp(String ip) {
+        logger.info("Releasing timed lock for user creation at IP "+ip);
+        apply(new ReleaseBearerTokenLockOnIpOperation(ip));
+    }
+    
+    @Override
     public Void internalDeleteUserGroup(UUID groupId) throws UserGroupManagementException {
         final UserGroup userGroup = getUserGroup(groupId);
         if (userGroup == null) {
@@ -1101,6 +1115,16 @@ implements ReplicableSecurityService, ClearStateTestSupport {
         return result.keySet();
     }
 
+    @Override
+    public HashMap<String,TimedLock> getClientIPBasedTimedLocksForUserCreation() {
+        return new HashMap<String, TimedLock>(clientIPBasedTimedLocksForUserCreation);
+    }
+    
+    @Override
+    public HashMap<String,TimedLock> getClientIPBasedTimedLocksForBearerTokenAbuse() {
+        return new HashMap<String, TimedLock>(clientIPBasedTimedLocksForBearerTokenAuthentication);
+    }
+    
     @Override
     public User createSimpleUser(final String username, final String email, String password, String fullName,
             String company, Locale locale, final String validationBaseURL, UserGroup groupOwningUser,
@@ -3512,5 +3536,19 @@ implements ReplicableSecurityService, ClearStateTestSupport {
                 serverAction -> getUsersWithPermissions(serverIdentifier.getPermission(serverAction))
                 .forEach(usersToSendMailTo::add));
         return usersToSendMailTo;
+    }
+
+    @Override
+    public void internalReleaseUserCreationLockOnIp(String ip) {
+        if(clientIPBasedTimedLocksForUserCreation.containsKey(ip)) {
+            clientIPBasedTimedLocksForUserCreation.remove(ip);
+        }
+    }
+
+    @Override
+    public void internalReleaseBearerTokenLockOnIp(String ip) {
+        if(clientIPBasedTimedLocksForBearerTokenAuthentication.containsKey(ip)) {
+            clientIPBasedTimedLocksForBearerTokenAuthentication.remove(ip);
+        }
     }
 }

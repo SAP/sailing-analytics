@@ -776,4 +776,8 @@ public interface SailingServiceWriteAsync extends FileStorageManagementGwtServic
     
     void copyPairingListFromOtherLeaderboard(String sourceLeaderboardName, String targetLeaderboardName, String fromRaceColumnName,
             String toRaceColumnInclusiveName, AsyncCallback<Void> asyncCallback);
+    
+    void releaseUserCreationLockOnIp(String ip, AsyncCallback<Void> asyncCallback);
+    
+    void releaseBearerTokenLockOnIp(String ip, AsyncCallback<Void> asyncCallback);
 }

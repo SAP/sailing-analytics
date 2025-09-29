@@ -4195,4 +4195,14 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
         getRaceLogTrackingAdapter().copyPairingListFromOtherLeaderboard((RegattaLeaderboard) sourceLeaderboard,
                 (RegattaLeaderboard) targetLeaderboard, fromRaceColumnName, toRaceColumnInclusiveName);
     }
+
+    @Override
+    public void releaseUserCreationLockOnIp(String ip) {
+        getService().getSecurityService().releaseUserCreationLockOnIp(ip);
+    }
+
+    @Override
+    public void releaseBearerTokenLockOnIp(String ip) {
+        getService().getSecurityService().releaseBearerTokenLockOnIp(ip);
+    }
 }

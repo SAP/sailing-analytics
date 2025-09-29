@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -101,6 +102,7 @@ import com.sap.sse.common.Duration;
 import com.sap.sse.common.Speed;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.TimeRange;
+import com.sap.sse.common.TimedLock;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.Util.Triple;
@@ -688,4 +690,8 @@ public interface SailingServiceAsync extends RemoteReplicationServiceAsync {
     void getCourseAreaForEventOfLeaderboard(String leaderboardName, AsyncCallback<List<CourseAreaDTO>> callback);
 
     void getGoogleMapsLoaderAuthenticationParams(AsyncCallback<String> callback);
+    
+    void getClientIPBasedTimedLocksForUserCreation(AsyncCallback<HashMap<String,TimedLock>> callback);
+    
+    void getClientIPBasedTimedLocksForBearerTokenAbuse(AsyncCallback<HashMap<String,TimedLock>> callback);
 }

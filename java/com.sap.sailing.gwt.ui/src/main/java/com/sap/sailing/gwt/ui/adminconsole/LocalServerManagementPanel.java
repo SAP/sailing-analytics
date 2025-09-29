@@ -86,6 +86,7 @@ public class LocalServerManagementPanel extends SimplePanel {
         mainPanel.add(this.buttonPanel = createServerActionsUi(userService));
         mainPanel.add(createServerInfoUI());
         mainPanel.add(createServerConfigurationUI());
+        mainPanel.add(createIPsLockedForBearerTokenAbuseUI());
         refreshServerConfiguration();
         if (userService.hasServerPermission(ServerActions.CONFIGURE_CORS_FILTER)) {
             mainPanel.add(createCORSFilterConfigurationUI());
@@ -140,6 +141,11 @@ public class LocalServerManagementPanel extends SimplePanel {
         isPublicServerCheckbox.ensureDebugId("isPublicServerCheckbox");
         isSelfServiceServerCheckbox = captionPanel.addCheckBox(stringMessages.selfServiceServer() + ":", callback);
         isSelfServiceServerCheckbox.ensureDebugId("isSelfServiceServerCheckbox");
+        return captionPanel;
+    }
+
+    private Widget createIPsLockedForBearerTokenAbuseUI() {
+        final ServerDataCaptionPanel captionPanel = new ServerDataCaptionPanel(stringMessages.ipsLockedForBearerTokenAbuse(), 3);
         return captionPanel;
     }
 
