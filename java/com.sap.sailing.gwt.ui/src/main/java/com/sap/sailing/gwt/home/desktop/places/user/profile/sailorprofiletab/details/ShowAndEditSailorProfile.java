@@ -41,7 +41,6 @@ import com.sap.sse.security.ui.client.UserService;
 
 import com.google.gwt.user.client.ui.SimpleLayoutPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.sap.sse.gwt.resources.Highcharts; 
 import org.moxieapps.gwt.highcharts.client.plotOptions.LinePlotOptions;
 import org.moxieapps.gwt.highcharts.client.plotOptions.Marker;
 import org.moxieapps.gwt.highcharts.client.*;
@@ -54,13 +53,10 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
 import java.util.List;
-
-// added
+import java.util.Arrays;
+import com.sap.sse.gwt.resources.Highcharts; 
 import com.sap.sse.gwt.client.async.ParallelExecutionCallback;
 import com.sap.sse.gwt.client.async.ParallelExecutionHolder;
-import java.util.Arrays;
-
-
 
 /**
  * Implementation of {@link EditSailorProfileDetailsView} where users can view the details of a SailorProfile and edit
@@ -188,32 +184,31 @@ public class ShowAndEditSailorProfile extends Composite implements EditSailorPro
 //        setupPolarChart(entry, SailorProfileNumericStatisticType.MAX_SPEED);
         setupTitleChangeListener(entry.getKey());
         
-        // added 
 //        loadAllStatisticsInParallel(entry);
         createGenericPerformanceRadarChart(entry);
     }
    
-    /**
-     * generic performance radar chart
-     * automatically generated for all sailorprofilenumericstatistictype enum values
-     */
+    /** generic performance radar chart automatically generated for all sailorprofilenumericstatistictype enum values */
     private void createGenericPerformanceRadarChart(SailorProfileDTO entry) {
         List<ParallelExecutionCallback<SailorProfileStatisticDTO>> callbacks = new ArrayList<>();
         Map<SailorProfileNumericStatisticType, ParallelExecutionCallback<SailorProfileStatisticDTO>> callbackMap = new HashMap<>();
+        List<SailorProfileNumericStatisticType> radarTypes = getRadarChartTypes();
         
-        // Automatisch für alle Enum-Werte Callbacks erstellen
-        for (SailorProfileNumericStatisticType type : SailorProfileNumericStatisticType.values()) {
+        // Automatically create callbacks for all enum values
+        for (SailorProfileNumericStatisticType type : radarTypes) {
             ParallelExecutionCallback<SailorProfileStatisticDTO> callback = new ParallelExecutionCallback<>(); // Create Callback 
             callbacks.add(callback); // Holder
             callbackMap.put(type, callback); // Value assignment
         }
         
+        // new ParallelExecutionHolder(callbacks.toArray(new ParallelExecutionCallback<?>[0])) {
+        // new ParallelExecutionHolder(callbackMap.values().toArray(new ParallelExecutionCallback<?>[0])) {
         ParallelExecutionHolder holder = new ParallelExecutionHolder(callbacks.toArray(new ParallelExecutionCallback<?>[0])) {
             @Override
             protected void handleSuccess() {
                 // If all Callbacks were successfull 
                 Map<SailorProfileNumericStatisticType, SailorProfileStatisticDTO> allStatistics = new HashMap<>();
-                for (SailorProfileNumericStatisticType type : SailorProfileNumericStatisticType.values()) {
+                for (SailorProfileNumericStatisticType type : radarTypes) {
                     allStatistics.put(type, callbackMap.get(type).getData());
                 }
                 // Create Radar Chart 
@@ -229,33 +224,62 @@ public class ShowAndEditSailorProfile extends Composite implements EditSailorPro
             }
         };
         
-        // Alle Server-Calls parallel starten
-        for (SailorProfileNumericStatisticType type : SailorProfileNumericStatisticType.values()) {
+        // Start all server calls in parallel`
+        for (SailorProfileNumericStatisticType type : radarTypes) {
             presenter.getDataProvider().getStatisticFor(entry.getKey(), type, callbackMap.get(type));
         }
     }
+      // currently not checking if values meet the boolean isShownInRadarChart criteria
+//    private void createGenericPerformanceRadarChart(SailorProfileDTO entry) {
+//        // NUR eine Datenstruktur!
+//        Map<SailorProfileNumericStatisticType, ParallelExecutionCallback<SailorProfileStatisticDTO>> callbackMap = new HashMap<>();
+//        
+//        // Callbacks nur in Map erstellen
+//        for (SailorProfileNumericStatisticType type : SailorProfileNumericStatisticType.values()) {
+//            callbackMap.put(type, new ParallelExecutionCallback<>());
+//        }
+//        
+//        // Holder direkt aus Map erstellen
+//        new ParallelExecutionHolder(callbackMap.values().toArray(new ParallelExecutionCallback<?>[0])) {
+//            @Override
+//            protected void handleSuccess() {
+//                // Rest bleibt gleich...
+//            }
+//        };
+//        
+//        // Server-Calls starten
+//        for (SailorProfileNumericStatisticType type : SailorProfileNumericStatisticType.values()) {
+//            presenter.getDataProvider().getStatisticFor(entry.getKey(), type, callbackMap.get(type));
+//        }
+//    }
     
-    /**
-     * Erstellt Team vs Field Performance Radar Chart (nur 2 Linien statt individueller Competitors)
-     */
+    /** Creates Team vs Field Performance Radar Chart (only 2 lines instead of individual competitors) */
     private void createDynamicPerformanceRadarChart(Map<SailorProfileNumericStatisticType, SailorProfileStatisticDTO> allStatistics, SailorProfileDTO entry) {
         try {
             Highcharts.ensureInjectedWithMore();
             
-            // Dynamische Kategorien basierend auf verfügbaren Enum-Werten
-            String[] categories = Arrays.stream(SailorProfileNumericStatisticType.values())
+            // Dynamic categories based on available enum values`
+            List<SailorProfileNumericStatisticType> radarTypes = getRadarChartTypes();
+            String[] categories = radarTypes.stream()
                 .map(this::getDisplayName)
                 .toArray(String[]::new);
+            
+            String teamName = (entry.getName() != null && !entry.getName().trim().isEmpty()) 
+                    ? entry.getName() 
+                    : "Performance";
             
             Chart radarChart = new Chart()
                 .setType(Series.Type.LINE)
                 .setPolar(true)
                 .setHeight100()
                 .setWidth100()
-                .setTitle(new ChartTitle().setText("Team vs Field Performance"), 
-                          new ChartSubtitle().setText("Team Average vs Field Average (100% = Field Average)"));
-            
-            // Radar Chart Konfiguration
+//                .setTitle(new ChartTitle().setText("Team "+ entry.getName() != null && !entry.getName().trim().isEmpty() ? entry.getName() : "Team Performance" + "vs Field Performance"), 
+//                          new ChartSubtitle().setText("Team Average vs Field Average (100% = Field Average)"));
+           
+                .setChartTitle(new ChartTitle().setText("Team: \"" + teamName + "\" vs Field Performance"))
+                .setChartSubtitle(new ChartSubtitle().setText("Team Average vs Field Average (100% = Field Average)"));
+         
+            // Radar chart configuration
             radarChart.getXAxis()
                 .setCategories(categories)
                 .setOption("tickmarkPlacement", "on")
@@ -265,18 +289,17 @@ public class ShowAndEditSailorProfile extends Composite implements EditSailorPro
                 .setOption("gridLineInterpolation", "polygon")
                 .setLineWidth(0)
                 .setMin(0)
-                .setMax(200); // 200% = doppelt so gut wie Durchschnitt
-            
+                .setMax(200); // 200% = twice as good as average
+                
             radarChart.setLegend(new Legend().setEnabled(true));
             radarChart.setExporting(new Exporting().setEnabled(false));
-//            radarChart.setOption("tooltip", "{\"valueSuffix\": \"%\"}");
 
-            // Team vs Field Performance-Prozente berechnen
+            // Calculate team vs field performance percentages
             Map<String, double[]> performancePercentages = calculateTeamVsFieldPerformancePercentages(allStatistics, entry);
             
-            // Team-Serie (Performance in %)
+            // Team-Series (Performance in %)
             Series teamSeries = radarChart.createSeries()
-                .setName("Team Performance")
+                .setName(entry.getName() != null && !entry.getName().trim().isEmpty() ? entry.getName() : "Team Performance")
                 .setOption("color", "#FF6B6B")
                 .setOption("pointPlacement", "on");
             
@@ -291,14 +314,14 @@ public class ShowAndEditSailorProfile extends Composite implements EditSailorPro
                 .setOption("color", "#999999")
                 .setOption("dashStyle", "dash")
                 .setOption("pointPlacement", "on");
-            
-            // Alle Werte auf 100% setzen
+
+            // Set all values to 100%
             for (int i = 0; i < categories.length; i++) {
                 baselineSeries.addPoint(100.0);
             }
             radarChart.addSeries(baselineSeries);
             
-            // Chart zu UI hinzufügen
+            // Add chart to UI
             SimpleLayoutPanel chartPanel = new SimpleLayoutPanel();
             chartPanel.add(radarChart);
             chartPanel.setHeight("600px");
@@ -312,18 +335,18 @@ public class ShowAndEditSailorProfile extends Composite implements EditSailorPro
         }
     }
 
-    
-    /**
-     * Converts enum names to user-friendly display names
-     */  
+    /** Converts enum names to user-friendly display names */  
     private String getDisplayName(SailorProfileNumericStatisticType type) {
         switch (type) {
             case MAX_SPEED: return "Max Speed";
             case BEST_DISTANCE_TO_START: return "Best Start Distance";
             case BEST_STARTLINE_SPEED: return "Best Start Speed";
-            case AVERAGE_STARTLINE_DISTANCE: return "Avg Start Distance";
+            case AVERAGE_STARTLINE_DISTANCE: return "Avg. Start Distance";
+            case AVERAGE_STARTLINE_DISTANCE_WITH_VALIDATION: return "Avg. Start Distance with Validation";
+            case AVERAGE_VELOCITY_MADE_GOOD_UPWIND_LEG: return "Avg. VMG Upwind Leg";
+            case AVERAGE_VELOCITY_MADE_GOOD_DOWNWIND_LEG: return "Avg. VMG Downwind Leg";
+            case AVERAGE_MANEUVERING_LOSSES: return "Avg. Maneuvering Losses";
             default:
-                // Automatische Konvertierung für neue Enum-Werte
                 return Arrays.stream(type.name().split("_"))
                     .map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
                     .reduce((a, b) -> a + " " + b)
@@ -331,72 +354,71 @@ public class ShowAndEditSailorProfile extends Composite implements EditSailorPro
         }
     }
 
-    
-    /**
-     * Berechnet Team-Durchschnitt vs Field-Durchschnitt als Prozent-Werte (100% = Field Average) (automatischer Wert-Inversion)
-     */
+    /** Calculates team average vs field average as percentage values (100% = Field Average) (automatic value inversion) */
     private Map<String, double[]> calculateTeamVsFieldPerformancePercentages(Map<SailorProfileNumericStatisticType, SailorProfileStatisticDTO> allStatistics, SailorProfileDTO entry) {
-        SailorProfileNumericStatisticType[] types = SailorProfileNumericStatisticType.values();
-        double[] teamPercentages = new double[types.length];
-        double[] fieldPercentages = new double[types.length]; // Immer 100%
+//        SailorProfileNumericStatisticType[] types = SailorProfileNumericStatisticType.values(); 
+        List<SailorProfileNumericStatisticType> radarTypes = getRadarChartTypes();
+        double[] teamPercentages = new double[radarTypes.size()]; 
+        double[] fieldPercentages = new double[radarTypes.size()]; 
         
-        for (int i = 0; i < types.length; i++) {
-            SailorProfileNumericStatisticType type = types[i];
+        for (int i = 0; i < radarTypes.size(); i++) {
+//            SailorProfileNumericStatisticType type = types[i];
+            SailorProfileNumericStatisticType type = radarTypes.get(i); 
             SailorProfileStatisticDTO stat = allStatistics.get(type);
             
             if (stat != null && !stat.getResult().isEmpty()) {
                 
-                // Team-Durchschnitt berechnen (echte Werte)
+                // Calculate team average 
                 double teamSum = 0.0;
                 int teamCount = 0;
-                
                 for (SimpleCompetitorWithIdDTO competitor : entry.getCompetitors()) {
                     if (stat.getResult().containsKey(competitor) && !stat.getResult().get(competitor).isEmpty()) {
                         teamSum += stat.getResult().get(competitor).get(0).getValue();
                         teamCount++;
                     }
                 }
-                
                 double teamAvg = teamCount > 0 ? teamSum / teamCount : 0.0;
-                
-                // Field-Durchschnitt (echte Werte)
-                double fieldAvg = 0.0;
-                if (!stat.getAggregateForOtherCompetitors().isEmpty()) {
-                    SimpleCompetitorWithIdDTO firstCompetitor = stat.getAggregateForOtherCompetitors().keySet().iterator().next();
-                    if (!stat.getAggregateForOtherCompetitors().get(firstCompetitor).isEmpty()) {
-                        fieldAvg = stat.getAggregateForOtherCompetitors().get(firstCompetitor).get(0).getValue();
+
+                // Calculate field average 
+                double fieldSum = 0.0;
+                int fieldCount = 0;
+                for (SimpleCompetitorWithIdDTO competitor : stat.getAggregateForOtherCompetitors().keySet()) {
+                    if (!stat.getAggregateForOtherCompetitors().get(competitor).isEmpty()) {
+                        fieldSum += stat.getAggregateForOtherCompetitors().get(competitor).get(0).getValue();
+                        fieldCount++;
                     }
                 }
+                double fieldAvg = fieldCount > 0 ? fieldSum / fieldCount : 0.0;
+
+                // ========================== DEBUG ========================== // 
+                // Log all team values individually              GWT.log("=== TEAM VALUES FOR " + type.name() + " ===");
+                for (SimpleCompetitorWithIdDTO competitor : entry.getCompetitors()) {
+                    if (stat.getResult().containsKey(competitor)) {
+                        Double value = stat.getResult().get(competitor).get(0).getValue();
+                        GWT.log("Team Competitor " + competitor.getName() + ": " + value + "m");
+                    }
+                }
+                GWT.log("Team Average: " + teamAvg + "m (calculated from " + teamCount + " competitors)");
+
+                // Log field values individually                GWT.log("=== FIELD VALUES FOR " + type.name() + " ===");
+                for (SimpleCompetitorWithIdDTO competitor : stat.getAggregateForOtherCompetitors().keySet()) {
+                    Double value = stat.getAggregateForOtherCompetitors().get(competitor).get(0).getValue();
+                    GWT.log("Field Average for " + competitor.getName() + ": " + value + "m");
+                }
                 
-                // DEBUG
-             // HIER: DEBUG-CODE HINZUFÜGEN
                 GWT.log("=== " + type.name() + " ===");
                 GWT.log("Team Avg: " + teamAvg);
                 GWT.log("Field Avg: " + fieldAvg);
                 GWT.log("isLowerIsBetter: " + type.isLowerIsBetter());
-                
-             // Alle Team-Werte einzeln loggen:
-                for (SimpleCompetitorWithIdDTO competitor : entry.getCompetitors()) {
-                    if (stat.getResult().containsKey(competitor)) {
-                        Double value = stat.getResult().get(competitor).get(0).getValue();
-                        GWT.log("Team Competitor " + competitor.getName() + ": " + value);
-                    }
-                }
+                // ========================== DEBUG ========================== // 
 
-                // Field-Werte loggen:
-                for (SimpleCompetitorWithIdDTO competitor : stat.getAggregateForOtherCompetitors().keySet()) {
-                    Double value = stat.getAggregateForOtherCompetitors().get(competitor).get(0).getValue();
-                    GWT.log("Field Competitor " + competitor.getName() + ": " + value);
-                }
-                
-                
-                // Team-Performance als Prozent berechnen (wie bei individuellen Competitors)
+                // Calculate team performance as percentage (like with individual competitors)
                 if (fieldAvg != 0.0) {
                     if (type.isLowerIsBetter()) {
-                        // Niedriger ist besser: fieldAvg / teamAvg * 100
+                        // Lower is better: fieldAvg / teamAvg * 100
                         teamPercentages[i] = (fieldAvg / teamAvg) * 100.0;
                     } else {
-                        // Höher ist besser: teamAvg / fieldAvg * 100
+                        // Higher is better: teamAvg / fieldAvg * 100
                         teamPercentages[i] = (teamAvg / fieldAvg) * 100.0;
                     }
                 } else {
@@ -404,13 +426,12 @@ public class ShowAndEditSailorProfile extends Composite implements EditSailorPro
                 }
                 
                 
-                // Ergebnis loggen
-             // HIER: Ergebnis loggen
-                GWT.log("Result: " + teamPercentages[i] + "%");
+                // Log result
+                GWT.log("Result: " + teamPercentages[i] + " %");
                 GWT.log("========================");
                 
-                
-                // Field Average ist immer 100%
+
+                // Field Average is always 100%
                 fieldPercentages[i] = 100.0;
                 
             } else {
@@ -424,29 +445,43 @@ public class ShowAndEditSailorProfile extends Composite implements EditSailorPro
         result.put("field", fieldPercentages);
         return result;
     }
+    
+    /** Returns all SailorProfileNumericStatisticType values that should be shown in radar chart */
+    private List<SailorProfileNumericStatisticType> getRadarChartTypes() {
+        List<SailorProfileNumericStatisticType> radarTypes = new ArrayList<>();
+        for (SailorProfileNumericStatisticType type : SailorProfileNumericStatisticType.values()) {
+            if (type.isShowInRadarChart()) {
+                radarTypes.add(type);
+            }
+        }
+        return radarTypes;
+    }
 
     // ========================================================================================================================= // 
     
     /** create tables for statistic types */
     private void setupTables(SailorProfileDTO entry) {
         DataMiningQueryForSailorProfilesPersistor.removeDMQueriesFromLocalStorage(userService.getStorage());
+        
         for (SailorProfileNumericStatisticType type : SailorProfileNumericStatisticType.values()) {
-            SailorProfileStatisticTable table = new SailorProfileStatisticTable(flagImageResolver, type, i18n,
-                    userService);
-            accordionStatisticsUi.addWidget(table);
-            if (accordionStatisticsUi.isExpanded()) {
-                updateStatistic(entry, type, table);
-            } else {
-                // load the statistic data when the accordion is expanded for the first time
-                accordionStatisticsUi.addAccordionListener(new AccordionExpansionListener() {
-                    @Override
-                    public void onExpansion(boolean expanded) {
-                        if (expanded) {
-                            updateStatistic(entry, type, table);
+            if (type.isShowInStatisticsTables()) { // filter which metrics are displayed
+                SailorProfileStatisticTable table = new SailorProfileStatisticTable(flagImageResolver, type, i18n,
+                        userService);
+                accordionStatisticsUi.addWidget(table);
+                if (accordionStatisticsUi.isExpanded()) {
+                    updateStatistic(entry, type, table);
+                } else {
+                    // load the statistic data when the accordion is expanded for the first time
+                    accordionStatisticsUi.addAccordionListener(new AccordionExpansionListener() {
+                        @Override
+                        public void onExpansion(boolean expanded) {
+                            if (expanded) {
+                                updateStatistic(entry, type, table);
+                            }
                         }
-                    }
-
-                });
+    
+                    });
+                }
             }
         }
     }
