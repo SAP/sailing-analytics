@@ -585,7 +585,8 @@ public class RaceContext {
             }
         }
         ScoreCorrection scoreCorrection = leaderboard.getScoreCorrection();
-        if (trackedRace == null && scoreCorrection != null && scoreCorrection.hasCorrectionForNonTrackedFleet(raceColumn)) {
+        // bug6168: for split fleets we need to check the fleet too
+        if (trackedRace == null && scoreCorrection != null && scoreCorrection.hasCorrectionForNonTrackedFleet(raceColumn, fleet)) {
             return RaceViewState.FINISHED;
         }
         if (startTime != null) {
