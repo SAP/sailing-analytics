@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.concurrent.Callable;
 
 import com.sap.sailing.domain.base.Competitor;
+import com.sap.sailing.domain.base.Fleet;
 import com.sap.sailing.domain.base.RaceColumn;
 import com.sap.sailing.domain.common.MaxPointsReason;
 import com.sap.sailing.domain.leaderboard.caching.LeaderboardDTOCalculationReuseCache;
@@ -121,8 +122,9 @@ public interface ScoreCorrection extends Serializable {
      * for any competitor who in <code>raceInLeaderboard</code> is not in a tracked race and hence the fleet assignment
      * cannot be determined. This is helpful, e.g., for progress detection. If score corrections are present for such
      * untracked competitors then all untracked fleets need to be assumed as finished.
+     * @param fleet TODO
      */
-    boolean hasCorrectionForNonTrackedFleet(RaceColumn raceInLeaderboard);
+    boolean hasCorrectionForNonTrackedFleet(RaceColumn raceInLeaderboard, Fleet fleet);
     
     /**
      * @return all race columns for which this score corrections object has at least one correction; note that this
