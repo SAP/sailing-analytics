@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.Course;
+import com.sap.sailing.domain.base.Fleet;
 import com.sap.sailing.domain.base.RaceColumn;
 import com.sap.sailing.domain.base.RaceColumnInSeries;
 import com.sap.sailing.domain.common.MaxPointsReason;
@@ -610,19 +611,17 @@ public class ScoreCorrectionImpl implements SettableScoreCorrection {
 
     @Override
     public boolean hasCorrectionFor(RaceColumn raceInLeaderboard) {
-        return internalHasScoreCorrectionFor(raceInLeaderboard, /* considerOnlyUntrackedRaces */ false);
+        return internalHasScoreCorrectionFor(raceInLeaderboard);
     }
 
-    private boolean internalHasScoreCorrectionFor(RaceColumn raceInLeaderboard, boolean considerOnlyUntrackedRaces) {
-        for (Pair<Competitor, RaceColumn> correctedScoresKey : correctedScores.keySet()) {
-            if (correctedScoresKey.getB() == raceInLeaderboard &&
-                    (!considerOnlyUntrackedRaces || raceInLeaderboard.getTrackedRace(correctedScoresKey.getA()) == null)) {
+    private boolean internalHasScoreCorrectionFor(RaceColumn raceInLeaderboard) {
+        for (final Pair<Competitor, RaceColumn> correctedScoresKey : correctedScores.keySet()) {
+            if (correctedScoresKey.getB() == raceInLeaderboard) {
                 return true;
             }
         }
         for (Pair<Competitor, RaceColumn> maxPointsReasonsKey : maxPointsReasons.keySet()) {
-            if (maxPointsReasonsKey.getB() == raceInLeaderboard &&
-                    (!considerOnlyUntrackedRaces || raceInLeaderboard.getTrackedRace(maxPointsReasonsKey.getA()) == null)) {
+            if (maxPointsReasonsKey.getB() == raceInLeaderboard) {
                 return true;
             }
         }
@@ -630,8 +629,21 @@ public class ScoreCorrectionImpl implements SettableScoreCorrection {
     }
 
     @Override
-    public boolean hasCorrectionForNonTrackedFleet(RaceColumn raceInLeaderboard) {
-        return internalHasScoreCorrectionFor(raceInLeaderboard, /* considerOnlyUntrackedRaces */ true);
+    public boolean hasCorrectionForNonTrackedFleet(RaceColumn raceInLeaderboard, Fleet fleet) {
+        boolean result;
+        if (raceInLeaderboard.getTrackedRace(fleet) == null) {
+            result = false;
+            for (final Competitor competitor : raceInLeaderboard.getAllCompetitors(fleet)) {
+                final Pair<Competitor, RaceColumn> key = raceInLeaderboard.getKey(competitor);
+                if (correctedScores.containsKey(key) || maxPointsReasons.containsKey(key)) {
+                    result = true;
+                    break;
+                }
+            }
+        } else {
+            result = false;
+        }
+        return result;
     }
 
     @Override
