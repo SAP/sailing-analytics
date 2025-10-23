@@ -32,6 +32,7 @@ public class TracTracConnectionDialog extends DataEntryDialog<TracTracConfigurat
     protected TextBox jsonURLTextBox;
     protected TextBox tracTracUpdateURITextBox;
     protected TextBox tracTracApiTokenTextBox;
+    protected boolean tracTracApiTokenAvailable;
     protected PasswordTextBox tractracPasswordTextBox;
     protected String creatorName;
     protected String name;
@@ -105,7 +106,7 @@ public class TracTracConnectionDialog extends DataEntryDialog<TracTracConfigurat
         final String courseDesignUpdateURI = tracTracUpdateURITextBox.getValue();
         final String tracTracApiToken = tracTracApiTokenTextBox.getValue();
         return new TracTracConfigurationWithSecurityDTO(name, jsonURL, liveDataURI, storedDataURI,
-                courseDesignUpdateURI, tracTracApiToken, /* tracTracApiTokenAvailable */ Util.hasLength(tracTracApiToken), creatorName);
+                courseDesignUpdateURI, tracTracApiToken, tracTracApiTokenAvailable || /* tracTracApiTokenAvailable */ Util.hasLength(tracTracApiToken), creatorName);
     }
 
     @Override

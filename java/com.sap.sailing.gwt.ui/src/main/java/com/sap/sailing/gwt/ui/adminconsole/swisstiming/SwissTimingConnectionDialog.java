@@ -29,6 +29,7 @@ public class SwissTimingConnectionDialog extends DataEntryDialog<SwissTimingConf
     protected TextBox portTextBox;
     protected TextBox updateUrlTextBox;
     protected TextBox updateApiTokenTextBox;
+    protected boolean apiTokenAvailable;
     protected String name;
     protected String creatorName;
     
@@ -108,13 +109,13 @@ public class SwissTimingConnectionDialog extends DataEntryDialog<SwissTimingConf
         grid.setWidget(5, 0, updateUrlLabel);
         grid.setWidget(5, 1, updateUrlTextBox);
         // Update Username
-        final Label updateUsernameLabel = new Label(stringMessages.swissTimingUpdateApiToken() + ":");
-        updateUsernameLabel.setTitle(stringMessages.leaveEmptyForDefault());
+        final Label updateApiTokenLabel = new Label(stringMessages.swissTimingUpdateApiToken() + ":");
+        updateApiTokenLabel.setTitle(stringMessages.leaveEmptyForDefault());
         updateApiTokenTextBox = createTextBox("");
         updateApiTokenTextBox.ensureDebugId("UpdateApiTokenTextBox");
         updateApiTokenTextBox.setVisibleLength(40);
         updateApiTokenTextBox.setTitle(stringMessages.swissTimingUpdateApiToken());
-        grid.setWidget(6, 0, updateUsernameLabel);
+        grid.setWidget(6, 0, updateApiTokenLabel);
         grid.setWidget(6, 1, updateApiTokenTextBox);
     }
 
@@ -149,7 +150,7 @@ public class SwissTimingConnectionDialog extends DataEntryDialog<SwissTimingConf
         return new SwissTimingConfigurationWithSecurityDTO(name,
                 manage2SailEventUrlJsonTextBox.getValue(), hostnameTextBox.getValue(), port,
                 updateUrlTextBox.getValue(), updateApiTokenTextBox.getValue(),
-                /* apiTokenAvailable */ Util.hasLength(updateApiTokenTextBox.getValue()), creatorName);
+                apiTokenAvailable || Util.hasLength(updateApiTokenTextBox.getValue()), creatorName);
     }
 
     @Override

@@ -14,7 +14,9 @@ import com.mongodb.client.model.ReplaceOptions;
 import com.sap.sailing.domain.swisstimingadapter.SwissTimingArchiveConfiguration;
 import com.sap.sailing.domain.swisstimingadapter.SwissTimingConfiguration;
 import com.sap.sailing.domain.swisstimingadapter.SwissTimingFactory;
+import com.sap.sailing.domain.swisstimingadapter.impl.SwissTimingConfigurationImpl;
 import com.sap.sailing.domain.swisstimingadapter.persistence.SwissTimingAdapterPersistence;
+import com.sap.sse.common.Util;
 import com.sap.sse.mongodb.MongoDBService;
 
 public class SwissTimingAdapterPersistenceImpl implements SwissTimingAdapterPersistence {
@@ -128,8 +130,8 @@ public class SwissTimingAdapterPersistenceImpl implements SwissTimingAdapterPers
         result.put(FieldNames.ST_CONFIG_HOSTNAME.name(), swissTimingConfiguration.getHostname());
         result.put(FieldNames.ST_CONFIG_PORT.name(), swissTimingConfiguration.getPort());
         result.put(FieldNames.ST_CONFIG_UPDATE_URL.name(), swissTimingConfiguration.getUpdateURL());
-        result.put(FieldNames.ST_CONFIG_API_TOKEN.name(), swissTimingConfiguration.getApiToken());
         result.put(FieldNames.ST_CONFIG_CREATOR_NAME.name(), swissTimingConfiguration.getCreatorName());
+        result.put(FieldNames.ST_CONFIG_API_TOKEN.name(), swissTimingConfiguration.getApiToken());
         return result;
     }
 
@@ -177,12 +179,27 @@ public class SwissTimingAdapterPersistenceImpl implements SwissTimingAdapterPers
     }
 
     @Override
-    public void updateSwissTimingConfiguration(SwissTimingConfiguration config) {
+    public void updateSwissTimingConfiguration(SwissTimingConfiguration config, boolean isApiTokenAvailable) {
         MongoCollection<org.bson.Document> stConfigCollection = database
                 .getCollection(CollectionNames.SWISSTIMING_CONFIGURATIONS.name());
-        Document result = storeSwissTimingConfiguration(config);
-        Document updateQuery = new Document(FieldNames.ST_CONFIG_JSON_URL.name(), config.getJsonURL());
-        updateQuery.put(FieldNames.ST_CONFIG_CREATOR_NAME.name(), config.getCreatorName());
+        final SwissTimingConfiguration configToStore;
+        if (isApiTokenAvailable && !Util.hasLength(config.getApiToken())) {
+            final String oldApiToken = Util.first(Util.map(Util.filter(getSwissTimingConfigurations(), c->c.getJsonURL().equals(config.getJsonURL())), c->c.getApiToken()));
+            // need to obtain the old API token from the DB first:
+            configToStore = new SwissTimingConfigurationImpl(
+                    config.getName(),
+                    config.getJsonURL(),
+                    config.getHostname(),
+                    config.getPort(),
+                    config.getUpdateURL(),
+                    oldApiToken,
+                    config.getCreatorName());
+        } else {
+            configToStore = config;
+        }
+        Document result = storeSwissTimingConfiguration(configToStore);
+        Document updateQuery = new Document(FieldNames.ST_CONFIG_JSON_URL.name(), configToStore.getJsonURL());
+        updateQuery.put(FieldNames.ST_CONFIG_CREATOR_NAME.name(), configToStore.getCreatorName());
         stConfigCollection.withWriteConcern(WriteConcern.ACKNOWLEDGED).replaceOne(updateQuery, result,
                 new ReplaceOptions().upsert(true));
     }

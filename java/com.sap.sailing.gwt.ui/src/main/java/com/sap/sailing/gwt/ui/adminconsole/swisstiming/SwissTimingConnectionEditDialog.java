@@ -32,6 +32,7 @@ public class SwissTimingConnectionEditDialog extends SwissTimingConnectionDialog
         hostnameTextBox.setText(dtoToEdit.getHostname());
         portTextBox.setText(dtoToEdit.getPort() == null ? "" : ("" + dtoToEdit.getPort()));
         updateUrlTextBox.setText(dtoToEdit.getUpdateURL());
+        apiTokenAvailable = dtoToEdit.isApiTokenAvailable();
         if (!Util.hasLength(dtoToEdit.getApiToken())) {
             updateApiTokenTextBox.setText("");
             if (dtoToEdit.isApiTokenAvailable()) {

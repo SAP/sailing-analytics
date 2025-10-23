@@ -31,8 +31,9 @@ public class TracTracConnectionEditDialog extends TracTracConnectionDialog {
         liveURITextBox.setText(dtotoEdit.getLiveDataURI()==null?"":dtotoEdit.getLiveDataURI());
         jsonURLTextBox.setText(dtotoEdit.getJsonUrl());
         tracTracUpdateURITextBox.setText(dtotoEdit.getUpdateURI()==null?"":dtotoEdit.getUpdateURI());
+        tracTracApiTokenAvailable = dtotoEdit.isTracTracApiTokenAvailable();
         if (!Util.hasLength(dtotoEdit.getTracTracApiToken())) {
-            tracTracApiTokenTextBox.setText("");;
+            tracTracApiTokenTextBox.setText("");
             if (dtotoEdit.isTracTracApiTokenAvailable()) {
                 tracTracApiTokenTextBox.getElement().setAttribute("placeholder", "********");
             }

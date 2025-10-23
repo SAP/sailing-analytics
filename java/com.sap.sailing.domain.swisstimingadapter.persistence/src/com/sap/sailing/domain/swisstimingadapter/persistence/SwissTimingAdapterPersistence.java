@@ -22,7 +22,7 @@ public interface SwissTimingAdapterPersistence {
 
     void deleteSwissTimingConfiguration(String creatorName, String jsonURL);
 
-    void updateSwissTimingConfiguration(SwissTimingConfiguration createSwissTimingConfiguration);
+    void updateSwissTimingConfiguration(SwissTimingConfiguration createSwissTimingConfiguration, boolean isApiTokenAvailable);
 
     void createSwissTimingConfiguration(SwissTimingConfiguration createSwissTimingConfiguration);
 }

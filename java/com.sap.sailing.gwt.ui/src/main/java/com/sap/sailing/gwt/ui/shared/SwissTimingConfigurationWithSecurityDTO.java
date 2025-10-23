@@ -47,6 +47,7 @@ public class SwissTimingConfigurationWithSecurityDTO implements IsSerializable, 
         this.port = port;
         this.updateURL = updateURL;
         this.apiToken = apiToken;
+        this.apiTokenAvailable = apiTokenAvailable;
         this.creatorName = creatorName;
     }
 

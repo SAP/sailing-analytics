@@ -1311,7 +1311,7 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
         swissTimingAdapterPersistence.updateSwissTimingConfiguration(swissTimingFactory.createSwissTimingConfiguration(
                 configuration.getName(), configuration.getJsonUrl(), configuration.getHostname(),
                 configuration.getPort(), configuration.getUpdateURL(), configuration.getApiToken(),
-                configuration.getCreatorName()));
+                configuration.getCreatorName()), configuration.isApiTokenAvailable());
     }
 
     @Override

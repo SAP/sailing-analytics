@@ -14,6 +14,7 @@ import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.sap.sailing.domain.tractracadapter.TracTracConfiguration;
 import com.sap.sailing.domain.tractracadapter.persistence.MongoObjectFactory;
+import com.sap.sse.common.Util;
 
 public class MongoObjectFactoryImpl implements MongoObjectFactory {
     private final MongoDatabase database;
@@ -67,7 +68,7 @@ public class MongoObjectFactoryImpl implements MongoObjectFactory {
                 Updates.set(FieldNames.TT_CONFIG_LIVE_DATA_URI.name(), tracTracConfiguration.getLiveDataURI()),
                 Updates.set(FieldNames.TT_CONFIG_STORED_DATA_URI.name(), tracTracConfiguration.getStoredDataURI()),
                 Updates.set(FieldNames.TT_CONFIG_COURSE_DESIGN_UPDATE_URI.name(), tracTracConfiguration.getUpdateURI())));
-        if (isTracTracApiTokenAvailable) {
+        if (isTracTracApiTokenAvailable && Util.hasLength(tracTracConfiguration.getTracTracApiToken())) {
             updates.add(Updates.set(FieldNames.TT_CONFIG_TRACTRAC_API_TOKEN.name(), tracTracConfiguration.getTracTracApiToken()));
         }
         return Updates.combine(updates.toArray(new Bson[updates.size()]));
