@@ -50,7 +50,7 @@ jobs:
       - name: Allocate swap space
         shell: bash
         run: |
-          sudo dd if=/dev/zero of=/mnt/large-swapfile bs=1G count=10
+          sudo dd if=/dev/zero of=/mnt/large-swapfile bs=1G count=30
           sudo chmod 600 /mnt/large-swapfile
           sudo mkswap /mnt/large-swapfile
           sudo chown root:root /mnt/large-swapfile
