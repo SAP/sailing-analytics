@@ -14,7 +14,7 @@ on:
         description: Build with a local target platform (set to "true" to use local target platform)
         default: 'false'
       runner_cpus:
-        description: Empty means ubuntu-latest, usually 4 CPUs with little disk/memory, but can be 4, 8, 16, and 64 as well; default is ubuntu-latest
+        description: Empty means ubuntu-latest, usually 4 CPUs with little disk/memory, but if you have runners named ubuntu-latest-Xcpu, it can be 4, 8, 16, and 64 as well, using, e.g., ubuntu-latest-16cpu; default is ubuntu-latest
         default: ''
       firefox_version:
         description: Version to use for Selenium tests; default is 137.0, but could, e.g., be "141.0" or "latest"
@@ -28,11 +28,6 @@ jobs:
       actions: read
     runs-on: ${{ github.event.inputs.runner_cpus != '' && format('ubuntu-latest-{0}cpu', github.event.inputs.runner_cpus) || 'ubuntu-latest' }}
     steps:
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        with:
-          detached: true
-          limit-access-to-actor: true
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@v1.3.1
         with:
