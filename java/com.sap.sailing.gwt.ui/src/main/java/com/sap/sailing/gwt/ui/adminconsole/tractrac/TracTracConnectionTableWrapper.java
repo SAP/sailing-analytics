@@ -16,6 +16,7 @@ import com.sap.sailing.domain.common.security.SecuredDomainType;
 import com.sap.sailing.gwt.ui.client.SailingServiceAsync;
 import com.sap.sailing.gwt.ui.client.SailingServiceWriteAsync;
 import com.sap.sailing.gwt.ui.shared.TracTracConfigurationWithSecurityDTO;
+import com.sap.sse.common.Util;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.async.MarkedAsyncCallback;
 import com.sap.sse.gwt.client.celltable.AbstractSortableTextColumn;
@@ -78,8 +79,8 @@ public class TracTracConnectionTableWrapper extends
                 dto -> dto.getJsonUrl(), tracTracAccountColumnListHandler);
         final TextColumn<TracTracConfigurationWithSecurityDTO> tracTracAccountTracTracServerUpdateUriColumn = new AbstractSortableTextColumn<TracTracConfigurationWithSecurityDTO>(
                 dto -> dto.getUpdateURI()==null?"":dto.getUpdateURI(), tracTracAccountColumnListHandler);
-        final TextColumn<TracTracConfigurationWithSecurityDTO> tracTracAccountUsernameColumn = new AbstractSortableTextColumn<TracTracConfigurationWithSecurityDTO>(
-                dto -> dto.getTracTracApiToken(), tracTracAccountColumnListHandler);
+        final TextColumn<TracTracConfigurationWithSecurityDTO> tracTracAccountApiTokenColumn = new AbstractSortableTextColumn<TracTracConfigurationWithSecurityDTO>(
+                dto -> Util.hasLength(dto.getTracTracApiToken()) ? dto.getTracTracApiToken() : dto.isTracTracApiTokenAvailable() ? "********" : "", tracTracAccountColumnListHandler);
         final TextColumn<TracTracConfigurationWithSecurityDTO> tracTracAccountCreatorNameColumn = new AbstractSortableTextColumn<TracTracConfigurationWithSecurityDTO>(
                 dto -> dto.getCreatorName(), tracTracAccountColumnListHandler);
         final HasPermissions type = SecuredDomainType.TRACTRAC_ACCOUNT;
@@ -157,7 +158,7 @@ public class TracTracConnectionTableWrapper extends
         table.addColumn(tracTracAccountStoredUriColumn, stringMessagesClient.storedUri());
         table.addColumn(tracTracAccountJsonUrlColumn, stringMessagesClient.jsonUrl());
         table.addColumn(tracTracAccountTracTracServerUpdateUriColumn, stringMessagesClient.tracTracUpdateUrl());
-        table.addColumn(tracTracAccountUsernameColumn, stringMessagesClient.tractracUsername());
+        table.addColumn(tracTracAccountApiTokenColumn, stringMessagesClient.tractracApiToken());
         table.addColumn(tracTracAccountCreatorNameColumn, stringMessagesClient.creatorName());
         SecuredDTOOwnerColumn.configureOwnerColumns(table, tracTracAccountColumnListHandler, stringMessages);
         table.addColumn(actionColumn, stringMessages.actions());

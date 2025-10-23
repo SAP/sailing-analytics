@@ -29,13 +29,17 @@ public class SwissTimingConfigurationWithSecurityDTO implements IsSerializable, 
     
     /**
      * The API token to use as part of the credentials for requests to the {@link #updateURL}.
+     * The server never sends back the API token for security reasons. But if a token is set, the
+     * {@link #apiTokenAvailable} flag is set to true to indicate that a token is present.
      */
     private String apiToken;
+    
+    private boolean apiTokenAvailable;
 
     public SwissTimingConfigurationWithSecurityDTO() {}
 
     public SwissTimingConfigurationWithSecurityDTO(String name, String jsonUrl, String hostname, Integer port,
-            String updateURL, String apiToken, String creatorName) {
+            String updateURL, String apiToken, boolean apiTokenAvailable, String creatorName) {
         super();
         this.name = name;
         this.jsonUrl = jsonUrl;
@@ -54,6 +58,7 @@ public class SwissTimingConfigurationWithSecurityDTO implements IsSerializable, 
         this.port = port;
         this.updateURL = dto.getUpdateURL();
         this.apiToken = dto.getApiToken();
+        this.apiTokenAvailable = dto.isApiTokenAvailable();
         this.creatorName = dto.getCreatorName();
     }
 
@@ -81,6 +86,10 @@ public class SwissTimingConfigurationWithSecurityDTO implements IsSerializable, 
         return apiToken;
     }
 
+    public boolean isApiTokenAvailable() {
+        return apiTokenAvailable;
+    }
+    
     public String getCreatorName() {
         return creatorName;
     }

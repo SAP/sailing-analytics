@@ -1,6 +1,7 @@
 package com.sap.sailing.gwt.ui.adminconsole.swisstiming;
 
 import com.sap.sailing.gwt.ui.shared.SwissTimingConfigurationWithSecurityDTO;
+import com.sap.sse.common.Util;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.security.ui.client.UserService;
 
@@ -31,7 +32,14 @@ public class SwissTimingConnectionEditDialog extends SwissTimingConnectionDialog
         hostnameTextBox.setText(dtoToEdit.getHostname());
         portTextBox.setText(dtoToEdit.getPort() == null ? "" : ("" + dtoToEdit.getPort()));
         updateUrlTextBox.setText(dtoToEdit.getUpdateURL());
-        updateApiTokenTextBox.setText(dtoToEdit.getApiToken());
+        if (!Util.hasLength(dtoToEdit.getApiToken())) {
+            updateApiTokenTextBox.setText("");
+            if (dtoToEdit.isApiTokenAvailable()) {
+                updateApiTokenTextBox.getElement().setAttribute("placeholder", "********");
+            }
+        } else {
+            updateApiTokenTextBox.setText(dtoToEdit.getApiToken());
+        }
         validateAndUpdate();
     }
 }

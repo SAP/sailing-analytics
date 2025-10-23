@@ -9,6 +9,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.sap.sailing.gwt.ui.adminconsole.TracTracEventManagementPanel;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.gwt.ui.shared.TracTracConfigurationWithSecurityDTO;
+import com.sap.sse.common.Util;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog;
 import com.sap.sse.security.ui.client.UserService;
@@ -87,7 +88,7 @@ public class TracTracConnectionDialog extends DataEntryDialog<TracTracConfigurat
         tracTracApiTokenTextBox = createTextBox("");
         tracTracApiTokenTextBox.ensureDebugId("TracTracApiTokenTextBox");
         tracTracApiTokenTextBox.setVisibleLength(40);
-        grid.setWidget(5, 0, new Label(stringMessages.tractracUsername() + ":"));
+        grid.setWidget(5, 0, new Label(stringMessages.tractracApiToken() + ":"));
         grid.setWidget(5, 1, tracTracApiTokenTextBox);
     }
 
@@ -104,7 +105,7 @@ public class TracTracConnectionDialog extends DataEntryDialog<TracTracConfigurat
         final String courseDesignUpdateURI = tracTracUpdateURITextBox.getValue();
         final String tracTracApiToken = tracTracApiTokenTextBox.getValue();
         return new TracTracConfigurationWithSecurityDTO(name, jsonURL, liveDataURI, storedDataURI,
-                courseDesignUpdateURI, tracTracApiToken, creatorName);
+                courseDesignUpdateURI, tracTracApiToken, /* tracTracApiTokenAvailable */ Util.hasLength(tracTracApiToken), creatorName);
     }
 
     @Override

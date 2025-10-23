@@ -8,6 +8,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.sap.sailing.gwt.ui.adminconsole.SwissTimingEventManagementPanel;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.gwt.ui.shared.SwissTimingConfigurationWithSecurityDTO;
+import com.sap.sse.common.Util;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog;
 import com.sap.sse.security.ui.client.UserService;
@@ -145,10 +146,10 @@ public class SwissTimingConnectionDialog extends DataEntryDialog<SwissTimingConf
                 // port will be null.
             }
         }
-
         return new SwissTimingConfigurationWithSecurityDTO(name,
                 manage2SailEventUrlJsonTextBox.getValue(), hostnameTextBox.getValue(), port,
-                updateUrlTextBox.getValue(), updateApiTokenTextBox.getValue(), creatorName);
+                updateUrlTextBox.getValue(), updateApiTokenTextBox.getValue(),
+                /* apiTokenAvailable */ Util.hasLength(updateApiTokenTextBox.getValue()), creatorName);
     }
 
     @Override

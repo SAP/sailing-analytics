@@ -1,6 +1,7 @@
 package com.sap.sailing.gwt.ui.adminconsole.tractrac;
 
 import com.sap.sailing.gwt.ui.shared.TracTracConfigurationWithSecurityDTO;
+import com.sap.sse.common.Util;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.security.ui.client.UserService;
 
@@ -30,7 +31,14 @@ public class TracTracConnectionEditDialog extends TracTracConnectionDialog {
         liveURITextBox.setText(dtotoEdit.getLiveDataURI()==null?"":dtotoEdit.getLiveDataURI());
         jsonURLTextBox.setText(dtotoEdit.getJsonUrl());
         tracTracUpdateURITextBox.setText(dtotoEdit.getUpdateURI()==null?"":dtotoEdit.getUpdateURI());
-        tracTracApiTokenTextBox.setText(dtotoEdit.getTracTracApiToken());
+        if (!Util.hasLength(dtotoEdit.getTracTracApiToken())) {
+            tracTracApiTokenTextBox.setText("");;
+            if (dtotoEdit.isTracTracApiTokenAvailable()) {
+                tracTracApiTokenTextBox.getElement().setAttribute("placeholder", "********");
+            }
+        } else {
+            tracTracApiTokenTextBox.setText(dtotoEdit.getTracTracApiToken());
+        }
         super.getOkButton().setEnabled(!jsonURLTextBox.getText().isEmpty());
     }
 }

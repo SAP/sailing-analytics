@@ -163,7 +163,7 @@ public class TracTracConnectivityParamsHandler extends AbstractRaceTrackingConne
                     /* stored URI */ params.isReplayRace(tractracRace) ? null // we mainly want to enable the user to list the event's races again in case they are removed;
                         : (params.getStoredURIFromConfiguration() == null ? null : params.getStoredURIFromConfiguration().toString()), // live/stored stuff comes from the tracking params
                     params.getUpdateURI()==null?null:params.getUpdateURI().toString(), params.getTracTracApiToken());
-            tractracMongoObjectFactory.updateTracTracConfiguration(tracTracConfiguration);
+            tractracMongoObjectFactory.updateTracTracConfiguration(tracTracConfiguration, /* isTracTracApiTokenAvailable */ true);
             securityService.setDefaultOwnershipIfNotSet(tracTracConfiguration.getIdentifier());
         }
     }

@@ -32,16 +32,16 @@ public class MongoObjectFactoryImpl implements MongoObjectFactory {
     @Override
     public void createTracTracConfiguration(TracTracConfiguration tracTracConfiguration) {
         MongoCollection<Document> ttConfigCollection = database.getCollection(CollectionNames.TRACTRAC_CONFIGURATIONS.name());
-        final Bson result = getUpdateForTracTracConfiguration(tracTracConfiguration);
+        final Bson result = getUpdateForTracTracConfiguration(tracTracConfiguration, /* isTracTracApiTokenAvailable */ true); // first-time creation
         ttConfigCollection.withWriteConcern(WriteConcern.ACKNOWLEDGED).updateOne(
                 getMongoQueryForConfiguration(tracTracConfiguration), result, new UpdateOptions().upsert(true));
     }
 
     @Override
-    public void updateTracTracConfiguration(TracTracConfiguration tracTracConfiguration) {
+    public void updateTracTracConfiguration(TracTracConfiguration tracTracConfiguration, boolean isTracTracApiTokenAvailable) {
         MongoCollection<Document> ttConfigCollection = database
                 .getCollection(CollectionNames.TRACTRAC_CONFIGURATIONS.name());
-        final Bson result = getUpdateForTracTracConfiguration(tracTracConfiguration);
+        final Bson result = getUpdateForTracTracConfiguration(tracTracConfiguration, isTracTracApiTokenAvailable);
         // Object with given name is updated or created if it does not exist yet
         final Document updateQuery = getMongoQueryForConfiguration(tracTracConfiguration);
         updateQuery.put(FieldNames.TT_CONFIG_CREATOR_NAME.name(), tracTracConfiguration.getCreatorName());
@@ -59,7 +59,7 @@ public class MongoObjectFactoryImpl implements MongoObjectFactory {
         return updateQuery;
     }
 
-    private Bson getUpdateForTracTracConfiguration(TracTracConfiguration tracTracConfiguration) {
+    private Bson getUpdateForTracTracConfiguration(TracTracConfiguration tracTracConfiguration, boolean isTracTracApiTokenAvailable) {
         final List<Bson> updates = new ArrayList<>();
         updates.addAll(Arrays.asList(Updates.set(FieldNames.TT_CONFIG_CREATOR_NAME.name(), tracTracConfiguration.getCreatorName()),
                 Updates.set(FieldNames.TT_CONFIG_NAME.name(), tracTracConfiguration.getName()),
@@ -67,8 +67,8 @@ public class MongoObjectFactoryImpl implements MongoObjectFactory {
                 Updates.set(FieldNames.TT_CONFIG_LIVE_DATA_URI.name(), tracTracConfiguration.getLiveDataURI()),
                 Updates.set(FieldNames.TT_CONFIG_STORED_DATA_URI.name(), tracTracConfiguration.getStoredDataURI()),
                 Updates.set(FieldNames.TT_CONFIG_COURSE_DESIGN_UPDATE_URI.name(), tracTracConfiguration.getUpdateURI())));
-        if (tracTracConfiguration.getTracTracApiToken() != null) {
-            Updates.set(FieldNames.TT_CONFIG_TRACTRAC_API_TOKEN.name(), tracTracConfiguration.getTracTracApiToken());
+        if (isTracTracApiTokenAvailable) {
+            updates.add(Updates.set(FieldNames.TT_CONFIG_TRACTRAC_API_TOKEN.name(), tracTracConfiguration.getTracTracApiToken()));
         }
         return Updates.combine(updates.toArray(new Bson[updates.size()]));
     }

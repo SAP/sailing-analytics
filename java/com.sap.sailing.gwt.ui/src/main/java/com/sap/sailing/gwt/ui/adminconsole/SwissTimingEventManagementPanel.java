@@ -422,7 +422,7 @@ public class SwissTimingEventManagementPanel extends AbstractEventManagementPane
         final String hostname = selectedObject.getHostname();
         final Integer port = selectedObject.getPort();
         final String updateURL = selectedObject.getUpdateURL();
-        final String updateUsername = selectedObject.getApiToken();
+        final String apiToken = selectedObject.getApiToken();
         final List<SwissTimingRaceRecordDTO> selectedRaces = new ArrayList<SwissTimingRaceRecordDTO>();
         for (final SwissTimingRaceRecordDTO race : this.raceList.getList()) {
             if (raceTable.getSelectionModel().isSelected(race)) {
@@ -437,7 +437,7 @@ public class SwissTimingEventManagementPanel extends AbstractEventManagementPane
         // Check if the assigned regatta makes sense
         if (checkBoatClassOK(selectedRegatta, selectedRaces)) {
             sailingServiceWrite.trackWithSwissTiming(/* regattaToAddTo */ regattaIdentifier, selectedRaces, hostname, port==null?0:port,
-                    trackWind, correctWindByDeclination, useInternalMarkPassingAlgorithm, updateURL, updateUsername,
+                    trackWind, correctWindByDeclination, useInternalMarkPassingAlgorithm, updateURL, apiToken,
                     selectedObject.getName(), selectedObject.getJsonUrl(), new AsyncCallback<Void>() {
                         @Override
                         public void onFailure(Throwable caught) {

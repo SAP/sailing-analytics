@@ -681,9 +681,10 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
         getSecurityService().checkCurrentUserUpdatePermission(tracTracConfiguration);
         tractracMongoObjectFactory.updateTracTracConfiguration(
                 getTracTracAdapter().createTracTracConfiguration(tracTracConfiguration.getCreatorName(),
-                tracTracConfiguration.getName(), tracTracConfiguration.getJsonUrl(),
-                tracTracConfiguration.getLiveDataURI(), tracTracConfiguration.getStoredDataURI(),
-                tracTracConfiguration.getUpdateURI(), tracTracConfiguration.getTracTracApiToken()));
+                    tracTracConfiguration.getName(), tracTracConfiguration.getJsonUrl(),
+                    tracTracConfiguration.getLiveDataURI(), tracTracConfiguration.getStoredDataURI(),
+                    tracTracConfiguration.getUpdateURI(), tracTracConfiguration.getTracTracApiToken()),
+                tracTracConfiguration.isTracTracApiTokenAvailable());
     }
 
     @Override

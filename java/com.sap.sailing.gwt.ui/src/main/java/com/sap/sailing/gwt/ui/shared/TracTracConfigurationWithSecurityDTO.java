@@ -20,7 +20,19 @@ public class TracTracConfigurationWithSecurityDTO implements IsSerializable, Sec
     private String liveDataURI;
     private String storedDataURI;
     private String courseDesignUpdateURI;
+    
+    /**
+     * The server never sends back the API token for security reasons. But if a token is set, the
+     * {@link #tracTracApiTokenAvailable} flag is set to true to indicate that a token is present.
+     */
     private String tracTracApiToken;
+    
+    /**
+     * If {@code true}, then an API token is generally known, but it may not be set in {@link #tracTracApiToken} for
+     * security reasons.
+     */
+    private boolean tracTracApiTokenAvailable;
+    
     private String creatorName;
 
     public TracTracConfigurationWithSecurityDTO() {
@@ -31,7 +43,7 @@ public class TracTracConfigurationWithSecurityDTO implements IsSerializable, Sec
     }
 
     public TracTracConfigurationWithSecurityDTO(String name, String jsonUrl, String liveDataURI, String storedDataURI,
-            String courseDesignUpdateUrl, String tracTracApiToken, String creatorName) {
+            String courseDesignUpdateUrl, String tracTracApiToken, boolean tracTracApiTokenAvailable, String creatorName) {
         super();
         this.name = name;
         this.jsonUrl = jsonUrl;
@@ -39,6 +51,7 @@ public class TracTracConfigurationWithSecurityDTO implements IsSerializable, Sec
         this.storedDataURI = storedDataURI;
         this.courseDesignUpdateURI = courseDesignUpdateUrl;
         this.tracTracApiToken = tracTracApiToken;
+        this.tracTracApiTokenAvailable = tracTracApiTokenAvailable;
         this.creatorName = creatorName;
     }
 
@@ -51,6 +64,7 @@ public class TracTracConfigurationWithSecurityDTO implements IsSerializable, Sec
         this.storedDataURI = config.getStoredDataURI();
         this.courseDesignUpdateURI = config.getUpdateURI();
         this.tracTracApiToken = config.getTracTracApiToken();
+        this.tracTracApiTokenAvailable = config.isTracTracApiTokenAvailable();
         this.creatorName = config.getCreatorName();
     }
 
@@ -100,6 +114,10 @@ public class TracTracConfigurationWithSecurityDTO implements IsSerializable, Sec
 
     public String getTracTracApiToken() {
         return tracTracApiToken;
+    }
+    
+    public boolean isTracTracApiTokenAvailable() {
+        return tracTracApiTokenAvailable;
     }
 
     public String getCreatorName() {

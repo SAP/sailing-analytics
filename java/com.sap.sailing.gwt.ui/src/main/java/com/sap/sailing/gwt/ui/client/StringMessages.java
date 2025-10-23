@@ -676,8 +676,7 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     String stopUpdating();
     String startUpdating();
     String currentTime();
-    String tractracUsername();
-    String tractracPassword();
+    String tractracApiToken();
     String operatorEquals();
     String operatorNotEqualTo();
     String operatorLessThan();

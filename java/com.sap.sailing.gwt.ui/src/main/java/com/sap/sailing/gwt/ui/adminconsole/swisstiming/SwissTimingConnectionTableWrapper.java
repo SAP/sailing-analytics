@@ -15,6 +15,7 @@ import com.sap.sailing.domain.common.security.SecuredDomainType;
 import com.sap.sailing.gwt.ui.client.SailingServiceAsync;
 import com.sap.sailing.gwt.ui.client.SailingServiceWriteAsync;
 import com.sap.sailing.gwt.ui.shared.SwissTimingConfigurationWithSecurityDTO;
+import com.sap.sse.common.Util;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.async.MarkedAsyncCallback;
 import com.sap.sse.gwt.client.celltable.AbstractSortableTextColumn;
@@ -80,8 +81,8 @@ public class SwissTimingConnectionTableWrapper extends
                 dto -> dto.getPort() == null ? "" : ("" + dto.getPort()), swissTimingConectionColumnListHandler);
         final TextColumn<SwissTimingConfigurationWithSecurityDTO> swissTimingConnectionUpdateUrlColumn = new AbstractSortableTextColumn<SwissTimingConfigurationWithSecurityDTO>(
                 dto -> dto.getUpdateURL(), swissTimingConectionColumnListHandler);
-        final TextColumn<SwissTimingConfigurationWithSecurityDTO> swissTimingConnectionUpdateUsernameColumn = new AbstractSortableTextColumn<SwissTimingConfigurationWithSecurityDTO>(
-                dto -> dto.getApiToken(), swissTimingConectionColumnListHandler);
+        final TextColumn<SwissTimingConfigurationWithSecurityDTO> swissTimingConnectionApiTokenColumn = new AbstractSortableTextColumn<SwissTimingConfigurationWithSecurityDTO>(
+                dto -> Util.hasLength(dto.getApiToken()) ? dto.getApiToken() : dto.isApiTokenAvailable() ? "********" : "", swissTimingConectionColumnListHandler);
         final TextColumn<SwissTimingConfigurationWithSecurityDTO> swissTimingConnectionCreatorNameColumn = new AbstractSortableTextColumn<SwissTimingConfigurationWithSecurityDTO>(
                 dto -> dto.getCreatorName(), swissTimingConectionColumnListHandler);
         final HasPermissions type = SecuredDomainType.SWISS_TIMING_ACCOUNT;
@@ -173,7 +174,7 @@ public class SwissTimingConnectionTableWrapper extends
         table.addColumn(swissTimingConnectionHostnameColumn, stringMessagesClient.hostname());
         table.addColumn(swissTimingConnectionPortColumn, stringMessagesClient.manage2SailPort());
         table.addColumn(swissTimingConnectionUpdateUrlColumn, stringMessagesClient.updateURL());
-        table.addColumn(swissTimingConnectionUpdateUsernameColumn, stringMessagesClient.username());
+        table.addColumn(swissTimingConnectionApiTokenColumn, stringMessagesClient.swissTimingUpdateApiToken());
         table.addColumn(swissTimingConnectionCreatorNameColumn, stringMessagesClient.creatorName());
         SecuredDTOOwnerColumn.configureOwnerColumns(table, swissTimingConectionColumnListHandler, stringMessages);
         table.addColumn(actionColumn, stringMessages.actions());

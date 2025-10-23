@@ -101,8 +101,7 @@ public class TracTracAdapterImpl implements TracTracAdapter {
     
     @Override
     public TracTracConfiguration createTracTracConfiguration(String creatorName, String name, String jsonURL,
-            String liveDataURI,
-            String storedDataURI, String courseDesignUpdateURI, String tracTracApiToken) {
+            String liveDataURI, String storedDataURI, String courseDesignUpdateURI, String tracTracApiToken) {
         return getTracTracDomainFactory().createTracTracConfiguration(creatorName, name, jsonURL, liveDataURI,
                 storedDataURI, courseDesignUpdateURI, tracTracApiToken);
     }
