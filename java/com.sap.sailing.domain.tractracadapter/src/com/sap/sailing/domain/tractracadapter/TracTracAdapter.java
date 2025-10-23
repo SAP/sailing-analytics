@@ -55,9 +55,9 @@ public interface TracTracAdapter {
      */
     RaceHandle addTracTracRace(TrackerManager trackerManager, URL paramURL, URI liveURI, URI storedURI,
             URI courseDesignUpdateURI, RaceLogStore raceLogStore, RegattaLogStore regattaLogStore,
-            long timeoutInMilliseconds, String tracTracUsername, String tracTracPassword, String raceStatus,
-            String raceVisibility, boolean trackWind, boolean correctWindDirectionByMagneticDeclination, int timeoutInMillis,
-            boolean useOfficialEventsToUpdateRaceLog, RaceTrackingHandler raceTrackingHandler)
+            long timeoutInMilliseconds, String tracTracApiToken, String raceStatus, String raceVisibility,
+            boolean trackWind, boolean correctWindDirectionByMagneticDeclination, int timeoutInMillis, boolean useOfficialEventsToUpdateRaceLog,
+            RaceTrackingHandler raceTrackingHandler)
                     throws MalformedURLException, FileNotFoundException, URISyntaxException, Exception;
 
     /**
@@ -82,10 +82,10 @@ public interface TracTracAdapter {
             URI liveURI, URI storedURI, URI courseDesignUpdateURI, TimePoint trackingStartTime,
             TimePoint trackingEndTime, RaceLogStore raceLogStore, RegattaLogStore regattaLogStore,
             long timeoutForReceivingRaceDefinitionInMilliseconds, Duration offsetToStartTimeOfSimulatedRace,
-            boolean useInternalMarkPassingAlgorithm, String tracTracUsername, String tracTracPassword,
-            String raceStatus, String raceVisibility, boolean trackWind,
-            boolean correctWindDirectionByMagneticDeclination, boolean useOfficialEventsToUpdateRaceLog,
-            URI liveURIFromConfiguration, URI storedURIFromConfiguration)
+            boolean useInternalMarkPassingAlgorithm, String tracTracApiToken, String raceStatus,
+            String raceVisibility, boolean trackWind, boolean correctWindDirectionByMagneticDeclination,
+            boolean useOfficialEventsToUpdateRaceLog, URI liveURIFromConfiguration,
+            URI storedURIFromConfiguration)
             throws MalformedURLException, FileNotFoundException, URISyntaxException, Exception;
 
     /**
@@ -107,7 +107,6 @@ public interface TracTracAdapter {
     RaceRecord getSingleTracTracRaceRecord(URL jsonURL, String raceId, boolean loadClientParams) throws Exception;
 
     TracTracConfiguration createTracTracConfiguration(String creatorName, String name, String jsonURL,
-            String liveDataURI,
-            String storedDataURI, String courseDesignUpdateURI, String tracTracUsername, String tracTracPassword);
+            String liveDataURI, String storedDataURI, String courseDesignUpdateURI, String tracTracApiToken);
     
 }

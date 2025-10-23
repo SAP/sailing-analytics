@@ -28,8 +28,8 @@ public class CourseDesignUpdateHandler extends UpdateHandler implements CourseDe
     private final static Logger logger = Logger.getLogger(CourseDesignUpdateHandler.class.getName());
     private final JsonSerializer<CourseBase> courseSerializer;
     
-    public CourseDesignUpdateHandler(URI updateURI, String username, String password, Serializable eventId, Serializable raceId) {
-        super(updateURI, ACTION, username, password, eventId, raceId);
+    public CourseDesignUpdateHandler(URI updateURI, String tracTracApiToken, Serializable eventId, Serializable raceId) {
+        super(updateURI, ACTION, tracTracApiToken, eventId, raceId);
         this.courseSerializer = new CourseJsonSerializer(
                 new CourseBaseJsonSerializer(
                         new WaypointJsonSerializer(

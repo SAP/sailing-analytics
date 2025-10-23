@@ -28,27 +28,21 @@ public class SwissTimingConfigurationWithSecurityDTO implements IsSerializable, 
     private String updateURL;
     
     /**
-     * The username to use as part of the credentials for requests to the {@link #updateURL}.
+     * The API token to use as part of the credentials for requests to the {@link #updateURL}.
      */
-    private String updateUsername;
-
-    /**
-     * The password to use as part of the credentials for requests to the {@link #updateURL}.
-     */
-    private String updatePassword;
+    private String apiToken;
 
     public SwissTimingConfigurationWithSecurityDTO() {}
 
     public SwissTimingConfigurationWithSecurityDTO(String name, String jsonUrl, String hostname, Integer port,
-            String updateURL, String updateUsername, String updatePassword, String creatorName) {
+            String updateURL, String apiToken, String creatorName) {
         super();
         this.name = name;
         this.jsonUrl = jsonUrl;
         this.hostname = hostname;
         this.port = port;
         this.updateURL = updateURL;
-        this.updateUsername = updateUsername;
-        this.updatePassword = updatePassword;
+        this.apiToken = apiToken;
         this.creatorName = creatorName;
     }
 
@@ -59,8 +53,7 @@ public class SwissTimingConfigurationWithSecurityDTO implements IsSerializable, 
         this.hostname = hostname;
         this.port = port;
         this.updateURL = dto.getUpdateURL();
-        this.updateUsername = dto.getUpdateUsername();
-        this.updatePassword = dto.getUpdatePassword();
+        this.apiToken = dto.getApiToken();
         this.creatorName = dto.getCreatorName();
     }
 
@@ -84,12 +77,8 @@ public class SwissTimingConfigurationWithSecurityDTO implements IsSerializable, 
         return updateURL;
     }
 
-    public String getUpdateUsername() {
-        return updateUsername;
-    }
-
-    public String getUpdatePassword() {
-        return updatePassword;
+    public String getApiToken() {
+        return apiToken;
     }
 
     public String getCreatorName() {

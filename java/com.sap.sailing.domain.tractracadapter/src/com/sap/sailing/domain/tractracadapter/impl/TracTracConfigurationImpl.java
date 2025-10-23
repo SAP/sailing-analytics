@@ -9,21 +9,19 @@ public class TracTracConfigurationImpl implements TracTracConfiguration {
     private final String liveDataURI;
     private final String storedDataURI;
     private final String updateURI;
-    private final String tracTracUsername;
-    private final String tracTracPassword;
+    private final String tracTracApiToken;
     private final String creatorName;
 
     public TracTracConfigurationImpl(String creatorName, String name, String jsonURL, String liveDataURI,
             String storedDataURI, String courseDesignUpdateURI,
-            String tracTracUsername, String tracTracPassword) {
+            String tracTracApiToken) {
         this.creatorName = creatorName;
         this.name = name;
         this.jsonURL = jsonURL;
         this.liveDataURI = liveDataURI;
         this.storedDataURI = storedDataURI;
         this.updateURI = courseDesignUpdateURI;
-        this.tracTracUsername = tracTracUsername;
-        this.tracTracPassword = tracTracPassword;
+        this.tracTracApiToken = tracTracApiToken;
     }
 
     @Override
@@ -61,13 +59,8 @@ public class TracTracConfigurationImpl implements TracTracConfiguration {
     }
 
     @Override
-    public String getTracTracUsername() {
-        return tracTracUsername;
-    }
-
-    @Override
-    public String getTracTracPassword() {
-        return tracTracPassword;
+    public String getTracTracApiToken() {
+        return tracTracApiToken;
     }
 
     public String getCreatorName() {

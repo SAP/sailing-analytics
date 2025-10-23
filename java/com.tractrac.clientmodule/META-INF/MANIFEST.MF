@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: TracTrac Client module
 Bundle-SymbolicName: com.tractrac.clientmodule
-Bundle-Version: 4.0.4
+Bundle-Version: 5.0.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .,
  lib/TracAPI.jar
@@ -11,6 +11,7 @@ Export-Package: com.tractrac.asio.lib.api,
  com.tractrac.asio.lib.api.protocol.session,
  com.tractrac.asio.lib.api.record,
  com.tractrac.asio.lib.api.session,
+ com.tractrac.asio.lib.api.stats,
  com.tractrac.asio.lib.spi,
  com.tractrac.asio.lib.spi.record,
  com.tractrac.common.lib.api.messenger,
@@ -90,6 +91,7 @@ Export-Package: com.tractrac.asio.lib.api,
  com.tractrac.model.server.lib.api.raceobject,
  com.tractrac.model.server.lib.api.route,
  com.tractrac.model.server.lib.api.sensor,
+ com.tractrac.model.server.lib.api.user,
  com.tractrac.model.server.lib.api.view,
  com.tractrac.osgi,
  com.tractrac.subscription.app.tracapi,
@@ -126,6 +128,7 @@ Export-Package: com.tractrac.asio.lib.api,
  com.tractrac.util.lib.api.search,
  com.tractrac.util.lib.api.selector,
  com.tractrac.util.lib.api.serialize,
+ com.tractrac.util.lib.api.test,
  com.tractrac.util.lib.impl.autolog,
  com.tractrac.util.lib.impl.autolog.file,
  com.tractrac.util.lib.impl.autolog.multiple,
@@ -144,8 +147,7 @@ Export-Package: com.tractrac.asio.lib.api,
  com.tractrac.util.server.lib.metrics,
  com.tractrac.util.server.lib.metrics.entities,
  com.tractrac.util.server.lib.monitor,
- com.tractrac.util.server.lib.parser,
- com.tractrac.util.server.lib.test
+ com.tractrac.util.server.lib.parser
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: TracTrac
 Import-Package: org.osgi.framework

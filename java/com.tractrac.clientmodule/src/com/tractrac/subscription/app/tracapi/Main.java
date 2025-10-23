@@ -31,19 +31,20 @@ public class Main {
         LoggerLocator.getLoggerManager().init(1, "println");
 
         Object[] myArgs = parseArguments(args);
-        URI paramURI = (URI) myArgs[0];
-        boolean measureDelay = (boolean) myArgs[1];
+        String apiToken = (String) myArgs[0];
+        URI paramURI = (URI) myArgs[1];
+        boolean measureDelay = (boolean) myArgs[2];
 
         // Create the event object
         IEventFactory eventFactory = ModelLocator.getEventFactory();
-        IRace race = eventFactory.createRace(paramURI);
+        IRace race = eventFactory.createRace(apiToken, paramURI);
         IEvent event = race.getEvent();
 
         event.getPositionedItems().forEach(positionedItem -> System.out.println(positionedItem.getMetadata().getText()));
 
         // Create the subscriber
         ISubscriberFactory subscriberFactory = SubscriptionLocator.getSusbcriberFactory();
-        IEventSubscriber eventSubscriber = subscriberFactory.createEventSubscriber(event);
+        IEventSubscriber eventSubscriber = subscriberFactory.createEventSubscriber(apiToken, event);
 
         AbstractListener listener;
         if (measureDelay) {
@@ -59,6 +60,7 @@ public class Main {
         eventSubscriber.subscribeCompetitors(listener);
 
         IRaceSubscriber raceSubscriber = subscriberFactory.createRaceSubscriber(
+                apiToken,
                 race
         );
         raceSubscriber.subscribeConnectionStatus(listener);
@@ -87,14 +89,15 @@ public class Main {
     }
 
     private static Object[] parseArguments(String[] args) {
-        if (args.length < 1) {
-            System.out.println("Usage: java -jar TracAPI.jar parametersfile measureDelay");
+        if (args.length < 2) {
+            System.out.println("Usage: java -jar TracAPI.jar API_TOKEN parametersfile measureDelay");
             System.exit(0);
         }
-        Object[] myArgs = new Object[2];
+        Object[] myArgs = new Object[3];
         try {
-            myArgs[0] = new URI(args[0]);
-            myArgs[1] = args.length >= 2 && args[1].equals("1");
+            myArgs[0] = args[0];
+            myArgs[1] = new URI(args[1]);
+            myArgs[2] = args.length >= 3 && args[2].equals("1");
         } catch (URISyntaxException ex) {
             System.out.println("Malformed URL " + ex.getMessage());
             System.exit(0);

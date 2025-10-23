@@ -3,9 +3,9 @@ package com.sap.sailing.gwt.ui.adminconsole.swisstiming;
 import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.sap.sailing.gwt.ui.adminconsole.SwissTimingEventManagementPanel;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.gwt.ui.shared.SwissTimingConfigurationWithSecurityDTO;
 import com.sap.sse.gwt.client.ErrorReporter;
@@ -27,8 +27,7 @@ public class SwissTimingConnectionDialog extends DataEntryDialog<SwissTimingConf
     protected TextBox hostnameTextBox;
     protected TextBox portTextBox;
     protected TextBox updateUrlTextBox;
-    protected TextBox updateUsernameTextBox;
-    protected PasswordTextBox updatePasswordTextBox;
+    protected TextBox updateApiTokenTextBox;
     protected String name;
     protected String creatorName;
     
@@ -58,7 +57,7 @@ public class SwissTimingConnectionDialog extends DataEntryDialog<SwissTimingConf
     }
 
     private void createUi() {
-        grid = new Grid(8, 2);
+        grid = new Grid(7, 2);
         grid.setWidget(0, 0, new Label(stringMessages.details() + ":"));
         // Manage2SailEventId
         final Label manage2SailEventIdLabel = new Label(stringMessages.manage2SailEventIdBox() + ":");
@@ -108,23 +107,14 @@ public class SwissTimingConnectionDialog extends DataEntryDialog<SwissTimingConf
         grid.setWidget(5, 0, updateUrlLabel);
         grid.setWidget(5, 1, updateUrlTextBox);
         // Update Username
-        final Label updateUsernameLabel = new Label(stringMessages.swissTimingUpdateUsername() + ":");
+        final Label updateUsernameLabel = new Label(stringMessages.swissTimingUpdateApiToken() + ":");
         updateUsernameLabel.setTitle(stringMessages.leaveEmptyForDefault());
-        updateUsernameTextBox = createTextBox("");
-        updateUsernameTextBox.ensureDebugId("UpdateUsernameTextBox");
-        updateUsernameTextBox.setVisibleLength(40);
-        updateUsernameTextBox.setTitle(stringMessages.swissTimingUpdateUsername());
+        updateApiTokenTextBox = createTextBox("");
+        updateApiTokenTextBox.ensureDebugId("UpdateApiTokenTextBox");
+        updateApiTokenTextBox.setVisibleLength(40);
+        updateApiTokenTextBox.setTitle(stringMessages.swissTimingUpdateApiToken());
         grid.setWidget(6, 0, updateUsernameLabel);
-        grid.setWidget(6, 1, updateUsernameTextBox);
-        // Update Password
-        final Label updatePasswordLabel = new Label(stringMessages.swissTimingUpdatePassword() + ":");
-        updatePasswordLabel.setTitle(stringMessages.leaveEmptyForDefault());
-        updatePasswordTextBox = createPasswordTextBox("");
-        updatePasswordTextBox.ensureDebugId("UpdatePasswordTextBox");
-        updatePasswordTextBox.setVisibleLength(40);
-        updatePasswordTextBox.setTitle(stringMessages.swissTimingUpdatePassword());
-        grid.setWidget(7, 0, updatePasswordLabel);
-        grid.setWidget(7, 1, updatePasswordTextBox);
+        grid.setWidget(6, 1, updateApiTokenTextBox);
     }
 
     /**
@@ -158,8 +148,7 @@ public class SwissTimingConnectionDialog extends DataEntryDialog<SwissTimingConf
 
         return new SwissTimingConfigurationWithSecurityDTO(name,
                 manage2SailEventUrlJsonTextBox.getValue(), hostnameTextBox.getValue(), port,
-                updateUrlTextBox.getValue(), updateUsernameTextBox.getValue(), updatePasswordTextBox.getValue(),
-                creatorName);
+                updateUrlTextBox.getValue(), updateApiTokenTextBox.getValue(), creatorName);
     }
 
     @Override

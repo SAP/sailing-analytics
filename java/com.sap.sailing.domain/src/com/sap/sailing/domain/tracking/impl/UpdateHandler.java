@@ -47,8 +47,7 @@ public class UpdateHandler {
     
     private JsonDeserializer<UpdateResponse> updateDeserializer;
     private final URI baseURI;
-    private final String username;
-    private final String password;
+    private final String tracTracApiToken;
     private final Serializable eventId;
     private final Serializable raceId;
     private final String action;
@@ -61,17 +60,16 @@ public class UpdateHandler {
     private final static String ContentTypeApplicationJson = "application/json";
     private final static String EncodingUtf8 = "UTF-8";
     private final static String ResponseCodeForFailure = "FAILURE";
-    private final static String UpdateUrlTemplate = "%s%s?eventid=%s&raceid=%s&username=%s&password=%s";
+    private final static String UpdateUrlTemplate = "%s%s?eventid=%s&raceid=%s";
     
-    public UpdateHandler(URI updateURI, String action, String username, String password, Serializable eventId, Serializable raceId) {
+    public UpdateHandler(URI updateURI, String action, String tracTracApiToken, Serializable eventId, Serializable raceId) {
         this.baseURI = updateURI;
         this.action = action;
-        this.username = username;
-        this.password = password;
+        this.tracTracApiToken = tracTracApiToken;
         this.eventId = eventId;
         this.raceId = raceId;
         this.updateDeserializer = new UpdateResponseDeserializer();
-        if (Util.hasLength(username)) {
+        if (Util.hasLength(tracTracApiToken)) {
             logger.info("Activating update handler "+this+" for race with ID "+raceId);
             this.active = true;
         } else {
@@ -103,8 +101,6 @@ public class UpdateHandler {
         final List<BasicNameValuePair> result = new ArrayList<>();
         result.add(new BasicNameValuePair("eventid", eventId.toString()));
         result.add(new BasicNameValuePair("raceid", this.raceId.toString()));
-        result.add(new BasicNameValuePair("username", username));
-        result.add(new BasicNameValuePair("password", password));
         return result;
     }
 
@@ -118,9 +114,7 @@ public class UpdateHandler {
                 serverUpdateURI.toString(),
                 this.action,
                 URLEncoder.encode(this.eventId.toString(), EncodingUtf8), 
-                URLEncoder.encode(this.raceId.toString(), EncodingUtf8),
-                URLEncoder.encode(username, EncodingUtf8),
-                URLEncoder.encode(password, EncodingUtf8));
+                URLEncoder.encode(this.raceId.toString(), EncodingUtf8));
         
         for (Entry<String, String> entry : additionalParameters.entrySet()) {
             url += String.format("&%s=%s", 
@@ -175,6 +169,9 @@ public class UpdateHandler {
             c.setUseCaches(false);
             c.setRequestProperty(ContentType, ContentTypeApplicationJson);
             c.addRequestProperty(ContentLength, String.valueOf(payload.getBytes().length));
+            if (Util.hasLength(tracTracApiToken)) {
+                c.addRequestProperty("Authorization", "Bearer " + tracTracApiToken);
+            }
             DataOutputStream writer = new DataOutputStream(c.getOutputStream());
             writer.writeBytes(payload);
             writer.flush();

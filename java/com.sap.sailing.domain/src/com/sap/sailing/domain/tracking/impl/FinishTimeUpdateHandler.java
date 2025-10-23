@@ -36,9 +36,9 @@ public class FinishTimeUpdateHandler extends UpdateHandler {
      */
     private final Regatta regatta;
     
-    public FinishTimeUpdateHandler(URI updateURI, String username, String password,
+    public FinishTimeUpdateHandler(URI updateURI, String tracTracApiToken,
             Serializable eventId, Serializable raceId, Regatta regatta) {
-        super(updateURI, ACTION_STOP_TRACKING, username, password, eventId, raceId);
+        super(updateURI, ACTION_STOP_TRACKING, tracTracApiToken, eventId, raceId);
         this.regatta = regatta;
     }
     

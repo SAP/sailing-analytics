@@ -46,8 +46,7 @@ public class RaceTrackingConnectivityParametersImpl extends AbstractRaceTracking
     private final transient DomainFactory domainFactory;
     private final long delayToLiveInMillis;
     private final Duration offsetToStartTimeOfSimulatedRace;
-    private final String tracTracUsername;
-    private final String tracTracPassword;
+    private final String tracTracApiToken;
     private final String raceStatus;
     private final String raceVisibility;
     private final boolean useInternalMarkPassingAlgorithm;
@@ -73,7 +72,7 @@ public class RaceTrackingConnectivityParametersImpl extends AbstractRaceTracking
             TimePoint startOfTracking, TimePoint endOfTracking, long delayToLiveInMillis,
             Duration offsetToStartTimeOfSimulatedRace, boolean useInternalMarkPassingAlgorithm,
             RaceLogStore raceLogStore, RegattaLogStore regattaLogStore, DomainFactory domainFactory,
-            String tracTracUsername, String tracTracPassword, String raceStatus, String raceVisibility,
+            String tracTracApiToken, String raceStatus, String raceVisibility,
             boolean trackWind, boolean correctWindDirectionByMagneticDeclination, boolean preferReplayIfAvailable,
             int timeoutInMillis, boolean useOfficialEventsToUpdateRaceLog,
             URI liveURIFromConfiguration, URI storedURIFromConfiguration) throws Exception {
@@ -101,8 +100,7 @@ public class RaceTrackingConnectivityParametersImpl extends AbstractRaceTracking
         this.offsetToStartTimeOfSimulatedRace = offsetToStartTimeOfSimulatedRace;
         this.raceLogStore = raceLogStore;
         this.regattaLogStore = regattaLogStore;
-        this.tracTracUsername = tracTracUsername;
-        this.tracTracPassword = tracTracPassword;
+        this.tracTracApiToken = tracTracApiToken;
         this.raceStatus = raceStatus;
         this.raceVisibility = raceVisibility;
         this.useInternalMarkPassingAlgorithm = useInternalMarkPassingAlgorithm;
@@ -118,9 +116,9 @@ public class RaceTrackingConnectivityParametersImpl extends AbstractRaceTracking
     public IRace getTractracRace() throws CreateModelException, URISyntaxException, TimeOutException {
         final IRace result;
         if (getTimeoutInMillis() == -1) {
-            result = ModelLocator.getEventFactory().createRace(new URI(paramURL.toString()));
+            result = ModelLocator.getEventFactory().createRace(tracTracApiToken, new URI(paramURL.toString()));
         } else {
-            result = ModelLocator.getEventFactory().createRace(new URI(paramURL.toString()), getTimeoutInMillis());
+            result = ModelLocator.getEventFactory().createRace(tracTracApiToken, new URI(paramURL.toString()), getTimeoutInMillis());
         }
         return result;
     }
@@ -197,12 +195,8 @@ public class RaceTrackingConnectivityParametersImpl extends AbstractRaceTracking
         return offsetToStartTimeOfSimulatedRace;
     }
 
-    public String getTracTracUsername() {
-        return tracTracUsername;
-    }
-
-    public String getTracTracPassword() {
-        return tracTracPassword;
+    public String getTracTracApiToken() {
+        return tracTracApiToken;
     }
 
     public String getRaceStatus() {

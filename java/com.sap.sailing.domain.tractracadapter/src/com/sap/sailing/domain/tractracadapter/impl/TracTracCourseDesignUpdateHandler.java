@@ -19,8 +19,8 @@ public class TracTracCourseDesignUpdateHandler extends CourseDesignUpdateHandler
     private final IRace tractracRace;
     private final DomainFactory domainFactory;
     
-    public TracTracCourseDesignUpdateHandler(URI updateURI, String tracTracUsername, String tracTracPassword, Serializable tracTracEventId, Serializable raceId, IRace tractracRace, DomainFactory domainFactory) {
-        super(updateURI, tracTracUsername, tracTracPassword, tracTracEventId, raceId);
+    public TracTracCourseDesignUpdateHandler(URI updateURI, String tracTracApiToken, Serializable tracTracEventId, Serializable raceId, IRace tractracRace, DomainFactory domainFactory) {
+        super(updateURI, tracTracApiToken, tracTracEventId, raceId);
         this.domainFactory = domainFactory;
         this.tractracRace = tractracRace;
     }

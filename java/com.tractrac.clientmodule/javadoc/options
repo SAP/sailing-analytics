@@ -1,0 +1,24 @@
+-classpath
+'/home/jorge/.m2/repository/com/tractrac/model-lib-api/5.0.0/model-lib-api-5.0.0.jar:/home/jorge/.m2/repository/com/tractrac/common-lib-api/5.0.0-SNAPSHOT/common-lib-api-5.0.0-SNAPSHOT.jar:/home/jorge/.m2/repository/org/json/json/20240303/json-20240303.jar:/home/jorge/.m2/repository/com/tractrac/subscription-lib-api/5.0.0/subscription-lib-api-5.0.0.jar:/home/jorge/.m2/repository/com/tractrac/util-lib-api/5.0.0-SNAPSHOT/util-lib-api-5.0.0-SNAPSHOT.jar'
+-encoding
+'Windows-1252'
+-protected
+-sourcepath
+'/home/jorge/TracTrac/src/daemons-java/subscription/app/tracapi/src/main/java:/home/jorge/TracTrac/src/daemons-java/subscription/app/tracapi/target/distro-javadoc-sources/model-lib-api-5.0.0-sources:/home/jorge/TracTrac/src/daemons-java/subscription/app/tracapi/target/distro-javadoc-sources/subscription-lib-api-5.0.0-sources'
+-author
+-bottom
+'Copyright &#169; 2025 <a href="http://www.tractrac.com/">TracTrac</a>. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'/home/jorge/TracTrac/src/daemons-java/subscription/app/tracapi/target/site/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'TracAPI 5.0.0'
+-linkoffline
+'https://docs.oracle.com/javase/8/docs/api' '/home/jorge/TracTrac/src/daemons-java/subscription/app/tracapi/target/javadoc-bundle-options'
+-use
+-version
+-windowtitle
+'Subscription - Applications - TracAPI 5.0.0 API'

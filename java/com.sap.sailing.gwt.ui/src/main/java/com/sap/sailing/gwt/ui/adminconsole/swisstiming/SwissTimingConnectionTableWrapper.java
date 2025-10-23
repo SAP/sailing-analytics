@@ -81,7 +81,7 @@ public class SwissTimingConnectionTableWrapper extends
         final TextColumn<SwissTimingConfigurationWithSecurityDTO> swissTimingConnectionUpdateUrlColumn = new AbstractSortableTextColumn<SwissTimingConfigurationWithSecurityDTO>(
                 dto -> dto.getUpdateURL(), swissTimingConectionColumnListHandler);
         final TextColumn<SwissTimingConfigurationWithSecurityDTO> swissTimingConnectionUpdateUsernameColumn = new AbstractSortableTextColumn<SwissTimingConfigurationWithSecurityDTO>(
-                dto -> dto.getUpdateUsername(), swissTimingConectionColumnListHandler);
+                dto -> dto.getApiToken(), swissTimingConectionColumnListHandler);
         final TextColumn<SwissTimingConfigurationWithSecurityDTO> swissTimingConnectionCreatorNameColumn = new AbstractSortableTextColumn<SwissTimingConfigurationWithSecurityDTO>(
                 dto -> dto.getCreatorName(), swissTimingConectionColumnListHandler);
         final HasPermissions type = SecuredDomainType.SWISS_TIMING_ACCOUNT;
@@ -141,8 +141,8 @@ public class SwissTimingConnectionTableWrapper extends
             public Iterable<String> getSearchableStrings(SwissTimingConfigurationWithSecurityDTO t) {
                 List<String> strings = new ArrayList<String>();
                 strings.add(t.getName());
-                if (t.getUpdateUsername() != null) {
-                    strings.add(t.getUpdateUsername());
+                if (t.getApiToken() != null) {
+                    strings.add(t.getApiToken());
                 }
                 strings.add(t.getCreatorName());
                 if (t.getHostname() != null) {

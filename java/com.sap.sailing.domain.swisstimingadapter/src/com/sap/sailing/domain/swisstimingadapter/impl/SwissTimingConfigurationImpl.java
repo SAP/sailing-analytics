@@ -9,20 +9,18 @@ public class SwissTimingConfigurationImpl implements SwissTimingConfiguration {
     private final String hostname;
     private final Integer port;
     private final String updateURL;
-    private final String updateUsername;
-    private final String updatePassword;
+    private final String apiToken;
     private String creatorName;
     
     public SwissTimingConfigurationImpl(String name, String jsonURL, String hostname, Integer port, String updateURL,
-            String updateUsername, String updatePassword, String creatorName) {
+            String apiToken, String creatorName) {
         super();
         this.name = name;
         this.jsonURL = jsonURL;
         this.hostname = hostname;
         this.port = port;
         this.updateURL = updateURL;
-        this.updateUsername = updateUsername;
-        this.updatePassword = updatePassword;
+        this.apiToken = apiToken;
         this.creatorName = creatorName;
     }
 
@@ -55,11 +53,7 @@ public class SwissTimingConfigurationImpl implements SwissTimingConfiguration {
         return updateURL;
     }
 
-    public String getUpdateUsername() {
-        return updateUsername;
-    }
-
-    public String getUpdatePassword() {
-        return updatePassword;
+    public String getApiToken() {
+        return apiToken;
     }
 }

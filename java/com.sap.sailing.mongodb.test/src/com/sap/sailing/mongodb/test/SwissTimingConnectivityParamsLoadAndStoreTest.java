@@ -56,7 +56,7 @@ public class SwissTimingConnectivityParamsLoadAndStoreTest extends AbstractConne
                 hostname, port, raceID, raceName, raceDescription, boatClass, startList, delayToLiveInMillis,
                 SwissTimingFactory.INSTANCE, new SwissTimingAdapterFactoryImpl().getOrCreateSwissTimingAdapter(domainObjectFactory.getBaseDomainFactory()).getSwissTimingDomainFactory(),
                 /* raceLogStore */ null, /* regattaLogStore */ null, useInternalMarkPassingAlgorithm, trackWind, correctWindDirectionByMagneticDeclination,
-                /* updateURL */ null, /* updateUsername */ null, /* updatePassword */ null, eventName, manage2SailEventUrl);
+                /* updateURL */ null, /* apiToken */ null, eventName, manage2SailEventUrl);
         // store
         mongoObjectFactory.addConnectivityParametersForRaceToRestore(stParams);
         // load
@@ -111,7 +111,7 @@ public class SwissTimingConnectivityParamsLoadAndStoreTest extends AbstractConne
                 hostname, port, raceID, raceName, raceDescription, boatClass, startList, delayToLiveInMillis,
                 SwissTimingFactory.INSTANCE, new SwissTimingAdapterFactoryImpl().getOrCreateSwissTimingAdapter(domainObjectFactory.getBaseDomainFactory()).getSwissTimingDomainFactory(),
                 /* raceLogStore */ null, /* regattaLogStore */ null, useInternalMarkPassingAlgorithm, trackWind, correctWindDirectionByMagneticDeclination,
-                /* updateURL */ null, /* updateUsername */ null, /* updatePassword */ null, eventName, manage2SailEventUrl);
+                /* updateURL */ null, /* updateApiToken */ null, eventName, manage2SailEventUrl);
         // store
         mongoObjectFactory.addConnectivityParametersForRaceToRestore(stParams);
         // load

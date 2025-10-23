@@ -2085,8 +2085,7 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     String audioFiles();
     String selectMedia();
     String swissTimingUpdateURL();
-    String swissTimingUpdateUsername();
-    String swissTimingUpdatePassword();
+    String swissTimingUpdateApiToken();
     String allowResizing();
     String resize();
     String resizeSuccessfull();

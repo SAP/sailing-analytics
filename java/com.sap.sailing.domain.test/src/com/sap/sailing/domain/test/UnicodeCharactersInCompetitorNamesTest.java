@@ -69,7 +69,7 @@ public class UnicodeCharactersInCompetitorNamesTest {
                                                 /* startOfTracking */null, /* endOfTracking */null, /* delayToLiveInMillis */0l,
                                                 /* offsetToStartTimeOfSimulatedRace */ null, /* ignoreTracTracMarkPassings*/
                                                 false, EmptyRaceLogStore.INSTANCE, EmptyRegattaLogStore.INSTANCE, domainFactory,
-                                                "tracTest", "tracTest", "", "", /* trackWind */ false, /* correctWindDirectionByMagneticDeclination */ true,
+                                                AbstractTracTracLiveTest.getTracTracApiToken(), "", "", /* trackWind */ false, /* correctWindDirectionByMagneticDeclination */ true,
                                                 /* preferReplayIfAvailable */ false, /* timeoutInMillis */ (int) RaceTracker.TIMEOUT_FOR_RECEIVING_RACE_DEFINITION_IN_MILLISECONDS,
                                                 /* useOfficialEventsToUpdateRaceLog */ false, /* liveURIFromConfiguration */ null, /* storedURIFromConfiguration */ null),
                                                 RaceTracker.TIMEOUT_FOR_RECEIVING_RACE_DEFINITION_IN_MILLISECONDS,

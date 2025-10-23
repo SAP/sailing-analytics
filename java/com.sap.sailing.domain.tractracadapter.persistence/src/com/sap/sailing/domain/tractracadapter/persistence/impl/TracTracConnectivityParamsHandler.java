@@ -45,8 +45,7 @@ public class TracTracConnectivityParamsHandler extends AbstractRaceTrackingConne
 
     private static final String USE_INTERNAL_MARK_PASSING_ALGORITHM = "useInternalMarkPassingAlgorithm";
     private static final String USE_OFFICIAL_EVENTS_TO_UPDATE_RACE_LOG = "useOfficialEventsToUpdateRaceLog";
-    private static final String TRAC_TRAC_USERNAME = "tracTracUsername";
-    private static final String TRAC_TRAC_PASSWORD = "tracTracPassword";
+    private static final String TRAC_TRAC_API_TOKEN = "tracTracApiToken";
     private static final String STORED_URI = "storedURI";
     private static final String STORED_URI_FROM_CONFIGURATION = "storedURIFromConfiguration";
     private static final String START_OF_TRACKING_MILLIS = "startOfTrackingMillis";
@@ -90,8 +89,7 @@ public class TracTracConnectivityParamsHandler extends AbstractRaceTrackingConne
         result.put(RACE_VISIBILITY, ttParams.getRaceVisibility());
         result.put(START_OF_TRACKING_MILLIS, ttParams.getStartOfTracking()==null?null:ttParams.getStartOfTracking().asMillis());
         result.put(STORED_URI, ttParams.getStoredURI()==null?null:ttParams.getStoredURI().toString());
-        result.put(TRAC_TRAC_PASSWORD, ttParams.getTracTracPassword());
-        result.put(TRAC_TRAC_USERNAME, ttParams.getTracTracUsername().toString());
+        result.put(TRAC_TRAC_API_TOKEN, ttParams.getTracTracApiToken());
         result.put(USE_INTERNAL_MARK_PASSING_ALGORITHM, ttParams.isUseInternalMarkPassingAlgorithm());
         result.put(USE_OFFICIAL_EVENTS_TO_UPDATE_RACE_LOG, ttParams.isUseOfficialEventsToUpdateRaceLog());
         result.put(LIVE_URI_FROM_CONFIGURATION, ttParams.getLiveURIFromConfiguration()==null?null:ttParams.getLiveURIFromConfiguration().toString());
@@ -113,8 +111,7 @@ public class TracTracConnectivityParamsHandler extends AbstractRaceTrackingConne
                 map.get(OFFSET_TO_START_TIME_OF_SIMULATED_RACE_MILLIS) == null ? null : new MillisecondsDurationImpl(((Number) map.get(OFFSET_TO_START_TIME_OF_SIMULATED_RACE_MILLIS)).longValue()),
                 (Boolean) map.get(USE_INTERNAL_MARK_PASSING_ALGORITHM),
                 raceLogStore, regattaLogStore, domainFactory,
-                map.get(TRAC_TRAC_USERNAME)==null?null:map.get(TRAC_TRAC_USERNAME).toString(),
-                map.get(TRAC_TRAC_PASSWORD)==null?null:map.get(TRAC_TRAC_PASSWORD).toString(),
+                map.get(TRAC_TRAC_API_TOKEN)==null?null:map.get(TRAC_TRAC_API_TOKEN).toString(),
                 map.get(RACE_STATUS)==null?null:map.get(RACE_STATUS).toString(),
                 map.get(RACE_VISIBILITY)==null?null:map.get(RACE_VISIBILITY).toString(), isTrackWind(map),
                 isCorrectWindDirectionByMagneticDeclination(map), /* preferReplayIfAvailable */ true,
@@ -143,7 +140,7 @@ public class TracTracConnectivityParamsHandler extends AbstractRaceTrackingConne
                 ttParams.getUpdateURI(), ttParams.getStartOfTracking(), ttParams.getEndOfTracking(),
                 ttParams.getDelayToLiveInMillis(), ttParams.getOffsetToStartTimeOfSimulatedRace(),
                 ttParams.isUseInternalMarkPassingAlgorithm(), raceLogStore, regattaLogStore, domainFactory,
-                ttParams.getTracTracUsername(), ttParams.getTracTracPassword(), ttParams.getRaceStatus(),
+                ttParams.getTracTracApiToken(), ttParams.getRaceStatus(),
                 ttParams.getRaceVisibility(), ttParams.isTrackWind(),
                 ttParams.isCorrectWindDirectionByMagneticDeclination(), ttParams.isPreferReplayIfAvailable(),
                 ttParams.getTimeoutInMillis(), ttParams.isUseOfficialEventsToUpdateRaceLog(),
@@ -165,7 +162,7 @@ public class TracTracConnectivityParamsHandler extends AbstractRaceTrackingConne
                     (params.getLiveURIFromConfiguration() == null ? null : params.getLiveURIFromConfiguration().toString()),
                     /* stored URI */ params.isReplayRace(tractracRace) ? null // we mainly want to enable the user to list the event's races again in case they are removed;
                         : (params.getStoredURIFromConfiguration() == null ? null : params.getStoredURIFromConfiguration().toString()), // live/stored stuff comes from the tracking params
-                    params.getUpdateURI()==null?null:params.getUpdateURI().toString(), params.getTracTracUsername(), params.getTracTracPassword());
+                    params.getUpdateURI()==null?null:params.getUpdateURI().toString(), params.getTracTracApiToken());
             tractracMongoObjectFactory.updateTracTracConfiguration(tracTracConfiguration);
             securityService.setDefaultOwnershipIfNotSet(tracTracConfiguration.getIdentifier());
         }

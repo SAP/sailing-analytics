@@ -414,26 +414,26 @@ public class DomainFactoryImpl implements DomainFactory {
             long delayToLiveInMillis, SwissTimingFactory swissTimingFactory, DomainFactory domainFactory,
             RaceLogStore raceLogStore, RegattaLogStore regattaLogStore, boolean useInternalMarkPassingAlgorithm,
             boolean trackWind, boolean correctWindDirectionByMagneticDeclination, String updateURL,
-            String updateUsername, String updatePassword, String eventName, String manage2SailEventUrl) {
+            String apiToken, String eventName, String manage2SailEventUrl) {
         return new SwissTimingTrackingConnectivityParameters(hostname, port, raceID, raceName, raceDescription,
                 boatClass, startList, delayToLiveInMillis, swissTimingFactory, domainFactory, raceLogStore,
                 regattaLogStore, useInternalMarkPassingAlgorithm, trackWind, correctWindDirectionByMagneticDeclination,
-                updateURL, updateUsername, updatePassword, eventName, manage2SailEventUrl);
+                updateURL, apiToken, eventName, manage2SailEventUrl);
     }
 
     @Override
-    public void addUpdateHandlers(String updateURL, String username, String password, Serializable eventId,
+    public void addUpdateHandlers(String updateURL, String apiToken, Serializable eventId,
             RaceDefinition raceDefinition, DynamicTrackedRace trackedRace) throws URISyntaxException {
         final URI updateURI = updateURL == null ? null : new URI(updateURL);
         CourseDesignUpdateHandler courseDesignHandler = new CourseDesignUpdateHandler(
-                updateURI, username, password, eventId, raceDefinition.getId());
+                updateURI, apiToken, eventId, raceDefinition.getId());
         StartTimeUpdateHandler startTimeHandler = new StartTimeUpdateHandler(
-                updateURI, username, password, eventId,
+                updateURI, apiToken, eventId,
                 raceDefinition.getId(), trackedRace.getTrackedRegatta().getRegatta());
         RaceAbortedHandler raceAbortedHandler = new RaceAbortedHandler(
-                updateURI, username, password, eventId,
+                updateURI, apiToken, eventId,
                 raceDefinition.getId());
-        final FinishTimeUpdateHandler finishTimeUpdateHandler = new FinishTimeUpdateHandler(updateURI, username, password, eventId,
+        final FinishTimeUpdateHandler finishTimeUpdateHandler = new FinishTimeUpdateHandler(updateURI, apiToken, eventId,
                 raceDefinition.getId(), trackedRace.getTrackedRegatta().getRegatta());
         baseDomainFactory.addUpdateHandlers(trackedRace, courseDesignHandler, startTimeHandler, raceAbortedHandler,
                 finishTimeUpdateHandler);

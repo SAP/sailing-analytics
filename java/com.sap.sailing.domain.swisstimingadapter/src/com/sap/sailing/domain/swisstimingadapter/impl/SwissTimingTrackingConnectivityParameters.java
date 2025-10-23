@@ -36,8 +36,7 @@ public class SwissTimingTrackingConnectivityParameters extends AbstractRaceTrack
     private final StartList startList;
     private final boolean useInternalMarkPassingAlgorithm;
     private final String updateURL;
-    private final String updateUsername;
-    private final String updatePassword;
+    private final String apiToken;
     private final String eventName;
     private final String manage2SailEventUrl;
     
@@ -45,8 +44,8 @@ public class SwissTimingTrackingConnectivityParameters extends AbstractRaceTrack
             String raceDescription, BoatClass boatClass, StartList startList, long delayToLiveInMillis,
             SwissTimingFactory swissTimingFactory, DomainFactory domainFactory, RaceLogStore raceLogStore,
             RegattaLogStore regattaLogStore, boolean useInternalMarkPassingAlgorithm, boolean trackWind,
-            boolean correctWindDirectionByMagneticDeclination, String updateURL, String updateUsername,
-            String updatePassword, String eventName, String manage2SailEventUrl) {
+            boolean correctWindDirectionByMagneticDeclination, String updateURL, String apiToken,
+            String eventName, String manage2SailEventUrl) {
         super(trackWind, correctWindDirectionByMagneticDeclination);
         this.hostname = hostname;
         this.port = port;
@@ -62,8 +61,7 @@ public class SwissTimingTrackingConnectivityParameters extends AbstractRaceTrack
         this.regattaLogStore = regattaLogStore;
         this.useInternalMarkPassingAlgorithm = useInternalMarkPassingAlgorithm;
         this.updateURL = updateURL;
-        this.updateUsername = updateUsername;
-        this.updatePassword = updatePassword;
+        this.apiToken = apiToken;
         this.eventName = eventName;
         this.manage2SailEventUrl = manage2SailEventUrl;
     }
@@ -111,12 +109,8 @@ public class SwissTimingTrackingConnectivityParameters extends AbstractRaceTrack
         return updateURL;
     }
 
-    public String getUpdateUsername() {
-        return updateUsername;
-    }
-
-    public String getUpdatePassword() {
-        return updatePassword;
+    public String getApiToken() {
+        return apiToken;
     }
 
     public String getRaceID() {

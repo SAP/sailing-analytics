@@ -605,8 +605,8 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
                         new MillisecondsTimePoint(record.getTrackingStartTime().asMillis()),
                         new MillisecondsTimePoint(record.getTrackingEndTime().asMillis()), getRaceLogStore(),
                         getRegattaLogStore(), RaceTracker.TIMEOUT_FOR_RECEIVING_RACE_DEFINITION_IN_MILLISECONDS,
-                        offsetToStartTimeOfSimulatedRace, useInternalMarkPassingAlgorithm, config == null ? null : config.getTracTracUsername(),
-                        config == null ? null : config.getTracTracPassword(), record.getRaceStatus(), record.getRaceVisibility(), trackWind,
+                        offsetToStartTimeOfSimulatedRace, useInternalMarkPassingAlgorithm, config == null ? null : config.getTracTracApiToken(),
+                        record.getRaceStatus(), record.getRaceVisibility(), trackWind,
                         correctWindByDeclination, useOfficialEventsToUpdateRaceLog,
                         liveURIFromConfiguration==null || liveURIFromConfiguration.trim().length() == 0 ? null : new URI(liveURIFromConfiguration),
                         storedURIFromConfiguration==null || storedURIFromConfiguration.trim().length() == 0 ? null : new URI(storedURIFromConfiguration));
@@ -651,7 +651,7 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
 
     @Override
     public void createTracTracConfiguration(String name, String jsonURL, String liveDataURI, String storedDataURI,
-            String courseDesignUpdateURI, String tracTracUsername, String tracTracPassword) throws Exception {
+            String courseDesignUpdateURI, String tracTracApiToken) throws Exception {
         if (existsTracTracConfigurationForCurrentUser(jsonURL)) {
             throw new RuntimeException("A configuration for the current user with this json URL already exists.");
         }
@@ -662,8 +662,7 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
                 identifier, name,
                 () -> tractracMongoObjectFactory.createTracTracConfiguration(
                         getTracTracAdapter().createTracTracConfiguration(currentUserName, name, jsonURL, liveDataURI,
-                                storedDataURI,
-                                courseDesignUpdateURI, tracTracUsername, tracTracPassword)));
+                                storedDataURI, courseDesignUpdateURI, tracTracApiToken)));
     }
 
     @Override
@@ -684,8 +683,7 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
                 getTracTracAdapter().createTracTracConfiguration(tracTracConfiguration.getCreatorName(),
                 tracTracConfiguration.getName(), tracTracConfiguration.getJsonUrl(),
                 tracTracConfiguration.getLiveDataURI(), tracTracConfiguration.getStoredDataURI(),
-                tracTracConfiguration.getUpdateURI(), tracTracConfiguration.getTracTracUsername(),
-                        tracTracConfiguration.getTracTracPassword()));
+                tracTracConfiguration.getUpdateURI(), tracTracConfiguration.getTracTracApiToken()));
     }
 
     @Override
@@ -1276,7 +1274,7 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
 
     @Override
     public void createSwissTimingConfiguration(String configName, String jsonURL, String hostname, Integer port,
-            String updateURL, String updateUsername, String updatePassword) throws Exception {
+            String updateURL, String apiToken) throws Exception {
         if (!jsonURL.equalsIgnoreCase("test")) {
             if (existsSwissTimingConfigurationForCurrentUser(jsonURL)) {
                 throw new RuntimeException("A Configuration for the current user with this json URL already exists.");
@@ -1289,7 +1287,7 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
                     () -> swissTimingAdapterPersistence
                             .createSwissTimingConfiguration(
                                     swissTimingFactory.createSwissTimingConfiguration(configName,
-                                            jsonURL, hostname, port, updateURL, updateUsername, updatePassword,
+                                            jsonURL, hostname, port, updateURL, apiToken,
                                             currentUserName)));
         }
     }
@@ -1311,15 +1309,15 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
         getSecurityService().checkCurrentUserUpdatePermission(configuration);
         swissTimingAdapterPersistence.updateSwissTimingConfiguration(swissTimingFactory.createSwissTimingConfiguration(
                 configuration.getName(), configuration.getJsonUrl(), configuration.getHostname(),
-                configuration.getPort(), configuration.getUpdateURL(), configuration.getUpdateUsername(),
-                configuration.getUpdatePassword(), configuration.getCreatorName()));
+                configuration.getPort(), configuration.getUpdateURL(), configuration.getApiToken(),
+                configuration.getCreatorName()));
     }
 
     @Override
     public void trackWithSwissTiming(RegattaIdentifier regattaToAddTo, List<SwissTimingRaceRecordDTO> rrs,
             String hostname, int port, boolean trackWind, final boolean correctWindByDeclination,
-            boolean useInternalMarkPassingAlgorithm, String updateURL, String updateUsername, String updatePassword,
-            String eventName, String manage2SailEventUrl) throws InterruptedException, ParseException, Exception {
+            boolean useInternalMarkPassingAlgorithm, String updateURL, String apiToken, String eventName,
+            String manage2SailEventUrl) throws InterruptedException, ParseException, Exception {
         logger.info(
                 "tracWithSwissTiming for regatta " + regattaToAddTo + " for race records " + rrs
                 + " with hostname " + hostname + " and port " + port);
@@ -1347,7 +1345,7 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
                     rr.raceId, rr.getName(), raceDescription, boatClass, hostname, port, startList,
                     getRaceLogStore(), getRegattaLogStore(),
                     RaceTracker.TIMEOUT_FOR_RECEIVING_RACE_DEFINITION_IN_MILLISECONDS, useInternalMarkPassingAlgorithm, trackWind,
-                    correctWindByDeclination, updateURL, updateUsername, updatePassword, eventName, manage2SailEventUrl);
+                    correctWindByDeclination, updateURL, apiToken, eventName, manage2SailEventUrl);
         }
     }
 

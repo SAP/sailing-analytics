@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
 
+import com.sap.sailing.domain.test.AbstractTracTracLiveTest;
 import com.sap.sse.common.Duration;
 import com.tractrac.model.lib.api.ModelLocator;
 import com.tractrac.model.lib.api.data.IControlPassing;
@@ -67,11 +68,10 @@ public class JorgesTracTracParallelLoadingTest {
             threads.add(new Thread(()->{
                     try {
                         // Download the parameters file and load the race
-                        IRace race = ModelLocator.getEventFactory().createRace(new URI(paramsURIs.get(index)), (int) /* timeout in milliseconds */ Duration.ONE_MINUTE.asMillis());
-
+                        IRace race = ModelLocator.getEventFactory().createRace(AbstractTracTracLiveTest.getTracTracApiToken(), new URI(paramsURIs.get(index)), (int) /* timeout in milliseconds */ Duration.ONE_MINUTE.asMillis());
                         // Create the subscriptions
                         SubscriptionLogger subscriptionLogger = new SubscriptionLogger(race);
-                        IRaceSubscriber raceSubscriber = SubscriptionLocator.getSusbcriberFactory().createRaceSubscriber(race);
+                        IRaceSubscriber raceSubscriber = SubscriptionLocator.getSusbcriberFactory().createRaceSubscriber(AbstractTracTracLiveTest.getTracTracApiToken(), race);
                         raceSubscriber.subscribePositions(subscriptionLogger);
                         raceSubscriber.subscribePositionedItemPositions(subscriptionLogger);
                         raceSubscriber.subscribeControlPassings(subscriptionLogger);

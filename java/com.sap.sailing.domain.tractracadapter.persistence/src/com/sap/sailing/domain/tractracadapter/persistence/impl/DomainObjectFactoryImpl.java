@@ -52,11 +52,9 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
     
     private TracTracConfiguration loadTracTracConfiguration(Document object) {
         final Object courseDesignUpdateUriObject = object.get(FieldNames.TT_CONFIG_COURSE_DESIGN_UPDATE_URI.name());
-        final Object tracTracUsernameObject = object.get(FieldNames.TT_CONFIG_TRACTRAC_USERNAME.name());
-        final Object tracTracPasswordObject = object.get(FieldNames.TT_CONFIG_TRACTRAC_PASSWORD.name());
+        final Object tracTracApiTokenObject = object.get(FieldNames.TT_CONFIG_TRACTRAC_API_TOKEN.name());
         final String courseDesignUpdateUri = courseDesignUpdateUriObject == null ? "" : (String) courseDesignUpdateUriObject;
-        final String tracTracUsername = tracTracUsernameObject == null ? "" : (String) tracTracUsernameObject;
-        final String tracTracPassword = tracTracPasswordObject == null ? "" : (String) tracTracPasswordObject;
+        final String tracTracApiToken = tracTracApiTokenObject == null ? "" : (String) tracTracApiTokenObject;
         String creatorName = (String) object.get(FieldNames.TT_CONFIG_CREATOR_NAME.name());
         final String jsonURL = (String) object.get(FieldNames.TT_CONFIG_JSON_URL.name());
         final boolean needsUpdate = (creatorName == null);
@@ -71,8 +69,7 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
                 (String) object.get(FieldNames.TT_CONFIG_LIVE_DATA_URI.name()),
                 (String) object.get(FieldNames.TT_CONFIG_STORED_DATA_URI.name()),
                 courseDesignUpdateUri,
-                tracTracUsername,
-                tracTracPassword);
+                tracTracApiToken);
         if (needsUpdate) {
             // recreating the config on the DB because the composite key changed
             new MongoObjectFactoryImpl(database).deleteTracTracConfiguration(null, jsonURL);

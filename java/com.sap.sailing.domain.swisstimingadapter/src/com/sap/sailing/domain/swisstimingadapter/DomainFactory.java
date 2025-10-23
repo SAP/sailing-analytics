@@ -75,7 +75,9 @@ public interface DomainFactory {
     RaceTrackingConnectivityParameters createTrackingConnectivityParameters(String hostname, int port, String raceID,
             String raceName, String raceDescription, BoatClass boatClass, StartList startList,
             long delayToLiveInMillis, SwissTimingFactory swissTimingFactory, DomainFactory domainFactory,
-            RaceLogStore raceLogStore, RegattaLogStore regattaLogStore, boolean useInternalMarkPassingAlgorithm, boolean trackWind, boolean correctWindDirectionByMagneticDeclination, String updateURL, String updateUsername, String updatePassword, String eventName, String manage2SailEventUrl);
+            RaceLogStore raceLogStore, RegattaLogStore regattaLogStore, boolean useInternalMarkPassingAlgorithm, boolean trackWind,
+            boolean correctWindDirectionByMagneticDeclination, String updateURL, String tracTracApiToken, String eventName,
+            String manage2SailEventUrl);
 
     ControlPoint getOrCreateControlPoint(String description, Iterable<Serializable> deviceIds, MarkType markType,
             String shortNameOfGate);
@@ -88,7 +90,7 @@ public interface DomainFactory {
      * Adds update handlers that forward events about a race, such as start time changes, course changes
      * or postponents, to an update URL using specific REST requests.
      */
-    void addUpdateHandlers(String updateURL, String username, String password, Serializable eventId,
+    void addUpdateHandlers(String updateURL, String tracTracApiToken, Serializable eventId,
             RaceDefinition raceDefinition, DynamicTrackedRace trackedRace) throws URISyntaxException;
 
     Map<Competitor, Boat> createCompetitorsAndBoats(StartList startList, String raceId, BoatClass boatClass, RaceTrackingHandler raceTrackHandler);

@@ -130,9 +130,7 @@ public class SwissTimingRaceTrackerImpl extends AbstractRaceTrackerImpl<SwissTim
      */
     private final String updateURL;
 
-    private final String updateUsername;
-
-    private final String updatePassword;
+    private final String apiToken;
 
     private final RaceTrackingHandler raceTrackingHandler;
 
@@ -151,7 +149,8 @@ public class SwissTimingRaceTrackerImpl extends AbstractRaceTrackerImpl<SwissTim
     protected SwissTimingRaceTrackerImpl(Regatta regatta, WindStore windStore, DomainFactory domainFactory,
             SwissTimingFactory factory, TrackedRegattaRegistry trackedRegattaRegistry, RaceLogStore raceLogStore,
             RegattaLogStore regattaLogStore, RaceLogAndTrackedRaceResolver raceLogResolver,
-            SwissTimingTrackingConnectivityParameters connectivityParams, RaceTrackingHandler raceTrackingHandler, MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry)
+            SwissTimingTrackingConnectivityParameters connectivityParams, RaceTrackingHandler raceTrackingHandler,
+            MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry)
             throws InterruptedException, UnknownHostException, IOException, ParseException, URISyntaxException {
         super(connectivityParams);
         this.raceLogResolver = raceLogResolver;
@@ -186,8 +185,7 @@ public class SwissTimingRaceTrackerImpl extends AbstractRaceTrackerImpl<SwissTim
         this.competitorsByBoatId = new HashMap<String, Competitor>();
         this.useInternalMarkPassingAlgorithm = connectivityParams.isUseInternalMarkPassingAlgorithm();
         this.updateURL = connectivityParams.getUpdateURL();
-        this.updateUsername = connectivityParams.getUpdateUsername();
-        this.updatePassword = connectivityParams.getUpdatePassword();
+        this.apiToken = connectivityParams.getApiToken();
         if (connectivityParams.getStartList() != null) {
             createRaceDefinition(course);
         }
@@ -573,7 +571,7 @@ public class SwissTimingRaceTrackerImpl extends AbstractRaceTrackerImpl<SwissTim
      * requests.
      */
     private void addUpdateHandlers() throws URISyntaxException {
-        getDomainFactory().addUpdateHandlers(updateURL, updateUsername, updatePassword,
+        getDomainFactory().addUpdateHandlers(updateURL, apiToken,
                 /* TODO using the regatta ID as the "eventId" for now... */ regatta.getId(), trackedRace.getRace(), trackedRace);
     }
     

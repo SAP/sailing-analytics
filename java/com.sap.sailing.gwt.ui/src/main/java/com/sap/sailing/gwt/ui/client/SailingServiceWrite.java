@@ -343,7 +343,7 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
 
     void trackWithSwissTiming(RegattaIdentifier regattaToAddTo, List<SwissTimingRaceRecordDTO> rrs, String hostname,
             int port, boolean trackWind, boolean correctWindByDeclination, boolean useInternalMarkPassingAlgorithm,
-            String updateURL, String updateUsername, String updatePassword, String eventName, String manage2SailEventUrl) throws UnauthorizedException, Exception;
+            String updateURL, String apiToken, String eventName, String manage2SailEventUrl) throws UnauthorizedException, Exception;
 
     void updateSwissTimingConfiguration(SwissTimingConfigurationWithSecurityDTO configuration)
             throws UnauthorizedException, Exception;
@@ -352,7 +352,7 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
             throws UnauthorizedException, Exception;
 
     void createSwissTimingConfiguration(String configName, String jsonURL, String hostname, Integer port,
-            String updateURL, String updateUsername, String updatePassword) throws UnauthorizedException, Exception;
+            String updateURL, String apiToken) throws UnauthorizedException, Exception;
 
     void updateRacesDelayToLive(List<RegattaAndRaceIdentifier> regattaAndRaceIdentifiers, long delayToLiveInMs);
 
@@ -462,7 +462,7 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
             throws UnauthorizedException, Exception;
 
     void createTracTracConfiguration(String name, String jsonURL, String liveDataURI, String storedDataURI,
-            String courseDesignUpdateURI, String tracTracUsername, String tracTracPassword) throws Exception;
+            String courseDesignUpdateURI, String tracTracApiToken) throws Exception;
 
     void trackWithTracTrac(RegattaIdentifier regattaToAddTo, List<TracTracRaceRecordDTO> rrs, String liveURIFromConfiguration,
             String storedURIFromConfiguration, String courseDesignUpdateURI, boolean trackWind, boolean correctWindByDeclination,

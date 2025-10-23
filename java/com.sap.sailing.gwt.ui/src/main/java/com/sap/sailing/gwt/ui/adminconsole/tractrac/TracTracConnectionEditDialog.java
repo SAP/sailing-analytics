@@ -30,7 +30,7 @@ public class TracTracConnectionEditDialog extends TracTracConnectionDialog {
         liveURITextBox.setText(dtotoEdit.getLiveDataURI()==null?"":dtotoEdit.getLiveDataURI());
         jsonURLTextBox.setText(dtotoEdit.getJsonUrl());
         tracTracUpdateURITextBox.setText(dtotoEdit.getUpdateURI()==null?"":dtotoEdit.getUpdateURI());
-        tractracUsernameTextBox.setText(dtotoEdit.getTracTracUsername());
+        tracTracApiTokenTextBox.setText(dtotoEdit.getTracTracApiToken());
         super.getOkButton().setEnabled(!jsonURLTextBox.getText().isEmpty());
     }
 }

@@ -21,8 +21,8 @@ public class RaceAbortedHandler extends UpdateHandler implements RaceAbortedList
     
     private final static Logger logger = Logger.getLogger(RaceAbortedHandler.class.getName());
     
-    public RaceAbortedHandler(URI updateURI, String username, String password, Serializable eventId, Serializable raceId) {
-        super(updateURI, ACTION, username, password, eventId, raceId);
+    public RaceAbortedHandler(URI updateURI, String tracTracApiToken, Serializable eventId, Serializable raceId) {
+        super(updateURI, ACTION, tracTracApiToken, eventId, raceId);
     }
 
     @Override

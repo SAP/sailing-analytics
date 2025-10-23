@@ -94,7 +94,7 @@ public class SwissTimingEventManagementPanel extends AbstractEventManagementPane
                                 sailingServiceWrite.createSwissTimingConfiguration(editedConnection.getName(),
                                         editedConnection.getJsonUrl(), editedConnection.getHostname(),
                                         editedConnection.getPort(), editedConnection.getUpdateURL(),
-                                        editedConnection.getUpdateUsername(), editedConnection.getUpdatePassword(),
+                                        editedConnection.getApiToken(),
                                         new MarkedAsyncCallback<Void>(new AsyncCallback<Void>() {
                                             @Override
                                             public void onFailure(Throwable caught) {
@@ -422,8 +422,7 @@ public class SwissTimingEventManagementPanel extends AbstractEventManagementPane
         final String hostname = selectedObject.getHostname();
         final Integer port = selectedObject.getPort();
         final String updateURL = selectedObject.getUpdateURL();
-        final String updateUsername = selectedObject.getUpdateUsername();
-        final String updatePassword = selectedObject.getUpdatePassword();
+        final String updateUsername = selectedObject.getApiToken();
         final List<SwissTimingRaceRecordDTO> selectedRaces = new ArrayList<SwissTimingRaceRecordDTO>();
         for (final SwissTimingRaceRecordDTO race : this.raceList.getList()) {
             if (raceTable.getSelectionModel().isSelected(race)) {
@@ -439,7 +438,7 @@ public class SwissTimingEventManagementPanel extends AbstractEventManagementPane
         if (checkBoatClassOK(selectedRegatta, selectedRaces)) {
             sailingServiceWrite.trackWithSwissTiming(/* regattaToAddTo */ regattaIdentifier, selectedRaces, hostname, port==null?0:port,
                     trackWind, correctWindByDeclination, useInternalMarkPassingAlgorithm, updateURL, updateUsername,
-                    updatePassword, selectedObject.getName(), selectedObject.getJsonUrl(), new AsyncCallback<Void>() {
+                    selectedObject.getName(), selectedObject.getJsonUrl(), new AsyncCallback<Void>() {
                         @Override
                         public void onFailure(Throwable caught) {
                             errorReporter.reportError("Error trying to register races " + selectedRaces

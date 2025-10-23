@@ -34,8 +34,8 @@ public interface SwissTimingAdapter {
             String raceName, String raceDescription, BoatClass boatClass, String hostname, int port,
             StartList startList, RaceLogStore logStore, RegattaLogStore regattaLogStore, long timeoutInMilliseconds,
             boolean useInternalMarkPassingAlgorithm, boolean trackWind,
-            boolean correctWindDirectionByMagneticDeclination, String updateURL, String updateUsername,
-            String updatePassword, String eventName, String manage2SailEventUrl)
+            boolean correctWindDirectionByMagneticDeclination, String updateURL, String apiToken,
+            String eventName, String manage2SailEventUrl)
             throws InterruptedException, UnknownHostException, IOException, ParseException, Exception;
 
     StartList readStartListForRace(String raceId, RegattaResults regattaResults);

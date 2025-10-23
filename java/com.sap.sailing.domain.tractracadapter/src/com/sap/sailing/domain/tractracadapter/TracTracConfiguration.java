@@ -28,16 +28,9 @@ public interface TracTracConfiguration extends WithQualifiedObjectIdentifier {
     String getUpdateURI();
 
     /**
-     * holds the Trac Trac username used to send course updates to TracTrac
-     * @return the TracTrac username
+     * holds the Trac Trac API token authenticating a used, used to send course updates to TracTrac
      */
-    String getTracTracUsername();
-
-    /**
-     * holds the Trac Trac password used to send course updates to TracTrac
-     * @return the TracTrac password
-     */
-    String getTracTracPassword();
+    String getTracTracApiToken();
 
     String getCreatorName();
 

@@ -189,8 +189,7 @@ public interface DomainFactory {
     Iterable<Receiver> getUpdateReceivers(DynamicTrackedRegatta trackedRegatta, long delayToLiveInMillis,
             Simulator simulator, WindStore windStore, DynamicRaceDefinitionSet raceDefinitionSetToUpdate, TrackedRegattaRegistry trackedRegattaRegistry,
             RaceLogAndTrackedRaceResolver raceLogResolver, MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry, LeaderboardGroupResolver leaderboardGroupResolver,
-            IRace tractracRace, URI courseDesignUpdateURI, String tracTracUsername,
-            String tracTracPassword, IEventSubscriber eventSubscriber, IRaceSubscriber raceSubscriber, boolean useInternalMarkPassingAlgorithm,
+            IRace tractracRace, URI courseDesignUpdateURI, String tracTracApiToken, IEventSubscriber eventSubscriber, IRaceSubscriber raceSubscriber, boolean useInternalMarkPassingAlgorithm,
             long timeoutInMilliseconds, RaceTrackingHandler raceTrackingHandler, RaceAndCompetitorStatusWithRaceLogReconciler raceAndCompetitorStatusWithRaceLogReconciler);
 
     /**
@@ -220,7 +219,7 @@ public interface DomainFactory {
             Course course, Iterable<Sideline> sidelines, WindStore windStore,
             long delayToLiveInMillis, long millisecondsOverWhichToAverageWind,
             DynamicRaceDefinitionSet raceDefinitionSetToUpdate, URI courseDesignUpdateURI, UUID tracTracEventUuid,
-            String tracTracUsername, String tracTracPassword, boolean ignoreTracTracMarkPassings,
+            String tracTracApiToken, boolean ignoreTracTracMarkPassings,
             RaceLogAndTrackedRaceResolver raceLogResolver, Consumer<DynamicTrackedRace> runBeforeExposingRace, IRace tractracRace,
             RaceTrackingHandler raceTrackingHandler, MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry);
 
@@ -242,7 +241,7 @@ public interface DomainFactory {
     Iterable<Receiver> getUpdateReceivers(DynamicTrackedRegatta trackedRegatta, IRace tractracRace, WindStore windStore,
             long delayToLiveInMillis, Simulator simulator, DynamicRaceDefinitionSet raceDefinitionSetToUpdate, TrackedRegattaRegistry trackedRegattaRegistry, 
             RaceLogAndTrackedRaceResolver raceLogResolver, MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry, LeaderboardGroupResolver leaderboardGroupResolver, 
-            URI courseDesignUpdateURI, String tracTracUsername, String tracTracPassword, IEventSubscriber eventSubscriber, IRaceSubscriber raceSubscriber, boolean ignoreTracTracMarkPassings,
+            URI courseDesignUpdateURI, String tracTracApiToken, IEventSubscriber eventSubscriber, IRaceSubscriber raceSubscriber, boolean ignoreTracTracMarkPassings,
             long timeoutInMilliseconds, RaceTrackingHandler raceTrackingHandler, RaceAndCompetitorStatusWithRaceLogReconciler raceAndCompetitorStatusWithRaceLogReconciler, ReceiverType... types);
 
     JSONService parseJSONURLWithRaceRecords(URL jsonURL, boolean loadClientParams) throws IOException, ParseException, org.json.simple.parser.ParseException, URISyntaxException;
@@ -261,8 +260,7 @@ public interface DomainFactory {
     void updateCourseWaypoints(Course courseToUpdate, Iterable<Util.Pair<IMapItem, PassingInstruction>> controlPoints) throws PatchFailedException;
 
     TracTracConfiguration createTracTracConfiguration(String creatorName, String name, String jsonURL,
-            String liveDataURI, String storedDataURI, String courseDesignUpdateURI, String tracTracUsername,
-            String tracTracPassword);
+            String liveDataURI, String storedDataURI, String courseDesignUpdateURI, String tracTracApiToken);
 
     /**
      * Fetch the race definition for <code>race</code>. If the race definition hasn't been created yet, the call blocks
@@ -291,13 +289,11 @@ public interface DomainFactory {
      *            {@code File}) then if this parameter is {@code true} the race will be loaded from the replay file
      *            instead of the {@code storedURI}/{@code liveURI} specified. This is particularly useful for restoring
      *            races if since the last connection the race was migrated to a replay file format.
-     * @param liveURIFromConfiguration TODO
-     * @param storedURIFromConfiguration TODO
      */
     RaceTrackingConnectivityParameters createTrackingConnectivityParameters(URL paramURL, URI liveURI, URI storedURI,
             URI courseDesignUpdateURI, TimePoint startOfTracking, TimePoint endOfTracking, long delayToLiveInMillis,
             Duration offsetToStartTimeOfSimulatedRace, boolean useInternalMarkPassingAlgorithm, RaceLogStore raceLogStore, RegattaLogStore regattaLogStore,
-            String tracTracUsername, String tracTracPassword, String raceStatus, String raceVisibility, boolean trackWind, boolean correctWindDirectionByMagneticDeclination,
+            String tracTracApiToken, String raceStatus, String raceVisibility, boolean trackWind, boolean correctWindDirectionByMagneticDeclination,
             boolean preferReplayIfAvailable, int timeoutInMillis, boolean useOfficialEventsToUpdateRaceLog, URI liveURIFromConfiguration, URI storedURIFromConfiguration) throws Exception;
     
     /**
@@ -324,8 +320,8 @@ public interface DomainFactory {
      * the {@link TrackedRace} which will notify certain changes to the race's state to TracTrac. This includes the course layout,
      * the start time and whether a race was aborted.
      */
-    void addTracTracUpdateHandlers(URI tracTracUpdateURI, UUID tracTracEventUuid, String tracTracUsername,
-            String tracTracPassword, RaceDefinition raceDefinition, DynamicTrackedRace trackedRace, IRace tractracRace);
+    void addTracTracUpdateHandlers(URI tracTracUpdateURI, UUID tracTracEventUuid, String tracTracApiToken,
+            RaceDefinition raceDefinition, DynamicTrackedRace trackedRace, IRace tractracRace);
 
     /**
      * Since TracAPI 3.6.1 the TracAPI provides a course area name for {@link IRace} objects. Furthermore, the
@@ -349,5 +345,5 @@ public interface DomainFactory {
      * the last {@link IEventSubscriber#stop()} call is forwarded. This is managed by an atomic counter that keeps track of the
      * start/stop invocations.
      */
-    IEventSubscriber getOrCreateEventSubscriber(IEvent tractracEvent, URI liveURI, URI storedURI);
+    IEventSubscriber getOrCreateEventSubscriber(IEvent tractracEvent, URI liveURI, URI storedURI, String tracTracApiToken);
 }

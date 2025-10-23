@@ -58,8 +58,7 @@ public class SwissTimingAdapterPersistenceImpl implements SwissTimingAdapterPers
         String hostname = (String) object.get(FieldNames.ST_CONFIG_HOSTNAME.name());
         Integer port = (Integer) object.get(FieldNames.ST_CONFIG_PORT.name());
         String updateURL = (String) object.get(FieldNames.ST_CONFIG_UPDATE_URL.name());
-        String updateUsername = (String) object.get(FieldNames.ST_CONFIG_UPDATE_USERNAME.name());
-        String updatePassword = (String) object.get(FieldNames.ST_CONFIG_UPDATE_PASSWORD.name());
+        String apiToken = (String) object.get(FieldNames.ST_CONFIG_API_TOKEN.name());
         String creatorName = object.getString(FieldNames.ST_CONFIG_CREATOR_NAME.name());
 
         // migration code
@@ -69,14 +68,12 @@ public class SwissTimingAdapterPersistenceImpl implements SwissTimingAdapterPers
             creatorName = "admin";
         }
         final SwissTimingConfiguration loadedSwissTimingConfiguration = swissTimingFactory.createSwissTimingConfiguration(name, jsonURL, hostname, port, updateURL,
-                updateUsername, updatePassword, creatorName);
-
+                apiToken, creatorName);
         if (needsUpdate) {
             // recreating the config on the DB because the composite key changed
             deleteSwissTimingConfiguration(null, jsonURL);
             createSwissTimingConfiguration(loadedSwissTimingConfiguration);
         }
-
         return loadedSwissTimingConfiguration;
     }
 
@@ -131,8 +128,7 @@ public class SwissTimingAdapterPersistenceImpl implements SwissTimingAdapterPers
         result.put(FieldNames.ST_CONFIG_HOSTNAME.name(), swissTimingConfiguration.getHostname());
         result.put(FieldNames.ST_CONFIG_PORT.name(), swissTimingConfiguration.getPort());
         result.put(FieldNames.ST_CONFIG_UPDATE_URL.name(), swissTimingConfiguration.getUpdateURL());
-        result.put(FieldNames.ST_CONFIG_UPDATE_USERNAME.name(), swissTimingConfiguration.getUpdateUsername());
-        result.put(FieldNames.ST_CONFIG_UPDATE_PASSWORD.name(), swissTimingConfiguration.getUpdatePassword());
+        result.put(FieldNames.ST_CONFIG_API_TOKEN.name(), swissTimingConfiguration.getApiToken());
         result.put(FieldNames.ST_CONFIG_CREATOR_NAME.name(), swissTimingConfiguration.getCreatorName());
         return result;
     }

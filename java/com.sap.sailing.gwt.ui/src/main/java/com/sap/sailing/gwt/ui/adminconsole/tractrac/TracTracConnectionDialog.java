@@ -6,9 +6,9 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.sap.sailing.gwt.ui.adminconsole.TracTracEventManagementPanel;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.gwt.ui.shared.TracTracConfigurationWithSecurityDTO;
-import com.sap.sse.common.Util;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog;
 import com.sap.sse.security.ui.client.UserService;
@@ -30,7 +30,7 @@ public class TracTracConnectionDialog extends DataEntryDialog<TracTracConfigurat
     protected TextBox liveURITextBox;
     protected TextBox jsonURLTextBox;
     protected TextBox tracTracUpdateURITextBox;
-    protected TextBox tractracUsernameTextBox;
+    protected TextBox tracTracApiTokenTextBox;
     protected PasswordTextBox tractracPasswordTextBox;
     protected String creatorName;
     protected String name;
@@ -48,7 +48,7 @@ public class TracTracConnectionDialog extends DataEntryDialog<TracTracConfigurat
     }
 
     private void createUi() {
-        grid = new Grid(7, 2);
+        grid = new Grid(6, 2);
         grid.setWidget(0, 0, new Label(stringMessages.details() + ":"));
         Label liveURILabel = new Label(stringMessages.liveUri() + ":");
         liveURILabel.setTitle(stringMessages.leaveEmptyForDefault());
@@ -84,17 +84,11 @@ public class TracTracConnectionDialog extends DataEntryDialog<TracTracConfigurat
         grid.setWidget(4, 0, tracTracUpdateURLLabel);
         grid.setWidget(4, 1, tracTracUpdateURITextBox);
         // TracTrac Username
-        tractracUsernameTextBox = createTextBox("");
-        tractracUsernameTextBox.ensureDebugId("TracTracUsernameTextBox");
-        tractracUsernameTextBox.setVisibleLength(40);
+        tracTracApiTokenTextBox = createTextBox("");
+        tracTracApiTokenTextBox.ensureDebugId("TracTracApiTokenTextBox");
+        tracTracApiTokenTextBox.setVisibleLength(40);
         grid.setWidget(5, 0, new Label(stringMessages.tractracUsername() + ":"));
-        grid.setWidget(5, 1, tractracUsernameTextBox);
-        // TracTrac Password
-        tractracPasswordTextBox = createPasswordTextBox("");
-        tractracPasswordTextBox.ensureDebugId("TracTracPasswordTextBox");
-        tractracPasswordTextBox.setVisibleLength(40);
-        grid.setWidget(6, 0, new Label(stringMessages.tractracPassword() + ":"));
-        grid.setWidget(6, 1, tractracPasswordTextBox);
+        grid.setWidget(5, 1, tracTracApiTokenTextBox);
     }
 
     @Override
@@ -108,10 +102,9 @@ public class TracTracConnectionDialog extends DataEntryDialog<TracTracConfigurat
         final String liveDataURI = liveURITextBox.getValue();
         final String storedDataURI = storedURITextBox.getValue();
         final String courseDesignUpdateURI = tracTracUpdateURITextBox.getValue();
-        final String tractracUsername = tractracUsernameTextBox.getValue();
-        final String tractracPassword = Util.hasLength(tractracPasswordTextBox.getValue()) ? tractracPasswordTextBox.getValue() : null;
+        final String tracTracApiToken = tracTracApiTokenTextBox.getValue();
         return new TracTracConfigurationWithSecurityDTO(name, jsonURL, liveDataURI, storedDataURI,
-                courseDesignUpdateURI, tractracUsername, tractracPassword, creatorName);
+                courseDesignUpdateURI, tracTracApiToken, creatorName);
     }
 
     @Override

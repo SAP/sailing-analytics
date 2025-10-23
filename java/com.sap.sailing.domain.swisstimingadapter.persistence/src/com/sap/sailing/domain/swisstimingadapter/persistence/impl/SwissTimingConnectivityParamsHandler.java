@@ -59,8 +59,7 @@ public class SwissTimingConnectivityParamsHandler extends AbstractRaceTrackingCo
     private static final String BOAT_CLASS_NAME = "boatClassName";
     private static final String HOSTNAME = "hostname";
     private static final String UPDATE_URL = "updateURL";
-    private static final String UPDATE_USERNAME = "updateUsername";
-    private static final String UPDATE_PASSWORD = "updatePassword";
+    private static final String API_TOKEN = "apiToken";
     private static final String EVENT_NAME = "eventName";
     private static final String MANAGE2SAIL_EVENT_URL = "manage2SailEventUrl";
     private final RaceLogStore raceLogStore;
@@ -90,8 +89,7 @@ public class SwissTimingConnectivityParamsHandler extends AbstractRaceTrackingCo
         result.put(DELAY_TO_LIVE_IN_MILLIS, stParams.getDelayToLiveInMillis());
         result.put(USE_INTERNAL_MARK_PASSING_ALGORITHM, stParams.isUseInternalMarkPassingAlgorithm());
         result.put(UPDATE_URL, stParams.getUpdateURL());
-        result.put(UPDATE_USERNAME, stParams.getUpdateUsername());
-        result.put(UPDATE_PASSWORD, stParams.getUpdatePassword());
+        result.put(API_TOKEN, stParams.getApiToken());
         result.put(EVENT_NAME, stParams.getEventName());
         result.put(MANAGE2SAIL_EVENT_URL, stParams.getManage2SailEventUrl());
         addWindTrackingParameters(stParams, result);
@@ -193,8 +191,7 @@ public class SwissTimingConnectivityParamsHandler extends AbstractRaceTrackingCo
                 swissTimingFactory, domainFactory, raceLogStore, regattaLogStore,
                 (boolean) map.get(USE_INTERNAL_MARK_PASSING_ALGORITHM), isTrackWind(map), isCorrectWindDirectionByMagneticDeclination(map),
                 (String) map.get(UPDATE_URL),
-                (String) map.get(UPDATE_USERNAME),
-                (String) map.get(UPDATE_PASSWORD),
+                (String) map.get(API_TOKEN),
                 (String) map.get(EVENT_NAME),
                 (String) map.get(MANAGE2SAIL_EVENT_URL));
     }
@@ -221,12 +218,12 @@ public class SwissTimingConnectivityParamsHandler extends AbstractRaceTrackingCo
                 stParams.getDelayToLiveInMillis(), swissTimingFactory, domainFactory, raceLogStore, regattaLogStore,
                 stParams.isUseInternalMarkPassingAlgorithm(), stParams.isTrackWind(),
                 stParams.isCorrectWindDirectionByMagneticDeclination(), stParams.getUpdateURL(),
-                stParams.getUpdateUsername(), stParams.getUpdatePassword(), stParams.getEventName(), stParams.getManage2SailEventUrl());
+                stParams.getApiToken(), stParams.getEventName(), stParams.getManage2SailEventUrl());
         final String creatorName = SessionUtils.getPrincipal().toString();
         if (result.getManage2SailEventUrl() != null) { // legacy records won't have this URL stored in their connectivity params
             final SwissTimingConfiguration swissTimingConfiguration = SwissTimingFactory.INSTANCE
                     .createSwissTimingConfiguration(result.getEventName(), result.getManage2SailEventUrl(), result.getHostname(), result.getPort(), result.getUpdateURL(),
-                            result.getUpdateUsername(), result.getUpdatePassword(), creatorName);
+                            result.getApiToken(), creatorName);
             SwissTimingAdapterPersistence.INSTANCE.updateSwissTimingConfiguration(swissTimingConfiguration);
             securityService.setDefaultOwnershipIfNotSet(swissTimingConfiguration.getIdentifier());
         }

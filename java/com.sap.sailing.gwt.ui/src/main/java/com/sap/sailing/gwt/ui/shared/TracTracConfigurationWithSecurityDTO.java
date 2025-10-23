@@ -20,8 +20,7 @@ public class TracTracConfigurationWithSecurityDTO implements IsSerializable, Sec
     private String liveDataURI;
     private String storedDataURI;
     private String courseDesignUpdateURI;
-    private String tracTracUsername;
-    private String tracTracPassword;
+    private String tracTracApiToken;
     private String creatorName;
 
     public TracTracConfigurationWithSecurityDTO() {
@@ -32,15 +31,14 @@ public class TracTracConfigurationWithSecurityDTO implements IsSerializable, Sec
     }
 
     public TracTracConfigurationWithSecurityDTO(String name, String jsonUrl, String liveDataURI, String storedDataURI,
-            String courseDesignUpdateUrl, String tractracUsername, String tractracPassword, String creatorName) {
+            String courseDesignUpdateUrl, String tracTracApiToken, String creatorName) {
         super();
         this.name = name;
         this.jsonUrl = jsonUrl;
         this.liveDataURI = liveDataURI;
         this.storedDataURI = storedDataURI;
         this.courseDesignUpdateURI = courseDesignUpdateUrl;
-        this.tracTracUsername = tractracUsername;
-        this.tracTracPassword = tractracPassword;
+        this.tracTracApiToken = tracTracApiToken;
         this.creatorName = creatorName;
     }
 
@@ -52,8 +50,7 @@ public class TracTracConfigurationWithSecurityDTO implements IsSerializable, Sec
         this.liveDataURI = config.getLiveDataURI();
         this.storedDataURI = config.getStoredDataURI();
         this.courseDesignUpdateURI = config.getUpdateURI();
-        this.tracTracUsername = config.getTracTracUsername();
-        this.tracTracPassword = config.getTracTracPassword();
+        this.tracTracApiToken = config.getTracTracApiToken();
         this.creatorName = config.getCreatorName();
     }
 
@@ -101,12 +98,8 @@ public class TracTracConfigurationWithSecurityDTO implements IsSerializable, Sec
         return courseDesignUpdateURI;
     }
 
-    public String getTracTracUsername() {
-        return tracTracUsername;
-    }
-
-    public String getTracTracPassword() {
-        return tracTracPassword;
+    public String getTracTracApiToken() {
+        return tracTracApiToken;
     }
 
     public String getCreatorName() {

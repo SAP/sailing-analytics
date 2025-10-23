@@ -15,8 +15,9 @@ public class ConnectToAllRaces {
     public static void main(String[] args) throws CreateModelException, URISyntaxException, SubscriberInitializationException, IOException, RaceLoadingException {
 
         URI paramURI = new URI("https://event.tractrac.com/events/event_20140429_ESSQingdao/jsonservice.php");
+        String apiToken = args[0];
         IEventFactory eventFactory = ModelLocator.getEventFactory();
-        IEvent event = eventFactory.createEvent(paramURI);
+        IEvent event = eventFactory.createEvent(apiToken, paramURI);
 
         List<IRaceSubscriber> raceSubscriberList = new ArrayList<>();
 
@@ -25,6 +26,7 @@ public class ConnectToAllRaces {
         EventListener listener = new EventListener();
 
         IEventSubscriber eventSubscriber = subscriberFactory.createEventSubscriber(
+                apiToken,
                 event
         );
         eventSubscriber.subscribeConnectionStatus(listener);
@@ -38,6 +40,7 @@ public class ConnectToAllRaces {
                 listener = new EventListener();
                 listener.setRace(race);
                 IRaceSubscriber raceSubscriber = subscriberFactory.createRaceSubscriber(
+                        apiToken,
                         race
                 );
                 raceSubscriber.subscribeConnectionStatus(listener);

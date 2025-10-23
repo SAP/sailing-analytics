@@ -46,10 +46,10 @@ public class StartTimeUpdateHandler extends UpdateHandler implements StartTimeCh
 
     private final RaceAbortedHandler raceAbortedHandler;
     
-    public StartTimeUpdateHandler(URI updateURI, String username, String password,
+    public StartTimeUpdateHandler(URI updateURI, String tracTracApiToken,
             Serializable tracTracEventId, Serializable raceId, Regatta regatta) {
-        super(updateURI, ACTION, username, password, tracTracEventId, raceId);
-        this.raceAbortedHandler = new RaceAbortedHandler(updateURI, username, password, tracTracEventId, raceId);
+        super(updateURI, ACTION, tracTracApiToken, tracTracEventId, raceId);
+        this.raceAbortedHandler = new RaceAbortedHandler(updateURI,tracTracApiToken, tracTracEventId, raceId);
         this.regatta = regatta;
     }
 

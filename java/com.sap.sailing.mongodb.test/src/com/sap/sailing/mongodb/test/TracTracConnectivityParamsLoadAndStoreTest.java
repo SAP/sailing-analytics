@@ -12,6 +12,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import com.mongodb.MongoException;
+import com.sap.sailing.domain.test.AbstractTracTracLiveTest;
 import com.sap.sailing.domain.tracking.RaceTracker;
 import com.sap.sailing.domain.tracking.RaceTrackingConnectivityParameters;
 import com.sap.sailing.domain.tractracadapter.DomainFactory;
@@ -40,14 +41,13 @@ public class TracTracConnectivityParamsLoadAndStoreTest extends AbstractConnecti
         final long delayToLiveInMillis = 3000;
         final Duration offsetToStartTimeOfSimulatedRace = Duration.ONE_MINUTE;
         final boolean useInternalMarkPassingAlgorithm = false;
-        final String tracTracUsername = "user";
-        final String tracTracPassword = "pass";
+        final String tracTracApiToken = AbstractTracTracLiveTest.getTracTracApiToken();
         final String raceStatus = (String) TracTracConnectionConstants.REPLAY_STATUS;
         final String raceVisibility = (String) TracTracConnectionConstants.REPLAY_VISIBILITY;
         final RaceTrackingConnectivityParameters tracTracParams = new RaceTrackingConnectivityParametersImpl(
                 paramURL, /* live URI */ null, storedURI, courseDesignUpdateURI, startOfTracking, endOfTracking,
                 delayToLiveInMillis, offsetToStartTimeOfSimulatedRace, useInternalMarkPassingAlgorithm,
-                /* raceLogStore */ null, /* regattaLogStore */ null, DomainFactory.INSTANCE, tracTracUsername, tracTracPassword,
+                /* raceLogStore */ null, /* regattaLogStore */ null, DomainFactory.INSTANCE, tracTracApiToken,
                 raceStatus, raceVisibility, trackWind, correctWindDirectionByMagneticDeclination, /* preferReplayIfAvailable */ false,
                 /* timeoutInMillis */ (int) RaceTracker.TIMEOUT_FOR_RECEIVING_RACE_DEFINITION_IN_MILLISECONDS, /* useOfficialEventsToUpdateRaceLog */ true,
                 /* liveURIFromConfiguration */ null, /* storedURIFromConfiguration */ null);
@@ -70,8 +70,7 @@ public class TracTracConnectivityParamsLoadAndStoreTest extends AbstractConnecti
         assertEquals(endOfTracking, tracTracParamsReadFromDB.getEndOfTracking());
         assertEquals(offsetToStartTimeOfSimulatedRace, tracTracParamsReadFromDB.getOffsetToStartTimeOfSimulatedRace());
         assertEquals(useInternalMarkPassingAlgorithm, tracTracParamsReadFromDB.isUseInternalMarkPassingAlgorithm());
-        assertEquals(tracTracUsername, tracTracParamsReadFromDB.getTracTracUsername());
-        assertEquals(tracTracPassword, tracTracParamsReadFromDB.getTracTracPassword());
+        assertEquals(tracTracApiToken, tracTracParamsReadFromDB.getTracTracApiToken());
         assertEquals(raceStatus, tracTracParamsReadFromDB.getRaceStatus());
         assertEquals(raceVisibility, tracTracParamsReadFromDB.getRaceVisibility());
         assertEquals(tracTracParams.getTrackerID(), tracTracParamsReadFromDB.getTrackerID());

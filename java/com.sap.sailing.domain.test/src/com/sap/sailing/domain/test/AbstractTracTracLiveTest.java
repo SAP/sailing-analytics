@@ -93,16 +93,16 @@ public abstract class AbstractTracTracLiveTest extends StoredTrackBasedTest {
     protected void setUp(URL paramUrl, URI liveUri, URI storedUri) throws FileNotFoundException, MalformedURLException, URISyntaxException, SubscriberInitializationException, CreateModelException {
         // Read event data from configuration file
         try {
-            final IRace race = ModelLocator.getEventFactory().createRace(new URI(paramUrl.toString()), (int) /* timeout in milliseconds */ Duration.ONE_MINUTE.asMillis());
+            final IRace race = ModelLocator.getEventFactory().createRace(getTracTracApiToken(), new URI(paramUrl.toString()), (int) /* timeout in milliseconds */ Duration.ONE_MINUTE.asMillis());
             this.race = race;
             logger.info("Using race "+race.getName()+" with ID "+race.getId()+" for this test");
             ISubscriberFactory subscriberFactory = SubscriptionLocator.getSusbcriberFactory();
             if (storedUri == null) {
-                eventSubscriber = subscriberFactory.createEventSubscriber(race.getEvent());
-                raceSubscriber = subscriberFactory.createRaceSubscriber(race);
+                eventSubscriber = subscriberFactory.createEventSubscriber(getTracTracApiToken(), race.getEvent());
+                raceSubscriber = subscriberFactory.createRaceSubscriber(getTracTracApiToken(), race);
             } else {
-                eventSubscriber = DomainFactory.INSTANCE.getOrCreateEventSubscriber(race.getEvent(), liveUri, storedUri);
-                raceSubscriber = subscriberFactory.createRaceSubscriber(race, liveUri, storedUri);
+                eventSubscriber = DomainFactory.INSTANCE.getOrCreateEventSubscriber(race.getEvent(), liveUri, storedUri, getTracTracApiToken());
+                raceSubscriber = subscriberFactory.createRaceSubscriber(getTracTracApiToken(), race, liveUri, storedUri);
             }
             assertNotNull(race);
             // Initialize data controller using live and stored data sources
@@ -166,11 +166,7 @@ public abstract class AbstractTracTracLiveTest extends StoredTrackBasedTest {
         return new URI("http://" + TracTracConnectionConstants.HOST_NAME + "/update_course");
     }
 
-    public static String getTracTracUsername() {
-        return "tracTest";
-    }
-
-    public static String getTracTracPassword() {
+    public static String getTracTracApiToken() {
         return "tracTest";
     }
     

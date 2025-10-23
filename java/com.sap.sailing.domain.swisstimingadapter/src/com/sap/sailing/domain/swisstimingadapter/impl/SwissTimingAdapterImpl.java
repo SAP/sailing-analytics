@@ -64,13 +64,13 @@ public class SwissTimingAdapterImpl implements SwissTimingAdapter {
             String raceName, String raceDescription, BoatClass boatClass, String hostname, int port,
             StartList startList, RaceLogStore raceLogStore, RegattaLogStore regattaLogStore, long timeoutInMilliseconds,
             boolean useInternalMarkPassingAlgorithm, boolean trackWind, boolean correctWindDirectionByMagneticDeclination,
-            String updateURL, String updateUsername, String updatePassword, String eventName, String manage2SailEventUrl) throws Exception {
+            String updateURL, String apiToken, String eventName, String manage2SailEventUrl) throws Exception {
         return trackerManager.addRace(regattaToAddTo,
                 swissTimingDomainFactory.createTrackingConnectivityParameters(hostname, port, raceID, raceName,
                         raceDescription, boatClass, startList, DEFAULT_SWISSTIMING_LIVE_DELAY_IN_MILLISECONDS,
                         swissTimingFactory, swissTimingDomainFactory, raceLogStore, regattaLogStore,
                         useInternalMarkPassingAlgorithm, trackWind, correctWindDirectionByMagneticDeclination,
-                        updateURL, updateUsername, updatePassword, eventName, manage2SailEventUrl),
+                        updateURL, apiToken, eventName, manage2SailEventUrl),
                 timeoutInMilliseconds);
     }
 

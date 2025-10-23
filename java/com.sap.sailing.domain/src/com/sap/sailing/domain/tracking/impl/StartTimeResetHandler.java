@@ -19,8 +19,8 @@ public class StartTimeResetHandler extends UpdateHandler implements StartTimeCha
     
     private final static Logger logger = Logger.getLogger(StartTimeResetHandler.class.getName());
     
-    public StartTimeResetHandler(URI updateURI, String username, String password, Serializable eventId, Serializable raceId) {
-        super(updateURI, ACTION, username, password, eventId, raceId);
+    public StartTimeResetHandler(URI updateURI, String tracTracApiToken, Serializable eventId, Serializable raceId) {
+        super(updateURI, ACTION, tracTracApiToken, eventId, raceId);
     }
 
     @Override

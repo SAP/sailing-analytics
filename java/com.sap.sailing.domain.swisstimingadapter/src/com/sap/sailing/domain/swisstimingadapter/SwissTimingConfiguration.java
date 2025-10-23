@@ -25,9 +25,7 @@ public interface SwissTimingConfiguration extends WithQualifiedObjectIdentifier 
 
     String getUpdateURL();
 
-    String getUpdateUsername();
-
-    String getUpdatePassword();
+    String getApiToken();
 
     @Override
     default QualifiedObjectIdentifier getIdentifier() {

@@ -79,8 +79,7 @@ public class TrackRaceReplicationTest extends AbstractServerReplicationTest {
         URI liveURI = AbstractTracTracLiveTest.getLiveURI();
         URI storedURI = AbstractTracTracLiveTest.getStoredURI();
         URI courseDesignUpdateURI = AbstractTracTracLiveTest.getCourseDesignUpdateURI();
-        String tracTracUsername = AbstractTracTracLiveTest.getTracTracUsername();
-        String tracTracPassword = AbstractTracTracLiveTest.getTracTracPassword();
+        String tracTracApiToken = AbstractTracTracLiveTest.getTracTracApiToken();
         GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
         cal.set(2011, 05, 23, 13, 14, 31);
         MillisecondsTimePoint startOfTracking = new MillisecondsTimePoint(cal.getTimeInMillis());
@@ -101,7 +100,7 @@ public class TrackRaceReplicationTest extends AbstractServerReplicationTest {
                 .createTrackingConnectivityParameters(paramURL, liveURI, storedURI, courseDesignUpdateURI,
                         startOfTracking, endOfTracking, /* delayToLiveInMillis */
                         0l, /* offsetToStartTimeOfSimulatedRace */null, /*ignoreTracTracMarkPassings*/ false, EmptyRaceLogStore.INSTANCE,
-                        EmptyRegattaLogStore.INSTANCE, tracTracUsername, tracTracPassword, "", "", /* trackWind */ false, /* correctWindDirectionByMagneticDeclination */ false,
+                        EmptyRegattaLogStore.INSTANCE, tracTracApiToken, "", "", /* trackWind */ false, /* correctWindDirectionByMagneticDeclination */ false,
                         /* preferReplayIfAvailable */ false, /* timeoutInMillis */ (int) RaceTracker.TIMEOUT_FOR_RECEIVING_RACE_DEFINITION_IN_MILLISECONDS,
                         /* useOfficialEventsToUpdateRaceLog */ false, /* liveURIFromConfiguration */ null, /* storedURIFromConfiguration */ null);
     }

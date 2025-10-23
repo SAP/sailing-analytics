@@ -1320,8 +1320,7 @@ public class SailingServiceImpl extends ResultCachingProxiedRemoteServiceServlet
                         ttConfig.getLiveDataURI()==null?null:ttConfig.getLiveDataURI().toString(),
                         ttConfig.getStoredDataURI()==null?null:ttConfig.getStoredDataURI().toString(),
                         ttConfig.getUpdateURI()==null?null:ttConfig.getUpdateURI().toString(),
-                        ttConfig.getTracTracUsername(), /* don't return passwords to the client */ null,
-                        ttConfig.getCreatorName());
+                        ttConfig.getTracTracApiToken(), ttConfig.getCreatorName());
                     SecurityDTOUtil.addSecurityInformation(getSecurityService(), config);
                     return config;
                 });
@@ -2491,7 +2490,7 @@ public class SailingServiceImpl extends ResultCachingProxiedRemoteServiceServlet
                     final SwissTimingConfigurationWithSecurityDTO config = new SwissTimingConfigurationWithSecurityDTO(
                             stConfig.getName(), stConfig.getJsonURL(),
                         stConfig.getHostname(), stConfig.getPort(), stConfig.getUpdateURL(),
-                            stConfig.getUpdateUsername(), stConfig.getUpdatePassword(), stConfig.getCreatorName());
+                            stConfig.getApiToken(), stConfig.getCreatorName());
                     SecurityDTOUtil.addSecurityInformation(getSecurityService(), config);
                     return config;
                 });

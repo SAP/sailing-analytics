@@ -29,18 +29,20 @@ public class EventSubscriberWrapper implements IEventSubscriber {
     private final IEvent tractracEvent;
     private final URI liveURI;
     private final URI storedURI;
+    private final String tracTracApiToken;
     private int startCounter;
     
-    public EventSubscriberWrapper(IEvent tractracEvent, URI liveURI, URI storedURI) throws SubscriberInitializationException {
+    public EventSubscriberWrapper(IEvent tractracEvent, URI liveURI, URI storedURI, String tracTracApiToken) throws SubscriberInitializationException {
         this.tractracEvent = tractracEvent;
         this.liveURI = liveURI;
         this.storedURI = storedURI;
         this.startCounter = 0;
+        this.tracTracApiToken = tracTracApiToken;
         this.delegate = createEventSubscriber();
     }
 
     private IEventSubscriber createEventSubscriber() throws SubscriberInitializationException {
-        return SubscriptionLocator.getSusbcriberFactory().createEventSubscriber(tractracEvent, liveURI, storedURI);
+        return SubscriptionLocator.getSusbcriberFactory().createEventSubscriber(tracTracApiToken, tractracEvent, liveURI, storedURI);
     }
 
     @Override

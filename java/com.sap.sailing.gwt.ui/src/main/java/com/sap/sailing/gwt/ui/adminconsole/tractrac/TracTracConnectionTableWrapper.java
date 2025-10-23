@@ -79,7 +79,7 @@ public class TracTracConnectionTableWrapper extends
         final TextColumn<TracTracConfigurationWithSecurityDTO> tracTracAccountTracTracServerUpdateUriColumn = new AbstractSortableTextColumn<TracTracConfigurationWithSecurityDTO>(
                 dto -> dto.getUpdateURI()==null?"":dto.getUpdateURI(), tracTracAccountColumnListHandler);
         final TextColumn<TracTracConfigurationWithSecurityDTO> tracTracAccountUsernameColumn = new AbstractSortableTextColumn<TracTracConfigurationWithSecurityDTO>(
-                dto -> dto.getTracTracUsername(), tracTracAccountColumnListHandler);
+                dto -> dto.getTracTracApiToken(), tracTracAccountColumnListHandler);
         final TextColumn<TracTracConfigurationWithSecurityDTO> tracTracAccountCreatorNameColumn = new AbstractSortableTextColumn<TracTracConfigurationWithSecurityDTO>(
                 dto -> dto.getCreatorName(), tracTracAccountColumnListHandler);
         final HasPermissions type = SecuredDomainType.TRACTRAC_ACCOUNT;
