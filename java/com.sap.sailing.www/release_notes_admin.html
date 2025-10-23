@@ -28,6 +28,14 @@
                 <li>When WindBots sent buffered data, e.g., from previous days, there was a possibility that
                     under some circumstances this data may have interfered with live data, leading, e.g.,
                     to "jumping" WindBot positions. This has now been fixed.<p>
+                <li>Upgraded the TracAPI to version 5.0.0. This version now secures access to TracTrac events
+                    with a new authentication and authorization scheme based on API tokens that are used
+                    to authenticate users. TracTrac can then authorize those users for read or read/write
+                    access to specific events. Such API tokens can be obtained from the new version of
+                    the TracTrac event manager.<p>
+                    The API token also replaces the username/password authentication scheme for the update
+                    back channel from which TracTrac can optionally receive updates coming from the Race
+                    Manager app, such as race start times, race aborts, or course configurations.</li>
           </ul>
           <h2 class="articleSubheadline">September 2025</h2>
           <ul class="bulletList">
