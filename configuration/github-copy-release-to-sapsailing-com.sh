@@ -17,7 +17,7 @@
 # produce false matches for the "main-" prefix.
 BEARER_TOKEN="${1}"
 RELEASE_NAME_PREFIX="${2}"
-RELEASE_TAR_GZ_FILE_NAME=$( `dirname "${0}"`/github-download-release-assets.sh "${BEARER_TOKEN}" "${RELEASE_NAME_PREFIX}" )
+RELEASE_TAR_GZ_FILE_NAME=$( `dirname "${0}"`/github-download-release-assets.sh "${BEARER_TOKEN}" "${RELEASE_NAME_PREFIX}" SAP/sailing-analytics )
 if [ "${RELEASE_TAR_GZ_FILE_NAME}" != "" ]; then
   RELEASE_NAME=$( echo ${RELEASE_TAR_GZ_FILE_NAME} | sed -e 's/^\(.*\)-\([0-9]*\).tar.gz$/\1/' )
   RELEASE_TIMESTAMP=$( echo ${RELEASE_TAR_GZ_FILE_NAME} | sed -e 's/^\(.*\)-\([0-9]*\).tar.gz$/\2/' )

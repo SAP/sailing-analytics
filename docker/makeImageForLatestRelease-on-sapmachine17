@@ -1,5 +1,11 @@
 #!/bin/bash
-release_prefix=$1
+release_prefix="$1"
+GITHUB_REPOSITORY="$2"
+OWNER=${GITHUB_REPOSITORY%%/*}
+OWNER_LOWER=$(echo "$OWNER" | tr '[:upper:]' '[:lower:]')
+REPO=${GITHUB_REPOSITORY##*/}
+REPO_LOWER=$(echo "$REPO" | tr '[:upper:]' '[:lower:]')
+PACKAGE="$OWNER_LOWER/$REPO_LOWER"
 GITROOT="`dirname $0`/.."
 DOCKERDIR="${GITROOT}/docker"
 DOCKERFILE="$DOCKERDIR/Dockerfile"
@@ -8,7 +14,7 @@ if [ "${release_prefix}" = "" ]; then
   release_prefix="docker-17-"
 fi
 pushd "${DOCKERDIR}"
-RELEASE_TAR_GZ_FILENAME=$( ${GITROOT}/configuration/github-download-release-assets.sh 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 "${release_prefix}" )
+RELEASE_TAR_GZ_FILENAME=$( ${GITROOT}/configuration/github-download-release-assets.sh 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 "${release_prefix}" "${GITHUB_REPOSITORY}" )
 if [ "${RELEASE_TAR_GZ_FILENAME}" = "" ]; then
   echo "No release with prefix ${release_prefix} found" >&2
 else
@@ -19,13 +25,13 @@ else
   cp "$GITROOT/java/target/start" "$DOCKERDIR"
   cp "$GITROOT/java/target/configuration/JavaSE-11.profile" "$DOCKERDIR"
   cd "$DOCKERDIR"
-  docker build --build-arg RELEASE=${release} -t ghcr.io/sap/sailing-analytics:${release} -f Dockerfile_sapsailing_on_sapmachine17 .
+  docker build --build-arg RELEASE=${release} -t ghcr.io/${PACKAGE}:${release} -f Dockerfile_sapsailing_on_sapmachine17 .
   echo "Cleaning up..."
   rm start env.sh JavaSE-11.profile ${RELEASE_TAR_GZ_FILENAME} release-notes.txt
-  docker push ghcr.io/sap/sailing-analytics:${release}
+  docker push ghcr.io/${PACKAGE}:${release}
   if [ "$SET_LATEST" = "1" ]; then
-    docker tag ghcr.io/sap/sailing-analytics:${release} ghcr.io/sap/sailing-analytics:latest-17
-    docker push ghcr.io/sap/sailing-analytics:latest-17
+    docker tag ghcr.io/${PACKAGE}:${release} ghcr.io/${PACKAGE}:latest-17
+    docker push ghcr.io/${PACKAGE}:latest-17
   fi
 fi
 popd
