@@ -1,9 +1,9 @@
 package com.sap.sailing.domain.markpassingcalculation.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.StreamSupport;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
 import com.sap.sailing.domain.abstractlog.race.impl.RaceLogImpl;
@@ -60,7 +60,7 @@ public class CandidateFinderImplWhiteBoxTest {
     private DynamicTrackedRace trackedRace;
     private TimePoint now;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         now = MillisecondsTimePoint.now();
         competitor = TrackBasedTest.createCompetitorWithBoat("Competitor");
@@ -218,7 +218,7 @@ public class CandidateFinderImplWhiteBoxTest {
         distancesToStartLineOfOtherCompetitors.add(createDistancePair(2739.0, null));
         final double probability = finder.getProbabilityOfStartBasedOnOtherCompetitorsStartLineDistances(distancesToStartLineOfOtherCompetitors,
                 /* startIsLine */ false);
-        assertTrue("Expected probability to exceed 55% but got "+probability, probability > 0.55);
+        assertTrue(probability > 0.55, "Expected probability to exceed 55% but got "+probability);
     }
 
     @Test
@@ -234,7 +234,7 @@ public class CandidateFinderImplWhiteBoxTest {
         distancesToStartLineOfOtherCompetitors.add(createDistancePair(2739.0, null));
         final double probability = finder.getProbabilityOfStartBasedOnOtherCompetitorsStartLineDistances(distancesToStartLineOfOtherCompetitors,
                 /* startIsLine */ false);
-        assertTrue("Expected probability to be below 10% but got "+probability, probability <= 0.1);
+        assertTrue(probability <= 0.1, "Expected probability to be below 10% but got "+probability);
     }
 
     @Test
@@ -250,7 +250,7 @@ public class CandidateFinderImplWhiteBoxTest {
         distancesToStartLineOfOtherCompetitors.add(createDistancePair(20.0, -10.)); // another late starter just across the line
         final double probability = finder.getProbabilityOfStartBasedOnOtherCompetitorsStartLineDistances(distancesToStartLineOfOtherCompetitors,
                 /* startIsLine */ true);
-        assertTrue("Expected probability to be above 85% but got "+probability, probability >= 0.85);
+        assertTrue(probability >= 0.85, "Expected probability to be above 85% but got "+probability);
     }
 
     private AbsoluteGeometricDistanceAndSignedProjectedDistanceToStartLine createDistancePair(double absoluteDistanceToLine,

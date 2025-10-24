@@ -31,8 +31,8 @@ import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.apache.shiro.web.subject.support.WebDelegatingSubject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.datamining.data.HasLeaderboardGroupContext;
 import com.sap.sailing.datamining.test.util.ConcurrencyTestsUtil;
@@ -104,7 +104,7 @@ public class TestLeaderboardGroupRetrievalProcessor {
         }
     }
     
-    @Before
+    @BeforeEach
     public void initializeComponents() {
         final DummyRealm realm = new DummyRealm();
         SecurityUtils.setSecurityManager(new DefaultSecurityManager(realm));

@@ -96,8 +96,8 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
             final Document query = new Document();
             appendMultiTimeRangeQuery(query, timeRanges);
             query.append(FieldNames.IGTIMI_MESSAGES_DEVICE_SERIAL_NUMBER.name(), deviceSerialNumber);
-            final Iterable<Document> queryResult = clientSessionOrNull == null ? messagesCollection.find(query)
-                    : messagesCollection.find(clientSessionOrNull, query);
+            final Iterable<Document> queryResult = (clientSessionOrNull == null ? messagesCollection.find(query)
+                    : messagesCollection.find(clientSessionOrNull, query)).sort(Sorts.ascending(FieldNames.IGTIMI_MESSAGES_TIMESTAMP.name()));
             result = Util.filter(Util.map(queryResult,
                     doc->{
                         try {

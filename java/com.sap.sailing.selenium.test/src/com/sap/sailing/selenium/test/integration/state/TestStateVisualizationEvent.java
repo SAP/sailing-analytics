@@ -6,9 +6,10 @@ import static com.sap.sailing.selenium.pages.common.DateHelper.getPastDate;
 import java.util.Date;
 import java.util.function.Predicate;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.event.EventConfigurationPanelPO;
 import com.sap.sailing.selenium.pages.common.LabelTypePO;
@@ -17,23 +18,24 @@ import com.sap.sailing.selenium.test.AbstractSeleniumTest;
 
 public class TestStateVisualizationEvent extends AbstractSeleniumTest {
 
+    @BeforeEach
     @Override
     public void setUp() {
         clearState(getContextRoot());
         super.setUp();
     }
     
-    @Test
+    @SeleniumTestCase
     public void testStateFlagOfUpcomingEvent() {
         testStateFlagOfEvent("Test1", "Somewhere", getFutureDate(3), getFutureDate(7), LabelTypePO::isUpcoming);
     }
     
-    @Test
+    @SeleniumTestCase
     public void testStateFlagOfLiveEvent() {
         testStateFlagOfEvent("Test2", "Somewhere else", getPastDate(3), getFutureDate(3), LabelTypePO::isLive);
     }
     
-    @Test
+    @SeleniumTestCase
     public void testStateFlagOfFinishedEvent() {
         testStateFlagOfEvent("Test3", "Anywhere", getPastDate(7), getPastDate(3), LabelTypePO::isFinished);
     }
@@ -45,7 +47,7 @@ public class TestStateVisualizationEvent extends AbstractSeleniumTest {
         eventConfigurationPanel.createEmptyEvent(name, null, venue, startDate, endDate, true);
         String eventUrl = eventConfigurationPanel.getEventEntry(name).getEventURL();
         EventPage eventPage = EventPage.goToEventUrl(getWebDriver(), eventUrl);
-        Assert.assertTrue(expectedLabelType.test(eventPage.getEventHeader().getEventStateLabel()));
+        Assertions.assertTrue(expectedLabelType.test(eventPage.getEventHeader().getEventStateLabel()));
     }
 
 }

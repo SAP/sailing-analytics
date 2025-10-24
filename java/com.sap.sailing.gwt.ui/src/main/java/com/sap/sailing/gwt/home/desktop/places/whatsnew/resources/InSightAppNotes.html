@@ -4,7 +4,11 @@
 <div id="mainContent">
     <h4 class="articleHeadline">What's New - Sail Insight powered by SAP</h4>
     <div class="innerContent">
-        See <a target="_blank" href="https://support.sapsailing.com/hc/en-us/articles/360017506480-Release-Notes">here</a>
+        <h5 class="articleSubheadline">15.05.2025 - Version 2.11.0</h5>
+        <ul class="bulletList">
+            <li>Ensure Android 14 compatibility for image selection</li>
+            <li>Don't invalidate access token on server when logging out from app</li>
+        </ul>
         <h5 class="articleSubheadline">06.10.2020 - Version 2.7.11</h5>
         <ul class="bulletList">
             <li>Fixed an issue with the tracking timer stopping after tracking in the background for a while.</li>
@@ -133,6 +137,102 @@
 			<li>Improvement with ‘Start Tracking’ button displayed in event details screen if current time falls within the current race start and end time.</li>
 		</ul>
 		
+        <h5 class="articleSubheadline">18.03.2020 - Version 2.2.0</h5>
+        <ul class="bulletList">
+            <li>Regatta details and races are now refreshed when selecting an event.</li>
+            <li>Fixed an issue with updating competitor ACL on the settings specified server instead of event server when joining an event.</li>
+            <li>Fixed an issue that prevented anonymous users from joining events due to an unnecessary call to update competitor ACL.</li>
+            <li>Course creator is now updated showing the new device binding when coming out of the ‘Scan QR Code’ screen for mark.</li>
+            <li>Display time gaps in the format ‘DD:HH:mm:ss’ in the leaderboard. Layout fixes to leaderboard screen.</li>
+            <li>Fixed a layout issue in course creator to extend the mark background to the lower edge of the screen.</li>
+            <li>Complete refactor of app navigation code, fixing various navigation issues.</li>
+            <li>Fixed an issue that showed an empty boat class field for owners in handicap based events.</li>
+            <li>Registration form is now cleared after a successful register.</li>
+            <li>Fixed an issue that hides the ‘New team’ button in teams screen when scrolling.</li>
+        </ul>
+        
+        <h5 class="articleSubheadline">06.03.2020 - Version 2.1.1</h5>
+        <ul class="bulletList">
+            <li>Fixed an issue that stopped tracking when tapping on tracking tab while being in leaderboard view.</li>
+            <li>Fixed an issue that made the Android back button not working properly in screens other than tracking.</li>
+            <li>Fixed an issue where the app didn’t navigate properly after registering a new user.</li>
+        </ul>
+        
+        <h5 class="articleSubheadline">03.03.2020 - Version 2.0.2</h5>
+        <ul class="bulletList">
+            <li>React Navigation dependency upgraded to the latest version.</li>
+            <li>Visual fixes in leaderboard screen.</li>
+            <li>Added localized text for undefined course or missing start times in race details.</li>
+        </ul>
+        
+        <h5 class="articleSubheadline">02.03.2020 - Version 2.0.0</h5>
+        <ul class="bulletList">
+            <li>Fixed leaderboard layout issues on certain devices.</li>
+            <li>Competitors and boats are assigned ‘READ_ALL’ permissions when joining an event.</li>
+            <li>Removed deletion of locally stored gps fixes when tracking is started. This fixes scenarios related to tracking being interrupted and restarted.</li>
+            <li>Fixed an issue that prevented start tracking while offline.</li>
+            <li>Color code other competitors in the leaderboard based on whether they’re ahead or behind my competitor.</li>
+            <li>Reduce the length of the mantissa to 1 when converting between handicap value types.</li>
+            <li>Fixed issue with Scan QR Code button overlapping the last item in Tracking screen.</li>
+            <li>Fixed issue with first save of a new course with mark position change of existing marks from inventory.</li>
+            <li>Fixed issue that sometimes prevented start time being set on races while tracking was active.</li>
+        </ul>
+        
+        <h5 class="articleSubheadline">20.02.2020 - Version 1.0.64</h5>
+        <ul class="bulletList">
+            <li>Fixed visuals for boat handicap style selector in Team details.</li>
+            <li>Default generated event names are now only placeholders in Event Creation screen, applied only if the input is left empty.</li>
+            <li>Fixed issue with fixed gps position overriding a tracker binding when saving a course right after binding was successfully made.</li>
+            <li>Fixed issue with ‘Join As Competitor’ button not being removed after an organizer joins an event he created.</li>
+            <li>Fixed issue where ‘Scan QR Code’ button overlapped the last event card in events list, making it hard to tap on the event.</li>
+            <li>Fixed issue where app was crashing when clicking on leaderboard dropdown.</li>
+            <li>Fixed issue with competitors not being able to see each other in the leaderboard due to permissions.</li>
+            <li>Fixed issue with missing multidex support on Android, making certain devices crash on app start.</li>
+            <li>Replaced hard to read font in event organizer view.</li>
+        </ul>
+        
+        <h5 class="articleSubheadline">19.02.2020 - Version 1.0.63</h5>
+        <ul class="bulletList">
+            <li>Fixed issue with tracking screen being closed when tapping multiple times on the tracking tab.</li>
+            <li>Added loading indicator on the button when creating a new event.</li>
+            <li>Added link to SAP race board for current tracked race from tracking screen.</li>
+            <li>Main tab bar hidden while device keyboard is shown.</li>
+            <li>Improved back button handling in Android devices.</li>
+            <li>Removed the modal popup presented to the user that blocked joining an event which is already added to the user’s device.</li>
+        </ul>
+        
+        <h5 class="articleSubheadline">March 2018</h5>
+        <ul class="bulletList">
+            <li>Made app robust against events that have no start/end dates set.</li>
+        </ul>
+        
+        <h5 class="articleSubheadline">November 2016</h5>
+        <ul class="bulletList">
+            <li>Improved tracking status and accuracy reporting.</li>
+        </ul>
+        
+        <h5 class="articleSubheadline">October 2016</h5>
+        <ul class="bulletList">
+            <li>Improved tracking reliability and accuracy, especially when the app is in background by using a more reliable and controllable API: The app will now only use true GPS signals instead of accepting positions acquired through network triangulation.</li>
+            <li>There now is a more detailed energy saving option, and the automatic overriding of user preferences has been removed.</li>
+            <li>In some rare situations the app crashed, if you want to scan a QR-Code.</li>
+            <li>This release introduces an entirely new design.</li>
+            <li>The landscape mode is optimized for small devices.</li>
+            <li>Unsent GPS-fixes will be sent automatically after a sudden reboot of the device.</li>
+            <li>Fixed an issue where a login could be done twice.</li>
+            <li>Fixed an issue where an invalid login is handled as a successful one.</li>
+        </ul>
+        
+        <h5 class="articleSubheadline">August 2016</h5>
+        <ul class="bulletList">
+            <li>The GPS fix sending was optimized to send all data in a bulk. Instead of sending every fix separately. This will reduce the battery consumption and minimize the used traffic overhead.</li>
+            <li>Fixed an issue, where the app stopped tracking, if the app was in background and killed by the system in case of low memory. Now the tracking will not stop, because the system can’t stop the service.</li>
+        </ul>
+        
+        <h5 class="articleSubheadline">July 2016</h5>
+        <ul class="bulletList">
+            <li>It is possible to track buoys for multiple regattas. Scan all buoy QR-codes and start tracking for one buoy. It will track all buoys.</li>
+        </ul>
     </div>
 </div>
 </body>

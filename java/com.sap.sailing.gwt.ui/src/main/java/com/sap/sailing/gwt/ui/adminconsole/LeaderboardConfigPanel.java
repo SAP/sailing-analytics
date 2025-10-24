@@ -299,11 +299,10 @@ public class LeaderboardConfigPanel extends AbstractLeaderboardConfigPanel
         leaderboardColumnListHandler.setComparator(courseAreasColumn,
                 (o1, o2) -> new NaturalComparator().compare(Util.joinStrings(", ", Util.map(o1.courseAreas, CourseAreaDTO::getName)),
                         Util.joinStrings(", ", Util.map(o2.courseAreas, CourseAreaDTO::getName))));
-
+        // Actions column:
         final HasPermissions type = SecuredDomainType.LEADERBOARD;
         final AccessControlledActionsColumn<StrippedLeaderboardDTO, LeaderboardConfigImagesBarCell> leaderboardActionColumn = create(
                 new LeaderboardConfigImagesBarCell(stringMessages), userService);
-
         leaderboardActionColumn.addAction(LeaderboardConfigImagesBarCell.ACTION_UPDATE, UPDATE, this::editLeaderboard);
         leaderboardActionColumn.addAction(LeaderboardConfigImagesBarCell.ACTION_DELETE, DELETE, leaderboardDTO -> {
             if (Window.confirm(stringMessages.doYouReallyWantToRemoveLeaderboard(leaderboardDTO.getName()))) {
@@ -356,6 +355,8 @@ public class LeaderboardConfigPanel extends AbstractLeaderboardConfigPanel
                 leaderboardDTO -> showRegattaLog());
         leaderboardActionColumn.addAction(LeaderboardConfigImagesBarCell.ACTION_CREATE_PAIRINGLIST, UPDATE,
                 this::createPairingListTemplate);
+        leaderboardActionColumn.addAction(LeaderboardConfigImagesBarCell.ACTION_COPY_PAIRINGLIST_FROM_OTHER_LEADERBOARD, UPDATE,
+                this::copyPairingListFromOtherLeaderboard);
         leaderboardActionColumn.addAction(LeaderboardConfigImagesBarCell.ACTION_PRINT_PAIRINGLIST, READ,
                 this::openPairingListEntryPoint);
         final DialogConfig<StrippedLeaderboardDTO> config = EditOwnershipDialog.create(
@@ -1170,7 +1171,6 @@ public class LeaderboardConfigPanel extends AbstractLeaderboardConfigPanel
     private void createPairingListTemplate(final StrippedLeaderboardDTO leaderboardDTO) {
         final PairingListCreationSetupDialog dialog = new PairingListCreationSetupDialog(leaderboardDTO,
                 this.stringMessages, new DialogCallback<PairingListTemplateDTO>() {
-
                     @Override
                     public void ok(PairingListTemplateDTO editedObject) {
                         BusyDialog busyDialog = new BusyDialog();
@@ -1193,6 +1193,40 @@ public class LeaderboardConfigPanel extends AbstractLeaderboardConfigPanel
                                         openPairingListCreationDialog(leaderboardDTO, result);
                                     }
                                 });
+                    }
+
+                    @Override
+                    public void cancel() {
+                    }
+                });
+        dialog.show();
+    }
+    
+    private void copyPairingListFromOtherLeaderboard(final StrippedLeaderboardDTO targetLeaderboardDTO) {
+        final CopyPairingListDialog dialog = new CopyPairingListDialog(availableLeaderboardList,
+                Collections.unmodifiableCollection(allRegattas), targetLeaderboardDTO, stringMessages,
+                new DialogCallback<CopyPairingListDialog.Result>() {
+                    @Override
+                    public void ok(CopyPairingListDialog.Result editedObject) {
+                        sailingServiceWrite.copyPairingListFromOtherLeaderboard(
+                            editedObject.getSourceLeaderboardName(), targetLeaderboardDTO.getName(),
+                            editedObject.getFromRaceColumnName(), editedObject.getToRaceColumnInclusiveName(),
+                            new AsyncCallback<Void>() {
+                                @Override
+                                public void onFailure(Throwable caught) {
+                                    Notification.notify(
+                                        stringMessages.errorCopyingPairings(caught.getMessage()),
+                                        NotificationType.ERROR);
+                                }
+
+                                @Override
+                                public void onSuccess(Void result) {
+                                    Notification.notify(
+                                            stringMessages.successfullyCopiedPairings(),
+                                            NotificationType.SUCCESS);
+                                }
+                            });
+                        // TODO
                     }
 
                     @Override

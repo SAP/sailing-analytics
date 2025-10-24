@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.function.Consumer;
 
 import com.sap.sailing.domain.common.tracking.SensorFix;
-import com.sap.sailing.domain.tracking.AddResult;
+import com.sap.sailing.domain.shared.tracking.AddResult;
 import com.sap.sailing.domain.tracking.DynamicSensorFixTrack;
 import com.sap.sailing.domain.tracking.SensorFixTrack;
 import com.sap.sailing.domain.tracking.SensorFixTrackListener;

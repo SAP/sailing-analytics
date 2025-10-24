@@ -21,7 +21,7 @@ import com.sap.sse.gwt.client.Notification.NotificationType;
 import com.sap.sse.gwt.client.dialog.DoubleBox;
 
 /**
- * An editor allowing users to specify the ORC Performance Curve leg type and distance, and in case of a
+ * An editor allowing users to specify the ORC Polar Curve leg type and distance, and in case of a
  * {@link ORCPerformanceCurveLegTypes#TWA}-type leg the angle between the leg's rhumb line and the true wind
  * direction ("leg TWA"). The result is a {@link ORCPerformanceCurveLegImpl} object.<p>
  * 

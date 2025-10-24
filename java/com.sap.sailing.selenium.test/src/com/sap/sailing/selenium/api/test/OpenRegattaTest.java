@@ -10,13 +10,12 @@ import static com.sap.sailing.selenium.api.core.GpsFixMoving.createFix;
 import static com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage.goToPage;
 import static java.lang.System.currentTimeMillis;
 import static java.util.UUID.randomUUID;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.sap.sailing.selenium.api.core.ApiContext;
 import com.sap.sailing.selenium.api.event.EventApi;
@@ -29,6 +28,7 @@ import com.sap.sailing.selenium.api.event.SecurityApi;
 import com.sap.sailing.selenium.api.regatta.Competitor;
 import com.sap.sailing.selenium.api.regatta.RaceColumn;
 import com.sap.sailing.selenium.api.regatta.RegattaApi;
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.test.AbstractSeleniumTest;
 
@@ -49,7 +49,7 @@ public class OpenRegattaTest extends AbstractSeleniumTest {
     private static final String EVENT_NAME = "Duckburg 2019 Everybody's Regatta";
     private static final String BOAT_CLASS = "49er";
 
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot());
         super.setUp();
@@ -62,7 +62,7 @@ public class OpenRegattaTest extends AbstractSeleniumTest {
         adminConsole.goToLocalServerPanel().setSelfServiceServer(true);
     }
 
-    @Test
+    @SeleniumTestCase
     public void simpleTest() throws Exception {
         final UUID deviceUuidCompetitor1 = randomUUID();
         final UUID deviceUuidCompetitor2 = randomUUID();
@@ -72,18 +72,18 @@ public class OpenRegattaTest extends AbstractSeleniumTest {
         final RaceColumn race = regattaApi.addRaceColumn(ownerCtx, EVENT_NAME, null, 1)[0];
         final Competitor competitorOwner = regattaApi.createAndAddCompetitorWithSecret(ownerCtx, EVENT_NAME, BOAT_CLASS,
                 /* email */ null, "Competitor Owner", "USA", registrationLinkSecret, deviceUuidCompetitor1);
-        assertNotNull("Competitor for Owner should not be null!", competitorOwner);
+        assertNotNull(competitorOwner, "Competitor for Owner should not be null!");
         final Competitor competitorSailor = regattaApi.createAndAddCompetitorWithSecret(sailorCtx, EVENT_NAME,
                 BOAT_CLASS, /* email */ null, "Competitor Sailor", "USA", registrationLinkSecret,
                 deviceUuidCompetitor2);
-        assertNotNull("Competitor for Sailor should not be null!", competitorSailor);
-        assertEquals("Regatta should contain 2 competitors (seen by regatta owner)", 2,
-                regattaApi.getCompetitors(ownerCtx, EVENT_NAME).length);
+        assertNotNull(competitorSailor, "Competitor for Sailor should not be null!");
+        assertEquals(2, regattaApi.getCompetitors(ownerCtx, EVENT_NAME).length,
+                "Regatta should contain 2 competitors (seen by regatta owner)");
         // see also bug 5442 / bug 5167: anonymous users registering a competitor with a secret will "donate" their competitor to the organizer:
-        assertEquals("Regatta should contain 2 competitor (seen by anonymous)", 2,
-                regattaApi.getCompetitors(sailorCtx, EVENT_NAME).length);
-        assertEquals("Regatta should contain 2 competitors (seen by admin)", 2,
-                regattaApi.getCompetitors(adminCtx, EVENT_NAME).length);
+        assertEquals(2, regattaApi.getCompetitors(sailorCtx, EVENT_NAME).length,
+                "Regatta should contain 2 competitor (seen by anonymous)");
+        assertEquals(2, regattaApi.getCompetitors(adminCtx, EVENT_NAME).length,
+                "Regatta should contain 2 competitors (seen by admin)");
         leaderboardApi.startRaceLogTracking(ownerCtx, EVENT_NAME, race.getRaceName(), "Default");
         leaderboardApi.setTrackingTimes(ownerCtx, EVENT_NAME, race.getRaceName(), "Default", currentTimeMillis(),
                 currentTimeMillis() + 600_000L);

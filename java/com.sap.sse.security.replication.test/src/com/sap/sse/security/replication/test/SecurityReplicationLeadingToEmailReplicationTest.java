@@ -9,15 +9,16 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Locale;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.osgi.util.tracker.ServiceTracker;
 
 import com.sap.sse.common.mail.MailException;
 import com.sap.sse.mail.MailService;
 import com.sap.sse.mail.impl.MailServiceImpl;
 import com.sap.sse.mail.replication.testsupport.AbstractMailServiceReplicationTest;
+import com.sap.sse.replication.FullyInitializedReplicableTracker;
 import com.sap.sse.replication.testsupport.AbstractServerWithMultipleServicesReplicationTest;
 import com.sap.sse.security.SecurityService;
 import com.sap.sse.security.impl.SecurityServiceImpl;
@@ -42,7 +43,7 @@ public class SecurityReplicationLeadingToEmailReplicationTest extends AbstractSe
     private MailServiceImpl masterMailService;
     private MailServiceImpl replicaMailService;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         masterMailService = AbstractMailServiceReplicationTest.createMailCountingService(true);
@@ -54,7 +55,7 @@ public class SecurityReplicationLeadingToEmailReplicationTest extends AbstractSe
     private class SecurityServerReplicationTestSetUp extends
             AbstractSecurityReplicationTest.SecurityServerReplicationTestSetUp {
         @Override
-        protected SecurityServiceImpl createNewMaster()
+        protected SecurityServiceImpl createNewMaster(FullyInitializedReplicableTracker<SecurityService> securityServiceTrackerMock)
                 throws MalformedURLException, IOException, InterruptedException, UserStoreManagementException {
             @SuppressWarnings("unchecked")
             ServiceTracker<MailService, MailService> trackerMock = mock(ServiceTracker.class);
@@ -70,7 +71,7 @@ public class SecurityReplicationLeadingToEmailReplicationTest extends AbstractSe
         }
 
         @Override
-        protected SecurityServiceImpl createNewReplica()
+        protected SecurityServiceImpl createNewReplica(FullyInitializedReplicableTracker<SecurityService> securityServiceTrackerMock)
                 throws UserStoreManagementException, MalformedURLException, IOException, InterruptedException {
             @SuppressWarnings("unchecked")
             ServiceTracker<MailService, MailService> trackerMock = mock(ServiceTracker.class);
@@ -89,12 +90,12 @@ public class SecurityReplicationLeadingToEmailReplicationTest extends AbstractSe
 
     private class MailServerReplicationTestSetUp extends AbstractMailServiceReplicationTest.MailServerReplicationTestSetUp {
         @Override
-        protected MailServiceImpl createNewMaster() throws MailException {
+        protected MailServiceImpl createNewMaster(FullyInitializedReplicableTracker<SecurityService> securityServiceTrackerMock) throws MailException {
             return masterMailService;
         }
 
         @Override
-        protected MailServiceImpl createNewReplica() throws MailException {
+        protected MailServiceImpl createNewReplica(FullyInitializedReplicableTracker<SecurityService> securityServiceTrackerMock) throws MailException {
             return replicaMailService;
         }
     }
@@ -137,7 +138,7 @@ public class SecurityReplicationLeadingToEmailReplicationTest extends AbstractSe
      * operations on the replica.
      */
     @Test
-    @Ignore
+    @Disabled
     public void triggerEmailSendByAddingUserOnReplica()
             throws UserManagementException, MailException, IllegalAccessException, InterruptedException, UserGroupManagementException {
         SecurityService replicaSecurityService = securitySetUp.getReplica();

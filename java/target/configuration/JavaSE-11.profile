@@ -12,6 +12,31 @@
 # NOTE: The JavaSE-9 profile is not yet finalized.
 
 org.osgi.framework.system.packages = \
+ java.io,\
+ java.lang,\
+ java.lang.annotation,\
+ java.lang.invoke,\
+ java.lang.module,\
+ java.lang.ref,\
+ java.lang.reflect,\
+ java.math,\
+ java.net,\
+ java.nio.charset,\
+ java.nio.file,\
+ java.nio.file.attribute,\
+ java.security,\
+ java.time,\
+ java.time.format,\
+ java.time.temporal,\
+ java.util,\
+ java.util.concurrent,\
+ java.util.concurrent.atomic,\
+ java.util.concurrent.locks,\
+ java.util.function,\
+ java.util.jar,\
+ java.util.logging,\
+ java.util.regex,\
+ java.util.stream,\
  javax.accessibility,\
  javax.activity,\
  javax.crypto,\

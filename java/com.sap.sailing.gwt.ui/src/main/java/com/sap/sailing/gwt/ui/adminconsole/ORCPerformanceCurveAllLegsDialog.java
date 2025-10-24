@@ -25,7 +25,7 @@ import com.sap.sse.gwt.client.Notification.NotificationType;
 import com.sap.sse.gwt.client.dialog.DoubleBox;
 
 /**
- * An editor allowing users to specify the ORC Performance Curve leg type and distance for all legs currently in the
+ * An editor allowing users to specify the ORC Polar Curve leg type and distance for all legs currently in the
  * course. See also {@link ORCPerformanceCurveLegDialog} which does this for a single leg only.
  * 
  * @author Axel Uhl (D043530)

@@ -6,14 +6,13 @@ import static com.sap.sailing.selenium.api.core.ApiContext.createAdminApiContext
 import static com.sap.sailing.selenium.api.core.ApiContext.createAnonymousApiContext;
 import static com.sap.sailing.selenium.api.core.ApiContext.createApiContext;
 import static com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage.goToPage;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.sap.sailing.domain.common.CompetitorRegistrationType;
 import com.sap.sailing.selenium.api.core.ApiContext;
@@ -22,6 +21,7 @@ import com.sap.sailing.selenium.api.event.EventApi.Event;
 import com.sap.sailing.selenium.api.event.SecurityApi;
 import com.sap.sailing.selenium.api.regatta.Competitor;
 import com.sap.sailing.selenium.api.regatta.RegattaApi;
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.test.AbstractSeleniumTest;
 
@@ -38,7 +38,7 @@ public class ClosedRegattaTest extends AbstractSeleniumTest {
     private static final String EVENT_NAME = "Super exclusive regatta - invited competitors only";
     private static final String BOAT_CLASS = "GC 32";
 
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot());
         super.setUp();
@@ -50,20 +50,20 @@ public class ClosedRegattaTest extends AbstractSeleniumTest {
         adminConsole.goToLocalServerPanel().setSelfServiceServer(true);
     }
 
-    @Test
+    @SeleniumTestCase
     public void testRegisterOwnerSucceededSelfRegistrationFailed() {
         final Event event = eventApi.createEvent(ownerCtx, EVENT_NAME, BOAT_CLASS, CompetitorRegistrationType.CLOSED,
                 "Some special place");
         final String registrationLinkSecret = event.getSecret();
         final Competitor owner = regattaApi.createAndAddCompetitor(ownerCtx, EVENT_NAME, BOAT_CLASS, "", "Donald Duck",
                 "USA");
-        assertNotNull("Owner should be able to register for a closed regatta!", owner);
+        assertNotNull(owner, "Owner should be able to register for a closed regatta!");
         try {
             regattaApi.createAndAddCompetitorWithSecret(unregisteredCtx, EVENT_NAME, BOAT_CLASS, "", "Mickey Mouse",
                     "USA", registrationLinkSecret, UUID.randomUUID());
             fail("Self-registration should not be possible for a closed regatta!");
         } catch (RuntimeException exc) {
-            assertTrue("Response status \"Forbidden\" expected!", exc.getMessage().contains("rc=403"));
+            assertTrue(exc.getMessage().contains("rc=403"), "Response status \"Forbidden\" expected!");
         }
     }
 }

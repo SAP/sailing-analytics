@@ -12,8 +12,8 @@ import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.StreamSupport;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.common.ManeuverType;
@@ -38,7 +38,7 @@ public class ManeuverLossOnPenaltyCircleTest extends OnlineTracTracBasedTest {
         return "Sailing Champions League 2015";
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         URI storedUri = new URI("file:////"+new File("resources/SailingChampionsLeague2015-Race28.mtb").getCanonicalPath().replace('\\', '/'));

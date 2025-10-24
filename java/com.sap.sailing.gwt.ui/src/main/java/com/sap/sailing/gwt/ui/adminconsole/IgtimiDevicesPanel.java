@@ -63,6 +63,8 @@ import com.sap.sse.gwt.client.celltable.FlushableCellTable;
 import com.sap.sse.gwt.client.celltable.ImagesBarCell;
 import com.sap.sse.gwt.client.celltable.RefreshableMultiSelectionModel;
 import com.sap.sse.gwt.client.celltable.SelectionCheckboxColumn;
+import com.sap.sse.gwt.client.controls.busyindicator.BusyIndicator;
+import com.sap.sse.gwt.client.controls.busyindicator.SimpleBusyIndicator;
 import com.sap.sse.gwt.client.controls.datetime.DateAndTimeInput;
 import com.sap.sse.gwt.client.controls.datetime.DateTimeInput.Accuracy;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog;
@@ -91,6 +93,7 @@ public class IgtimiDevicesPanel extends FlowPanel implements FilterablePanelProv
     private final RefreshableMultiSelectionModel<IgtimiDeviceWithSecurityDTO> refreshableDevicesSelectionModel;
     private final LabeledAbstractFilterablePanel<IgtimiDataAccessWindowWithSecurityDTO> filterDataAccessWindowPanel;
     private final RefreshableMultiSelectionModel<IgtimiDataAccessWindowWithSecurityDTO> refreshableDataAccessWindowsSelectionModel;
+    private final BusyIndicator busyIndicator;
 
     public static class AccountImagesBarCell extends ImagesBarCell {
         public static final String ACTION_REMOVE = "ACTION_REMOVE";
@@ -175,6 +178,8 @@ public class IgtimiDevicesPanel extends FlowPanel implements FilterablePanelProv
         devicesControlsPanel.add(filterDevicesPanel);
         final AccessControlledButtonPanel buttonPanel = new AccessControlledButtonPanel(presenter.getUserService(), SecuredDomainType.IGTIMI_DEVICE);
         devicesControlsPanel.add(buttonPanel);
+        busyIndicator = new SimpleBusyIndicator();
+        devicesControlsPanel.add(busyIndicator);
         buttonPanel.addUnsecuredAction(stringMessages.refresh(), () -> refreshDevices());
         // setup controls
         final Button removeDeviceButton = buttonPanel.addRemoveAction(stringMessages.remove(), refreshableDevicesSelectionModel,
@@ -263,6 +268,8 @@ public class IgtimiDevicesPanel extends FlowPanel implements FilterablePanelProv
         public static final String ACTION_GPS_ON = "ACTION_GPS_ON";
         public static final String ACTION_RESTART = "ACTION_RESTART";
         public static final String ACTION_POWER_OFF = "ACTION_POWER_OFF";
+        public static final String ACTION_CALIBRATE = "ACTION_CALIBRATE";
+        public static final String ACTION_SEND_FREESTYLE_COMMAND = "ACTION_SEND_FREESTYLE_COMMAND";
         private final StringMessages stringMessages;
 
         public DevicesImagesBarCell(StringMessages stringMessages) {
@@ -277,12 +284,14 @@ public class IgtimiDevicesPanel extends FlowPanel implements FilterablePanelProv
                     new ImageSpec(ACTION_GPS_ON, stringMessages.turnGPSOn(), IconResources.INSTANCE.gpsSymbol()),
                     new ImageSpec(ACTION_RESTART, stringMessages.restart(), IconResources.INSTANCE.restartSymbol()),
                     new ImageSpec(ACTION_POWER_OFF, stringMessages.powerOff(), IconResources.INSTANCE.powerButton()),
+                    new ImageSpec(ACTION_CALIBRATE, stringMessages.calibrateIMU(), IconResources.INSTANCE.compassSymbol()),
+                    new ImageSpec(ACTION_SEND_FREESTYLE_COMMAND, stringMessages.sendFreestyleCommand(), IconResources.INSTANCE.commandSymbol()),
                     getDeleteImageSpec(), getChangeOwnershipImageSpec(), getChangeACLImageSpec());
         }
     }
 
 
-    private FlushableCellTable<IgtimiDeviceWithSecurityDTO> createIgtimiDevicesTable(
+    private void createIgtimiDevicesTable(
             final FlushableCellTable<IgtimiDeviceWithSecurityDTO> table, final CellTableWithCheckboxResources tableResources,
             final UserService userService, final ListDataProvider<IgtimiDeviceWithSecurityDTO> filteredDevices,
             final LabeledAbstractFilterablePanel<IgtimiDeviceWithSecurityDTO> filterDevicesPanel) {
@@ -351,6 +360,8 @@ public class IgtimiDevicesPanel extends FlowPanel implements FilterablePanelProv
         actionColumn.addAction(DevicesImagesBarCell.ACTION_GPS_ON, UPDATE, this::sendGPSOn);
         actionColumn.addAction(DevicesImagesBarCell.ACTION_RESTART, UPDATE, this::sendRestart);
         actionColumn.addAction(DevicesImagesBarCell.ACTION_POWER_OFF, UPDATE, this::sendPowerOff);
+        actionColumn.addAction(DevicesImagesBarCell.ACTION_CALIBRATE, UPDATE, this::sendIMUCalibrationCommandSequence);
+        actionColumn.addAction(DevicesImagesBarCell.ACTION_SEND_FREESTYLE_COMMAND, UPDATE, this::sendFreestyleCommands);
         actionColumn.addAction(ACTION_DELETE, DELETE, device -> {
             if (Window.confirm(stringMessages.doYouReallyWantToRemoveIgtimiDevice(device.getSerialNumber()))) {
                 removeDevice(device, filteredDevices);
@@ -376,7 +387,6 @@ public class IgtimiDevicesPanel extends FlowPanel implements FilterablePanelProv
         table.addColumn(actionColumn, stringMessages.actions());
         table.setSelectionModel(devicesSelectionCheckboxColumn.getSelectionModel(),
                 devicesSelectionCheckboxColumn.getSelectionManager());
-        return table;
     }
     
     private void editDevice(IgtimiDeviceWithSecurityDTO device, ListDataProvider<IgtimiDeviceWithSecurityDTO> filteredDevices) {
@@ -495,14 +505,17 @@ public class IgtimiDevicesPanel extends FlowPanel implements FilterablePanelProv
     }
 
     public void refreshDevices() {
+        busyIndicator.setBusy(true);
         sailingServiceWrite.getAllIgtimiDevicesWithSecurity(new AsyncCallback<ArrayList<IgtimiDeviceWithSecurityDTO>>() {
             @Override
             public void onSuccess(ArrayList<IgtimiDeviceWithSecurityDTO> result) {
+                busyIndicator.setBusy(false);
                 filterDevicesPanel.updateAll(result);
             }
 
             @Override
             public void onFailure(Throwable caught) {
+                busyIndicator.setBusy(false);
                 errorReporter.reportError(stringMessages.errorFetchingIgtimiDevices(caught.getMessage()));
             }
         });
@@ -692,7 +705,7 @@ public class IgtimiDevicesPanel extends FlowPanel implements FilterablePanelProv
                     if (result) {
                         Notification.notify(stringMessages.successfullyTurnedGPSOffForIgtimiDevice(device.getSerialNumber()), NotificationType.INFO);
                     } else {
-                        Notification.notify(stringMessages.noLiveConnectionFoundForIgtimiDevice(device.getSerialNumber()), NotificationType.ERROR);
+                        Notification.notify(stringMessages.noLiveConnectionFoundForIgtimiDevice(device.getSerialNumber()), NotificationType.WARNING);
                     }
                 }
             });
@@ -712,7 +725,7 @@ public class IgtimiDevicesPanel extends FlowPanel implements FilterablePanelProv
                     if (result) {
                         Notification.notify(stringMessages.successfullyTurnedGPSOnForIgtimiDevice(device.getSerialNumber()), NotificationType.INFO);
                     } else {
-                        Notification.notify(stringMessages.noLiveConnectionFoundForIgtimiDevice(device.getSerialNumber()), NotificationType.ERROR);
+                        Notification.notify(stringMessages.noLiveConnectionFoundForIgtimiDevice(device.getSerialNumber()), NotificationType.WARNING);
                     }
                 }
             });
@@ -732,7 +745,7 @@ public class IgtimiDevicesPanel extends FlowPanel implements FilterablePanelProv
                     if (result) {
                         Notification.notify(stringMessages.successfullyPoweredOffIgtimiDevice(device.getSerialNumber()), NotificationType.INFO);
                     } else {
-                        Notification.notify(stringMessages.noLiveConnectionFoundForIgtimiDevice(device.getSerialNumber()), NotificationType.ERROR);
+                        Notification.notify(stringMessages.noLiveConnectionFoundForIgtimiDevice(device.getSerialNumber()), NotificationType.WARNING);
                     }
                 }
             });
@@ -752,10 +765,34 @@ public class IgtimiDevicesPanel extends FlowPanel implements FilterablePanelProv
                     if (result) {
                         Notification.notify(stringMessages.successfullyRestartedIgtimiDevice(device.getSerialNumber()), NotificationType.INFO);
                     } else {
-                        Notification.notify(stringMessages.noLiveConnectionFoundForIgtimiDevice(device.getSerialNumber()), NotificationType.ERROR);
+                        Notification.notify(stringMessages.noLiveConnectionFoundForIgtimiDevice(device.getSerialNumber()), NotificationType.WARNING);
                     }
                 }
             });
         }
+    }
+    
+    private void sendIMUCalibrationCommandSequence(IgtimiDeviceWithSecurityDTO device) {
+        if (Window.confirm(stringMessages.reallyRunCalibrationOnIgtimiDevice(device.getSerialNumber()))) {
+            sailingServiceWrite.sendIMUCalibrationCommandSequenceToIgtimiDevice(device.getSerialNumber(), new AsyncCallback<Boolean>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                    Notification.notify(stringMessages.errorCalibratingIgtimiDevice(device.getSerialNumber(), caught.getMessage()), NotificationType.ERROR);
+                }
+
+                @Override
+                public void onSuccess(Boolean result) {
+                    if (result) {
+                        Notification.notify(stringMessages.successfullyCalibratedIgtimiDevice(device.getSerialNumber()), NotificationType.INFO);
+                    } else {
+                        Notification.notify(stringMessages.noLiveConnectionFoundForIgtimiDevice(device.getSerialNumber()), NotificationType.WARNING);
+                    }
+                }
+            });
+        }
+    }
+    
+    private void sendFreestyleCommands(IgtimiDeviceWithSecurityDTO device) {
+        new FreestyleCommandDialog(stringMessages, sailingServiceWrite, device.getSerialNumber()).show();
     }
 }

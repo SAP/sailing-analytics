@@ -687,7 +687,6 @@ public class LandscapeManagementWriteServiceImpl extends ResultCachingProxiedRem
      * 
      * The "internal" method exists in order to declare a few type parameters which wouldn't be possible on the GWT RPC
      * interface method as some of these types are not seen by clients.
-     * @param optionalIgtimiRiotPort TODO
      * @param optionalMinimumAutoScalingGroupSize
      *            defaults to 1; if 0, a replica process will be launched on an eligible shared instance in an
      *            availability zone different from that of the instance hosting the master process. Otherwise,

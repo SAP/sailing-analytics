@@ -290,7 +290,6 @@ public class LeaderboardTotalRankComparator implements Comparator<Competitor> {
                 }
             }
         }
-        // TODO bug5877: pass leaderboard and competitors and a totalPointsSupplier (based on totalPointsCache, see call to compareByBetterScore below) to allow for identifying competitors promoted through to later medal race
         int result = scoringScheme.compareByMedalRaceParticipation(zeroBasedIndexOfLastMedalSeriesInWhichO1Scored, zeroBasedIndexOfLastMedalSeriesInWhichO2Scored);
         if (result == 0) {
             result = defaultFleetBasedComparisonResult;
@@ -482,29 +481,26 @@ public class LeaderboardTotalRankComparator implements Comparator<Competitor> {
     }
 
     /**
-     * If the race column only has one fleet, no decision is made and 0 is returned. Otherwise, if <code>fleet</code> is the
-     * best fleet with others in the column being worse, return "better" (lesser; -1). If <code>fleet</code> is the worst fleet
-     * with others in the column being better, return "worse" (greater; 1). Otherwise, return 0.
+     * If the race column only has one fleet, no decision is made and 0 is returned. Otherwise, if there are other fleets with
+     * a {@link Fleet#getOrdering() rank} different from that of <code>fleet</code>, we want to sort competitors with no fleet
+     * assignment to the "worse" end of the leaderboard, therefore returning 1. Otherwise, 0 is returned.
      */
     private int extremeFleetComparison(RaceColumn raceColumn, Fleet fleet) {
-        boolean allOthersAreGreater = true;
-        boolean allOthersAreLess = true;
+        boolean greaterFleetExists = false;
+        boolean lesserFleetExists = false;
         boolean othersExist = false;
         for (Fleet f : raceColumn.getFleets()) {
             if (f != fleet) {
                 othersExist = true;
-                allOthersAreGreater = allOthersAreGreater && f.compareTo(fleet) > 0;
-                allOthersAreLess = allOthersAreLess && f.compareTo(fleet) < 0;
+                greaterFleetExists = greaterFleetExists || f.compareTo(fleet) > 0;
+                lesserFleetExists = lesserFleetExists || f.compareTo(fleet) < 0;
             }
         }
-        int result = 0;
-        if (othersExist) {
-            assert !(allOthersAreGreater && allOthersAreLess);
-            if (allOthersAreGreater) {
-                result = -1;
-            } else if (allOthersAreLess) {
-                result = 1;
-            }
+        final int result;
+        if (othersExist && (greaterFleetExists || lesserFleetExists)) {
+            result = -1; // the competitor with no fleet is considered worse than a competitor in one of the ranked fleets
+        } else {
+            result = 0;
         }
         return result;
     }

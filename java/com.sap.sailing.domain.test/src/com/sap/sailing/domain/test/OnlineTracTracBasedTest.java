@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
 import java.io.FileNotFoundException;
@@ -17,7 +17,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.DomainFactory;
@@ -91,7 +91,7 @@ public abstract class OnlineTracTracBasedTest extends AbstractTracTracLiveTest i
         super();
     }
     
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         domainFactory = new DomainFactoryImpl(new com.sap.sailing.domain.base.impl.DomainFactoryImpl(DomainFactory.TEST_RACE_LOG_RESOLVER));
         // keep superclass implementation from automatically setting up for a Weymouth event and force subclasses
@@ -149,12 +149,9 @@ public abstract class OnlineTracTracBasedTest extends AbstractTracTracLiveTest i
                 case Begin:
                     logger.info("Stored data begin");
                     lastStatus = new TrackedRaceStatusImpl(TrackedRaceStatusEnum.LOADING, 0);
-                    new Thread(()->{
-                        final RaceDefinition raceDefinition = domainFactory.getAndWaitForRaceDefinition(getTracTracRace().getId(), /* timeout in millis */ 10000);
-                        if (trackedRegatta != null && raceDefinition != null && trackedRegatta.getTrackedRace(raceDefinition) != null) {
-                            trackedRegatta.getTrackedRace(raceDefinition).onStatusChanged(OnlineTracTracBasedTest.this, lastStatus);
-                        }
-                    }, "waiting for race definition for race "+getTracTracRace().getId()).start();
+                    if (getTrackedRace() != null) {
+                        getTrackedRace().onStatusChanged(OnlineTracTracBasedTest.this, lastStatus);
+                    }
                     break;
                 case End:
                     logger.info("Stored data end. Delaying status update on tracked race "+getTrackedRace()+" until all events queued in receivers so far have been processed");

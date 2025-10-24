@@ -2,8 +2,9 @@
 
 [[_TOC_]]
 
-##Domain Model
-We have created a set of interfaces that represent the concepts of the domain of sailing races. Typical abstractions captured by these interfaces are, e.g., Regatta, Series, Course, Leg, Waypoint, Buoy and Competitor. There are also interfaces describing more general concepts not necessarily specific to sailing, such as GPSTrack, Position and Distance.
+## Domain Model
+
+We have created a set of interfaces that represent the concepts of the domain of sailing races. Typical abstractions captured by these interfaces are, e.g., Regatta, Series, Course, Leg, Waypoint, Mark and Competitor. There are also interfaces describing more general concepts not necessarily specific to sailing, such as GPSTrack, Position and Distance.
 
 Instances of classes implementing these domain interfaces are generally created using a DomainFactory instance. However, in some special cases constructors of domain classes implementing the domain interfaces may also be invoked directly.
 
@@ -81,6 +82,10 @@ There are various ways to implement server replication. Among the easiest is a l
 With a distinction between master and replica it also becomes possible to apply a technique called Operational Transformation (OT). It is an approach leading to eventual consistency between one master and multiple replicas, supporting changes injected on both, master and replicas. This may become an interesting option when discussing a dying master and the replicas negotiating a new master.
 
 The code base already contains an OT implementation (see package com.sap.sailing.server.operationaltransformation). The operations used for replication are prepared to interact with this framework, but the implementation of the transformation rules are largely not yet implemented except for a few tests in the area of leaderboard-related operations.
+
+For now, it is most important to ensure that the operation implementations behave as "idempotent," meaning that if applied to the replicable object multiple times, only the first execution will lead to a state change; repeated executions will leave the state unchanged. This is important because during the initialization of a replica, operations may be executed on the primary and sent and queued on the replica that is currently initializing by receiving and installing the initial load from the primary. After the initial load has been installed in the replica, the queued operations are applied. The effects of some of these operations may already be encoded in the initial load received by the replica, so re-applying those operations must not alter the state anymore.
+
+This, in particular, means that operation implementations should not describe incremental state changes but should rather specify the new state.
 
 ### Implementation of Operations, Services, and Events
 The operations used for replicating changes are so far all located in the package com.sap.sailing.server.operationaltransformation. There are three ways in which these operations are being used, two of which need urgent consolidation.

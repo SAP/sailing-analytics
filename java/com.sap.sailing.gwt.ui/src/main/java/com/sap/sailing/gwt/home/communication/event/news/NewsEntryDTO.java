@@ -4,7 +4,7 @@ import java.net.URL;
 import java.util.Date;
 
 import com.google.gwt.core.shared.GwtIncompatible;
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
+import com.sap.sse.gwt.shared.DTO;
 
 public abstract class NewsEntryDTO implements DTO {
     

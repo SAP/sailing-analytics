@@ -18,6 +18,7 @@ import com.sap.sailing.gwt.home.shared.SharedHomeResources;
 import com.sap.sailing.gwt.home.shared.partials.videoplayer.VideoPlayer;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sse.gwt.client.DateAndTimeFormatterUtil;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 import com.sap.sse.gwt.client.media.VideoDTO;
 
 public class VideoGalleryVideo extends Composite {
@@ -31,16 +32,17 @@ public class VideoGalleryVideo extends Composite {
     interface VideoGalleryVideoUiBinder extends UiBinder<Widget, VideoGalleryVideo> {
     }
 
-    @UiField(provided = true) VideoPlayer videoPlayerUi = new VideoPlayer(true, false);
+    @UiField(provided = true) VideoPlayer videoPlayerUi;
     @UiField DivElement videoTitleUi;
     @UiField DivElement videoCreateDateUi;
     @UiField DivElement overlayUi;
     @UiField Button editButtonUi;
     @UiField Button deleteButtonUi;
 
-    public VideoGalleryVideo(VideoDTO video, Consumer<VideoDTO> updateVideo) {
+    public VideoGalleryVideo(VideoDTO video, Consumer<VideoDTO> updateVideo, TakedownNoticeService takedownNoticeService, String eventName) {
         this.videoUrl = video.getSourceRef();
         this.videoCreateDate = video.getCreatedAtDate();
+        this.videoPlayerUi = new VideoPlayer(/* fullHeightWidth */ true, /* autoplay */ false, takedownNoticeService, eventName);
         initWidget(uiBinder.createAndBindUi(this));
         SharedHomeResources.INSTANCE.sharedHomeCss().ensureInjected();
         videoPlayerUi.setVideo(video);

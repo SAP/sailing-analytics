@@ -372,7 +372,7 @@ public class WindStreamletsRaceboardOverlay extends MovingCanvasOverlay implemen
 
     public void onDragStart() {
         dragging = true;
-
+        swarm.pause(500 / animationIntervalMillis); // pause animation for two seconds
     }
 
     public void onDragEnd() {
@@ -382,9 +382,9 @@ public class WindStreamletsRaceboardOverlay extends MovingCanvasOverlay implemen
     public void onBoundsChanged(boolean zoomChanged) {
         if (swarm != null) {
             if (dragging) {
-                swarm.pause(2);
+                swarm.pause(300/animationIntervalMillis);
             } else {
-                int swarmPause = (zoomChanged ? 5 : 2);
+                int swarmPause = ((zoomChanged ? 1000 : 300)/animationIntervalMillis);
                 swarm.onBoundsChanged(zoomChanged, swarmPause);
             }
         }

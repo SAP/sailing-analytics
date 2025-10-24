@@ -1,11 +1,11 @@
 package com.sap.sailing.server.gateway.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.json.simple.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.DeviceIdentifier;
 import com.sap.sailing.domain.racelog.tracking.test.mock.MockEmptyServiceFinder;
@@ -21,7 +21,7 @@ import com.sap.sse.common.TypeBasedServiceFinder;
 import com.sap.sse.shared.json.JsonDeserializationException;
 
 public class DeviceIdentifierSerializationTest {
-    @Before
+    @BeforeEach
     public void setup() {
     }
     

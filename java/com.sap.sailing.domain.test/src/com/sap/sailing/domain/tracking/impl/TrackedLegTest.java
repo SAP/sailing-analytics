@@ -1,12 +1,12 @@
 package com.sap.sailing.domain.tracking.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.sap.sailing.domain.base.Competitor;
@@ -27,7 +27,7 @@ public class TrackedLegTest {
     private DynamicTrackedRaceImpl dynamicTrackedRace;
     private Leg leg;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         leg = Mockito.mock(Leg.class);
         dynamicTrackedRace = Mockito.mock(DynamicTrackedRaceImpl.class);

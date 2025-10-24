@@ -1,6 +1,6 @@
 package com.sap.sailing.simulator.test.util;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -49,7 +49,7 @@ public class PolarDiagramPlotDataPolar {
         }
 
         fw.close();
-        assertEquals("no test", 1, 1);
+        assertEquals(1, 1, "no test");
 
     }
 

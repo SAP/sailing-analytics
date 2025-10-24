@@ -349,7 +349,7 @@ public class DataMiningEntryPoint extends AbstractSailingReadEntryPoint implemen
                 });
                 queryDefinitionProvider.addControl(orientationAnchor);
                 queryDefinitionProvider.addControl(new HelpButton(DataMiningHelpButtonResources.INSTANCE,
-                        getStringMessages().videoGuide(), "https://support.sapsailing.com/hc/en-us/articles/360019913740-An-Introduction-to-the-SAP-Sailing-Analytics-Data-Mining-Tool"));
+                        getStringMessages().videoGuide(), "https://wiki.sapsailing.com/wiki/howto/tutorials/sailinganalytics/data-mining-tool.md"));
                 queryAndResultSplitPanel = new SplitLayoutPanel(10);
                 mainPanel.add(queryAndResultSplitPanel);
                 addDefinitionProviderAndResultPresenter();

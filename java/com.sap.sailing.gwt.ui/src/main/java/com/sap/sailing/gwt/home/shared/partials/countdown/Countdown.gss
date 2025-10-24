@@ -24,6 +24,7 @@
      -moz-transform: translate(-50%, -80%);
       -ms-transform: translate(-50%, -80%);
           transform: translate(-50%, -80%);
+  pointer-events: none;
 }
 .countdown_content_title {
   text-shadow: 0 1px 1px rgba(0,0,0,0.4);
@@ -38,6 +39,7 @@
   color: #f6f9fc;
   padding: 1.333333333333333em;
   background: rgba(0,0,0,0.5);
+  pointer-events: none;
 }
 .countdown_info_text {
   display: inline-block;

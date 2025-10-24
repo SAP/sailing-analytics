@@ -1,6 +1,6 @@
 package com.sap.sse.replication.testsupport;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,8 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
-import org.junit.Rule;
-import org.junit.rules.Timeout;
+import org.junit.jupiter.api.Timeout;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -42,6 +42,7 @@ import org.mockito.stubbing.Answer;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.QueueingConsumer;
 import com.sap.sse.common.Util.Pair;
+import com.sap.sse.replication.FullyInitializedReplicableTracker;
 import com.sap.sse.replication.ReplicaDescriptor;
 import com.sap.sse.replication.Replicable;
 import com.sap.sse.replication.ReplicationMasterDescriptor;
@@ -57,9 +58,10 @@ import com.sap.sse.replication.impl.ReplicationServiceImpl;
 import com.sap.sse.replication.impl.ReplicationServlet;
 import com.sap.sse.replication.impl.SingletonReplicablesProvider;
 import com.sap.sse.replication.interfaces.impl.ReplicaDescriptorImpl;
-
+import com.sap.sse.security.SecurityService;
 import net.jpountz.lz4.LZ4BlockOutputStream;
 
+@Timeout(value=5, unit=TimeUnit.MINUTES) // timeout after 5 minutes
 public abstract class AbstractServerReplicationTestSetUp<ReplicableInterface extends Replicable<?, ?>, ReplicableImpl extends ReplicableInterface> {
     private static final Logger logger = Logger.getLogger(AbstractServerReplicationTestSetUp.class.getName());
     
@@ -72,17 +74,27 @@ public abstract class AbstractServerReplicationTestSetUp<ReplicableInterface ext
     private ReplicaDescriptor replicaDescriptor;
     private ReplicationServiceImpl masterReplicator;
     protected ReplicationMasterDescriptor masterDescriptor;
+    private Thread initialLoadTestServerThread;
+    
+    private final FullyInitializedReplicableTracker<SecurityService> securityServiceTrackerMock;
     
     protected AbstractServerReplicationTestSetUp() {
+        this(/* securityServiceTrackerMock*/ null);
     }
     
     protected AbstractServerReplicationTestSetUp(int servletPort) {
+        this(/* securityServiceTrackerMock*/ null);
         this.servletPort = servletPort;
     }
     
-    @Rule public Timeout AbstractTracTracLiveTestTimeout = Timeout.millis(5 * 60 * 1000); // timeout after 5 minutes
-    private Thread initialLoadTestServerThread;
-
+    protected AbstractServerReplicationTestSetUp(final FullyInitializedReplicableTracker<SecurityService> securityServiceTrackerMock) {
+        this.securityServiceTrackerMock = securityServiceTrackerMock;
+    }
+    
+    public FullyInitializedReplicableTracker<SecurityService> getSecurityServiceTrackerMock() {
+        return securityServiceTrackerMock;
+    }
+    
     /**
      * Sets up master and replica, starts the JMS message broker and registers the replica with the master. If you want
      * to drop the DB in your particular test case first, override {@link #persistenceSetUp(boolean)}. If you don't want
@@ -167,12 +179,12 @@ public abstract class AbstractServerReplicationTestSetUp<ReplicableInterface ext
         if (master != null) {
             this.master = master;
         } else {
-            this.master = createNewMaster();
+            this.master = createNewMaster(securityServiceTrackerMock);
         }
         if (replica != null) {
             this.replica = replica;
         } else {
-            this.replica = createNewReplica();
+            this.replica = createNewReplica(securityServiceTrackerMock);
         }
         ReplicationInstancesManager rim = new ReplicationInstancesManager();
         masterReplicator = new ReplicationServiceImpl(exchangeName, exchangeHost, 0, rim, new SingletonReplicablesProvider(this.master));
@@ -192,18 +204,24 @@ public abstract class AbstractServerReplicationTestSetUp<ReplicableInterface ext
     }
 
     /**
-     * Creates a new master replicable. This method is called only after {@link #persistenceSetUp(boolean)} has been called. Therefore,
-     * any initialization that {@link #persistenceSetUp(boolean)} may have performed can be assumed to have taken place in the implementations
-     * of this method.
+     * Creates a new master replicable. This method is called only after {@link #persistenceSetUp(boolean)} has been
+     * called. Therefore, any initialization that {@link #persistenceSetUp(boolean)} may have performed can be assumed
+     * to have taken place in the implementations of this method.
+     * 
+     * @param securityServiceTrackerMock
+     *            an optional mock for the security service tracker; may be <code>null</code>
      */
-    protected abstract ReplicableImpl createNewMaster() throws Exception;
+    protected abstract ReplicableImpl createNewMaster(FullyInitializedReplicableTracker<SecurityService> securityServiceTrackerMock) throws Exception;
 
     /**
-     * Creates a new replica replicable instance. This method is called only after {@link #persistenceSetUp(boolean)} has been called. Therefore,
-     * any initialization that {@link #persistenceSetUp(boolean)} may have performed can be assumed to have taken place in the implementations
-     * of this method.
+     * Creates a new replica replicable instance. This method is called only after {@link #persistenceSetUp(boolean)}
+     * has been called. Therefore, any initialization that {@link #persistenceSetUp(boolean)} may have performed can be
+     * assumed to have taken place in the implementations of this method.
+     * 
+     * @param securityServiceTrackerMock
+     *            an optional mock for the security service tracker; may be <code>null</code>
      */
-    protected abstract ReplicableImpl createNewReplica() throws Exception;
+    protected abstract ReplicableImpl createNewReplica(FullyInitializedReplicableTracker<SecurityService> securityServiceTrackerMock) throws Exception;
 
     public void tearDown() throws Exception {
         logger.info("starting to tearDown() test");
@@ -224,7 +242,7 @@ public abstract class AbstractServerReplicationTestSetUp<ReplicableInterface ext
                 logger.info("sent and closed STOP request");
                 initialLoadTestServerThread.join(10000 /* wait 10s */);
                 logger.info("joined servlet thread");
-                assertFalse("Expected initial load test server thread to die", initialLoadTestServerThread.isAlive());
+                assertFalse(initialLoadTestServerThread.isAlive(), "Expected initial load test server thread to die");
             }
         } catch (ConnectException ex) {
             /* do not make tests fail because of a server that has been shut down

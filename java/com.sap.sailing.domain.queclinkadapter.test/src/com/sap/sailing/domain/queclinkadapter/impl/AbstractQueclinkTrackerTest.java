@@ -2,9 +2,9 @@ package com.sap.sailing.domain.queclinkadapter.impl;
 
 import java.io.IOException;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.mongodb.MongoException;
 import com.mongodb.ReadConcern;
@@ -26,12 +26,12 @@ public class AbstractQueclinkTrackerTest {
     protected SensorFixStore store;
     private static ClientSession clientSession;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         clientSession = MongoDBService.INSTANCE.startCausallyConsistentSession();
     }
     
-    @Before
+    @BeforeEach
     public void setUp() throws MongoException, IOException {
         dropPersistedData();
         newStore();
@@ -43,7 +43,7 @@ public class AbstractQueclinkTrackerTest {
                 WriteConcern.MAJORITY, clientSession, clientSession);
     }
 
-    @After
+    @AfterEach
     public void after() throws IOException {
         dropPersistedData();
     }

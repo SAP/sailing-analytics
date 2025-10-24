@@ -1,9 +1,9 @@
 package com.sap.sailing.server.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Event;
 import com.sap.sailing.domain.common.LeaderboardNameConstants;
@@ -46,7 +46,7 @@ public class RemoveLeaderboardGroupTest {
     private Event pfingstbusch;
     private UUID newGroupId;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         final SecurityService securityService = SecurityServiceMockFactory.mockSecurityService();
         server = new RacingEventServiceImpl() {

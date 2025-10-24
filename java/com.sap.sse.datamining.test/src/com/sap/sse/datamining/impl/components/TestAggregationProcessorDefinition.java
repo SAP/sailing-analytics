@@ -1,14 +1,21 @@
 package com.sap.sse.datamining.impl.components;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.test.util.components.aggregators.TestAggregationProcessorDummyWithInvalidConstructor;
 
 public class TestAggregationProcessorDefinition {
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testCreationWithInvalidConstructor() {
-        new SimpleAggregationProcessorDefinition<>(Object.class, Double.class, "InvalidAggregatorDefinition", TestAggregationProcessorDummyWithInvalidConstructor.class);
+        try {
+            new SimpleAggregationProcessorDefinition<>(Object.class, Double.class, "InvalidAggregatorDefinition", TestAggregationProcessorDummyWithInvalidConstructor.class);
+            fail("Expected IllegalArgumentException for invalid constructor");
+        } catch (IllegalArgumentException e) {
+            // Expected exception
+        }
     }
 
 }

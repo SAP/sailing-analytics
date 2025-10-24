@@ -3,9 +3,9 @@ package com.sap.sse.security.test;
 import java.io.Serializable;
 import java.net.UnknownHostException;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoDatabase;
@@ -33,7 +33,7 @@ public class UserPreferenceObjectAndConverterTest {
     private static final SimplePreferenceForSerialization pref2 = new SimplePreferenceForSerialization("some sailing value", true, 9.87654321);
     private static final String serializedPref2 = prefConverter.toPreferenceString(pref2);
 
-    @Before
+    @BeforeEach
     public void setUp() throws UnknownHostException, MongoException, UserGroupManagementException, UserManagementException {
         final MongoDBConfiguration dbConfiguration = MongoDBConfiguration.getDefaultTestConfiguration();
         final MongoDBService service = dbConfiguration.getService();
@@ -48,21 +48,21 @@ public class UserPreferenceObjectAndConverterTest {
     @Test
     public void noConverterSetTest() {
         store.setPreference(user1, prefKey1, serializedPref1);
-        Assert.assertNull(store.getPreferenceObject(user1, prefKey1));
+        Assertions.assertNull(store.getPreferenceObject(user1, prefKey1));
     }
     
     @Test
     public void converterAlreadyRegisteredWhenSettingPreferenceTest() {
         store.registerPreferenceConverter(prefKey1, prefConverter);
         store.setPreference(user1, prefKey1, serializedPref1);
-        Assert.assertEquals(pref1, store.getPreferenceObject(user1, prefKey1));
+        Assertions.assertEquals(pref1, store.getPreferenceObject(user1, prefKey1));
     }
     
     @Test
     public void converterSetWhenPreferenceAlreadyRegisteredTest() {
         store.setPreference(user1, prefKey1, serializedPref1);
         store.registerPreferenceConverter(prefKey1, prefConverter);
-        Assert.assertEquals(pref1, store.getPreferenceObject(user1, prefKey1));
+        Assertions.assertEquals(pref1, store.getPreferenceObject(user1, prefKey1));
     }
     
     @Test
@@ -70,8 +70,8 @@ public class UserPreferenceObjectAndConverterTest {
         store.setPreference(user1, prefKey1, serializedPref1);
         store.setPreference(user2, prefKey1, serializedPref2);
         store.registerPreferenceConverter(prefKey1, prefConverter);
-        Assert.assertEquals(pref1, store.getPreferenceObject(user1, prefKey1));
-        Assert.assertEquals(pref2, store.getPreferenceObject(user2, prefKey1));
+        Assertions.assertEquals(pref1, store.getPreferenceObject(user1, prefKey1));
+        Assertions.assertEquals(pref2, store.getPreferenceObject(user2, prefKey1));
     }
     
     @Test
@@ -80,16 +80,16 @@ public class UserPreferenceObjectAndConverterTest {
         store.setPreference(user1, prefKey2, serializedPref2);
         store.registerPreferenceConverter(prefKey1, prefConverter);
         store.registerPreferenceConverter(prefKey2, prefConverter);
-        Assert.assertEquals(pref1, store.getPreferenceObject(user1, prefKey1));
-        Assert.assertEquals(pref2, store.getPreferenceObject(user1, prefKey2));
+        Assertions.assertEquals(pref1, store.getPreferenceObject(user1, prefKey1));
+        Assertions.assertEquals(pref2, store.getPreferenceObject(user1, prefKey2));
     }
     
     @Test
     public void setPreferenceObjectTest() {
         store.registerPreferenceConverter(prefKey1, prefConverter);
         store.setPreferenceObject(user1, prefKey1, pref1);
-        Assert.assertEquals(serializedPref1, store.getPreference(user1, prefKey1));
-        Assert.assertEquals(pref1, store.getPreferenceObject(user1, prefKey1));
+        Assertions.assertEquals(serializedPref1, store.getPreference(user1, prefKey1));
+        Assertions.assertEquals(pref1, store.getPreferenceObject(user1, prefKey1));
     }
     
     @Test
@@ -97,7 +97,7 @@ public class UserPreferenceObjectAndConverterTest {
         store.registerPreferenceConverter(prefKey1, prefConverter);
         store.setPreferenceObject(user1, prefKey1, pref1);
         store.unsetPreference(user1, prefKey1);
-        Assert.assertNull(store.getPreferenceObject(user1, prefKey1));
+        Assertions.assertNull(store.getPreferenceObject(user1, prefKey1));
     }
     
     @Test
@@ -105,7 +105,7 @@ public class UserPreferenceObjectAndConverterTest {
         store.registerPreferenceConverter(prefKey1, prefConverter);
         store.setPreferenceObject(user1, prefKey1, pref1);
         store.setPreferenceObject(user1, prefKey1, null);
-        Assert.assertNull(store.getPreferenceObject(user1, prefKey1));
+        Assertions.assertNull(store.getPreferenceObject(user1, prefKey1));
     }
     
     /**
@@ -119,7 +119,7 @@ public class UserPreferenceObjectAndConverterTest {
         store.registerPreferenceConverter(prefKey1, prefConverter);
         store.setPreferenceObject(user1, prefKey1, pref1);
         store.deleteUser(user1);
-        Assert.assertNull(store.getPreferenceObject(user1, prefKey1));
+        Assertions.assertNull(store.getPreferenceObject(user1, prefKey1));
     }
     
     @Test
@@ -128,7 +128,7 @@ public class UserPreferenceObjectAndConverterTest {
         store.registerPreferenceConverter(prefKey1, prefConverter);
         store.setPreference(user1, prefKey1, serializedPref1);
         store.removePreferenceConverter(prefKey1);
-        Assert.assertNull(store.getPreferenceObject(user1, prefKey1));
+        Assertions.assertNull(store.getPreferenceObject(user1, prefKey1));
     }
 
     public static class SimplePreferenceForSerialization implements Serializable {

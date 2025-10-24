@@ -9,8 +9,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class ManagedInfoWindow {
 
-    private final InfoWindowOptions infoWindowOptions = InfoWindowOptions.newInstance();
-    private final InfoWindow infoWindow = InfoWindow.newInstance(infoWindowOptions);
+    private final InfoWindowOptions infoWindowOptions;
+    private final InfoWindow infoWindow;
     private final MapWidget map;
 
     private final InfoWindowContent container = new InfoWindowContent();
@@ -18,6 +18,8 @@ public class ManagedInfoWindow {
     private boolean shown = false;
 
     public ManagedInfoWindow(final MapWidget map) {
+        infoWindowOptions = InfoWindowOptions.newInstance();
+        infoWindow = InfoWindow.newInstance(infoWindowOptions);
         this.map = map;
         this.infoWindow.setContent(container);
         this.infoWindow.addDomReadyHandler(event -> container.maybeAttach());
@@ -29,6 +31,8 @@ public class ManagedInfoWindow {
 
     public void openAtPosition(final Widget content, final LatLng position) {
         this.container.setWidget(content);
+        this.infoWindowOptions.setDisableAutoPan(map.getHeading() != 0); // avoids map rotating back to 0deg heading when info window is shown
+        this.infoWindow.setOptions(infoWindowOptions);
         this.infoWindow.setPosition(position);
         this.infoWindow.open(map);
         this.shown = true;

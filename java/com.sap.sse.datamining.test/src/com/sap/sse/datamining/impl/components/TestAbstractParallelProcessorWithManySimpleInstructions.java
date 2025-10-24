@@ -6,8 +6,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.components.AdditionalResultDataBuilder;
 import com.sap.sse.datamining.components.Processor;
@@ -22,7 +22,7 @@ public class TestAbstractParallelProcessorWithManySimpleInstructions {
     private int sum = 0;
     private boolean receiverWasToldToFinish = false;
     
-    @Before
+    @BeforeEach
     public void initializeProcessor() {
         Processor<Integer, Void> receiver = new NullProcessor<Integer, Void>(Integer.class, Void.class) {
             @Override

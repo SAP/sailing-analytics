@@ -123,6 +123,9 @@ extends OperationsToMasterSender<S, O>, Replicator<S, O> {
      * To determine whether this {@link Replicable} is a replica, this method uses the
      * {@link ReplicationService#getReplicatingFromMaster()} method which also provides the master server's connectivity
      * information required to forward the <code>operation</code>.
+     * 
+     * @return the result of applying the operation locally; results of applying the operation on other nodes of the
+     *        replica set are not considered
      */
     <T> T apply(O operation);
 
@@ -250,7 +253,7 @@ extends OperationsToMasterSender<S, O>, Replicator<S, O> {
 
     /**
      * Responds with what has been passed to the last invocation to {@link #setCurrentlyFillingFromInitialLoad(boolean)}
-     * and {@link #setCurrentlyApplyingOperationReceivedFromMaster(boolean)}, respectively, in the calling thread; the
+     * and {@link #setCurrentlyFillingFromInitialLoad(boolean)}, respectively, in the calling thread; the
      * default is <code>false</code>. This is required in order to not replicate operations triggered on the replica
      * while receiving the initial load back to the master.
      */

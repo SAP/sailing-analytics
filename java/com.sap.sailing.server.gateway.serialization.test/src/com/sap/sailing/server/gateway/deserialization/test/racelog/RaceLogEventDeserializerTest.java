@@ -1,6 +1,6 @@
 package com.sap.sailing.server.gateway.deserialization.test.racelog;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;

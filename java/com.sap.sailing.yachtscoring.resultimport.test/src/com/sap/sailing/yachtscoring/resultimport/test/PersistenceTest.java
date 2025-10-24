@@ -5,9 +5,8 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.persistence.DomainObjectFactory;
 import com.sap.sailing.domain.persistence.MongoObjectFactory;
@@ -32,16 +31,16 @@ public class PersistenceTest {
         resultUrlRegistry.registerResultUrl(testProviderName, testUrl);
 
         Map<String, Set<URL>> resultUrls = domainObjectFactory.loadResultUrls();
-        Assert.assertTrue(resultUrls.containsKey(testProviderName));
+        Assertions.assertTrue(resultUrls.containsKey(testProviderName));
         Set<URL> urls = resultUrls.get(testProviderName);
-        Assert.assertEquals(1, urls.size());
+        Assertions.assertEquals(1, urls.size());
         URL url = urls.iterator().next();
-        Assert.assertEquals(testUrl, url);
+        Assertions.assertEquals(testUrl, url);
 
         resultUrlRegistry.unregisterResultUrl(testProviderName, testUrl);
 
         resultUrls = domainObjectFactory.loadResultUrls();
-        Assert.assertFalse(resultUrls.containsKey(testProviderName));
+        Assertions.assertFalse(resultUrls.containsKey(testProviderName));
 
     }
 

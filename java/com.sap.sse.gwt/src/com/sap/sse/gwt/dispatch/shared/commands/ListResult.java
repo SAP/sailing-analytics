@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.sap.sse.gwt.shared.DTO;
+
 public class ListResult<T extends DTO> implements CollectionResult<T> {
     private ArrayList<T> values = new ArrayList<>();
     

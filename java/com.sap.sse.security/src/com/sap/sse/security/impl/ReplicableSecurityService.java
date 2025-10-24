@@ -124,9 +124,9 @@ public interface ReplicableSecurityService extends SecurityService {
 
     LockingAndBanning internalFailedPasswordAuthentication(String username);
 
-    Void internalSuccessfulPasswordAuthentication(String username);
+    Boolean internalSuccessfulPasswordAuthentication(String username);
 
-    Void internalSuccessfulBearerTokenAuthentication(String clientIP);
+    Boolean internalSuccessfulBearerTokenAuthentication(String clientIP);
 
     LockingAndBanning internalFailedBearerTokenAuthentication(String clientIP);
 

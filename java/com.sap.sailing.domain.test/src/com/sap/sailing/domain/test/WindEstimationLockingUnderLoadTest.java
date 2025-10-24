@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.sap.sailing.domain.base.BoatClass;
@@ -78,14 +78,14 @@ public class WindEstimationLockingUnderLoadTest {
     
     private WindTrack measuredTrack;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         realWindSource = new WindSourceWithAdditionalID(WindSourceType.EXPEDITION, "1");
         mockedTrackedRace = mockTrackedRace();
         estimationTrack = new TrackBasedEstimationWindTrackImpl(mockedTrackedRace, WindTrack.DEFAULT_MILLISECONDS_OVER_WHICH_TO_AVERAGE_WIND, 0.5);
     }
     
-    @After
+    @AfterEach
     public void tearDown() {
         // clean up all Mockito stubbing leaks, particularly the InvocationImpl objects attached to any ThreadLocal;
         // see also bug 1923, comment #9.

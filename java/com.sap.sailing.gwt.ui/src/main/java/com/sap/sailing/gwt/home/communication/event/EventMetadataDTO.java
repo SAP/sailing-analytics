@@ -3,6 +3,7 @@ package com.sap.sailing.gwt.home.communication.event;
 import java.util.Date;
 
 import com.sap.sailing.gwt.home.communication.eventlist.EventListEventSeriesDTO;
+import com.sap.sailing.gwt.ui.shared.EventReferenceDTO;
 
 public class EventMetadataDTO extends EventReferenceDTO {
 

@@ -1,14 +1,14 @@
 package com.sap.sailing.mongodb.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.net.UnknownHostException;
 
 import org.bson.Document;
 import org.json.simple.parser.ParseException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
@@ -32,7 +32,7 @@ public class TestStoringAndRetrievingRaceLogEventData extends AbstractMongoDBTes
         super();
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void dropTestDB() throws UnknownHostException, MongoException, InterruptedException {
         super.dropTestDB();

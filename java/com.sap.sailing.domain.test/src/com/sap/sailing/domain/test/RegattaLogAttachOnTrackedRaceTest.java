@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -9,8 +9,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.regatta.RegattaLog;
 import com.sap.sailing.domain.abstractlog.regatta.impl.RegattaLogImpl;
@@ -77,7 +77,7 @@ public class RegattaLogAttachOnTrackedRaceTest {
     
     private FlexibleLeaderboard leaderboard;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         leaderboard = new FlexibleLeaderboardImpl(EmptyRaceLogStore.INSTANCE, new MyMockedRegattaLogStore(), "", null, new LowPoint(),
                 /* no course area */ (CourseArea) null);

@@ -53,7 +53,7 @@ public interface VectorField {
     /**
      * @param zoomLevel the zoom level as returned by {@link MapWidget#getZoom()}
      */
-    double getMotionScale(int zoomLevel);
+    double getMotionScale(double zoomLevel);
 
     /**
      * A weight between 0.0 and 1.0 (inclusive) that tells the probability at which a particle at position

@@ -1,14 +1,14 @@
 package com.sap.sailing.nmeaconnector.test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.nmeaconnector.NmeaFactory;
@@ -17,7 +17,7 @@ import com.sap.sse.common.Util;
 public class NMEAWindImportTest {
     Iterable<Wind> windFixes;
     
-    @Before
+    @BeforeEach
     public void setUp() throws FileNotFoundException, InterruptedException {
         NmeaFactory.INSTANCE.getUtil().registerAdditionalParsers();
         windFixes = NmeaFactory.INSTANCE.readWind(new FileInputStream("resources/ExcerptFromLogJB010815.txt"));
@@ -29,7 +29,7 @@ public class NMEAWindImportTest {
         assertTrue(!Util.isEmpty(windFixes));
     }
     
-    @After
+    @AfterEach
     public void tearDown() {
         NmeaFactory.INSTANCE.getUtil().unregisterAdditionalParsers();
     }

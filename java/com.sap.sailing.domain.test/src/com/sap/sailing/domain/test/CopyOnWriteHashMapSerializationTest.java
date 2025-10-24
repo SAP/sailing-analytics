@@ -1,6 +1,6 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.concurrent.CopyOnWriteHashMap;
 
@@ -17,7 +17,7 @@ public class CopyOnWriteHashMapSerializationTest {
     
     private CopyOnWriteHashMap<String, String> expected;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         expected = new CopyOnWriteHashMap<>();
         expected.put("a", "1");

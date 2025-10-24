@@ -1,19 +1,18 @@
 package com.sap.sse.landscape.aws;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.net.InetAddress;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
 import com.sap.sse.common.Util;
@@ -29,7 +28,7 @@ public class MongoUriParserTest {
     private MongoUriParser<String> parser;
     
     @SuppressWarnings("unchecked")
-    @Before
+    @BeforeEach
     public void setUp() throws UnknownHostException {
         final AwsLandscape<String> landscape = Mockito.mock(AwsLandscape.class);
         final InetAddress wwwExampleCom = InetAddress.getByName(WWW_EXAMPLE_COM);

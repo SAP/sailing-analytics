@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -91,15 +92,18 @@ import com.nulabinc.zxcvbn.ZxcvbnBuilder;
 import com.nulabinc.zxcvbn.io.ClasspathResource;
 import com.nulabinc.zxcvbn.matchers.SlantedKeyboardLoader;
 import com.sap.sse.ServerInfo;
+import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.http.HttpHeaderUtil;
 import com.sap.sse.common.mail.MailException;
+import com.sap.sse.common.media.TakedownNoticeRequestContext;
 import com.sap.sse.concurrent.LockUtil;
 import com.sap.sse.concurrent.NamedReentrantReadWriteLock;
 import com.sap.sse.i18n.impl.ResourceBundleStringMessagesImpl;
 import com.sap.sse.mail.MailService;
+import com.sap.sse.replication.ReplicationService;
 import com.sap.sse.replication.interfaces.impl.AbstractReplicableWithObjectInputStream;
 import com.sap.sse.rest.CORSFilterConfiguration;
 import com.sap.sse.security.Action;
@@ -241,6 +245,8 @@ implements ReplicableSecurityService, ClearStateTestSupport {
     private final ServiceTracker<MailService, MailService> mailServiceTracker;
     
     private final ServiceTracker<CORSFilterConfiguration, CORSFilterConfiguration> corsFilterConfigurationTracker;
+    
+    private final ServiceTracker<ReplicationService, ReplicationService> replicationServiceTracker;
 
     private ThreadLocal<UserGroup> temporaryDefaultTenant = new InheritableThreadLocal<>();
     
@@ -319,8 +325,8 @@ implements ReplicableSecurityService, ClearStateTestSupport {
             ServiceTracker<CORSFilterConfiguration, CORSFilterConfiguration> corsFilterConfigurationTracker,
             UserStore userStore, AccessControlStore accessControlStore, HasPermissionsProvider hasPermissionsProvider,
             SubscriptionPlanProvider subscriptionPlanProvider) {
-        this(mailServiceTracker, corsFilterConfigurationTracker, userStore, accessControlStore, hasPermissionsProvider,
-                subscriptionPlanProvider, /* sharedAcrossSubdomainsOf */ null, /* baseUrlForCrossDomainStorage */ null);
+        this(mailServiceTracker, corsFilterConfigurationTracker, /* replicationServiceTracker */ null, userStore, accessControlStore,
+                hasPermissionsProvider, subscriptionPlanProvider, /* sharedAcrossSubdomainsOf */ null, /* baseUrlForCrossDomainStorage */ null);
     }
     
     /**
@@ -330,8 +336,8 @@ implements ReplicableSecurityService, ClearStateTestSupport {
      * be shared as well.
      */
     public SecurityServiceImpl(ServiceTracker<MailService, MailService> mailServiceTracker, ServiceTracker<CORSFilterConfiguration, CORSFilterConfiguration> corsFilterConfigurationTracker,
-            UserStore userStore, AccessControlStore accessControlStore, HasPermissionsProvider hasPermissionsProvider,
-            SubscriptionPlanProvider subscriptionPlanProvider, String sharedAcrossSubdomainsOf, String baseUrlForCrossDomainStorage) {
+            ServiceTracker<ReplicationService, ReplicationService> replicationServiceTracker, UserStore userStore, AccessControlStore accessControlStore,
+            HasPermissionsProvider hasPermissionsProvider, SubscriptionPlanProvider subscriptionPlanProvider, String sharedAcrossSubdomainsOf, String baseUrlForCrossDomainStorage) {
         initialLoadClassLoaderRegistry.addClassLoader(getClass().getClassLoader());
         if (hasPermissionsProvider == null) {
             throw new IllegalArgumentException("No HasPermissionsProvider defined");
@@ -347,6 +353,7 @@ implements ReplicableSecurityService, ClearStateTestSupport {
         this.accessControlStore = accessControlStore;
         this.mailServiceTracker = mailServiceTracker;
         this.corsFilterConfigurationTracker = corsFilterConfigurationTracker;
+        this.replicationServiceTracker = replicationServiceTracker;
         this.hasPermissionsProvider = hasPermissionsProvider;
         this.cacheManager = loadReplicationCacheManagerContents();
         this.corsFilterConfigurationsByReplicaSetName = loadCORSFilterConfigurations();
@@ -537,6 +544,10 @@ implements ReplicableSecurityService, ClearStateTestSupport {
     private CORSFilterConfiguration getCORSFilterConfiguration() {
         return corsFilterConfigurationTracker == null ? null : corsFilterConfigurationTracker.getService();
     }
+    
+    private ReplicationService getReplicationService() {
+        return replicationServiceTracker == null ? null : replicationServiceTracker.getService();
+    }
 
     @Override
     public void sendMail(String username, String subject, String body) throws MailException {
@@ -594,6 +605,7 @@ implements ReplicableSecurityService, ClearStateTestSupport {
 
     @Override
     public Void internalResetPassword(String username, String passwordResetSecret) {
+        logger.info("Password reset for user "+username+" requested");
         getUserByName(username).startPasswordReset(passwordResetSecret);
         return null;
     }
@@ -1149,7 +1161,7 @@ implements ReplicableSecurityService, ClearStateTestSupport {
             if (lockingAndBanning == null || !lockingAndBanning.isAuthenticationLocked()) {
                 apply(s->s.internalRecordUserCreationFromClientIP(clientIP));
             } else {
-                throw new UserManagementException("Client IP "+clientIP+" locked for user creation: "+lockingAndBanning);
+                throw new UserManagementException(UserManagementException.CLIENT_CURRENTLY_LOCKED_FOR_USER_CREATION);
             }
         }
     }
@@ -1199,7 +1211,7 @@ implements ReplicableSecurityService, ClearStateTestSupport {
     
     @Override
     public User internalCreateUser(String username, String email, Account... accounts) throws UserManagementException {
-        final User result = store.createUser(username, email, new LockingAndBanningImpl(), accounts); // TODO: get the principal as owner
+        final User result = store.createUser(username, email, new LockingAndBanningImpl(), accounts);
         return result;
     }
 
@@ -1233,6 +1245,7 @@ implements ReplicableSecurityService, ClearStateTestSupport {
         final UsernamePasswordAccount account = (UsernamePasswordAccount) user.getAccount(AccountType.USERNAME_PASSWORD);
         account.setSalt(salt);
         account.setSaltedPassword(hashedPasswordBase64);
+        logger.info("Password for user "+username+" was updated by "+SessionUtils.getPrincipal());
         user.passwordWasReset();
         store.updateUser(user);
         return null;
@@ -1264,7 +1277,7 @@ implements ReplicableSecurityService, ClearStateTestSupport {
             throw new UserManagementException(UserManagementException.USER_DOES_NOT_EXIST);
         }
         if (user.getLockingAndBanning().isAuthenticationLocked()) {
-            throw new UserManagementException("Password authentication is locked for user "+username);
+            throw new UserManagementException(UserManagementException.PASSWORD_AUTHENTICATION_CURRENTLY_LOCKED_FOR_USER);
         }
         final UsernamePasswordAccount account = (UsernamePasswordAccount) user.getAccount(AccountType.USERNAME_PASSWORD);
         String hashedOldPassword = hashPassword(password, account.getSalt());
@@ -1291,6 +1304,7 @@ implements ReplicableSecurityService, ClearStateTestSupport {
             lockingAndBanning = user.getLockingAndBanning();
             lockingAndBanning.failedPasswordAuthentication();
             store.updateUser(user);
+            logger.info("failed password authentication for user "+username+"; locking: "+lockingAndBanning);
         } else {
             lockingAndBanning = null;
         }
@@ -1299,29 +1313,45 @@ implements ReplicableSecurityService, ClearStateTestSupport {
 
     @Override
     public void successfulPasswordAuthentication(User user) {
-        apply(s->s.internalSuccessfulPasswordAuthentication(user.getName()));
+        // replicate only if this really implied a change
+        if (internalSuccessfulPasswordAuthentication(user.getName())) {
+            replicate(s->s.internalSuccessfulPasswordAuthentication(user.getName()));
+        }
     }
     
     @Override
-    public Void internalSuccessfulPasswordAuthentication(String username) {
+    public Boolean internalSuccessfulPasswordAuthentication(String username) {
+        final boolean changed;
         final User user = getUserByName(username);
         if (user != null) {
-            if (user.getLockingAndBanning().successfulPasswordAuthentication()) {
+            changed = user.getLockingAndBanning().successfulPasswordAuthentication();
+            if (changed) {
                 store.updateUser(user);
             }
+        } else {
+            changed = false;
         }
-        return null;
+        return changed;
     }
 
     @Override
     public LockingAndBanning failedBearerTokenAuthentication(String clientIP) {
-        return apply(s->s.internalFailedBearerTokenAuthentication(clientIP));
+        final LockingAndBanning result;
+        final ReplicationService replicationService = getReplicationService();
+        if (replicationService == null || !replicationService.isReplicationStarting()) {
+            result = apply(s->s.internalFailedBearerTokenAuthentication(clientIP));
+        } else {
+            logger.warning("Replication is starting, so not recording failed bearer token authentication for client IP "+clientIP);
+            result = null;
+        }
+        return result;
     }
     
     @Override
     public LockingAndBanning internalFailedBearerTokenAuthentication(String clientIP) {
         final LockingAndBanning lockingAndBanning = clientIPBasedLockingAndBanningForBearerTokenAuthentication.computeIfAbsent(escapeNullClientIP(clientIP), key->new LockingAndBanningImpl());
         lockingAndBanning.failedPasswordAuthentication();
+        logger.info("failed bearer token authentication from client IP "+clientIP+"; locking: "+lockingAndBanning);
         scheduleCleanUpTask(clientIP, lockingAndBanning, clientIPBasedLockingAndBanningForBearerTokenAuthentication,
                 "client IPs locked for bearer token authentication");
         return lockingAndBanning;
@@ -1329,34 +1359,35 @@ implements ReplicableSecurityService, ClearStateTestSupport {
 
     /**
      * Schedule a clean-up task to avoid leaking memory for the LockingAndBanning objects; schedule it in two times the
-     * locking expiry pf {@code lockingAndBanning} because if no authentication failure occurs for that IP/user agent
-     * combination, we will entirely remove the {@link LockingAndBanning} from the map, effectively resetting that IP to
-     * a short default locking duration again; this way, if during the double expiration time another failed attempt is
-     * registered, we can still grow the locking duration because we have kept the {@link LockingAndBanning} object
-     * available for a bit longer. Furthermore, for authentication requests, the responsible {@link Realm} will let
-     * authentication requests get to here only if not locked, so if we were to expunge entries immediately as they
-     * unlock, the locking duration could never grow.
+     * locking expiry of {@code lockingAndBanning}, but at least one hour, because if no authentication failure occurs
+     * for that IP/user agent combination, we will entirely remove the {@link LockingAndBanning} from the map,
+     * effectively resetting that IP to a short default locking duration again; this way, if during the double
+     * expiration time another failed attempt is registered, we can still grow the locking duration because we have kept
+     * the {@link LockingAndBanning} object available for a bit longer. Furthermore, for authentication requests, the
+     * responsible {@link Realm} will let authentication requests get to here only if not locked, so if we were to
+     * expunge entries immediately as they unlock, the locking duration could never grow.<p>
+     * 
+     * With the minimum of one hour, we ensure that failing requests done at a slower rate still grow the locking
+     * expiry duration.
      */
     private void scheduleCleanUpTask(final String clientIPOrNull,
             final LockingAndBanning lockingAndBanning,
             final ConcurrentMap<String, LockingAndBanning> mapToRemoveFrom,
             final String nameOfMapForLog) {
-        final long millisUntilLockingExpiry = 2*ApproximateTime.approximateNow().until(lockingAndBanning.getLockedUntil()).asMillis();
-        if (millisUntilLockingExpiry > 0) {
-            ThreadPoolUtil.INSTANCE.getDefaultBackgroundTaskThreadPoolExecutor().schedule(
-                    ()->{
-                        final LockingAndBanning lab = mapToRemoveFrom.get(escapeNullClientIP(clientIPOrNull));
-                        if (lab != null && !lab.isAuthenticationLocked()) {
-                            mapToRemoveFrom.remove(escapeNullClientIP(clientIPOrNull));
-                            logger.info("Removed "+clientIPOrNull+" from "+nameOfMapForLog+"; "
-                                    +mapToRemoveFrom.size()
-                                    +" locked client IP(s) remaining");
-                        }
-                    },
-                    millisUntilLockingExpiry, TimeUnit.MILLISECONDS);
-        } else { // a bit weird because we just locked it; suggests very slow execution; yet, let's clean up...
-            mapToRemoveFrom.remove(escapeNullClientIP(clientIPOrNull));
-        }
+        final long millisUntilLockingExpiry = Math.max(
+                2*ApproximateTime.approximateNow().until(lockingAndBanning.getLockedUntil()).asMillis(),
+                Duration.ONE_HOUR.asMillis());
+        ThreadPoolUtil.INSTANCE.getDefaultBackgroundTaskThreadPoolExecutor().schedule(
+                ()->{
+                    final LockingAndBanning lab = mapToRemoveFrom.get(escapeNullClientIP(clientIPOrNull));
+                    if (lab != null && !lab.isAuthenticationLocked()) {
+                        mapToRemoveFrom.remove(escapeNullClientIP(clientIPOrNull));
+                        logger.info("Removed "+clientIPOrNull+" from "+nameOfMapForLog+"; "
+                                +mapToRemoveFrom.size()
+                                +" locked client IP(s) remaining");
+                    }
+                },
+                millisUntilLockingExpiry, TimeUnit.MILLISECONDS);
     }
 
     private String escapeNullClientIP(String clientIP) {
@@ -1365,16 +1396,23 @@ implements ReplicableSecurityService, ClearStateTestSupport {
 
     @Override
     public void successfulBearerTokenAuthentication(String clientIP) {
-        apply(s->s.internalSuccessfulBearerTokenAuthentication(clientIP));
+        // replicate only if this truly caused a change in locking/banning:
+        if (internalSuccessfulBearerTokenAuthentication(clientIP)) {
+            replicate(s->s.internalSuccessfulBearerTokenAuthentication(clientIP));
+        }
     }
     
     @Override
-    public Void internalSuccessfulBearerTokenAuthentication(String clientIP) {
+    public Boolean internalSuccessfulBearerTokenAuthentication(String clientIP) {
+        final boolean changed;
         final LockingAndBanning lockingAndBanning = clientIPBasedLockingAndBanningForBearerTokenAuthentication.remove(escapeNullClientIP(clientIP));
         if (lockingAndBanning != null) {
             logger.info("Unlocked bearer token authentication from "+clientIP+"; last locking state was "+lockingAndBanning);
+            changed = true;
+        } else {
+            changed = false;
         }
-        return null;
+        return changed;
     }
 
     @Override
@@ -3391,5 +3429,70 @@ implements ReplicableSecurityService, ClearStateTestSupport {
     @Override
     public void unlockSubscriptionsForUser(final User user) {
         LockUtil.unlockAfterWrite(subscriptionLocksForUsers.computeIfAbsent(user, u->new NamedReentrantReadWriteLock("Subscriptions lock for user "+user.getName(), /* fair */ false)));
+    }
+
+    @Override
+    public void fileTakedownNotice(TakedownNoticeRequestContext takedownNoticeRequestContext) throws MailException {
+        final String SUPPORT_MAIL_ADDRESS = "support@sapsailing.com";
+        final User user = getUserByName(takedownNoticeRequestContext.getUsername());
+        final String email = user.getEmail();
+        final StringBuilder sb = new StringBuilder()
+                .append("User ")
+                .append(takedownNoticeRequestContext.getUsername())
+                .append(" with e-mail ")
+                .append(email)
+                .append(" requests that the media with URL ")
+                .append(takedownNoticeRequestContext.getContentUrl())
+                .append(" used in context ")
+                .append(messages.get(Locale.ENGLISH, takedownNoticeRequestContext.getContextDescriptionMessageKey(), takedownNoticeRequestContext.getContextDescriptionMessageParameter()))
+                .append(" on page ")
+                .append(takedownNoticeRequestContext.getPageUrl())
+                .append(" be removed from the site. The user provides the following comment:\n\n")
+                .append("   \"")
+                .append(takedownNoticeRequestContext.getReportingUserComment())
+                .append("\"\n\n")
+                .append("The claim is of nature ")
+                .append(takedownNoticeRequestContext.getNatureOfClaim())
+                .append(".");
+        if (!Util.isEmpty(takedownNoticeRequestContext.getSupportingURLs())) {
+            sb.append("\n\nThe user provided the following additional URLs to substantiate or prove the claim:\n");
+            for (final String url : takedownNoticeRequestContext.getSupportingURLs()) {
+                sb.append(" - ");
+                sb.append(url);
+                sb.append("\n");
+            }
+        }
+        final String message = sb.toString();
+        getMailService().sendMail(SUPPORT_MAIL_ADDRESS, "Media Take-Down Request", message);
+        getMailService().sendMail(email, "Media Take-Down Request Confirmation", messages.get(user.getLocaleOrDefault(), "takedownRequestConfirmation",
+                Util.hasLength(user.getFullName()) ? user.getFullName() : user.getName(), SUPPORT_MAIL_ADDRESS, message));
+    }
+    
+    /**
+     * For a {@link SecuredSecurityTypes#SERVER SERVER} object identified by {@code serverName}, determines the user set
+     * as the server's owner, plus additional users that have the permission to execute
+     * {@code alsoSendToAllUsersWithThisPermissionOnReplicaSet} on that server.
+     * 
+     * @param serverName
+     *            identifies the server object; for the local server that would, e.g., be {@link ServerInfo#getName()}.
+     *            For replica sets, this is the name of the replica set.
+     * @param alsoSendToAllUsersWithThisPermissionOnReplicaSet
+     *            when not empty, all users that have permission to this {@link SecuredSecurityTypes#SERVER SERVER}
+     *            action on the {@code replicaSet} will receive the e-mail in addition to the server owner. No user will
+     *            receive the e-mail twice.
+     */
+    @Override
+    public Iterable<User> getUsersToInformAboutReplicaSet(String serverName, Optional<HasPermissions.Action> alsoSendToAllUsersWithThisPermissionOnReplicaSet) {
+        final QualifiedObjectIdentifier serverIdentifier = SecuredSecurityTypes.SERVER.getQualifiedObjectIdentifier(new TypeRelativeObjectIdentifier(serverName));
+        final OwnershipAnnotation serverOwnership = getOwnership(serverIdentifier);
+        final User serverOwner;
+        final Set<User> usersToSendMailTo = new HashSet<>();
+        if (serverOwnership != null && serverOwnership.getAnnotation() != null && (serverOwner = serverOwnership.getAnnotation().getUserOwner()) != null) {
+            usersToSendMailTo.add(serverOwner);
+        }
+        alsoSendToAllUsersWithThisPermissionOnReplicaSet.ifPresent(
+                serverAction -> getUsersWithPermissions(serverIdentifier.getPermission(serverAction))
+                .forEach(usersToSendMailTo::add));
+        return usersToSendMailTo;
     }
 }

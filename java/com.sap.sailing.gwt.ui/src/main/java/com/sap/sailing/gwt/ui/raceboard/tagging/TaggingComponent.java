@@ -27,6 +27,7 @@ import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.CellPreviewEvent.Handler;
 import com.google.gwt.view.client.NoSelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
+import com.sap.sailing.domain.common.RaceIdentifier;
 import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
 import com.sap.sailing.domain.common.dto.FleetDTO;
 import com.sap.sailing.domain.common.dto.RaceColumnDTO;
@@ -170,7 +171,7 @@ public class TaggingComponent extends ComponentWithoutSettings
     public TaggingComponent(Component<?> parent, ComponentContext<?> context, StringMessages stringMessages,
             SailingServiceAsync sailingService, UserService userService, Timer timer,
             RaceTimesInfoProvider raceTimesInfoProvider, TimePoint timePointToHighlight, String tagToHighlight,
-            StrippedLeaderboardDTO leaderboardDTO, SailingServiceWriteAsync sailingServiceWrite) {
+            StrippedLeaderboardDTO leaderboardDTO, SailingServiceWriteAsync sailingServiceWrite, RaceIdentifier raceIdentifier) {
         super(parent, context);
         this.stringMessages = stringMessages;
         this.sailingService = sailingService;
@@ -185,7 +186,7 @@ public class TaggingComponent extends ComponentWithoutSettings
         style.ensureInjected();
         TaggingPanelResources.INSTANCE.cellListStyle().ensureInjected();
         TaggingPanelResources.INSTANCE.cellTableStyle().ensureInjected();
-        tagCellList = new CellList<TagDTO>(new TagCell(this, stringMessages, userService, false),
+        tagCellList = new CellList<TagDTO>(new TagCell(this, stringMessages, userService, false, raceIdentifier),
                 TaggingPanelResources.INSTANCE);
         tagSelectionModel = new SingleSelectionModel<TagDTO>();
         tagListProvider = new TagListProvider();
@@ -200,7 +201,7 @@ public class TaggingComponent extends ComponentWithoutSettings
             }
         };
         filterbarAndContentPanel = new HeaderPanel();
-        tagFooterPanel = new TagFooterPanel(this, sailingService, stringMessages, userService);
+        tagFooterPanel = new TagFooterPanel(this, sailingService, stringMessages, userService, raceIdentifier);
         footerPanel = new ScrollPanel(tagFooterPanel);
         filterbarPanel = new TagFilterPanel(this, stringMessages, userService);
         contentPanel = new FlowPanel();

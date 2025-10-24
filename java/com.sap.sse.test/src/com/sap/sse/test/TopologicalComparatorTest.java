@@ -1,7 +1,7 @@
 package com.sap.sse.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -9,7 +9,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.StreamSupport;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
@@ -58,8 +58,8 @@ public class TopologicalComparatorTest {
     public void testSimpleSortWithTrivialCycle() {
         addLessThan("A", "B"); addLessThan("B", "C"); addLessThan("C", "A");
         createGraph();
-        assertEquals("Cycle not detected properly", 1, Util.size(graph.getCycleClusters().getClusters()));
-        assertEquals("Cycle cluster not detected properly", 1, Util.size(graph.getCycleClusters().getClusters()));
+        assertEquals(1, Util.size(graph.getCycleClusters().getClusters()), "Cycle not detected properly");
+        assertEquals(1, Util.size(graph.getCycleClusters().getClusters()), "Cycle cluster not detected properly");
         TopologicalComparator<String> comparator = new TopologicalComparator<>(graph);
         assertMutualEquality(comparator, "A", "B", "C");
     }
@@ -109,7 +109,7 @@ public class TopologicalComparatorTest {
     
     private void assertOnCycle(String... nodes) {
         for (final String node : nodes) {
-            assertTrue("Expected "+node+" on cycle but wasn't", StreamSupport.stream(graph.getCycleClusters().getClusters().spliterator(), /* parallel */ false).anyMatch(c->c.contains(node)));
+            assertTrue(StreamSupport.stream(graph.getCycleClusters().getClusters().spliterator(), /* parallel */ false).anyMatch(c->c.contains(node)), "Expected "+node+" on cycle but wasn't");
         }
     }
 
@@ -144,8 +144,8 @@ public class TopologicalComparatorTest {
     private void assertMutualEquality(TopologicalComparator<String> comparator, String... strings) {
         for (int i=0; i<strings.length; i++) {
             for (int j=0; j<strings.length; j++) {
-                assertEquals(strings[i]+" at position "+i+" and "+strings[j]+" at position "+j+" compared incorrectly",
-                        0, comparator.compare(strings[i], strings[j]));
+                assertEquals(0,
+                        comparator.compare(strings[i], strings[j]), strings[i]+" at position "+i+" and "+strings[j]+" at position "+j+" compared incorrectly");
             }
         }
     }
@@ -153,8 +153,8 @@ public class TopologicalComparatorTest {
     private void assertChain(TopologicalComparator<String> comparator, String... strings) {
         for (int i=0; i<strings.length; i++) {
             for (int j=0; j<strings.length; j++) {
-                assertEquals(strings[i]+" at position "+i+" and "+strings[j]+" at position "+j+" compared incorrectly",
-                        Integer.compare(i, j), comparator.compare(strings[i], strings[j]));
+                assertEquals(Integer.compare(i, j),
+                        comparator.compare(strings[i], strings[j]), strings[i]+" at position "+i+" and "+strings[j]+" at position "+j+" compared incorrectly");
             }
         }
     }

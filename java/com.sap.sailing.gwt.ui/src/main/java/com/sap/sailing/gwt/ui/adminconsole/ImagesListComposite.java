@@ -360,7 +360,7 @@ public class ImagesListComposite extends Composite {
         }
     }
     
-    public void fillImages(List<ImageDTO> images) {
+    public void fillImages(List<? extends ImageDTO> images) {
         imageSelectionModel.clear();
         imageListDataProvider.getList().clear();
         imageListDataProvider.getList().addAll(images);

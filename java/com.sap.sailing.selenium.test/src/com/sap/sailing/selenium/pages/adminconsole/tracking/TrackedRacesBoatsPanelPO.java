@@ -1,6 +1,6 @@
 package com.sap.sailing.selenium.pages.adminconsole.tracking;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;

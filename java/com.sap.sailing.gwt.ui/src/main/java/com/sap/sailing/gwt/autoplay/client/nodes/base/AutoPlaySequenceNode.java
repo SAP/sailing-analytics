@@ -33,7 +33,7 @@ public class AutoPlaySequenceNode extends BaseCompositeNode {
                 onLoopEnd.execute();
             }
             //do nothing we stay at the end position
-        }else{
+        } else {
             transitionTo(nodes.get(currentPos));
         }
     }

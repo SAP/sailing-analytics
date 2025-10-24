@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.channels.ServerSocketChannel;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.simple.parser.ParseException;
+import org.osgi.framework.BundleContext;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.igtimi.IgtimiData.DataMsg;
@@ -28,9 +30,11 @@ import com.sap.sailing.domain.igtimiadapter.server.replication.ReplicableRiotSer
 import com.sap.sailing.domain.igtimiadapter.server.replication.RiotReplicationOperation;
 import com.sap.sailing.domain.igtimiadapter.server.riot.impl.RiotServerImpl;
 import com.sap.sailing.domain.igtimiadapter.shared.IgtimiWindReceiver;
+import com.sap.sse.common.Duration;
 import com.sap.sse.common.MultiTimeRange;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.Util.Pair;
 import com.sap.sse.replication.Replicable;
 
 /**
@@ -49,9 +53,9 @@ import com.sap.sse.replication.Replicable;
  * can be registered with this server using the {@link #addListener(BulkFixReceiver)} method.
  * <p>
  * 
- * When combined with {@link IgtimiWindReceiver} (which is such a {@link BulkFixReceiver},
+ * When combined with {@link IgtimiWindReceiver} (which is such a {@link BulkFixReceiver}),
  * {@link IgtimiWindListener}s can be registered on the wind receiver, just as they can
- * for a websocket connection.
+ * for a websocket connection.<p>
  * 
  * The server uses <tt>java.nio</tt> and {@link ServerSocketChannel}s, avoiding the creation
  * of a thread per connection.<p>
@@ -64,15 +68,15 @@ public interface RiotServer extends Replicable<ReplicableRiotServer, RiotReplica
      * Created a {@link RiotServer} listening on the {@code port} specified. If the port is not
      * available, an {@link IOException} will be thrown.
      */
-    static RiotServer create(int port, DomainObjectFactory domainObjectFactory, MongoObjectFactory mongoObjectFactory) throws Exception {
-        return new RiotServerImpl(port, domainObjectFactory, mongoObjectFactory);
+    static RiotServer create(int port, DomainObjectFactory domainObjectFactory, MongoObjectFactory mongoObjectFactory, BundleContext context) throws Exception {
+        return new RiotServerImpl(port, domainObjectFactory, mongoObjectFactory, context);
     }
     
     /**
      * Creates a {@link RiotServer} listening on an available local TCP port selected automatically.
      */
-    static RiotServer create(DomainObjectFactory domainObjectFactory, MongoObjectFactory mongoObjectFactory) throws Exception {
-        return new RiotServerImpl(domainObjectFactory, mongoObjectFactory);
+    static RiotServer create(DomainObjectFactory domainObjectFactory, MongoObjectFactory mongoObjectFactory, BundleContext context) throws Exception {
+        return new RiotServerImpl(domainObjectFactory, mongoObjectFactory, context);
     }
     
     void addListener(RiotMessageListener listener);
@@ -174,4 +178,15 @@ public interface RiotServer extends Replicable<ReplicableRiotServer, RiotReplica
      * device identified by {@code deviceSerialNumber}.
      */
     boolean sendStandardCommand(String deviceSerialNumber, RiotStandardCommand command) throws IOException;
+    
+    /**
+     * Returns {@code true} if and only if a {@link #getLiveConnections() live connection} was found that belongs to the
+     * device identified by {@code deviceSerialNumber}.
+     */
+    boolean sendFreestyleCommand(String deviceSerialNumber, String command) throws IOException;
+
+    Iterable<Pair<TimePoint, String>> getDeviceLogs(String serialNumber, Duration duration) throws ParseException, IOException;
+
+    boolean enableOverTheAirLog(String deviceSerialNumber, boolean enable)
+            throws IOException, InterruptedException, ExecutionException;
 }

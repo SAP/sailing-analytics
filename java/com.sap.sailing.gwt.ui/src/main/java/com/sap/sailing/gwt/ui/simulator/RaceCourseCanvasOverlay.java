@@ -50,7 +50,7 @@ public class RaceCourseCanvasOverlay extends FullCanvasOverlay {
         @Override
         public void onEvent(MouseMoveMapEvent event) {
             if (startPoint != null) {
-                Point s = mapProjection.fromLatLngToDivPixel(startPoint);
+                Point s = getMapProjection().fromLatLngToDivPixel(startPoint);
                 drawPointWithText(s.getX(), s.getY(), "Start");
                 refreshLine(event.getMouseEvent().getLatLng(), "Grey");
             }
@@ -126,7 +126,7 @@ public class RaceCourseCanvasOverlay extends FullCanvasOverlay {
     }
 
     public void setStartEndPoint(LatLng startPoint, LatLng endPoint) {
-    	int zoomLevel = map.getZoom();
+    	double zoomLevel = map.getZoom();
     	racecourseBuoySize = 1.0 + (5.0 - 1.0)*(zoomLevel - 10.0)/(14.0 - 10.0);
         setStartPoint(startPoint);
         setEndPoint(endPoint);        
@@ -142,11 +142,11 @@ public class RaceCourseCanvasOverlay extends FullCanvasOverlay {
 
     @Override
     protected void draw() {
-        if (mapProjection != null && startPoint != null && endPoint != null) {
+        if (getMapProjection() != null && startPoint != null && endPoint != null) {
             setCanvasSettings();
             setStartEndPoint(startPoint, endPoint);
             if (startPoint != null) {
-                Point point = mapProjection.fromLatLngToDivPixel(startPoint);
+                Point point = getMapProjection().fromLatLngToDivPixel(startPoint);
                 if (racecourseBuoySize > 0.0) {
                 	drawCircleWithText(point.getX() - getWidgetPosLeft(), point.getY() - getWidgetPosTop(), racecourseBuoySize,
                 			racecourseColor, "Start");
@@ -173,7 +173,7 @@ public class RaceCourseCanvasOverlay extends FullCanvasOverlay {
                 }
             }
             if (endPoint != null) {
-            	Point point = mapProjection.fromLatLngToDivPixel(endPoint);
+            	Point point = getMapProjection().fromLatLngToDivPixel(endPoint);
             	if (racecourseBuoySize > 0.0) {
             		drawCircleWithText(point.getX() - getWidgetPosLeft(), point.getY() - getWidgetPosTop(), racecourseBuoySize,
             				racecourseColor, "End");
@@ -209,8 +209,8 @@ public class RaceCourseCanvasOverlay extends FullCanvasOverlay {
 
     private void drawLine(LatLng currentPoint, String color) {
         if (startPoint != null) {
-            Point s = mapProjection.fromLatLngToDivPixel(startPoint);
-            Point e = mapProjection.fromLatLngToDivPixel(currentPoint);
+            Point s = getMapProjection().fromLatLngToDivPixel(startPoint);
+            Point e = getMapProjection().fromLatLngToDivPixel(currentPoint);
             Context2d context2d = canvas.getContext2d();
             context2d.setGlobalAlpha(0.4f);
             drawLine(s.getX() - getWidgetPosLeft(), s.getY() - getWidgetPosTop(), e.getX() - getWidgetPosLeft(),

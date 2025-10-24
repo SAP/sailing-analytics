@@ -1,7 +1,6 @@
 package com.sap.sailing.selenium.pages.gwt.query.operation.object;
 
 import com.sap.sailing.selenium.pages.gwt.query.Expression;
-
 import com.sap.sailing.selenium.pages.gwt.query.operation.PredicateOperation;
 
 public class IsNull extends PredicateOperation {

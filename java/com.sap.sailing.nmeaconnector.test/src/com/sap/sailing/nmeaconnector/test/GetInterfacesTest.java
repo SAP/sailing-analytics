@@ -1,10 +1,10 @@
 package com.sap.sailing.nmeaconnector.test;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import net.sf.marineapi.nmea.event.AbstractSentenceListener;
 

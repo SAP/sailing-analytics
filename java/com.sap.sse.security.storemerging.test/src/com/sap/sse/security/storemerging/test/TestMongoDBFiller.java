@@ -1,14 +1,15 @@
 package com.sap.sse.security.storemerging.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 
 import org.bson.Document;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoCollection;
 import com.sap.sse.mongodb.MongoDBService;
@@ -19,8 +20,8 @@ public class TestMongoDBFiller {
     private MongoDBFiller filler = new MongoDBFiller();
     private ClientSession causallyConsistentSession;
 
-    @Before
-    @After
+    @BeforeEach
+    @AfterEach
     public void dropCollection() {
         causallyConsistentSession = MongoDBService.INSTANCE.startCausallyConsistentSession();
         MongoDBService.INSTANCE.getDB().getCollection(ODD_FILLER_TEST_COLLECTION_NAME).drop(causallyConsistentSession);

@@ -17,7 +17,7 @@ import com.sap.sailing.gwt.ui.simulator.streamlets.Vector;
  */
 public abstract class MovingCanvasOverlay extends FullCanvasOverlay {
 
-    private LatLng nw;
+    private LatLng upperLeftCornerLatLng;
 
     public MovingCanvasOverlay(MapWidget map, int zIndex, CoordinateSystem coordinateSystem) {
         super(map, zIndex, coordinateSystem);
@@ -26,50 +26,52 @@ public abstract class MovingCanvasOverlay extends FullCanvasOverlay {
     @Override
     public void setCanvasSettings() {
         // do nothing, if mapProjection is not available
-        if (mapProjection != null) {
+        if (getMapProjection() != null) {
             final int canvasWidth = getMap().getDiv().getClientWidth();
             final int canvasHeight = getMap().getDiv().getClientHeight();
             // calculate pixel-positions of old and new canvas-bounds using the same, current mapProjection
             // start from LatLng, as the canvas might have jumped to new bounds that do not intersect with the old bounds
-            final Point nwOldPx;
-            if (nw == null) {
-                nwOldPx = null;
+            final Point nwOldDivPx;
+            if (upperLeftCornerLatLng == null) {
+                nwOldDivPx = null;
             } else {
-                nwOldPx = mapProjection.fromLatLngToDivPixel(nw);
+                nwOldDivPx = getMapProjection().fromLatLngToDivPixel(upperLeftCornerLatLng);
             }
-            nw = LatLng.newInstance(getMap().getBounds().getNorthEast().getLatitude(), getMap().getBounds().getSouthWest().getLongitude());
-            final Point nwNewPx = mapProjection.fromLatLngToDivPixel(nw);
-            widgetPosLeft = Math.round(nwNewPx.getX());
-            widgetPosTop = Math.round(nwNewPx.getY());
+            upperLeftCornerLatLng = getMapProjection().fromContainerPixelToLatLng(Point.newInstance(0, 0));
+            final Point nwNewDivPx = getMapProjection().fromLatLngToDivPixel(upperLeftCornerLatLng);
+            widgetPosLeft = Math.round(nwNewDivPx.getX());
+            widgetPosTop = Math.round(nwNewDivPx.getY());
             // calculate the translation-vector between old and new origin in pixels
-            if (nwOldPx == null) {
+            if (nwOldDivPx == null) {
                 diffPx = new Vector(0, 0);
             } else {
-                double oldPosLeft = Math.round(nwOldPx.getX());
-                double oldPosTop = Math.round(nwOldPx.getY());
+                double oldPosLeft = Math.round(nwOldDivPx.getX());
+                double oldPosTop = Math.round(nwOldDivPx.getY());
                 diffPx = new Vector(oldPosLeft - widgetPosLeft, oldPosTop - widgetPosTop);
             }
             // store canvas-content, because setWidth() and setHeight() will clear canvas and change Context2d 
             Context2d ctxt = canvas.getContext2d();
-            final ImageData canvasContent = ctxt.getImageData(0, 0, canvas.getElement().getClientWidth(), canvas.getElement().getClientHeight());
-            canvas.setWidth(String.valueOf(canvasWidth));
-            canvas.setHeight(String.valueOf(canvasHeight));
-            canvas.setCoordinateSpaceWidth(canvasWidth);
-            canvas.setCoordinateSpaceHeight(canvasHeight);
-            // get updated Context2d and restore canvas-content moved by translation-vector
-            ctxt = canvas.getContext2d();
-            ctxt.putImageData(canvasContent, diffPx.x, diffPx.y);
+            final int clientWidth = canvas.getElement().getClientWidth();
+            final int clientHeight = canvas.getElement().getClientHeight();
+            ImageData canvasContent = null;
+            if (clientWidth > 0 && clientHeight > 0) {
+                canvasContent = ctxt.getImageData(0, 0, canvas.getElement().getClientWidth(), canvas.getElement().getClientHeight());
+            }
+            canvas.setWidth(String.valueOf(Math.max(1, canvasWidth)));
+            canvas.setHeight(String.valueOf(Math.max(1, canvasHeight)));
+            canvas.setCoordinateSpaceWidth(Math.max(1, canvasWidth));
+            canvas.setCoordinateSpaceHeight(Math.max(1, canvasHeight));
+            if (clientWidth > 0 && clientHeight > 0) {
+                // get updated Context2d and restore canvas-content moved by translation-vector
+                ctxt = canvas.getContext2d();
+                ctxt.putImageData(canvasContent, diffPx.x, diffPx.y);
+            }
             // update canvas position
             setCanvasPosition(widgetPosLeft, widgetPosTop);
         }
     }
 
-    @Override
-    protected void draw() {
-        // do nothing; setCanvasSettings() is called directly
-    }
-    
     public void initCanvasOrigin() {
-        nw = null;
+        upperLeftCornerLatLng = null;
     }
 }

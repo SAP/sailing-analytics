@@ -18,7 +18,7 @@ public class RootNodeClassic extends RootNodeBase {
     private final IdlePreEventNode preEvent;
 
     public RootNodeClassic(AutoPlayClientFactory cf) {
-        super(RaceEndWithCompetitorsFlagsNode.class.getName(), cf);
+        super(RootNodeClassic.class.getName(), cf);
         this.idle = new IdleRaceLeaderboard(cf);
         this.live = new LiveRaceBoardNode(cf);
         this.preEvent = new IdlePreEventNode(cf);

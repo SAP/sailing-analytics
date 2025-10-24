@@ -1,9 +1,9 @@
 package com.sap.sse.landscape.aws;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.net.InetAddress;
 import java.net.URISyntaxException;
@@ -12,9 +12,9 @@ import java.util.Optional;
 import java.util.Random;
 
 import org.bson.Document;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.mongodb.client.MongoDatabase;
@@ -27,7 +27,7 @@ import com.sap.sse.landscape.mongodb.impl.MongoProcessImpl;
 import com.sap.sse.landscape.mongodb.impl.MongoProcessInReplicaSetImpl;
 import com.sap.sse.landscape.mongodb.impl.MongoReplicaSetImpl;
 
-@Ignore("Needs a specific MongoDB replica set named 'rs0' in the environment")
+@Disabled("Needs a specific MongoDB replica set named 'rs0' in the environment")
 public class MongoTests {
     private static final Optional<Duration> optionalTimeout = Optional.of(Duration.ONE_MINUTE.times(5));
 
@@ -36,7 +36,7 @@ public class MongoTests {
     private MongoProcessInReplicaSetImpl mongoProcessInReplicaSet;
     private MongoReplicaSetImpl mongoReplicaSet;
     
-    @Before
+    @BeforeEach
     public void setUp() throws UnknownHostException {
         localhost = Mockito.mock(Host.class);
         Mockito.when(localhost.getPrivateAddress()).thenReturn(InetAddress.getByName("127.0.0.1"));

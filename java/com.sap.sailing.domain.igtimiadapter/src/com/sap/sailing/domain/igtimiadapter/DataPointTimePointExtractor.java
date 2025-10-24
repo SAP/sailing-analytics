@@ -41,7 +41,6 @@ import com.igtimi.IgtimiData.TrueWindSpeed;
 import com.sap.sse.common.TimePoint;
 
 public class DataPointTimePointExtractor implements DataPointVisitor<TimePoint> {
-
     @Override
     public TimePoint handleAcc(Acceleration acc) {
         return TimePoint.of(acc.getTimestamp());

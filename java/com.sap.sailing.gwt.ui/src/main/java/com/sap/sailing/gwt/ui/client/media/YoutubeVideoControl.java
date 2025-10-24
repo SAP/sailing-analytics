@@ -17,7 +17,6 @@ public class YoutubeVideoControl  {
     private double deferredPlaybackSpeed;
 
     YoutubeVideoControl(String videoUrl, String videoContainerId) {
-        
         if (!isYoutubeApiInitialized()) {
             loadInitialYoutubePlayer(videoUrl, videoContainerId);
         } else {
@@ -38,28 +37,22 @@ public class YoutubeVideoControl  {
     // Code Playground: https://code.google.com/apis/ajax/playground/?exp=youtube#chromeless_player
     // Extended with API-initialization control to support multiple players on the same page. 
     private native void loadInitialYoutubePlayer(String videoUrl, String videoContainerId) /*-{
-        
                 var that = this;
-                
                 // This function creates an <iframe> containing a YouTube player after the API code downloads.
                 var player;
                 $wnd.onYouTubeIframeAPIReady = function() {
                         that.@com.sap.sailing.gwt.ui.client.media.YoutubeVideoControl::setYoutubeApiInitialized()();
                         that.@com.sap.sailing.gwt.ui.client.media.YoutubeVideoControl::loadYoutubePlayer(Ljava/lang/String;Ljava/lang/String;)(videoUrl, videoContainerId);
                 }
-
                 // Use script tag trick to cope with browser's cross domain restrictions
                 var tag = $doc.createElement('script');
                 tag.src = "//www.youtube.com/iframe_api"; // This is a protocol-relative URL as described here: http://paulirish.com/2010/the-protocol-relative-url/
                 var firstScriptTag = $doc.getElementsByTagName('script')[0];
                 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
     }-*/;
 
     private native void loadYoutubePlayer(String videoUrl, String videoContainerId) /*-{
-    
         var that = this;
-        
         var player = new $wnd.YT.Player(videoContainerId, {
                 videoId : videoUrl,
                 //height: '480', //see https://developers.google.com/youtube/iframe_api_reference?hl=en#Playback_quality
@@ -77,7 +70,6 @@ public class YoutubeVideoControl  {
                         modestbranding: 1
                 }
         });
-
     }-*/;
 
     public void initPlayState(JavaScriptObject youtubePlayer) {

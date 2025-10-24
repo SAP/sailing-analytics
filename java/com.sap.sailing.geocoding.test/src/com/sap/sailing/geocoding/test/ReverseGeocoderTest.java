@@ -1,16 +1,16 @@
 package com.sap.sailing.geocoding.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.List;
 
 import org.json.simple.parser.ParseException;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.Placemark;
 import com.sap.sailing.domain.common.Position;
@@ -22,9 +22,9 @@ import com.sap.sailing.geocoding.impl.ReverseGeocoderImpl;
 public class ReverseGeocoderTest {
     private ReverseGeocoder geocoder;
     private static final Placemark KIEL = new PlacemarkImpl("Kiel", "DE", new DegreePosition(54.32132926107913, 10.1348876953125), 232758);
-    private static final Position KIEL_POSITION = new DegreePosition(54.3231063453431, 10.12265682220459);
+    private static final Position KIEL_POSITION = new DegreePosition(54.32217976191047, 10.133570443980922);
     
-    @Before
+    @BeforeEach
     public void setUp() {
         geocoder = new ReverseGeocoderImpl(); // ensure we don't see any caching effects across test case executions
     }
@@ -42,14 +42,14 @@ public class ReverseGeocoderTest {
         //Simple Test in Kiel center to check the connection and the parsing from JSONObject to Placemark
         try {
             Placemark kielReversed = geocoder.getPlacemarkNearest(KIEL_POSITION);
-            Assert.assertEquals(KIEL.getName(), kielReversed.getName());
-            Assert.assertEquals(KIEL.getCountryCode(), kielReversed.getCountryCode());
-            Assert.assertEquals(KIEL.getPosition().getLatDeg(), kielReversed.getPosition().getLatDeg(), 0.0001);
-            Assert.assertEquals(KIEL.getPosition().getLngDeg(), kielReversed.getPosition().getLngDeg(), 0.0001);
+            Assertions.assertEquals(KIEL.getName(), kielReversed.getName());
+            Assertions.assertEquals(KIEL.getCountryCode(), kielReversed.getCountryCode());
+            Assertions.assertEquals(KIEL.getPosition().getLatDeg(), kielReversed.getPosition().getLatDeg(), 0.0001);
+            Assertions.assertEquals(KIEL.getPosition().getLngDeg(), kielReversed.getPosition().getLngDeg(), 0.0001);
         } catch (IOException e) {
-            Assert.fail(e.getMessage());
+            Assertions.fail(e.getMessage());
         } catch (ParseException e) {
-            Assert.fail(e.getMessage());
+            Assertions.fail(e.getMessage());
         }
     }
     
@@ -58,11 +58,11 @@ public class ReverseGeocoderTest {
         try {
             List<Placemark> placemarks = geocoder.getPlacemarksNear(KIEL_POSITION, 20);
             assertNotNull(placemarks);
-            Assert.assertFalse(placemarks.isEmpty());
+            Assertions.assertFalse(placemarks.isEmpty());
         } catch (IOException e) {
-            Assert.fail(e.getMessage());
+            Assertions.fail(e.getMessage());
         } catch (ParseException e) {
-            Assert.fail(e.getMessage());
+            Assertions.fail(e.getMessage());
         }
     }
     
@@ -73,27 +73,27 @@ public class ReverseGeocoderTest {
         final Placemark firstByDistanceVariation = new PlacemarkImpl("Wendtorfer Strand", "DE", new DegreePosition(54.41212, 10.28952), 1139);
         try {
             Placemark p = geocoder.getPlacemarkLast(abroad, 20, new Placemark.ByPopulation());
-            Assert.assertEquals(KIEL.getName(), p.getName());
-            Assert.assertEquals(KIEL.getCountryCode(), p.getCountryCode());
-            Assert.assertEquals(KIEL.getPosition().getLatDeg(), p.getPosition().getLatDeg(), 0.0001);
-            Assert.assertEquals(KIEL.getPosition().getLngDeg(), p.getPosition().getLngDeg(), 0.0001);
+            Assertions.assertEquals(KIEL.getName(), p.getName());
+            Assertions.assertEquals(KIEL.getCountryCode(), p.getCountryCode());
+            Assertions.assertEquals(KIEL.getPosition().getLatDeg(), p.getPosition().getLatDeg(), 0.0001);
+            Assertions.assertEquals(KIEL.getPosition().getLngDeg(), p.getPosition().getLngDeg(), 0.0001);
             
             p = geocoder.getPlacemarkFirst(abroad, 20, new Placemark.ByDistance(abroad));
-            Assert.assertTrue(""+p.getName()+" neither equals "+firstByDistance.getName()+" nor "+firstByDistanceVariation.getName(),
-                    firstByDistance.getName().equals(p.getName()) || firstByDistanceVariation.getName().equals(p.getName()));
-            Assert.assertEquals(firstByDistance.getCountryCode(), p.getCountryCode());
-            Assert.assertEquals(firstByDistance.getPosition().getLatDeg(), p.getPosition().getLatDeg(), 0.005);
-            Assert.assertEquals(firstByDistance.getPosition().getLngDeg(), p.getPosition().getLngDeg(), 0.012);
+            Assertions.assertTrue(firstByDistance.getName().equals(p.getName()) || firstByDistanceVariation.getName().equals(p.getName()),
+                    ""+p.getName()+" neither equals "+firstByDistance.getName()+" nor "+firstByDistanceVariation.getName());
+            Assertions.assertEquals(firstByDistance.getCountryCode(), p.getCountryCode());
+            Assertions.assertEquals(firstByDistance.getPosition().getLatDeg(), p.getPosition().getLatDeg(), 0.005);
+            Assertions.assertEquals(firstByDistance.getPosition().getLngDeg(), p.getPosition().getLngDeg(), 0.012);
             
             p = geocoder.getPlacemarkLast(abroad, 20, new Placemark.ByPopulationDistanceRatio(abroad));
-            Assert.assertEquals(KIEL.getName(), p.getName());
-            Assert.assertEquals(KIEL.getCountryCode(), p.getCountryCode());
-            Assert.assertEquals(KIEL.getPosition().getLatDeg(), p.getPosition().getLatDeg(), 0.005);
-            Assert.assertEquals(KIEL.getPosition().getLngDeg(), p.getPosition().getLngDeg(), 0.005);
+            Assertions.assertEquals(KIEL.getName(), p.getName());
+            Assertions.assertEquals(KIEL.getCountryCode(), p.getCountryCode());
+            Assertions.assertEquals(KIEL.getPosition().getLatDeg(), p.getPosition().getLatDeg(), 0.005);
+            Assertions.assertEquals(KIEL.getPosition().getLngDeg(), p.getPosition().getLngDeg(), 0.005);
         } catch (IOException e) {
-            Assert.fail(e.getMessage());
+            Assertions.fail(e.getMessage());
         } catch (ParseException e) {
-            Assert.fail(e.getMessage());
+            Assertions.fail(e.getMessage());
         }
     }
     
@@ -103,11 +103,11 @@ public class ReverseGeocoderTest {
         long radius = 300; 
         try {
             List<Placemark> placemarks = geocoder.getPlacemarksNear(offshore, radius);
-            Assert.assertNull(placemarks);
+            Assertions.assertNull(placemarks);
         } catch (IOException e) {
-            Assert.fail(e.getMessage());
+            Assertions.fail(e.getMessage());
         } catch (ParseException e) {
-            Assert.fail(e.getMessage());
+            Assertions.fail(e.getMessage());
         }
     }
 }

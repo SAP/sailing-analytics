@@ -1,16 +1,16 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.HashMap;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -32,7 +32,7 @@ public class LowPointWithEliminatingMedalSeriesPromotingOneToFinalAndTwoToSemifi
     private HashMap<Competitor, Integer> competitorsRankedByOpeningSeries;
     private Competitor c1, c2, c3, c4, c5;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         regatta = mock(Regatta.class);
         scoringScheme = new LowPointWithEliminatingMedalSeriesPromotingOneToFinalAndTwoToSemifinal();

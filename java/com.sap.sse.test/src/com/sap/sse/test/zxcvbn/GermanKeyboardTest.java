@@ -1,12 +1,12 @@
 package com.sap.sse.test.zxcvbn;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.nulabinc.zxcvbn.StandardDictionaries;
 import com.nulabinc.zxcvbn.StandardKeyboards;
@@ -39,14 +39,14 @@ public class GermanKeyboardTest {
         {
             final double defaultGuessesForQuertz = zxcvbn.measure(DE_PASSWD1).getGuesses();
             final double germanGuessesForQuertz = zxcvbnWithGermanKeyboard.measure(DE_PASSWD1).getGuesses();
-            assertTrue(""+defaultGuessesForQuertz+" is not greater than "+germanGuessesForQuertz+" but should have been",
-                    defaultGuessesForQuertz > germanGuessesForQuertz);
+            assertTrue(defaultGuessesForQuertz > germanGuessesForQuertz,
+                    ""+defaultGuessesForQuertz+" is not greater than "+germanGuessesForQuertz+" but should have been");
         }
         {
             final double defaultGuessesForQuertz = zxcvbn.measure(DE_PASSWD2).getGuesses();
             final double germanGuessesForQuertz = zxcvbnWithGermanKeyboard.measure(DE_PASSWD2).getGuesses();
-            assertTrue(""+defaultGuessesForQuertz+" is not greater than "+germanGuessesForQuertz+" but should have been",
-                    defaultGuessesForQuertz > germanGuessesForQuertz);
+            assertTrue(defaultGuessesForQuertz > germanGuessesForQuertz,
+                    ""+defaultGuessesForQuertz+" is not greater than "+germanGuessesForQuertz+" but should have been");
         }
     }
 }

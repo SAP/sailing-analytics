@@ -47,7 +47,7 @@ public class MultiregattaMediaTabView extends Composite implements MultiregattaT
             @Override
             public void onSuccess(MediaDTO media) {
                 contentArea.setWidget(MultiregattaMediaTabView.this);
-                mediaPage.setMedia(media);
+                mediaPage.setMedia(media, currentPresenter.getEventDTO());
             }
         });
     }

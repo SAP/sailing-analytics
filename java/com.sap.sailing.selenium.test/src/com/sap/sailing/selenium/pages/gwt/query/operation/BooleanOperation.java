@@ -4,9 +4,7 @@ import java.util.List;
 
 import com.sap.sailing.selenium.pages.gwt.query.Expression;
 import com.sap.sailing.selenium.pages.gwt.query.Operation;
-
 import com.sap.sailing.selenium.pages.gwt.query.expr.BooleanExpression;
-
 import com.sap.sailing.selenium.pages.gwt.query.operation.bool.Not;
 
 public class BooleanOperation extends BooleanExpression implements Operation<Boolean> {

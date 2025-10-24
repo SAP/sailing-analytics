@@ -1,8 +1,8 @@
 package com.sap.sailing.grib.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +15,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.Bounds;
 import com.sap.sailing.domain.common.Position;
@@ -176,7 +176,7 @@ public class SimpleGridFileReadingTest {
         //        ll: 10.0N 100.0W+ ur: 48.0N 40.00W
         //
         //       Havana, Cuba (23.099242, -82.360187)
-        //       5:55 AM 19.0 °C -       18.0 °C 94%     1018 hPa        9.0 km  NE      7.4 km/h / 2.1 m/s      -       N/A             Unknown
+        //       5:55 AM 19.0 ï¿½C -       18.0 ï¿½C 94%     1018 hPa        9.0 km  NE      7.4 km/h / 2.1 m/s      -       N/A             Unknown
         //
         //       NE is approx. from 45
         //       2.1m/s is approx. 4.2kts
@@ -188,7 +188,7 @@ public class SimpleGridFileReadingTest {
         cal.setTimeZone(TimeZone.getTimeZone("CET"));
         WindWithConfidence<TimePoint> wind = windField.getWind(new MillisecondsTimePoint(cal.getTimeInMillis()), havanaPosition);
         assertEquals(4.2, wind.getObject().getKnots(), 3);
-        assertEquals(90, wind.getObject().getFrom().getDegrees(), 45); // historic data says NE but we get 130° which matches the SE
+        assertEquals(90, wind.getObject().getFrom().getDegrees(), 45); // historic data says NE but we get 130ï¿½ which matches the SE
         // direction from https://www.wunderground.com/history/airport/MUHA/2016/12/12/DailyHistory.html?req_city=Havana&req_state=03&req_statename=Cuba&reqdb.zip=00000&reqdb.magic=1&reqdb.wmo=78224&MR=1
         // for 10:55 CST. So we should probably accept that.
         dataSet.close();
@@ -199,7 +199,7 @@ public class SimpleGridFileReadingTest {
         //        Mon Dec 12 13:00:00 CET 2016
         //
         //       Nassau, Bahamas (25.052497, -77.366815)
-        //       8:00 AM        25.0 °C -       23.0 °C 89%     1020.2 hPa      10.0 km ESE     9.3 km/h / 2.6 m/s      -       N/A             Mostly Cloudy
+        //       8:00 AM        25.0 ï¿½C -       23.0 ï¿½C 89%     1020.2 hPa      10.0 km ESE     9.3 km/h / 2.6 m/s      -       N/A             Mostly Cloudy
         //
         //       NE is approx. from 45
         //       2.1m/s is approx. 4.2kts

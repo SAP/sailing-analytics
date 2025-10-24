@@ -27,7 +27,7 @@
 		<div class="{res.mediaCss.columns}">
 			<div class="{res.mediaCss.small12} {style.pageTitle}">
 			     <ui:text from="{i18n.racesAndTracking}" />
-			     <h:HelpButton addStyleNames= "{style.help}" ui:field='HelpButton' description='Video Guide' url='https://support.sapsailing.com/hc/en-us/articles/7275243525148-Tracking-Race-Player-Overview' />
+			     <h:HelpButton addStyleNames= "{style.help}" ui:field='HelpButton' description='Video Guide' url='https://wiki.sapsailing.com/wiki/howto/tutorials/sailinganalytics/tracking-race-player.md' />
 			</div>
 			<sp:filter.RacesByCompetitorTextBoxFilter addStyleNames="{res.mediaCss.small12} {style.filter}" ui:field="competitorFilterUi" />
 		</div>

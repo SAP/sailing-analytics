@@ -1,6 +1,7 @@
 package com.sap.sailing.gwt.ui.client;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -242,7 +243,7 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
             throws NotFoundException, NotDenotableForRaceLogTrackingException;
 
     Map<RegattaAndRaceIdentifier, Integer> importWindFromIgtimi(List<RaceDTO> selectedRaces,
-            boolean correctByDeclination)
+            boolean correctByDeclination, String optionalBearerTokenOrNull)
             throws IllegalStateException, Exception;
 
     IgtimiDataAccessWindowWithSecurityDTO addIgtimiDataAccessWindow(String deviceSerialNumber, Date from, Date to);
@@ -261,6 +262,14 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
 
     boolean sendRestartCommandToIgtimiDevice(String serialNumber) throws IOException;
 
+    boolean sendIMUCalibrationCommandSequenceToIgtimiDevice(String serialNumber) throws IOException, InterruptedException;
+    
+    boolean sendIgtimiCommand(String serialNumber, String command) throws IOException, InterruptedException;
+    
+    boolean enableIgtimiDeviceOverTheAirLog(String serialNumber, boolean enable) throws Exception;
+    
+    ArrayList<Pair<TimePoint, String>> getIgtimiDeviceLogs(String serialNumber, Duration duration) throws Exception;
+    
     void setTrackingTimes(RaceLogSetTrackingTimesDTO dto) throws NotFoundException;
 
     boolean removeDeviceConfiguration(UUID deviceConfigurationId);
@@ -320,8 +329,8 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
 
     EventDTO updateEvent(UUID eventId, String eventName, String eventDescription, Date startDate, Date endDate,
             VenueDTO venue, boolean isPublic, List<UUID> leaderboardGroupIds, String officialWebsiteURLString,
-            String baseURLAsString, Map<String, String> sailorsInfoWebsiteURLsByLocaleName, List<ImageDTO> images,
-            List<VideoDTO> videos, List<String> windFinderReviewedSpotCollectionIds)
+            String baseURLAsString, Map<String, String> sailorsInfoWebsiteURLsByLocaleName, List<? extends ImageDTO> images,
+            List<? extends VideoDTO> videos, List<String> windFinderReviewedSpotCollectionIds)
             throws UnauthorizedException, IOException;
 
     void updateLeaderboardGroup(UUID leaderboardGroupId, String oldName, String newName, String newDescription,
@@ -749,4 +758,9 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
     boolean hasAIAgentCredentials();
     
     void setAIAgentCredentials(String credentials) throws Exception;
+    
+    void resetAIAgentCredentials();
+
+    void copyPairingListFromOtherLeaderboard(String sourceLeaderboardName, String targetLeaderboardName, String fromRaceColumnName,
+            String toRaceColumnInclusiveName) throws UnauthorizedException, NotFoundException;
 }

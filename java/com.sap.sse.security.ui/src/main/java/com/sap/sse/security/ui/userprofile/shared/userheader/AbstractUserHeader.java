@@ -28,8 +28,6 @@ public class AbstractUserHeader extends Composite implements NeedsAuthentication
     @Override
     public void setAuthenticationContext(AuthenticationContext authenticationContext) {
 //        UserDTO currentUser = authenticationContext.getCurrentUser();
-        // TODO correct message
-//        imageUi.setTitle("TODO picture of: " + currentUser.getName());
         // TODO use image from user when field is available
         imageUi.getStyle().setBackgroundImage("url('" + SharedAuthenticationResources.INSTANCE.userdefault().getSafeUri().asString() + "')");
         

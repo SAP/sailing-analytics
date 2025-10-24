@@ -30,6 +30,7 @@ import com.sap.sailing.gwt.home.shared.places.event.EventContext;
 import com.sap.sailing.gwt.home.shared.refresh.RefreshManager;
 import com.sap.sailing.gwt.home.shared.refresh.RefreshManagerWithErrorAndBusy;
 import com.sap.sailing.gwt.ui.client.StringMessages;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 
 public abstract class AbstractEventView<P extends EventViewBase.Presenter> extends Composite implements EventViewBase {
     
@@ -47,8 +48,8 @@ public abstract class AbstractEventView<P extends EventViewBase.Presenter> exten
         @UiField(provided = true) WindfinderControl windfinderUi;
         @UiField SimplePanel viewContentUi;
         
-        private AbstractEventViewLayout(EventContext eventContext, EventViewDTO event, String regattaName, PlaceNavigation<?> logoNavigation) {
-            this.eventHeaderUi = new EventHeader(eventContext, event, regattaName, logoNavigation);
+        private AbstractEventViewLayout(EventContext eventContext, EventViewDTO event, String regattaName, PlaceNavigation<?> logoNavigation, TakedownNoticeService takedownNoticeService) {
+            this.eventHeaderUi = new EventHeader(eventContext, event, regattaName, logoNavigation, takedownNoticeService);
             this.windfinderUi = new WindfinderControl(SpotDTO::getCurrentlyMostAppropriateUrl);
         }
     }
@@ -68,7 +69,7 @@ public abstract class AbstractEventView<P extends EventViewBase.Presenter> exten
         this.currentPresenter = presenter;
         String regattaName = showRegattaName ? currentPresenter.getRegatta().getDisplayName() : null;
         PlaceNavigation<?> logoNavigation = enableLogoNavigation ? currentPresenter.getEventNavigation() : null;
-        this.layout = new AbstractEventViewLayout(currentPresenter.getCtx(), currentPresenter.getEventDTO(), regattaName, logoNavigation);
+        this.layout = new AbstractEventViewLayout(currentPresenter.getCtx(), currentPresenter.getEventDTO(), regattaName, logoNavigation, currentPresenter.getUserService());
         initWidget(uiBinder.createAndBindUi(this.layout));
         if (supportsRefresh) {
             this.refreshManager = new RefreshManagerWithErrorAndBusy(contentRoot, layout.viewContentUi,

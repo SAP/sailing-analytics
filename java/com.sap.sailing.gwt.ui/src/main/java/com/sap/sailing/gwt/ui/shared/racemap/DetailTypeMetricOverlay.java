@@ -70,7 +70,7 @@ public class DetailTypeMetricOverlay extends FullCanvasOverlay {
 
     @Override
     protected void draw() {
-        if (mapProjection != null) {
+        if (getMapProjection() != null) {
             super.setCanvasSettings();
             drawLegend();
         }

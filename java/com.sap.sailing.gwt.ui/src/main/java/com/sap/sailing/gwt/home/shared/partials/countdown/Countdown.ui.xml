@@ -1,11 +1,15 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-		xmlns:s="urn:import:com.sap.sailing.gwt.home.client.shared">
+		xmlns:s="urn:import:com.sap.sailing.gwt.home.client.shared"
+        xmlns:m="urn:import:com.sap.sse.gwt.client.media">
   <ui:with field="i18n" type="com.sap.sailing.gwt.ui.client.StringMessages" />
   <ui:with field="res" type="com.sap.sailing.gwt.common.client.SharedResources" />
   <ui:with field="local_res" type="com.sap.sailing.gwt.home.shared.partials.countdown.CountdownResources" />
   <g:HTMLPanel addStyleNames="{local_res.css.countdown}">
-      <div ui:field="image" class="{local_res.css.countdown_image}"></div>
+      <div ui:field="image" class="{local_res.css.countdown_image} {res.mainCss.media_wrapper}">
+        <!-- take-down notice/request button: -->
+        <m:MediaMenuIcon ui:field="imageMenuButton" fontSize="20px"/>
+      </div>
       <div class="{local_res.css.countdown_content}">
         <h3 class="{local_res.css.countdown_content_title}" ui:field="countdownTitle"></h3>
         <g:SimplePanel ui:field="tickerContainer"/>

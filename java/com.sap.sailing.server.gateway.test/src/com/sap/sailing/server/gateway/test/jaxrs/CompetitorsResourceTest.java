@@ -1,13 +1,13 @@
 package com.sap.sailing.server.gateway.test.jaxrs;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Collections;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.impl.DynamicTeam;
 import com.sap.sailing.domain.base.impl.NationalityImpl;
@@ -23,7 +23,7 @@ public class CompetitorsResourceTest extends AbstractJaxRsApiTest {
     private final String countryCode = "DE";
     private final String shortName = "HK";
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         DynamicTeam team = new TeamImpl(null, Collections.singleton(new PersonImpl(null, new NationalityImpl(nationality), null, null)), null);

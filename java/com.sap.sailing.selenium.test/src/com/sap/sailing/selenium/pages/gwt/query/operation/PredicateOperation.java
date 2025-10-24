@@ -1,7 +1,6 @@
 package com.sap.sailing.selenium.pages.gwt.query.operation;
 
 import com.google.common.collect.ImmutableList;
-
 import com.sap.sailing.selenium.pages.gwt.query.Expression;
 import com.sap.sailing.selenium.pages.gwt.query.Predicate;
 import com.sap.sailing.selenium.pages.gwt.query.operation.bool.Not;

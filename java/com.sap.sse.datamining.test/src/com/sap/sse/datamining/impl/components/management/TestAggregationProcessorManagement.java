@@ -2,15 +2,15 @@ package com.sap.sse.datamining.impl.components.management;
 
 import org.hamcrest.Matchers;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.ModifiableDataMiningServer;
 import com.sap.sse.datamining.components.AggregationProcessorDefinition;
@@ -33,7 +33,7 @@ public class TestAggregationProcessorManagement {
     private static AggregationProcessorDefinition<Test_Race,Test_Race> raceAggregatorDefinition;
     private static AggregationProcessorDefinition<Test_Competitor,Test_Competitor> competitorAggregatorDefinition;
 
-    @BeforeClass
+    @BeforeAll
     public static void initializeAggregationProcessorDefinitions() {
         anyDataAggregatorDefinition = new SimpleAggregationProcessorDefinition<>(Object.class, Double.class, "AnyDataAggregator",
                 TestAnyDataTypeAggregationProcessorDummy.class);

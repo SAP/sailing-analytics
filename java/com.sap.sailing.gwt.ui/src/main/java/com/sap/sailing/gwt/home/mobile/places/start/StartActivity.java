@@ -17,6 +17,7 @@ import com.sap.sailing.gwt.home.shared.app.PlaceNavigation;
 import com.sap.sailing.gwt.home.shared.places.start.StartPlace;
 import com.sap.sailing.gwt.home.shared.refresh.RefreshManagerWithErrorAndBusy;
 import com.sap.sse.gwt.dispatch.shared.commands.ListResult;
+import com.sap.sse.security.ui.client.UserService;
 
 public class StartActivity extends AbstractActivity implements Presenter {
     private final MobileApplicationClientFactory clientFactory;
@@ -62,5 +63,10 @@ public class StartActivity extends AbstractActivity implements Presenter {
     @Override
     public PlaceNavigation<?> getEventNavigation(EventQuickfinderDTO event) {
         return clientFactory.getNavigator().getEventNavigation(event.getId().toString(), event.getBaseURL(), event.isOnRemoteServer());
+    }
+
+    @Override
+    public UserService getUserService() {
+        return clientFactory.getUserService();
     }
 }

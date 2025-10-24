@@ -20,6 +20,7 @@ import com.sap.sse.classloading.ServiceTrackerCustomizerForClassLoaderSupplierRe
 import com.sap.sse.mail.MailService;
 import com.sap.sse.replication.Replicable;
 import com.sap.sse.replication.ReplicationMasterDescriptor;
+import com.sap.sse.replication.ReplicationService;
 import com.sap.sse.rest.CORSFilterConfiguration;
 import com.sap.sse.security.SecurityInitializationCustomizer;
 import com.sap.sse.security.SecurityService;
@@ -211,9 +212,10 @@ public class Activator implements BundleActivator {
         hasPermissionsProviderTracker.open();
         SecurityService initialSecurityService = new SecurityServiceImpl(
                 ServiceTrackerFactory.createAndOpen(context, MailService.class),
-                ServiceTrackerFactory.createAndOpen(context, CORSFilterConfiguration.class), userStore,
-                accessControlStore, new OSGIHasPermissionsProvider(hasPermissionsProviderTracker),
-                subscriptionPlanProvider, sharedAcrossSubdomainsOf, baseUrlForCrossDomainStorage);
+                ServiceTrackerFactory.createAndOpen(context, CORSFilterConfiguration.class),
+                ServiceTrackerFactory.createAndOpen(context, ReplicationService.class),
+                userStore, accessControlStore,
+                new OSGIHasPermissionsProvider(hasPermissionsProviderTracker), subscriptionPlanProvider, sharedAcrossSubdomainsOf, baseUrlForCrossDomainStorage);
         initialSecurityService.initialize();
         securityService.complete(initialSecurityService);
         registration = context.registerService(SecurityService.class, initialSecurityService, null);

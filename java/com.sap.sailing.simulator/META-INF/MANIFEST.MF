@@ -14,7 +14,8 @@ Require-Bundle: com.sap.sailing.domain.common;bundle-version="1.0.0",
  org.apache.httpcomponents.httpclient;bundle-version="4.5.5",
  org.json.simple;bundle-version="1.1.0"
 Bundle-ActivationPolicy: lazy
-Import-Package: org.osgi.framework;version="1.6.0"
+Import-Package: com.sap.sailing.domain.shared.tracking,
+ org.osgi.framework;version="1.6.0"
 Bundle-ClassPath: .
 Export-Package: com.sap.sailing.simulator,
  com.sap.sailing.simulator.impl,

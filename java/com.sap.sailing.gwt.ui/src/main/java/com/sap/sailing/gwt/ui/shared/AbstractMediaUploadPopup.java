@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,9 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.sap.sailing.gwt.home.shared.SharedHomeResources;
+import com.sap.sailing.gwt.ui.client.SailingServiceAsync;
 import com.sap.sailing.gwt.ui.client.StringMessages;
+import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.fileupload.FileUploadConstants;
 import com.sap.sse.common.fileupload.FileUploadUtil;
 import com.sap.sse.common.media.MediaTagConstants;
@@ -47,6 +50,8 @@ import com.sap.sse.common.media.MediaType;
 import com.sap.sse.common.media.MimeType;
 import com.sap.sse.gwt.client.Notification;
 import com.sap.sse.gwt.client.Notification.NotificationType;
+import com.sap.sse.gwt.client.async.ParallelExecutionCallback;
+import com.sap.sse.gwt.client.async.ParallelExecutionHolder;
 import com.sap.sse.gwt.client.media.ImageDTO;
 import com.sap.sse.gwt.client.media.VideoDTO;
 import com.sap.sse.gwt.client.panels.HorizontalFlowPanel;
@@ -77,6 +82,8 @@ public abstract class AbstractMediaUploadPopup extends DialogBox {
     private FlowPanel progressOverlay;
     private final Map<String, MediaObject> mediaObjectMap = new LinkedHashMap<>();
     
+    private final SailingServiceAsync sailingService;
+    
     private static class MediaObject {
         String title;
         String subTitle;
@@ -84,8 +91,9 @@ public abstract class AbstractMediaUploadPopup extends DialogBox {
         MimeType mimeType;
     }
 
-    public AbstractMediaUploadPopup(BiConsumer<List<ImageDTO>, List<VideoDTO>> updateImagesAndVideos) {
+    public AbstractMediaUploadPopup(BiConsumer<List<ImageDTO>, List<VideoDTO>> updateImagesAndVideos, SailingServiceAsync sailingService) {
         this.updateImagesAndVideos = updateImagesAndVideos;
+        this.sailingService = sailingService;
         sharedHomeResources.sharedHomeCss().ensureInjected();
         this.addStyleName(sharedHomeResources.sharedHomeCss().popup());
         this.setTitle(i18n.upload());
@@ -360,8 +368,7 @@ public abstract class AbstractMediaUploadPopup extends DialogBox {
     private void addMedia() {
         List<ImageDTO> imageList = new ArrayList<>();
         List<VideoDTO> videoList = new ArrayList<>();
-        
-        for (Entry<String, MediaObject> mediaObjectEntry: mediaObjectMap.entrySet()) {
+        for (Entry<String, MediaObject> mediaObjectEntry : mediaObjectMap.entrySet()) {
             String uri = mediaObjectEntry.getKey();
             final String uploadUrl;
             if (uri == null) {
@@ -405,7 +412,48 @@ public abstract class AbstractMediaUploadPopup extends DialogBox {
             }
         }
         if (!imageList.isEmpty() || !videoList.isEmpty()) {
-            updateImagesAndVideos.accept(imageList, videoList);
+            if (imageList.isEmpty()) { // need not fetch size for any image, can invoke the callback directly:
+                updateImagesAndVideos.accept(imageList, videoList);
+            } else {
+                // For all images, try to obtain the dimensions in order to update the ImageDTOs accordingly.
+                // Use a parallel execution holder that waits until all responses have arrived. Log but ignore
+                // failures by treating them as null responses, eventually unblocking the parallel execution holder,
+                // even if one more images fail to resolve their dimensions.
+                final Map<String, ParallelExecutionCallback<Pair<Integer, Integer>>> callbacks = new HashMap<>(imageList.size());
+                for (final ImageDTO image : imageList) {
+                    final ParallelExecutionCallback<Pair<Integer, Integer>> fetchSizeCallback = new ParallelExecutionCallback<Pair<Integer,Integer>>() {
+                        @Override
+                        public void onSuccess(Pair<Integer, Integer> t) {
+                            if (t != null) {
+                                logger.info("Setting image size of "+image.getSourceRef()+" to "+t);
+                                image.setSizeInPx(t.getA(), t.getB());
+                            }
+                            super.onSuccess(t);
+                        }
+
+                        @Override
+                        public void onFailure(Throwable t) {
+                            logger.warning("Couldn't get image size for "+image.getSourceRef()+": "+t.getMessage());
+                            onSuccess(null); // still call it success to eventually unblock ParallelExecutionHolder
+                        }
+                    };
+                    callbacks.put(image.getSourceRef(), fetchSizeCallback);
+                }
+                new ParallelExecutionHolder(callbacks.values().toArray(new ParallelExecutionCallback<?>[0])) {
+                    @Override
+                    protected void handleSuccess() {
+                        updateImagesAndVideos.accept(imageList, videoList);
+                    }
+                    
+                    @Override
+                    protected void handleFailure(Throwable t) {
+                        logger.severe("Shouldn't have come here because callbacks are expected to wrap failure into a success");
+                    }
+                };
+                for (final Entry<String, ParallelExecutionCallback<Pair<Integer, Integer>>> urlAndCallback : callbacks.entrySet()) {
+                    sailingService.resolveImageDimensions(urlAndCallback.getKey(), urlAndCallback.getValue());
+                }
+            }
         } else {
             logger.warning("No image nor video detected. Nothing will be saved.");
             Notification.notify(i18n.noImageOrVideoDetected(), NotificationType.WARNING);

@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.igtimiadapter.websocket.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.net.URI;
@@ -21,7 +21,7 @@ import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.eclipse.jetty.websocket.servlet.WebSocketServlet;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.igtimi.IgtimiStream.ChannelManagement;
 import com.igtimi.IgtimiStream.Msg;

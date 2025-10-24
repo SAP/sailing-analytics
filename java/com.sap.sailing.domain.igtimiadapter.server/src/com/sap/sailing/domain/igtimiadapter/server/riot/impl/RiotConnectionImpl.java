@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SocketChannel;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -17,6 +19,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.igtimi.IgtimiAPI.Token;
 import com.igtimi.IgtimiData.Data;
 import com.igtimi.IgtimiData.DataMsg;
+import com.igtimi.IgtimiData.DataPoint;
 import com.igtimi.IgtimiDevice.DeviceCommand;
 import com.igtimi.IgtimiDevice.DeviceManagement;
 import com.igtimi.IgtimiDevice.DeviceManagementRequest;
@@ -28,8 +31,15 @@ import com.igtimi.IgtimiStream.Msg;
 import com.igtimi.IgtimiStream.ServerDisconnecting;
 import com.sap.sailing.domain.igtimiadapter.ChannelManagementVisitor;
 import com.sap.sailing.domain.igtimiadapter.Device;
+import com.sap.sailing.domain.igtimiadapter.FixFactory;
+import com.sap.sailing.domain.igtimiadapter.FixVisitor;
+import com.sap.sailing.domain.igtimiadapter.IgtimiFixReceiver;
+import com.sap.sailing.domain.igtimiadapter.IgtimiFixReceiverAdapter;
 import com.sap.sailing.domain.igtimiadapter.MsgVisitor;
+import com.sap.sailing.domain.igtimiadapter.datatypes.Log;
 import com.sap.sailing.domain.igtimiadapter.server.riot.RiotConnection;
+import com.sap.sailing.domain.igtimiadapter.server.riot.RiotMessageListener;
+import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.util.ThreadPoolUtil;
@@ -84,15 +94,26 @@ public class RiotConnectionImpl implements RiotConnection {
     
     private TimePoint lastHeartbeatReceivedAt;
     
+    private TimePoint requireNextHeartbeatUntil;
+    
+    /**
+     * How many command sends have enabled over-the-air log collection? Use only while holding
+     * this object's monitor to make this thread-safe.
+     */
+    private int overTheAirLogEnabled;
+    
+    private static final Duration MAX_ALLOWED_DURATION_BETWEEN_HEARTBEATS = Duration.ONE_SECOND.times(30);
+    
     RiotConnectionImpl(SocketChannel socketChannel, RiotServerImpl riotServer) {
         this.socketChannel = socketChannel;
         this.riotServer = riotServer;
         this.messageLengthBuffer = ByteBuffer.allocate(5);
+        this.requireNextHeartbeatUntil = TimePoint.now().plus(Duration.ONE_MINUTE); // start gracefully; normally this would be 30s...
         heartbeatSendingTask = scheduleHeartbeat();
     }
     
     private ScheduledFuture<?> scheduleHeartbeat() {
-        return ThreadPoolUtil.INSTANCE.getDefaultBackgroundTaskThreadPoolExecutor().scheduleAtFixedRate(this::sendHeartbeat, 15, 15, TimeUnit.SECONDS);
+        return ThreadPoolUtil.INSTANCE.getDefaultBackgroundTaskThreadPoolExecutor().scheduleAtFixedRate(this::sendAndCheckHeartbeat, 15, 15, TimeUnit.SECONDS);
     }
 
     @Override
@@ -120,15 +141,76 @@ public class RiotConnectionImpl implements RiotConnection {
         try {
             send(Msg.newBuilder().setChannelManagement(ChannelManagement.newBuilder().setDisconnect(ServerDisconnecting.newBuilder().setCode(500).setReason("Connection closed by server"))).build());
         } finally {
-            heartbeatSendingTask.cancel(/* mayInterruptIfRunning */ false);
-            socketChannel.close();
+            onClosed();
         }
+    }
+
+    private void onClosed() throws IOException {
+        riotServer.connectionClosed(socketChannel); // remove the connection from the server managing it
+        heartbeatSendingTask.cancel(/* mayInterruptIfRunning */ false);
+        socketChannel.close();
     }
     
     @Override
-    public void sendCommand(String command) throws IOException {
-        send(Msg.newBuilder().setDeviceManagement(DeviceManagement.newBuilder().setRequest(DeviceManagementRequest.newBuilder()
-                .setCommand(DeviceCommand.newBuilder().setText(command)))).build());
+    public ConcurrentLinkedQueue<String> sendCommand(String command) throws IOException, InterruptedException, ExecutionException {
+        final ConcurrentLinkedQueue<String> logLines = new ConcurrentLinkedQueue<>();
+        final FixFactory fixFactory = new FixFactory();
+        final IgtimiFixReceiver fixReceiver = new IgtimiFixReceiverAdapter() {
+            @Override
+            public void received(Log fix) {
+                logLines.add(fix.getLogMessage());
+                logger.info("Log from device "+getSerialNumber()+" probably in response to command "+command+
+                        ": "+fix.getLogMessage());
+            }
+        };
+        final FixVisitor fixVisitor = new FixVisitor(fixReceiver);
+        final RiotMessageListener listener = m->fixVisitor.received(fixFactory.createFixes(m));
+        riotServer.addListener(listener);
+        enableOverTheAirLog(); // enable over-the-air log collection
+        send(buildCommandMessage(command));
+        // stop log collection after 10 seconds
+        ThreadPoolUtil.INSTANCE.getDefaultBackgroundTaskThreadPoolExecutor().schedule(
+                ()->{
+                    try {
+                        disableOverTheAirLog();
+                    } catch (IOException e) {
+                        logger.warning("Couldn't send commands to stop receiving logs to device "+getSerialNumber()+": "+e.getMessage());
+                    }
+                    riotServer.removeListener(listener);
+                }, 10, TimeUnit.SECONDS);
+        return logLines;
+    }
+
+    @Override
+    public synchronized void enableOverTheAirLog() throws IOException {
+        // Logging priorities:
+        //        debug
+        //        info
+        //        warning
+        //        error
+        //        fatal
+        //        response // possibly special case for console responses
+        if (overTheAirLogEnabled == 0) {
+            send(buildCommandMessage("log cell debug"));   // alternatively: "log cell verbose payload"     // log messages over modem in "payload" format
+            send(buildCommandMessage("log cell block 2")); // blocking wait for modem for two seconds
+        }
+        overTheAirLogEnabled++;
+    }
+    
+    @Override
+    public synchronized void disableOverTheAirLog() throws IOException {
+        if (overTheAirLogEnabled > 0) {
+            overTheAirLogEnabled--;
+            if (overTheAirLogEnabled == 0) {
+                send(buildCommandMessage("log cell none"));
+                send(buildCommandMessage("log cell block 0"));
+            }
+        }
+    }
+
+    private Msg buildCommandMessage(String command) {
+        return Msg.newBuilder().setDeviceManagement(DeviceManagement.newBuilder().setRequest(DeviceManagementRequest.newBuilder()
+                .setCommand(DeviceCommand.newBuilder().setText(command)))).build();
     }
 
     @Override
@@ -267,10 +349,15 @@ public class RiotConnectionImpl implements RiotConnection {
     private void send(final AbstractMessage message) throws IOException {
         final ByteArrayOutputStream bos = new ByteArrayOutputStream(4096);
         message.writeDelimitedTo(bos);
-        final ByteBuffer buf = ByteBuffer.allocate(bos.size());
+        final int size = bos.size();
+        final ByteBuffer buf = ByteBuffer.allocate(size);
         buf.put(bos.toByteArray());
         buf.flip();
-        socketChannel.write(buf);
+        final int bytesWritten;
+        if ((bytesWritten = socketChannel.write(buf)) < size) {
+            logger.warning("Trying to write "+size+" bytes to device "+socketChannel+" but was able to write only "+bytesWritten+
+                    "; message "+message+" most likely not delivered to device "+serialNumber+" successfully.");
+        }
     }
     
     /**
@@ -283,12 +370,24 @@ public class RiotConnectionImpl implements RiotConnection {
             @Override
             public void handleDeviceManagement(DeviceManagement deviceManagement) {
                 updateSerialNumber(deviceManagement.getSerialNumber());
+                if (deviceManagement.hasResponse()) {
+                    logger.info("Received a response from device "+deviceManagement.getSerialNumber()+
+                            ". Code: "+deviceManagement.getResponse().getCode()+
+                            ", reason: "+deviceManagement.getResponse().getReason()+
+                            ", text: "+deviceManagement.getResponse().getText()+
+                            ", timestamp: "+TimePoint.of(deviceManagement.getResponse().getTimestamp()));
+                }
             }
             
             @Override
             public void handleData(Data data) {
                 for (final DataMsg dataMsg : data.getDataList()) {
                     updateSerialNumber(dataMsg.getSerialNumber());
+                    for (final DataPoint d : dataMsg.getDataList()) {
+                        if (d.hasLog()) {
+                            logger.info("Log from Igtimi device "+getSerialNumber()+": "+d.getLog().getMessage());
+                        }
+                    }
                 }
             }
             
@@ -310,6 +409,7 @@ public class RiotConnectionImpl implements RiotConnection {
                     @Override
                     public void handleHeartbeat(long heartbeat) {
                         lastHeartbeatReceivedAt = TimePoint.now();
+                        requireNextHeartbeatUntil = lastHeartbeatReceivedAt.plus(MAX_ALLOWED_DURATION_BETWEEN_HEARTBEATS);
                         updateDeviceHeartbeatIfSerialNumberKnown();
                     }
                 });
@@ -352,15 +452,38 @@ public class RiotConnectionImpl implements RiotConnection {
         }
     }
 
-    private void sendHeartbeat() {
-        try {
-            send(Msg.newBuilder().setChannelManagement(ChannelManagement.newBuilder().setHeartbeat(1)).build());
-        } catch (ClosedChannelException cce) {
-            logger.warning("Channel "+socketChannel+" closed. Forwarding exception to stop sending heartbeat to closed connection");
-            throw new RuntimeException(cce);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Problem while trying to send heartbeat message to device "+getSerialNumber(), e);
-            throw new RuntimeException(e);
+    private void sendAndCheckHeartbeat() {
+        final TimePoint now = TimePoint.now();
+        if (now.after(requireNextHeartbeatUntil)) {
+            logger.info("Expected heartbeat from channel "+socketChannel+
+                    " until "+requireNextHeartbeatUntil+" but haven't received it until "+now+
+                    "; closing connection");
+            try {
+                close();
+            } catch (Exception e) {
+                logger.warning("Channel "+socketChannel+" threw exception while trying to close it: "+e.getMessage());
+                throw new RuntimeException(e);
+            }
+        } else {
+            try {
+                send(Msg.newBuilder().setChannelManagement(ChannelManagement.newBuilder().setHeartbeat(1)).build());
+            } catch (ClosedChannelException cce) {
+                logger.warning("Channel "+socketChannel+" closed.");
+                try {
+                    onClosed();
+                } catch (Exception e) {
+                    logger.warning("Channel "+socketChannel+" threw exception while trying to close it: "+e.getMessage());
+                    throw new RuntimeException(e);
+                }
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Problem while trying to send heartbeat message to device "+getSerialNumber(), e);
+                try {
+                    close();
+                } catch (Exception e1) {
+                    logger.warning("Channel "+socketChannel+" threw exception while trying to close it: "+e1.getMessage());
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 

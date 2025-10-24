@@ -13,4 +13,8 @@ public class CompetitorImageProvider implements ImageProvider {
         return "";
     }
 
+    @Override
+    public String getTakedownNoticeContextKey() {
+        return "takedownRequestForCompetitorImage";
+    }
 }

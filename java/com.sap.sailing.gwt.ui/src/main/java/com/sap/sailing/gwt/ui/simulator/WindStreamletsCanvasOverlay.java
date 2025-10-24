@@ -11,6 +11,7 @@ import com.sap.sailing.gwt.ui.simulator.streamlets.RectField;
 import com.sap.sailing.gwt.ui.simulator.streamlets.SimulatorField;
 import com.sap.sailing.gwt.ui.simulator.streamlets.SimulatorJSBundle;
 import com.sap.sailing.gwt.ui.simulator.streamlets.Swarm;
+import com.sap.sse.common.Duration;
 import com.sap.sse.gwt.client.player.Timer;
 
 /**
@@ -21,6 +22,7 @@ import com.sap.sse.gwt.client.player.Timer;
  * 
  */
 public class WindStreamletsCanvasOverlay extends FullCanvasOverlay implements TimeListenerWithStoppingCriteria {
+    private final static Duration ANIMATION_INTERVAL = Duration.ONE_MILLISECOND.times(40);
     /** The wind field that is to be displayed in the overlay */
     private WindFieldDTO windFieldDTO;
     private final WindFieldGenParamsDTO windParams;
@@ -57,7 +59,7 @@ public class WindStreamletsCanvasOverlay extends FullCanvasOverlay implements Ti
             setCanvasSettings();
             this.swarm = new Swarm(this, map, timer, field, streamletPars);
         }
-        this.swarm.start(40);
+        this.swarm.start((int) ANIMATION_INTERVAL.asMillis());
     }
     public void stopStreamlets() {
         if (swarm != null) {
@@ -109,7 +111,7 @@ public class WindStreamletsCanvasOverlay extends FullCanvasOverlay implements Ti
     @Override
     protected void draw() {
         super.draw();
-        if (mapProjection != null) {
+        if (getMapProjection() != null) {
             if ((macroWeather) && (swarm == null)) {
                 macroWeather = false;
                 SimulatorJSBundle bundle = GWT.create(SimulatorJSBundle.class);
@@ -118,7 +120,7 @@ public class WindStreamletsCanvasOverlay extends FullCanvasOverlay implements Ti
                 map.setZoom(5);
                 map.panTo(f.getCenter());
                 this.swarm = new Swarm(this, map, timer, f, streamletPars);
-                this.swarm.start(/* animationIntervalMillis */ 40);
+                this.swarm.start((int) ANIMATION_INTERVAL.asMillis());
             }
         }
     }

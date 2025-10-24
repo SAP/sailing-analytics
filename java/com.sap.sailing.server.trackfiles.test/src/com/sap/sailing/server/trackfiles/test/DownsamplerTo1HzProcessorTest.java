@@ -1,14 +1,13 @@
 package com.sap.sailing.server.trackfiles.test;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.server.trackfiles.impl.doublefix.DoubleFixProcessor;
 import com.sap.sailing.server.trackfiles.impl.doublefix.DoubleVectorFixData;
 import com.sap.sailing.server.trackfiles.impl.doublefix.DownsamplerTo1HzProcessor;
-
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Assert;
 
 public class DownsamplerTo1HzProcessorTest {
 
@@ -44,13 +43,13 @@ public class DownsamplerTo1HzProcessorTest {
         processor.accept(new DoubleVectorFixData(second + 920, new Double[] { 0d, 0d, 0d, 0d }));
         second = 50 * 1000;
         processor.accept(new DoubleVectorFixData(second + 130, new Double[] { 0d, 0d, 0d, 0d }));
-        Assert.assertEquals("Count consolidated fixes", 3, delegate.countAccepted);
-        Assert.assertFalse("Not finished yet", delegate.fineshedWasCalled);
+        Assertions.assertEquals(3, delegate.countAccepted, "Count consolidated fixes");
+        Assertions.assertFalse(delegate.fineshedWasCalled, "Not finished yet");
         
         processor.finish();
         
-        Assert.assertEquals("Count consolidated fixes", 4, delegate.countAccepted);
-        Assert.assertTrue("Finished", delegate.fineshedWasCalled);
+        Assertions.assertEquals(4, delegate.countAccepted, "Count consolidated fixes");
+        Assertions.assertTrue(delegate.fineshedWasCalled, "Finished");
     }
     
     @Test
@@ -65,14 +64,14 @@ public class DownsamplerTo1HzProcessorTest {
         processor.accept(new DoubleVectorFixData(second + 999, new Double[] { 0.00d, 1d, 1d, 0d }));
 
         processor.finish();
-        Assert.assertTrue("Finished", delegate.fineshedWasCalled);
-        Assert.assertEquals("Count consolidated fixes", 1, delegate.countAccepted);
+        Assertions.assertTrue(delegate.fineshedWasCalled, "Finished");
+        Assertions.assertEquals(1, delegate.countAccepted, "Count consolidated fixes");
         DoubleVectorFixData lastFix = delegate.lastFix;
-        Assert.assertNotNull("Lastfix", lastFix);
-        assertEquals("Avg col 1", (12.4d + 0.01d - 10d + 1d + 0d) / 5d, (double) lastFix.getFix()[0], 0.000001);
-        assertEquals("Avg col 2", 9d / 5d, (double) lastFix.getFix()[1], 0.000001);
-        assertEquals("Avg col 3", 1d, (double) lastFix.getFix()[2], 0.000001);
-        assertEquals("Avg col 4", 0d, (double) lastFix.getFix()[3], 0.000001);
+        Assertions.assertNotNull(lastFix, "Lastfix");
+        assertEquals((12.4d + 0.01d - 10d + 1d + 0d) / 5d, (double) lastFix.getFix()[0], 0.000001, "Avg col 1");
+        assertEquals(9d / 5d, (double) lastFix.getFix()[1], 0.000001, "Avg col 2");
+        assertEquals(1d, (double) lastFix.getFix()[2], 0.000001, "Avg col 3");
+        assertEquals(0d, (double) lastFix.getFix()[3], 0.000001, "Avg col 4");
     }
 
     private final class MyProcessor implements DoubleFixProcessor {

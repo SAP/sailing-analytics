@@ -62,8 +62,8 @@ public class Main {
                 race
         );
         raceSubscriber.subscribeConnectionStatus(listener);
-        raceSubscriber.subscribePositionedItemPositions(listener);
-        //raceSubscriber.subscribePositions(listener);
+        //raceSubscriber.subscribePositionedItemPositions(listener);
+        raceSubscriber.subscribePositions(listener);
         //raceSubscriber.subscribePositionsSnapped(listener);
         raceSubscriber.subscribeControlPassings(listener);
         //raceSubscriber.subscribeCompetitorSensorData(listener);

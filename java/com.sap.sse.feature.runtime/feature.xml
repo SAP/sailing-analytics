@@ -63,14 +63,14 @@
          id="org.eclipse.jetty.osgi.boot"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.osgi.boot.warurl"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
@@ -119,224 +119,224 @@
          id="org.eclipse.jetty.deploy"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.deploy.source"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.http"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.http.source"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.io"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.io.source"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.jmx"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.jmx.source"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.security"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.security.source"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.server"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.server.source"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.servlet"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.servlet.source"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.util"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.util.source"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.util.ajax"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.util.ajax.source"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.webapp"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.webapp.source"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.websocket.api"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.websocket.api.source"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.websocket.client"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.websocket.client.source"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.websocket.common"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.websocket.common.source"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.websocket.server"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.websocket.server.source"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.websocket.servlet"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.websocket.servlet.source"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.xml"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.xml.source"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
@@ -545,7 +545,7 @@
          id="org.eclipse.jetty.client"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
@@ -775,105 +775,119 @@
          id="com.amazon.aws.aws-java-api"
          download-size="0"
          install-size="0"
-         version="2.25.11"
+         version="2.32.25"
          unpack="false"/>
 
    <plugin
          id="com.amazon.aws.aws-java-api.source"
          download-size="0"
          install-size="0"
-         version="2.25.11"
+         version="2.32.25"
          unpack="false"/>
 
    <plugin
          id="org.objectweb.asm"
          download-size="0"
          install-size="0"
-         version="9.4.0.v20221107-1714"
+         version="9.8.0"
          unpack="false"/>
 
    <plugin
          id="org.objectweb.asm.commons"
          download-size="0"
          install-size="0"
-         version="9.4.0.v20221107-1714"
+         version="9.8.0"
          unpack="false"/>
 
    <plugin
-         id="org.objectweb.asm.analysis"
+         id="org.objectweb.asm.tree.analysis"
          download-size="0"
          install-size="0"
-         version="9.4.0.v20221107-1714"
+         version="9.8.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.objectweb.asm.tree.analysis.source"
+         download-size="0"
+         install-size="0"
+         version="9.8.0"
          unpack="false"/>
 
    <plugin
          id="org.objectweb.asm.tree"
          download-size="0"
          install-size="0"
-         version="9.4.0.v20221107-1714"
-         unpack="false"/>
-
-   <plugin
-         id="org.objectweb.asm.util"
-         download-size="0"
-         install-size="0"
-         version="9.4.0.v20221107-1714"
-         unpack="false"/>
-
-   <plugin
-         id="org.objectweb.asm.source"
-         download-size="0"
-         install-size="0"
-         version="9.4.0.v20221107-1714"
-         unpack="false"/>
-
-   <plugin
-         id="org.objectweb.asm.analysis.source"
-         download-size="0"
-         install-size="0"
-         version="9.4.0.v20221107-1714"
-         unpack="false"/>
-
-   <plugin
-         id="org.objectweb.asm.commons.source"
-         download-size="0"
-         install-size="0"
-         version="9.4.0.v20221107-1714"
+         version="9.8.0"
          unpack="false"/>
 
    <plugin
          id="org.objectweb.asm.tree.source"
          download-size="0"
          install-size="0"
-         version="9.4.0.v20221107-1714"
+         version="9.8.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.objectweb.asm.tree"
+         download-size="0"
+         install-size="0"
+         version="9.8.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.objectweb.asm.util"
+         download-size="0"
+         install-size="0"
+         version="9.8.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.objectweb.asm.source"
+         download-size="0"
+         install-size="0"
+         version="9.8.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.objectweb.asm.commons.source"
+         download-size="0"
+         install-size="0"
+         version="9.8.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.objectweb.asm.tree.source"
+         download-size="0"
+         install-size="0"
+         version="9.8.0"
          unpack="false"/>
 
    <plugin
          id="org.objectweb.asm.util.source"
          download-size="0"
          install-size="0"
-         version="9.4.0.v20221107-1714"
+         version="9.8.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.apache-jsp"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.apache-jsp.source"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.osgi.boot.jsp"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          fragment="true"
          unpack="false"/>
 
@@ -881,7 +895,7 @@
          id="org.eclipse.jetty.osgi.boot.jsp.source"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
@@ -909,14 +923,28 @@
          id="org.mortbay.jasper.apache-el"
          download-size="0"
          install-size="0"
-         version="8.5.70"
+         version="8.5.100"
          unpack="false"/>
 
    <plugin
          id="org.mortbay.jasper.apache-jsp"
          download-size="0"
          install-size="0"
-         version="8.5.70"
+         version="8.5.100"
+         unpack="false"/>
+
+   <plugin
+         id="org.mortbay.jasper.apache-el.source"
+         download-size="0"
+         install-size="0"
+         version="8.5.100"
+         unpack="false"/>
+
+   <plugin
+         id="org.mortbay.jasper.apache-jsp.source"
+         download-size="0"
+         install-size="0"
+         version="8.5.100"
          unpack="false"/>
 
    <plugin
@@ -979,21 +1007,21 @@
          id="org.eclipse.jetty.annotations"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.jndi"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.plus"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
@@ -1358,28 +1386,28 @@
          id="com.sun.jna"
          download-size="0"
          install-size="0"
-         version="5.12.1.v20221103-2317"
+         version="5.17.0.v20250316-1700"
          unpack="false"/>
 
    <plugin
          id="com.sun.jna.source"
          download-size="0"
          install-size="0"
-         version="5.12.1.v20221103-2317"
+         version="5.17.0.v20250316-1700"
          unpack="false"/>
 
    <plugin
          id="com.sun.jna.platform"
          download-size="0"
          install-size="0"
-         version="5.12.1.v20221103-2317"
+         version="5.17.0"
          unpack="false"/>
 
    <plugin
          id="com.sun.jna.platform.source"
          download-size="0"
          install-size="0"
-         version="5.12.1.v20221103-2317"
+         version="5.17.0"
          unpack="false"/>
 
    <plugin

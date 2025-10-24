@@ -378,7 +378,7 @@ public class SeriesEditDialog extends DataEntryDialog<SeriesDescriptor> {
             addRacesPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
             addRacesPanel.setSpacing(5);
             addRacesPanel.add(new Label(getStringMessages().addRaces()));
-            for(int i = 1; i <= 50; i++) {
+            for(int i = 1; i <= 100; i++) {
                 addRacesFromListBox.addItem("" + i);
                 addRacesToListBox.addItem("" + i);
             }

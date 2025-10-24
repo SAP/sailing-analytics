@@ -1,0 +1,355 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?p2f version='1.0.0'?>
+<p2f version='1.0.0'>
+  <ius size='57'>
+    <iu id='com.amazonaws.eclipse.core.feature.feature.group' name='AWS Toolkit for Eclipse Core (Required)' version='2.3.1.v201807201743'>
+      <repositories size='1'>
+        <repository location='http://aws.amazon.com/eclipse/site.xml'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.jst.ws.axis2tools.feature.feature.group' name='Axis2 Tools' version='1.1.0.v200905242110-78-FBpDZRDE6FdPdLYYe'>
+      <repositories size='3'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+        <repository location='http://download.eclipse.org/webtools/updates/3.1'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.buildship.feature.group' name='Buildship: Eclipse Plug-ins for Gradle' version='3.1.10.v20240802-1314'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.jdt.bcoview.feature.feature.group' name='Bytecode Outline View' version='1.2.700.v20250114-1355'>
+      <repositories size='3'>
+        <repository location='https://download.eclipse.org/eclipse/updates/4.36'/>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='de.anbos.eclipse.easyshell.feature.feature.group' name='EasyShell' version='2.3.0.v20230630-1658'>
+      <repositories size='1'>
+        <repository location='http://anb0s.github.io/EasyShell'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.eclemma.feature.feature.group' name='EclEmma Java Code Coverage' version='3.1.10.202505212130'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.e4.core.tools.feature.feature.group' name='Eclipse e4 Tools' version='4.30.500.v20250415-1756'>
+      <repositories size='3'>
+        <repository location='https://download.eclipse.org/eclipse/updates/4.36'/>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='epp.package.committers' name='Eclipse IDE for Eclipse Committers' version='4.36.0.20250605-1300'>
+      <repositories size='3'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+        <repository location='https://download.eclipse.org/technology/epp/packages/latest/'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.jdt.feature.group' name='Eclipse Java Development Tools' version='3.20.200.v20250528-1830'>
+      <repositories size='3'>
+        <repository location='https://download.eclipse.org/eclipse/updates/4.36'/>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.jdt.source.feature.group' name='Eclipse JDT Plug-in Developer Resources' version='3.20.200.v20250528-1830'>
+      <repositories size='3'>
+        <repository location='https://download.eclipse.org/eclipse/updates/4.36'/>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.platform.feature.group' name='Eclipse Platform' version='4.36.0.v20250528-2229'>
+      <repositories size='3'>
+        <repository location='https://download.eclipse.org/eclipse/updates/4.36'/>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.platform.source.feature.group' name='Eclipse Platform Developer Resources' version='4.36.0.v20250528-2229'>
+      <repositories size='3'>
+        <repository location='https://download.eclipse.org/eclipse/updates/4.36'/>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.pde.feature.group' name='Eclipse Plug-in Development Environment' version='3.16.300.v20250528-1830'>
+      <repositories size='3'>
+        <repository location='https://download.eclipse.org/eclipse/updates/4.36'/>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.pde.source.feature.group' name='Eclipse Plug-in Development Environment Developer Resources' version='3.16.300.v20250528-1830'>
+      <repositories size='3'>
+        <repository location='https://download.eclipse.org/eclipse/updates/4.36'/>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.pde.spies.feature.group' name='Eclipse Plug-in Development Environment Spies' version='1.0.700.v20250521-0419'>
+      <repositories size='3'>
+        <repository location='https://download.eclipse.org/eclipse/updates/4.36'/>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.pde.spies.source.feature.group' name='Eclipse Plug-in Development Environment Spies Developer Resources' version='1.0.700.v20250521-0419'>
+      <repositories size='3'>
+        <repository location='https://download.eclipse.org/eclipse/updates/4.36'/>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.rcp.source.feature.group' name='Eclipse RCP Developer Resources' version='4.36.0.v20250528-1830'>
+      <repositories size='3'>
+        <repository location='https://download.eclipse.org/eclipse/updates/4.36'/>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.sf.feeling.decompiler.feature.group' name='Enhanced Class Decompiler (Core)' version='3.5.1'>
+      <repositories size='1'>
+        <repository location='https://ecd-plugin.github.io/update'/>
+      </repositories>
+    </iu>
+    <iu id='org.sf.feeling.decompiler.cfr.feature.group' name='Enhanced Class Decompiler CFR Extension (Optional)' version='3.5.1'>
+      <repositories size='1'>
+        <repository location='https://ecd-plugin.github.io/update'/>
+      </repositories>
+    </iu>
+    <iu id='org.sf.feeling.decompiler.jd.feature.group' name='Enhanced Class Decompiler JD-Core Extension (Optional)' version='3.5.1'>
+      <repositories size='1'>
+        <repository location='https://ecd-plugin.github.io/update'/>
+      </repositories>
+    </iu>
+    <iu id='org.sf.feeling.decompiler.procyon.feature.group' name='Enhanced Class Decompiler Procyon Extension (Optional)' version='3.5.1'>
+      <repositories size='1'>
+        <repository location='https://ecd-plugin.github.io/update'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.egit.feature.group' name='Git integration for Eclipse' version='7.3.0.202506031305-r'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.egit.gitflow.feature.feature.group' name='Git integration for Eclipse - Gitflow support' version='7.3.0.202506031305-r'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='com.gwtplugins.eclipse.suite.v3.feature.feature.group' name='GWT Eclipse Plugin' version='4.0.0.202302020242'>
+      <repositories size='1'>
+        <repository location='https://plugins.gwtproject.org/eclipse/gwt-eclipse-plugin/4.0.0'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.jgit.feature.group' name='Java implementation of Git' version='7.3.0.202506031305-r'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.jgit.http.apache.feature.group' name='Java implementation of Git - optional Http support using Apache httpclient' version='7.3.0.202506031305-r'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.wst.jsdt.feature.feature.group' name='JavaScript Developer Tools' version='1.1.2.v200908101420-77-FGDCcNBDjBXMoBbFb'>
+      <repositories size='3'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+        <repository location='http://download.eclipse.org/webtools/updates/3.1'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.justj.epp.feature.group' name='JustJ JRE for IDE Packages' version='21.0.0.v20250503-1036'>
+      <repositories size='1'>
+        <repository location='https://download.eclipse.org/justj/epp/release/latest'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.m2e.feature.feature.group' name='M2E - Maven Integration for Eclipse' version='2.9.0.20250514-0352'>
+      <repositories size='3'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+        <repository location='https://download.eclipse.org/technology/m2e/releases/latest'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.m2e.pde.feature.feature.group' name='M2E - PDE Integration' version='2.3.400.20250514-0353'>
+      <repositories size='3'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+        <repository location='https://download.eclipse.org/technology/m2e/releases/latest'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.m2e.lemminx.feature.feature.group' name='M2E - POM Editor using LemMinX language server (includes Incubating components)' version='2.6.100.20250514-0352'>
+      <repositories size='3'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+        <repository location='https://download.eclipse.org/technology/m2e/releases/latest'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.epp.mpc.feature.group' name='Marketplace Client' version='1.12.1.v20250508-2126'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mat.feature.feature.group' name='Memory Analyzer' version='1.16.1.202501091339'>
+      <repositories size='3'>
+        <repository location='https://download.eclipse.org/mat/latest/update-site/'/>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mat.chart.feature.feature.group' name='Memory Analyzer (Charts) [optional]' version='1.16.1.202501091339'>
+      <repositories size='3'>
+        <repository location='https://download.eclipse.org/mat/latest/update-site/'/>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.jenkins.feature.feature.group' name='Mylyn Builds Connector: Jenkins' version='4.7.0.v20250326-1000'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.commons.activity.feature.feature.group' name='Mylyn Commons Activity' version='4.7.0.v20250326-1000'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.ide.feature.feature.group' name='Mylyn Context Connector: Eclipse IDE' version='4.7.0.v20250326-1000'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.jdt.feature.feature.group' name='Mylyn Context Connector: Java Development' version='4.7.0.v20250326-1000'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.pde.feature.feature.group' name='Mylyn Context Connector: Plug-in Development' version='4.7.0.v20250326-1000'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.egit.feature.feature.group' name='Mylyn Git integration - Task focused interface' version='4.7.0.v20250326-1000'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.reviews.feature.feature.group' name='Mylyn Reviews' version='4.7.0.v20250326-1000'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.bugzilla.feature.feature.group' name='Mylyn Tasks Connector: Bugzilla' version='4.7.0.v20250326-1000'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.github.feature.feature.group' name='Mylyn Tasks Connector: GitHub' version='6.8.0.v20250326-1000'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.git.feature.feature.group' name='Mylyn Versions Connector: Git' version='4.7.0.v20250326-1000'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.wikitext.feature.feature.group' name='Mylyn WikiText' version='4.7.0.v20250513-1805'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.wildwebdeveloper.embedder.node.feature.feature.group' name='Node.js embedder from Wild Web Developer' version='1.2.0.202411190713'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.oomph.setup.feature.group' name='Oomph Setup' version='1.36.0.v20250521-1019'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='com.oracle.jmc.feature.ide.feature.group' name='Oracle Java Mission Control IDE Integration' version='6.0.0.173920'>
+      <repositories size='1'>
+        <repository location='http://download.oracle.com/technology/products/missioncontrol/updatesites/base/6.0.0/eclipse'/>
+      </repositories>
+    </iu>
+    <iu id='org.quartz' name='Quartz Scheduler' version='1.8.3.v20110329-1420'>
+      <repositories size='1'>
+        <repository location='https://download.eclipse.org/tools/orbit/downloads/drops/R20190602212107/repository'/>
+      </repositories>
+    </iu>
+    <iu id='com.sap.jvm.profiling.feature.group' name='SAP JVM Tools' version='2.4.15'>
+      <repositories size='1'>
+        <repository location='https://tools.hana.ondemand.com/oxygen'/>
+      </repositories>
+    </iu>
+    <iu id='com.github.sdbg.feature.feature.group' name='Source Map Editor Feature' version='2.2.0.202503101247'>
+      <repositories size='1'>
+        <repository location='https://p2.sapsailing.com/p2/sdbg'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.swt.tools.feature.feature.group' name='SWT Tools' version='3.109.700.v20250516-0845'>
+      <repositories size='3'>
+        <repository location='https://download.eclipse.org/eclipse/updates/4.36'/>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.tm4e.feature.feature.group' name='TextMate Core' version='0.14.1.202501141527'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.tm4e.language_pack.feature.feature.group' name='TextMate Language Pack' version='0.14.1.202501052236'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.tm.terminal.feature.feature.group' name='TM Terminal' version='12.1.0.202505062016'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+    <iu id='umlet-eclipse-feature.feature.group' name='UMLet Eclipse Plugin' version='15.1.0'>
+      <repositories size='1'>
+        <repository location='https://www.umlet.com/umlet_latest/repository/'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.wildwebdeveloper.feature.feature.group' name='Wild Web Developer HTML, CSS, JSON, Yaml, JavaScript, TypeScript, Node tools' version='1.3.9.202411190713'>
+      <repositories size='2'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+        <repository location='https://download.eclipse.org/releases/2025-06'/>
+      </repositories>
+    </iu>
+  </ius>
+</p2f>

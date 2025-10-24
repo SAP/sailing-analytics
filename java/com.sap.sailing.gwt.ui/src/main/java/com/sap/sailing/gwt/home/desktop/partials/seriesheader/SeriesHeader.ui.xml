@@ -1,6 +1,7 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-		xmlns:dp="urn:import:com.sap.sailing.gwt.home.desktop.partials">
+		xmlns:dp="urn:import:com.sap.sailing.gwt.home.desktop.partials"
+        xmlns:m="urn:import:com.sap.sse.gwt.client.media">
 	<ui:with field="i18n" type="com.sap.sailing.gwt.ui.client.StringMessages" />
 	<ui:with field="res" type="com.sap.sailing.gwt.common.client.SharedResources" />
 	<ui:with field="local_res" type="com.sap.sailing.gwt.home.desktop.partials.seriesheader.SeriesHeaderResources" />
@@ -8,7 +9,9 @@
 		<div class="{res.mediaCss.small12} {res.mediaCss.large9} {res.mediaCss.columns}">
 			<div class="{local_res.css.eventheader_intro}">
 				<div class="{local_res.css.eventheader_intro_logo}">
-					<div ui:field="eventLogo" class="{local_res.css.eventheader_intro_logo_image}" />
+					<div ui:field="eventLogo" class="{local_res.css.eventheader_intro_logo_image} {res.mainCss.media_wrapper}">
+                      <m:MediaMenuIcon ui:field="seriesLogoMenuButton" fontSize="5px" />
+                    </div>
 				</div>
 				<h2 class="{local_res.css.eventheader_intro_name}">
 					<span ui:field="eventName"></span>

@@ -1,14 +1,15 @@
 package com.sap.sse.datamining.impl.components;
 
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.hamcrest.MatcherAssert.assertThat;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.components.Processor;
 import com.sap.sse.datamining.factories.ProcessorFactory;
@@ -34,7 +35,7 @@ public class TestParallelMultiDimensionalGroupingProcessor {
 
     private GroupedDataEntry<Number> groupedElement;
 
-    @Before
+    @BeforeEach
     public void intializeProcessor() throws IllegalArgumentException, NoSuchMethodException, SecurityException {
         @SuppressWarnings("unchecked")
         Processor<GroupedDataEntry<Number>, Void> receiver = new NullProcessor<GroupedDataEntry<Number>, Void>((Class<GroupedDataEntry<Number>>)(Class<?>) GroupedDataEntry.class, Void.class) {
@@ -54,23 +55,29 @@ public class TestParallelMultiDimensionalGroupingProcessor {
         processor = ComponentTestsUtil.getProcessorFactory().createGroupingProcessor(Number.class, receivers, dimensions);
     }
     
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testConstructionWithNullDimensions() {
-        new ParallelMultiDimensionsValueNestingGroupingProcessor<>(Number.class, ConcurrencyTestsUtil.getSharedExecutor(), receivers, null);
+        assertThrows(IllegalArgumentException.class, () -> {
+            new ParallelMultiDimensionsValueNestingGroupingProcessor<>(Number.class, ConcurrencyTestsUtil.getSharedExecutor(), receivers, null);
+        });
     }
     
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testConstructionWithEmptyDimensions() {
-        List<ParameterizedFunction<?>> dimensions = new ArrayList<>();
-        processorFactory.createGroupingProcessor(Number.class, receivers, dimensions);
+        assertThrows(IllegalArgumentException.class, () -> {
+            List<ParameterizedFunction<?>> dimensions = new ArrayList<>();
+            processorFactory.createGroupingProcessor(Number.class, receivers, dimensions);
+        });
     }
     
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testConstructionWithFunctionsInsteadOfDimensions() {
-        List<ParameterizedFunction<?>> functions = new ArrayList<>();
-        Method method = FunctionTestsUtil.getMethodFromSimpleClassWithMarkedMethod("sideEffectFreeValue");
-        functions.add(new SimpleParameterizedFunction<>(FunctionTestsUtil.getFunctionFactory().createMethodWrappingFunction(method), ParameterProvider.NULL));
-        processorFactory.createGroupingProcessor(Number.class, receivers, functions);
+        assertThrows(IllegalArgumentException.class, () -> {
+            List<ParameterizedFunction<?>> functions = new ArrayList<>();
+            Method method = FunctionTestsUtil.getMethodFromSimpleClassWithMarkedMethod("sideEffectFreeValue");
+            functions.add(new SimpleParameterizedFunction<>(FunctionTestsUtil.getFunctionFactory().createMethodWrappingFunction(method), ParameterProvider.NULL));
+            processorFactory.createGroupingProcessor(Number.class, receivers, functions);
+        });
     }
 
     @Test

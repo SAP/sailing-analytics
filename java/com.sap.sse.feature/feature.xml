@@ -42,7 +42,7 @@ Computes leaderboard information for sailing races and offers RESTful APIs to al
          id="com.google.gwt.servlet"
          download-size="0"
          install-size="0"
-         version="2.11.0"
+         version="2.11.1"
          unpack="false"/>
 
    <plugin

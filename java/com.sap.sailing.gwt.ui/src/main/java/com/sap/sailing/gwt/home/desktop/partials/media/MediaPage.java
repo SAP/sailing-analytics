@@ -22,7 +22,6 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.sap.sailing.gwt.common.client.SharedResources;
 import com.sap.sailing.gwt.home.communication.eventview.EventViewDTO;
 import com.sap.sailing.gwt.home.communication.media.MediaDTO;
-import com.sap.sailing.gwt.home.communication.media.SailingImageDTO;
 import com.sap.sailing.gwt.home.desktop.partials.uploadpopup.DesktopMediaUploadPopup;
 import com.sap.sailing.gwt.home.shared.partials.videoplayer.VideoWithLowerThird;
 import com.sap.sailing.gwt.ui.client.SailingServiceHelper;
@@ -31,6 +30,7 @@ import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.gwt.ui.client.media.GalleryImageHolder;
 import com.sap.sailing.gwt.ui.client.media.VideoThumbnail;
 import com.sap.sailing.gwt.ui.shared.ManageMediaModel;
+import com.sap.sailing.gwt.ui.shared.SailingImageDTO;
 import com.sap.sse.common.media.MimeType;
 import com.sap.sse.gwt.client.media.ImageDTO;
 import com.sap.sse.gwt.client.media.VideoDTO;
@@ -83,6 +83,10 @@ public class MediaPage extends Composite {
     private boolean manageVideos;
     private boolean managePhotos;
     private VideoWithLowerThird videoDisplayUi;
+
+    private final UserService userService;
+
+    private final SailingServiceWriteAsync sailingServiceWrite;
 
     @UiHandler("videoSettingsButton")
     public void handleVideoSettingsButtonClick(ClickEvent e) {
@@ -137,15 +141,16 @@ public class MediaPage extends Composite {
     public void handleMediaAddButtonClick(ClickEvent e) {
         popupHolder.clear();
         final DesktopMediaUploadPopup popup = new DesktopMediaUploadPopup(
-                (images, videos) -> manageMediaModel.addImagesAndVideos(images, videos, eventDto -> updateMedia()));
+                (images, videos) -> manageMediaModel.addImagesAndVideos(images, videos, eventDto -> updateMedia(eventDto.getName())), sailingServiceWrite);
         popupHolder.add(popup);
         popup.center();
     }
 
     public MediaPage(IsWidget initialView, EventBus eventBus, UserService userService, EventViewDTO eventViewDto) {
+        this.userService = userService;
         MediaPageResources.INSTANCE.css().ensureInjected();
         stringMessages = StringMessages.INSTANCE;
-        SailingServiceWriteAsync sailingServiceWrite = SailingServiceHelper.createSailingServiceWriteInstance();
+        this.sailingServiceWrite = SailingServiceHelper.createSailingServiceWriteInstance();
         manageMediaModel = new ManageMediaModel(sailingServiceWrite, userService, eventViewDto, stringMessages);
         contentPanel = new SimplePanel();
         contentPanel.setWidget(initialView);
@@ -157,12 +162,12 @@ public class MediaPage extends Composite {
         });
     }
 
-    public void setMedia(final MediaDTO media) {
+    public void setMedia(final MediaDTO media, EventViewDTO eventDTO) {
         manageMediaModel.setMedia(media);
-        updateMedia();
+        updateMedia(eventDTO.getName());
     }
 
-    private void updateMedia() {
+    private void updateMedia(String eventName) {
         contentPanel.setWidget(uiBinder.createAndBindUi(this));
         setMediaManaged(manageMediaModel.hasPermissions());
         int photosCount = manageMediaModel.getImages().size();
@@ -195,7 +200,7 @@ public class MediaPage extends Composite {
             }
             for (final ImageDTO holder : manageMediaModel.getImages()) {
                 if (holder.getSourceRef() != null) {
-                    GalleryImageHolder gih = new GalleryImageHolder(holder, getDeleteImageHandler(holder));
+                    GalleryImageHolder gih = new GalleryImageHolder(holder, getDeleteImageHandler(holder), userService, eventName);
                     gih.addStyleName(photoCss);
                     gih.addStyleName(res.mediaCss().columns());
                     photoListOuterBoxUi.add(gih);
@@ -213,7 +218,7 @@ public class MediaPage extends Composite {
                                 final SailingImageDTO showImage = sailingImageDTOs.stream()
                                         .filter(sailingImageDto -> sailingImageDto.compareTo(holder) == 0).findFirst()
                                         .orElse(new SailingImageDTO(null, holder));
-                                new SailingFullscreenViewer().show(showImage, sailingImageDTOs);
+                                new SailingFullscreenViewer(userService).show(showImage, sailingImageDTOs);
                             }
                         }
                     });
@@ -231,7 +236,7 @@ public class MediaPage extends Composite {
                 }
                 if (videoCount > 0) {
                     VideoThumbnail thumbnail = new VideoThumbnail(videoCandidateInfo,
-                            getDeleteVideoHandler(videoCandidateInfo), null);
+                            eventName, getDeleteVideoHandler(videoCandidateInfo), /* edit handler */ null, this.userService);
                     thumbnail.addClickHandler(new ClickHandler() {
                         @Override
                         public void onClick(ClickEvent event) {
@@ -275,7 +280,7 @@ public class MediaPage extends Composite {
             @Override
             public void onClick(ClickEvent event) {
                 if (Window.confirm(stringMessages.confirmDeleteVideo())) {
-                    manageMediaModel.deleteVideo(videoCandidateInfo, eventDto -> updateMedia());
+                    manageMediaModel.deleteVideo(videoCandidateInfo, eventDto -> updateMedia(eventDto.getName()));
                 }
             }
         };
@@ -287,7 +292,7 @@ public class MediaPage extends Composite {
             public void onClick(ClickEvent event) {
                 event.stopPropagation();
                 if (Window.confirm(stringMessages.confirmDeleteImage())) {
-                    manageMediaModel.deleteImage(imageCandidateInfo, eventDto -> updateMedia());
+                    manageMediaModel.deleteImage(imageCandidateInfo, eventDto -> updateMedia(eventDto.getName()));
                 }
             }
         };
@@ -302,7 +307,7 @@ public class MediaPage extends Composite {
      *            true, if the video should play automatically, false otherwise
      */
     private void putVideoOnDisplay(final VideoDTO video, boolean autoplay) {
-        videoDisplayUi = new VideoWithLowerThird(true, autoplay);
+        videoDisplayUi = new VideoWithLowerThird(true, autoplay, userService, manageMediaModel.getEventName());
         videoDisplayUi.setVideo(video);
         try {
             videoDisplayHolderUi.setWidget(videoDisplayUi);

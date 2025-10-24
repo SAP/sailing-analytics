@@ -1,8 +1,8 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.BoatClass;
 import com.sap.sailing.domain.base.Competitor;
@@ -129,7 +129,7 @@ public class LeaderboardScoringAndRankingForLowPointThreeMedalWinsTest extends L
         series.add(finalSeries);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         series = new ArrayList<Series>();
         setupOpeningSeriesWithOneRaceColumnPerSeries();
@@ -351,7 +351,7 @@ public class LeaderboardScoringAndRankingForLowPointThreeMedalWinsTest extends L
      *            of each of the qualification series races to gold and half to silver, each.
      */
     private void createCompetitorsAndRunAndAssertOpeningSeries(TimePoint now, TimePoint later, int numberOfCompetitors) {
-        assertEquals("Number of competitors must be evenly divisible by four, but "+numberOfCompetitors+" isn't.", 0, numberOfCompetitors % 4);
+        assertEquals(0, numberOfCompetitors % 4, "Number of competitors must be evenly divisible by four, but "+numberOfCompetitors+" isn't.");
         final int NUMBER_OF_COMPETITORS_PER_RACE = numberOfCompetitors / 2;
         // Competitor set-up
         final List<Competitor> competitors = createCompetitors(2*NUMBER_OF_COMPETITORS_PER_RACE);
@@ -580,29 +580,29 @@ public class LeaderboardScoringAndRankingForLowPointThreeMedalWinsTest extends L
         final RaceColumn r2Column = regatta.getRaceColumnByName("R2");
         final int previousFleetOrdering = r2Column.getFleetOfCompetitor(previous).getOrdering();
         final int nextFleetOrdering = r2Column.getFleetOfCompetitor(next).getOrdering();
-        assertTrue("Competitor "+previous+" ranked better although their final series fleet ranks worse than that of "+next,
-                + previousFleetOrdering <= nextFleetOrdering);
+        assertTrue(+ previousFleetOrdering <= nextFleetOrdering,
+                "Competitor "+previous+" ranked better although their final series fleet ranks worse than that of "+next);
         if (previousFleetOrdering == nextFleetOrdering) {
             // for equal fleet ordering ranking must be decided by points, and ties are to be broken by A8.1
             final Double previousNetPoints = leaderboard.getNetPoints(previous, timePoint);
             final Double nextNetPoints = leaderboard.getNetPoints(next, timePoint);
-            assertTrue("Competitor "+previous+" ranked better although more points than "+next, previousNetPoints <= nextNetPoints);
+            assertTrue(previousNetPoints <= nextNetPoints, "Competitor "+previous+" ranked better although more points than "+next);
             if (previousNetPoints.doubleValue() == nextNetPoints.doubleValue()) {
                 final double previousR1Score = leaderboard.getTotalPoints(previous, r1Column, timePoint);
                 final double previousR2Score = leaderboard.getTotalPoints(previous, r2Column, timePoint);
                 final double nextR1Score = leaderboard.getTotalPoints(next, r1Column, timePoint);
                 final double nextR2Score = leaderboard.getTotalPoints(next, r2Column, timePoint);
                 assertTrue(
+                        Math.min(previousR1Score, previousR2Score) <= Math.min(nextR1Score, nextR2Score),
                         "A8.1 tie-break broken: " + previous + " scored [" + previousR1Score + ", " + previousR2Score
                                 + "], " + next + " scored [" + nextR1Score + ", " + nextR2Score + "], yet " + previous
-                                + " was ranked better",
-                        Math.min(previousR1Score, previousR2Score) <= Math.min(nextR1Score, nextR2Score));
+                                + " was ranked better");
                 if (Math.min(previousR1Score, previousR2Score) == Math.min(nextR1Score, nextR2Score)) {
                     // it had to be broken by the last race
                     assertTrue(
+                            previousR2Score < nextR2Score,
                             "Tie-break by last race broken: " + previous + " scored " + previousR2Score + ", " + next
-                                    + " scored " + nextR2Score + ", yet " + previous + " was ranked better",
-                            previousR2Score < nextR2Score);
+                                    + " scored " + nextR2Score + ", yet " + previous + " was ranked better");
                 }
             }
         }

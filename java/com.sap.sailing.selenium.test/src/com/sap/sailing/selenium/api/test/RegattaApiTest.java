@@ -7,12 +7,12 @@ import static com.sap.sailing.selenium.api.core.ApiContext.createAdminApiContext
 import static com.sap.sailing.selenium.api.core.ApiContext.createApiContext;
 import static com.sap.sailing.selenium.api.core.GpsFixMoving.createFix;
 import static com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage.goToPage;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Map;
@@ -22,9 +22,8 @@ import java.util.stream.Collectors;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.sap.sailing.domain.common.CompetitorRegistrationType;
 import com.sap.sailing.selenium.api.core.ApiContext;
@@ -43,11 +42,12 @@ import com.sap.sailing.selenium.api.regatta.RegattaApi;
 import com.sap.sailing.selenium.api.regatta.RegattaDeviceStatus;
 import com.sap.sailing.selenium.api.regatta.RegattaDeviceStatus.CompetitorDeviceStatus;
 import com.sap.sailing.selenium.api.regatta.RegattaRaces;
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.test.AbstractSeleniumTest;
-import com.sap.sse.security.SecurityService;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
+import com.sap.sse.security.SecurityService;
 
 public class RegattaApiTest extends AbstractSeleniumTest {
 
@@ -63,13 +63,13 @@ public class RegattaApiTest extends AbstractSeleniumTest {
     private final UserGroupApi usergroupApi = new UserGroupApi();
     private final GpsFixApi gpsFixApi = new GpsFixApi();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot(), /* headless */ true);
         super.setUp();
     }
 
-    @Test
+    @SeleniumTestCase
     public void testGetRegattaForCreatedEvent() {
         final ApiContext ctx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
         eventApi.createEvent(ctx, EVENT_NAME, BOAT_CLASS, CLOSED, "default");
@@ -78,24 +78,24 @@ public class RegattaApiTest extends AbstractSeleniumTest {
         JSONObject serie = (JSONObject) series.get(0);
         JSONArray fleets = (JSONArray) serie.get("fleets");
         JSONObject trackedRaces = (JSONObject) serie.get("trackedRaces");
-        assertEquals("read: regatta.name is different", EVENT_NAME, regatta.getName());
-        assertNull("read: regatta.startDate should be null", regatta.getStartDate());
-        assertNull("read: regatta.endDate should be null", regatta.getEndDate());
-        assertEquals("read: regatta.scoringSystem is different", "LOW_POINT", regatta.getScoringSystem());
-        assertEquals("read: regatta.boeatclass is different", BOAT_CLASS, regatta.getBoatClass());
-        assertFalse("read: regatta.courseAreaId is missing", regatta.getCourseAreaId().isEmpty());
-        assertEquals("read: regatta.canBoatsOfCompetitorsChangePerRace should be false", false,
-                regatta.canBoatsOfCompetitorsChangePerRace());
-        assertEquals("read: regatta.competitorRegistrationType is different", CLOSED,
-                regatta.getCompetitorRegistrationType());
+        assertEquals(EVENT_NAME, regatta.getName(), "read: regatta.name is different");
+        assertNull(regatta.getStartDate(), "read: regatta.startDate should be null");
+        assertNull(regatta.getEndDate(), "read: regatta.endDate should be null");
+        assertEquals("LOW_POINT", regatta.getScoringSystem(), "read: regatta.scoringSystem is different");
+        assertEquals(BOAT_CLASS, regatta.getBoatClass(), "read: regatta.boeatclass is different");
+        assertFalse(regatta.getCourseAreaId().isEmpty(), "read: regatta.courseAreaId is missing");
+        assertEquals(false, regatta.canBoatsOfCompetitorsChangePerRace(),
+                "read: regatta.canBoatsOfCompetitorsChangePerRace should be false");
+        assertEquals(CLOSED, regatta.getCompetitorRegistrationType(),
+                "read: regatta.competitorRegistrationType is different");
         assertTrue(regatta.isUseStartTimeInference());
         assertFalse(regatta.isControlTrackingFromStartAndFinishTimes());
-        assertEquals("read: reagtta.series should have 1 entry", 1, series.size());
-        assertEquals("read: reagtta.fleets should have 1 entry", 1, fleets.size());
-        assertNotNull("read: reagtta.trackedRaces is missing", trackedRaces);
+        assertEquals(1, series.size(), "read: reagtta.series should have 1 entry");
+        assertEquals(1, fleets.size(), "read: reagtta.fleets should have 1 entry");
+        assertNotNull(trackedRaces, "read: reagtta.trackedRaces is missing");
     }
     
-    @Test
+    @SeleniumTestCase
     public void testUpdateRegatta() {
         final ApiContext ctx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
         
@@ -113,23 +113,23 @@ public class RegattaApiTest extends AbstractSeleniumTest {
         assertTrue(regatta.isControlTrackingFromStartAndFinishTimes());
     }
 
-    @Test
+    @SeleniumTestCase
     public void testGetRacesForRegattaForCreateEvent() {
         final ApiContext ctx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
 
         eventApi.createEvent(ctx, EVENT_NAME, BOAT_CLASS, CLOSED, "default");
         RegattaRaces regattaRaces = regattaApi.getRegattaRaces(ctx, EVENT_NAME);
 
-        assertEquals("read: regatta is different", EVENT_NAME, regattaRaces.getRegattaName());
+        assertEquals(EVENT_NAME, regattaRaces.getRegattaName(), "read: regatta is different");
         //assertEquals("read: reagtta.series should have 0 entries", 0, regattaRaces.getRaces().length);
         
         RaceColumn[] raceColumns = regattaApi.addRaceColumn(ctx, EVENT_NAME, "R", 1);
         leaderboardApi.startRaceLogTracking(ctx, EVENT_NAME, raceColumns[0].getRaceName(), "Default");
         regattaRaces = regattaApi.getRegattaRaces(ctx, EVENT_NAME, r -> r.getRaces().length > 0);
-        assertEquals("read: reagtta.series should have 1 entries", 1, regattaRaces.getRaces().length);
+        assertEquals(1, regattaRaces.getRaces().length, "read: reagtta.series should have 1 entries");
     }
 
-    @Test
+    @SeleniumTestCase
     public void testCreateAndAddCompetitor() {
         final String competitorName = "Max Mustermann";
         final String competitorNationality = "USA";
@@ -138,18 +138,18 @@ public class RegattaApiTest extends AbstractSeleniumTest {
         eventApi.createEvent(ctx, EVENT_NAME, BOAT_CLASS, CLOSED, "default");
         Competitor competitor = regattaApi.createAndAddCompetitor(ctx, EVENT_NAME, BOAT_CLASS, "test@de",
                 competitorName, competitorNationality);
-        assertNotNull("read: competitor.id is missing", competitor.getId());
-        assertEquals("read: competitor.name is different", competitorName, competitor.getName());
-        assertEquals("read: competitor.shortName is different", competitorName, competitor.getShortName());
-        assertEquals("read: competitor.nationality is different", competitorNationality, competitor.getNationality());
-        assertNotNull("read: competitor.team should not be emtpy", competitor.getTeam());
-        assertNotNull("read: competitor.boat should not be empty", competitor.getBoat());
-        assertNotNull("read: competitor.boat.boatClass should not be empty", competitor.getBoat().getBoatClass());
-        assertEquals("read: competitor.boat.boatClass.name is differnet", BOAT_CLASS,
-                competitor.getBoat().getBoatClass().getName());
+        assertNotNull(competitor.getId(), "read: competitor.id is missing");
+        assertEquals(competitorName, competitor.getName(), "read: competitor.name is different");
+        assertEquals(competitorName, competitor.getShortName(), "read: competitor.shortName is different");
+        assertEquals(competitorNationality, competitor.getNationality(), "read: competitor.nationality is different");
+        assertNotNull(competitor.getTeam(), "read: competitor.team should not be emtpy");
+        assertNotNull(competitor.getBoat(), "read: competitor.boat should not be empty");
+        assertNotNull(competitor.getBoat().getBoatClass(), "read: competitor.boat.boatClass should not be empty");
+        assertEquals(BOAT_CLASS, competitor.getBoat().getBoatClass().getName(),
+                "read: competitor.boat.boatClass.name is differnet");
     }
 
-    @Test
+    @SeleniumTestCase
     public void testGetCompetitors() {
         final String competitor1Name = "Max Mustermann";
         final String competitor2Name = "Hans Albatros";
@@ -159,33 +159,33 @@ public class RegattaApiTest extends AbstractSeleniumTest {
         eventApi.createEvent(ctx, EVENT_NAME, BOAT_CLASS, CLOSED, "default");
         final Competitor competitor1 = regattaApi.createAndAddCompetitor(ctx, EVENT_NAME, BOAT_CLASS, "test@de",
                 competitor1Name, competitor1Nationality);
-        assertNotNull("Competitor1 should not be null", competitor1);
+        assertNotNull(competitor1, "Competitor1 should not be null");
         final Competitor competitor2 = regattaApi.createAndAddCompetitor(ctx, EVENT_NAME, BOAT_CLASS, "test@de",
                 competitor2Name, competitor2Nationality);
-        assertNotNull("Competitor2 should not be null", competitor2);
+        assertNotNull(competitor2, "Competitor2 should not be null");
         final Competitor[] competitors = regattaApi.getCompetitors(ctx, EVENT_NAME);
-        assertNotNull("read: list of competitors should not be null", competitors);
-        assertNotEquals("read: list of competitors should not be empty", 0, competitors.length);
-        assertEquals("read: list of competitors should contains 2 comeptitors", 2, competitors.length);
+        assertNotNull(competitors, "read: list of competitors should not be null");
+        assertNotEquals(0, competitors.length, "read: list of competitors should not be empty");
+        assertEquals(2, competitors.length, "read: list of competitors should contains 2 comeptitors");
         for (Competitor competitor : competitors) {
-            assertTrue("competitor name " + competitor.getName() + " is wrong",
-                    competitor1Name.equals(competitor.getName()) || competitor2Name.equals(competitor.getName()));
+            assertTrue(competitor1Name.equals(competitor.getName()) || competitor2Name.equals(competitor.getName()),
+                    "competitor name " + competitor.getName() + " is wrong");
         }
     }
 
-    @Test
+    @SeleniumTestCase
     public void testAddRaceColumns() {
         final ApiContext ctx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
 
         eventApi.createEvent(ctx, EVENT_NAME, BOAT_CLASS, CLOSED, "default");
         RaceColumn[] result = regattaApi.addRaceColumn(ctx, EVENT_NAME, "T", 5);
-        assertEquals("read: racecolumn.seriesname is different", "Default", result[0].getSeriesName());
-        assertEquals("read: racecolumn.racename is different", "T1", result[0].getRaceName());
-        assertEquals("read: racecolumn.seriesname is different", "Default", result[4].getSeriesName());
-        assertEquals("read: racecolumn.racename is different", "T5", result[4].getRaceName());
+        assertEquals("Default", result[0].getSeriesName(), "read: racecolumn.seriesname is different");
+        assertEquals("T1", result[0].getRaceName(), "read: racecolumn.racename is different");
+        assertEquals("Default", result[4].getSeriesName(), "read: racecolumn.seriesname is different");
+        assertEquals("T5", result[4].getRaceName(), "read: racecolumn.racename is different");
     }
     
-    @Test
+    @SeleniumTestCase
     public void testRegisterExistingCompetitorWithSecret() {
         final AdminConsolePage adminConsole = goToPage(getWebDriver(), getContextRoot());
         adminConsole.goToLocalServerPanel().setSelfServiceServer(true);
@@ -212,7 +212,7 @@ public class RegattaApiTest extends AbstractSeleniumTest {
         assertEquals(competitor.getId(), competitors[0].getId());
     }
 
-    @Test
+    @SeleniumTestCase
     public void testRegisterExistingCompetitorWithBadSecret() {
         final AdminConsolePage adminConsole = goToPage(getWebDriver(), getContextRoot());
         adminConsole.goToLocalServerPanel().setSelfServiceServer(true);
@@ -246,9 +246,9 @@ public class RegattaApiTest extends AbstractSeleniumTest {
         try {
             regattaApi.addCompetitor(userWithCompetitorCtx, OTHER_EVENT_NAME, competitor.getId(),
                     Optional.of(eventToRegisterExistingCompetitor.getSecret() + "bad"));
-            Assert.fail("Expected error because of bad secret.");
+            Assertions.fail("Expected error because of bad secret.");
         } catch (RuntimeException e) {
-            Assert.assertTrue("Exepcted HTTP 401 - Unauthorized", e.getMessage().contains("rc=401"));
+            Assertions.assertTrue(e.getMessage().contains("rc=401"), "Exepcted HTTP 401 - Unauthorized");
         }
 
         Competitor[] competitors = regattaApi.getCompetitors(userOwningEventCtx, OTHER_EVENT_NAME);
@@ -256,7 +256,7 @@ public class RegattaApiTest extends AbstractSeleniumTest {
         assertEquals(0, competitors.length);
     }
     
-    @Test
+    @SeleniumTestCase
     public void testTrackingDeviceStatus() {
         final ApiContext ctx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
         Event event = eventApi.createEvent(ctx, EVENT_NAME, BOAT_CLASS, OPEN_UNMODERATED, "default");

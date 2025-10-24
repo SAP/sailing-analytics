@@ -52,7 +52,7 @@ ext {
     buildTools = "30.0.3"
     compileSdk = 33
     minSdk = 16
-    targetSdk = 34
+    targetSdk = 35
 
     sourceCompatibilityVersion = JavaVersion.VERSION_1_8
     targetCompatibilityVersion = JavaVersion.VERSION_1_8

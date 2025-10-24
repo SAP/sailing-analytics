@@ -1,5 +1,6 @@
 package com.sap.sailing.selenium.pages.leaderboard;
 
+import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -9,8 +10,6 @@ import com.sap.sailing.selenium.core.BySeleniumId;
 import com.sap.sailing.selenium.core.FindBy;
 import com.sap.sailing.selenium.pages.HostPage;
 import com.sap.sailing.selenium.pages.gwt.CheckBoxPO;
-
-import org.junit.Assert;
 
 /**
  * <p>The page object representing the leaderboard.</p>
@@ -146,7 +145,7 @@ public class LeaderboardPage extends HostPage {
         } catch(Exception e) {}
         
         int leaderboardsCount = findElementsBySeleniumId("LeaderboardCellTable").size();
-        Assert.assertEquals(selected ? 2 : 1, leaderboardsCount);
+        Assertions.assertEquals(selected ? 2 : 1, leaderboardsCount);
         return selected;
     }
     
@@ -187,7 +186,7 @@ public class LeaderboardPage extends HostPage {
         try {
             element = findElementBySeleniumId("CompetitorChart");
         } catch(Exception e) {}
-        Assert.assertEquals(selected, element != null);
+        Assertions.assertEquals(selected, element != null);
         return selected;
     }
     

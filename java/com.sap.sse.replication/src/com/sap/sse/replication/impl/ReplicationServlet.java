@@ -40,6 +40,7 @@ import com.sap.sse.replication.interfaces.impl.ReplicaDescriptorImpl;
 import com.sap.sse.security.shared.TypeRelativeObjectIdentifier;
 import com.sap.sse.security.shared.impl.SecuredSecurityTypes;
 import com.sap.sse.security.shared.impl.SecuredSecurityTypes.ServerActions;
+import com.sap.sse.util.HttpRequestUtils;
 import com.sap.sse.util.impl.CountingOutputStream;
 
 import net.jpountz.lz4.LZ4BlockInputStream;
@@ -125,7 +126,7 @@ public class ReplicationServlet extends AbstractHttpServlet {
                 Channel channel = getReplicationService().createMasterChannel();
                 try {
                     RabbitOutputStream ros = new RabbitOutputStream(INITIAL_LOAD_PACKAGE_SIZE, channel,
-                            /* queueName */ "initialLoad-for-"+req.getRemoteHost()+"@"+new Date()+"-"+UUID.randomUUID(),
+                            /* queueName */ "initialLoad-for-"+HttpRequestUtils.getClientIP(req)+"@"+new Date()+"-"+UUID.randomUUID(),
                             /* syncAfterTimeout */ false);
                     PrintWriter br = new PrintWriter(new OutputStreamWriter(resp.getOutputStream()));
                     resp.setContentType("text/plain");
@@ -133,10 +134,10 @@ public class ReplicationServlet extends AbstractHttpServlet {
                     br.flush();
                     final CountingOutputStream countingOutputStream = new CountingOutputStream(
                             ros, /* log every megabyte */1024l * 1024l, Level.INFO,
-                            "uncompressed output for initial load for " + req.getRemoteHost());
+                            "uncompressed output for initial load for " + HttpRequestUtils.getClientIP(req));
                     final LZ4BlockOutputStream compressingOutputStream = new LZ4BlockOutputStream(countingOutputStream);
                     for (String replicableIdAsString : replicableIdsAsStrings) {
-                        logger.info("Serializing initial load for replicable "+replicableIdAsString+" for remote host "+req.getRemoteHost());
+                        logger.info("Serializing initial load for replicable "+replicableIdAsString+" for remote host "+HttpRequestUtils.getClientIP(req));
                         Replicable<?, ?> replicable = replicablesProvider.getReplicable(replicableIdAsString, /* wait */ false);
                         if (replicable == null) {
                             final String msg = "Couldn't find replicable with ID "+replicableIdAsString+". Aborting serialization of initial load.";
@@ -146,7 +147,7 @@ public class ReplicationServlet extends AbstractHttpServlet {
                         }
                         try {
                             replicable.serializeForInitialReplication(compressingOutputStream);
-                            logger.info("Done serializing initial load for replicable "+replicableIdAsString+" for remote host "+req.getRemoteHost());
+                            logger.info("Done serializing initial load for replicable "+replicableIdAsString+" for remote host "+HttpRequestUtils.getClientIP(req));
                         } catch (Throwable e) {
                             logger.info("Error trying to serialize initial load for replication: " + e.getMessage());
                             logger.log(Level.SEVERE, "doGet", e);
@@ -154,7 +155,7 @@ public class ReplicationServlet extends AbstractHttpServlet {
                             resp.getWriter().append("Error obtaining status; see server logs for details.");
                         }
                     }
-                    logger.info("Done serializing initial loads for remote host "+req.getRemoteHost());
+                    logger.info("Done serializing initial loads for remote host "+HttpRequestUtils.getClientIP(req));
                     compressingOutputStream.finish();
                     countingOutputStream.close();
                     break;
@@ -235,7 +236,7 @@ public class ReplicationServlet extends AbstractHttpServlet {
             String replicableIdAsString = dis.readUTF();
             Replicable<?, ?> replicable = replicablesProvider.getReplicable(replicableIdAsString, /* wait */ false);
             if (replicable != null) {
-                logger.info("Received request to apply and replicate an operation from a replica for replicable "+replicable);
+                logger.fine("Received request to apply and replicate an operation from a replica for replicable "+replicable);
                 checkReplicatorPermission(ServerActions.REPLICATE);
                 try {
                     applyOperationToReplicable(replicable, is);
@@ -298,7 +299,8 @@ public class ReplicationServlet extends AbstractHttpServlet {
             throw e;
         }
         Thread.currentThread().setContextClassLoader(oldContextClassLoader);
-        logger.info("Applying operation of type " + operation.getClassForLogging().getName()
+        logger.fine("Applying operation of type " + operation.getClassForLogging().getName()
+                + (operation.getOriginServerName() == null ? "" : (" originating from server \""+operation.getOriginServerName()+"\""))
                 + " received from replica to replicable " + replicable.toString());
         try {
             replicable.apply(operation);

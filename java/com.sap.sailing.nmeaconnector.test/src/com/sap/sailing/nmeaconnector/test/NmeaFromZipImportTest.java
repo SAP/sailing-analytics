@@ -1,7 +1,7 @@
 package com.sap.sailing.nmeaconnector.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.nmeaconnector.NmeaFactory;
@@ -20,7 +20,7 @@ import com.sap.sse.common.Util;
 public class NmeaFromZipImportTest {
     private ZipInputStream zipInputStream;
 
-    @Before
+    @BeforeEach
     public void setUp() throws FileNotFoundException {
         NmeaFactory.INSTANCE.getUtil().registerAdditionalParsers();
     }
@@ -37,7 +37,7 @@ public class NmeaFromZipImportTest {
         }
     }
 
-    @Ignore("This test only makes sense if the large file resources/Log210417.zip is present locally")
+    @Disabled("This test only makes sense if the large file resources/Log210417.zip is present locally")
     @Test
     public void testOtherZipFile() throws IOException, InterruptedException {
         zipInputStream = new ZipInputStream(new FileInputStream("resources/Log210417.zip"));

@@ -1,14 +1,14 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.CourseArea;
 import com.sap.sailing.domain.base.impl.CourseAreaImpl;
@@ -22,7 +22,7 @@ import com.sap.sse.common.impl.MillisecondsTimePoint;
 public class BravoFixTrackAverageRideHeightTest {
     private DynamicBravoFixTrack<CourseArea> track;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         track = new BravoFixTrackImpl<>(new CourseAreaImpl("Test", UUID.randomUUID(), /* centerPosition */ null, /* radius */ null),
                 "test", /* hasExtendedFixes */ true);

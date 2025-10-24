@@ -1,9 +1,9 @@
 package com.sap.sailing.server.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.List;
 import java.util.Locale;
@@ -15,11 +15,11 @@ import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.subject.support.SubjectThreadState;
 import org.apache.shiro.util.ThreadContext;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.sap.sailing.domain.abstractlog.race.RaceLog;
@@ -80,7 +80,7 @@ public class TaggingServiceTest {
     private static Subject subject;
     private static SubjectThreadState threadState;
 
-    @BeforeClass
+    @BeforeAll
     public synchronized static void setUpClass() throws Exception {
         logger.info("current thread: "+Thread.currentThread());
         MongoDBService.INSTANCE.getDB().drop();
@@ -107,7 +107,7 @@ public class TaggingServiceTest {
         Mockito.doReturn(taggingService).when(racingService).getTaggingService();
     }
 
-    @AfterClass
+    @AfterAll
     public synchronized static void tearDownClass() {
         logger.info("current thread: "+Thread.currentThread());
         try {
@@ -119,7 +119,7 @@ public class TaggingServiceTest {
         MongoDBService.INSTANCE.getDB().drop();
     }
 
-    @Before
+    @BeforeEach
     public void resetEnvironment() {
         logger.info("current thread: "+Thread.currentThread());
         synchronized (TaggingServiceTest.class) {
@@ -151,7 +151,7 @@ public class TaggingServiceTest {
         }
     }
 
-    @After
+    @AfterEach
     public void restoreEnvironment() {
         logger.info("current thread: "+Thread.currentThread());
         synchronized (TaggingServiceTest.class) {
@@ -173,15 +173,15 @@ public class TaggingServiceTest {
                     true, raceTimepoint);
             fail("Tag should not be added because the tag title is missing!");
         } catch (IllegalArgumentException e) {
-            assertTrue("Invalid arguments were caught correctly!", true);
+            assertTrue(true, "Invalid arguments were caught correctly!");
         }
         taggingService.addTag(leaderboardName, raceColumnName, fleetName, tag, comment, hiddenInfo, imageURL, imageURL,
                 false, raceTimepoint);
         String preference = securityService.getPreference(username,
                 serializer.generateUniqueKey(leaderboardName, raceColumnName, fleetName));
         List<TagDTO> privateTags = serializer.deserializeTags(preference);
-        assertTrue("Create private tag", privateTags.size() == 1 && privateTags.get(0).equals(tag, comment, hiddenInfo,
-                imageURL, imageURL, false, subject.getPrincipal().toString(), raceTimepoint));
+        assertTrue(privateTags.size() == 1 && privateTags.get(0).equals(tag, comment, hiddenInfo,
+                imageURL, imageURL, false, subject.getPrincipal().toString(), raceTimepoint), "Create private tag");
         // we used to test for permission checking here, but it was wrong in the first place to check permissions
         // in TaggingService; permission checks shall happen in the REST API layer and in the GWT RPC service layer
         try {
@@ -190,21 +190,21 @@ public class TaggingServiceTest {
             taggingService.addTag(leaderboardName, "bla", fleetName, tag, comment, hiddenInfo, imageURL, imageURL, true, raceTimepoint);
             fail("Tag should not be added because racelog does not exist!");
         } catch (RaceLogNotFoundException e) {
-            assertTrue("Missing racelog was caught correctly!", true);
+            assertTrue(true, "Missing racelog was caught correctly!");
         }
         logger.info("Trying to add public tag, should succeed");
         taggingService.addTag(leaderboardName, raceColumnName, fleetName, tag, comment, hiddenInfo, imageURL, imageURL,
                 true, raceTimepoint);
         List<TagDTO> publicTags = taggingService.getPublicTags(leaderboardName, raceColumnName, fleetName, null, false);
-        assertTrue("", publicTags.size() == 1 && publicTags.get(0).equals(tag, comment, hiddenInfo, imageURL, imageURL,
-                true, subject.getPrincipal().toString(), raceTimepoint));
+        assertTrue(publicTags.size() == 1 && publicTags.get(0).equals(tag, comment, hiddenInfo, imageURL, imageURL,
+                true, subject.getPrincipal().toString(), raceTimepoint), "");
         try {
             logger.info("Trying to add already existing public tag which should be catched by this test.");
             taggingService.addTag(leaderboardName, raceColumnName, fleetName, tag, comment, hiddenInfo, imageURL, imageURL,
                     true, raceTimepoint);
             fail("Tag should not be added because it already exists!");
         } catch (TagAlreadyExistsException e) {
-            assertTrue("Tag already exists was caught correctly!", true);
+            assertTrue(true, "Tag already exists was caught correctly!");
         }
         logger.exiting(getClass().getName(), "testAddTag");
     }
@@ -222,16 +222,16 @@ public class TaggingServiceTest {
                 false, raceTimepoint);
         taggingService.addTag(leaderboardName, raceColumnName, fleetName, tag, comment, hiddenInfo, imageURL, imageURL,
                 true, raceTimepoint);
-        assertTrue("Private tags contain added tag",
-                taggingService.getPrivateTags(leaderboardName, raceColumnName, fleetName).get(0).equals(tag, comment,
-                        hiddenInfo, imageURL, imageURL, false, subject.getPrincipal().toString(), raceTimepoint));
-        assertTrue("Public tags contain added tag",
-                taggingService.getPublicTags(leaderboardName, raceColumnName, fleetName, null, false).get(0).equals(tag,
-                        comment, hiddenInfo, imageURL, imageURL, true, subject.getPrincipal().toString(), raceTimepoint));
-        assertEquals("Public tags contain added tag with matching creation date filter", 1,
-                taggingService.getPublicTags(leaderboardName, raceColumnName, fleetName, raceTimepoint, false).size());
-        assertEquals("Public tags do not contain added tag with non-matching creation date filter", 0, taggingService
-                .getPublicTags(leaderboardName, raceColumnName, fleetName, MillisecondsTimePoint.now(), false).size());
+        assertTrue(taggingService.getPrivateTags(leaderboardName, raceColumnName, fleetName).get(0).equals(tag, comment,
+                hiddenInfo, imageURL, imageURL, false, subject.getPrincipal().toString(), raceTimepoint),
+                "Private tags contain added tag");
+        assertTrue(taggingService.getPublicTags(leaderboardName, raceColumnName, fleetName, null, false).get(0).equals(tag,
+                comment, hiddenInfo, imageURL, imageURL, true, subject.getPrincipal().toString(), raceTimepoint),
+                "Public tags contain added tag");
+        assertEquals(1, taggingService.getPublicTags(leaderboardName, raceColumnName, fleetName, raceTimepoint, false).size(),
+                "Public tags contain added tag with matching creation date filter");
+        assertEquals(0, taggingService
+                .getPublicTags(leaderboardName, raceColumnName, fleetName, MillisecondsTimePoint.now(), false).size(), "Public tags do not contain added tag with non-matching creation date filter");
         logger.exiting(getClass().getName(), "testGetTags");
     }
 
@@ -256,32 +256,32 @@ public class TaggingServiceTest {
         taggingService.updateTag(leaderboardName, raceColumnName, fleetName, tagObject, updatedTag, comment, hiddenInfo,
                 imageURL, imageURL, false);
         tagObject = taggingService.getTags(leaderboardName, raceColumnName, fleetName, null, false).get(0);
-        assertEquals("Updated tag title", updatedTag, tagObject.getTag());
+        assertEquals(updatedTag, tagObject.getTag(), "Updated tag title");
         // update comment
         taggingService.updateTag(leaderboardName, raceColumnName, fleetName, tagObject, tag, updatedComment, hiddenInfo,
                 imageURL, imageURL, false);
         tagObject = taggingService.getTags(leaderboardName, raceColumnName, fleetName, null, false).get(0);
-        assertEquals("Updated comment", updatedComment, tagObject.getComment());
+        assertEquals(updatedComment, tagObject.getComment(), "Updated comment");
         // update hidden info
         taggingService.updateTag(leaderboardName, raceColumnName, fleetName, tagObject, tag, updatedComment, updatedHiddenInfo,
                 imageURL, imageURL, false);
         tagObject = taggingService.getTags(leaderboardName, raceColumnName, fleetName, null, false).get(0);
-        assertEquals("Updated hidden info", updatedHiddenInfo, tagObject.getHiddenInfo());
+        assertEquals(updatedHiddenInfo, tagObject.getHiddenInfo(), "Updated hidden info");
         // update image URL
         taggingService.updateTag(leaderboardName, raceColumnName, fleetName, tagObject, tag, comment, hiddenInfo,
                 updatedImageURL, updatedImageURL, false);
         tagObject = taggingService.getTags(leaderboardName, raceColumnName, fleetName, null, false).get(0);
-        assertEquals("Updated image URL", updatedImageURL, tagObject.getImageURL());
+        assertEquals(updatedImageURL, tagObject.getImageURL(), "Updated image URL");
         // update visibility (private -> public)
         taggingService.updateTag(leaderboardName, raceColumnName, fleetName, tagObject, tag, comment, hiddenInfo,
                 imageURL, imageURL, true);
         tagObject = taggingService.getTags(leaderboardName, raceColumnName, fleetName, null, false).get(0);
-        assertEquals("Updated visibility (private -> public)", true, tagObject.isVisibleForPublic());
+        assertEquals(true, tagObject.isVisibleForPublic(), "Updated visibility (private -> public)");
         // update visibility (public -> private)
         taggingService.updateTag(leaderboardName, raceColumnName, fleetName, tagObject, tag, comment, hiddenInfo,
                 imageURL, imageURL, false);
         tagObject = taggingService.getTags(leaderboardName, raceColumnName, fleetName, null, false).get(0);
-        assertEquals("Updated visibility (public -> private)", false, tagObject.isVisibleForPublic());
+        assertEquals(false, tagObject.isVisibleForPublic(), "Updated visibility (public -> private)");
         logger.exiting(getClass().getName(), "testUpdateTag");
     }
 
@@ -298,12 +298,12 @@ public class TaggingServiceTest {
         taggingService.addTag(leaderboardName, raceColumnName, fleetName, tag, comment, /* hiddenInfo */ null, imageURL, imageURL,
                 true, raceTimepoint);
         final List<TagDTO> tags = taggingService.getTags(leaderboardName, raceColumnName, fleetName, null, false);
-        assertEquals("Tags were added successfully so they can be removed afterwards", 2, tags.size());
+        assertEquals(2, tags.size(), "Tags were added successfully so they can be removed afterwards");
         for (TagDTO tagObject : tags) {
             taggingService.removeTag(leaderboardName, raceColumnName, fleetName, tagObject);
         }
-        assertEquals("Tag list should be empty after deleting all tags", 0,
-                taggingService.getTags(leaderboardName, raceColumnName, fleetName, null, false).size());
+        assertEquals(0, taggingService.getTags(leaderboardName, raceColumnName, fleetName, null, false).size(),
+                "Tag list should be empty after deleting all tags");
         logger.exiting(getClass().getName(), "testRemoveTag");
     }
 }

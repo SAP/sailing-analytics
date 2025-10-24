@@ -1,10 +1,10 @@
 package com.sap.sse.i18n.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Random;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * A class whose {@link #main(String[])} method can be used to convert a .properties file written in the conventions as

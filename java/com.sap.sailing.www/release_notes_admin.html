@@ -19,10 +19,74 @@
         </div>
     </div>
     <div class="yield_content">
-        <div class="contentWrapper">
-            <div class="mainContent">
-                <h2 class="releaseHeadline">Release Notes - Administration Console</h2>
-                <div class="innerContent">
+      <div class="contentWrapper">
+        <div class="mainContent">
+          <h2 class="releaseHeadline">Release Notes - Administration Console</h2>
+          <div class="innerContent">
+          <h2 class="articleSubheadline">October 2025</h2>
+          <ul class="bulletList">
+                <li>When WindBots sent buffered data, e.g., from previous days, there was a possibility that
+                    under some circumstances this data may have interfered with live data, leading, e.g.,
+                    to "jumping" WindBot positions. This has now been fixed.<p>
+                <li>For the following system properties, alternative environment variables have been introduced:
+                    <ul>
+                        <li><tt>AWS_S3_TEST_S3ACCESSID</tt> for <tt>aws.s3.test.s3AccessId</tt></li>
+                        <li><tt>AWS_S3_TEST_S3ACCESSKEY</tt> for <tt>aws.s3.test.s3AccessKey</tt></li>
+                        <li><tt>GOOGLE_MAPS_AUTHENTICATION_PARAMS</tt> for <tt>google.maps.authenticationparams</tt></li>
+                        <li><tt>YOUTUBE_V3_API_KEY</tt> for <tt>youtube.api.key</tt></li>
+                        <li><tt>GEONAMES_ORG_USERNAMES</tt> for <tt>geonames.org.usernames</tt></li>
+                    </ul>   
+                    If the system property is set, it takes precedence over the environment variable.</li>
+          </ul>
+          <h2 class="articleSubheadline">September 2025</h2>
+          <ul class="bulletList">
+                <li>Added boat classes "Elan E4" and "Beneteau First 36" to the list of boat classes.<p>
+          </ul>
+          <h2 class="articleSubheadline">August 2025</h2>
+          <ul class="bulletList">
+                <li>Pairings, e.g., in league set-ups, can not be copied across regattas/leaderboards.
+                    This allows users to create a hidden regatta/leaderboard with flights to the entire
+                    season, create a pairing list for that and the copy sub-sequences from it to
+                    the regattas of the individual events. This can help improve the fairness of
+                    pairing lists across an entire season.</li>
+                <li>Upon popular demand, the series editing dialog now supports not only 50 but 100
+                    race columns / flights to be created in the drop-down list.</li>
+                <li>AI Agent credentials can now be reset from the Admin Console.</li>
+                <li>When using the Advanced / Landscape Management page of the Admin Console, and a new
+                    application load balancer (ALB) is created (e.g., in response to the number of ALB
+                    listener rules exceeding the limit for all existing ALBs in the region), the new ALB
+                    will automatically be registered with any AWS Web Application Firewall (WAF) access
+                    control list (Web ACL) that has a tag "web-acl-purpose" with value "geoblocking".<p>
+          </ul>
+          <h2 class="articleSubheadline">June 2025</h2>
+          <ul class="bulletList">
+                <li>Introduced a new Low Point scoring scheme for overall leaderboards which---instead of using the <em>ranks</em>
+                    from the contained leaderboards---uses the net points from those leaderboards. This way, the overall leaderboard's
+                    point sum equals the total points sum of the leaderboards (if no discards are configured for the overall leaderboard).
+                    Tie breaking is by rule A8.1, as usual. Use this if you want to give emphasis to each act according to the number
+                    of races/flights sailed in them.</li>
+                <li>ORC Performance Curve Scoring (PCS) was renamed to "ORC Polar Curve Scoring" with the acronym unchanged. We have adjusted
+                    our message texts in the UI accordingly. Furthermore, the "CIRCULAR_RANDOM" pre-set is now called "All Purpose,"
+                    and "LONG_DISTANCE" is now called "Ocean Race." Non-spinnaker allowances now typically come in separate certificates.</li>
+                <li>Upgraded embedded Jetty web server, closing CVE-2024-13009</li>
+                <li>Added boat classes "ORC Multihull" and "SRS" (also known as "LYS")</li>
+                <li>Added action to remotely trigger a calibration run on a WindBot device.</li>
+                <li>New scoring system for iQFOil medal series mode where two, not one, get promoted straight into the grand final.</li>
+          </ul>
+          <h2 class="articleSubheadline">May 2025</h2>
+          <ul class="bulletList">
+                <li>The Riot server listening for WindBot data now properly implements connection closing upon not having
+                    received device heartbeat messages for more than 30s.</li>
+                <li>Users can now file take-down requests for media assets displayed on the web site. This includes
+                    event stage/logo/teaser/gallery images and videos, as well as competitor images and competitor flags.
+                    For all these assets, a little semi-transparent three-dots button is displayed in the top-left
+                    corner of the image/video tile. When a logged-in user with a validated e-mail address clicks the
+                    button, a popup dialog allows for additional input and submitting of the take-down request, which
+                    will lead to an e-mail being sent to support@sapsailing.com.</li>
+                <li>Fixed parsing of X-Forwarded-For header, now reporting the correct client IP in case of multiple proxies along the way.</li>
+                <li>Improved logging in case operations received from replicas are being applied. The log entry now shows the name of the server
+                    where the operation originated from.</li>
+          </ul>
           <h2 class="articleSubheadline">March 2025</h2>
           <ul class="bulletList">
                 <li>We included a new AI Agent, based on <a href="https://help.sap.com/docs/sap-ai-core/sap-ai-core-service-guide/what-is-sap-ai-core">SAP AI Core</a>,

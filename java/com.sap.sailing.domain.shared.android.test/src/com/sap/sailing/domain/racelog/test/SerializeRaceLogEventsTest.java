@@ -1,6 +1,6 @@
 package com.sap.sailing.domain.racelog.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
 import com.sap.sailing.domain.abstractlog.race.RaceLog;
@@ -30,7 +30,7 @@ public class SerializeRaceLogEventsTest {
     private ByteArrayOutputStream bos;
     private RaceLog raceLog;
     
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         bos = new ByteArrayOutputStream();
         oos = new ObjectOutputStream(bos);

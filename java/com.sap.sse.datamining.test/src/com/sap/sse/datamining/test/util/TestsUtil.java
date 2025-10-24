@@ -39,7 +39,6 @@ public class TestsUtil {
             TEST_STRING_MESSAGES = new ResourceBundleStringMessagesImpl(TEST_STRING_MESSAGES_BASE_NAME,
                     TestsUtil.class.getClassLoader(), StandardCharsets.UTF_8.name());
         }
-        
         return TEST_STRING_MESSAGES;
     }
     

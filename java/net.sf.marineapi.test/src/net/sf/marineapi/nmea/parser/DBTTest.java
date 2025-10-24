@@ -1,11 +1,12 @@
 package net.sf.marineapi.nmea.parser;
 
-import static org.junit.Assert.assertEquals;
 import net.sf.marineapi.nmea.sentence.DBTSentence;
 import net.sf.marineapi.nmea.sentence.TalkerId;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class DBTTest {
 
@@ -13,7 +14,7 @@ public class DBTTest {
 	private DBTSentence dbt;
 	private DBTSentence empty;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		empty = new DBTParser(TalkerId.II);
 		dbt = new DBTParser(EXAMPLE);

@@ -1,6 +1,6 @@
 package com.sap.sailing.server.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.dto.TagDTO;
 import com.sap.sailing.server.tagging.TagDTODeSerializer;
@@ -39,20 +39,20 @@ public class TagDTODeSerializerTest {
         final TagDTO revokedTag = new TagDTO(title, comment, hiddenInfo, imageURL, imageURL, false, username, raceTimePoint,
                 createdAt, revokedAt);
         final JSONObject tagJson = serializer.serialize(tag);
-        assertEquals("title equals serialized title", title, tagJson.get(TagDTODeSerializer.FIELD_TAG));
-        assertEquals("comment equals serialized comment", comment, tagJson.get(TagDTODeSerializer.FIELD_COMMENT));
-        assertEquals("hidden info equals serialized hidden info", hiddenInfo, tagJson.get(TagDTODeSerializer.FIELD_HIDDEN_INFO));
-        assertEquals("imageURL equals serialized imageURL", imageURL, tagJson.get(TagDTODeSerializer.FIELD_ORIGINAL_IMAGE_URL));
-        assertEquals("username equals serialized username", username, tagJson.get(TagDTODeSerializer.FIELD_USERNAME));
-        assertEquals("raceTimepoint equals serialized raceTimepoint", raceTimePoint.asMillis(),
-                tagJson.get(TagDTODeSerializer.FIELD_RACE_TIMEPOINT));
-        assertEquals("createdAt timepoint equals serialized createdAt timepoint", createdAt.asMillis(),
-                tagJson.get(TagDTODeSerializer.FIELD_CREATED_AT));
-        assertEquals("revokedAt timepoint is null for non-revoked tags", null,
-                tagJson.get(TagDTODeSerializer.FIELD_REVOKED_AT));
+        assertEquals(title, tagJson.get(TagDTODeSerializer.FIELD_TAG), "title equals serialized title");
+        assertEquals(comment, tagJson.get(TagDTODeSerializer.FIELD_COMMENT), "comment equals serialized comment");
+        assertEquals(hiddenInfo, tagJson.get(TagDTODeSerializer.FIELD_HIDDEN_INFO), "hidden info equals serialized hidden info");
+        assertEquals(imageURL, tagJson.get(TagDTODeSerializer.FIELD_ORIGINAL_IMAGE_URL), "imageURL equals serialized imageURL");
+        assertEquals(username, tagJson.get(TagDTODeSerializer.FIELD_USERNAME), "username equals serialized username");
+        assertEquals(raceTimePoint.asMillis(), tagJson.get(TagDTODeSerializer.FIELD_RACE_TIMEPOINT),
+                "raceTimepoint equals serialized raceTimepoint");
+        assertEquals(createdAt.asMillis(), tagJson.get(TagDTODeSerializer.FIELD_CREATED_AT),
+                "createdAt timepoint equals serialized createdAt timepoint");
+        assertEquals(null, tagJson.get(TagDTODeSerializer.FIELD_REVOKED_AT),
+                "revokedAt timepoint is null for non-revoked tags");
         final JSONObject revokedTagJson = serializer.serialize(revokedTag);
-        assertEquals("revokedAt timepoint equals serialized revokedAt", revokedAt.asMillis(),
-                revokedTagJson.get(TagDTODeSerializer.FIELD_REVOKED_AT));
+        assertEquals(revokedAt.asMillis(), revokedTagJson.get(TagDTODeSerializer.FIELD_REVOKED_AT),
+                "revokedAt timepoint equals serialized revokedAt");
         logger.exiting(getClass().getName(), "testSerializeSingleTag");
     }
 
@@ -76,10 +76,10 @@ public class TagDTODeSerializerTest {
         final JSONObject tag2Json = serializer.serialize(tag2);
         final List<TagDTO> tags = Arrays.asList(tag1, tag2);
         final JSONArray tagsJson = serializer.serialize(tags);
-        assertEquals("First serialized tag equals serialized version of JSON array", tag1Json,
-                (JSONObject) tagsJson.get(0));
-        assertEquals("Second serialized tag equals serialized version of JSON array", tag2Json,
-                (JSONObject) tagsJson.get(1));
+        assertEquals(tag1Json, (JSONObject) tagsJson.get(0),
+                "First serialized tag equals serialized version of JSON array");
+        assertEquals(tag2Json, (JSONObject) tagsJson.get(1),
+                "Second serialized tag equals serialized version of JSON array");
         logger.exiting(getClass().getName(), "testSerializeMultipleTags");
     }
 
@@ -109,8 +109,8 @@ public class TagDTODeSerializerTest {
         tagJson.put(TagDTODeSerializer.FIELD_RACE_TIMEPOINT, raceTimePoint.asMillis());
         tagJson.put(TagDTODeSerializer.FIELD_CREATED_AT, createdAt.asMillis());
         tagJson.put(TagDTODeSerializer.FIELD_REVOKED_AT, revokedAt.asMillis());
-        assertEquals("Deserialize tag from string", tag, serializer.deserializeTag(tagJson.toJSONString()));
-        assertEquals("Deserialize tag from JSON object", tag, serializer.deserialize(tagJson));
+        assertEquals(tag, serializer.deserializeTag(tagJson.toJSONString()), "Deserialize tag from string");
+        assertEquals(tag, serializer.deserialize(tagJson), "Deserialize tag from JSON object");
         logger.exiting(getClass().getName(), "testDeserializeSingleTag");
     }
 
@@ -156,10 +156,10 @@ public class TagDTODeSerializerTest {
         tagsJson.add(tag2Json);
         List<TagDTO> deserialzedFromString = serializer.deserializeTags(tagsJson.toJSONString());
         List<TagDTO> deserialzedFromArray = serializer.deserialize(tagsJson);
-        assertEquals("Deserialize tag1 from string", tag1, deserialzedFromString.get(0));
-        assertEquals("Deserialize tag2 from string", tag2, deserialzedFromString.get(1));
-        assertEquals("Deserialize tag1 from JSON array", tag1, deserialzedFromArray.get(0));
-        assertEquals("Deserialize tag2 from JSON array", tag2, deserialzedFromArray.get(1));
+        assertEquals(tag1, deserialzedFromString.get(0), "Deserialize tag1 from string");
+        assertEquals(tag2, deserialzedFromString.get(1), "Deserialize tag2 from string");
+        assertEquals(tag1, deserialzedFromArray.get(0), "Deserialize tag1 from JSON array");
+        assertEquals(tag2, deserialzedFromArray.get(1), "Deserialize tag2 from JSON array");
         logger.exiting(getClass().getName(), "testDeserializeMultipleTags");
     }
 
@@ -167,9 +167,9 @@ public class TagDTODeSerializerTest {
     public void testSerializeTimePoint() {
         logger.entering(getClass().getName(), "testSerializeTimePoint");
         long millis = 1234;
-        assertEquals("Serialize timepoint with null value", 0, serializer.serializeTimePoint(null));
-        assertEquals("Serialize timepoint with non-null value", 1234,
-                serializer.serializeTimePoint(new MillisecondsTimePoint(millis)));
+        assertEquals(0, serializer.serializeTimePoint(null), "Serialize timepoint with null value");
+        assertEquals(1234, serializer.serializeTimePoint(new MillisecondsTimePoint(millis)),
+                "Serialize timepoint with non-null value");
         logger.exiting(getClass().getName(), "testSerializeTimePoint");
     }
 
@@ -177,7 +177,7 @@ public class TagDTODeSerializerTest {
     public void testDeserializeTimePoint() {
         logger.entering(getClass().getName(), "testDeserializeTimePoint");
         long millis = 1234;
-        assertEquals("Deserialize timepoint", millis, serializer.deserializeTimePoint(millis).asMillis());
+        assertEquals(millis, serializer.deserializeTimePoint(millis).asMillis(), "Deserialize timepoint");
         logger.exiting(getClass().getName(), "testDeserializeTimePoint");
     }
 

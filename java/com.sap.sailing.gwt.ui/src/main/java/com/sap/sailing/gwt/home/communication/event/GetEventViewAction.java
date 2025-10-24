@@ -65,10 +65,8 @@ public class GetEventViewAction implements SailingAction<EventViewDTO>, IsClient
             throw new RuntimeException("Event not found");
         }
         context.getSecurityService().checkCurrentUserReadPermission(event);
-
         final EventViewDTO dto = new EventViewDTO();
-        HomeServiceUtil.mapToMetadataDTO(event, dto, context.getRacingEventService());
-        
+        HomeServiceUtil.mapToMetadataDTO(event, dto);
         ImageDescriptor logoImage = event.findImageWithTag(MediaTagConstants.LOGO.getName());
         dto.setLogoImage(logoImage != null ? HomeServiceUtil.convertToImageDTO(logoImage) : null);
         dto.setOfficialWebsiteURL(event.getOfficialWebsiteURL() == null ? null : event.getOfficialWebsiteURL().toString());
@@ -84,17 +82,14 @@ public class GetEventViewAction implements SailingAction<EventViewDTO>, IsClient
         dto.setName(event.getName());
         // bug2982: always show leaderboard and competitor analytics 
         dto.setHasAnalytics(true);
-        
         String description = event.getDescription();
         if (description == null || description.trim().isEmpty() || event.getName().equalsIgnoreCase(description)) {
             // If a description isn't useful, it should not be shown in the UI
             description = null;
         }
         dto.setDescription(description);
-
         final Set<RegattaMetadataDTO> regattasOfEvent = new HashSet<>();
         final Set<LeaderboardGroup> relevantLeaderboardGroupsOfEvent = new HashSet<>();
-        
         EventActionUtil.forLeaderboardsOfEventWithReadPermissions(context, event, new LeaderboardCallback() {
             @Override
             public void doForLeaderboard(LeaderboardContext lcontext) {

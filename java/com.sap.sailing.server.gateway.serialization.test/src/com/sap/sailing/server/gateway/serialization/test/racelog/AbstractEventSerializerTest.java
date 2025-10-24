@@ -1,6 +1,6 @@
 package com.sap.sailing.server.gateway.serialization.test.racelog;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -11,8 +11,8 @@ import java.util.UUID;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
@@ -41,7 +41,7 @@ public abstract class AbstractEventSerializerTest<EventType extends RaceLogEvent
     /**
      * Be sure to call this from subclasses as last statement!
      */
-    @Before
+    @BeforeEach
     public void setUp() {
         serializer = createSerializer(competitorSerializer);
         event = createMockEvent();

@@ -1,6 +1,6 @@
 package com.sap.sailing.server.gateway.deserialization.test.racelog;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,8 +9,8 @@ import java.io.InputStreamReader;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.race.RaceLog;
 import com.sap.sailing.domain.abstractlog.race.RaceLogEvent;
@@ -24,7 +24,7 @@ import com.sap.sailing.server.gateway.deserialization.racelog.impl.RaceLogEventD
 public class RaceLogDeserializationTest {
     private RaceLog parsedRaceLog;
     
-    @Before
+    @BeforeEach
     public void setUp() throws IOException, ParseException {
         parsedRaceLog = deserializeFromFile();
     }

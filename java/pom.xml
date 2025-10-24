@@ -36,11 +36,12 @@
          When adjusting tycho-version here, also make sure to adjust it accordingly
          in java/com.amazon.aws.aws-java-api/pom.xml
      -->
-    <tycho-version>1.7.0</tycho-version>
-    <gwt.version>2.11.0</gwt.version>
+    <tycho-version>4.0.12</tycho-version>
+    <toolchains-version>3.2.0</toolchains-version>
+    <gwt.version>2.11.1</gwt.version>
     <!-- gwt-maven-plugin is typically in sync with the GWT version. But sometimes versions need extra time after a new GWT release. -->
-    <gwt.plugin.version>2.11.0</gwt.plugin.version>
-    <gwt.minVersion>2.11.0</gwt.minVersion>
+    <gwt.plugin.version>2.11.1</gwt.plugin.version>
+    <gwt.minVersion>2.11.1</gwt.minVersion>
     <gwt.workers>2</gwt.workers>
     <p2-target>race-analysis-p2-remote</p2-target><!--can be overidden through p2-target.local profile -->
     <!-- QUESTION: Which properties or settings are system dependent and differ across different machines/environments? QUESTION:
@@ -476,6 +477,7 @@
 <build>
   <directory>bin</directory>
   <outputDirectory>bin</outputDirectory>
+  <testSourceDirectory>src</testSourceDirectory>
   <testOutputDirectory>bin</testOutputDirectory>
 
   <pluginManagement>
@@ -493,6 +495,11 @@
         <configuration>
           <reportsDirectory>${reportsdirectory}</reportsDirectory>
         </configuration>
+      </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-toolchains-plugin</artifactId>
+          <version>${toolchains-version}</version>
       </plugin>
       <plugin>
           <groupId>com.simpligility.maven.plugins</groupId>
@@ -546,6 +553,25 @@
   </pluginManagement>
 
   <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-toolchains-plugin</artifactId>
+      <version>${toolchains-version}</version>
+      <executions>
+        <execution>
+          <goals>
+            <goal>toolchain</goal>
+          </goals>
+        </execution>
+      </executions>
+      <configuration>
+        <toolchains>
+          <jdk>
+            <version>8</version>
+          </jdk>
+        </toolchains>
+      </configuration>
+    </plugin>
     <plugin>
       <groupId>org.eclipse.tycho</groupId>
       <artifactId>tycho-maven-plugin</artifactId>
@@ -607,6 +633,7 @@
         </excludes>
         <reportsDirectory>${reportsdirectory}</reportsDirectory>
         <showEclipseLog>true</showEclipseLog>
+        <useJUnitPlatform>true</useJUnitPlatform>
       </configuration>
     </plugin>
     <plugin>

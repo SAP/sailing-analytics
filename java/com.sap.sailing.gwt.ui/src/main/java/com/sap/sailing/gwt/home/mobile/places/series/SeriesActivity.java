@@ -20,6 +20,7 @@ import com.sap.sailing.gwt.home.shared.places.error.ErrorPlace;
 import com.sap.sailing.gwt.home.shared.places.fakeseries.AbstractSeriesPlace;
 import com.sap.sailing.gwt.home.shared.places.fakeseries.SeriesContext;
 import com.sap.sailing.gwt.ui.client.FlagImageResolver;
+import com.sap.sse.security.ui.client.UserService;
 
 public class SeriesActivity extends AbstractActivity implements SeriesView.Presenter {
     private final MobileApplicationClientFactory clientFactory;
@@ -100,5 +101,10 @@ public class SeriesActivity extends AbstractActivity implements SeriesView.Prese
     @Override
     public EventSeriesViewDTO getSeriesDTO() {
         return series;
+    }
+
+    @Override
+    public UserService getUserService() {
+        return clientFactory.getUserService();
     }
 }

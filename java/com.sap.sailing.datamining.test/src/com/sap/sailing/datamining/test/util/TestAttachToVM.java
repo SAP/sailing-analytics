@@ -1,11 +1,11 @@
 package com.sap.sailing.datamining.test.util;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import net.bytebuddy.agent.VirtualMachine;
 
@@ -15,7 +15,7 @@ import net.bytebuddy.agent.VirtualMachine;
  * @author Axel Uhl (d043530)
  *
  */
-@Ignore("This class is used only to demonstrate how injecting the JMX Prometheus Java agent works for a running VM")
+@Disabled("This class is used only to demonstrate how injecting the JMX Prometheus Java agent works for a running VM")
 public class TestAttachToVM {
     @Test
     public void testInjectAgentToRunningVM() throws IOException {

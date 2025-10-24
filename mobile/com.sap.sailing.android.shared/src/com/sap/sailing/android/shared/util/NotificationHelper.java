@@ -16,27 +16,11 @@ public class NotificationHelper {
     private final static String CHANNEL_ID = "default";
 
     private static Bitmap largeIcon;
-    private static CharSequence title;
     private static int smallIcon;
 
-    public static void prepareNotificationWith(CharSequence appTitle, Bitmap appIcon, int notificationIcon) {
-        title = appTitle;
+    public static void prepareNotificationWith(Bitmap appIcon, int notificationIcon) {
         largeIcon = appIcon;
         smallIcon = notificationIcon;
-    }
-
-    public static Notification getNotification(Context context, String channelId) {
-        return getNotification(context, channelId, title, "");
-    }
-
-    public static Notification getNotification(Context context, String channelId, CharSequence customTitle,
-            String content) {
-        return getNotification(context, channelId, customTitle, content, null);
-    }
-
-    public static Notification getNotification(Context context, String channelId, CharSequence customTitle,
-            String content, PendingIntent intent) {
-        return getNotification(context, channelId, customTitle, content, intent, NotificationCompat.COLOR_DEFAULT);
     }
 
     public static Notification getNotification(Context context, String channelId, CharSequence customTitle,
@@ -44,11 +28,9 @@ public class NotificationHelper {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId).setContentText(content)
                 .setContentTitle(customTitle).setLargeIcon(largeIcon).setSmallIcon(smallIcon).setOngoing(true)
                 .setColor(color).setPriority(Notification.PRIORITY_HIGH);
-
         if (intent != null) {
             builder.setContentIntent(intent);
         }
-
         return builder.build();
     }
 

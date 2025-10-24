@@ -1,12 +1,12 @@
 package com.sap.sailing.server.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -22,9 +22,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.osgi.framework.BundleContext;
 
@@ -98,7 +98,7 @@ public class AutomaticRetrackUponCompetitorSetChangeTest {
     private MongoObjectFactory mongoObjectFactory;
     private RegattaName regattaIdentifier;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final BundleContext contextMock = mock(BundleContext.class);
         when(contextMock.createFilter(ArgumentMatchers.any())).thenReturn(null);
@@ -239,7 +239,7 @@ public class AutomaticRetrackUponCompetitorSetChangeTest {
         return raceTracker;
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         if (racesHandle != null) {
             racesHandle.getRaceTracker().stop(/* preemptive */ false);

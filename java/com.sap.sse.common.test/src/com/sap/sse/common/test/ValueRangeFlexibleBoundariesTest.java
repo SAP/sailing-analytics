@@ -1,10 +1,10 @@
 package com.sap.sse.common.test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.ValueRangeFlexibleBoundaries;
 import com.sap.sse.common.ValueRangeFlexibleBoundariesChangedListener;
@@ -17,7 +17,7 @@ public class ValueRangeFlexibleBoundariesTest {
     private double maxRight;
     private ValueRangeFlexibleBoundariesChangedListener listener;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         // a ten percent range at each end of an original range of length 10, so length 1 at each end,
         // spread symmetrically around the min/max value

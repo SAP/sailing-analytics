@@ -1,16 +1,16 @@
 package com.sap.sailing.selenium.test.adminconsole.usermanagement;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.advanced.LocalServerPO;
 import com.sap.sailing.selenium.pages.adminconsole.event.EventConfigurationPanelPO;
@@ -50,7 +50,7 @@ public class TestNegativeAcls extends AbstractSeleniumTest {
     private static final String CUSTOM_ROLE = "custom-role";
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot());
         super.setUp();
@@ -71,7 +71,7 @@ public class TestNegativeAcls extends AbstractSeleniumTest {
         userManagementPanel.grantPermissionToUser(USER1_NAME, EVENT_UPLOAD_MEDIA_PERMISSION);
     }
 
-    @Test
+    @SeleniumTestCase
     public void testUserWithNegativeAclCantGiveARoleToAnotherUser() {
         // user1 creates an event
         AdminConsolePage adminConsole = changeUserAndReloadAdminConsole(USER1_NAME);
@@ -108,7 +108,7 @@ public class TestNegativeAcls extends AbstractSeleniumTest {
         assertNull(userRoles.findRole(qualifiedRoleName));
     }
     
-    @Test
+    @SeleniumTestCase
     public void testUserWithNegativeAclCantGiveAPermissionToAnotherUser() {
         // user1 creates an event
         AdminConsolePage adminConsole = changeUserAndReloadAdminConsole(USER1_NAME);
@@ -147,7 +147,7 @@ public class TestNegativeAcls extends AbstractSeleniumTest {
         assertNull(userPermissions.findPermission(eventAllPermission));
     }
     
-    @Test
+    @SeleniumTestCase
     public void testUserWithNegativeAclCantAddUserToGroup() {
         // user1 creates an event
         AdminConsolePage adminConsole = changeUserAndReloadAdminConsole(USER1_NAME);
@@ -189,7 +189,7 @@ public class TestNegativeAcls extends AbstractSeleniumTest {
         assertNull(userGroupUsers.findUser(USER4_NAME));
     }
     
-    @Test
+    @SeleniumTestCase
     public void testUserWithNegativeAclCantAddRoleToGroup() {
         // user1 creates an event
         AdminConsolePage adminConsole = changeUserAndReloadAdminConsole(USER1_NAME);
@@ -232,7 +232,7 @@ public class TestNegativeAcls extends AbstractSeleniumTest {
         assertNull(userGroupRoles.findRole(USER_ROLE));
     }
     
-    @Test
+    @SeleniumTestCase
     public void testUserWithNegativeAclCantAddPermissionToRoleThatIsAssociatedToAUserGroup() {
         // user1 creates an event
         AdminConsolePage adminConsole = changeUserAndReloadAdminConsole(USER1_NAME);
@@ -276,7 +276,7 @@ public class TestNegativeAcls extends AbstractSeleniumTest {
         // assertFalse(roleDefinitions.findRole(CUSTOM_ROLE).getPermissions().contains(eventAllPermission));
     }
     
-    @Test
+    @SeleniumTestCase
     public void testUserWithNegativeAclCantAddPermissionToRoleThatIsAssociatedToAUser() {
         // user1 creates an event
         AdminConsolePage adminConsole = changeUserAndReloadAdminConsole(USER1_NAME);

@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 
 import javax.xml.bind.DatatypeConverter;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.event.EventConfigurationPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardConfigurationPanelPO;
@@ -72,7 +72,7 @@ public class SettingsTest extends AbstractSeleniumTest {
     private static final String URL_PARAMETER_IGNORE_LOCAL_SETTINGS = "ignoreLocalSettings=true";
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot());
         super.setUp();
@@ -86,7 +86,7 @@ public class SettingsTest extends AbstractSeleniumTest {
      * Verifies the settings storage of the raceboard. Checks the precedences of url, context specific settings, mode
      * settings and global settings.
      */
-    @Test
+    @SeleniumTestCase
     public void testRaceBoardPageSettingsStorage() throws InterruptedException, UnsupportedEncodingException {
         createEventWithTrackedRace();
         RaceBoardPage raceboard = RaceBoardPage.goToRaceboardUrl(getWebDriver(), getContextRoot(), BMW_CUP_REGATTA,
@@ -105,14 +105,14 @@ public class SettingsTest extends AbstractSeleniumTest {
         LeaderboardSettingsPanelPO leaderboardSettingsPanelPO = leaderboardSettingsDialog
                 .getLeaderboardSettingsPanelPO();
         DetailCheckboxInfo[] selectedDetails = leaderboardSettingsPanelPO.getSelectedDetails();
-        Assert.assertArrayEquals(detailsToSelect, selectedDetails);
+        Assertions.assertArrayEquals(detailsToSelect, selectedDetails);
         leaderboardSettingsPanelPO.setRefreshInterval(2);
         leaderboardSettingsDialog.pressMakeDefault();
         leaderboardSettingsDialog.pressCancel();
         MapSettingsPO mapSettings = raceboard.openMapSettings();
         // Verify initial mode settings
         mapSettings.waitForWindUpUntil(false);
-        Assert.assertFalse(mapSettings.isShowOnlySelectedCompetitors());
+        Assertions.assertFalse(mapSettings.isShowOnlySelectedCompetitors());
         mapSettings.setTransparentHoverlines(true);
         mapSettings.setWindUp(false);
         mapSettings.pressMakeDefault();
@@ -131,7 +131,7 @@ public class SettingsTest extends AbstractSeleniumTest {
         leaderboardSettingsDialog = raceboard.openLeaderboardSettingsDialog();
         leaderboardSettingsPanelPO = leaderboardSettingsDialog.getLeaderboardSettingsPanelPO();
         selectedDetails = leaderboardSettingsPanelPO.getSelectedDetails();
-        Assert.assertArrayEquals(detailsToSelect, selectedDetails);
+        Assertions.assertArrayEquals(detailsToSelect, selectedDetails);
         detailsToSelect = new DetailCheckboxInfo[] {
                 // Race details
                 DetailCheckboxInfo.RACE_GAP_TO_LEADER, DetailCheckboxInfo.RACE_DISTANCE, DetailCheckboxInfo.RACE_TIME,
@@ -150,9 +150,9 @@ public class SettingsTest extends AbstractSeleniumTest {
         // verify default mode settings override custom user settings
         mapSettings.waitForWindUpUntil(true);
         // verify default mode settings override system defaults
-        Assert.assertTrue(mapSettings.isShowOnlySelectedCompetitors());
+        Assertions.assertTrue(mapSettings.isShowOnlySelectedCompetitors());
         // Verify custom user settings are independent for modes
-        Assert.assertFalse(mapSettings.isTransparentHoverlines());
+        Assertions.assertFalse(mapSettings.isTransparentHoverlines());
         mapSettings.setWindUp(false);
         mapSettings.setTransparentHoverlines(false);
         mapSettings.pressOk(false, false);
@@ -162,15 +162,15 @@ public class SettingsTest extends AbstractSeleniumTest {
         leaderboardSettingsPanelPO = leaderboardSettingsDialog.getLeaderboardSettingsPanelPO();
         selectedDetails = leaderboardSettingsPanelPO.getSelectedDetails();
         // verify highest precedence of document settings
-        Assert.assertArrayEquals(detailsToSelect, selectedDetails);
+        Assertions.assertArrayEquals(detailsToSelect, selectedDetails);
         // verify that document settings are able to override custom user settings by a system default value
-        Assert.assertEquals(1, leaderboardSettingsPanelPO.getRefreshInterval());
+        Assertions.assertEquals(1, leaderboardSettingsPanelPO.getRefreshInterval());
         leaderboardSettingsDialog.pressCancel();
         mapSettings = raceboard.openMapSettings();
         // Verify that mode settings are overridden by document settings
         mapSettings.waitForWindUpUntil(false);
         // Verify custom user settings are independent for modes
-        Assert.assertFalse(mapSettings.isTransparentHoverlines());
+        Assertions.assertFalse(mapSettings.isTransparentHoverlines());
         // verify that custom document settings override mode settings of other modes
         raceboard = RaceBoardPage.goToRaceboardUrl(getWebDriver(), getContextRoot(), BMW_CUP_REGATTA, BMW_CUP_REGATTA,
                 String.format(BMW_RACE, 1), "START_ANALYSIS", false);
@@ -188,7 +188,7 @@ public class SettingsTest extends AbstractSeleniumTest {
                 DetailCheckboxInfo.START_TACK, // start analysis mode
                 DetailCheckboxInfo.RANK_GAIN,
                 DetailCheckboxInfo.TACK, DetailCheckboxInfo.JIBE, DetailCheckboxInfo.PENALTY_CIRCLE };
-        Assert.assertArrayEquals(detailsToSelect, selectedDetails);
+        Assertions.assertArrayEquals(detailsToSelect, selectedDetails);
         leaderboardSettingsDialog.pressCancel();
         mapSettings = raceboard.openMapSettings();
         mapSettings.waitForWindUpUntil(true);
@@ -197,7 +197,7 @@ public class SettingsTest extends AbstractSeleniumTest {
     /**
      * Verifies that settings for different modes are distinct and do not have an effect on other modes. 
      */
-    @Test
+    @SeleniumTestCase
     public void testThatUserDefaultsForOneModeDoNotHaveAnEffectOnAnotherMode() throws InterruptedException, UnsupportedEncodingException {
         createEventWithTrackedRace();
         
@@ -206,7 +206,7 @@ public class SettingsTest extends AbstractSeleniumTest {
         
         MapSettingsPO mapSettings = raceboard.openMapSettings();
         // Verify initial settings for mode PLAYER
-        Assert.assertFalse(mapSettings.isShowWindStreamletOverlay());
+        Assertions.assertFalse(mapSettings.isShowWindStreamletOverlay());
         
         mapSettings.setTransparentHoverlines(true);
         mapSettings.setWindUp(false);
@@ -217,7 +217,7 @@ public class SettingsTest extends AbstractSeleniumTest {
 
         mapSettings = raceboard.openMapSettings();
         // Verify initial settings for mode WINNING_LANES
-        Assert.assertFalse(mapSettings.isShowWindStreamletOverlay());
+        Assertions.assertFalse(mapSettings.isShowWindStreamletOverlay());
         
         raceboard = RaceBoardPage.goToRaceboardUrl(getWebDriver(), getContextRoot(), BMW_CUP_REGATTA,
                 BMW_CUP_REGATTA, String.format(BMW_RACE, 1), "PLAYER", false);
@@ -232,13 +232,13 @@ public class SettingsTest extends AbstractSeleniumTest {
 
         mapSettings = raceboard.openMapSettings();
         // Verify settings for mode WINNING_LANES are unchanged
-        Assert.assertFalse(mapSettings.isShowWindStreamletOverlay());
+        Assertions.assertFalse(mapSettings.isShowWindStreamletOverlay());
     }
     
     /**
      * Verifies that settings are stored for raceboard.
      */
-    @Test
+    @SeleniumTestCase
     public void testThatSettingsAreStoredForOneMode() throws InterruptedException, UnsupportedEncodingException {
         createEventWithTrackedRace();
         
@@ -248,7 +248,7 @@ public class SettingsTest extends AbstractSeleniumTest {
         MapSettingsPO mapSettings = raceboard.openMapSettings();
         // Verify initial mode settings
         mapSettings.waitForWindUpUntil(false);
-        Assert.assertFalse(mapSettings.isShowOnlySelectedCompetitors());
+        Assertions.assertFalse(mapSettings.isShowOnlySelectedCompetitors());
         mapSettings.setWindUp(true);
         mapSettings.setShowOnlySelectedCompetitors(true);
         mapSettings.pressMakeDefault();
@@ -259,13 +259,13 @@ public class SettingsTest extends AbstractSeleniumTest {
         mapSettings = raceboard.openMapSettings();
         // verify default settings work
         mapSettings.waitForWindUpUntil(true);
-        Assert.assertTrue(mapSettings.isShowOnlySelectedCompetitors());
+        Assertions.assertTrue(mapSettings.isShowOnlySelectedCompetitors());
     }
     
     /**
      * Verifies that Modes correctly set the time slider.
      */
-    @Test
+    @SeleniumTestCase
     public void testThatAnalysisModeAffectsTimeSliderCorrectly() throws InterruptedException, UnsupportedEncodingException {
         createEventWithTrackedRace();
         final RaceBoardPage raceboard = RaceBoardPage.goToRaceboardUrl(getWebDriver(), getContextRoot(), BMW_CUP_REGATTA,
@@ -276,10 +276,10 @@ public class SettingsTest extends AbstractSeleniumTest {
         final TimeSliderPO timeSlider = raceboard.getTimeSlider();
         final String sliderKnobTime = timeSlider.getSliderKnobTime();
         final String endMarkerTime = timeSlider.getEndMarkerTime();
-        Assert.assertTrue(sliderKnobTime.equals(endMarkerTime));
+        Assertions.assertTrue(sliderKnobTime.equals(endMarkerTime));
     }
     
-    @Test
+    @SeleniumTestCase
     public void testThatFinishingLanesModeAffectsTimeSliderCorrectly() throws InterruptedException, UnsupportedEncodingException {
         createEventWithTrackedRace();
         final RaceBoardPage raceboard = RaceBoardPage.goToRaceboardUrl(getWebDriver(), getContextRoot(), BMW_CUP_REGATTA,
@@ -290,10 +290,10 @@ public class SettingsTest extends AbstractSeleniumTest {
         final TimeSliderPO timeSlider = raceboard.getTimeSlider();
         final String sliderKnobTime = timeSlider.getSliderKnobTime();
         final String finishMarkerTime = timeSlider.getFinishMarkerTime();
-        Assert.assertTrue(sliderKnobTime.equals(finishMarkerTime));
+        Assertions.assertTrue(sliderKnobTime.equals(finishMarkerTime));
     }
     
-    @Test
+    @SeleniumTestCase
     public void testThatPlayerModeAffectsTimeSliderCorrectly()
             throws InterruptedException, UnsupportedEncodingException {
         createEventWithTrackedRace();
@@ -308,10 +308,10 @@ public class SettingsTest extends AbstractSeleniumTest {
         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm");
         final String formatedPlayerStartTime = formatter.format(playerStartTime);
         final String sliderKnobTime = timeSlider.getSliderKnobTime();
-        Assert.assertTrue(sliderKnobTime.equals(formatedPlayerStartTime));
+        Assertions.assertTrue(sliderKnobTime.equals(formatedPlayerStartTime));
     }
     
-    @Test
+    @SeleniumTestCase
     public void testThatStartAnalysisModeAffectsTimeSliderCorrectly()
             throws InterruptedException, UnsupportedEncodingException {
         createEventWithTrackedRace();
@@ -326,14 +326,14 @@ public class SettingsTest extends AbstractSeleniumTest {
         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm");
         final String formatedPlayerStartTime = formatter.format(playerStartTime);
         final String sliderKnobTime = timeSlider.getSliderKnobTime();
-        Assert.assertTrue(sliderKnobTime.equals(formatedPlayerStartTime));
+        Assertions.assertTrue(sliderKnobTime.equals(formatedPlayerStartTime));
     }
      
     
     /**
      * Verifies that settings are stored for raceboard.
      */
-    @Test
+    @SeleniumTestCase
     public void testThatModeDependentSettingsAreStoredForOneMode() throws InterruptedException, UnsupportedEncodingException {
         createEventWithTrackedRace();
         RaceBoardPage raceboard = RaceBoardPage.goToRaceboardUrl(getWebDriver(), getContextRoot(), BMW_CUP_REGATTA,
@@ -341,7 +341,7 @@ public class SettingsTest extends AbstractSeleniumTest {
         MapSettingsPO mapSettings = raceboard.openMapSettings();
         // The following options are false in the system default but activated by the WINNING_LANES mode
         mapSettings.waitForWindUpUntil(true);
-        Assert.assertTrue(mapSettings.isShowOnlySelectedCompetitors());
+        Assertions.assertTrue(mapSettings.isShowOnlySelectedCompetitors());
         mapSettings.setWindUp(false);
         mapSettings.setShowOnlySelectedCompetitors(false);
         mapSettings.pressMakeDefault();
@@ -350,7 +350,7 @@ public class SettingsTest extends AbstractSeleniumTest {
         mapSettings = raceboard.openMapSettings();
         // verify mode settings have been overwritten
         mapSettings.waitForWindUpUntil(false);
-        Assert.assertFalse(mapSettings.isShowOnlySelectedCompetitors());
+        Assertions.assertFalse(mapSettings.isShowOnlySelectedCompetitors());
     }
 
     private void createEventWithTrackedRace() {
@@ -379,7 +379,7 @@ public class SettingsTest extends AbstractSeleniumTest {
         // status FINISHED when done loading
         LeaderboardConfigurationPanelPO leaderboard = adminConsole.goToLeaderboardConfiguration();
         LeaderboardDetailsPanelPO details = leaderboard.getLeaderboardDetails(BMW_CUP_REGATTA);
-        Assert.assertTrue(details != null);
+        Assertions.assertTrue(details != null);
         details.linkRace(new RaceDescriptor(BMW_CUP_RACE_NAME, "Default", false, false, 0), trackedRace);
     }
 
@@ -390,7 +390,7 @@ public class SettingsTest extends AbstractSeleniumTest {
      * is correctly not supported, thats why the corresponding assertion has been commented out.
      * 
      */
-    @Test
+    @SeleniumTestCase
     public void testLeaderboardPageSettingsForwarding() {
         // create event
         AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
@@ -414,11 +414,11 @@ public class SettingsTest extends AbstractSeleniumTest {
         LeaderboardPage leaderboardPage = urlConfigurationDialog.openLeaderboard();
         leaderboardSettingsPanel = leaderboardPage.getLeaderboardSettings().getLeaderboardSettingsPanelPO();
         DetailCheckboxInfo[] selectedDetails = leaderboardSettingsPanel.getSelectedDetails();
-        Assert.assertArrayEquals(detailsToSelect, selectedDetails);
-        Assert.assertTrue(leaderboardSettingsPanel.getCheckboxValue("R1CheckBox"));
-        Assert.assertTrue(!leaderboardSettingsPanel.getCheckboxValue("R2CheckBox"));
-        Assert.assertTrue(leaderboardSettingsPanel.getCheckboxValue("R3CheckBox"));
-        Assert.assertEquals(2, leaderboardSettingsPanel.getRefreshInterval());
+        Assertions.assertArrayEquals(detailsToSelect, selectedDetails);
+        Assertions.assertTrue(leaderboardSettingsPanel.getCheckboxValue("R1CheckBox"));
+        Assertions.assertTrue(!leaderboardSettingsPanel.getCheckboxValue("R2CheckBox"));
+        Assertions.assertTrue(leaderboardSettingsPanel.getCheckboxValue("R3CheckBox"));
+        Assertions.assertEquals(2, leaderboardSettingsPanel.getRefreshInterval());
         // set different custom leaderboard settings
         adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
         leaderboardConfiguration = adminConsole.goToLeaderboardConfiguration();
@@ -464,11 +464,11 @@ public class SettingsTest extends AbstractSeleniumTest {
         // open settings dialog of configurated leaderboard and match the set values with forwarded values
         leaderboardPage = urlConfigurationDialog.openLeaderboard();
         leaderboardSettingsPanel = leaderboardPage.getLeaderboardSettings().getLeaderboardSettingsPanelPO();
-        Assert.assertTrue(leaderboardSettingsPanel.isNumberOfRacesToDisplaySelected());
-        Assert.assertEquals(2, leaderboardSettingsPanel.getNumberOfRacesToDisplaySelected());
-        Assert.assertEquals(3, leaderboardSettingsPanel.getRefreshInterval());
+        Assertions.assertTrue(leaderboardSettingsPanel.isNumberOfRacesToDisplaySelected());
+        Assertions.assertEquals(2, leaderboardSettingsPanel.getNumberOfRacesToDisplaySelected());
+        Assertions.assertEquals(3, leaderboardSettingsPanel.getRefreshInterval());
         selectedDetails = leaderboardSettingsPanel.getSelectedDetails();
-        Assert.assertArrayEquals(detailsToSelect, selectedDetails);
+        Assertions.assertArrayEquals(detailsToSelect, selectedDetails);
     }
 
     /**
@@ -476,7 +476,7 @@ public class SettingsTest extends AbstractSeleniumTest {
      * the chart presence is verified when the corresponding settings in admin console has been checked. In order to get
      * the race details displayed, a tracked race is used.
      */
-    @Test
+    @SeleniumTestCase
     public void testLeaderboardPageSettingsForwardingWithTrackedRace() {
         // create event
         AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
@@ -515,14 +515,14 @@ public class SettingsTest extends AbstractSeleniumTest {
         leaderboardSettingsPanel.selectDetailsAndDeselectOther(detailsToSelect);
         // check the displaying leaderboard table columns of a tracked race
         LeaderboardPage leaderboardPage = urlConfigurationDialog.openLeaderboard();
-        Assert.assertFalse(leaderboardPage.isCompetitorChartVisible());
+        Assertions.assertFalse(leaderboardPage.isCompetitorChartVisible());
         LeaderboardTablePO leaderboardTable = leaderboardPage.getLeaderboardTable();
         leaderboardTable.expandRace("R1");
         List<String> columnHeadersToCheck = Arrays.stream(detailsToSelect).map(detail -> detail.getLabel())
                 .collect(Collectors.toList());
         for (String headerToCheck : columnHeadersToCheck) {
-            Assert.assertTrue("Column header label \"" + headerToCheck + "\" not found",
-                    leaderboardTable.containsColumnHeader(headerToCheck));
+            Assertions.assertTrue(leaderboardTable.containsColumnHeader(headerToCheck),
+                    "Column header label \"" + headerToCheck + "\" not found");
         }
         // test showRaceDetails and showChart configuration options
         adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
@@ -534,7 +534,7 @@ public class SettingsTest extends AbstractSeleniumTest {
         leaderboardPageSettings.setShowCharts(true);
         // open settings dialog of configurated leaderboard and match the set values with forwarded values
         leaderboardPage = urlConfigurationDialog.openLeaderboard();
-        Assert.assertTrue(leaderboardPage.isCompetitorChartVisible());
+        Assertions.assertTrue(leaderboardPage.isCompetitorChartVisible());
     }
 
     /**
@@ -542,7 +542,7 @@ public class SettingsTest extends AbstractSeleniumTest {
      * console has been checked and the settings for overall leaderboard has been set differently than the settings of
      * the regatta leaderboard. The settings of both leaderboards get asserted separately.
      */
-    @Test
+    @SeleniumTestCase
     public void testLeaderboardPageSettingsForwardingWithOverallLeaderboard() {
         // create event
         AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
@@ -591,12 +591,12 @@ public class SettingsTest extends AbstractSeleniumTest {
         LeaderboardSettingsDialogPO leaderboardSettingsDialog = leaderboardPage.getLeaderboardSettings();
         leaderboardSettingsPanel = leaderboardSettingsDialog.getLeaderboardSettingsPanelPO();
         DetailCheckboxInfo[] selectedDetails = leaderboardSettingsPanel.getSelectedDetails();
-        Assert.assertArrayEquals(detailsToSelect, selectedDetails);
+        Assertions.assertArrayEquals(detailsToSelect, selectedDetails);
         leaderboardSettingsDialog.pressCancel();
         // open settings dialog of configurated OVERALL leaderboard and match the set values with forwarded values
         leaderboardSettingsPanel = leaderboardPage.getOverallLeaderboardSettings().getLeaderboardSettingsPanelPO();
         selectedDetails = leaderboardSettingsPanel.getSelectedDetails();
-        Assert.assertArrayEquals(overallDetailsToSelect, selectedDetails);
+        Assertions.assertArrayEquals(overallDetailsToSelect, selectedDetails);
     }
 
     /**
@@ -604,7 +604,7 @@ public class SettingsTest extends AbstractSeleniumTest {
      * global settings. Verifies also the {@code ignoreLocalSettings} flag for correctness which is used to deactivate
      * settings storage support when it is set to {@code true}.
      */
-    @Test
+    @SeleniumTestCase
     public void testLeaderboardPageSettingsStorage() {
         // create event
         AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
@@ -649,8 +649,8 @@ public class SettingsTest extends AbstractSeleniumTest {
         leaderboardPage = LeaderboardPage.goToPage(getWebDriver(), bmwCupDefaultLeaderboardLink);
         leaderboardSettingsDialog = leaderboardPage.getLeaderboardSettings();
         leaderboardSettingsPanel = leaderboardSettingsDialog.getLeaderboardSettingsPanelPO();
-        Assert.assertArrayEquals(newDetails, leaderboardSettingsPanel.getSelectedDetails());
-        Assert.assertEquals(newRefreshInterval, leaderboardSettingsPanel.getRefreshInterval());
+        Assertions.assertArrayEquals(newDetails, leaderboardSettingsPanel.getSelectedDetails());
+        Assertions.assertEquals(newRefreshInterval, leaderboardSettingsPanel.getRefreshInterval());
         // ensure that url has priority
         adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
         leaderboardConfiguration = adminConsole.goToLeaderboardConfiguration();
@@ -661,7 +661,7 @@ public class SettingsTest extends AbstractSeleniumTest {
         leaderboardPage = urlConfigurationDialog.openLeaderboard();
         leaderboardSettingsDialog = leaderboardPage.getLeaderboardSettings();
         leaderboardSettingsPanel = leaderboardSettingsDialog.getLeaderboardSettingsPanelPO();
-        Assert.assertEquals(4, leaderboardSettingsPanel.getRefreshInterval());
+        Assertions.assertEquals(4, leaderboardSettingsPanel.getRefreshInterval());
         // ensure that context specific settings are stored only for the context
         adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
         events = adminConsole.goToEvents();
@@ -675,23 +675,23 @@ public class SettingsTest extends AbstractSeleniumTest {
         leaderboardPage = urlConfigurationDialog.openLeaderboard();
         leaderboardSettingsDialog = leaderboardPage.getLeaderboardSettings();
         leaderboardSettingsPanel = leaderboardSettingsDialog.getLeaderboardSettingsPanelPO();
-        Assert.assertArrayEquals(defaultDetails, leaderboardSettingsPanel.getSelectedDetails());
-        Assert.assertEquals(defaultRefreshInterval, leaderboardSettingsPanel.getRefreshInterval());
+        Assertions.assertArrayEquals(defaultDetails, leaderboardSettingsPanel.getSelectedDetails());
+        Assertions.assertEquals(defaultRefreshInterval, leaderboardSettingsPanel.getRefreshInterval());
         // set old default values to default again and check that the context values of other leaderboard have priority
         leaderboardSettingsDialog.pressMakeDefault();
         leaderboardPage = LeaderboardPage.goToPage(getWebDriver(), bmwCupDefaultLeaderboardLink);
         leaderboardSettingsDialog = leaderboardPage.getLeaderboardSettings();
         leaderboardSettingsPanel = leaderboardSettingsDialog.getLeaderboardSettingsPanelPO();
-        Assert.assertArrayEquals(newDetails, leaderboardSettingsPanel.getSelectedDetails());
-        Assert.assertEquals(newRefreshInterval, leaderboardSettingsPanel.getRefreshInterval());
+        Assertions.assertArrayEquals(newDetails, leaderboardSettingsPanel.getSelectedDetails());
+        Assertions.assertEquals(newRefreshInterval, leaderboardSettingsPanel.getRefreshInterval());
         // set new values to default and check that the other leaderboard which does not have context specific settings
         // stored, applies that values
         leaderboardSettingsDialog.pressMakeDefault();
         leaderboardPage = LeaderboardPage.goToPage(getWebDriver(), audiCupDefaultLeaderboardLink);
         leaderboardSettingsDialog = leaderboardPage.getLeaderboardSettings();
         leaderboardSettingsPanel = leaderboardSettingsDialog.getLeaderboardSettingsPanelPO();
-        Assert.assertArrayEquals(newDetails, leaderboardSettingsPanel.getSelectedDetails());
-        Assert.assertEquals(newRefreshInterval, leaderboardSettingsPanel.getRefreshInterval());
+        Assertions.assertArrayEquals(newDetails, leaderboardSettingsPanel.getSelectedDetails());
+        Assertions.assertEquals(newRefreshInterval, leaderboardSettingsPanel.getRefreshInterval());
     }
 
     /**
@@ -699,7 +699,7 @@ public class SettingsTest extends AbstractSeleniumTest {
      * settings. Verifies also the {@code ignoreLocalSettings} flag for correctness which is used to deactivate settings
      * storage support when it is set to {@code true}.
      */
-    @Test
+    @SeleniumTestCase
     public void testRegattaOverviewSettingsHandling() {
         // create event
         AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
@@ -718,13 +718,13 @@ public class SettingsTest extends AbstractSeleniumTest {
                 .getRegattaOverviewSettingsDialog();
         // assert state
         String regattaOverviewUrl = regattaOverviewPage.getCurrentUrl();
-        Assert.assertTrue(regattaOverviewUrl.contains(URL_PARAMETER_IGNORE_LOCAL_SETTINGS));
-        Assert.assertFalse(regattaOverviewSettingsDialog.isMakeDefaultButtonVisible());
+        Assertions.assertTrue(regattaOverviewUrl.contains(URL_PARAMETER_IGNORE_LOCAL_SETTINGS));
+        Assertions.assertFalse(regattaOverviewSettingsDialog.isMakeDefaultButtonVisible());
         // per default all course areas and regatta names are selected => selectedValues equals availableValues
         List<String> initiallySelectedCourseAreas = regattaOverviewSettingsDialog.getSelectedCourseAreas();
         List<String> initiallySelectedRegattaNames = regattaOverviewSettingsDialog.getSelectedRegattaNames();
-        Assert.assertEquals(2, initiallySelectedCourseAreas.size());
-        Assert.assertEquals(2, initiallySelectedRegattaNames.size());
+        Assertions.assertEquals(2, initiallySelectedCourseAreas.size());
+        Assertions.assertEquals(2, initiallySelectedRegattaNames.size());
         // save initial state
         boolean initialShowOnlyCurrentlyRunningRaces = regattaOverviewSettingsDialog.isShowOnlyCurrentlyRunningRaces();
         boolean initialShowOnlyRacesOfSameDay = regattaOverviewSettingsDialog.isShowOnlyRacesOfSameDay();
@@ -739,18 +739,18 @@ public class SettingsTest extends AbstractSeleniumTest {
         // ensure the regatta overview has still the initial state after reload due to ignoreLocalSettings flag
         regattaOverviewPage = RegattaOverviewPage.goToPage(getWebDriver(), regattaOverviewUrl);
         regattaOverviewSettingsDialog = regattaOverviewPage.getRegattaOverviewSettingsDialog();
-        Assert.assertEquals(initiallySelectedCourseAreas, regattaOverviewSettingsDialog.getSelectedCourseAreas());
-        Assert.assertEquals(initiallySelectedRegattaNames, regattaOverviewSettingsDialog.getSelectedRegattaNames());
-        Assert.assertEquals(initialShowOnlyCurrentlyRunningRaces,
+        Assertions.assertEquals(initiallySelectedCourseAreas, regattaOverviewSettingsDialog.getSelectedCourseAreas());
+        Assertions.assertEquals(initiallySelectedRegattaNames, regattaOverviewSettingsDialog.getSelectedRegattaNames());
+        Assertions.assertEquals(initialShowOnlyCurrentlyRunningRaces,
                 regattaOverviewSettingsDialog.isShowOnlyCurrentlyRunningRaces());
-        Assert.assertEquals(initialShowOnlyRacesOfSameDay, regattaOverviewSettingsDialog.isShowOnlyRacesOfSameDay());
+        Assertions.assertEquals(initialShowOnlyRacesOfSameDay, regattaOverviewSettingsDialog.isShowOnlyRacesOfSameDay());
         // verify settings storage support without ignoreLocalSettingsParameter
         String regattaOverviewUrlWithoutIgnoreLocalSettings = regattaOverviewUrl
                 .replace(URL_PARAMETER_IGNORE_LOCAL_SETTINGS, "");
         regattaOverviewPage = RegattaOverviewPage.goToPage(getWebDriver(),
                 regattaOverviewUrlWithoutIgnoreLocalSettings);
         regattaOverviewSettingsDialog = regattaOverviewPage.getRegattaOverviewSettingsDialog();
-        Assert.assertTrue(regattaOverviewSettingsDialog.isMakeDefaultButtonVisible());
+        Assertions.assertTrue(regattaOverviewSettingsDialog.isMakeDefaultButtonVisible());
         regattaOverviewSettingsDialog.selectCourseAreasAndDeselectOther(newSelectedCourseAreas);
         regattaOverviewSettingsDialog.selectRegattaNamesAndDeselectOther(newSelectedRegattaNames);
         regattaOverviewSettingsDialog.setShowOnlyCurrentlyRunningRaces(!initialShowOnlyCurrentlyRunningRaces);
@@ -760,11 +760,11 @@ public class SettingsTest extends AbstractSeleniumTest {
         regattaOverviewPage = RegattaOverviewPage.goToPage(getWebDriver(),
                 regattaOverviewUrlWithoutIgnoreLocalSettings);
         regattaOverviewSettingsDialog = regattaOverviewPage.getRegattaOverviewSettingsDialog();
-        Assert.assertEquals(newSelectedCourseAreas, regattaOverviewSettingsDialog.getSelectedCourseAreas());
-        Assert.assertEquals(newSelectedRegattaNames, regattaOverviewSettingsDialog.getSelectedRegattaNames());
-        Assert.assertEquals(!initialShowOnlyCurrentlyRunningRaces,
+        Assertions.assertEquals(newSelectedCourseAreas, regattaOverviewSettingsDialog.getSelectedCourseAreas());
+        Assertions.assertEquals(newSelectedRegattaNames, regattaOverviewSettingsDialog.getSelectedRegattaNames());
+        Assertions.assertEquals(!initialShowOnlyCurrentlyRunningRaces,
                 regattaOverviewSettingsDialog.isShowOnlyCurrentlyRunningRaces());
-        Assert.assertEquals(!initialShowOnlyRacesOfSameDay, regattaOverviewSettingsDialog.isShowOnlyRacesOfSameDay());
+        Assertions.assertEquals(!initialShowOnlyRacesOfSameDay, regattaOverviewSettingsDialog.isShowOnlyRacesOfSameDay());
         // create second event
         adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
         events = adminConsole.goToEvents();
@@ -786,11 +786,11 @@ public class SettingsTest extends AbstractSeleniumTest {
         // verify the initial values are untouched
         List<String> initiallySelectedCourseAreasForAudi = regattaOverviewSettingsDialog.getSelectedCourseAreas();
         List<String> initiallySelectedRegattaNamesForAudi = regattaOverviewSettingsDialog.getSelectedRegattaNames();
-        Assert.assertEquals(2, initiallySelectedCourseAreasForAudi.size());
-        Assert.assertEquals(2, initiallySelectedRegattaNamesForAudi.size());
-        Assert.assertEquals(initialShowOnlyCurrentlyRunningRaces,
+        Assertions.assertEquals(2, initiallySelectedCourseAreasForAudi.size());
+        Assertions.assertEquals(2, initiallySelectedRegattaNamesForAudi.size());
+        Assertions.assertEquals(initialShowOnlyCurrentlyRunningRaces,
                 regattaOverviewSettingsDialog.isShowOnlyCurrentlyRunningRaces());
-        Assert.assertEquals(initialShowOnlyRacesOfSameDay, regattaOverviewSettingsDialog.isShowOnlyRacesOfSameDay());
+        Assertions.assertEquals(initialShowOnlyRacesOfSameDay, regattaOverviewSettingsDialog.isShowOnlyRacesOfSameDay());
         // apply new state
         List<String> newSelectedCourseAreasForAudi = initiallySelectedCourseAreasForAudi.subList(0, 1);
         List<String> newSelectedRegattaNamesForAudi = initiallySelectedRegattaNamesForAudi.subList(1, 2);
@@ -803,11 +803,11 @@ public class SettingsTest extends AbstractSeleniumTest {
         regattaOverviewPage = RegattaOverviewPage.goToPage(getWebDriver(),
                 regattaOverviewUrlWithoutIgnoreLocalSettings);
         regattaOverviewSettingsDialog = regattaOverviewPage.getRegattaOverviewSettingsDialog();
-        Assert.assertEquals(newSelectedCourseAreas, regattaOverviewSettingsDialog.getSelectedCourseAreas());
-        Assert.assertEquals(newSelectedRegattaNames, regattaOverviewSettingsDialog.getSelectedRegattaNames());
-        Assert.assertEquals(!initialShowOnlyCurrentlyRunningRaces,
+        Assertions.assertEquals(newSelectedCourseAreas, regattaOverviewSettingsDialog.getSelectedCourseAreas());
+        Assertions.assertEquals(newSelectedRegattaNames, regattaOverviewSettingsDialog.getSelectedRegattaNames());
+        Assertions.assertEquals(!initialShowOnlyCurrentlyRunningRaces,
                 regattaOverviewSettingsDialog.isShowOnlyCurrentlyRunningRaces());
-        Assert.assertEquals(!initialShowOnlyRacesOfSameDay, regattaOverviewSettingsDialog.isShowOnlyRacesOfSameDay());
+        Assertions.assertEquals(!initialShowOnlyRacesOfSameDay, regattaOverviewSettingsDialog.isShowOnlyRacesOfSameDay());
         // verify global settings with make default button
         regattaOverviewSettingsDialog.pressMakeDefault();
         // open second event again and verify that the global settings of the first event have applied
@@ -815,21 +815,21 @@ public class SettingsTest extends AbstractSeleniumTest {
                 audiCupRegattaOverviewUrlWithoutIgnoreLocalSettings);
         regattaOverviewSettingsDialog = regattaOverviewPage.getRegattaOverviewSettingsDialog();
         // context specific settings must stay initial
-        Assert.assertEquals(2, regattaOverviewSettingsDialog.getSelectedCourseAreas().size());
-        Assert.assertEquals(2, regattaOverviewSettingsDialog.getSelectedRegattaNames().size());
+        Assertions.assertEquals(2, regattaOverviewSettingsDialog.getSelectedCourseAreas().size());
+        Assertions.assertEquals(2, regattaOverviewSettingsDialog.getSelectedRegattaNames().size());
         // global settings must match with the settings of the first event
-        Assert.assertEquals(!initialShowOnlyCurrentlyRunningRaces,
+        Assertions.assertEquals(!initialShowOnlyCurrentlyRunningRaces,
                 regattaOverviewSettingsDialog.isShowOnlyCurrentlyRunningRaces());
-        Assert.assertEquals(!initialShowOnlyRacesOfSameDay, regattaOverviewSettingsDialog.isShowOnlyRacesOfSameDay());
+        Assertions.assertEquals(!initialShowOnlyRacesOfSameDay, regattaOverviewSettingsDialog.isShowOnlyRacesOfSameDay());
         // verify that the stored values are ignored with ignoreLocalSettings flag set
         regattaOverviewPage = RegattaOverviewPage.goToPage(getWebDriver(), audiCupRegattaOverviewUrl);
         regattaOverviewSettingsDialog = regattaOverviewPage.getRegattaOverviewSettingsDialog();
-        Assert.assertEquals(initiallySelectedCourseAreasForAudi,
+        Assertions.assertEquals(initiallySelectedCourseAreasForAudi,
                 regattaOverviewSettingsDialog.getSelectedCourseAreas());
-        Assert.assertEquals(initiallySelectedRegattaNamesForAudi,
+        Assertions.assertEquals(initiallySelectedRegattaNamesForAudi,
                 regattaOverviewSettingsDialog.getSelectedRegattaNames());
-        Assert.assertEquals(initialShowOnlyCurrentlyRunningRaces,
+        Assertions.assertEquals(initialShowOnlyCurrentlyRunningRaces,
                 regattaOverviewSettingsDialog.isShowOnlyCurrentlyRunningRaces());
-        Assert.assertEquals(initialShowOnlyRacesOfSameDay, regattaOverviewSettingsDialog.isShowOnlyRacesOfSameDay());
+        Assertions.assertEquals(initialShowOnlyRacesOfSameDay, regattaOverviewSettingsDialog.isShowOnlyRacesOfSameDay());
     }
 }

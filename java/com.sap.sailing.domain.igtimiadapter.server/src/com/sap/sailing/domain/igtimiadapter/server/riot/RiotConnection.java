@@ -4,6 +4,8 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
 
 import com.google.protobuf.CodedInputStream;
 import com.igtimi.IgtimiStream.Msg;
@@ -43,8 +45,18 @@ public interface RiotConnection extends Closeable {
      * <tr><td>GPS ON</td><td>Turns the GPS on</td></tr>
      * </table>
      * See {@link RiotStandardCommand} for convenience commands.
+     * 
+     * @return the log messages received within a 10s duration after having sent the command;
+     * the queue will be filled asynchronously and will typically start out empty. The listener
+     * filling it will be removed after the first 10s, so the queue will not grow indefinitely.
+     * The result can be safely ignored, or the caller may wait up to 10s to collect, display,
+     * forward, or analyze messages.
      */
-    void sendCommand(String command) throws IOException;
+    ConcurrentLinkedQueue<String> sendCommand(String command) throws IOException, InterruptedException, ExecutionException;
 
     TimePoint getLastHeartbeatReceivedAt();
+
+    void enableOverTheAirLog() throws IOException;
+
+    void disableOverTheAirLog() throws IOException;
 }

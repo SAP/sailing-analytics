@@ -1,7 +1,8 @@
 package com.sap.sailing.mongodb.test;
 
-import java.util.HashMap;
 import static org.mockito.Mockito.mock;
+
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;

@@ -1,7 +1,9 @@
 package com.sap.sailing.domain.orc;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,11 +21,10 @@ import org.apache.commons.math.ArgumentOutsideDomainException;
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.MaxIterationsExceededException;
 import org.json.simple.parser.ParseException;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ErrorCollector;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 
@@ -51,11 +52,9 @@ import com.sap.sse.common.impl.DegreeBearingImpl;
  * @author Daniel Lisunkin {i505543)
  *
  */
+@ExtendWith(FailIfNoValidOrcCertificateRule.class)
 public class TestORCPerformanceCurve {
     private static final Logger logger = Logger.getLogger(TestORCPerformanceCurve.class.getName());
-    
-    // set true to see all the differences i
-    private final boolean collectErrors = true;
     
     private static ORCPerformanceCurveCourse alturaCourse;
     private static ORCCertificatesCollection importerLocal;
@@ -64,33 +63,7 @@ public class TestORCPerformanceCurve {
     
     private static final String RESOURCES = "resources/orc/";
     
-    @Rule
-    public FailIfNoValidOrcCertificateRule customFailRule = new FailIfNoValidOrcCertificateRule();
-
-    @Rule
-    public ErrorCollector collector = new ErrorCollector();
-    
-    public void assertEquals(double a, double b, double accuracy) {
-        try {
-            Assert.assertEquals(a, b, accuracy);
-        } catch (AssertionError e) {
-            if (collectErrors) {
-                collector.addError(e);
-            }
-        }
-    }
-    
-    public void assertEquals(String message, double a, double b, double accuracy) {
-        try {
-            Assert.assertEquals(message, a, b, accuracy);
-        } catch (AssertionError e) {
-            if (collectErrors) {
-                collector.addError(e);
-            }
-        }
-    }
-    
-    @BeforeClass
+    @BeforeAll
     public static void initialize() throws IOException, ParseException, DOMException, SAXException,
             ParserConfigurationException, java.text.ParseException {
         List<ORCPerformanceCurveLeg> legs = new ArrayList<>();
@@ -268,7 +241,7 @@ public class TestORCPerformanceCurve {
    }
     
     /**
-     * Tests to make sure, that the structure of the certificate files didn't change and performance curves can be built
+     * Tests to make sure, that the structure of the certificate files didn't change and polar curves can be built
      */
     @FailIfNoValidOrcCertificates
     @Test
@@ -285,15 +258,17 @@ public class TestORCPerformanceCurve {
         final double allowanceAccuracy = 0.1;
         final Distance ONE_NAUTICAL_MILE = new NauticalMileDistance(1.0);
         final ORCCertificate certificateWithSpecificBins = importerWithSpecificBins.getCertificateById("N/A");
+        final List<Executable> assertions = new ArrayList<>();
         for (final Bearing twa : certificateWithSpecificBins.getTrueWindAngles()) {
             final ORCPerformanceCurveCourse singleLegOneMileCourseWithTwa = createSingleLegCourseWithTwa(twa);
             final ORCPerformanceCurve performanceCurveSpecificBins = new ORCPerformanceCurveImpl(certificateWithSpecificBins, singleLegOneMileCourseWithTwa);
             for (final Speed tws : certificateWithSpecificBins.getTrueWindSpeeds()) {
                 final Duration duration = certificateWithSpecificBins.getVelocityPredictionPerTrueWindSpeedAndAngle().get(tws).get(twa).getDuration(ONE_NAUTICAL_MILE);
-                assertEquals("mismatch for twa "+twa+", tws "+tws, duration.asSeconds(), performanceCurveSpecificBins.getAllowancePerCourse(tws).asSeconds(), allowanceAccuracy);
-                assertEquals("mismatch for twa "+twa+", tws "+tws, tws.getKnots(), performanceCurveSpecificBins.getImpliedWind(duration).getKnots(), highAccuracy);
+                assertions.add(()->assertEquals(duration.asSeconds(), performanceCurveSpecificBins.getAllowancePerCourse(tws).asSeconds(), allowanceAccuracy, "mismatch for twa "+twa+", tws "+tws));
+                assertions.add(()->assertEquals(tws.getKnots(), performanceCurveSpecificBins.getImpliedWind(duration).getKnots(), highAccuracy, "mismatch for twa "+twa+", tws "+tws));
             }
         }
+        assertAll(assertions);
     }
     
     private ORCPerformanceCurveCourse createSingleLegCourseWithTwa(Bearing twa) {

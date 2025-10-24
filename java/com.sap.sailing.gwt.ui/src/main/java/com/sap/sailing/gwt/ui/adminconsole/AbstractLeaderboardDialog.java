@@ -70,8 +70,8 @@ public abstract class AbstractLeaderboardDialog<LD extends LeaderboardDescriptor
         return result;
     }
     
-    protected ListBox createSortedRegattaLeaderboardsListBox(Collection<StrippedLeaderboardDTO> existingLeaderboards, String preSelectedRegattaName) {
-        ListBox result = createListBox(false);
+    protected static <T> ListBox createSortedRegattaLeaderboardsListBox(Collection<StrippedLeaderboardDTO> existingLeaderboards, String preSelectedRegattaName, StringMessages stringMessages, DataEntryDialog<T> dialog) {
+        ListBox result = dialog.createListBox(false);
         // sort the regatta names
         List<StrippedLeaderboardDTO> sortedRegattaLeaderboards = new ArrayList<>();
         for (StrippedLeaderboardDTO leaderboard : existingLeaderboards) {

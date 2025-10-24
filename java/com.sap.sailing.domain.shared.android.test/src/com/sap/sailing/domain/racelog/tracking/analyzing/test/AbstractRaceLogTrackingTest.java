@@ -1,6 +1,6 @@
 package com.sap.sailing.domain.racelog.tracking.analyzing.test;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
@@ -21,7 +21,7 @@ public abstract class AbstractRaceLogTrackingTest {
         super();
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         log = new RaceLogImpl("log");
     }

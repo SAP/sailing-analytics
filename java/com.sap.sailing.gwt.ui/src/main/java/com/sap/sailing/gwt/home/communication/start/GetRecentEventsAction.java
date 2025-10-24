@@ -47,7 +47,7 @@ public class GetRecentEventsAction implements SailingAction<ListResult<EventQuic
             public void visit(EventBase event, boolean onRemoteServer, URL baseURL) {
                 EventQuickfinderDTO dto = new EventQuickfinderDTO();
                 dto.setId((UUID) event.getId());
-                dto.setDisplayName(HomeServiceUtil.getEventDisplayName(event, context.getRacingEventService()));
+                dto.setDisplayName(HomeServiceUtil.getEventDisplayName(event));
                 dto.setOnRemoteServer(onRemoteServer);
                 dto.setBaseURL(baseURL == null ? null : baseURL.toString());
                 dto.setStartTimePoint(event.getStartDate());

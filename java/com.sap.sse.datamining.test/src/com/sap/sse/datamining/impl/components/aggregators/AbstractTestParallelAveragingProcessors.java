@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.sap.sse.datamining.components.Processor;
 import com.sap.sse.datamining.impl.components.GroupedDataEntry;
@@ -90,7 +90,7 @@ public abstract class AbstractTestParallelAveragingProcessors<T> {
         return elements;
     }
     
-    @Before
+    @BeforeEach
     public void initializeResultReceivers() {
         @SuppressWarnings("unchecked")
         Processor<Map<GroupKey, T>, Void> receiver = new NullProcessor<Map<GroupKey, T>, Void>((Class<Map<GroupKey, T>>)(Class<?>) Map.class, Void.class) {

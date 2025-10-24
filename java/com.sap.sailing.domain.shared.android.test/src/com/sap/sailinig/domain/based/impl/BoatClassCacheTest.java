@@ -1,10 +1,10 @@
 package com.sap.sailinig.domain.based.impl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.race.analyzing.impl.RaceLogResolver;
 import com.sap.sailing.domain.base.BoatClass;
@@ -22,7 +22,7 @@ import com.sap.sailing.domain.common.BoatClassMasterdata;
 public class BoatClassCacheTest {
     private SharedDomainFactory<RaceLogResolver> sharedDomainFactory;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         sharedDomainFactory = new SharedDomainFactoryImpl<>(/* raceLogResolver */ null);
     }
@@ -70,7 +70,7 @@ public class BoatClassCacheTest {
     public void testEssMayHaveNonUpwindStart() {
         for (final String boatClassName : new String[] { "extreme40", "ess", "ess40" }) {
             final BoatClass ess40 = sharedDomainFactory.getOrCreateBoatClass(boatClassName);
-            assertFalse("Boat class "+boatClassName+" expected to allow for non-upwind starts", ess40.typicallyStartsUpwind());
+            assertFalse(ess40.typicallyStartsUpwind(), "Boat class "+boatClassName+" expected to allow for non-upwind starts");
         }
     }
 }

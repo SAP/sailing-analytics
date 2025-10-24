@@ -10,6 +10,10 @@ Fragment-Host: com.sap.sailing.domain.swisstimingreplayadapter
 Import-Package: org.json.simple,
  org.json.simple.parser
 Require-Bundle: com.sap.sailing.domain.test,
- org.junit;bundle-version="4.8.2",
+ junit-jupiter-api;bundle-version="5.11.3",
+ junit-jupiter-engine;bundle-version="5.11.3",
+ junit-platform-commons;bundle-version="1.11.3",
+ junit-platform-engine;bundle-version="1.11.3",
+ org.opentest4j;bundle-version="1.3.0",
  com.sap.sse.common,
  org.mockito.mockito-core;bundle-version="1.10.14"

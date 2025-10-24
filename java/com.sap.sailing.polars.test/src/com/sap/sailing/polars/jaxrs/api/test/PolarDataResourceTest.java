@@ -10,8 +10,8 @@ import java.util.logging.Logger;
 
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.json.simple.parser.ParseException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.BoatClass;
 import com.sap.sailing.domain.base.DomainFactory;
@@ -31,7 +31,7 @@ public class PolarDataResourceTest {
     private PolarDataServiceImpl polarService;
     private DomainFactory domainFactory;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException, ParseException, ClassNotFoundException, InterruptedException {
         polarService = new PolarDataServiceImpl();
         domainFactory = new DomainFactoryImpl(/* raceLogResolver */ null);

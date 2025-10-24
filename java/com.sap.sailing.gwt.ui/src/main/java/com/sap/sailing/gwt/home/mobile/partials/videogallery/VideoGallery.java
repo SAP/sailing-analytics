@@ -12,6 +12,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.sap.sailing.gwt.home.mobile.partials.section.MobileSection;
 import com.sap.sailing.gwt.home.mobile.partials.sectionHeader.SectionHeaderContent;
 import com.sap.sailing.gwt.ui.client.StringMessages;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 import com.sap.sse.gwt.client.media.VideoDTO;
 
 public class VideoGallery extends Composite {
@@ -31,7 +32,6 @@ public class VideoGallery extends Composite {
         initWidget(mobileSection = uiBinder.createAndBindUi(this));
         sectionHeaderUi.setSectionTitle(StringMessages.INSTANCE.videos());
         sectionHeaderUi.initCollapsibility(mobileSection.getContentContainerElement(), true);
-
         sectionHeaderUi.addManageButtonClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
@@ -41,11 +41,11 @@ public class VideoGallery extends Composite {
         });
     }
 
-    public void setVideos(Collection<? extends VideoDTO> videos, Consumer<VideoDTO> deleteVideo) {
+    public void setVideos(Collection<? extends VideoDTO> videos, Consumer<VideoDTO> deleteVideo, TakedownNoticeService takedownNoticeService, String eventName) {
         sectionHeaderUi.setInfoText(StringMessages.INSTANCE.videosCount(videos.size()));
         mobileSection.clearContent();
         for (VideoDTO video : videos) {
-            mobileSection.addContent(new VideoGalleryVideo(video, deleteVideo));
+            mobileSection.addContent(new VideoGalleryVideo(video, deleteVideo, takedownNoticeService, eventName));
         }
     }
 

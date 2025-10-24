@@ -97,7 +97,7 @@ public class PeerImpl<O extends Operation<S>, S> implements Peer<O, S> {
     }
     
     @Override
-    public void finalize() {
+    public void shutdown() {
 	merger.shutdown();
     }
 

@@ -1,10 +1,10 @@
 package com.sap.sailing.server.trackfiles.test;
 
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.io.InputStream;
@@ -20,7 +20,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
 import com.sap.sailing.domain.abstractlog.race.RaceLog;
@@ -199,8 +199,8 @@ public class JumpyTrackSmootheningTest {
             assertNotNull(markPassings);
             assertEquals(13, markPassings.size());
         }
-        assertTrue("Expected duration for mark passing analysis on adjusted track to be at least eight times less than for original track",
-                durationForAdjustedTrack.times(8).compareTo(durationForOriginalTrack) < 0);
+        assertTrue(durationForAdjustedTrack.times(8).compareTo(durationForOriginalTrack) < 0,
+                "Expected duration for mark passing analysis on adjusted track to be at least eight times less than for original track");
     }
     
     private DynamicGPSFixTrack<Competitor, GPSFixMoving> readTrack(String filename) throws Exception {
@@ -340,8 +340,8 @@ public class JumpyTrackSmootheningTest {
         final Pair<Integer, DynamicGPSFixTrack<Competitor, GPSFixMoving>> numberOfInconsistenciesAndReplacedTrack = new OutlierFilter().findAndRemoveInconsistenciesOnRawFixes(track);
         assertTrue(numberOfInconsistenciesAndReplacedTrack.getA() > maximumNumberOfOutliersAllowed);
         final int actualNumberOfOutliers = getNumberOfFixesWithInconsistentCogSog(numberOfInconsistenciesAndReplacedTrack.getB());
-        assertTrue("Expected number of inconsistencies to be less than or equal to "+maximumNumberOfOutliersAllowed+" but was "+actualNumberOfOutliers,
-                actualNumberOfOutliers <= maximumNumberOfOutliersAllowed);
+        assertTrue(actualNumberOfOutliers <= maximumNumberOfOutliersAllowed,
+                "Expected number of inconsistencies to be less than or equal to "+maximumNumberOfOutliersAllowed+" but was "+actualNumberOfOutliers);
     }
     
     /**

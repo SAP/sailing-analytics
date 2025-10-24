@@ -1,16 +1,18 @@
 package com.sap.sailing.domain.orc;
 
+import java.lang.reflect.AnnotatedElement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.StreamSupport;
 
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 import com.sap.sailing.domain.common.orc.ORCCertificate;
 import com.sap.sailing.domain.orc.ORCPublicCertificateDatabase.CertificateHandle;
@@ -19,7 +21,7 @@ import com.sap.sailing.domain.orc.impl.ORCPublicCertificateDatabaseImpl;
 import com.sap.sse.common.Util;
 
 /***
- * A IgnoreInvalidOrcCerticatesRule is an implementation of TestRule. This class execution depends on
+ * An {@link IgnoreInvalidOrcCerticatesRule} execution depends on
  * {@link FailIfNoValidOrcCertificates} annotation on any method in a test class containing
  * {@link org.junit.rules.TestRule} annotation with current class implementation. When any test class added
  * {@link FailIfNoValidOrcCertificateRule} rule then before executing all of it's test method, Junit will execute the
@@ -34,7 +36,7 @@ import com.sap.sse.common.Util;
  *
  */
 
-public class FailIfNoValidOrcCertificateRule implements TestRule {
+public class FailIfNoValidOrcCertificateRule implements BeforeTestExecutionCallback {
     private static final Logger logger = Logger.getLogger(FailIfNoValidOrcCertificateRule.class.getName());
     private static final int NUMBER_OF_CERTIFICATES_TO_PROBE = 3;
     
@@ -70,37 +72,19 @@ public class FailIfNoValidOrcCertificateRule implements TestRule {
         logger.info("FailIfNoValidOrcCertificateRule created");
     }
 
-    public Collection<ORCCertificate> getAvailableCerts() {
+    public static Collection<ORCCertificate> getAvailableCerts() {
         return Collections.unmodifiableCollection(availableCerts);
     }
-
+    
     @Override
-    public Statement apply(Statement base, Description description) {
-        return new IgnorableStatement(base, description);
-    }
-
-    private class IgnorableStatement extends Statement {
-        private final Statement base;
-        private final Description description;
-
-        public IgnorableStatement(Statement base, Description description) {
-            this.base = base;
-            this.description = description;
-        }
-        
-        /***
-         * This method executes for every test case having {@link TestRule} annotation of
-         * {@link FailIfNoValidOrcCertificateRule} class. Assume statement at the end of this method evaluates whether
-         * the test method will execute or be ignored.
-         */
-        @Override
-        public void evaluate() throws Throwable {
-            FailIfNoValidOrcCertificates annotation = description.getAnnotation(FailIfNoValidOrcCertificates.class);
-            if (annotation == null || certificateExists) {
-                base.evaluate();
-            } else if (annotation != null) {
-                logger.warning("No certificates found. Are we at the beginning of a new year (January)? Then this may be okay. Otherwise, please check what's up!");
-            }
+    public void beforeTestExecution(ExtensionContext context) {
+        Optional<AnnotatedElement> testElement = context.getElement();
+        final boolean hasAnnotation = testElement
+                .map(el -> el.isAnnotationPresent(FailIfNoValidOrcCertificates.class))
+                .orElse(false);
+        if (hasAnnotation && !certificateExists) {
+            logger.warning("No certificates found. Are we at the beginning of a new year (January)? Then this may be okay. Otherwise, please check what's up!");
+            Assumptions.assumeTrue(false, "Skipping test: no valid ORC certificates found.");
         }
     }
 }

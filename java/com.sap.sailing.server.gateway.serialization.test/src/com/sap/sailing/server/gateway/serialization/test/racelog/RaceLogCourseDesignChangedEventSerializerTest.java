@@ -1,13 +1,13 @@
 package com.sap.sailing.server.gateway.serialization.test.racelog;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.UUID;
 
 import org.json.simple.JSONObject;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
@@ -53,7 +53,7 @@ public class RaceLogCourseDesignChangedEventSerializerTest {
     private TimePoint now;
     private AbstractLogEventAuthor author = new LogEventAuthorImpl("Test Author", 1);
 
-    @Before
+    @BeforeEach
     public void setUp() {
         SharedDomainFactory<?> factory = DomainFactory.INSTANCE;
         serializer = new RaceLogCourseDesignChangedEventSerializer(CompetitorJsonSerializer.create(), new CourseBaseJsonSerializer(
@@ -99,8 +99,8 @@ public class RaceLogCourseDesignChangedEventSerializerTest {
     protected void compareCourseData(CourseBase serializedCourse, CourseBase deserializedCourse) {
         assertEquals(serializedCourse.getFirstWaypoint().getPassingInstructions(), PassingInstruction.None);
         assertEquals(deserializedCourse.getFirstWaypoint().getPassingInstructions(), PassingInstruction.None);
-        Assert.assertTrue(serializedCourse.getFirstWaypoint().getControlPoint() instanceof ControlPointWithTwoMarks);
-        Assert.assertTrue(deserializedCourse.getFirstWaypoint().getControlPoint() instanceof ControlPointWithTwoMarks);
+        Assertions.assertTrue(serializedCourse.getFirstWaypoint().getControlPoint() instanceof ControlPointWithTwoMarks);
+        Assertions.assertTrue(deserializedCourse.getFirstWaypoint().getControlPoint() instanceof ControlPointWithTwoMarks);
 
         ControlPointWithTwoMarks serializedGate = (ControlPointWithTwoMarks) serializedCourse.getFirstWaypoint().getControlPoint();
         ControlPointWithTwoMarks deserializedGate = (ControlPointWithTwoMarks) deserializedCourse.getFirstWaypoint().getControlPoint();
@@ -111,8 +111,8 @@ public class RaceLogCourseDesignChangedEventSerializerTest {
 
         assertEquals(serializedCourse.getLastWaypoint().getPassingInstructions(), PassingInstruction.Port);
         assertEquals(deserializedCourse.getLastWaypoint().getPassingInstructions(), PassingInstruction.Port);
-        Assert.assertTrue(serializedCourse.getLastWaypoint().getControlPoint() instanceof Mark);
-        Assert.assertTrue(deserializedCourse.getLastWaypoint().getControlPoint() instanceof Mark);
+        Assertions.assertTrue(serializedCourse.getLastWaypoint().getControlPoint() instanceof Mark);
+        Assertions.assertTrue(deserializedCourse.getLastWaypoint().getControlPoint() instanceof Mark);
 
         Mark serializedMark = (Mark) serializedCourse.getLastWaypoint().getControlPoint();
         Mark deserializedMark = (Mark) deserializedCourse.getLastWaypoint().getControlPoint();

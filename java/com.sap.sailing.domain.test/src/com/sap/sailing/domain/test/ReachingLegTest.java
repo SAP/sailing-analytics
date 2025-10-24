@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Boat;
 import com.sap.sailing.domain.base.Competitor;
@@ -74,7 +74,7 @@ public class ReachingLegTest extends TrackBasedTest {
      * Creates the race and two competitors ({@link #plattner} and {@link #hunger}) and sets the start line passing for both of them
      * to {@link #start}.
      */
-    @Before
+    @BeforeEach
     public void setUp() {
         competitorsAndBoats = new LinkedHashMap<>();
         hunger = createCompetitorWithBoat("Wolfgang Hunger"); 

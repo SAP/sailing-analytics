@@ -1,6 +1,6 @@
 package com.sap.sailing.gwt.home.communication.eventview;
 
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
+import com.sap.sse.gwt.shared.DTO;
 
 public class RegattaReferenceDTO implements DTO, Comparable<RegattaReferenceDTO> {
     private String id;

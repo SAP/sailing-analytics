@@ -2,6 +2,7 @@ package com.sap.sse.security;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.shiro.authc.AuthenticationException;
@@ -49,7 +50,7 @@ public class BearerTokenRealm extends AbstractCompositeAuthorizingRealm {
                 logger.warning("Cannot check whether client IP/User-Agent is locked for bearer token-based authentication; security service not found");
             }
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error retrieving security service", e);
         }
         final User user = getUserStore().getUserByAccessToken(accessToken.getCredentials());
         if (user == null) {

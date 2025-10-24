@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.sap.sse.gwt.shared.DTO;
+
 public class SortedSetResult<T extends DTO> implements CollectionResult<T> {
     private TreeSet<T> values = new TreeSet<>();
     

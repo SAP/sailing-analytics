@@ -1,10 +1,10 @@
 package com.sap.sailing.domain.swisstimingreplayadapter.test;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.io.ByteArrayInputStream;
@@ -15,8 +15,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Boat;
 import com.sap.sailing.domain.base.Competitor;
@@ -78,7 +78,7 @@ public class SwissTimingReplayAdapterServiceTest {
         assertEquals(321920, replayCountListener.rankingMarkCount);                
     }
 
-    @Ignore("SwissTiming has shut down the ota2.sportresult.com server around 2020-11-13")
+    @Disabled("SwissTiming has shut down the ota2.sportresult.com server around 2020-11-13")
     @Test
     public void testRaceData_SAW005905_20120805_EqualsOnlineVersion() throws Exception {
         byte[] localCopy = read(getClass().getResourceAsStream("/SAW005905.20120805.replay"));

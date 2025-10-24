@@ -22,6 +22,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.user.client.Window;
+import com.sap.sailing.domain.common.RaceIdentifier;
 import com.sap.sailing.domain.common.dto.TagDTO;
 import com.sap.sailing.gwt.settings.client.raceboard.RaceBoardPerspectiveOwnSettings;
 import com.sap.sailing.gwt.ui.client.GwtUrlHelper;
@@ -29,6 +30,9 @@ import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.gwt.ui.raceboard.tagging.TaggingComponent.State;
 import com.sap.sailing.gwt.ui.raceboard.tagging.TaggingPanelResources.TagPanelStyle;
 import com.sap.sse.gwt.client.dialog.ConfirmationDialog;
+import com.sap.sse.gwt.client.media.TakedownNoticeRequestDialog;
+import com.sap.sse.gwt.common.CommonSharedResources;
+import com.sap.sse.gwt.common.CommonSharedResources.CommonMainCss;
 import com.sap.sse.security.ui.client.UserService;
 
 /**
@@ -60,8 +64,6 @@ public class TagCell extends AbstractCell<TagDTO> {
          * @param content
          *            available configurations are {@link #contentWithCommentWithImage},
          *            {@link #contentWithCommentWithoutImage} and {@link #contentWithoutCommentWithImage}.
-         * @param shareButton
-         * @param content2
          * @return {@link SafeHtml HTML template}
          */
         @Template("<div class='{0}'><div class='{1}'>{3}{4}{5}</div><div class='{2}'>{6}</div>{7}</div>")
@@ -70,16 +72,16 @@ public class TagCell extends AbstractCell<TagDTO> {
 
         /**
          * Renders content with maximal configuration (comment and image).
-         * 
          * @param imageURL
          *            image URL
          * @param comment
          *            comment
          * @return {@link SafeHtml HTML template}
          */
-        @Template("<div class='{0}'><img src='{2}'/></div><div class='{1}'>{3}</div>")
+        @Template("<div class='{0}'><div class='{5}'><img src='{2}'/><div class='{4}' takedown-contextDescriptionMessageParameter='{7}' takedown-contentUrl='{6}' takedown-username='{8}' onclick=\"showTakedownNoticeRequestDialog('takedownRequestForImageInTagColumn', this.getAttribute('takedown-contextDescriptionMessageParameter'), this.getAttribute('takedown-contentUrl'), this.getAttribute('takedown-username'))\">⋯</div></div></div><div class='{1}'>{3}</div>")
         SafeHtml contentWithCommentWithImage(String classTagImage, String classTagComment, SafeUri imageURL,
-                SafeHtml comment);
+                SafeHtml comment, String classMenuIcon, String classMediaWrapper, String imageUrlAsSanitizedString,
+                String takedownNoticeContext, String username);
 
         /**
          * Renders content with mixed configuration (comment, no image).
@@ -93,13 +95,13 @@ public class TagCell extends AbstractCell<TagDTO> {
 
         /**
          * Renders content with mixed configuration (image, no comment).
-         * 
          * @param imageURL
          *            image URL
          * @return {@link SafeHtml HTML template}
          */
-        @Template("<div class='{0}'><img src='{1}'/></div>")
-        SafeHtml contentWithoutCommentWithImage(String classTagImage, SafeUri imageURL);
+        @Template("<div class='{0}'><div class='{3}'><img src='{1}'/><div class='{2}' takedown-contextDescriptionMessageParameter='{5}' takedown-contentUrl='{4}' takedown-username='{6}' onclick=\"showTakedownNoticeRequestDialog('takedownRequestForImageInTagColumn', this.getAttribute('takedown-contextDescriptionMessageParameter'), this.getAttribute('takedown-contentUrl'), this.getAttribute('takedown-username'))\">⋯</div></div></div>")
+        SafeHtml contentWithoutCommentWithImage(String classTagImage, SafeUri imageURL, String classMenuIcon,
+                String classMediaWrapper, String imageUrlAsSanitizedString, String takedownNoticeContext, String username);
 
         /**
          * Renders heading buttons to share, edit or delete a tag.
@@ -134,11 +136,13 @@ public class TagCell extends AbstractCell<TagDTO> {
     private final TagCellTemplate tagCellTemplate = GWT.create(TagCellTemplate.class);
     private final TaggingPanelResources resources = TaggingPanelResources.INSTANCE;
     private final TagPanelStyle style = resources.style();
+    private final CommonMainCss sharedResources = CommonSharedResources.INSTANCE.mainCss();
 
     private final TaggingComponent taggingComponent;
     private final StringMessages stringMessages;
     private final UserService userService;
     private final boolean isPreviewCell;
+    private final RaceIdentifier raceIdentifier;
 
     /**
      * Displays the content of a {@link TagDTO tag} by using {@link SafeHtmlTemplates}.
@@ -148,13 +152,16 @@ public class TagCell extends AbstractCell<TagDTO> {
      * @param isPreviewCell
      *            should be <code>true</code> if {@link TagCell cell} is used as {@link TagPreviewPanel preview cell},
      *            otherwise <code>false</code>
+     * @param raceIdentifier used to construct take-down notice text
      */
-    TagCell(TaggingComponent taggingComponent, StringMessages stringMessages, UserService userService, boolean isPreviewCell) {
+    TagCell(TaggingComponent taggingComponent, StringMessages stringMessages, UserService userService, boolean isPreviewCell, RaceIdentifier raceIdentifier) {
         super("click");
         this.taggingComponent = taggingComponent;
         this.stringMessages = stringMessages;
         this.userService = userService;
         this.isPreviewCell = isPreviewCell;
+        this.raceIdentifier = raceIdentifier;
+        sharedResources.ensureInjected();
     }
 
     /**
@@ -183,10 +190,19 @@ public class TagCell extends AbstractCell<TagDTO> {
         if (!tag.getComment().isEmpty() && trustedImageURL == null) {
             content = tagCellTemplate.contentWithCommentWithoutImage(style.tagCellComment(), safeComment);
         } else if (tag.getComment().isEmpty() && trustedImageURL != null) {
-            content = tagCellTemplate.contentWithoutCommentWithImage(style.tagCellImage(), trustedImageURL);
+            TakedownNoticeRequestDialog.ensureJSFunctionInstalled(userService);
+            content = tagCellTemplate.contentWithoutCommentWithImage(style.tagCellImage(), trustedImageURL,
+                    sharedResources.media_menu_icon(), sharedResources.media_wrapper(),
+                    new SafeHtmlBuilder().appendEscaped(trustedImageURL.asString()).toSafeHtml().asString(),
+                    tag.getTag()+", "+tag.getRaceTimepoint()+", "+raceIdentifier,
+                    userService.getCurrentUser() == null ? "" : userService.getCurrentUser().getName());
         } else if (!tag.getComment().isEmpty() && trustedImageURL != null) {
+            TakedownNoticeRequestDialog.ensureJSFunctionInstalled(userService);
             content = tagCellTemplate.contentWithCommentWithImage(style.tagCellImage(), style.tagCellComment(),
-                    trustedImageURL, safeComment);
+                    trustedImageURL, safeComment, sharedResources.media_menu_icon(), sharedResources.media_wrapper(),
+                    new SafeHtmlBuilder().appendEscaped(trustedImageURL.asString()).toSafeHtml().asString(),
+                    tag.getTag()+", "+tag.getRaceTimepoint()+", "+raceIdentifier+", "+Window.Location.createUrlBuilder().buildString(),
+                    userService.getCurrentUser() == null ? "" : userService.getCurrentUser().getName());
         }
         SafeHtml icon = SafeHtmlUtils.EMPTY_SAFE_HTML;
         if (!tag.isVisibleForPublic()) {
@@ -211,9 +227,7 @@ public class TagCell extends AbstractCell<TagDTO> {
                     editButton = tagCellTemplate.button(style.tagActionButton() + " " + style.tagEditButton(),
                             stringMessages.tagEditTag(), tagCellTemplate.icon(resources.editIcon().getSafeUri()));
                 }
-                if (tag.getUsername().equals(userService.getCurrentUser().getName())
-                        // FIXME doesn't work with permission-vertical anymore
-                        /* || userService.getCurrentUser().hasRole("admin") */) {
+                if (tag.getUsername().equals(userService.getCurrentUser().getName())) {
                     deleteButton = tagCellTemplate.button(style.tagActionButton() + " " + style.tagDeleteButton(),
                             stringMessages.tagDeleteTag(), tagCellTemplate.icon(resources.deleteIcon().getSafeUri()));
                 }

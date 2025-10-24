@@ -53,6 +53,7 @@ Precious::App.set(:gollum_path, gollum_path)
 Precious::App.set(:wiki_options, wiki_options)
 Precious::App.set(:authorized_users, YAML.load_file(File.expand_path('users.yml', File.expand_path(File.dirname(__FILE__)))))
 Precious::App.set(:loggedInUser, "anonymous");
+Precious::App.set(:loggedInUserEmail, "wiki@sapsailing.com");
 App.set(:default_markup, :markdown) # set your favorite markup language
 run App
 

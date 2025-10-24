@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.components.Processor;
 import com.sap.sse.datamining.impl.components.GroupedDataEntry;
@@ -21,7 +21,7 @@ public class TestParallelGroupedDataCollectingAsSetProcessor {
     private Collection<Processor<Map<GroupKey, HashSet<Double>>, ?>> receivers;
     private Map<GroupKey, HashSet<Double>> receivedData = null;
     
-    @Before
+    @BeforeEach
     public void initializeReceivers() {
         @SuppressWarnings("unchecked")
         Processor<Map<GroupKey, HashSet<Double>>, Void> receiver = new NullProcessor<Map<GroupKey, HashSet<Double>>, Void>((Class<Map<GroupKey, HashSet<Double>>>)(Class<?>) Map.class, Void.class) {

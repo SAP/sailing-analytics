@@ -57,8 +57,10 @@ public class TrueNorthIndicatorPanel extends FlowPanel {
     public void toggle() {
         RaceMapSettings oldRaceMapSettings = map.getSettings();
         boolean newWindUpSettings = !oldRaceMapSettings.isWindUp();
-        final RaceMapSettings newRaceMapSettings = new RaceMapSettings.RaceMapSettingsBuilder(securedDTO, paywallResolver)
-                .withWindUp(newWindUpSettings).build();
+        final RaceMapSettings newRaceMapSettings = new RaceMapSettings.RaceMapSettingsBuilder(oldRaceMapSettings, securedDTO, paywallResolver)
+                .withWindUp(newWindUpSettings)
+                .withShowSatelliteLayer(oldRaceMapSettings.isShowSatelliteLayer() && !newWindUpSettings)
+                .build();
         if (map.getComponentContext() != null && map.getComponentContext().isStorageSupported(map)) {
             map.getComponentContext().storeSettingsForContext(map, newRaceMapSettings,
                     new DummyOnSettingsStoredCallback());

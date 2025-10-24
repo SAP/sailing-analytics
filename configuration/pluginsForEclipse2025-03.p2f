@@ -1,0 +1,163 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?p2f version='1.0.0'?>
+<p2f version='1.0.0'>
+  <ius size='3'>
+    <!-- These Mylyn extension are needed to get back the md editor in 2022-06. The editor is added back in the next release. Then these two can be removed -->
+    <iu id='org.eclipse.mylyn.wikitext.editors_feature.feature.group' name='Mylyn WikiText Editors' version='3.0.42.202201072301'>
+      <repositories size='1'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.wikitext_feature.group' name='Mylyn WikiText' version='3.0.42.202201072301'>
+      <repositories size='1'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+      </repositories>
+    </iu>
+
+    <!-- Quartz is needed to make eclipse aware of the repository so that lucene can be found. 
+          Lucene is needed for the mylyn Tasks SDk. The SDK is needed for the MyLyn tasks list. 
+          As of writing 2022-07-12 the dependencies are not correct so that a manual installation is needed. -->
+    <iu id='org.quartz' name='Quartz Scheduler' version='1.8.3.v20110329-1420'>
+      <repositories size='1'>
+        <repository location='https://download.eclipse.org/tools/orbit/downloads/drops/R20190602212107/repository'/>
+      </repositories>
+    </iu>
+    <iu id='org.apache.lucene.core' name='Lucene Core' version='7.1.0.v20171214-1510'>
+      <repositories size='1'>
+        <repository location='https://download.eclipse.org/tools/orbit/downloads/drops/R20190602212107/repository'/>
+      </repositories>
+    </iu>
+
+    <!-- multiple Plugins needed for the development -->
+    <iu id='com.gwtplugins.eclipse.suite.v3.feature.feature.group' name='GWT Eclipse Plugin' version='4.0.0.202302020242'>
+      <repositories size='1'>
+        <repository location='https://plugins.gwtproject.org/eclipse/gwt-eclipse-plugin/4.0.0'/>
+      </repositories>
+    </iu>
+    <iu id='com.oracle.jmc.feature.ide.feature.group' name='Oracle Java Mission Control IDE Integration'>
+      <repositories size='1'>
+        <repository location='http://download.oracle.com/technology/products/missioncontrol/updatesites/base/6.0.0/eclipse'/>
+      </repositories>
+    </iu>
+    <iu id='de.anbos.eclipse.easyshell.feature.feature.group' name='EasyShell'>
+      <repositories size='1'>
+        <repository location='http://anb0s.github.io/EasyShell'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mat.feature.feature.group' name='Memory Analyzer'>
+      <repositories size='1'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mat.chart.feature.feature.group' name='Memory Analyzer (Charts) [optional]'>
+      <repositories size='1'>
+        <repository location='https://download.eclipse.org/releases/latest'/>
+      </repositories>
+    </iu>
+    <iu id='com.sap.jvm.profiling.feature.group' name='SAP JVM Tools'>
+      <repositories size='1'>
+        <repository location='https://tools.hana.ondemand.com/oxygen'/>
+      </repositories>
+    </iu>
+    <iu id='umlet-eclipse-feature.feature.group' name='UMLet Eclipse Plugin'>
+      <repositories size='1'>
+        <repository location='https://www.umlet.com/umlet_latest/repository/'/>
+      </repositories>
+    </iu>
+    <iu id='org.sf.feeling.decompiler.feature.group' name='Enhanced Class Decompiler (Core)'>
+      <repositories size='1'>
+        <repository location='https://ecd-plugin.github.io/update'/>
+      </repositories>
+    </iu>
+    <iu id='org.sf.feeling.decompiler.cfr.feature.group' name='Enhanced Class Decompiler CFR Extension (Optional)'>
+      <repositories size='1'>
+        <repository location='https://ecd-plugin.github.io/update'/>
+      </repositories>
+    </iu>
+    <iu id='org.sf.feeling.decompiler.jd.feature.group' name='Enhanced Class Decompiler JD-Core Extension (Optional)'>
+      <repositories size='1'>
+        <repository location='https://ecd-plugin.github.io/update'/>
+      </repositories>
+    </iu>
+    <iu id='org.sf.feeling.decompiler.procyon.feature.group' name='Enhanced Class Decompiler Procyon Extension (Optional)'>
+      <repositories size='1'>
+        <repository location='https://ecd-plugin.github.io/update'/>
+      </repositories>
+    </iu>
+    <iu id='javax.xml.bind' name='XML Binding for Java' >
+      <repositories size='1'>
+        <repository location='http://download.eclipse.org/mylyn/releases/latest'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.hudson.feature.group' name='Mylyn Builds Connector: Hudson/Jenkins'>
+      <repositories size='1'>
+        <repository location='http://download.eclipse.org/mylyn/releases/latest'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.java_feature.feature.group' name='Mylyn Context Connector: Java Development'>
+      <repositories size='1'>
+        <repository location='http://download.eclipse.org/mylyn/releases/latest'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.pde_feature.feature.group' name='Mylyn Context Connector: Plug-in Development'>
+      <repositories size='1'>
+        <repository location='http://download.eclipse.org/mylyn/releases/latest'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn_feature.feature.group' name='Mylyn Task List'>
+      <repositories size='1'>
+        <repository location='http://download.eclipse.org/mylyn/releases/latest'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.bugzilla_feature.feature.group' name='Mylyn Task Connector: Bugzilla'>
+      <repositories size='1'>
+        <repository location='http://download.eclipse.org/mylyn/releases/latest'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.git.feature.group' name='Mylyn Versions Connector: Git'>
+      <repositories size='1'>
+        <repository location='http://download.eclipse.org/mylyn/releases/latest'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.tasks.ide.feature.group' name='Mylyn Tasks Connector: Eclipse IDE'>
+      <repositories size='1'>
+        <repository location='http://download.eclipse.org/mylyn/releases/latest'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.sdk_feature.feature.group' name='Mylyn Tasks SDK'>
+      <repositories size='1'>
+        <repository location='http://download.eclipse.org/mylyn/releases/latest'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.commons.feature.group' name='Mylyn Commons'>
+      <repositories size='1'>
+        <repository location='http://download.eclipse.org/mylyn/releases/latest'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.mylyn.commons.sdk.feature.group' name='Mylyn Commons SDK'>
+      <repositories size='1'>
+        <repository location='http://download.eclipse.org/mylyn/releases/latest'/>
+      </repositories>
+    </iu>
+    <iu id='com.github.sdbg.feature.feature.group' name='JavaScript Debugger with Source Mapping Support'>
+      <repositories size='1'>
+        <repository location='https://p2.sapsailing.com/p2/sdbg'/>
+      </repositories>
+    </iu>
+    <iu id='com.amazonaws.eclipse.core.feature.feature.group' name='AWS Toolkit for Eclipse Core (Required)'>
+      <repositories size='1'>
+        <repository location='http://aws.amazon.com/eclipse/site.xml'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.jst.ws.axis2tools.feature.feature.group' name='Axis2 Tools'>
+      <repositories size='1'>
+          <repository location='http://download.eclipse.org/webtools/updates/'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.wst.jsdt.feature.feature.group' name='JavaScript Developer Tools'>
+      <repositories size='1'>
+        <repository location='http://download.eclipse.org/webtools/updates/'/>
+      </repositories>
+    </iu>
+  </ius>
+</p2f>

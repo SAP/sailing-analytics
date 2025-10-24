@@ -14,6 +14,7 @@ import com.sap.sailing.gwt.home.shared.utils.Countdown;
 import com.sap.sailing.gwt.home.shared.utils.Countdown.CountdownListener;
 import com.sap.sailing.gwt.home.shared.utils.Countdown.RemainingTime;
 import com.sap.sailing.gwt.ui.shared.EventDTO;
+import com.sap.sailing.gwt.ui.shared.SailingImageDTO;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.common.media.MediaTagConstants;
 import com.sap.sse.gwt.client.media.ImageDTO;
@@ -81,9 +82,9 @@ public class IdlePreEventPresenterImpl extends AutoPlayPresenterConfigured<IdleP
     }
 
     protected void updateEventImage() {
-        List<ImageDTO> teaserHighlight = new ArrayList<>();
-        List<ImageDTO> bigScreenImages = new ArrayList<>();
-        for (ImageDTO imageDTO : getSlideCtx().getEvent().getImages()) {
+        List<SailingImageDTO> teaserHighlight = new ArrayList<>();
+        List<SailingImageDTO> bigScreenImages = new ArrayList<>();
+        for (SailingImageDTO imageDTO : getSlideCtx().getEvent().getImages()) {
             if (imageDTO.getTags().contains(MediaTagConstants.BIGSCREEN.getName())) {
                 bigScreenImages.add(imageDTO);
             } else if (imageDTO.getTags().contains(MediaTagConstants.TEASER.getName())) {
@@ -92,7 +93,7 @@ public class IdlePreEventPresenterImpl extends AutoPlayPresenterConfigured<IdleP
                 teaserHighlight.add(imageDTO);
             }
         }
-        List<ImageDTO> usedImages;
+        List<SailingImageDTO> usedImages;
         if (bigScreenImages.isEmpty()) {
             if (teaserHighlight.isEmpty()) {
                 usedImages = getSlideCtx().getEvent().getImages();

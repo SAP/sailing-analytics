@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
 import com.sap.sailing.domain.abstractlog.race.RaceLog;
@@ -70,7 +70,7 @@ public class CompetitorProviderCacheInvalidationTest extends AbstractLeaderboard
     private List<Competitor>[] compLists = (List<Competitor>[]) new List<?>[NUMBER_OF_COMP_LISTS];
     private Map<Competitor, Boat> boats = new HashMap<>();
     
-    @Before
+    @BeforeEach
     public void setUp() {
         final CourseAreaImpl courseArea = new CourseAreaImpl(
                 "Test Course Area", UUID.randomUUID(), /* centerPosition */ null, /* radius */ null);

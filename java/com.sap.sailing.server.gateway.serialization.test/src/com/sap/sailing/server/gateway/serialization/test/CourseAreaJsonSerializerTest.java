@@ -1,14 +1,14 @@
 package com.sap.sailing.server.gateway.serialization.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.UUID;
 
 import org.json.simple.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.CourseArea;
 import com.sap.sailing.server.gateway.serialization.impl.CourseAreaJsonSerializer;
@@ -21,7 +21,7 @@ public class CourseAreaJsonSerializerTest {
     protected CourseArea courseArea;
     protected CourseAreaJsonSerializer serializer;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         courseArea = mock(CourseArea.class);
         serializer = new CourseAreaJsonSerializer();

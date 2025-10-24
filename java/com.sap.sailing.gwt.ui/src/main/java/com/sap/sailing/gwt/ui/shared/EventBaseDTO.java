@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import com.sap.sailing.gwt.ui.client.shared.SailingVideoDTO;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.WithID;
 import com.sap.sse.common.media.ImageSize;
@@ -38,8 +39,8 @@ public class EventBaseDTO extends NamedDTO implements WithID, IsSerializable {
     private List<? extends LeaderboardGroupBaseDTO> leaderboardGroups;
     private String officialWebsiteURL;
     private Map<String, String> sailorsInfoWebsiteURLs;
-    private List<ImageDTO> images = new ArrayList<>();
-    private List<VideoDTO> videos = new ArrayList<>();
+    private List<SailingImageDTO> images = new ArrayList<>();
+    private List<SailingVideoDTO> videos = new ArrayList<>();
 
     /**
      * For the image URL keys holds the sizes of these images if known. An image size is "known" by this object if it
@@ -185,27 +186,52 @@ public class EventBaseDTO extends NamedDTO implements WithID, IsSerializable {
         this.isOnRemoteServer = isOnRemoteServer;
     }
 
-    public void addImage(ImageDTO image) {
-        images.add(image);
+    /**
+     * Constructs a new {@link SailingImageDTO} from the {@code image}, using this event's data to construct
+     * the required {@link SailingImageDTO#getEventLink() event link}. The new object which is then also part
+     * of the result of {@link #getImages()} is returned and must be used during {@link #removeImage(SailingImageDTO)}
+     * when trying to again remove the image added.
+     */
+    public SailingImageDTO addImage(ImageDTO image) {
+        final SailingImageDTO result = new SailingImageDTO(getEventLink(), image);
+        images.add(result);
+        return result;
     }
 
-    public boolean removeImage(ImageDTO image) {
+    public boolean removeImage(SailingImageDTO image) {
         return images.remove(image);
     }
 
-    public List<ImageDTO> getImages() {
+    public List<SailingImageDTO> getImages() {
         return images;
     }
 
-    public void addVideo(VideoDTO video) {
-        videos.add(video);
+    private EventLinkDTO getEventLink() {
+        final EventLinkDTO eventLink = new EventLinkDTO();
+        eventLink.setBaseURL(getBaseURL());
+        eventLink.setDisplayName(getName());
+        eventLink.setId(getId());
+        eventLink.setOnRemoteServer(isOnRemoteServer());
+        return eventLink;
     }
 
-    public boolean removeVideo(VideoDTO video) {
+    /**
+     * Constructs a new {@link SailingVideoDTO} from the {@code video}, using this event's data to construct
+     * the required {@link SailingVideoDTO#getEventRef() event reference}. The new object which is then also part
+     * of the result of {@link #getVideos()} is returned and must be used during {@link #removeVideo(SailingVideoDTO)}
+     * when trying to again remove the video added.
+     */
+    public SailingVideoDTO addVideo(VideoDTO video) {
+        final SailingVideoDTO result = new SailingVideoDTO(getEventLink(), video);
+        videos.add(result);
+        return result;
+    }
+
+    public boolean removeVideo(SailingVideoDTO video) {
         return videos.remove(video);
     }
 
-    public List<VideoDTO> getVideos() {
+    public List<SailingVideoDTO> getVideos() {
         return videos;
     }
 

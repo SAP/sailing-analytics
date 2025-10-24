@@ -126,7 +126,7 @@ public class LeaderboardEntryDTO implements Serializable {
     public Duration calculatedTime;
     
     /**
-     * If this is a leaderboard entry for an ORC Performance Curve Scoring (PCS) race,
+     * If this is a leaderboard entry for an ORC Polar Curve Scoring (PCS) race,
      * the field holds the so-called "implied wind" as a speed. It is the wind speed with which,
      * according to its polar, the competitor would have sailed the part of the course sailed
      * so far in the time elapsed so far. For ORC PCS before 2015 this was the primary ranking

@@ -2,7 +2,8 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
 		xmlns:s="urn:import:com.sap.sailing.gwt.home.client.shared"
 		xmlns:sp="urn:import:com.sap.sailing.gwt.home.shared.partials"
-		xmlns:mp="urn:import:com.sap.sailing.gwt.home.mobile.partials">
+		xmlns:mp="urn:import:com.sap.sailing.gwt.home.mobile.partials"
+        xmlns:m="urn:import:com.sap.sse.gwt.client.media">
 	<ui:with field="i18n" type="com.sap.sailing.gwt.ui.client.StringMessages" />
 	<ui:with field="res" type="com.sap.sailing.gwt.common.client.SharedResources" />
 	<ui:with field="local_res" type="com.sap.sailing.gwt.home.mobile.partials.stage.StageResources" />
@@ -16,10 +17,12 @@
 	</ui:style>
 	<g:HTMLPanel styleName="{local_res.css.stageteaser} {local_res.css.swiperslide}">
 		<div class="{local_res.css.stageteaser_background}">
-			<div ui:field="teaserImage" class="{local_res.css.stageteaser_background_image}" />
+			<div ui:field="teaserImage" class="{local_res.css.stageteaser_background_image} {res.mainCss.media_wrapper}">
+              <m:MediaMenuIcon ui:field="takedownButton"/>
+            </div>
 		</div>
 		<div class="{local_res.css.stageteaser_content}" >
-			<header class="{local_res.css.stageteaser_content_header}"  style="display:none;">
+			<header class="{local_res.css.stageteaser_content_header}" style="display:none;">
 				<p class="{local_res.css.stageteaser_content_header_subtitle}" >
 					<span ui:field="subtitle"/>
 				</p>

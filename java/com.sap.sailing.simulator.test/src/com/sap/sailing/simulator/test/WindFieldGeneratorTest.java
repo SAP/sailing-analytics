@@ -3,15 +3,15 @@
  */
 package com.sap.sailing.simulator.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.impl.KilometersPerHourSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.Position;
@@ -65,13 +65,13 @@ public class WindFieldGeneratorTest {
         }
         wf.setPositionGrid(bd.generatePositions(hSteps, vSteps, 0, 0));
         Position[][] positionGrid = wf.getPositionGrid();
-        assertNotNull("Position Grid is not null", positionGrid);
-        assertEquals("Position Grid Number of Rows", vSteps, positionGrid.length);
-        assertEquals("Position Grid Number of Columns", hSteps, positionGrid[0].length);
+        assertNotNull(positionGrid, "Position Grid is not null");
+        assertEquals(vSteps, positionGrid.length, "Position Grid Number of Rows");
+        assertEquals(hSteps, positionGrid[0].length, "Position Grid Number of Columns");
         for (int i = 0; i < vSteps; ++i) {
             for (int j = 0; j < hSteps; ++j) {
                 logger.info("P[" + i + "][" + j + "]:" + positionGrid[i][j]);
-                assertEquals("Map index check", positionGrid[i][j], wf.getPosition(i, j));
+                assertEquals(positionGrid[i][j], wf.getPosition(i, j), "Map index check");
             }
         }
     }
@@ -116,25 +116,25 @@ public class WindFieldGeneratorTest {
                 windList.add(localWind);
             }
         }
-        assertEquals("Size of windList ", hSteps * vSteps, windList.size());
+        assertEquals(hSteps * vSteps, windList.size(), "Size of windList ");
         double epsilon = 1e-6;
         // Check the speed
-        assertEquals("StartTime First Wind Speed ", 7, windList.get(0).getKnots(), 0);
-        assertEquals("StartTime Last Wind Speed in first row ", 9, windList.get(hSteps - 1).getKnots(), 0);
+        assertEquals(7, windList.get(0).getKnots(), 0, "StartTime First Wind Speed ");
+        assertEquals(9, windList.get(hSteps - 1).getKnots(), 0, "StartTime Last Wind Speed in first row ");
 
-        assertEquals("StartTime One before Middle Wind Speed ", 7.896551, windList.get(windList.size() / 2 - 2)
-                .getKnots(), epsilon);
-        assertEquals("StartTime Middle Wind Speed ", 7.965517, windList.get(windList.size() / 2 - 1).getKnots(), epsilon);
-        assertEquals("StartTime Last Wind Speed ", 9, windList.get(windList.size() - 1).getKnots(), 0);
+        assertEquals(7.896551, windList.get(windList.size() / 2 - 2)
+                .getKnots(), epsilon, "StartTime One before Middle Wind Speed ");
+        assertEquals(7.965517, windList.get(windList.size() / 2 - 1).getKnots(), epsilon, "StartTime Middle Wind Speed ");
+        assertEquals(9, windList.get(windList.size() - 1).getKnots(), 0, "StartTime Last Wind Speed ");
         // Check the angle
-        assertEquals("StartTime First Wind Angle ", 0, windList.get(0).getBearing().getRadians(), 0);
+        assertEquals(0, windList.get(0).getBearing().getRadians(), 0, "StartTime First Wind Angle ");
         Util.Pair<Integer, Integer> pairIndex = getIndex(windList.size(), hSteps);
         logger.info(pairIndex.toString());
-        assertEquals("StartTime One before Middle Wind Angle ", 0.3224948, windList.get(windList.size() / 2 - 2).getBearing()
-                .getRadians(), epsilon);
-        assertEquals("StartTime Middle Wind Angle ", 0.3224948, windList.get(windList.size() / 2 - 1).getBearing().getRadians(),
-                epsilon);
-        assertEquals("StartTime Last Wind Angle ", 0.2468268, windList.get(windList.size() - 1).getBearing().getRadians(), epsilon);
+        assertEquals(0.3224948, windList.get(windList.size() / 2 - 2).getBearing()
+                .getRadians(), epsilon, "StartTime One before Middle Wind Angle ");
+        assertEquals(0.3224948, windList.get(windList.size() / 2 - 1).getBearing().getRadians(), epsilon,
+                "StartTime Middle Wind Angle ");
+        assertEquals(0.2468268, windList.get(windList.size() - 1).getBearing().getRadians(), epsilon, "StartTime Last Wind Angle ");
 
         /**
          * Check the speed at the next time
@@ -151,22 +151,22 @@ public class WindFieldGeneratorTest {
                 windList.add(localWind);
             }
         }
-        assertEquals("Size of windList ", hSteps * vSteps, windList.size());
+        assertEquals(hSteps * vSteps, windList.size(), "Size of windList ");
 
         // Check the speed
-        assertEquals("One Time Unit First Wind Speed ", 7, windList.get(0).getKnots(), 0);
-        assertEquals("One Time Unit One before Middle Wind Speed ", 7.896551, windList.get(windList.size() / 2 - 2).getKnots(),
-                epsilon);
-        assertEquals("One Time Unit Middle Wind Speed ", 7.965517, windList.get(windList.size() / 2 - 1).getKnots(), epsilon);
-        assertEquals("One Time Unit Last Wind Speed ", 9, windList.get(windList.size() - 1).getKnots(), 0);
+        assertEquals(7, windList.get(0).getKnots(), 0, "One Time Unit First Wind Speed ");
+        assertEquals(7.896551, windList.get(windList.size() / 2 - 2).getKnots(), epsilon,
+                "One Time Unit One before Middle Wind Speed ");
+        assertEquals(7.965517, windList.get(windList.size() / 2 - 1).getKnots(), epsilon, "One Time Unit Middle Wind Speed ");
+        assertEquals(9, windList.get(windList.size() - 1).getKnots(), 0, "One Time Unit Last Wind Speed ");
         // Check the angle
-        assertEquals("One Time Unit First Wind Angle ",0.0068534, windList.get(0).getBearing().getRadians(), epsilon);
-        assertEquals("One Time Unit One before Middle Wind Angle ",  0.3250553, windList.get(windList.size() / 2 - 2).getBearing()
-                .getRadians(), epsilon);
-        assertEquals("One Time Unit Middle Wind Angle ", 0.3250553, windList.get(windList.size() / 2 - 1).getBearing()
-               .getRadians(), epsilon);
-        assertEquals("One Time Unit Last Wind Angle ",  0.241933, windList.get(windList.size() - 1).getBearing().getRadians(),
-                epsilon);
+        assertEquals(0.0068534,windList.get(0).getBearing().getRadians(), epsilon, "One Time Unit First Wind Angle ");
+        assertEquals(0.3250553,  windList.get(windList.size() / 2 - 2).getBearing()
+                .getRadians(), epsilon, "One Time Unit One before Middle Wind Angle ");
+        assertEquals(0.3250553, windList.get(windList.size() / 2 - 1).getBearing()
+               .getRadians(), epsilon, "One Time Unit Middle Wind Angle ");
+        assertEquals(0.241933,  windList.get(windList.size() - 1).getBearing().getRadians(), epsilon,
+                "One Time Unit Last Wind Angle ");
 
     }
 
@@ -259,18 +259,18 @@ public class WindFieldGeneratorTest {
                 windList.add(localWind);
             }
         }
-        assertEquals("Size of windList ", hSteps * vSteps, windList.size());
+        assertEquals(hSteps * vSteps, windList.size(), "Size of windList ");
         double epsilon = 1e-6;
         // Check the speed
-        assertEquals("StartTime First Wind Speed ", 7, windList.get(0).getKnots(), 0);
-        assertEquals("StartTime Last Wind Speed in first row ", 9, windList.get(hSteps - 1).getKnots(), 0);
+        assertEquals(7, windList.get(0).getKnots(), 0, "StartTime First Wind Speed ");
+        assertEquals(9, windList.get(hSteps - 1).getKnots(), 0, "StartTime Last Wind Speed in first row ");
 
-        assertEquals("StartTime One before Middle Wind Speed ", 7.896551, windList.get(windList.size() / 2 - 2)
-                .getKnots(), epsilon);
-        assertEquals("StartTime Middle Wind Speed ", 7.965517, windList.get(windList.size() / 2 - 1).getKnots(), epsilon);
-        assertEquals("StartTime Last Wind Speed ", 9, windList.get(windList.size() - 1).getKnots(), 0);
+        assertEquals(7.896551, windList.get(windList.size() / 2 - 2)
+                .getKnots(), epsilon, "StartTime One before Middle Wind Speed ");
+        assertEquals(7.965517, windList.get(windList.size() / 2 - 1).getKnots(), epsilon, "StartTime Middle Wind Speed ");
+        assertEquals(9, windList.get(windList.size() - 1).getKnots(), 0, "StartTime Last Wind Speed ");
         // Check the angle
-        assertEquals("StartTime First Wind Angle ", 0, windList.get(0).getBearing().getRadians(), 0);
+        assertEquals(0, windList.get(0).getBearing().getRadians(), 0, "StartTime First Wind Angle ");
        
     }
     
@@ -283,17 +283,17 @@ public class WindFieldGeneratorTest {
     @Test
     public void testIndex() {
         Util.Pair<Integer, Integer> pairIndex = getIndex(1, 30);
-        assertEquals("Index 1 RowIndex ", 1, (int) pairIndex.getA());
-        assertEquals("Index 1 ColIndex ", 1, (int) pairIndex.getB());
+        assertEquals(1, (int) pairIndex.getA(), "Index 1 RowIndex ");
+        assertEquals(1, (int) pairIndex.getB(), "Index 1 ColIndex ");
         pairIndex = getIndex(30, 30);
-        assertEquals("Index 30 RowIndex ", 1, (int) pairIndex.getA());
-        assertEquals("Index 30 ColIndex ", 30, (int) pairIndex.getB());
+        assertEquals(1, (int) pairIndex.getA(), "Index 30 RowIndex ");
+        assertEquals(30, (int) pairIndex.getB(), "Index 30 ColIndex ");
         pairIndex = getIndex(31, 30);
-        assertEquals("Index 31 RowIndex ", 2, (int) pairIndex.getA());
-        assertEquals("Index 31 ColIndex ", 1, (int) pairIndex.getB());
+        assertEquals(2, (int) pairIndex.getA(), "Index 31 RowIndex ");
+        assertEquals(1, (int) pairIndex.getB(), "Index 31 ColIndex ");
         pairIndex = getIndex(450, 30);
-        assertEquals("Index 450 RowIndex ", 15, (int) pairIndex.getA());
-        assertEquals("Index 450 ColIndex ", 30, (int) pairIndex.getB());
+        assertEquals(15, (int) pairIndex.getA(), "Index 450 RowIndex ");
+        assertEquals(30, (int) pairIndex.getB(), "Index 450 ColIndex ");
     }
 
 }

@@ -17,11 +17,13 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CaptionPanel;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.sap.sailing.gwt.ui.adminconsole.places.AdminConsoleView.Presenter;
 import com.sap.sailing.gwt.ui.client.Displayer;
 import com.sap.sailing.gwt.ui.client.SailingServiceWriteAsync;
@@ -43,8 +45,6 @@ public class AIAgentConfigurationPanel extends SimplePanel {
     private final ErrorReporter errorReporter;
     private final TableWrapperWithMultiSelectionAndFilterForSecuredDTO<EventDTO, StringMessages, AdminConsoleTableResources> eventsTableWrapper;
     private final Set<EventDTO> selectedEvents;
-    private final Label hasCredentialsLabel;
-    private final CaptionPanel eventsCaptionPanel;
     private boolean selectionUpdatedAfterEventsHaveLoaded;
     private boolean handleSelectionChangeEvents;
     private String languageModelName;
@@ -54,20 +54,22 @@ public class AIAgentConfigurationPanel extends SimplePanel {
         this.stringMessages = stringMessages;
         this.userService = presenter.getUserService();
         this.errorReporter = presenter.getErrorReporter();
+        this.eventsTableWrapper = this.getEventsTableWrapper();
         this.selectedEvents = new HashSet<>();
-        final VerticalPanel mainPanel = new VerticalPanel();
-        mainPanel.setWidth("100%");
-        final AccessControlledButtonPanel buttonPanel = new AccessControlledButtonPanel(userService, EVENT);
+        setWidget(this.getMainPanel(presenter));
+    }
+    
+    private TableWrapperWithMultiSelectionAndFilterForSecuredDTO<EventDTO, StringMessages, AdminConsoleTableResources> getEventsTableWrapper() {
         final AdminConsoleTableResources adminConsoleTableResources = GWT.create(AdminConsoleTableResources.class);
-        hasCredentialsLabel = new Label();
-        final Label languageModelNameLabel = new Label();
-        eventsTableWrapper = new TableWrapperWithMultiSelectionAndFilterForSecuredDTO<EventDTO, StringMessages, AdminConsoleTableResources>(stringMessages, this.errorReporter,
+        final TableWrapperWithMultiSelectionAndFilterForSecuredDTO<EventDTO, StringMessages, AdminConsoleTableResources> eventsTableWrapper
+            = new TableWrapperWithMultiSelectionAndFilterForSecuredDTO<EventDTO, StringMessages, AdminConsoleTableResources>(
+                this.stringMessages, this.errorReporter,
                 /* enablePager */ true, Optional.of(new EntityIdentityComparator<EventDTO>() {
                     @Override
                     public boolean representSameEntity(EventDTO dto1, EventDTO dto2) {
                         return dto1.getId().equals(dto2.getId());
                     }
-
+    
                     @Override
                     public int hashCode(EventDTO t) {
                         return t.getId().hashCode();
@@ -126,9 +128,16 @@ public class AIAgentConfigurationPanel extends SimplePanel {
                 }));
             }
         });
+        return eventsTableWrapper;
+    }
+    
+    private Widget getMainPanel(final Presenter presenter) {
+        final VerticalPanel mainPanel = new VerticalPanel();
+        mainPanel.setWidth("100%");
+        final AccessControlledButtonPanel buttonPanel = new AccessControlledButtonPanel(userService, EVENT);
         final Button refresh = buttonPanel.addUnsecuredAction(stringMessages.refresh(), () -> presenter.getEventsRefresher().reloadAndCallFillAll());
         refresh.ensureDebugId("RefreshEventsButton");
-        eventsCaptionPanel = new CaptionPanel(stringMessages.selectEventsForWhichToUseAICommenting());
+        final CaptionPanel eventsCaptionPanel = new CaptionPanel(stringMessages.selectEventsForWhichToUseAICommenting());
         eventsCaptionPanel.setWidth("100%");
         final VerticalPanel contents = new VerticalPanel();
         contents.setWidth("100%");
@@ -139,22 +148,25 @@ public class AIAgentConfigurationPanel extends SimplePanel {
         final CaptionPanel credentialsCaptionPanel = new CaptionPanel(stringMessages.credentials());
         final VerticalPanel credentialsVP = new VerticalPanel();
         credentialsVP.setSpacing(5);
-        final HorizontalPanel credentialsHP = new HorizontalPanel();
-        credentialsHP.setSpacing(5);
-        credentialsCaptionPanel.setContentWidget(credentialsVP);
-        credentialsHP.add(credentialsTextArea);
-        final Button credentialsUpdateButton = new Button(stringMessages.updateCredentials());
-        eventsTableWrapper.getTable().setWidth("100%");
+        final HorizontalPanel hasOrResetCredentialsHP = new HorizontalPanel();
+        hasOrResetCredentialsHP.setSpacing(5);
+        hasOrResetCredentialsHP.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+        final Label hasCredentialsLabel = new Label();
+        hasOrResetCredentialsHP.add(hasCredentialsLabel);
+        final Label languageModelNameLabel = new Label();
+        final Button resetCredentialsButton = new Button(stringMessages.resetCredentials());
         final AsyncCallback<Boolean> hasAIAgentCredentialsCallback = new AsyncCallback<Boolean>() {
             @Override
             public void onFailure(Throwable caught) {
-                updateHasCredentialsLabelAndSetEventsCaptionVisibility(false);
+                updateHasCredentialsLabelAndSetEventsCaptionVisibility(
+                        false, hasCredentialsLabel, eventsCaptionPanel, resetCredentialsButton, languageModelNameLabel);
                 Notification.notify(stringMessages.errorTryingToCheckForAIAgentCredentials(caught.getMessage()), NotificationType.ERROR);
             }
-
+    
             @Override
             public void onSuccess(Boolean result) {
-                updateHasCredentialsLabelAndSetEventsCaptionVisibility(result);
+                updateHasCredentialsLabelAndSetEventsCaptionVisibility(
+                        result, hasCredentialsLabel, eventsCaptionPanel, resetCredentialsButton, languageModelNameLabel);
                 if (result) {
                     sailingServiceWrite.getAIAgentLanguageModelName(new AsyncCallback<String>() {
                         @Override
@@ -180,6 +192,28 @@ public class AIAgentConfigurationPanel extends SimplePanel {
                 }
             }
         };
+        resetCredentialsButton.addClickHandler(e->sailingServiceWrite.resetAIAgentCredentials(
+                new AsyncCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void result) {
+                        sailingServiceWrite.hasAIAgentCredentials(hasAIAgentCredentialsCallback);
+                        Notification.notify(stringMessages.successfullyResetAIAgentCredentials(), NotificationType.INFO);
+                    }
+                    
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        sailingServiceWrite.hasAIAgentCredentials(hasAIAgentCredentialsCallback);
+                        Notification.notify(stringMessages.errorUpdatingAIAgentCredentials(caught.getMessage()), NotificationType.ERROR);
+                    }
+                }));
+        hasOrResetCredentialsHP.add(resetCredentialsButton);
+        credentialsVP.add(hasOrResetCredentialsHP);
+        final HorizontalPanel updateCredentialsHP = new HorizontalPanel();
+        updateCredentialsHP.setSpacing(5);
+        credentialsCaptionPanel.setContentWidget(credentialsVP);
+        updateCredentialsHP.add(credentialsTextArea);
+        final Button credentialsUpdateButton = new Button(stringMessages.updateCredentials());
+        eventsTableWrapper.getTable().setWidth("100%");
         sailingServiceWrite.hasAIAgentCredentials(hasAIAgentCredentialsCallback);
         credentialsUpdateButton.addClickHandler(e->sailingServiceWrite.setAIAgentCredentials(
                 credentialsTextArea.getText(), new AsyncCallback<Void>() {
@@ -197,13 +231,12 @@ public class AIAgentConfigurationPanel extends SimplePanel {
                         Notification.notify(stringMessages.errorUpdatingAIAgentCredentials(caught.getMessage()), NotificationType.ERROR);
                     }
                 }));
-        credentialsHP.add(credentialsUpdateButton);
-        credentialsVP.add(hasCredentialsLabel);
-        credentialsVP.add(credentialsHP);
+        updateCredentialsHP.add(credentialsUpdateButton);
+        credentialsVP.add(updateCredentialsHP);
         mainPanel.add(credentialsCaptionPanel);
         mainPanel.add(languageModelNameLabel);
         mainPanel.add(eventsCaptionPanel);
-        setWidget(mainPanel);
+        return mainPanel;
     }
     
     public Displayer<EventDTO> getEventsDisplayer() {
@@ -236,8 +269,16 @@ public class AIAgentConfigurationPanel extends SimplePanel {
         };
     }
 
-    private void updateHasCredentialsLabelAndSetEventsCaptionVisibility(final boolean hasCredentials) {
-        hasCredentialsLabel.setText(hasCredentials ? stringMessages.hasAIAgentCredentials() : stringMessages.hasNoAIAgentCredentials());
+    private void updateHasCredentialsLabelAndSetEventsCaptionVisibility(
+            final boolean hasCredentials, 
+            final Label hasCredentialsLabel,
+            final CaptionPanel eventsCaptionPanel,
+            final Button resetCredentialsButton,
+            final Label languageModelNameLabel) {
+        final String label = hasCredentials ? stringMessages.hasAIAgentCredentials() : stringMessages.hasNoAIAgentCredentials();
+        hasCredentialsLabel.setText(label);
         eventsCaptionPanel.setVisible(hasCredentials);
+        resetCredentialsButton.setVisible(hasCredentials);
+        languageModelNameLabel.setVisible(hasCredentials);
     }
 }

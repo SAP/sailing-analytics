@@ -1,11 +1,11 @@
 package com.sap.sailing.selenium.test.adminconsole.usermanagement;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.usermanagement.ChangePasswordDialogPO;
 import com.sap.sailing.selenium.pages.adminconsole.usermanagement.CreateUserDialogPO;
@@ -24,7 +24,7 @@ public class TestUserManagement extends AbstractSeleniumTest {
     private static final String TEST_PERMISSION = "USER:READ";
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot());
         super.setUp();
@@ -39,7 +39,7 @@ public class TestUserManagement extends AbstractSeleniumTest {
         userManagementPanel.waitUntilUserFound(TEST_USER_NAME);
     }
 
-    @Test
+    @SeleniumTestCase
     public void testUserCreation() {
         final UserManagementPanelPO userManagementPanel = goToUserManagementPanel();
         assertNull(userManagementPanel.findUser(TEST_USER_NAME));
@@ -47,7 +47,7 @@ public class TestUserManagement extends AbstractSeleniumTest {
         assertNotNull(userManagementPanel.findUser(TEST_USER_NAME));
     }
 
-    @Test
+    @SeleniumTestCase
     public void testRoleCreation() {
         final UserManagementPanelPO userManagementPanel = goToUserManagementPanel();
         createUser(userManagementPanel);
@@ -63,7 +63,7 @@ public class TestUserManagement extends AbstractSeleniumTest {
         userRolesPO.clickAddButtonOrThrow();
     }
 
-    @Test
+    @SeleniumTestCase
     public void testPermissionCreation() {
         final UserManagementPanelPO userManagementPanel = goToUserManagementPanel();
         createUser(userManagementPanel);
@@ -79,7 +79,7 @@ public class TestUserManagement extends AbstractSeleniumTest {
         wildcardPermissionPanelPO.clickAddButtonOrThrow();
     }
 
-    @Test
+    @SeleniumTestCase
     public void testChangePassword() {
         final UserManagementPanelPO userManagementPanel = goToUserManagementPanel();
         final EditUserDialogPO editUserDialog = userManagementPanel.getEditUserDialog("admin");
@@ -90,7 +90,7 @@ public class TestUserManagement extends AbstractSeleniumTest {
         changePasswordDialog.clickOkButtonOrThrow();
     }
 
-    @Test
+    @SeleniumTestCase
     public void testRemoveUser() {
         final UserManagementPanelPO userManagementPanel = goToUserManagementPanel();
         createUser(userManagementPanel);
@@ -100,7 +100,7 @@ public class TestUserManagement extends AbstractSeleniumTest {
         assertNull(userManagementPanel.findUser(TEST_USER_NAME));
     }
 
-    @Test
+    @SeleniumTestCase
     public void testRemoveUserPermission() {
         final UserManagementPanelPO userManagementPanel = goToUserManagementPanel();
         createUser(userManagementPanel);
@@ -112,7 +112,7 @@ public class TestUserManagement extends AbstractSeleniumTest {
         assertNull(wildcardPermissionPanelPO.findPermission(TEST_PERMISSION));
     }
 
-    @Test
+    @SeleniumTestCase
     public void testRemoveRole() {
         final UserManagementPanelPO userManagementPanel = goToUserManagementPanel();
         createUser(userManagementPanel);

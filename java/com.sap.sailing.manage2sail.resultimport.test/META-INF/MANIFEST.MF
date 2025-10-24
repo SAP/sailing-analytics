@@ -13,7 +13,11 @@ Import-Package: com.sap.sailing.domain.common,
  com.sap.sailing.xrr.schema,
  org.osgi.framework;version="1.5.0"
 Fragment-Host: com.sap.sailing.manage2sail.resultimport
-Require-Bundle: org.junit;bundle-version="4.8.2",
+Require-Bundle: junit-jupiter-api;bundle-version="5.11.3",
+ junit-jupiter-engine;bundle-version="5.11.3",
+ junit-platform-commons;bundle-version="1.11.3",
+ junit-platform-engine;bundle-version="1.11.3",
+ org.opentest4j;bundle-version="1.3.0",
  com.sap.sse.common,
  org.mockito.mockito-core;bundle-version="1.9.5",
  org.objenesis;bundle-version="1.3.0",

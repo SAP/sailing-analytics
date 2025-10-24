@@ -1172,9 +1172,9 @@ public class Util {
      *         order in which they appear in {@code oldSequence}. The "contains" check is based on the
      *         {@code equivalenceRelation}.
      */
-    public static <T> boolean isOnlyAdding(final Iterable<T> newSequence, final Iterable<T> oldSequence, BiFunction<T, T, Boolean> equivalenceRelation) {
-        final Iterator<T> nIter = newSequence.iterator();
-        final Iterator<T> oIter = oldSequence.iterator();
+    public static <T> boolean isOnlyAdding(final Iterable<? extends T> newSequence, final Iterable<? extends T> oldSequence, BiFunction<T, T, Boolean> equivalenceRelation) {
+        final Iterator<? extends T> nIter = newSequence.iterator();
+        final Iterator<? extends T> oIter = oldSequence.iterator();
         boolean result = true;
         while (result && oIter.hasNext()) {
             final T nextFromOld = oIter.next();

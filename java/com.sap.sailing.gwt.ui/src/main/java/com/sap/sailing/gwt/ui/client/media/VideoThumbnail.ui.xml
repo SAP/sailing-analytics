@@ -1,6 +1,7 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-    xmlns:g="urn:import:com.google.gwt.user.client.ui">
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:m="urn:import:com.sap.sse.gwt.client.media">
     <ui:with field="res"
         type="com.sap.sailing.gwt.common.client.SharedResources" />
     <ui:with field="local_res"
@@ -42,7 +43,7 @@
     }
     </ui:style>
     <g:HTMLPanel>
-        <div class="{style.holder}">
+        <div class="{style.holder} {res.mainCss.media_wrapper}">
             <div class="{res_home.sharedHomeCss.overlay}"
                 ui:field="overlay" style="display:none;">
                 <g:Anchor ui:field="deleteAnchor"
@@ -50,6 +51,7 @@
                     styleName="{res.mainCss.button} {local_res.css.button} {local_res.css.thumbnail_delete_button}" />
             </div>
             <img class="{style.thumbnail}" ui:field="thumbnailUi" />
+            <m:MediaMenuIcon ui:field="videoThumbnailMenuButton" fontSize="20px" />
             <div class="{style.caption}" ui:field="captionUi" />
         </div>
     </g:HTMLPanel>

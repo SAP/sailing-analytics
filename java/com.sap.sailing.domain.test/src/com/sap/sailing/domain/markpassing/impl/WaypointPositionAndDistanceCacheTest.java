@@ -1,6 +1,6 @@
 package com.sap.sailing.domain.markpassing.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -9,8 +9,8 @@ import java.util.Collections;
 import java.util.UUID;
 import java.util.function.Function;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.ControlPointWithTwoMarks;
 import com.sap.sailing.domain.base.Course;
@@ -57,7 +57,7 @@ public class WaypointPositionAndDistanceCacheTest {
     private Mark windward;
     private ControlPointWithTwoMarks startFinish;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         final RaceDefinition race = mock(RaceDefinition.class);
         when(race.getCompetitors()).thenReturn(Collections.emptyList());

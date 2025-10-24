@@ -60,8 +60,7 @@ public class PreRaceRacemapViewImpl extends ResizeComposite implements PreRaceRa
         statistics.addItem(PreRaceStatisticsBoxResources.INSTANCE.legs(), StringMessages.INSTANCE.legs(), result.getLegs());
         try {
             statistics.addItem(PreRaceStatisticsBoxResources.INSTANCE.sumMiles(), StringMessages.INSTANCE.estimatedDistance(),
-                    compactFormat.format(result.getDistance().getSeaMiles()) + " "
-                            + StringMessages.INSTANCE.seaMiles());
+                    compactFormat.format(result.getDistance().getNauticalMiles()) + " " + StringMessages.INSTANCE.nauticalMiles());
         } catch (Exception e) {
         }
         try {

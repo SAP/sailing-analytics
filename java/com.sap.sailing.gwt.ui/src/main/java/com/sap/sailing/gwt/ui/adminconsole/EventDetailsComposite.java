@@ -147,12 +147,12 @@ public class EventDetailsComposite extends Composite  {
             }
             courseAreaNamesList.setValues(courseAreaNames);
             List<String> imageURLStringsAsList = new ArrayList<>();
-            for(ImageDTO image: event.getImages()) {
+            for (ImageDTO image: event.getImages()) {
                 imageURLStringsAsList.add(image.getSourceRef());
             }
             imageURLList.setValues(imageURLStringsAsList);
             List<String> videoURLStringsAsList = new ArrayList<>();
-            for(VideoDTO video: event.getVideos()) {
+            for( VideoDTO video: event.getVideos()) {
                 videoURLStringsAsList.add(video.getSourceRef());
             }
             videoURLList.setValues(videoURLStringsAsList);

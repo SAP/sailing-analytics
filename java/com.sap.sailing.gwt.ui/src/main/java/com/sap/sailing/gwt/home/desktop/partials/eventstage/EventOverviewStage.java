@@ -67,7 +67,6 @@ public class EventOverviewStage extends Composite {
     
     public EventOverviewStage(EventView.Presenter presenter) {
         this.presenter = presenter;
-        
         updatesUi = new UpdatesBox(presenter);
         initWidget(uiBinder.createAndBindUi(this));
     }
@@ -86,16 +85,15 @@ public class EventOverviewStage extends Composite {
 
     private void setStageData(EventOverviewStageDTO stageData) {
         message.setMessage(stageData.getEventMessage());
-        
         EventOverviewStageContentDTO data = stageData.getStageContent();
-        if(data instanceof EventOverviewVideoStageDTO) {
-            if(!(lastContent instanceof Video) || ((Video) lastContent).shouldBeReplaced(((EventOverviewVideoStageDTO) data).getVideo().getSourceRef())) {
-                lastContent = new Video();
-                ((Video)lastContent).setData((EventOverviewVideoStageDTO) data);
+        if (data instanceof EventOverviewVideoStageDTO) {
+            if (!(lastContent instanceof Video) || ((Video) lastContent).shouldBeReplaced(((EventOverviewVideoStageDTO) data).getVideo().getSourceRef())) {
+                lastContent = new Video(presenter.getUserService(), presenter.getEventDTO().getName());
+                ((Video) lastContent).setData((EventOverviewVideoStageDTO) data);
             } 
         } else if (data instanceof EventOverviewTickerStageDTO) {
             if (!(lastContent instanceof Countdown)) {
-                lastContent = new Countdown(countdownNavigationProvider);
+                lastContent = new Countdown(countdownNavigationProvider, presenter.getUserService());
             }
             ((Countdown) lastContent).setData((EventOverviewTickerStageDTO) data);
         } else {
@@ -105,11 +103,10 @@ public class EventOverviewStage extends Composite {
     }
     
     private void setNews(List<NewsEntryDTO> news) {
-        if(lastContent == null) {
+        if (lastContent == null) {
             setStageData(new EventOverviewStageDTO(null, new EventOverviewTickerStageDTO(null, null, null)));
         }
-        
-        if(news == null || news.isEmpty()) {
+        if (news == null || news.isEmpty()) {
             updatesWrapperUi.getStyle().setDisplay(Display.NONE);
             stage.removeStyleName(mediaCss.medium7());
             stage.removeStyleName(mediaCss.large8());

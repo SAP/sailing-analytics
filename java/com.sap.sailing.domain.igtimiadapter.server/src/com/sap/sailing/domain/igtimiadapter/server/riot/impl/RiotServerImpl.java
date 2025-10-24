@@ -14,19 +14,25 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.simple.parser.ParseException;
+import org.osgi.framework.BundleContext;
+import org.osgi.util.tracker.ServiceTracker;
 
 import com.igtimi.IgtimiData.DataMsg;
 import com.igtimi.IgtimiData.DataPoint;
@@ -56,8 +62,11 @@ import com.sap.sse.common.MultiTimeRange;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.TimeRange;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.Util.Pair;
+import com.sap.sse.replication.ReplicationService;
 import com.sap.sse.replication.interfaces.impl.AbstractReplicableWithObjectInputStream;
 import com.sap.sse.security.SecurityService;
+import com.sap.sse.security.SessionUtils;
 import com.sap.sse.security.shared.AccessControlListAnnotation;
 import com.sap.sse.security.shared.HasPermissions.DefaultActions;
 import com.sap.sse.security.shared.OwnershipAnnotation;
@@ -65,6 +74,8 @@ import com.sap.sse.security.shared.PermissionChecker;
 import com.sap.sse.security.shared.impl.User;
 import com.sap.sse.shared.util.Wait;
 import com.sap.sse.util.ObjectInputStreamResolvingAgainstCache;
+import com.sap.sse.util.ServiceTrackerFactory;
+import com.sap.sse.util.ThreadPoolUtil;
 
 public class RiotServerImpl extends AbstractReplicableWithObjectInputStream<ReplicableRiotServer, RiotReplicationOperation<?>> implements RiotServer, ReplicableRiotServer, Runnable {
     private static final Logger logger = Logger.getLogger(RiotServerImpl.class.getName());
@@ -90,24 +101,37 @@ public class RiotServerImpl extends AbstractReplicableWithObjectInputStream<Repl
      */
     private final ConcurrentMap<SocketChannel, RiotConnection> connections;
 
+    private final ServiceTracker<ReplicationService, ReplicationService> replicationServiceTracker;
+    
+    private final ExecutorService executorForNotifyingListeners;
+
     /**
      * Like {@link #RiotServerImpl(int)}, only that an available port is selected automatically.
      * The port can be obtained by calling {@link #getPort}.
      */
-    public RiotServerImpl(DomainObjectFactory domainObjectFactory, MongoObjectFactory mongoObjectFactory) throws Exception {
-        this(0, domainObjectFactory, mongoObjectFactory);
+    public RiotServerImpl(DomainObjectFactory domainObjectFactory, MongoObjectFactory mongoObjectFactory, BundleContext context) throws Exception {
+        this(0, domainObjectFactory, mongoObjectFactory, context);
     }
     
-    public RiotServerImpl(int port, DomainObjectFactory domainObjectFactory, MongoObjectFactory mongoObjectFactory) throws Exception {
-        this(new InetSocketAddress("0.0.0.0", port), domainObjectFactory, mongoObjectFactory);
+    public RiotServerImpl(int port, DomainObjectFactory domainObjectFactory, MongoObjectFactory mongoObjectFactory, BundleContext context) throws Exception {
+        this(new InetSocketAddress("0.0.0.0", port), domainObjectFactory, mongoObjectFactory, context);
     }
     
     /**
-     * @param localAddress if {@code null}, select a local port to listen on automatically
+     * @param localAddress
+     *            if {@code null}, select a local port to listen on automatically
+     * @param context
+     *            OSGi bundle context; if set, the {@link ReplicationService} will be tracked and used determine whether
+     *            replication is currently starting, to avoid asking for other replicables such as the
+     *            {@link SecurityService}, which would cause a deadlock. If {@code null}, no such tracking will
+     *            happen, assuming we're not in a production and particularly no replicated environment.
      */
     public RiotServerImpl(SocketAddress localAddress, DomainObjectFactory domainObjectFactory,
-            MongoObjectFactory mongoObjectFactory) throws Exception {
+            MongoObjectFactory mongoObjectFactory, BundleContext context) throws Exception {
+        this.replicationServiceTracker = context == null ? null :
+            ServiceTrackerFactory.createAndOpen(context, ReplicationService.class);
         this.listeners = ConcurrentHashMap.newKeySet();
+        this.executorForNotifyingListeners = ThreadPoolUtil.INSTANCE.createForegroundTaskThreadPoolExecutor("Riot Listener Notifier");
         this.dataAccessWindows = new ConcurrentHashMap<>();
         this.devices = new ConcurrentHashMap<>();
         this.devicesBySerialNumber = new ConcurrentHashMap<>();
@@ -195,9 +219,8 @@ public class RiotServerImpl extends AbstractReplicableWithObjectInputStream<Repl
                             logger.info("Device channel from "+deviceChannel.getRemoteAddress()+" closed");
                             if (connection != null) {
                                 logger.info("The device was handled by connection "+connection);
-                                connections.remove(deviceChannel);
                                 try {
-                                    connection.close();
+                                    connection.close(); // will also remove the connection from this server through connectionClosed(RiotConnection)
                                 } catch (Exception e) {
                                     logger.warning("Trying to properly close a connection for which we read EOF from its channel threw an exception: "+e.getMessage());
                                 }
@@ -206,12 +229,30 @@ public class RiotServerImpl extends AbstractReplicableWithObjectInputStream<Repl
                         }
                     }
                 }
-            } catch (IOException e) {
+            } catch (Throwable e) {
                 logger.log(Level.SEVERE, "Exception trying to read or accept new connection. Continuing...", e);
             }
         }
+        try {
+            logger.info("Riot server listening on "+serverSocketChannel.getLocalAddress()+" stops running");
+        } catch (IOException e) {
+            logger.info("Riot server listening on "+serverSocketChannel+" stops running");
+        }
     }
 
+    /**
+     * Removes the {@link RiotConnection} connected to the {@code deviceChannel} in {@link #connections} from this
+     * server. The {@code deviceChannel} has its key for the {@link #socketSelector} {@link SelectionKey#cancel()
+     * cancelled}.
+     */
+    void connectionClosed(SocketChannel deviceChannel) {
+        connections.remove(deviceChannel);
+        final SelectionKey selectionKey = deviceChannel.keyFor(socketSelector);
+        if (selectionKey != null) {
+            selectionKey.cancel();
+        }
+    }
+    
     @Override
     public void addListener(RiotMessageListener listener) {
         listeners.add(listener);
@@ -225,15 +266,22 @@ public class RiotServerImpl extends AbstractReplicableWithObjectInputStream<Repl
     /**
      * Forwards the {@code message} to all {@link #addListener(RiotMessageListener) registered} listeners and sends it
      * to all {@link #liveWebSocketConnections} that are authorized to {@link DefaultActions#READ READ} from the
-     * {@link Device} from which the message originated and for which a READable {@link DataAccessWindow} exists for
-     * the web socket connection's authenticated user for the time points of the data points in the message.<p>
+     * {@link Device} from which the message originated and for which a READable {@link DataAccessWindow} exists for the
+     * web socket connection's authenticated user for the time points of the data points in the message.
+     * <p>
      * 
-     * This is a replicating operation which only {@link #apply(RiotReplicationOperation) applies} this request to
-     * the replicable; if running as primary/master, the request will be applied locally and replicated to all replicas
+     * This is a replicating operation which only {@link #apply(RiotReplicationOperation) applies} this request to the
+     * replicable; if running as primary/master, the request will be applied locally and replicated to all replicas
      * which will forward the {@code message} to their respective live websocket connections. If on a replica, the
-     * {@code message} will be applied on the replica and sent to the master/primary for forwarding to the primary's
-     * web socket listeners. The persistent storage of the message on the primary/master is essential for retrieving
+     * {@code message} will be applied on the replica and sent to the master/primary for forwarding to the primary's web
+     * socket listeners. The persistent storage of the message on the primary/master is essential for retrieving
      * resource data at a later point, e.g., for "replay" purposes. The replicas' persistence is to be ignored.
+     * <p>
+     * 
+     * We expect listeners to perform DB and other network interactions which may block for I/O.. Therefore, the method
+     * uses the {@link #executorForNotifyingListeners} executor to notify the listeners in a separate thread. This will
+     * allow the calling thread to return quickly, even if the listeners take a long time to process the message.
+     * <p>
      * 
      * @param message
      *            the message received from the device
@@ -241,14 +289,17 @@ public class RiotServerImpl extends AbstractReplicableWithObjectInputStream<Repl
      *            the serial number of the device from which the message originated
      */
     void notifyListeners(Msg message, String deviceSerialNumber) {
-        apply(s->s.internalNotifyListeners(message, deviceSerialNumber));
+        executorForNotifyingListeners.execute(()->apply(s->s.internalNotifyListeners(message, deviceSerialNumber)));
     }
     
     @Override
     public Void internalNotifyListeners(Msg message, String deviceSerialNumber) {
         try {
-            if (deviceSerialNumber != null) {
-                forwardMessageToEligibleWebSocketClients(message, deviceSerialNumber);
+            if (replicationServiceTracker == null || replicationServiceTracker.getService() == null ||
+              !replicationServiceTracker.getService().isReplicationStarting()) {
+                if (deviceSerialNumber != null) {
+                    forwardMessageToEligibleWebSocketClients(message, deviceSerialNumber);
+                }
             }
             for (final RiotMessageListener listener : listeners) {
                 listener.onMessage(message);
@@ -265,7 +316,12 @@ public class RiotServerImpl extends AbstractReplicableWithObjectInputStream<Repl
     }
 
     /**
-     * @param deviceSerialNumber must not be {@code null}
+     * Requires the {@link SecurityService} to be available, at least when one or more {@link #liveWebSocketConnections}
+     * are registered. This means that this method must not be invoked, e.g., when {@link #replicationServiceTracker the
+     * replication service} is still {@link ReplicationService#isReplicationStarting() starting}.
+     * 
+     * @param deviceSerialNumber
+     *            must not be {@code null}
      */
     private void forwardMessageToEligibleWebSocketClients(Msg message, String deviceSerialNumber) {
         final Device device = getDeviceBySerialNumber(deviceSerialNumber);
@@ -276,28 +332,31 @@ public class RiotServerImpl extends AbstractReplicableWithObjectInputStream<Repl
                     getSecurityService().getServerGroup(), newDevice.getName());
         } else {
             final byte[] messageAsBytes = message.toByteArray();
-            final SecurityService securityService = getSecurityService();
             final TimeRange messageDataTimeRange = getTimeRange(message);
             final Iterable<DataAccessWindow> daws = getDataAccessWindows(Collections.singleton(deviceSerialNumber), MultiTimeRange.of(messageDataTimeRange));
+            // obtain the securityService only if connections exist; otherwise, we may still be in start-up mode
+            final SecurityService securityService = liveWebSocketConnections.isEmpty() ? null : getSecurityService();
             for (final RiotWebsocketHandler webSocketClient : liveWebSocketConnections) {
-                final User user = webSocketClient.getAuthenticatedUser();
-                final OwnershipAnnotation deviceOwnership = securityService.getOwnership(device.getIdentifier());
-                final AccessControlListAnnotation deviceAccessControlList = securityService.getAccessControlList(device.getIdentifier());
-                if (!Util.isEmpty(Util.filter(daws, daw->{
-                    final OwnershipAnnotation dawOownership = securityService.getOwnership(daw.getIdentifier());
-                    final AccessControlListAnnotation dawAccessControlList = securityService.getAccessControlList(daw.getIdentifier());
-                    return PermissionChecker.isPermitted(
-                            daw.getIdentifier().getPermission(DefaultActions.READ),
+                if (webSocketClient.getDeviceSerialNumbers().contains(deviceSerialNumber)) {
+                    final User user = webSocketClient.getAuthenticatedUser();
+                    final OwnershipAnnotation deviceOwnership = securityService.getOwnership(device.getIdentifier());
+                    final AccessControlListAnnotation deviceAccessControlList = securityService.getAccessControlList(device.getIdentifier());
+                    if (!Util.isEmpty(Util.filter(daws, daw->{
+                        final OwnershipAnnotation dawOownership = securityService.getOwnership(daw.getIdentifier());
+                        final AccessControlListAnnotation dawAccessControlList = securityService.getAccessControlList(daw.getIdentifier());
+                        return PermissionChecker.isPermitted(
+                                daw.getIdentifier().getPermission(DefaultActions.READ),
+                                user, securityService.getAllUser(),
+                                dawOownership==null?null:dawOownership.getAnnotation(),
+                                dawAccessControlList==null?null:dawAccessControlList.getAnnotation());
+                    }))
+                    && PermissionChecker.isPermitted(
+                            device.getIdentifier().getPermission(DefaultActions.READ),
                             user, securityService.getAllUser(),
-                            dawOownership==null?null:dawOownership.getAnnotation(),
-                            dawAccessControlList==null?null:dawAccessControlList.getAnnotation());
-                }))
-                && PermissionChecker.isPermitted(
-                        device.getIdentifier().getPermission(DefaultActions.READ),
-                        user, securityService.getAllUser(),
-                        deviceOwnership==null?null:deviceOwnership.getAnnotation(),
-                        deviceAccessControlList==null?null:deviceAccessControlList.getAnnotation()) ) {
-                    webSocketClient.sendBytesByFuture(ByteBuffer.wrap(messageAsBytes));
+                            deviceOwnership==null?null:deviceOwnership.getAnnotation(),
+                            deviceAccessControlList==null?null:deviceAccessControlList.getAnnotation()) ) {
+                        webSocketClient.sendBytesByFuture(ByteBuffer.wrap(messageAsBytes));
+                    }
                 }
             }
         }
@@ -535,7 +594,9 @@ public class RiotServerImpl extends AbstractReplicableWithObjectInputStream<Repl
         final int masterPort = getMasterDescriptor().getServletPort();
         final String masterHostname = getMasterDescriptor().getHostname();
         final SecurityService securityService = getSecurityService();
-        final String currentUserBearerToken = securityService == null ? null : securityService.getAccessToken(securityService.getCurrentUser().getName());
+        final String currentUserBearerToken = securityService == null ? null
+                : securityService.getCurrentUser() == null ? null
+                        : securityService.getAccessToken(securityService.getCurrentUser().getName());
         try {
             final URL baseUrl = new URL(masterPort==443?"https":"http", masterHostname, masterPort, "/");
             final IgtimiConnectionFactory igtimiConnectionFactory =
@@ -550,6 +611,31 @@ public class RiotServerImpl extends AbstractReplicableWithObjectInputStream<Repl
     @FunctionalInterface
     private static interface MessageLoader<T> {
         T getResult(IgtimiConnection connection, String deviceSerialNumber, Type[] types) throws IOException, ParseException;
+    }
+
+    @Override
+    public Iterable<Pair<TimePoint, String>> getDeviceLogs(String serialNumber, Duration duration) throws ParseException, IOException {
+        final TimePoint endTime = TimePoint.now();
+        final TimePoint startTime = endTime.minus(duration);
+        final Iterable<Msg> messages;
+        if (getMasterDescriptor() == null) {
+            messages = domainObjectFactory.getMessages(serialNumber, MultiTimeRange.of(TimeRange.create(startTime, endTime)),
+                    Collections.singleton(DataCase.LOG), /* clientSessionOrNull */ null);
+        } else {
+            messages = getFromPrimary(serialNumber, new Type[] { Type.valueOf(DataCase.LOG.getNumber()) },
+                    (c, dsn, ts)->c.getMessages(startTime, endTime, Collections.singleton(dsn), ts));
+        }
+        final List<Pair<TimePoint, String>> logMessages = new ArrayList<>();
+        for (final Msg message : messages) {
+            for (final DataMsg data : message.getData().getDataList()) {
+                for (final DataPoint dataPoint : data.getDataList()) {
+                    if (dataPoint.hasLog()) {
+                        logMessages.add(new Pair<>(TimePoint.of(dataPoint.getLog().getTimestamp()), dataPoint.getLog().getMessage()));
+                    }
+                }
+            }
+        }
+        return logMessages;
     }
 
     @Override
@@ -576,15 +662,48 @@ public class RiotServerImpl extends AbstractReplicableWithObjectInputStream<Repl
 
     @Override
     public boolean sendStandardCommand(String deviceSerialNumber, RiotStandardCommand command) throws IOException {
-        return apply(s->s.internalSendStandardCommand(deviceSerialNumber, command));
+        logger.info("User "+SessionUtils.getPrincipal()+" requests sending standard command "+command+" to device with serial number "+deviceSerialNumber);
+        return apply(s->s.internalSendCommand(deviceSerialNumber, command.getCommand()));
     }
 
     @Override
-    public boolean internalSendStandardCommand(String deviceSerialNumber, RiotStandardCommand command) throws IOException {
+    public boolean sendFreestyleCommand(String deviceSerialNumber, String command) throws IOException {
+        logger.info("User "+SessionUtils.getPrincipal()+" requests sending freestyle command "+command+" to device with serial number "+deviceSerialNumber);
+        return apply(s->s.internalSendCommand(deviceSerialNumber, command));
+    }
+
+    @Override
+    public boolean internalSendCommand(String deviceSerialNumber, String command) throws IOException, InterruptedException, ExecutionException {
         boolean foundConnection = false;
         for (final RiotConnection connection : getLiveConnections()) {
             if (Util.equalsWithNull(connection.getSerialNumber(), deviceSerialNumber)) {
-                connection.sendCommand(command.getCommand());
+                connection.sendCommand(command); // see bug6140: could try to use log output returned as a queue
+                foundConnection = true;
+                break;
+            }
+        }
+        return foundConnection;
+    }
+    
+    @Override
+    public boolean enableOverTheAirLog(String deviceSerialNumber, boolean enable) throws IOException, InterruptedException, ExecutionException {
+        final Device device = getDeviceBySerialNumber(deviceSerialNumber);
+        if (device == null) {
+            throw new IllegalArgumentException("No device with serial number "+deviceSerialNumber+" found");
+        }
+        return apply(s->s.internalEnableOverTheAirLog(deviceSerialNumber, enable));
+    }
+
+    @Override
+    public boolean internalEnableOverTheAirLog(String deviceSerialNumber, boolean enable) throws IOException {
+        boolean foundConnection = false;
+        for (final RiotConnection connection : getLiveConnections()) {
+            if (Util.equalsWithNull(connection.getSerialNumber(), deviceSerialNumber)) {
+                if (enable) {
+                    connection.enableOverTheAirLog();
+                } else {
+                    connection.disableOverTheAirLog();
+                }
                 foundConnection = true;
                 break;
             }

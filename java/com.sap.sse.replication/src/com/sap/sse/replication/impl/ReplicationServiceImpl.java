@@ -353,12 +353,6 @@ public class ReplicationServiceImpl implements ReplicationService, OperationsToM
         }
     }
 
-    @Override
-    protected void finalize() {
-        logger.info("terminating timer " + timer);
-        timer.cancel();
-    }
-
     protected ServiceTracker<Replicable<?, ?>, Replicable<?, ?>> getReplicableTracker() {
         return new ServiceTracker<Replicable<?, ?>, Replicable<?, ?>>(Activator.getDefaultContext(),
                 Replicable.class.getName(), null);
@@ -967,5 +961,10 @@ public class ReplicationServiceImpl implements ReplicationService, OperationsToM
         }
         return new ReplicationStatusImpl(isReplica, ServerInfo.getName(), isReplicationStarting, suspended, stopped,
                 messageQueueLength, isInitialLoadRunning, operationQueueLengths, getReplicatingFromMaster(), getReplicaInfo(), exchangeName, exchangePort);
+    }
+
+    public void stop() {
+        logger.info("terminating timer " + timer);
+        timer.cancel();
     }
 }

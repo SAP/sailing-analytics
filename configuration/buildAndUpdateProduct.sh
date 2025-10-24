@@ -222,7 +222,8 @@ echo TMP will be used for java.io.tmpdir and is $TMP
 if [ "$TMP" = "" ]; then
   export TMP=/tmp
 fi
-extra="${extra} -Dgwt.workers=${GWT_WORKERS} -Djava.io.tmpdir=$TMP"
+extra="${extra} -Dgwt.workers=${GWT_WORKERS} -Djava.io.tmpdir=$TMP -Dgwt.workDir=$TMP"
+extra="${extra} -Djdk.xml.maxGeneralEntitySizeLimit=0 -Djdk.xml.totalEntitySizeLimit=0"
 
 shift $((OPTIND-1))
 
@@ -765,7 +766,7 @@ if [[ "$@" == "build" ]] || [[ "$@" == "all" ]]; then
 	    JAVA_HOME="${JAVA8_HOME}" `dirname $0`/install-gwt "${PROJECT_HOME}"
           else
             echo "Downloading and installing forked GWT version..."
-            `dirname $0`/install-gwt-from-fork-releases https://github.com/SAP/gwt-forward-serialization-rpc https://github.com/SAP/gwt-maven-plugin-forward-serialization-rpc 2.11.0 .
+            `dirname $0`/install-gwt-from-fork-releases https://github.com/SAP/gwt-forward-serialization-rpc https://github.com/SAP/gwt-maven-plugin-forward-serialization-rpc 2.11.1 .
           fi
         fi
         echo "Using following command: mvn $extra -DargLine=\"$APP_PARAMETERS\" -fae -s $MAVEN_SETTINGS $clean install"

@@ -44,22 +44,22 @@ public class BoatClassVectorGraphicsResolver {
         BoatClassVectorGraphics smallMultihull = new SmallMultihullVectorGraphics(BoatClassMasterdata.NACRA_15, BoatClassMasterdata.NACRA_17,
                 BoatClassMasterdata.NACRA_17_FOIL, BoatClassMasterdata.F_16, BoatClassMasterdata.F_18,
                 BoatClassMasterdata.HOBIE_WILD_CAT, BoatClassMasterdata.HOBIE_16, BoatClassMasterdata.HOBIE_TIGER,
-                BoatClassMasterdata.A_CAT, BoatClassMasterdata.TORNADO, BoatClassMasterdata.FLYING_PHANTOM);
+                BoatClassMasterdata.A_CAT, BoatClassMasterdata.TORNADO, BoatClassMasterdata.FLYING_PHANTOM, BoatClassMasterdata.ORC_MULTIHULL);
         BoatClassVectorGraphics keelBoatWithGennaker = new KeelBoatWithGennakerVectorGraphics(BoatClassMasterdata.ELAN350,
-                BoatClassMasterdata.FIRST_CLASS_7_5,
+                BoatClassMasterdata.ELAN_E4, BoatClassMasterdata.FIRST_CLASS_7_5,
                 BoatClassMasterdata.J70, BoatClassMasterdata.J80, BoatClassMasterdata.J92, BoatClassMasterdata.J92S,
                 BoatClassMasterdata.B_ONE, BoatClassMasterdata.IRC, BoatClassMasterdata.LASER_SB3, BoatClassMasterdata.LONGTZE,
                 BoatClassMasterdata.RS_FEVA, BoatClassMasterdata.RS_TERA, BoatClassMasterdata.RS_VENTURE,
                 BoatClassMasterdata.RS_VAREO,
                 BoatClassMasterdata.RS100, BoatClassMasterdata.RS21, BoatClassMasterdata.TP52,
                 BoatClassMasterdata.CLUB_SWAN_50, BoatClassMasterdata.BAVARIA_CRUISER_41S, BoatClassMasterdata.BAVARIA_CRUISER_45,
-                BoatClassMasterdata.BAVARIA_CRUISER_46, BoatClassMasterdata.BENETEAU_FIRST_35, BoatClassMasterdata.BENETEAU_FIRST_45,
-                BoatClassMasterdata.SPAEKHUGGER, BoatClassMasterdata.SCAN_KAP_99,
+                BoatClassMasterdata.BAVARIA_CRUISER_46, BoatClassMasterdata.BENETEAU_FIRST_35, BoatClassMasterdata.BENETEAU_FIRST_36,
+                BoatClassMasterdata.BENETEAU_FIRST_45, BoatClassMasterdata.SPAEKHUGGER, BoatClassMasterdata.SCAN_KAP_99,
                 BoatClassMasterdata.BB10M, BoatClassMasterdata.WAYFARER, BoatClassMasterdata.X_332,
                 BoatClassMasterdata.BRASSFAHRT_I, BoatClassMasterdata.BRASSFAHRT_II, BoatClassMasterdata.BRASSFAHRT_III,
                 BoatClassMasterdata.BRASSFAHRT_IV, BoatClassMasterdata.BRASSFAHRT_V,
                 BoatClassMasterdata.VO60, BoatClassMasterdata.VO65, BoatClassMasterdata.IMOCA,
-                BoatClassMasterdata.HANSE_418, BoatClassMasterdata.SALONA_46);
+                BoatClassMasterdata.HANSE_418, BoatClassMasterdata.SALONA_46, BoatClassMasterdata.SRS);
         BoatClassVectorGraphics dinghyWithSpinnaker = new DinghyWithSpinnakerVectorGraphics(BoatClassMasterdata._420,
                 BoatClassMasterdata._470, BoatClassMasterdata._5O5, BoatClassMasterdata.CADET, BoatClassMasterdata.FLYING_DUTCHMAN,
                 BoatClassMasterdata.FOLKBOAT, BoatClassMasterdata.DYAS, BoatClassMasterdata.DRAGON_INT,

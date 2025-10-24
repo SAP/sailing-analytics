@@ -2,7 +2,9 @@ package com.sap.sailing.domain.racelogtracking.impl;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -43,12 +45,15 @@ import com.sap.sailing.domain.base.Event;
 import com.sap.sailing.domain.base.Fleet;
 import com.sap.sailing.domain.base.Mark;
 import com.sap.sailing.domain.base.RaceColumn;
+import com.sap.sailing.domain.base.RaceColumnInSeries;
 import com.sap.sailing.domain.base.Regatta;
+import com.sap.sailing.domain.base.Series;
 import com.sap.sailing.domain.base.SharedDomainFactory;
 import com.sap.sailing.domain.base.Waypoint;
 import com.sap.sailing.domain.base.impl.CourseDataImpl;
 import com.sap.sailing.domain.common.CourseDesignerMode;
 import com.sap.sailing.domain.common.MailInvitationType;
+import com.sap.sailing.domain.common.NotFoundException;
 import com.sap.sailing.domain.common.RegattaIdentifier;
 import com.sap.sailing.domain.common.abstractlog.NotRevokableException;
 import com.sap.sailing.domain.common.racelog.tracking.CompetitorRegistrationOnRaceLogDisabledException;
@@ -387,5 +392,75 @@ public class RaceLogTrackingAdapterImpl implements RaceLogTrackingAdapter {
             throw new IllegalArgumentException("Unhandled mail type");
         }
         return mail;
+    }
+
+
+    @Override
+    public void copyPairingListFromOtherLeaderboard(RegattaLeaderboard sourceLeaderboard, RegattaLeaderboard targetLeaderboard,
+            String fromRaceColumnName, String toRaceColumnInclusiveName) throws NotFoundException {
+        final RaceColumn fromColumn = sourceLeaderboard.getRaceColumnByName(fromRaceColumnName);
+        if (fromColumn == null) {
+            throw new NotFoundException("Race column from which to start copying pairings "+fromRaceColumnName+" not found in source leaderboard "+sourceLeaderboard.getName());
+        }
+        final RaceColumn toColumn = sourceLeaderboard.getRaceColumnByName(toRaceColumnInclusiveName);
+        if (toColumn == null) {
+            throw new NotFoundException("Race column up to which to copy pairings "+toColumn+" not found in source leaderboard "+targetLeaderboard.getName());
+        }
+        // ensure all boats from source regatta are also registered on the target regatta
+        final Iterable<Boat> targetBoats = targetLeaderboard.getAllBoats();
+        for (final Boat sourceBoat : sourceLeaderboard.getAllBoats()) {
+            if (!Util.contains(targetBoats, sourceBoat)) {
+                // register the boat on the target leaderboard
+                targetLeaderboard.registerBoat(sourceBoat);
+            }
+        }
+        boolean inSequence = false;
+        final Iterator<RaceColumn> targetRaceColumnIterator = targetLeaderboard.getRaceColumns().iterator();
+        for (final RaceColumn sourceRaceColumn : sourceLeaderboard.getRaceColumns()) {
+            // we're in a regatta leaderboard, so we can safely cast
+            final RaceColumnInSeries sourceRaceColumnInSeries = (RaceColumnInSeries) sourceRaceColumn;
+            if (sourceRaceColumn == fromColumn) {
+                inSequence = true;
+            }
+            if (inSequence) {
+                if (!targetRaceColumnIterator.hasNext()) {
+                    throw new IllegalArgumentException("Target leaderboard "+targetLeaderboard.getName()+
+                            " doesn't have enough race columns to copy pairings from source leaderboard");
+                }
+                copyPairingsFromRaceColumn(sourceLeaderboard, targetLeaderboard, sourceRaceColumnInSeries, (RaceColumnInSeries) targetRaceColumnIterator.next());
+                if (sourceRaceColumn == toColumn) {
+                    inSequence = false;
+                }
+            }
+        }
+    }
+
+    /**
+     * Copies the competitor-to-boat pairings from {@code sourceRaceColumn} to {@code targetRaceColumn}.
+     * If there is a mismatch in the number of fleets, an {@link IllegalArgumentException} is thrown.
+     * If competitors or boats are missing from the {@code targetLeaderboard}, they are registered on the
+     * {@code targetLeaderboard}'s regatta.
+     */
+    private void copyPairingsFromRaceColumn(RegattaLeaderboard sourceLeaderboard, RegattaLeaderboard targetLeaderboard,
+            RaceColumnInSeries sourceRaceColumn, RaceColumnInSeries targetRaceColumn) throws IllegalArgumentException {
+        final Series sourceSeries = sourceRaceColumn.getSeries();
+        final Series targetSeries = targetRaceColumn.getSeries();
+        if (Util.size(sourceSeries.getFleets()) != Util.size(targetSeries.getFleets())) {
+            throw new IllegalArgumentException("Source series has "+Util.size(sourceSeries.getFleets())+
+                    " fleets, but target series has "+Util.size(targetSeries.getFleets()));
+        }
+        final Iterator<? extends Fleet> targetFleetIterator = targetSeries.getFleets().iterator();
+        for (final Fleet sourceFleet : sourceRaceColumn.getFleets()) {
+            final Fleet targetFleet = targetFleetIterator.next();
+            final Iterable<Competitor> targetCompetitors = targetRaceColumn.getAllCompetitors(targetFleet);
+            // ensure the target regatta has all competitors we need:
+            for (final Competitor sourceCompetitor : sourceRaceColumn.getAllCompetitors(sourceFleet)) {
+                if (!Util.contains(targetCompetitors, sourceCompetitor)) {
+                    // register the competitor on the target leaderboard
+                    targetLeaderboard.registerCompetitor(sourceCompetitor);
+                }
+            }
+            copyCompetitors(sourceRaceColumn, sourceFleet, Collections.singleton(new Pair<>(targetRaceColumn, targetFleet)));
+        }
     }
 }

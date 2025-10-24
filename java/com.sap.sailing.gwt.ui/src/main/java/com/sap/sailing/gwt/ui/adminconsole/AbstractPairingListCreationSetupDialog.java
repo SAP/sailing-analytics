@@ -13,11 +13,9 @@ public abstract class AbstractPairingListCreationSetupDialog<T> extends DataEntr
     
     public AbstractPairingListCreationSetupDialog(StrippedLeaderboardDTO leaderboardDTO, String title, StringMessages stringMessages,
             Validator<T> validator, DialogCallback<T> callback) {
-        
         super(title, null, stringMessages.ok(), stringMessages.cancel(), validator, callback);
         this.stringMessages = stringMessages;
         this.leaderboardDTO = leaderboardDTO;
-        
     }
     
     @Override

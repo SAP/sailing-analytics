@@ -11,7 +11,7 @@ class App < Precious::App
     before do
         session['gollum.author'] = {
             :name => "%s" % settings.loggedInUser,
-            :email => "%s@example.com" % settings.loggedInUser,
+            :email => "%s" % settings.loggedInUserEmail,
         }
     end
 
@@ -56,6 +56,7 @@ class App < Precious::App
       end
       if @_auth.provided? && @_auth.basic? && @_auth.credentials && @user = detected_user(@_auth.credentials)
         Precious::App.set(:loggedInUser, @user.name)
+        Precious::App.set(:loggedInUserEmail, @user.email)
         return @user
       else
         response['WWW-Authenticate'] = %(Basic realm="Gollum Wiki")

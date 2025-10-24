@@ -13,4 +13,9 @@ public class FlagImageProvider implements ImageProvider {
         return "";
     }
 
+    @Override
+    public String getTakedownNoticeContextKey() {
+        return "takedownRequestForCompetitorFlagImage";
+    }
+
 }

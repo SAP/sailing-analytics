@@ -1,16 +1,16 @@
 package com.sap.sailing.datamining.impl.components;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.datamining.data.HasLeaderboardContext;
 import com.sap.sailing.datamining.data.HasRaceOfCompetitorContext;
@@ -54,7 +54,7 @@ public class TestSegmentsTackType extends StoredTrackBasedTest {
     private HasRaceOfCompetitorContext raceOfCompContext;
     private TackTypeSegmentRetrievalProcessor resultTTSegmentsRetrieval;
 
-    @Before
+    @BeforeEach
     public void setup() {
         competitorA = createCompetitorWithBoat("A");
         trackedRace = createTestTrackedRace("TestRegatta", "TestRace", "F18", createCompetitorAndBoatsMap(competitorA),

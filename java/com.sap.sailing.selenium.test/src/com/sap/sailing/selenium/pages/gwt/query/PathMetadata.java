@@ -1,7 +1,6 @@
 package com.sap.sailing.selenium.pages.gwt.query;
 
 import java.lang.reflect.Method;
-
 import java.util.Arrays;
 import java.util.Objects;
 

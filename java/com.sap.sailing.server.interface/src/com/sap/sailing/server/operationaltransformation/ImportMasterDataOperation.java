@@ -118,7 +118,6 @@ public class ImportMasterDataOperation extends
         this.connectivityParametersToRestore = masterData.getConnectivityParametersToRestore();
     }
 
-    
     /**
      * Operations of this type are expected to be explicitly sent out <em>before</em> the operation is applied locally on
      * the master server. This is important because otherwise tracking-related operations may be sent out before the
@@ -130,15 +129,14 @@ public class ImportMasterDataOperation extends
         return false;
     }
 
-
     @Override
     protected Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
 
-
     @Override
     public MasterDataImportObjectCreationCountImpl internalApplyTo(RacingEventService toState) throws Exception {
+        logger.info("Starting to import master data into "+toState);
         final DataImportLockWithProgress dataImportLock = toState.getDataImportLock();
         SecurityService securityService = toState.getSecurityService();
         if (securityService == null) {
@@ -194,6 +192,7 @@ public class ImportMasterDataOperation extends
             waitForTrackedRacesToFinishLoading(trackedRacesToWaitForLoadingComplete);
             dataImportLock.getProgress(importOperationId).setResult(creationCount);
             progress.setOverAllProgressPct(1.0);
+            logger.info("Done importing master data into "+toState);
             return creationCount;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error during execution of ImportMasterDataOperation", e);
@@ -245,7 +244,6 @@ public class ImportMasterDataOperation extends
         }
         logger.info("All races imported have finished loading");
     }
-
 
     private void importDeviceConfigurations(RacingEventService toState) {
         if (toState.getMasterDescriptor() == null) { // don't do this on a replica's RacingEventService; device config removals/additions are replicated by RacingEventService
@@ -513,8 +511,6 @@ public class ImportMasterDataOperation extends
         }
     }
     
-
-    
     private void importRaceLogTrackingGPSFixes(RacingEventService toState) {
         if (toState.getMasterDescriptor() == null) { // don't do this on a replica's RacingEventService; tracking data will be received through the tracked race loading replication
             Map<DeviceIdentifier, Set<Timed>> raceLogTrackingFixes = masterData.getRaceLogTrackingFixes();
@@ -634,7 +630,6 @@ public class ImportMasterDataOperation extends
             }
         }
     }
-
 
     private void createCourseAreasAndEvents(RacingEventService toState, LeaderboardGroup leaderboardGroup,
             SecurityService securityService) {

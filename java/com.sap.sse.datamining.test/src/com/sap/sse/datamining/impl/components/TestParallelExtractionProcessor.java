@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.components.Processor;
 import com.sap.sse.datamining.functions.Function;
@@ -34,7 +34,7 @@ public class TestParallelExtractionProcessor {
      */
     private Function<Integer> invalidFunction;
     
-    @Before
+    @BeforeEach
     public void initializeReceivers() {
         receivedValues = new HashMap<>();
         
@@ -52,7 +52,7 @@ public class TestParallelExtractionProcessor {
         receivers.add(receiver);
     }
     
-    @Before
+    @BeforeEach
     public void initializeExtractionFunctions() {
         Method getCrossSumMethod = FunctionTestsUtil.getMethodFromClass(Number.class, "getCrossSum");
         getCrossSumFunction = FunctionTestsUtil.getFunctionFactory().createMethodWrappingFunction(getCrossSumMethod);

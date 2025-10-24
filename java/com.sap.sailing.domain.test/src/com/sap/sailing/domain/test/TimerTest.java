@@ -1,13 +1,13 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.Timeout;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 /**
  * Tests around the Timer class; e.g., does it kill a timer if a task throws an exception?
@@ -15,10 +15,8 @@ import org.junit.rules.Timeout;
  * @author Axel Uhl (d043530)
  * 
  */
+@Timeout(value = 10, unit = TimeUnit.SECONDS)
 public class TimerTest {
-    @Rule
-    public Timeout AbstractTracTracLiveTestTimeout = Timeout.millis(10 * 1000);
-
     @Test
     public void exceptionInTask() throws InterruptedException {
         Timer t = new Timer("Test");

@@ -24,6 +24,7 @@ import com.sap.sailing.gwt.home.shared.places.event.EventDefaultPlace;
 import com.sap.sailing.gwt.home.shared.places.fakeseries.SeriesContext;
 import com.sap.sailing.gwt.home.shared.utils.CollapseAnimation;
 import com.sap.sailing.gwt.ui.client.StringMessages;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 
 public class EventsOverviewRecentYear extends Composite {
 
@@ -43,18 +44,15 @@ public class EventsOverviewRecentYear extends Composite {
     
     private final CollapseAnimation animation;
     
-    public EventsOverviewRecentYear(EventListYearDTO yearDTO, DesktopPlacesNavigator navigator, boolean showInitial) {
+    public EventsOverviewRecentYear(EventListYearDTO yearDTO, DesktopPlacesNavigator navigator, boolean showInitial, TakedownNoticeService takedownNoticeService) {
         List<EventListEventDTO> events = yearDTO.getEvents();
-        
         EventsOverviewRecentResources.INSTANCE.css().ensureInjected();
         initWidget(uiBinder.createAndBindUi(this));
-        
         this.year.setInnerText(String.valueOf(yearDTO.getYear()));
         this.eventsCount.setInnerText(i18n.eventsCount(yearDTO.getEventCount()));
-        
         for (EventListEventDTO eventDTO : events) {
             final PlaceNavigation<EventDefaultPlace> eventNavigation = navigator.getEventNavigation(eventDTO.getId().toString(), eventDTO.getBaseURL(), eventDTO.isOnRemoteServer());
-            final RecentEventTeaser recentEvent = new RecentEventTeaser(eventNavigation, eventDTO, eventDTO.getState().getListStateMarker());
+            final RecentEventTeaser recentEvent = new RecentEventTeaser(eventNavigation, eventDTO, eventDTO.getState().getListStateMarker(), takedownNoticeService);
             final EventListEventSeriesDTO eventSeriesData = eventDTO.getEventSeries();
             if (eventSeriesData != null) {
                 final SeriesContext ctx = SeriesContext

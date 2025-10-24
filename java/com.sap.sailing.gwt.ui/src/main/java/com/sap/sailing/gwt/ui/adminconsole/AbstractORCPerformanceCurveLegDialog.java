@@ -19,12 +19,30 @@ public abstract class AbstractORCPerformanceCurveLegDialog<T> extends DataEntryD
         this.stringMessages = stringMessages;
     }
 
+    public String getLegTypeName(ORCPerformanceCurveLegTypes legType, StringMessages stringMessages) {
+        switch (legType) {
+            case CIRCULAR_RANDOM:
+                return stringMessages.orcPerformanceCurveLegTypeNameCircularRandom();
+            case LONG_DISTANCE:
+                return stringMessages.orcPerformanceCurveLegTypeNameLongDistance();
+            case NON_SPINNAKER:
+                return stringMessages.orcPerformanceCurveLegTypeNameNonSpinnaker();
+            case TWA:
+                return stringMessages.orcPerformanceCurveLegTypeNameConstructedCourse();
+            case WINDWARD_LEEWARD:
+                return stringMessages.orcPerformanceCurveLegTypeNameWindwardLeeward();
+            case WINDWARD_LEEWARD_REAL_LIVE:
+                return stringMessages.orcPerformanceCurveLegTypeNameWindwardLeewardRealLive();
+        }
+        throw new RuntimeException("Internal error: don't know ORC performance curve leg type " + legType.name());
+    }
+    
     protected ListBox createLegTypeBox(ORCPerformanceCurveLegImpl orcLegParametersSoFar) {
         final ListBox legTypeBox = createListBox(/* isMultipleSelect */ false);
         legTypeBox.addItem("", (String) null);
         int i=1;
         for (final ORCPerformanceCurveLegTypes t : ORCPerformanceCurveLegTypes.values()) {
-            legTypeBox.addItem(t.name(), t.name());
+            legTypeBox.addItem(getLegTypeName(t, stringMessages), t.name());
             if (orcLegParametersSoFar != null && orcLegParametersSoFar.getType() == t) {
                 legTypeBox.setSelectedIndex(i);
             }

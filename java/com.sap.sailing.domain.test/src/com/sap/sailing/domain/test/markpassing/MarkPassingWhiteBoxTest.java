@@ -1,15 +1,15 @@
 package com.sap.sailing.domain.test.markpassing;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NavigableSet;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Course;
 import com.sap.sailing.domain.base.Waypoint;
@@ -32,9 +32,8 @@ import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 /**
  * Tests tricky situation that can fail easily. Created with help of http://itouchmap.com/latlong.html
- * 
  */
-@Ignore
+@Disabled
 public class MarkPassingWhiteBoxTest extends AbstractMockedRaceMarkPassingTest {
 
     @Test

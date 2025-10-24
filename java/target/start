@@ -130,18 +130,22 @@ if [[ $PARAM == "" ]] || [[ $PARAM == "no-update" ]]; then
     if [[ $PLATFORM != "Darwin" ]]; then
         if [[ $SERVER_PORT == "" ]] || [[ $SERVER_ACTIVE == "" ]]; then
             echo "Something went wrong with startup. Please check the logs..."
-            if [[ ${SERVER_STARTUP_NOTIFY} != "" ]]; then
-                echo "Startup of java server ${SERVER_NAME} on ${INSTANCE_ID} failed - check the logs ($SERVER_ACTIVE)\n\n$NETSTAT\n$PROCESS_INFO" | mail -s "Server $INSTANCE_ID startup failed!" ${SERVER_STARTUP_NOTIFY}
+            if which mail; then
+                if [[ ${SERVER_STARTUP_NOTIFY} != "" ]]; then
+                    echo "Startup of java server ${SERVER_NAME} on ${INSTANCE_ID} failed - check the logs ($SERVER_ACTIVE)\n\n$NETSTAT\n$PROCESS_INFO" | mail -r noreply@sapsailing.com -s "Server $INSTANCE_ID startup failed!" ${SERVER_STARTUP_NOTIFY}
+                fi
             fi
             exit
         fi
     fi
     echo "Started $SERVER_NAME - use telnet localhost $TELNET_PORT to connect to the OSGi console. Logs should be found in logs/sailing0.log.0"
-    if [[ ${SERVER_STARTUP_NOTIFY} != "" ]]; then
-        if [[ ! -z "$ON_AMAZON" ]]; then
-            echo "Go to http://$INSTANCE_DNS:$SERVER_PORT to reach your instance!" | mail -s "Server $SERVER_NAME on $INSTANCE_ID started up!" $MAIL_ATTACH_OPTION env.sh $SERVER_STARTUP_NOTIFY
-        else
-            echo "OK" | mail -s "Server $SERVER_NAME on $INSTANCE_ID started up!" $MAIL_ATTACH_OPTION env.sh ${SERVER_STARTUP_NOTIFY}
+    if which mail; then
+        if [[ ${SERVER_STARTUP_NOTIFY} != "" ]]; then
+            if [[ ! -z "$ON_AMAZON" ]]; then
+                echo "Go to http://$INSTANCE_DNS:$SERVER_PORT to reach your instance!" | mail -r noreply@sapsailing.com -s "Server $SERVER_NAME on $INSTANCE_ID started up!" $SERVER_STARTUP_NOTIFY
+            else
+                echo "OK" | mail -r noreply@sapsailing.com -s "Server $SERVER_NAME on $INSTANCE_ID started up!" ${SERVER_STARTUP_NOTIFY}
+            fi
         fi
     fi
 elif [[ $PARAM == "debug" ]]; then

@@ -1,15 +1,15 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
 import java.util.Collections;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.race.RaceLog;
 import com.sap.sailing.domain.base.Fleet;
@@ -56,7 +56,7 @@ public class RaceLogAttachOnTrackedRaceTest {
     
     private FlexibleLeaderboard leaderboard;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         leaderboard = new FlexibleLeaderboardImpl("", null, new LowPoint(), null);
     }

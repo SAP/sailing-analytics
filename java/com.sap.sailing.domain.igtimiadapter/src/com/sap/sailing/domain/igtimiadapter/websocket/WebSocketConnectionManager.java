@@ -187,10 +187,7 @@ public class WebSocketConnectionManager implements LiveDataConnection {
                 logger.fine("Received server heartbeat for "+this);
                 receivedServerHeartbeatInInterval = true;
             } else if (message.startsWith("[")) {
-                messageCount++;
-                if (messageCount % LOG_EVERY_SO_MANY_MESSAGES == 0) {
-                    logger.info("Received another "+LOG_EVERY_SO_MANY_MESSAGES+" Igtimi messages. Last message was: "+message);
-                }
+                logMessageCount(message);
                 final List<Fix> fixes = new ArrayList<>();
                 try {
                     final JSONArray jsonArray = (JSONArray) new JSONParser().parse(message);
@@ -221,12 +218,20 @@ public class WebSocketConnectionManager implements LiveDataConnection {
             final ByteBuffer bb = ByteBuffer.wrap(payload, offset, len);
             try {
                 final Msg msg = Msg.parseFrom(bb);
+                logMessageCount(msg.toString());
                 final Iterable<Fix> fixes = fixFactory.createFixes(msg);
                 fixes.forEach(fix->warnUnknownDeviceId(msg, fix));
                 notifyListeners(fixes);
             } catch (IOException e) {
                 logger.log(Level.SEVERE, "Error trying to parse or send bytes received on web socket", e);
                 throw new RuntimeException(e);
+            }
+        }
+
+        private void logMessageCount(final String msg) {
+            messageCount++;
+            if (messageCount % LOG_EVERY_SO_MANY_MESSAGES == 0) {
+                logger.info("Received another "+LOG_EVERY_SO_MANY_MESSAGES+" Igtimi messages. Last message was: "+msg);
             }
         }
         

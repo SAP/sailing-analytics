@@ -4,8 +4,8 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.UUID;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.EventBase;
 import com.sap.sailing.domain.base.impl.StrippedEventImpl;
@@ -16,7 +16,7 @@ public class EventUtilTest {
     @Test
     public void testGetYearOfEvent() {
         EventBase event = getEventForDate(2017, 6, 27);
-        Assert.assertEquals(Integer.valueOf(2017), EventUtil.getYearOfEvent(event));
+        Assertions.assertEquals(Integer.valueOf(2017), EventUtil.getYearOfEvent(event));
     }
 
     private EventBase getEventForDate(int year, int month, int date) {

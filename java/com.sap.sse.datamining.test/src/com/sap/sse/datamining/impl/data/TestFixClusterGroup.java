@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.data.Cluster;
 import com.sap.sse.datamining.data.ClusterBoundary;
@@ -67,7 +67,7 @@ public class TestFixClusterGroup {
         return new FixClusterGroup<>(clusters);
     }
 
-    @Before
+    @BeforeEach
     public void initializeClusters() {
         ClusterBoundary<Integer> lowerThanZero = new ComparatorClusterBoundary<Integer>(0, ComparisonStrategy.LOWER_THAN, comparator);
         clusterLowerThanZero = new ClusterWithSingleBoundary<>(lowerThanZero);

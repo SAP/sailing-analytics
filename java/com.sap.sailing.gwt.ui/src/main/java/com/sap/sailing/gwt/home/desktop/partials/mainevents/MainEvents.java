@@ -17,6 +17,7 @@ import com.sap.sailing.gwt.home.desktop.partials.eventsrecent.RecentEventTeaser;
 import com.sap.sailing.gwt.home.shared.app.PlaceNavigation;
 import com.sap.sailing.gwt.home.shared.places.event.EventDefaultPlace;
 import com.sap.sailing.gwt.home.shared.places.events.EventsPlace;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 
 public class MainEvents extends Composite {
     interface MainEventsUiBinder extends UiBinder<Widget, MainEvents> {
@@ -38,13 +39,13 @@ public class MainEvents extends Composite {
         showAllEventsAnchor.setHref(eventsNavigation.getTargetUrl());
     }
 
-    public void setRecentEvents(List<EventListEventDTO> recentEvents) {
+    public void setRecentEvents(List<EventListEventDTO> recentEvents, TakedownNoticeService takedownNoticeService) {
         final int MAX_RECENT_EVENTS_ON_HOME_PAGE = 3;
         recentEventsTeaserPanel.clear();
         for (int i=0; i<recentEvents.size() && i<MAX_RECENT_EVENTS_ON_HOME_PAGE; i++) {
             EventListEventDTO event = recentEvents.get(i);
-            PlaceNavigation<EventDefaultPlace> eventNavigation = navigator.getEventNavigation(event.getId().toString(), event.getBaseURL(), event.isOnRemoteServer());
-            RecentEventTeaser recentEvent = new RecentEventTeaser(eventNavigation, event, event.getState().getListStateMarker());
+            final PlaceNavigation<EventDefaultPlace> eventNavigation = navigator.getEventNavigation(event.getId().toString(), event.getBaseURL(), event.isOnRemoteServer());
+            final RecentEventTeaser recentEvent = new RecentEventTeaser(eventNavigation, event, event.getState().getListStateMarker(), takedownNoticeService);
             recentEventsTeaserPanel.add(recentEvent);
         }
     }

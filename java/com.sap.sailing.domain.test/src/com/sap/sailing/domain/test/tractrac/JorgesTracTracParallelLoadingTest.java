@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.test.tractrac;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.Duration;
 import com.tractrac.model.lib.api.ModelLocator;
@@ -249,7 +249,7 @@ public class JorgesTracTracParallelLoadingTest {
             fail("Key set differs: a-b="+diff1+", b-a="+diff2+"; in the meantime the following keys were updated: "+outputs.keySet());
         }
         for (String key : firstRunsOutput.keySet()) {
-            assertEquals("values for key "+key+" differ", firstRunsOutput.get(key).toString(), secondRunsOutput.get(key).toString());
+            assertEquals(firstRunsOutput.get(key).toString(), secondRunsOutput.get(key).toString(), "values for key "+key+" differ");
         }
     }
 }

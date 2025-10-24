@@ -2,8 +2,37 @@
 
 [[_TOC_]]
 
-## Adding a Bundle
-We distinguish two cases: adding a 3rd-party bundle to the target platform and adding a new development bundle as a Java project.
+## Adding a New Boat Class
+
+Support for different boat classes comes with the following aspects:
+* Name and possible alias names for the boat class
+* hull dimensions
+* separate downwind sail configuration for display
+* boat class symbol / icon
+* map visualization
+
+If you'd like to add a boat class that the system does not yet support with its own boat class symbol or even a separate, new boat visualization on the map, the necessary extensions currently need to me implemented as code.
+
+To start with, add an enumeration literal for the new class in [BoatClassMasterdata](https://github.com/SAP/sailing-analytics/blob/main/java/com.sap.sailing.domain.common/src/com/sap/sailing/domain/common/BoatClassMasterdata.java). The constructor needs to tell the default boat class name, whether races in this class typically have an upwind start (in which case we'll be more confident in guessing wind direction for races in this class based on the first leg's bearing), the hull length and beam in meters, the hull type, whether or not boats of that class fly a separate downwind sail, and optionally a list of alternative boat class names that can help users find the class, or to reflect name changes over time (Laser becoming ILCA, for example).
+
+To understand the next steps, you may also search your workspace for usages of other ``BoatClassMasterdata`` enumeration literals. You will typically find at least two more: one in [BoatClassImageResolver](https://github.com/SAP/sailing-analytics/blob/main/java/com.sap.sailing.gwt.ui/src/main/java/com/sap/sailing/gwt/common/client/BoatClassImageResolver.java) which helps define the boat class symbol / icon to be displayed in the UI and made available through the REST API, e.g., for the companion apps; and another in [BoatClassVectorGraphicsResolver](https://github.com/SAP/sailing-analytics/blob/main/java/com.sap.sailing.gwt.ui/src/main/java/com/sap/sailing/gwt/ui/client/shared/racemap/BoatClassVectorGraphicsResolver.java) which defines how boats of this class are to be visualized on the map.
+
+For the boat class symbol you have to create a transparent 140x140 pixel PNG file and place it in the ``java/com.sap.sailing.gwt.ui/src/main/resources/com/sap/sailing/gwt/ui/client/images/boatclass`` folder. The file's base name must match the ``BoatClassMasterdata`` enumeration literal you created _exactly_. The file extension shall be ``.png``. Then, define a GWT image resource in [BoatClassImageResolver](https://github.com/SAP/sailing-analytics/blob/main/java/com.sap.sailing.gwt.ui/src/main/java/com/sap/sailing/gwt/common/client/BoatClassImageResolver.java), using one of the other resource definitions in that class as an example:
+```
+    @Source("com/sap/sailing/gwt/ui/client/images/boatclass/FINN.png")
+    @ImageOptions(preventInlining = true)
+    ImageResource FinnIcon();
+```
+In ``BoatClassImageResolver`` then use this image resource, e.g., as follows:
+```
+        boatClassIconsMap.put(BoatClassMasterdata.FINN.getDisplayName(), imageResources.FinnIcon());
+```
+If any of the already existing boat class map visualizations work for your new class, simply add your new enumeration literal to the ``BoatClassVectorGraphics`` constructor in ``BoatClassVectorGraphicsResolver``'s static initializer that best matches your boat class. If you feel you need a better, more specific boat class visualization on the map, you'll have to [[implement your own|wiki/howto/development/boatgraphicssvg.md]] ``BoatClassVectorGraphics`` class and use that in the static initializer of ``BoatClassVectorGraphicsResolver``.
+
+Mention the new boat class in the release notes, and don't forget to add all new files to your Git index before committing ;-).
+
+## Adding an OSGi Bundle
+Make sure you have read [[Workspace, Bundles, Projects|wiki/info/general/workspace-bundles-projects-structure]] before continuing. We distinguish two cases: adding a 3rd-party bundle to the target platform and adding a new development bundle as a Java project.
 
 ## Adding a Bundle to the Target Platform
 * Add a New Library which can not be found in any SAP Repository
@@ -26,7 +55,8 @@ Bundle-Version: 3.6.4
  * Currently this scripts work for the cygwin shell and the git bash, if the path to your files in the target definition is incorrect, this may be the reason.
 * Test the new overall target platform
  * by setting the race-analysis-p2-local.target as target platform in the IDE
- * by running the local maven build via ''buildAndUpdateProduct.sh -v build'' (the ''-v'' switch builds and uses the local p2 repository)
+ * by running the ``release`` workflow on Github using the "Build with a local target platform (set to "true" to use local target platform)" switch, or
+ * run the local maven build via ''buildAndUpdateProduct.sh -v build'' (the ''-v'' switch builds and uses the local p2 repository)
 * The admin of the central p2 repository (currently at sapsailing.com) must now replace the content of the central server /home/trac/p2-repositories/sailing with the content of the new local base p2 repository (com.sap.sailing.targetplatform.base/target/repository), using the 'uploadRepositoryToServer.sh' script
 * Reload the target platform in the IDE
 
@@ -339,4 +369,4 @@ When TracTrac publishes a TracAPI upgrade, they usually notify us by e-mail and 
 
 After downloading, extract the ``lib/TracAPI.jar`` and ``src/TracAPI-src.jar`` from the ``TracAPI-x.y.z.tar.gz`` to ``java/com.tractrac.clientmodule/lib``. Unpack the ``TracAPI-x.y.z-javadoc.tar.gz`` into ``java/com.tractrac.clientmodule/javadoc`` and adjust the versions in ``META-INF/MANIFEST.MF`` and ``pom.xml`` accordingly. Unpack the ``Readme.txt`` file from ``TracAPI-x.y.z.tar.gz`` to ``java/com.tractrac.clientmodule``. Optionally, unpack the sample sources from the ``src/com`` folder contained in ``TracAPI-x.y.z.tar.gz`` into ``java/com.tractrac.clientmodule/src``.
 
-For non-trivial upgrades use of a git branch and dedicated build job is recommended. Otherwise, committing and pushing to master with the ``SAPSailingAnalytics-master`` build job picking up and testing the changes should suffice.
+For non-trivial upgrades use of a git branch and dedicated build job is recommended. Otherwise, committing and pushing to the ``main`` branch with the ``SAPSailingAnalytics-master`` build job picking up and testing the changes should suffice.

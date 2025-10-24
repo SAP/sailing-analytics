@@ -62,12 +62,20 @@ public interface AICore {
     static AICore getDefault() throws MalformedURLException, ParseException {
         final String systemProperty = System.getProperty(CREDENTIALS_SYSTEM_PROPERTY_NAME);
         final Credentials credentials;
-        if (systemProperty == null) {
+        if (Util.hasLength(systemProperty)) {
+            Credentials parsedCredentials;
+            try {
+                parsedCredentials = CredentialsParser.create().parse(systemProperty);
+            } catch (Exception e) {
+                logger.warning("Failed to parse credentials from system property "+CREDENTIALS_SYSTEM_PROPERTY_NAME+
+                        ": "+systemProperty);
+                parsedCredentials = null;
+            }
+            credentials = parsedCredentials != null ? parsedCredentials : null;
+        } else {
             logger.warning("No credentials provided for AICore service through system property "+CREDENTIALS_SYSTEM_PROPERTY_NAME+
                     "; cannot produce an authenticated default service instance");
             credentials = null;
-        } else {
-            credentials = CredentialsParser.create().parse(systemProperty);
         }
         return AICore.create(credentials);
     }

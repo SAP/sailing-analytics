@@ -1,14 +1,14 @@
 package com.sap.sailing.domain.test.markpassing;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Date;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.Waypoint;
@@ -120,8 +120,8 @@ public class StarIDM2013MarkPassingTest extends AbstractMarkPassingTest {
             fail("Expected mark passing for "+competitor+" and "+waypoint+" around "+when+" but no mark passing found");
         }
         final Duration offset = new MillisecondsTimePoint(when).until(markPassing.getTimePoint()).abs();
-        assertTrue("Expected mark passing for "+competitor+" and "+waypoint+" around "+when+
-                " but found one at "+markPassing.getTimePoint()+" which is "+offset+" off.", offset.asSeconds() < 10);
+        assertTrue(offset.asSeconds() < 10, "Expected mark passing for "+competitor+" and "+waypoint+" around "+when+
+                        " but found one at "+markPassing.getTimePoint()+" which is "+offset+" off.");
     }
 
     @Test

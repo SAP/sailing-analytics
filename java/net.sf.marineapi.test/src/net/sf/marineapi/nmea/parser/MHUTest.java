@@ -23,10 +23,11 @@ package net.sf.marineapi.nmea.parser;
 import net.sf.marineapi.nmea.sentence.MHUSentence;
 import net.sf.marineapi.nmea.sentence.SentenceId;
 import net.sf.marineapi.nmea.sentence.TalkerId;
-import org.junit.Before;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * MHU parser tests.
@@ -40,7 +41,7 @@ public class MHUTest {
     private MHUSentence mhu;
     private MHUSentence empty;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         mhu = new MHUParser(EXAMPLE);
         empty = new MHUParser(TalkerId.II);

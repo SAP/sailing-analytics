@@ -1,13 +1,13 @@
 package com.sap.sailing.grib.test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.impl.DegreePosition;
@@ -25,12 +25,12 @@ import ucar.unidata.geoloc.LatLonRect;
 public class Bzip2GridFileReadingTest {
     private GridDataset dataSet;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         dataSet = GridDataset.open("resources/EWAM_DD_10M_2017011912_050.grib2.bz2");
     }
     
-    @After
+    @AfterEach
     public void tearDown() throws IOException {
         dataSet.close();
     }

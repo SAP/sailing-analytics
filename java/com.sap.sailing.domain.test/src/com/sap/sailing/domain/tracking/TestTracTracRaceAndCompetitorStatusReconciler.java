@@ -1,18 +1,18 @@
 package com.sap.sailing.domain.tracking;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
@@ -95,7 +95,7 @@ public class TestTracTracRaceAndCompetitorStatusReconciler {
         }
     }
     
-    @Before
+    @BeforeEach
     public void setUp() {
         author = new LogEventAuthorImpl("me", 1);
         startOfPass = MillisecondsTimePoint.now();

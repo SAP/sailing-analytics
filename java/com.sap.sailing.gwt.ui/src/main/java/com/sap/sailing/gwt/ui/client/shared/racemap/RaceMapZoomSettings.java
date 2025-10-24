@@ -2,7 +2,7 @@ package com.sap.sailing.gwt.ui.client.shared.racemap;
 
 import java.util.Collections;
 
-import com.google.gwt.maps.client.base.LatLngBounds;
+import com.sap.sailing.domain.common.NonCardinalBounds;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.settings.generic.AbstractGenericSerializableSettings;
 import com.sap.sse.common.settings.generic.BooleanSetting;
@@ -17,19 +17,19 @@ public class RaceMapZoomSettings extends AbstractGenericSerializableSettings {
 
     /**
      * The auto-zoom types for a {@link RaceMap}.<br />
-     * Each zoom type has a {@link LatLngBoundsCalculator}, which calculates the new bounds for a map.
+     * Each zoom type has a {@link NonCardinalBoundsCalculator}, which calculates the new bounds for a map.
      */
     public enum ZoomTypes {
         NONE(null), WINDSENSORS(new RaceMap.WindSensorsBoundsCalculator()), BOATS(new RaceMap.BoatsBoundsCalculator()), 
         TAILS(new RaceMap.TailsBoundsCalculator()), BUOYS(new RaceMap.CourseMarksBoundsCalculator());
 
-        private LatLngBoundsCalculator calculator;
+        private NonCardinalBoundsCalculator calculator;
 
-        private ZoomTypes(LatLngBoundsCalculator calculator) {
+        private ZoomTypes(NonCardinalBoundsCalculator calculator) {
             this.calculator = calculator;
         }
 
-        public LatLngBounds calculateNewBounds(RaceMap forMap) {
+        public NonCardinalBounds calculateNewBounds(RaceMap forMap) {
             return calculator == null ? null : calculator.calculateNewBounds(forMap);
         }
     };
@@ -72,18 +72,17 @@ public class RaceMapZoomSettings extends AbstractGenericSerializableSettings {
         }
     }
     
-    public LatLngBounds getNewBounds(RaceMap forMap) {
-        LatLngBounds newBounds = null;
+    public NonCardinalBounds getNewBounds(RaceMap forMap) {
+        NonCardinalBounds newBounds = null;
         if (typesToConsiderOnZoom != null) {
-            for (ZoomTypes type : typesToConsiderOnZoom.getValues()) {
-                //Calculate the new bounds and extend the result
-                LatLngBounds calculatedBounds = type.calculateNewBounds(forMap);
+            for (final ZoomTypes type : typesToConsiderOnZoom.getValues()) {
+                // Calculate the new bounds and extend the result
+                final NonCardinalBounds calculatedBounds = type.calculateNewBounds(forMap);
                 if (calculatedBounds != null) {
                     if (newBounds == null) {
                         newBounds = calculatedBounds;
                     } else {
-                        newBounds.extend(calculatedBounds.getNorthEast());
-                        newBounds.extend(calculatedBounds.getSouthWest());
+                        newBounds = newBounds.extend(calculatedBounds);
                     }
                 }
             }

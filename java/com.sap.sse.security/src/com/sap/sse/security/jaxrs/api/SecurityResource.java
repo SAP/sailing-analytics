@@ -110,7 +110,7 @@ public class SecurityResource extends AbstractSecurityResource {
                     usernames.add(userWithPermission.getName());
                 }
             }
-            logger.info("Request for users with permission took "+start.until(TimePoint.now()));
+            logger.fine(()->"Request for users with permission took "+start.until(TimePoint.now()));
             return Response.status(Status.OK).entity(streamingOutput(usernames)).build();
         } catch (Exception e) {
             return Response.status(Status.PRECONDITION_FAILED).entity(e.getMessage()).build();

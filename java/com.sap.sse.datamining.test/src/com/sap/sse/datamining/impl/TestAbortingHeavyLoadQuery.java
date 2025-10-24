@@ -1,9 +1,9 @@
 package com.sap.sse.datamining.impl;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
@@ -23,9 +23,9 @@ import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.Query;
 import com.sap.sse.datamining.QueryState;
@@ -131,15 +131,15 @@ public class TestAbortingHeavyLoadQuery {
         // Checking query, result and processor chain state
         assertThat(query.getState(), is(QueryState.ABORTED));
         assertThat(result.getState(), is(QueryResultState.ABORTED));
-        assertTrue("The result is not empty", result.isEmpty());
+        assertTrue(result.isEmpty(), "The result is not empty");
         for (Processor<?, ?> processor : processors) {
-            assertTrue("Processor wasn't aborted", processor.isAborted());
+            assertTrue(processor.isAborted(), "Processor wasn't aborted");
         }
         // Execution of unfinished instructions
         executor.shutdown();
         boolean terminated = executor.awaitTermination(TerminationTimeout, TimeUnit.MILLISECONDS);
         printExecutionRecord();
-        assertTrue("The executor didn't terminate in the given time", terminated);
+        assertTrue(terminated, "The executor didn't terminate in the given time");
         // The query execution returned, so all processors have received the abort signal (checked below).
         // The number of unfinished instructions mustn't change after this point
         int unfinishedInstructionsCount = unfinishedInstructions.size();
@@ -160,26 +160,26 @@ public class TestAbortingHeavyLoadQuery {
         assertThat("Number of unfinished instructions changed", unfinishedInstructions.size(), is(unfinishedInstructionsCount));
         for (StatefulProcessorInstruction<?> instruction : unfinishedInstructions) {
             boolean previouslyContained = runningInstructions.contains(instruction) || notStartedInstructions.contains(instruction);
-            assertTrue("A new instruction has been scheduled after aborting the query", previouslyContained);
+            assertTrue(previouslyContained, "A new instruction has been scheduled after aborting the query");
         }
         for (StatefulProcessorInstruction<?> instruction : runningInstructions) {
-            assertTrue("A previously running instruction was removed from unfinished instructions", unfinishedInstructions.contains(instruction));
+            assertTrue(unfinishedInstructions.contains(instruction), "A previously running instruction was removed from unfinished instructions");
         }
         for (StatefulProcessorInstruction<?> instruction : notStartedInstructions) {
-            assertTrue("A previously unstarted instruction was removed from unfinished instructions", unfinishedInstructions.contains(instruction));
+            assertTrue(unfinishedInstructions.contains(instruction), "A previously unstarted instruction was removed from unfinished instructions");
         }
         // Checking state of unfinished instructions
         for (StatefulProcessorInstruction<?> instruction : runningInstructions) {
-            assertTrue("computeResult() of a running unfinished instruction didn't finish", instruction.computeResultWasCalled() == instruction.computeResultWasFinished());
+            assertTrue(instruction.computeResultWasCalled() == instruction.computeResultWasFinished(), "computeResult() of a running unfinished instruction didn't finish");
             if (instruction instanceof StatefulBlockingInstruction) {
                 StatefulBlockingInstruction<?> blockingInstruction = (StatefulBlockingInstruction<?>) instruction;
-                assertTrue("computeResult() of a running heavy load instruction wasn't aborted", !blockingInstruction.computeResultWasCalled() || blockingInstruction.computeResultWasAborted());
+                assertTrue(!blockingInstruction.computeResultWasCalled() || blockingInstruction.computeResultWasAborted(), "computeResult() of a running heavy load instruction wasn't aborted");
             }
         }
         for (StatefulProcessorInstruction<?> instruction : notStartedInstructions) {
-            assertTrue("run() of an unstarted unfinished instruction wasn't called", instruction.runWasCalled());
-            assertFalse("computeResult() of an unstarted unfinished instruction was called", instruction.computeResultWasCalled());
-            assertFalse("computeResult() of an unstarted unfinished instruction was finished", instruction.computeResultWasFinished());
+            assertTrue(instruction.runWasCalled(), "run() of an unstarted unfinished instruction wasn't called");
+            assertFalse(instruction.computeResultWasCalled(), "computeResult() of an unstarted unfinished instruction was called");
+            assertFalse(instruction.computeResultWasFinished(), "computeResult() of an unstarted unfinished instruction was finished");
         }
     }
 
@@ -232,7 +232,7 @@ public class TestAbortingHeavyLoadQuery {
      * A concurrent set ({@link ConcurrentHashMap#newKeySet()}) is used to track the unfinished instructions. An instruction
      * is added to the set upon its construction and is removed when the instruction finished callback method is called.
      */
-    @Before
+    @BeforeEach
     @SuppressWarnings("unchecked")
     public void initialize() {
         if (RecordExecution) {
@@ -454,7 +454,7 @@ public class TestAbortingHeavyLoadQuery {
 
     }
     
-    @After
+    @AfterEach
     public void resetComputeResultAccessibility() throws SecurityException, NoSuchMethodException {
         AbstractProcessorInstruction.class.getDeclaredMethod("computeResult").setAccessible(false);
     }

@@ -1,7 +1,7 @@
 package com.sap.sailing.server.gateway.serialization.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -12,8 +12,8 @@ import java.util.Collections;
 import java.util.UUID;
 
 import org.json.simple.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.DomainFactory;
 import com.sap.sailing.domain.base.EventBase;
@@ -66,7 +66,7 @@ public class EventWithNullStartAndEndDataJsonSerializerTest {
         expectedLogoImageDescriptor = new ImageDescriptorImpl(expectedLogoImageURL, MillisecondsTimePoint.now());
     }
     
-    @Before
+    @BeforeEach
     public void setUp() {
         // Event and its basic attributes ...
         when(expectedLeaderboardGroup.getId()).thenReturn(UUID.randomUUID());

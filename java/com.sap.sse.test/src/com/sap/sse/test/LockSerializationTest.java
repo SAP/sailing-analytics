@@ -1,7 +1,7 @@
 package com.sap.sse.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.concurrent.LockUtil;
 import com.sap.sse.concurrent.NamedReentrantReadWriteLock;
@@ -26,7 +26,7 @@ import com.sap.sse.concurrent.NamedReentrantReadWriteLock;
 public class LockSerializationTest {
     private NamedReentrantReadWriteLock lock;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         lock = new NamedReentrantReadWriteLock("A", /* fair */ false);
     }

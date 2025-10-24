@@ -1,9 +1,9 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.CompetitorWithBoat;
@@ -25,7 +25,7 @@ public class CourseChangeBasedTrackApproximationTest {
     private DynamicGPSFixTrack<Competitor, GPSFixMoving> track;
     private CourseChangeBasedTrackApproximation approximation;
 
-    @Before
+    @BeforeEach
     public void setUp() throws InterruptedException {
         final CompetitorWithBoat competitor = TrackBasedTest.createCompetitorWithBoat("Someone");
         track = new DynamicGPSFixMovingTrackImpl<Competitor>(competitor,

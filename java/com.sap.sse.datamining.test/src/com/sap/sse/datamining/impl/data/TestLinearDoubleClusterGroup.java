@@ -4,8 +4,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.data.Cluster;
 
@@ -14,7 +14,7 @@ public class TestLinearDoubleClusterGroup {
     private LinearDoubleClusterGroup hardPercentageClusterGroup;
     private LinearDoubleClusterGroup softLinearClusterGroup;
     
-    @Before
+    @BeforeEach
     public void initialize() {
         hardPercentageClusterGroup = new LinearDoubleClusterGroup(0.0, 1.0, 0.1, true);
         softLinearClusterGroup = new LinearDoubleClusterGroup(0, 100, 10, false);

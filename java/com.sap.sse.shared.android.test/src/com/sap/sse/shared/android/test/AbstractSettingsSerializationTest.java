@@ -1,11 +1,12 @@
 package com.sap.sse.shared.android.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.filter.TextOperator;
 import com.sap.sse.common.filter.TextOperator.Operators;
@@ -271,17 +272,21 @@ public abstract class AbstractSettingsSerializationTest<SOT> {
      * Verifies that it is not possible to have two equally named child settings that would cause conflicts on
      * serialization.
      */
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testDuplicateSetting() {
-        new DuplicateFieldSettings();
+        assertThrows(RuntimeException.class, () -> {
+            new DuplicateFieldSettings();
+        });
     }
     
     /**
      * Verifies that it is not possible to have setting names with ".".
      */
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testDisallowedSettingNameSetting() {
-        new DisallowedKeySettings();
+        assertThrows(RuntimeException.class, () -> {
+            new DisallowedKeySettings();
+        });
     }
 
     /**

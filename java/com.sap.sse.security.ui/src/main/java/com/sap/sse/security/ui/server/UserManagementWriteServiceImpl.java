@@ -19,6 +19,7 @@ import com.sap.sse.ServerInfo;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Triple;
 import com.sap.sse.common.mail.MailException;
+import com.sap.sse.common.media.TakedownNoticeRequestContext;
 import com.sap.sse.security.Action;
 import com.sap.sse.security.SecurityService;
 import com.sap.sse.security.shared.HasPermissions.DefaultActions;
@@ -674,8 +675,7 @@ public class UserManagementWriteServiceImpl extends UserManagementServiceImpl im
             AccessControlListDTO acl) throws UnauthorizedException {
         if (SecurityUtils.getSubject()
                 .isPermitted(idOfAccessControlledObject.getStringPermission(DefaultActions.CHANGE_ACL))) {
-            
-            Map<UserGroup, Set<String>> aclActionsByGroup = new HashMap<>();
+            final Map<UserGroup, Set<String>> aclActionsByGroup = new HashMap<>();
             for (Entry<StrippedUserGroupDTO, Set<String>> entry : acl.getActionsByUserGroup().entrySet()) {
                 final StrippedUserGroupDTO groupDTO = entry.getKey();
                 final UserGroup userGroup;
@@ -686,7 +686,6 @@ public class UserManagementWriteServiceImpl extends UserManagementServiceImpl im
                 }
                 aclActionsByGroup.put(userGroup, entry.getValue());
             }
-
             return securityDTOFactory.createAccessControlListDTO(getSecurityService()
                     .overrideAccessControlList(idOfAccessControlledObject, aclActionsByGroup));
         } else {
@@ -704,5 +703,10 @@ public class UserManagementWriteServiceImpl extends UserManagementServiceImpl im
     public void setCORSFilterConfigurationAllowedOrigins(ArrayList<String> allowedOrigins) {
         getSecurityService().checkCurrentUserServerPermission(ServerActions.CONFIGURE_CORS_FILTER);
         getSecurityService().setCORSFilterConfigurationAllowedOrigins(ServerInfo.getName(), allowedOrigins.toArray(new String[0]));
+    }
+    
+    @Override
+    public void fileTakedownNotice(TakedownNoticeRequestContext takedownNoticeRequestContext) throws MailException {
+        getSecurityService().fileTakedownNotice(takedownNoticeRequestContext);
     }
 }

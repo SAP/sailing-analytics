@@ -10,7 +10,7 @@ import com.sap.sailing.gwt.home.shared.places.ShareablePlaceContext;
  * Common context used by the different tabs in the series place.
  * 
  */
-public class SeriesContext implements ShareablePlaceContext{
+public class SeriesContext implements ShareablePlaceContext {
     private final UUID seriesId;
     private UUID leaderboardGroupId;
     

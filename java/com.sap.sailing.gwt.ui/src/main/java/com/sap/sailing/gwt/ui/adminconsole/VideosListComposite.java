@@ -293,7 +293,7 @@ public class VideosListComposite extends Composite {
         }
     }
     
-    public void fillVideos(List<VideoDTO> videos) {
+    public void fillVideos(List<? extends VideoDTO> videos) {
         videoSelectionModel.clear();
         videoListDataProvider.getList().clear();
         videoListDataProvider.getList().addAll(videos);

@@ -56,7 +56,7 @@ public class Activator implements BundleActivator {
         final int bindPort = Integer.valueOf(riotPortAsString);
         final DomainObjectFactory domainObjectFactory = PersistenceFactory.INSTANCE.getDefaultDomainObjectFactory();
         final MongoObjectFactory mongoObjectFactory = PersistenceFactory.INSTANCE.getDefaultMongoObjectFactory();
-        riotServer = RiotServer.create(bindPort, domainObjectFactory, mongoObjectFactory);
+        riotServer = RiotServer.create(bindPort, domainObjectFactory, mongoObjectFactory, context);
         context.registerService(RiotServer.class, riotServer, null);
         final Dictionary<String, String> replicableServiceProperties = new Hashtable<>();
         replicableServiceProperties.put(Replicable.OSGi_Service_Registry_ID_Property_Name, riotServer.getId().toString());

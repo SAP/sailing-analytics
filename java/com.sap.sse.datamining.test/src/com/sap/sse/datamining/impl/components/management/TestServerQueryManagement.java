@@ -3,7 +3,7 @@ package com.sap.sse.datamining.impl.components.management;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -12,8 +12,8 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.AdditionalQueryData;
 import com.sap.sse.datamining.DataMiningServer;
@@ -39,7 +39,7 @@ public class TestServerQueryManagement {
     private static final FunctionFactory functionFactory = new FunctionFactory();
     private DataMiningServer server;
     
-    @Before
+    @BeforeEach
     public void initializeServer() {
         server = TestsUtil.createNewServer();
     }

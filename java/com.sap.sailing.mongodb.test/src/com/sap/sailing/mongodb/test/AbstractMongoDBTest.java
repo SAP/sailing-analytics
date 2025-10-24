@@ -1,11 +1,11 @@
 package com.sap.sailing.mongodb.test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.net.UnknownHostException;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoClient;
@@ -35,14 +35,14 @@ public abstract class AbstractMongoDBTest {
         return MongoClients.create(dbConfiguration.getMongoClientURI());
     }
     
-    @Before
+    @BeforeEach
     public void dropTestDB() throws UnknownHostException, MongoException, InterruptedException {
         assertNotNull(mongo);
         dropAllCollections(db);
         assertNotNull(db);
     }
     
-    @After
+    @AfterEach
     public void tearDown() {
     }
 

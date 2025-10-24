@@ -1,11 +1,11 @@
 package com.sap.sse.security.jaxrs.api;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -20,8 +20,8 @@ import org.apache.shiro.subject.Subject;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.media.MediaTrack;
 import com.sap.sse.common.mail.MailException;
@@ -55,7 +55,7 @@ public class SecurityResourceTest {
     private UserStore store;
     private AccessControlStore accessControlStore;
 
-    @Before
+    @BeforeEach
     public void setUp() throws UserManagementException, MailException, UserGroupManagementException {
         PersistenceFactory.INSTANCE.getDefaultMongoObjectFactory().getDatabase().drop();
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();

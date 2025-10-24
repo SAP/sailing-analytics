@@ -20,8 +20,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.BoatClass;
 import com.sap.sailing.domain.base.Competitor;
@@ -84,7 +84,7 @@ public class PolarDataMinerTest {
         return new BearingClusterGroup(0, 180, 5);
     }
 
-    @Ignore("The test did work before DataMining was used for polars; maybe rework in the future...")
+    @Disabled("The test did work before DataMining was used for polars; maybe rework in the future...")
     @Test
     public void testGrouping() throws InterruptedException, TimeoutException, NoSuchMethodException,
             NotEnoughDataHasBeenAddedException {

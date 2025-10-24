@@ -12,13 +12,13 @@ import com.sap.sailing.gwt.home.communication.eventlist.EventListViewDTO;
 import com.sap.sailing.gwt.home.communication.eventlist.EventListYearDTO;
 import com.sap.sailing.gwt.home.mobile.partials.recents.EventsOverviewRecent;
 import com.sap.sailing.gwt.home.mobile.partials.upcoming.EventsOverviewUpcoming;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 
 public class EventsViewImpl extends Composite implements EventsView {
     private static StartPageViewUiBinder uiBinder = GWT.create(StartPageViewUiBinder.class);
 
     interface StartPageViewUiBinder extends UiBinder<Widget, EventsViewImpl> {
     }
-
 
     @UiField(provided = true)
     protected EventsOverviewUpcoming upcomingUi;
@@ -29,18 +29,13 @@ public class EventsViewImpl extends Composite implements EventsView {
         upcomingUi = new EventsOverviewUpcoming(presenter.getNavigator());
         recentsUi = new EventsOverviewRecent(presenter.getNavigator());
         initWidget(uiBinder.createAndBindUi(this));
-
     }
-
 
     @Override
-    public void setEvents(EventListViewDTO eventListView) {
+    public void setEvents(EventListViewDTO eventListView, TakedownNoticeService takedownNoticeService) {
         ArrayList<EventListEventDTO> upcomingEvents = eventListView.getUpcomingEvents();
-
         upcomingUi.updateEvents(upcomingEvents);
-
         ArrayList<EventListYearDTO> recentEvents = eventListView.getRecentEvents();
-        recentsUi.updateEvents(recentEvents);
+        recentsUi.updateEvents(recentEvents, takedownNoticeService);
     }
-    
 }

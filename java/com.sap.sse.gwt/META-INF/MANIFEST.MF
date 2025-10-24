@@ -11,7 +11,8 @@ Require-Bundle: com.google.gwt.user;bundle-version="2.10.0";resolution:=optional
  com.sap.sse.common,
  com.sap.sse.filestorage,
  com.sap.sse.security.common,
- elemental2;bundle-version="1.1.0"
+ elemental2;bundle-version="1.1.0",
+ com.sap.sse
 Bundle-ActivationPolicy: lazy
 Web-ContextPath: /gwt-base
 Import-Package: com.sap.sse.security,

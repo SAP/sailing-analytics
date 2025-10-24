@@ -21,6 +21,7 @@ import com.sap.sailing.gwt.ui.client.SailingServiceHelper;
 import com.sap.sailing.gwt.ui.client.SailingServiceWriteAsync;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.gwt.ui.shared.ManageMediaModel;
+import com.sap.sailing.gwt.ui.shared.SailingImageDTO;
 import com.sap.sse.gwt.client.media.ImageDTO;
 import com.sap.sse.gwt.client.media.VideoDTO;
 import com.sap.sse.security.ui.client.UserService;
@@ -59,7 +60,7 @@ public class MediaViewImpl extends AbstractEventView<MediaView.Presenter> implem
         setViewContent(uiBinder.createAndBindUi(this));
         MediaPageResources.INSTANCE.css().ensureInjected();
         mobileMediaUploadPopup = new MobileMediaUploadPopup(
-                (images, videos) -> manageMediaModel.addImagesAndVideos(images, videos, eventDto -> updateMedia()));
+                (images, videos) -> manageMediaModel.addImagesAndVideos(images, videos, eventDto -> updateMedia()), sailingServiceWrite);
         addMediaButtonUi.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
@@ -83,12 +84,12 @@ public class MediaViewImpl extends AbstractEventView<MediaView.Presenter> implem
 
     public void updateMedia() {
         setMediaManaged(manageMediaModel.hasPermissions());
-        Collection<ImageDTO> images = manageMediaModel.getImages();
+        Collection<SailingImageDTO> images = manageMediaModel.getImages();
         Collection<VideoDTO> videos = manageMediaModel.getVideos();
         noContentInfoUi.setVisible(videos.isEmpty() && images.isEmpty());
-        videoGalleryUi.setVideos(videos, video -> deleteVideo(video));
+        videoGalleryUi.setVideos(videos, video -> deleteVideo(video), userService, currentPresenter.getEventDTO().getName());
         videoGalleryUi.setVisible(!videos.isEmpty());
-        imageGalleryUi.setImages(images, image -> deleteImage(image));
+        imageGalleryUi.setImages(images, image -> deleteImage(image), userService, currentPresenter.getEventDTO().getName());
         imageGalleryUi.setVisible(!images.isEmpty());
         imageGalleryUi.setMediaManaged(false);
         videoGalleryUi.setMediaManaged(false);

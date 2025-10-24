@@ -53,7 +53,6 @@ public class SortedCellTable<T> extends BaseCelltable<T> {
         dataProvider = new ListDataProvider<T>();
         dataProvider.addDataDisplay(this);
         columnSortHandler = new ListHandler<T>(dataProvider.getList()) {
-
             @Override
             public void onColumnSort(ColumnSortEvent event) {
                 @SuppressWarnings("unchecked")
@@ -127,10 +126,6 @@ public class SortedCellTable<T> extends BaseCelltable<T> {
 
     /**
      * Adds a column to the table and sets its sortable state
-     * 
-     * @param column
-     * @param headerName
-     * @param sortable
      */
     public void addColumn(Column<T, ?> column, String headerName, InvertibleComparator<T> comparator, boolean ascendingSorting) {
         addColumn(column, headerName);
@@ -150,10 +145,6 @@ public class SortedCellTable<T> extends BaseCelltable<T> {
     
     /**
      * Adds a column to the table and sets its sortable state
-     * 
-     * @param column
-     * @param header
-     * @param sortable
      */
     public void addColumn(Column<T, ?> column, Header<?> header, InvertibleComparator<T> comparator, boolean ascendingSorting) {
         addColumn(column, header);

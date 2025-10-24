@@ -1,15 +1,15 @@
 package com.sap.sse.security.test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.security.SecurityService;
 import com.sap.sse.security.impl.SecurityServiceImpl;
@@ -59,7 +59,7 @@ public class PrivilegeEscalationTest {
     private SecurityService securityService;
     private RoleDefinition rd;
 
-    @Before
+    @BeforeEach
     public void setup() throws UserStoreManagementException {
         userStore = new UserStoreImpl(PersistenceFactory.INSTANCE.getDefaultDomainObjectFactory(),
                 PersistenceFactory.INSTANCE.getDefaultMongoObjectFactory(), TEST_DEFAULT_TENANT);
@@ -108,7 +108,7 @@ public class PrivilegeEscalationTest {
                 new Ownership(null, null), noopAclResolver));
     }
 
-    @After
+    @AfterEach
     public void cleanup() {
         userStore.clear();
         accessControlStore.clear();

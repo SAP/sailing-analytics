@@ -18,6 +18,8 @@ import com.sap.sailing.gwt.home.shared.partials.countdowntimer.CountdownTimer;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.gwt.client.controls.carousel.LazyLoadable;
+import com.sap.sse.gwt.client.media.MediaMenuIcon;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 
 public abstract class StageTeaser extends Composite implements LazyLoadable {
     
@@ -27,6 +29,7 @@ public abstract class StageTeaser extends Composite implements LazyLoadable {
     @UiField(provided = true) CountdownTimer countdownTimerUi;
     @UiField HTMLPanel stageTeaserBandsPanel;
     @UiField DivElement teaserImage;
+    @UiField(provided=true) MediaMenuIcon takedownButton;
 
     interface StageTeaserUiBinder extends UiBinder<Widget, StageTeaser> {
     }
@@ -36,27 +39,26 @@ public abstract class StageTeaser extends Composite implements LazyLoadable {
 
     @Override
     public void doInitializeLazyComponents() {
-        String stageImageUrl = event.getStageImageURL() != null ? event.getStageImageURL() :
+        final String stageImageUrl = event.getStageImageURL() != null ? event.getStageImageURL() :
                 SharedHomeResources.INSTANCE.defaultStageEventTeaserImage().getSafeUri().asString();
-        String backgroundImage = "url(" + stageImageUrl + ")";
+        final String backgroundImage = "url(" + stageImageUrl + ")";
         teaserImage.getStyle().setBackgroundImage(backgroundImage);
+        takedownButton.setData(event.getDisplayName(), stageImageUrl);
     }
 
     protected void handleUserAction() {
     }
 
-    public StageTeaser(EventStageDTO event) {
+    public StageTeaser(EventStageDTO event, TakedownNoticeService takedownNoticeService) {
         this.event = event;
         StageResources.INSTANCE.css().ensureInjected();
-        
         TimePoint eventStart = new MillisecondsTimePoint(event.getStartDate());
         countdownTimerUi = new CountdownTimer(eventStart.asDate(), false);
+        takedownButton = new MediaMenuIcon(takedownNoticeService, "takedownRequestForEventStageImage");
         initWidget(uiBinder.createAndBindUi(this));
-        
-        if(MillisecondsTimePoint.now().after(eventStart)) {
+        if (MillisecondsTimePoint.now().after(eventStart)) {
             countdownTimerUi.removeFromParent();
         }
-
         addDomHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {

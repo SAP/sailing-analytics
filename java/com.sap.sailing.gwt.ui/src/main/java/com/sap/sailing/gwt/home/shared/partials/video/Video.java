@@ -7,6 +7,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.sap.sailing.gwt.home.communication.event.eventoverview.EventOverviewVideoStageDTO;
 import com.sap.sailing.gwt.home.shared.partials.videoplayer.VideoWithLowerThird;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 
 public class Video extends Composite {
 
@@ -16,10 +17,11 @@ public class Video extends Composite {
     }
     
     private String source;
-    @UiField(provided = true) VideoWithLowerThird videoPlayer = new VideoWithLowerThird(false, false);
+    @UiField(provided = true) VideoWithLowerThird videoPlayer;
 
-    public Video() {
+    public Video(TakedownNoticeService takedownNoticeService, String eventName) {
         VideoResources.INSTANCE.css().ensureInjected();
+        videoPlayer = new VideoWithLowerThird(false, false, takedownNoticeService, eventName);
         initWidget(uiBinder.createAndBindUi(this));
     }
 

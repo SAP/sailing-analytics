@@ -47,8 +47,8 @@ public class SecuredSecurityTypes extends HasPermissionsImpl {
      * type-relative identifier is the {@link User#getName() username}.
      */
     public static final HasPermissions USER = new SecuredSecurityTypes("USER", DefaultActions
-            .plus(UserActions.FORCE_OVERWRITE_PASSWORD, PublicReadableActions.READ_PUBLIC, UserActions.ADD_SUBSCRIPTION
-                    , UserActions.BE_PREMIUM));
+            .plus(UserActions.FORCE_OVERWRITE_PASSWORD, PublicReadableActions.READ_PUBLIC,
+                  UserActions.ADD_SUBSCRIPTION, UserActions.BE_PREMIUM));
 
     /**
      * type-relative identifier is the {@link RoleDefinition#getId() role ID's} string representation

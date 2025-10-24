@@ -1,9 +1,10 @@
 package com.sap.sailing.domain.orc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -26,10 +27,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.sap.sailing.domain.base.impl.BoatClassImpl;
 import com.sap.sailing.domain.common.orc.ORCCertificate;
@@ -37,6 +38,7 @@ import com.sap.sailing.domain.orc.ORCPublicCertificateDatabase.CertificateHandle
 import com.sap.sailing.domain.orc.impl.ORCPublicCertificateDatabaseImpl;
 import com.sap.sse.common.Util;
 
+@ExtendWith(FailIfNoValidOrcCertificateRule.class)
 public class TestORCPublicCertificateDatabase {
     private static final Logger logger = Logger.getLogger(TestORCPublicCertificateDatabase.class.getName());
     
@@ -45,10 +47,7 @@ public class TestORCPublicCertificateDatabase {
     private List<String> dateFailureCases = Arrays.asList("2019-02-21T10:44GMT+2","2019-02-21T10:38+0800","2019-02-21T10:38+08:00",
             "2019-02-21T10:38-08","2019-02-21T10:38Z","2019-02-21T10z","2019-02-21T10:38z");
     
-    @Rule
-    public FailIfNoValidOrcCertificateRule customIgnoreRule = new FailIfNoValidOrcCertificateRule();
-    
-    @Before
+    @BeforeEach
     public void setUp() {
         db = new ORCPublicCertificateDatabaseImpl();
         /**
@@ -153,7 +152,7 @@ public class TestORCPublicCertificateDatabase {
     @FailIfNoValidOrcCertificates
     @Test
     public void testGetCertificate() throws Exception {
-        Collection<ORCCertificate> certificates = customIgnoreRule.getAvailableCerts();
+        Collection<ORCCertificate> certificates = FailIfNoValidOrcCertificateRule.getAvailableCerts();
         final ORCCertificate cert = certificates.stream().findFirst().get();
         Iterable<CertificateHandle> certHandles = db.search(/* country */ null, LocalDate.now().getYear(), /* referenceNumber */ null, cert.getBoatName(),
                 cert.getSailNumber(), /*
@@ -185,19 +184,19 @@ public class TestORCPublicCertificateDatabase {
                                            */ null, /* includeInvalid */ false);
         }
         Optional<CertificateHandle> certificateHandle = Optional.ofNullable(certHandles.iterator().hasNext() ? certHandles.iterator().next() : null);
-        assertTrue("No certificate found for handle "+certificateHandle+
-                " extracted from certificates "+certificates, certificateHandle.isPresent());
+        assertTrue(certificateHandle.isPresent(), "No certificate found for handle "+certificateHandle+
+                        " extracted from certificates "+certificates);
         final String referenceNumber = certificateHandle.get().getReferenceNumber();
         final CertificateHandle handle = db.getCertificateHandle(referenceNumber);
         final ORCCertificate result = db.getCertificate(referenceNumber, handle.getFamily());
-        assertNotNull("Unable to load certificate for reference number "+referenceNumber+" from handle "+certificateHandle, result);
+        assertNotNull(result, "Unable to load certificate for reference number "+referenceNumber+" from handle "+certificateHandle);
         assertEquals(handle.getGPH(), result.getGPH().asSeconds(), 0.00001);
         // Use some tolerance as we found differences as much as 5s between the dxtDate in the handle coming from the XML search result
         // and the IssueDate field in the JSON. Both suggest to report millisecond accuracy, but dxtDate always seems to have the
         // milliseconds as "000" explaining many sub-second differences. But in some cases differences were significantly bigger.
-        assertEquals("Issue dates of certificate with reference number "+referenceNumber+
-                " varies between current year result handle ("+handle.getIssueDate()+") and certificate ("+
-                result.getIssueDate()+").", handle.getIssueDate().asMillis(), result.getIssueDate().asMillis(), 10000.0);
+        assertEquals(handle.getIssueDate().asMillis(), result.getIssueDate().asMillis(), 10000.0, "Issue dates of certificate with reference number "+referenceNumber+
+                        " varies between current year result handle ("+handle.getIssueDate()+") and certificate ("+
+                        result.getIssueDate()+").");
         assertEquals(handle.getSailNumber(), result.getSailNumber());
     }
     
@@ -207,7 +206,7 @@ public class TestORCPublicCertificateDatabase {
         int year = LocalDate.now().getYear();
         ArrayList<Future<Set<ORCCertificate>>> futures = new ArrayList<Future<Set<ORCCertificate>>>();
         boolean isYearFound = false;
-        for (ORCCertificate orcCertificate : customIgnoreRule.getAvailableCerts()) {
+        for (ORCCertificate orcCertificate : FailIfNoValidOrcCertificateRule.getAvailableCerts()) {
             futures.add(db.search(orcCertificate.getBoatName(), orcCertificate.getSailNumber(),
                     new BoatClassImpl(orcCertificate.getBoatClassName(), true)));
         }
@@ -225,12 +224,14 @@ public class TestORCPublicCertificateDatabase {
         }
     }
     
-    @Test(expected = DateTimeParseException.class)
+    @Test
     public void testShould() throws Exception {
-        for (String dateString : dateFailureCases) {
-            db.parseDate(dateString);
-            Assert.fail(dateString + " is parsable");
-        }
+        assertThrows(DateTimeParseException.class, ()->{
+            for (String dateString : dateFailureCases) {
+                db.parseDate(dateString);
+                Assertions.fail(dateString + " is parsable");
+            }
+        });
     }
 
     private boolean assertFoundYear(final Set<ORCCertificate> certificates, int year) {

@@ -6,9 +6,9 @@ import com.sap.sse.common.Speed;
 import com.sap.sse.common.Timed;
 
 /**
- * Provides information about the so-called "implied wind" of a race that is ranked by ORC Performance Curve Scoring
+ * Provides information about the so-called "implied wind" of a race that is ranked by ORC Polar Curve Scoring
  * (PCS). Implied wind is generally determined by mapping a competitor's elapsed time "backwards" through the
- * performance curve function to obtain a wind speed at which the time allowance for the course sailed matches
+ * polar curve function to obtain a wind speed at which the time allowance for the course sailed matches
  * with the time elapsed. In uses of ORC PCS scoring before 2015 this was the ranking criterion, whereas since 2015
  * the general rule is to take the maximum implied wind achieved by any competitor and use it to determine each
  * competitor's time allowance for the course sailed, then comparing their elapsed time to their allowance and

@@ -54,8 +54,8 @@ import com.sap.sailing.gwt.home.shared.refresh.RefreshManagerWithErrorAndBusy;
 import com.sap.sailing.gwt.home.shared.refresh.RefreshableWidget;
 import com.sap.sailing.gwt.ui.client.FlagImageResolver;
 import com.sap.sailing.gwt.ui.client.StringMessages;
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
 import com.sap.sse.gwt.dispatch.shared.commands.ResultWithTTL;
+import com.sap.sse.gwt.shared.DTO;
 import com.sap.sse.security.ui.client.premium.PaywallResolverImpl;
 
 public class RegattaRacesTabView extends Composite implements RegattaTabView<RegattaRacesPlace> {

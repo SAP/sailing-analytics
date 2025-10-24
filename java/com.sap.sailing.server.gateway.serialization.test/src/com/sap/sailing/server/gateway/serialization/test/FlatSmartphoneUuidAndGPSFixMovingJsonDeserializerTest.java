@@ -9,8 +9,8 @@ import java.util.UUID;
 
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.server.gateway.deserialization.impl.FlatSmartphoneUuidAndGPSFixMovingJsonDeserializer;
@@ -80,7 +80,7 @@ public class FlatSmartphoneUuidAndGPSFixMovingJsonDeserializerTest {
                 new FlatSmartphoneUuidAndGPSFixMovingJsonDeserializer();
         try {
                 deserializer.deserialize(Helpers.toJSONObjectSafe(JSONValue.parseWithException(json)));
-                Assert.fail();
+                Assertions.fail();
         } catch (JsonDeserializationException e) {
             assertThat(e.getMessage(),equalTo("two timestamp fields are filled. Please use only one of both."));
         }
@@ -104,7 +104,7 @@ public class FlatSmartphoneUuidAndGPSFixMovingJsonDeserializerTest {
                 new FlatSmartphoneUuidAndGPSFixMovingJsonDeserializer();
         try {
                 deserializer.deserialize(Helpers.toJSONObjectSafe(JSONValue.parseWithException(json)));
-                Assert.fail();
+                Assertions.fail();
         } catch (NumberFormatException e) {
             assertThat(e.getMessage(),equalTo("For input string: \"2418-03-18T17:34:30Z\""));
         }
@@ -128,7 +128,7 @@ public class FlatSmartphoneUuidAndGPSFixMovingJsonDeserializerTest {
                 new FlatSmartphoneUuidAndGPSFixMovingJsonDeserializer();
         try {
                 deserializer.deserialize(Helpers.toJSONObjectSafe(JSONValue.parseWithException(json)));
-                Assert.fail();
+                Assertions.fail();
         } catch (DateTimeParseException e) {
             assertThat(e.getMessage(),equalTo("Text '14144168490000' could not be parsed at index 0"));
         }

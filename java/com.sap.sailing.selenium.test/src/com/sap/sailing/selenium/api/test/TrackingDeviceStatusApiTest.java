@@ -3,14 +3,13 @@ package com.sap.sailing.selenium.api.test;
 import static com.sap.sailing.selenium.api.core.ApiContext.SERVER_CONTEXT;
 import static com.sap.sailing.selenium.api.core.ApiContext.createAdminApiContext;
 import static com.sap.sailing.selenium.api.core.GpsFixMoving.createFix;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.sap.sailing.selenium.api.core.ApiContext;
 import com.sap.sailing.selenium.api.core.DeviceStatus;
@@ -18,6 +17,7 @@ import com.sap.sailing.selenium.api.core.GPSFixResponse;
 import com.sap.sailing.selenium.api.core.GpsFixMoving;
 import com.sap.sailing.selenium.api.event.GpsFixApi;
 import com.sap.sailing.selenium.api.event.TrackingDeviceApi;
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.test.AbstractSeleniumTest;
 
 public class TrackingDeviceStatusApiTest extends AbstractSeleniumTest {
@@ -25,12 +25,12 @@ public class TrackingDeviceStatusApiTest extends AbstractSeleniumTest {
     private final GpsFixApi gpsFixApi = new GpsFixApi();
     private final TrackingDeviceApi trackingDeviceApi = new TrackingDeviceApi();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot(), /* headless */ true);
     }
 
-    @Test
+    @SeleniumTestCase
     public void testDeviceStatusWithLastFix() {
         final UUID deviceUUID = UUID.randomUUID();
         final ApiContext ctx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);

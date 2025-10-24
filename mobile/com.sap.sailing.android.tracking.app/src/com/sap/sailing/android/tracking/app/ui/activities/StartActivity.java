@@ -53,7 +53,7 @@ public class StartActivity extends AbstractStartActivity<CheckinData> {
         Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
         int smallIcon = R.drawable.ic_directions_boat;
         CharSequence title = getText(R.string.app_name);
-        NotificationHelper.prepareNotificationWith(title, largeIcon, smallIcon);
+        NotificationHelper.prepareNotificationWith(largeIcon, smallIcon);
     }
 
     @Override

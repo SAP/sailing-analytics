@@ -20,6 +20,8 @@ import com.sap.sailing.gwt.home.desktop.partials.media.MediaPageResources;
 import com.sap.sailing.gwt.home.shared.SharedHomeResources;
 import com.sap.sailing.gwt.ui.common.client.YoutubeApi;
 import com.sap.sse.common.media.MediaSubType;
+import com.sap.sse.gwt.client.media.MediaMenuIcon;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 import com.sap.sse.gwt.client.media.VideoDTO;
 
 public class VideoThumbnail extends Composite implements HasClickHandlers {
@@ -45,12 +47,17 @@ public class VideoThumbnail extends Composite implements HasClickHandlers {
     Anchor deleteAnchor;
     @UiField
     DivElement overlay;
+    @UiField(provided = true)
+    MediaMenuIcon videoThumbnailMenuButton;
 
-    public VideoThumbnail(VideoDTO video, ClickHandler deleteHandler, ClickHandler editHandler) {
+    public VideoThumbnail(VideoDTO video, String eventName, ClickHandler deleteHandler,
+            ClickHandler editHandler, TakedownNoticeService takedownNoticeService) {
         this.videoSourceRef = video.getSourceRef();
         this.videoCreateAt = video.getCreatedAtDate();
         MediaPageResources.INSTANCE.css().ensureInjected();
         SharedHomeResources.INSTANCE.sharedHomeCss().ensureInjected();
+        videoThumbnailMenuButton = new MediaMenuIcon(takedownNoticeService, "takedownRequestForEventGalleryVideo");
+        videoThumbnailMenuButton.setData(eventName, videoSourceRef);
         initWidget(uiBinder.createAndBindUi(this));
         getElement().addClassName("videoThumbnail");
         captionUi.setInnerText(video.getTitle());

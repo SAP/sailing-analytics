@@ -5,18 +5,18 @@ import static com.sap.sailing.selenium.api.core.ApiContext.SERVER_CONTEXT;
 import static com.sap.sailing.selenium.api.core.ApiContext.createAdminApiContext;
 import static com.sap.sailing.selenium.api.core.ApiContext.createApiContext;
 import static java.lang.System.currentTimeMillis;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.sap.sailing.domain.common.CompetitorRegistrationType;
 import com.sap.sailing.domain.common.MarkType;
@@ -36,6 +36,7 @@ import com.sap.sailing.selenium.api.regatta.Course;
 import com.sap.sailing.selenium.api.regatta.RaceColumn;
 import com.sap.sailing.selenium.api.regatta.Regatta;
 import com.sap.sailing.selenium.api.regatta.RegattaApi;
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.test.AbstractSeleniumTest;
 
 public class MarkApiTest extends AbstractSeleniumTest {
@@ -52,12 +53,12 @@ public class MarkApiTest extends AbstractSeleniumTest {
     private final CourseConfigurationApi courseConfigurationApi = new CourseConfigurationApi();
     private final SecurityApi securityApi = new SecurityApi();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot(), /* headless */ true);
     }
 
-    @Test
+    @SeleniumTestCase
     public void testAddMarkToRegatta() {
         final ApiContext ctx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
 
@@ -65,52 +66,54 @@ public class MarkApiTest extends AbstractSeleniumTest {
         final Regatta regatta = regattaApi.getRegatta(ctx, EVENT_NAME);
         final Mark mark = markApi.addMarkToRegatta(ctx, regatta.getName(), "Startboat");
 
-        assertNotNull("Mark result should not be null", mark);
-        assertNotNull("Id of created mark should not be null", mark.getMarkId());
+        assertNotNull(mark, "Mark result should not be null");
+        assertNotNull(mark.getMarkId(), "Id of created mark should not be null");
     }
 
     /**
      * Negative test scenarios. Checks all common 'not found' errors.
      */
-    @Test(expected = HttpException.class)
+    @SeleniumTestCase
     public void testRevokeMarkOnRegattaMarkNotFound() {
-        final ApiContext ctx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
-        eventApi.createEvent(ctx, EVENT_NAME, BOAT_CLASS, CompetitorRegistrationType.CLOSED, "default");
-        final Regatta regatta = regattaApi.getRegatta(ctx, EVENT_NAME);
-        final RaceColumn race = regattaApi.addRaceColumn(ctx, EVENT_NAME, null, 1)[0];
-        try {
-            markApi.revokeMarkOnRegatta(ctx, "blah", race.getRaceName(), FLEET, UUID.randomUUID());
+        assertThrows(HttpException.class, () -> {
+            final ApiContext ctx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
+            eventApi.createEvent(ctx, EVENT_NAME, BOAT_CLASS, CompetitorRegistrationType.CLOSED, "default");
+            final Regatta regatta = regattaApi.getRegatta(ctx, EVENT_NAME);
+            final RaceColumn race = regattaApi.addRaceColumn(ctx, EVENT_NAME, null, 1)[0];
+            try {
+                markApi.revokeMarkOnRegatta(ctx, "blah", race.getRaceName(), FLEET, UUID.randomUUID());
+                assertFalse(true);
+            } catch (HttpException e) {
+                assertTrue(e.getMessage().contains("Could not find a regatta with name"));
+            }
+            try {
+                markApi.revokeMarkOnRegatta(ctx, regatta.getName(), "Blub", FLEET, UUID.randomUUID());
+                assertFalse(true);
+            } catch (HttpException e) {
+                assertTrue(e.getMessage().contains("Could not find a race with raceColumn"));
+            }
+            try {
+                markApi.revokeMarkOnRegatta(ctx, regatta.getName(), race.getRaceName(), "Blume", UUID.randomUUID());
+                assertFalse(true);
+            } catch (HttpException e) {
+                assertTrue(e.getMessage().contains("Could not find a race with raceColumn"));
+            }
+            try {
+                markApi.revokeMarkOnRegatta(ctx, regatta.getName(), race.getRaceName(), FLEET, UUID.randomUUID());
+                assertFalse(true);
+            } catch (HttpException e) {
+                assertTrue(e.getMessage().contains("Could not find a mark with id"));
+                throw e;
+            }
             assertFalse(true);
-        } catch (HttpException e) {
-            assertTrue(e.getMessage().contains("Could not find a regatta with name"));
-        }
-        try {
-            markApi.revokeMarkOnRegatta(ctx, regatta.getName(), "Blub", FLEET, UUID.randomUUID());
-            assertFalse(true);
-        } catch (HttpException e) {
-            assertTrue(e.getMessage().contains("Could not find a race with raceColumn"));
-        }
-        try {
-            markApi.revokeMarkOnRegatta(ctx, regatta.getName(), race.getRaceName(), "Blume", UUID.randomUUID());
-            assertFalse(true);
-        } catch (HttpException e) {
-            assertTrue(e.getMessage().contains("Could not find a race with raceColumn"));
-        }
-        try {
-            markApi.revokeMarkOnRegatta(ctx, regatta.getName(), race.getRaceName(), FLEET, UUID.randomUUID());
-            assertFalse(true);
-        } catch (HttpException e) {
-            assertTrue(e.getMessage().contains("Could not find a mark with id"));
-            throw e;
-        }
-        assertFalse(true);
+        });
     }
 
     /**
      * Test to check if mark is already used by a tracking of a race.
      * Expected result: HTTP exception, that mark is already used in a tacked race.
      */
-    @Test
+    @SeleniumTestCase
     public void testRevokeMarkOnRegattaAlreadyTracked() {
         final ApiContext ctx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
         eventApi.createEvent(ctx, EVENT_NAME, BOAT_CLASS, CompetitorRegistrationType.CLOSED, "default");
@@ -129,7 +132,7 @@ public class MarkApiTest extends AbstractSeleniumTest {
     /**
      * Positive rest case. Revoke mark on regatte without errors.
      */
-    @Test
+    @SeleniumTestCase
     public void testRevokeMarkOnRegatta() {
         final ApiContext ctx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
         eventApi.createEvent(ctx, EVENT_NAME, BOAT_CLASS, CompetitorRegistrationType.CLOSED, "default");
@@ -145,7 +148,7 @@ public class MarkApiTest extends AbstractSeleniumTest {
      * Try to revoke the mark on 1st race. 
      * Expected result is a HTTP exception, that the is mark already in use in 2nd race.
      */
-    @Test
+    @SeleniumTestCase
     public void testRevokeMarkAlreadyUsedInCourse() {
         final ApiContext ctx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
         eventApi.createEvent(ctx, EVENT_NAME, BOAT_CLASS, CompetitorRegistrationType.CLOSED, "default");
@@ -187,7 +190,7 @@ public class MarkApiTest extends AbstractSeleniumTest {
      * Test to check if revoke also works on fixed marks. In parallel it checks if only specific mark is removed
      * from regatta/race/fleet.
      */
-    @Test
+    @SeleniumTestCase
     public void testRevokeMarkWithFixOnRegatta() {
         final ApiContext ctx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
         eventApi.createEvent(ctx, EVENT_NAME, BOAT_CLASS, CompetitorRegistrationType.CLOSED, "default");
@@ -218,7 +221,7 @@ public class MarkApiTest extends AbstractSeleniumTest {
         assertEquals(markConfiguration2.getMarkId(), mark2.getMarkId());
     }
 
-    @Test
+    @SeleniumTestCase
     public void testAddMarkFix() {
         final ApiContext ctx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
 
@@ -230,7 +233,7 @@ public class MarkApiTest extends AbstractSeleniumTest {
                 /* markPropertiesId */ null, 9.12, .599, currentTimeMillis());
     }
 
-    @Test
+    @SeleniumTestCase
     public void testAddMarkFixWithMarkTemplateAndMarkProperties() {
         final ApiContext ctx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
 
@@ -243,20 +246,23 @@ public class MarkApiTest extends AbstractSeleniumTest {
                 currentTimeMillis());
     }
 
-    @Test(expected = HttpException.NotFound.class)
+    @SeleniumTestCase
     public void testAddMarkToRegattaForNonExistingEvent() {
-        final ApiContext ctx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
-        markApi.addMarkToRegatta(ctx, "NONEVENT", "Startboat");
+        assertThrows(HttpException.NotFound.class, () -> {
+            final ApiContext ctx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
+            markApi.addMarkToRegatta(ctx, "NONEVENT", "Startboat");
+        });
     }
     
-    @Test(expected = HttpException.Unauthorized.class)
+    @SeleniumTestCase
     public void testAddMarkToRegattaWithoutPermission() {
-        final ApiContext adminSecurityCtx = createAdminApiContext(getContextRoot(), SECURITY_CONTEXT);
-        final ApiContext ownerCtx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
-        securityApi.createUser(adminSecurityCtx, "donald", "Donald Duck", null, DONALDS_PASSWORD);
-        final ApiContext readerCtx = createApiContext(getContextRoot(), SERVER_CONTEXT, "donald", DONALDS_PASSWORD);
-        
-        eventApi.createEvent(ownerCtx, EVENT_NAME, BOAT_CLASS, CompetitorRegistrationType.CLOSED, "default");
-        markApi.addMarkToRegatta(readerCtx, EVENT_NAME, "Startboat");
+        assertThrows(HttpException.Unauthorized.class, () -> {
+            final ApiContext adminSecurityCtx = createAdminApiContext(getContextRoot(), SECURITY_CONTEXT);
+            final ApiContext ownerCtx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
+            securityApi.createUser(adminSecurityCtx, "donald", "Donald Duck", null, DONALDS_PASSWORD);
+            final ApiContext readerCtx = createApiContext(getContextRoot(), SERVER_CONTEXT, "donald", DONALDS_PASSWORD);
+            eventApi.createEvent(ownerCtx, EVENT_NAME, BOAT_CLASS, CompetitorRegistrationType.CLOSED, "default");
+            markApi.addMarkToRegatta(readerCtx, EVENT_NAME, "Startboat");
+        });
     }
 }

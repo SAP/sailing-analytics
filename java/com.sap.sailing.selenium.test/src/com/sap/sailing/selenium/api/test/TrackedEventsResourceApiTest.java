@@ -4,9 +4,9 @@ import static com.sap.sailing.selenium.api.core.ApiContext.SERVER_CONTEXT;
 import static com.sap.sailing.selenium.api.core.ApiContext.createAdminApiContext;
 import static com.sap.sailing.selenium.api.core.ApiContext.createApiContext;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.iterableWithSize;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,9 +20,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.StreamSupport;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.opentest4j.AssertionFailedError;
 
 import com.sap.sailing.domain.common.CompetitorRegistrationType;
 import com.sap.sailing.selenium.api.core.ApiContext;
@@ -33,11 +33,10 @@ import com.sap.sailing.selenium.api.event.TrackedEventsApi;
 import com.sap.sailing.selenium.api.event.TrackedEventsApi.TrackedElement;
 import com.sap.sailing.selenium.api.event.TrackedEventsApi.TrackedEvent;
 import com.sap.sailing.selenium.api.event.TrackedEventsApi.TrackedEvents;
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.test.AbstractSeleniumTest;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Triple;
-
-import junit.framework.AssertionFailedError;
 
 public class TrackedEventsResourceApiTest extends AbstractSeleniumTest {
 
@@ -48,20 +47,20 @@ public class TrackedEventsResourceApiTest extends AbstractSeleniumTest {
     private final EventApi eventApi = new EventApi();
     private final SecurityApi securityApi = new SecurityApi();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot());
     }
 
-    @Test
+    @SeleniumTestCase
     public void testGetTrackedEventsEmpty() {
         final ApiContext adminCtx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
         final TrackedEvents trackedEvents = trackedEventsApi.getTrackedEvents(adminCtx, true);
-        Assert.assertNotNull("Tracked Events element should not be null", trackedEvents);
-        Assert.assertTrue("Expected empty list of tracked events", Util.isEmpty(trackedEvents.getEvents()));
+        Assertions.assertNotNull(trackedEvents, "Tracked Events element should not be null");
+        Assertions.assertTrue(Util.isEmpty(trackedEvents.getEvents()), "Expected empty list of tracked events");
     }
 
-    @Test
+    @SeleniumTestCase
     public void testCreateMultipleTrackingEventsAndEditOne() {
         final ApiContext adminCtx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
         final String competitorId = UUID.randomUUID().toString();
@@ -95,7 +94,7 @@ public class TrackedEventsResourceApiTest extends AbstractSeleniumTest {
         assertThat(trackedEvents.getEvents(), iterableWithSize(1));
     }
 
-    @Test
+    @SeleniumTestCase
     public void testCreateUpdateTrackingEventsMultiThreaded() throws InterruptedException {
         final ExecutorService threadPool = Executors.newFixedThreadPool(20);
         final List<Future<?>> executions = new ArrayList<>();
@@ -139,9 +138,9 @@ public class TrackedEventsResourceApiTest extends AbstractSeleniumTest {
             try {
                 future.get();
             } catch (InterruptedException e) {
-                Assert.fail("interrupted exception occurred");
+                Assertions.fail("interrupted exception occurred");
             } catch (ExecutionException e) {
-                Assert.fail("execution exception:" + e.getCause());
+                Assertions.fail("execution exception:" + e.getCause());
             }
         });
     }
@@ -172,7 +171,7 @@ public class TrackedEventsResourceApiTest extends AbstractSeleniumTest {
         return actual;
     }
 
-    @Test
+    @SeleniumTestCase
     public void testCreateMultipleTrackingEvents() {
         final ApiContext adminCtx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
         final String competitorId = UUID.randomUUID().toString();
@@ -208,17 +207,17 @@ public class TrackedEventsResourceApiTest extends AbstractSeleniumTest {
         int cntEvents = 0;
         for (final TrackedEvent event : trackedEvents.getEvents()) {
             cntEvents++;
-            Assert.assertEquals("Unexpected event base url", eventBaseUrl, event.getEventBaseUrl());
+            Assertions.assertEquals(eventBaseUrl, event.getEventBaseUrl(), "Unexpected event base url");
             if (eventId.equals(event.getEventId())) {
-                Assert.assertEquals("Unexpected event ID", eventId, event.getEventId());
-                Assert.assertEquals("Unexpected leaderboard name", leaderboardName, event.getLeaderboardName());
-                Assert.assertEquals("Unexpected regatta secret", regattaSecret, event.getRegattaSecret());
+                Assertions.assertEquals(eventId, event.getEventId(), "Unexpected event ID");
+                Assertions.assertEquals(leaderboardName, event.getLeaderboardName(), "Unexpected leaderboard name");
+                Assertions.assertEquals(regattaSecret, event.getRegattaSecret(), "Unexpected regatta secret");
             } else if (eventId2.equals(event.getEventId())) {
-                Assert.assertEquals("Unexpected event ID", eventId2, event.getEventId());
-                Assert.assertEquals("Unexpected leaderboard name", leaderboardName2, event.getLeaderboardName());
-                Assert.assertEquals("Unexpected regatta secret", regattaSecret2, event.getRegattaSecret());
+                Assertions.assertEquals(eventId2, event.getEventId(), "Unexpected event ID");
+                Assertions.assertEquals(leaderboardName2, event.getLeaderboardName(), "Unexpected leaderboard name");
+                Assertions.assertEquals(regattaSecret2, event.getRegattaSecret(), "Unexpected regatta secret");
             } else {
-                Assert.fail("Invalid event id.");
+                Assertions.fail("Invalid event id.");
             }
 
             int cntElements = 0;
@@ -228,18 +227,18 @@ public class TrackedEventsResourceApiTest extends AbstractSeleniumTest {
                 final boolean correctCompetitorId = competitorId.equals(elem.getCompetitorId());
                 final boolean correctMarkId = markId.equals(elem.getMarkId());
 
-                Assert.assertEquals("Unexpected device ID", deviceId, elem.getDeviceId());
-                Assert.assertTrue("More than one or zero items tracked in this element",
-                        correctBoatId ^ correctCompetitorId ^ correctMarkId);
+                Assertions.assertEquals(deviceId, elem.getDeviceId(), "Unexpected device ID");
+                Assertions.assertTrue(correctBoatId ^ correctCompetitorId ^ correctMarkId,
+                        "More than one or zero items tracked in this element");
             }
-            Assert.assertEquals("Invalid numer of elements in this event", eventId.equals(event.getEventId()) ? 2 : 1,
-                    cntElements);
+            Assertions.assertEquals(eventId.equals(event.getEventId()) ? 2 : 1, cntElements,
+                    "Invalid numer of elements in this event");
         }
 
-        Assert.assertEquals("Expected 2 events", 2, cntEvents);
+        Assertions.assertEquals(2, cntEvents, "Expected 2 events");
     }
 
-    @Test
+    @SeleniumTestCase
     public void testCreateMultipleTrackingsForSameEvent() {
         final ApiContext adminCtx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
         final String eventName = "TestEvent-" + UUID.randomUUID().toString();
@@ -269,10 +268,10 @@ public class TrackedEventsResourceApiTest extends AbstractSeleniumTest {
         int cntEvents = 0;
         for (final TrackedEvent event : trackedEvents.getEvents()) {
             cntEvents++;
-            Assert.assertEquals("Unexpected event base url", eventBaseUrl, event.getEventBaseUrl());
-            Assert.assertEquals("Unexpected event ID", eventId, event.getEventId());
-            Assert.assertEquals("Unexpected leaderboard name", leaderboardName, event.getLeaderboardName());
-            Assert.assertEquals("Unexpected regatta secret", regattaSecret, event.getRegattaSecret());
+            Assertions.assertEquals(eventBaseUrl, event.getEventBaseUrl(), "Unexpected event base url");
+            Assertions.assertEquals(eventId, event.getEventId(), "Unexpected event ID");
+            Assertions.assertEquals(leaderboardName, event.getLeaderboardName(), "Unexpected leaderboard name");
+            Assertions.assertEquals(regattaSecret, event.getRegattaSecret(), "Unexpected regatta secret");
 
             int cntElements = 0;
             for (final TrackedElement elem : event.getTrackedElements()) {
@@ -281,31 +280,31 @@ public class TrackedEventsResourceApiTest extends AbstractSeleniumTest {
                 final boolean correctCompetitorId = competitorId.equals(elem.getCompetitorId());
                 final boolean correctMarkId = markId.equals(elem.getMarkId());
 
-                Assert.assertEquals("Unexpected device ID", deviceId, elem.getDeviceId());
-                Assert.assertTrue("More than one or zero items tracked in this element",
-                        correctBoatId ^ correctCompetitorId ^ correctMarkId);
+                Assertions.assertEquals(deviceId, elem.getDeviceId(), "Unexpected device ID");
+                Assertions.assertTrue(correctBoatId ^ correctCompetitorId ^ correctMarkId,
+                        "More than one or zero items tracked in this element");
             }
-            Assert.assertEquals("Expected 3 event elements", 3, cntElements);
+            Assertions.assertEquals(3, cntElements, "Expected 3 event elements");
         }
 
-        Assert.assertEquals("Expected exactly 1 event", 1, cntEvents);
+        Assertions.assertEquals(1, cntEvents, "Expected exactly 1 event");
     }
 
-    @Test
+    @SeleniumTestCase
     public void testCreateTrackedEventWithCompetitorTracking() {
         final ApiContext adminCtx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
         testCreateTrackedEventWithTracking(UUID.randomUUID().toString(), null, null, adminCtx,
                 "TestEvent-" + UUID.randomUUID().toString());
     }
 
-    @Test
+    @SeleniumTestCase
     public void testCreateTrackedEventWithBoatTracking() {
         final ApiContext adminCtx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
         testCreateTrackedEventWithTracking(null, UUID.randomUUID().toString(), null, adminCtx,
                 "TestEvent-" + UUID.randomUUID().toString());
     }
 
-    @Test
+    @SeleniumTestCase
     public void testCreateTrackedEventWithMarkTracking() {
         final ApiContext adminCtx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
         testCreateTrackedEventWithTracking(null, null, UUID.randomUUID().toString(), adminCtx,
@@ -332,27 +331,27 @@ public class TrackedEventsResourceApiTest extends AbstractSeleniumTest {
         boolean hasEvents = false;
         for (final TrackedEvent event : trackedEvents.getEvents()) {
             hasEvents = true;
-            Assert.assertEquals("Unexpected event base url", eventBaseUrl, event.getEventBaseUrl());
-            Assert.assertEquals("Unexpected event ID", eventId, event.getEventId());
-            Assert.assertEquals("Unexpected leaderboard name", leaderboardName, event.getLeaderboardName());
-            Assert.assertEquals("Unexpected regatta secret", regattaSecret, event.getRegattaSecret());
+            Assertions.assertEquals(eventBaseUrl, event.getEventBaseUrl(), "Unexpected event base url");
+            Assertions.assertEquals(eventId, event.getEventId(), "Unexpected event ID");
+            Assertions.assertEquals(leaderboardName, event.getLeaderboardName(), "Unexpected leaderboard name");
+            Assertions.assertEquals(regattaSecret, event.getRegattaSecret(), "Unexpected regatta secret");
 
             boolean hasElements = false;
             for (final TrackedElement elem : event.getTrackedElements()) {
                 hasElements = true;
-                Assert.assertEquals("Unexpected boat ID", boatId, elem.getBoatId());
-                Assert.assertEquals("Unexpected competitor ID", competitorId, elem.getCompetitorId());
-                Assert.assertEquals("Unexpected device ID", deviceId, elem.getDeviceId());
-                Assert.assertEquals("Unexpected mark ID", markId, elem.getMarkId());
+                Assertions.assertEquals(boatId, elem.getBoatId(), "Unexpected boat ID");
+                Assertions.assertEquals(competitorId, elem.getCompetitorId(), "Unexpected competitor ID");
+                Assertions.assertEquals(deviceId, elem.getDeviceId(), "Unexpected device ID");
+                Assertions.assertEquals(markId, elem.getMarkId(), "Unexpected mark ID");
             }
-            Assert.assertTrue("Expected at least one element", hasElements);
+            Assertions.assertTrue(hasElements, "Expected at least one element");
         }
 
-        Assert.assertTrue("Expected at least one event", hasEvents);
+        Assertions.assertTrue(hasEvents, "Expected at least one event");
         return eventId;
     }
 
-    @Test
+    @SeleniumTestCase
     public void testDeleteEvent() {
         final ApiContext adminCtx = createAdminApiContext(getContextRoot(), SERVER_CONTEXT);
         final String leaderboardName = "TestEvent-" + UUID.randomUUID().toString();
@@ -362,11 +361,11 @@ public class TrackedEventsResourceApiTest extends AbstractSeleniumTest {
         trackedEventsApi.deleteEventTrackings(adminCtx, eventId, leaderboardName);
 
         final TrackedEvents trackedEvents = trackedEventsApi.getTrackedEvents(adminCtx, true);
-        Assert.assertNotNull("Tracked Events element should not be null", trackedEvents);
-        Assert.assertTrue("Expected empty list of tracked events", Util.isEmpty(trackedEvents.getEvents()));
+        Assertions.assertNotNull(trackedEvents, "Tracked Events element should not be null");
+        Assertions.assertTrue(Util.isEmpty(trackedEvents.getEvents()), "Expected empty list of tracked events");
     }
 
-    @Test
+    @SeleniumTestCase
     public void testMultipleUsers() {
 
         // create test user
@@ -382,8 +381,8 @@ public class TrackedEventsResourceApiTest extends AbstractSeleniumTest {
 
         // check if event is invisible to the other user
         final TrackedEvents trackedEvents = trackedEventsApi.getTrackedEvents(userCtx, true);
-        Assert.assertNotNull("Tracked Events element should not be null", trackedEvents);
-        Assert.assertTrue("Expected empty list of tracked events", Util.isEmpty(trackedEvents.getEvents()));
+        Assertions.assertNotNull(trackedEvents, "Tracked Events element should not be null");
+        Assertions.assertTrue(Util.isEmpty(trackedEvents.getEvents()), "Expected empty list of tracked events");
     }
 
 }

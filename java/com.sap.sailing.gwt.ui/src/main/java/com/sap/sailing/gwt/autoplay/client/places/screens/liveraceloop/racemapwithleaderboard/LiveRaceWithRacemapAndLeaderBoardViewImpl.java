@@ -94,7 +94,7 @@ public class LiveRaceWithRacemapAndLeaderBoardViewImpl extends ResizeComposite i
             statisticValue2.setText(StringMessages.INSTANCE.noDataFound());
         } else {
             statisticValue2
-                    .setText(compactFormat.format(distance.getSeaMiles()) + " " + StringMessages.INSTANCE.seaMiles());
+                    .setText(compactFormat.format(distance.getNauticalMiles()) + " " + StringMessages.INSTANCE.nauticalMiles());
         }
 
         statisticProperty3.setText(StringMessages.INSTANCE.durationPlain());

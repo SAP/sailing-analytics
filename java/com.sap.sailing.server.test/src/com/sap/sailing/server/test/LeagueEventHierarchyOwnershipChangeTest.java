@@ -1,7 +1,7 @@
 package com.sap.sailing.server.test;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.Collections;
 import java.util.Locale;
@@ -14,10 +14,10 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.subject.support.SubjectThreadState;
 import org.apache.shiro.util.ThreadContext;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.mongodb.WriteConcern;
@@ -56,7 +56,7 @@ public class LeagueEventHierarchyOwnershipChangeTest {
     private static SecurityService securityService;
     private CourseArea defaultCourseArea;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws Exception {
         MongoDBConfiguration.getDefaultTestConfiguration().getService().getDB().withWriteConcern(WriteConcern.JOURNALED).drop();
         service = Mockito.spy(new RacingEventServiceImpl());
@@ -66,7 +66,7 @@ public class LeagueEventHierarchyOwnershipChangeTest {
                 /* validation URL */ Locale.ENGLISH, null, null, /* clientIP */ null, /* enforce strong password */ false);
     }
     
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         event = service.addEvent("Test", "Test Event", TimePoint.now(), TimePoint.now().plus(Duration.ONE_WEEK), "Here",
                 /* isPublic */ true, UUID.randomUUID());
@@ -143,7 +143,7 @@ public class LeagueEventHierarchyOwnershipChangeTest {
         assertSame(eventOwnership.getAnnotation().getTenantOwner(), lg2Ownership.getAnnotation().getTenantOwner());
     }
     
-    @After
+    @AfterEach
     public void tearDown() {
         if (service != null && event != null) {
             service.removeEvent(event.getId());

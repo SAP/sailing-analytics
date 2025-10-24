@@ -12,7 +12,6 @@ import com.sap.sailing.selenium.pages.PageArea;
 import com.sap.sailing.selenium.pages.gwt.ListBoxPO;
 
 public class MediaUploadDialogPO extends PageArea {
-    
     @FindBy(how = BySeleniumId.class, using = "urlInput")
     private WebElement urlTextBox;
     
@@ -36,5 +35,4 @@ public class MediaUploadDialogPO extends PageArea {
         waitUntil(() -> mimeTypeListBoxes.size() > index);
         waitUntil(() -> expectedValue.equals(ListBoxPO.create(driver, mimeTypeListBoxes.get(index)).getSelectedOptionValue()));
     }
-
 }

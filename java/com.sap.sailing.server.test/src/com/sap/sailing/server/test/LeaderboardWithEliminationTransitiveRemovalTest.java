@@ -1,15 +1,15 @@
 package com.sap.sailing.server.test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Regatta;
 import com.sap.sailing.domain.common.CompetitorRegistrationType;
@@ -36,7 +36,7 @@ public class LeaderboardWithEliminationTransitiveRemovalTest {
     private RegattaLeaderboard regattaLeaderboard;
     private DelegatingRegattaLeaderboardWithCompetitorElimination regattaLeaderboardWithEliminations;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         PersistenceFactory.INSTANCE.getDefaultMongoObjectFactory().getDatabase().drop();
         final SecurityService securityService = SecurityServiceMockFactory.mockSecurityService();

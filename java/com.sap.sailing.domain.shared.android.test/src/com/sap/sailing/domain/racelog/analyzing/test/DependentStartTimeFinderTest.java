@@ -1,14 +1,14 @@
 package com.sap.sailing.domain.racelog.analyzing.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
@@ -38,7 +38,7 @@ public class DependentStartTimeFinderTest {
 
     private RaceLogResolver raceLogResolver;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         author = new LogEventAuthorImpl("Test", 1);
         raceLogA = new RaceLogImpl("raceLogA");

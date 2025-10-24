@@ -1,14 +1,14 @@
 package com.sap.sailing.selenium.test.adminconsole;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.connectors.SmartphoneTrackingEventManagementPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardConfigurationPanelPO;
@@ -47,7 +47,7 @@ public class TestSmartphoneTrackingEventManagementPanel extends AbstractSelenium
     private List<RaceDescriptor> leaderboardRaces;
     
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         this.regatta = new RegattaDescriptor(REGATTA, BOAT_CLASS);
         this.trackableRaces = new ArrayList<>();
@@ -68,7 +68,7 @@ public class TestSmartphoneTrackingEventManagementPanel extends AbstractSelenium
         configureLeaderboard();
     }
     
-    @Test
+    @SeleniumTestCase
     public void testAutomaticSelectionOfLinkedRaceInRaceTable() {
         AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
         LeaderboardConfigurationPanelPO leaderboardConfigurationPanelPO = adminConsole.goToLeaderboardConfiguration();

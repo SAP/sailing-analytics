@@ -1,11 +1,11 @@
 package com.sap.sailing.mongodb.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -13,9 +13,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.mongodb.MongoException;
 import com.sap.sailing.domain.base.Competitor;
@@ -72,7 +72,7 @@ public class TestStoringAndRetrievingLeaderboardGroups extends AbstractMongoDBTe
         super();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         DomainFactory.INSTANCE.getCompetitorAndBoatStore().clearCompetitors();
         mongoObjectFactory = new MongoObjectFactoryImpl(db);
@@ -385,13 +385,13 @@ public class TestStoringAndRetrievingLeaderboardGroups extends AbstractMongoDBTe
         final LeaderboardGroup loadedLeaderboardGroup = domainObjectFactory.loadLeaderboardGroup(groupName, /* regattaRegistry */ null,
                 /* leaderboardRegistry */ null);
 
-        Assert.assertEquals(groupName, loadedLeaderboardGroup.getName());
-        Assert.assertEquals(groupDescription, loadedLeaderboardGroup.getDescription());
-        Assert.assertEquals(groupDisplayName, loadedLeaderboardGroup.getDisplayName());
+        Assertions.assertEquals(groupName, loadedLeaderboardGroup.getName());
+        Assertions.assertEquals(groupDescription, loadedLeaderboardGroup.getDescription());
+        Assertions.assertEquals(groupDisplayName, loadedLeaderboardGroup.getDisplayName());
 
         int c = 0;
         for (Leaderboard board : leaderboardGroup.getLeaderboards()) {
-            Assert.assertEquals(leaderboardNames[c], board.getName());
+            Assertions.assertEquals(leaderboardNames[c], board.getName());
             c++;
         }
     }
@@ -424,7 +424,7 @@ public class TestStoringAndRetrievingLeaderboardGroups extends AbstractMongoDBTe
         mongoObjectFactory.storeLeaderboard(ungroupedLeaderboards[2]);
         Iterable<Leaderboard> loadedUngroupedLeaderboards = domainObjectFactory.getLeaderboardsNotInGroup(/* regattaRegistry */ null,
                 /* leaderboardRegistry */ null);
-        Assert.assertTrue(loadedUngroupedLeaderboards.iterator().hasNext());
+        Assertions.assertTrue(loadedUngroupedLeaderboards.iterator().hasNext());
         int c = 0;
         for (int i = 0; i < ungroupedLeaderboardNames.length; i++) {
             boolean loadedBoardsContainsName = false;
@@ -435,9 +435,9 @@ public class TestStoringAndRetrievingLeaderboardGroups extends AbstractMongoDBTe
                     break;
                 }
             }
-            Assert.assertTrue(loadedBoardsContainsName);
+            Assertions.assertTrue(loadedBoardsContainsName);
         }
-        Assert.assertTrue(c == ungroupedLeaderboards.length);
+        Assertions.assertTrue(c == ungroupedLeaderboards.length);
     }
 
     @Test
@@ -465,12 +465,12 @@ public class TestStoringAndRetrievingLeaderboardGroups extends AbstractMongoDBTe
         final Leaderboard loadedLeaderboard = domainObjectFactory.loadLeaderboard(leaderboard.getName(), /* regattaRegistry */ null, /* leaderboardRegistry */ null);
         final RaceColumn loadedRaceColumnByName = loadedLeaderboard.getRaceColumnByName(columnName);
         Fleet loadedFleet = loadedRaceColumnByName.getFleetByName(fleet.getName());
-        Assert.assertEquals(race.getRaceIdentifier(fleet), loadedRaceColumnByName.getRaceIdentifier(loadedFleet));
+        Assertions.assertEquals(race.getRaceIdentifier(fleet), loadedRaceColumnByName.getRaceIdentifier(loadedFleet));
         // Check if the group received the changes
         loadedGroup = domainObjectFactory.loadLeaderboardGroup(groupName, /* regattaRegistry */ null, /* leaderboardRegistry */ null);
         final RaceColumn loadedRaceColumnFromGroupByName = loadedGroup.getLeaderboards().iterator().next().getRaceColumnByName(columnName);
         Fleet loadedGroupFleet = loadedRaceColumnFromGroupByName.getFleetByName(fleet.getName());
         RaceIdentifier loadedIdentifier = loadedRaceColumnFromGroupByName.getRaceIdentifier(loadedGroupFleet);
-        Assert.assertEquals(race.getRaceIdentifier(fleet), loadedIdentifier);
+        Assertions.assertEquals(race.getRaceIdentifier(fleet), loadedIdentifier);
     }
 }

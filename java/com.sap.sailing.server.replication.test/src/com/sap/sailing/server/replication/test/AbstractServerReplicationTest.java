@@ -14,6 +14,8 @@ import com.sap.sailing.server.impl.RacingEventServiceImpl;
 import com.sap.sailing.server.impl.RacingEventServiceImpl.ConstructorParameters;
 import com.sap.sailing.server.interfaces.RacingEventService;
 import com.sap.sse.mongodb.MongoDBService;
+import com.sap.sse.replication.FullyInitializedReplicableTracker;
+import com.sap.sse.security.SecurityService;
 
 public abstract class AbstractServerReplicationTest extends com.sap.sse.replication.testsupport.AbstractServerWithSingleServiceReplicationTest<RacingEventService, RacingEventServiceImpl> {
     protected ServerReplicationTestSetUp testSetUp;
@@ -22,6 +24,7 @@ public abstract class AbstractServerReplicationTest extends com.sap.sse.replicat
         super(testSetUp);
         this.testSetUp = testSetUp;
     }
+    
     
     public AbstractServerReplicationTest() {
         super(new ServerReplicationTestSetUp());
@@ -32,6 +35,14 @@ public abstract class AbstractServerReplicationTest extends com.sap.sse.replicat
         protected MongoDBService mongoDBService;
         protected MongoObjectFactory mongoObjectFactory;
 
+        protected ServerReplicationTestSetUp() {
+            super();
+        }
+        
+        protected ServerReplicationTestSetUp(FullyInitializedReplicableTracker<SecurityService> securityServiceTrackerMock) {
+            super(securityServiceTrackerMock);
+        }
+        
         /**
          * Drops the test DB, if <code>dropDB</code> is <code>true</code> and requests the DB to start.
          */
@@ -45,7 +56,7 @@ public abstract class AbstractServerReplicationTest extends com.sap.sse.replicat
         }
 
         @Override
-        public RacingEventServiceImpl createNewMaster() {
+        public RacingEventServiceImpl createNewMaster(FullyInitializedReplicableTracker<SecurityService> securityServiceTrackerMock) {
             return new RacingEventServiceImpl((final RaceLogAndTrackedRaceResolver raceLogResolver)-> {
                 return new ConstructorParameters() {
                     private final DomainFactory baseDomainFactory = new DomainFactoryImpl(raceLogResolver);
@@ -63,7 +74,7 @@ public abstract class AbstractServerReplicationTest extends com.sap.sse.replicat
         }
 
         @Override
-        public RacingEventServiceImpl createNewReplica() {
+        public RacingEventServiceImpl createNewReplica(FullyInitializedReplicableTracker<SecurityService> securityServiceTrackerMock) {
             return new RacingEventServiceImpl(
                     (final RaceLogAndTrackedRaceResolver raceLogResolver) -> {
                         return new RacingEventServiceImpl.ConstructorParameters() {

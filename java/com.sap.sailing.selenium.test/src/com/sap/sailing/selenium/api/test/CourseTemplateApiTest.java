@@ -4,9 +4,9 @@ import static com.sap.sailing.selenium.api.core.ApiContext.SECURITY_CONTEXT;
 import static com.sap.sailing.selenium.api.core.ApiContext.SHARED_SERVER_CONTEXT;
 import static com.sap.sailing.selenium.api.core.ApiContext.createAdminApiContext;
 import static com.sap.sailing.selenium.api.core.ApiContext.createApiContext;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,8 +15,7 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.sap.sailing.selenium.api.core.ApiContext;
 import com.sap.sailing.selenium.api.core.HttpException;
@@ -27,6 +26,7 @@ import com.sap.sailing.selenium.api.coursetemplate.MarkRoleApi;
 import com.sap.sailing.selenium.api.coursetemplate.MarkTemplate;
 import com.sap.sailing.selenium.api.event.SecurityApi;
 import com.sap.sailing.selenium.api.helper.CourseTemplateDataFactory;
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.test.AbstractSeleniumTest;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
@@ -38,14 +38,14 @@ public class CourseTemplateApiTest extends AbstractSeleniumTest {
     private ApiContext ctx;
     private CourseTemplateDataFactory ctdf;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot(), /* headless */ true);
         ctx = createAdminApiContext(getContextRoot(), SHARED_SERVER_CONTEXT);
         ctdf = new CourseTemplateDataFactory(ctx);
     }
 
-    @Test
+    @SeleniumTestCase
     public void createSimpleCourseTemplateTest() {
         final CourseTemplate courseTemplateToSave = ctdf.constructCourseTemplate();
         final CourseTemplate createdCourseTemplate = courseTemplateApi.createCourseTemplate(ctx, courseTemplateToSave);
@@ -53,7 +53,7 @@ public class CourseTemplateApiTest extends AbstractSeleniumTest {
         assertEquals(ctdf.waypointSequence.size(), Util.size(createdCourseTemplate.getWaypoints()));
     }
 
-    @Test
+    @SeleniumTestCase
     public void cantUseOthersMarkTemplatesTest() {
         final ApiContext adminSecurityCtx = createAdminApiContext(getContextRoot(), SECURITY_CONTEXT);
         new SecurityApi().createUser(adminSecurityCtx, "donald", "Donald Duck", null, DONALDS_PASSWORD);
@@ -64,11 +64,11 @@ public class CourseTemplateApiTest extends AbstractSeleniumTest {
             fail();
         } catch (Exception e) {
             final String expected = "Subject does not have permission [MARK_ROLE:READ:";
-            assertTrue("Expected "+e.getMessage()+" to contain "+expected, e.getMessage().contains(expected));
+            assertTrue(e.getMessage().contains(expected), "Expected "+e.getMessage()+" to contain "+expected);
         }
     }
 
-    @Test
+    @SeleniumTestCase
     public void createCourseTemplateWithRepeatablePartTest() {
         final Pair<Integer, Integer> repeatablePart = new Pair<>(1, 3);
         final CourseTemplate courseTemplateToSave = ctdf.constructCourseTemplate(repeatablePart,
@@ -79,7 +79,7 @@ public class CourseTemplateApiTest extends AbstractSeleniumTest {
         assertEquals(repeatablePart, createdCourseTemplate.getOptionalRepeatablePart());
     }
 
-    @Test
+    @SeleniumTestCase
     public void createCourseTemplateWithInvalidRepeatablePartTest() {
         final Pair<Integer, Integer> repeatablePart = new Pair<>(1, 6);
         final CourseTemplate courseTemplateToSave = ctdf.constructCourseTemplate(repeatablePart,
@@ -92,7 +92,7 @@ public class CourseTemplateApiTest extends AbstractSeleniumTest {
         }
     }
 
-    @Test
+    @SeleniumTestCase
     public void createCourseTemplateWithRoleMappingTest() {
         final Map<MarkRole, MarkTemplate> associatedRoles = new HashMap<>();
         associatedRoles.put(ctdf.sbRole, ctdf.sb);
@@ -107,7 +107,7 @@ public class CourseTemplateApiTest extends AbstractSeleniumTest {
                         .map(r -> markRoleApi.getMarkRole(ctx, r.getAssociatedMarkRoleId())).collect(Collectors.toSet())));
     }
 
-    @Test
+    @SeleniumTestCase
     public void createCourseTemplateWithImplicitRoleMappingTest() {
         final CourseTemplate createdCourseTemplate = courseTemplateApi.createCourseTemplate(ctx,
                 ctdf.constructCourseTemplate());
@@ -119,7 +119,7 @@ public class CourseTemplateApiTest extends AbstractSeleniumTest {
                         .collect(Collectors.toSet())));
     }
 
-    @Test
+    @SeleniumTestCase
     public void createCourseTemplateWithPartialRoleMappingTest() {
         final Map<MarkRole, MarkTemplate> associatedRoles = new HashMap<>();
         associatedRoles.put(ctdf.b1Role, ctdf.b1);

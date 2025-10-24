@@ -1,24 +1,24 @@
 package com.sap.see.pairinglist.test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.pairinglist.PairingListTemplate;
 import com.sap.sse.pairinglist.impl.PairingListTemplateFactoryImpl;
-
-import org.junit.Assert;
 
 public class PairingListTemplateFactoryTest {
 
     public PairingListTemplateFactoryImpl factoryImpl;
 
-    @Before
+    @BeforeEach
     public void testSetup() {
         factoryImpl = new PairingListTemplateFactoryImpl();
     }
@@ -31,11 +31,11 @@ public class PairingListTemplateFactoryTest {
         int[][] plTemplate = factoryImpl
                 .createPairingListTemplate(new PairingFrameProviderTest(flights, groups, competitors))
                 .getPairingListTemplate();
-        Assert.assertNotNull(plTemplate);
+        Assertions.assertNotNull(plTemplate);
         for (int[] group : plTemplate) {
             for (int competitorNumber : group) {
                 if (competitorNumber < 0 && competitorNumber < competitors) {
-                    Assert.fail("Values of Pairing List Template must not be smaller 0, when there are no dummies!");
+                    Assertions.fail("Values of Pairing List Template must not be smaller 0, when there are no dummies!");
                 }
             }
         }
@@ -43,19 +43,19 @@ public class PairingListTemplateFactoryTest {
                 .createPairingListTemplate(new PairingFrameProviderTest(flights, groups, competitors + 1))
                 .getPairingListTemplate();
         int dummyCount = 0;
-        Assert.assertNotNull(plTemplate2);
+        Assertions.assertNotNull(plTemplate2);
         for (int[] group : plTemplate2) {
             for (int competitorNumber : group) {
                 if (competitorNumber == -1) {
                     dummyCount++;
                 }
                 if (competitorNumber < -1 && competitorNumber < competitors) {
-                    Assert.fail("Values of Pairing List Template must not be smaller -1, when there are dummies!");
+                    Assertions.fail("Values of Pairing List Template must not be smaller -1, when there are dummies!");
                 }
             }
         }
         if (dummyCount != (groups - 1) * flights) {
-            Assert.fail("There are not as much dummies as there should be!");
+            Assertions.fail("There are not as much dummies as there should be!");
         }
     }
     
@@ -65,7 +65,7 @@ public class PairingListTemplateFactoryTest {
         PairingListTemplate template1 = factoryImpl.createPairingListTemplate(new PairingFrameProviderTest(15, 3, 18));
         PairingListTemplate template2 = factoryImpl.createPairingListTemplate(new PairingFrameProviderTest(15, 3, 18));
 
-        Assert.assertFalse(Arrays.equals(template1.getPairingListTemplate(), template2.getPairingListTemplate()));
+        Assertions.assertFalse(Arrays.equals(template1.getPairingListTemplate(), template2.getPairingListTemplate()));
     }
     
     /**
@@ -114,14 +114,14 @@ public class PairingListTemplateFactoryTest {
         System.out.println(Arrays.deepToString(template.getPairingListTemplate()));
         System.out.println(template.getQuality());
         if (template.getQuality() >= 0.7) {
-            Assert.fail("Quality of Pairinglist is worse than usual!");
+            Assertions.fail("Quality of Pairinglist is worse than usual!");
         }
 
         PairingListTemplate template2 = factoryImpl.createPairingListTemplate(new PairingFrameProviderTest(10, 3, 30));
         System.out.println(Arrays.deepToString(template2.getPairingListTemplate()));
         System.out.println(template2.getQuality());
         if (template2.getQuality() >= 1.2) {
-            Assert.fail("Quality of Pairinglist is worse than usual!");
+            Assertions.fail("Quality of Pairinglist is worse than usual!");
         }
     }
 
@@ -152,7 +152,7 @@ public class PairingListTemplateFactoryTest {
             if (availableCompetitors.isEmpty()) {
                 continue;
             } else {
-                Assert.fail("The competitors are not divided up correctly!");
+                Assertions.fail("The competitors are not divided up correctly!");
             }
         }
     }

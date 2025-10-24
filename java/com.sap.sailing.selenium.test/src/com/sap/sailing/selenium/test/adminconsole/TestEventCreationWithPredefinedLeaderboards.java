@@ -2,12 +2,12 @@ package com.sap.sailing.selenium.test.adminconsole;
 
 import static com.sap.sailing.selenium.pages.common.DateHelper.getFutureDate;
 import static com.sap.sailing.selenium.pages.common.DateHelper.getPastDate;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.event.EventConfigurationPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.event.EventConfigurationPanelPO.EventEntryPO;
@@ -18,7 +18,7 @@ public class TestEventCreationWithPredefinedLeaderboards extends AbstractSeleniu
     private AdminConsolePage adminConsolePage;
     
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot());
         super.setUp();
@@ -30,7 +30,7 @@ public class TestEventCreationWithPredefinedLeaderboards extends AbstractSeleniu
      * dialog, those leaderboard groups can be expected to be linked to the event when confirming the
      * creation operation.
      */
-    @Test
+    @SeleniumTestCase
     public void createTestEventLinkingToExistingLeaderboardGroups() {
         LeaderboardGroupConfigurationPanelPO leaderboardGroupsConfigPanel = adminConsolePage.goToLeaderboardGroupConfiguration();
         leaderboardGroupsConfigPanel.createLeaderboardGroup("A", "A");

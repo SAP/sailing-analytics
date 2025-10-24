@@ -8,8 +8,8 @@ import java.util.UUID;
 import javax.ws.rs.core.Response;
 
 import org.json.simple.parser.ParseException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.DeviceIdentifier;
 import com.sap.sailing.domain.racelog.tracking.test.mock.MockSmartphoneUuidServiceFinderFactory;
@@ -43,7 +43,7 @@ public class GPSFixesResourceTest {
     
     private RacingEventService service;
     
-    @Before
+    @BeforeEach
     public void setup() {
         service = new RacingEventServiceImpl(/* clearPersistentCompetitorStore */ true,
                 /* sensorFixStore */ null, new MockSmartphoneUuidServiceFinderFactory(), /* restoreTrackedRaces */ false);

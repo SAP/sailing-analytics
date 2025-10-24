@@ -1,8 +1,8 @@
 package com.sap.sailing.simulator.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.impl.DegreePosition;
@@ -18,7 +18,7 @@ public class RectangularBoundaryTest {
 
         Grid b = new RectangularGrid(p1, p2);
         Position[][] grid = b.generatePositions(20,20,0,0);
-        assertEquals("Number of lattice points",400,grid.length*grid[0].length);
+        assertEquals(400,grid.length*grid[0].length,"Number of lattice points");
     	
     }
 

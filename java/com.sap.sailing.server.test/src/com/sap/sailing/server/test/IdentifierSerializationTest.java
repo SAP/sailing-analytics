@@ -6,8 +6,8 @@ import java.io.ObjectOutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.RegattaNameAndRaceName;
 
@@ -31,7 +31,7 @@ public class IdentifierSerializationTest {
         ois.close();
         oos.close();
         
-        Assert.assertEquals(original, streamed);
+        Assertions.assertEquals(original, streamed);
     }
     
 }

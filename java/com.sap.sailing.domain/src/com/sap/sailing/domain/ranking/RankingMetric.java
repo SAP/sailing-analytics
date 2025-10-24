@@ -35,7 +35,7 @@ import com.sap.sse.common.Timed;
  * 
  * A handicap-based metric may need to request specific parameters from the {@link Competitor} to judge the ranking
  * correctly, such as the time-on-time multiplier, the Yardstick number, the time-on-distance allowance or the complex
- * ORC Performance Curve rating.
+ * ORC Polar Curve rating.
  * 
  * @author Axel Uhl (D043530)
  *
@@ -237,7 +237,7 @@ public interface RankingMetric extends Serializable {
             RankingInfo rankingInfo, WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache);
 
     /**
-     * A so-called "implied wind" speed is determined in ORC Performance Curve Scoring (PCS) by inverting the
+     * A so-called "implied wind" speed is determined in ORC Polar Curve Scoring (PCS) by inverting the
      * performance curve functions of the competitors that maps a wind speed to the time allowance for a course that the
      * competitor gets for that wind speed. This way, a virtual wind speed can be calculated based on the time the
      * competitor actually took to complete that course.

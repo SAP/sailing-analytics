@@ -10,10 +10,10 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.concurrent.TimeUnit;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.Timeout;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Timeout;
 
 import com.google.protobuf.CodedOutputStream;
 import com.sap.sailing.domain.igtimiadapter.IgtimiConnection;
@@ -36,16 +36,13 @@ import com.sun.jersey.core.util.Base64;
  * @author Axel Uhl (d043530)
  *
  */
+@Timeout(value = 2, unit = TimeUnit.MINUTES)
 public abstract class AbstractTestWithIgtimiConnection extends AbstractSeleniumTest {
     protected IgtimiConnection connection;
     
-    @Rule public Timeout AbstractTestWithIgtimiConnectionTimeout = Timeout.millis(2 * 60 * 1000);
-    
-    @Rule public Timeout AbstractTracTracLiveTestTimeout = Timeout.millis(2 * 60 * 1000);
-    
     protected ApiContext ctx;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot(), /* headless */ true);
         super.setUp();

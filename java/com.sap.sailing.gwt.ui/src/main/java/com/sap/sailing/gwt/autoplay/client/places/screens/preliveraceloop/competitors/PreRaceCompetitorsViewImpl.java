@@ -13,6 +13,7 @@ import com.google.gwt.user.client.ui.ResizeComposite;
 import com.google.gwt.user.client.ui.Widget;
 import com.sap.sailing.domain.common.dto.CompetitorWithBoatDTO;
 import com.sap.sailing.gwt.autoplay.client.places.screens.preliveraceloop.leaderboard.PreLiveRaceLeaderboardWithImageViewImpl.ImageProvider;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 
 public class PreRaceCompetitorsViewImpl extends ResizeComposite implements PreRaceCompetitorsView {
     private static PreRaceCompetitorsViewImplUiBinder uiBinder = GWT.create(PreRaceCompetitorsViewImplUiBinder.class);
@@ -44,17 +45,17 @@ public class PreRaceCompetitorsViewImpl extends ResizeComposite implements PreRa
     }
 
     @Override
-    public void setCompetitors(List<CompetitorWithBoatDTO> competitors) {
+    public void setCompetitors(List<CompetitorWithBoatDTO> competitors, TakedownNoticeService takedownNoticeService) {
         for (CompetitorWithBoatDTO competitor : competitors) {
-            Widget w = createCompetitorElement(competitor);
+            Widget w = createCompetitorElement(competitor, takedownNoticeService);
             competitorSlider.add(w);
         }
         competitorSlider.forceLayout();
     }
 
-    private Widget createCompetitorElement(CompetitorWithBoatDTO competitor) {
+    private Widget createCompetitorElement(CompetitorWithBoatDTO competitor, TakedownNoticeService takedownNoticeService) {
         FlowPanel competitorPanel = new FlowPanel();
-        competitorPanel.add(new CompetitorViewImpl(provider, competitor));
+        competitorPanel.add(new CompetitorViewImpl(provider, competitor, takedownNoticeService));
         return new Label(competitor.getName());
     }
 

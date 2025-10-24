@@ -1,13 +1,14 @@
 package com.sap.sailing.server.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.RaceColumn;
 import com.sap.sailing.domain.leaderboard.FlexibleLeaderboard;
@@ -34,7 +35,7 @@ public class OperationalTransformationTest {
     private Peer<RacingEventServiceOperation<?>, RacingEventService> server;
     private Peer<RacingEventServiceOperation<?>, RacingEventService> replica;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         // ensure that leaderboards will be loaded from and stored to the test database which is 
         MongoDBService.INSTANCE.getDB().drop();
@@ -46,6 +47,12 @@ public class OperationalTransformationTest {
         // wire the peers:
         server.addPeer(replica);
         replica.addPeer(server);
+    }
+    
+    @AfterEach
+    public void tearDown() {
+        server.shutdown();
+        replica.shutdown();
     }
 
     @Test

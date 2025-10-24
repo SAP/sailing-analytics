@@ -154,6 +154,7 @@ public class LeaderboardGroupsResource extends AbstractSailingServerResource {
                         idsOfEventsReferencingLeaderboardGroup.add(event.getId().toString());
                     }
                 }
+                Collections.sort(idsOfEventsReferencingLeaderboardGroup, (id1, id2)->id1.toString().compareTo(id2.toString()));
                 jsonLeaderboardGroup.put(LeaderboardGroupConstants.EVENTS, idsOfEventsReferencingLeaderboardGroup);
                 JSONArray jsonLeaderboardEntries = new JSONArray();
                 jsonLeaderboardGroup.put(LeaderboardGroupConstants.LEADERBOARDS, jsonLeaderboardEntries);

@@ -1,8 +1,8 @@
 package com.sap.sailing.domain.test.markpassing;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.Waypoint;
@@ -222,7 +222,7 @@ public abstract class AbstractMarkPassingTest extends OnlineTracTracBasedTest {
         incorrect += incorrectPasses;
         skipped += wronglyNotComputed;
         extra += wronglyComputed;
-        assertTrue("Expected accuracy to be at least 0.8 but was " + accuracy, accuracy >= 0.8);
+        assertTrue(accuracy >= 0.8, "Expected accuracy to be at least 0.8 but was " + accuracy);
         logger.info(mpc.toString());
     }
 
@@ -290,7 +290,7 @@ public abstract class AbstractMarkPassingTest extends OnlineTracTracBasedTest {
         chooser.calculateMarkPassDeltas(c, f.getA(), f.getB());
     }
 
-    @AfterClass
+    @AfterAll
     public static void createXML() throws IOException {
         double accuracy = correct / totalPasses;
         double different = incorrect / totalPasses;

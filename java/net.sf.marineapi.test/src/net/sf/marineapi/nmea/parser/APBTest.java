@@ -1,15 +1,16 @@
 package net.sf.marineapi.nmea.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import net.sf.marineapi.nmea.sentence.APBSentence;
 import net.sf.marineapi.nmea.sentence.TalkerId;
 import net.sf.marineapi.nmea.util.DataStatus;
 import net.sf.marineapi.nmea.util.Direction;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class APBTest {
 
@@ -18,7 +19,7 @@ public class APBTest {
 	private APBSentence apb;
 	private APBSentence empty;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		apb = new APBParser(EXAMPLE);
 		empty = new APBParser(TalkerId.AG);

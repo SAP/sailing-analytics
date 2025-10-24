@@ -5,6 +5,7 @@
 	<ui:style gss="true" type="com.sap.sailing.gwt.home.shared.partials.fullscreen.FullscreenContainer.Style">
 		.popup {
 			position: fixed !important;
+			z-index: 2; /* above media menu buttons (1) and video player iframe, same as gwt-Dialog (2) */
 			top: 0;
 			bottom: 0;
 			left: 0;
@@ -89,7 +90,7 @@
 	</ui:style>
 	<g:HeaderPanel>
 		<g:HTMLPanel styleName="{style.header}">
-			<a href="http://sapsponsorships.com" class="{style.logoLink}" style="display:none;" ui:field="logoUi">
+			<a href="https://sap.com" class="{style.logoLink}" style="display:none;" ui:field="logoUi">
 		    	<img src="images/home/logo-small@2x.png" alt="{i18n.headerLogo}" class="{style.logo}"></img>
 	        </a>
 			<div class="{style.toolbar}">

@@ -1,14 +1,15 @@
 package com.sap.sse.security.replication.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Locale;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.mail.MailException;
+import com.sap.sse.replication.FullyInitializedReplicableTracker;
 import com.sap.sse.replication.testsupport.AbstractServerWithSingleServiceReplicationTest;
 import com.sap.sse.security.SecurityService;
 import com.sap.sse.security.impl.SecurityServiceImpl;
@@ -32,7 +33,7 @@ public class SecurityServiceInitialLoadTest extends AbstractServerWithSingleServ
     public SecurityServiceInitialLoadTest() {
         super(new AbstractSecurityReplicationTest.SecurityServerReplicationTestSetUp() {
             @Override
-            protected SecurityServiceImpl createNewMaster()
+            protected SecurityServiceImpl createNewMaster(FullyInitializedReplicableTracker<SecurityService> securityServiceTrackerMock)
                     throws MalformedURLException, IOException, InterruptedException, MailException, UserStoreManagementException {
                 final UserStore userStore = new UserStoreImpl(PersistenceFactory.INSTANCE.getDefaultDomainObjectFactory(),
                         PersistenceFactory.INSTANCE.getDefaultMongoObjectFactory(), "TestDefaultTenant");

@@ -7,11 +7,10 @@ import static com.sap.sailing.selenium.pages.common.DateHelper.getPastTime;
 import java.util.Date;
 import java.util.function.Predicate;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 
-import org.junit.Before;
-import org.junit.Test;
-
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.event.EventConfigurationPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardConfigurationPanelPO;
@@ -26,20 +25,20 @@ import com.sap.sailing.selenium.test.AbstractSeleniumTest;
 public class TestStateVisualizationRegatta extends AbstractSeleniumTest {
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot());
         super.setUp();
     }
     
-    @Test
+    @SeleniumTestCase
     public void testStateFlagOfUpcomingRegatta() {
         TestCase testCase = new TestCase();
         testCase.createTestEventWithRegatta("TestUpcomingRegatta", getFutureDate(3), getFutureDate(7));
         testCase.assertStateFlagOfRegatta("TestUpcomingRegatta", LabelTypePO::isUpcoming);
     }
 
-    @Test
+    @SeleniumTestCase
     public void testStateFlagOfInProgressRegatta() {
         TestCase testCase = new TestCase();
         testCase.createTestEventWithRegatta("TestInProgressRegatta", getPastDate(3), getFutureDate(3));
@@ -48,7 +47,7 @@ public class TestStateVisualizationRegatta extends AbstractSeleniumTest {
         testCase.assertStateFlagOfRegatta("TestInProgressRegatta", LabelTypePO::isInProgress);
     }
 
-    @Test
+    @SeleniumTestCase
     public void testStateFlagOfLiveRegatta() {
         TestCase testCase = new TestCase();
         testCase.createTestEventWithRegatta("TestLiveRegatta", getPastDate(3), getFutureDate(3));
@@ -56,7 +55,7 @@ public class TestStateVisualizationRegatta extends AbstractSeleniumTest {
         testCase.assertStateFlagOfRegatta("TestLiveRegatta", LabelTypePO::isLive);
     }
 
-    @Test
+    @SeleniumTestCase
     public void testStateFlagOfFinishedRegatta() {
         TestCase testCase = new TestCase();
         testCase.createTestEventWithRegatta("TestFinishedRegatta", getPastDate(7), getPastDate(3));
@@ -86,7 +85,7 @@ public class TestStateVisualizationRegatta extends AbstractSeleniumTest {
         private void assertStateFlagOfRegatta(String regattaName, Predicate<LabelTypePO> expectedLabelType) {
             RegattaEventPage regattaEventPage = RegattaEventPage.goToRegattaEventUrl(getWebDriver(), eventUrl);
             RegattaListItemPO regattaListItem = regattaEventPage.getRegattaListItem(regattaName);
-            Assert.assertTrue(expectedLabelType.test(regattaListItem.getRegattaHeader().getRegattaStateLabel()));
+            Assertions.assertTrue(expectedLabelType.test(regattaListItem.getRegattaHeader().getRegattaStateLabel()));
         }
     }
 }

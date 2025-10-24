@@ -94,9 +94,15 @@ public class ORCCertificateJsonSerializer implements JsonSerializer<ORCCertifica
             beatVMGPredictions.put(keyTWS, certificate.getBeatVMGPredictions().get(tws).getKnots());
             runVMGPredictions.put(keyTWS, certificate.getRunVMGPredictions().get(tws).getKnots());
             windwardLeewardPredictions.put(keyTWS, certificate.getWindwardLeewardSpeedPrediction().get(tws).getKnots());
-            circularRandomPredictions.put(keyTWS, certificate.getCircularRandomSpeedPredictions().get(tws).getKnots());
-            longDistancePredictions.put(keyTWS, certificate.getLongDistanceSpeedPredictions().get(tws).getKnots());
-            nonSpinnakerPredictions.put(keyTWS, certificate.getNonSpinnakerSpeedPredictions().get(tws).getKnots());
+            if (certificate.getCircularRandomSpeedPredictions().containsKey(tws)) {
+                circularRandomPredictions.put(keyTWS, certificate.getCircularRandomSpeedPredictions().get(tws).getKnots());
+            }
+            if (certificate.getLongDistanceSpeedPredictions().containsKey(tws)) {
+                longDistancePredictions.put(keyTWS, certificate.getLongDistanceSpeedPredictions().get(tws).getKnots());
+            }
+            if (certificate.getNonSpinnakerSpeedPredictions().containsKey(tws)) {
+                nonSpinnakerPredictions.put(keyTWS, certificate.getNonSpinnakerSpeedPredictions().get(tws).getKnots());
+            }
             for (Bearing twa : certificate.getTrueWindAngles()) {
                 String keyTWA = bearingToDegreeString(twa);
                 velocityPredictionsPerTrueWindAngle.put(keyTWA,

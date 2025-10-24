@@ -1,6 +1,6 @@
 package com.sap.sse.security.persistence.test;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.sap.sse.mongodb.MongoDBService;
 import com.sap.sse.security.persistence.DomainObjectFactory;
@@ -11,7 +11,7 @@ public abstract class AbstractSecurityPersistenceTest {
     protected DomainObjectFactory dof;
     protected MongoObjectFactory mof;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         MongoDBService.INSTANCE.getDB().drop();
         dof = PersistenceFactory.INSTANCE.getDefaultDomainObjectFactory();

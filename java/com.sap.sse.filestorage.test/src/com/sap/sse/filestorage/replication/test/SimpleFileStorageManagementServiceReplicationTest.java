@@ -3,8 +3,8 @@ package com.sap.sse.filestorage.replication.test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.NoCorrespondingServiceRegisteredException;
 import com.sap.sse.filestorage.FileStorageService;
@@ -33,7 +33,7 @@ public class SimpleFileStorageManagementServiceReplicationTest extends
         replicaReplicator.waitUntilQueueIsEmpty();
         Thread.sleep(3000);
 
-        Assert.assertThrows(NoCorrespondingServiceRegisteredException.class, ()->replica.getActiveFileStorageService());
+        Assertions.assertThrows(NoCorrespondingServiceRegisteredException.class, ()->replica.getActiveFileStorageService());
         assertThat("service property on replica set after replication",
                 Util.findProperty(serviceOnReplica, DummyFileStorageService.PROPERTY_NAME).getValue(), equalTo("456"));
     }

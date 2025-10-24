@@ -11,8 +11,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * Used to force specific garbage collection properties together with the G1GC implementation. By adjusting the
@@ -30,7 +30,7 @@ import org.junit.Test;
  * @author Axel Uhl (D043530)
  *
  */
-@Ignore("Unignore if you want to run GC tests")
+@Disabled("Unignore if you want to run GC tests")
 public class OutperformingTheGarbageCollectorTest {
     private static final Logger logger = Logger.getLogger(OutperformingTheGarbageCollectorTest.class.getName());
     private static final int MAX_THREADPOOL_SIZE = 100;

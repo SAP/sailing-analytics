@@ -130,7 +130,7 @@ public class ORCCertificateJsonDeserializer implements JsonDeserializer<ORCCerti
         } else {
             final List<T> resultList = new ArrayList<>();
             for (final Object number : windAnglesJsonArray) {
-                resultList.add(constructor.apply((Double) number));
+                resultList.add(constructor.apply(number==null ? null : ((Number) number).doubleValue()));
             }
             final T[] tArray = resultList.toArray(array);
             result = tArray;

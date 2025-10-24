@@ -5,9 +5,8 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.Timeout;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import com.sap.sailing.domain.common.DeviceIdentifier;
 import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
@@ -18,10 +17,8 @@ import com.sap.sailing.domain.racelogtracking.test.AbstractGPSFixStoreTest;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.Util.Triple;
 
+@Timeout(value = 3, unit = TimeUnit.SECONDS)
 public class GPSFixStoreListenerTest extends AbstractGPSFixStoreTest {
-    @Rule
-    public Timeout GPSFixStoreListenerTestTimeout = Timeout.millis(3 * 1000);
-
     /**
      * {@link MongoSensorFixStoreImpl} had broken synchronization of the listeners collection (add/removeListener
      * methods were synchronized but notifyListeners was not synchronized).

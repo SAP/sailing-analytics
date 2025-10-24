@@ -30,10 +30,9 @@ public class StartActivity extends AbstractActivity {
             public void onSuccess(StartViewDTO result) {
                 panel.setWidget(view.asWidget());
                 Window.setTitle(place.getTitle());
-                view.setData(result);
+                view.setData(result, /* takedownNoticeService */ clientFactory.getUserService());
             }
         });
-
         final RefreshManager refreshManager = new RefreshManagerWithErrorAndBusy(view.asWidget(), panel,
                 clientFactory.getDispatch(), clientFactory);
         refreshManager.add(view.getAnniversariesView(), new GetAnniversariesAction());

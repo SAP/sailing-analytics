@@ -1,12 +1,13 @@
 package net.sf.marineapi.nmea.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import net.sf.marineapi.nmea.sentence.DTMSentence;
 import net.sf.marineapi.nmea.sentence.TalkerId;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class DTMTest {
 	
@@ -15,7 +16,7 @@ public class DTMTest {
 	private DTMSentence dtm;
 	private DTMSentence empty;
 	
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		dtm = new DTMParser(EXAMPLE);
 		empty = new DTMParser(TalkerId.GP);

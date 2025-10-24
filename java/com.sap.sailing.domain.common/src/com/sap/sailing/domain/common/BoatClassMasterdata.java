@@ -31,6 +31,7 @@ public enum BoatClassMasterdata {
     BAVARIA_CRUISER_46 ("Bavaria Cruiser 46", true, 14.27, 4.35, BoatHullType.MONOHULL, true, "B46", "B 46", "BAVARIACRUISER46"),
     BB10M ("BB 10m", true, 10.00, 2.30, BoatHullType.MONOHULL, true, "Dansk BB10M klub"),
     BENETEAU_FIRST_35 ("Benetau First 35", true, 10.66, 3.636, BoatHullType.MONOHULL, true, "First 35"),
+    BENETEAU_FIRST_36 ("Benetau First 36", true, 11.98, 3.80, BoatHullType.MONOHULL, true, "First 36"),
     BENETEAU_FIRST_45 ("Benetau First 45", true, 13.68, 4.202, BoatHullType.MONOHULL, true, "First 45"),
     BRASSFAHRT_I ("Brassfahrt I", true, 12.00, 3.50, BoatHullType.MONOHULL, true, "Brassfahrt 1"),
     BRASSFAHRT_II ("Brassfahrt II", true, 12.00, 3.50, BoatHullType.MONOHULL, true, "Brassfahrt 2"),
@@ -49,6 +50,7 @@ public enum BoatClassMasterdata {
     DELPHIA_24 ("Delphia 24", true, 7.70, 2.50, BoatHullType.MONOHULL, true, "Delphia 24 One Design", "Delphia 24 OD"),
     DYAS("Dyas", true, 7.15, 1.95, BoatHullType.MONOHULL, true),
     ELAN350("Elan 350", true, 10.6, 3.5, BoatHullType.MONOHULL, true, "Elan 350 Performance"),
+    ELAN_E4("Elan E4", true, 10.6, 3.5, BoatHullType.MONOHULL, true, "Elan E4"),
     EXTREME_40 ("Extreme 40", false, 12.2, 6.60, BoatHullType.CATAMARAN, true, "Extreme-40", "Extreme40", "ESS40", "ess"),
     D_35 ("D35", false, 10.81, 6.89, BoatHullType.CATAMARAN, false),
     ELLIOTT_6M ("Elliott 6m", true, 6.0, 2.35, BoatHullType.MONOHULL, true, "Elliott6m"),
@@ -136,6 +138,7 @@ public enum BoatClassMasterdata {
     SPLASH_BLUE ("Splash Blue", true, 3.50, 1.50, BoatHullType.MONOHULL, false, "Splash_Blue"),
     SPLASH_RED ("Splash Red", true, 3.50, 1.50, BoatHullType.MONOHULL, false, "Splash_Red"),
     SPLASH_GREEN ("Splash Green", true, 3.50, 1.50, BoatHullType.MONOHULL, false, "Splash_Green"),
+    SRS ("Svenskt Respitsystem", true, 15.00, 4.00, BoatHullType.MONOHULL, false, "SRS", "LYS", "Leading Yard Stick", "Lidingö Yard Stick"),
     STAR ("Star", true, 6.92, 1.74, BoatHullType.MONOHULL, false, "STR", "STARBOOT", "STARBOAT"),
     STREAMLINE ("Streamline", true, 7.15, 2.55, BoatHullType.MONOHULL, true),
     SUNBEAM_22 ("Sunbeam 22", true, 6.70, 2.15, BoatHullType.MONOHULL, true, "Sunbeam 22.1"),
@@ -168,6 +171,7 @@ public enum BoatClassMasterdata {
     ORC ("ORC", true, 13.83, 3.91, BoatHullType.MONOHULL, true, "ORC I", "ORC II", "ORC III", "ORC IV", "ORC III+IV", "ORC A", "ORC B", "ORC C", "ORC D"),
     ORC_CLUB ("ORC Club", true, 13.83, 3.91, BoatHullType.MONOHULL, true),
     ORC_INTERNATIONAL ("ORC International", true, 13.83, 3.91, BoatHullType.MONOHULL, true, "ORC Int."),
+    ORC_MULTIHULL ("ORC Multihull", true, 13.83, 3.91, BoatHullType.CATAMARAN, true, "ORC MH"),
 
     // Rowing:    
     ROWING_BOAT("Rowing", false, 8.00, 0.80, BoatHullType.MONOHULL, false, "RowingBoat"),

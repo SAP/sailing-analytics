@@ -2,7 +2,7 @@
 # Downloads releases of GWT and the gwt-maven-plugin and installs them to the local Maven repo at ~/.m2
 # as well as copies the GWT JARs to the sailing Git workspace
 # Usage: install-gwt-from-fork-releases {gwt-repo-URL} {gwt-maven-plugin-repo-URL} {gwt-version} {sailing-git-root}
-# Example: install-gwt-from-fork-releases https://github.com/axeluhl/gwt https://github.com/axeluhl/gwt-maven-plugin 2.11.0 .
+# Example: install-gwt-from-fork-releases https://github.com/axeluhl/gwt https://github.com/axeluhl/gwt-maven-plugin 2.11.1 .
 GWT_REPO_URL="${1}"
 GWT_MAVEN_PLUG_REPO_URL="${2}"
 GWT_VERSION="${3}"

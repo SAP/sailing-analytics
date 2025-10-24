@@ -1,10 +1,10 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Boat;
 import com.sap.sailing.domain.base.Competitor;
@@ -52,7 +52,7 @@ public class WindEstimationOnConstructedTracksTest extends StoredTrackBasedTest 
     private List<CompetitorWithBoat> competitors;
     private static final String[] competitorNames = new String[] { "Wolfgang Hunger", "Dr. Hasso Plattner",  "Robert Stanjek", "Simon Grotelueschen" };
     
-    @Before
+    @BeforeEach
     public void setUp() {
         competitors = new ArrayList<>();
         for (String name : competitorNames) {
@@ -137,9 +137,9 @@ public class WindEstimationOnConstructedTracksTest extends StoredTrackBasedTest 
         assertTrue(combinedDegreesNow > 170 && combinedDegreesNow < 180);
         // we expect the combined direction now to be closer to the estimation as compared to before because the estimation is more confident
         // since the minimum cluster size is 2 instead of 1
-        assertTrue("expected combinedDegreesNow ("+combinedDegreesNow+
-                ") < combinedDegreesMinClusterSizeOne ("+combinedDegreesMinClusterSizeOne+")",
-                combinedDegreesNow < combinedDegreesMinClusterSizeOne);
+        assertTrue(combinedDegreesNow < combinedDegreesMinClusterSizeOne,
+                "expected combinedDegreesNow ("+combinedDegreesNow+
+                        ") < combinedDegreesMinClusterSizeOne ("+combinedDegreesMinClusterSizeOne+")");
     }
 
     @Test
@@ -253,9 +253,9 @@ public class WindEstimationOnConstructedTracksTest extends StoredTrackBasedTest 
         Wind estimatedWindDirectionNew = track.getAveragedWind(/* position */ null, checkTime);
         assertFalse(cachedFixes.isEmpty());
         assertNotNull(estimatedWindDirectionNew);
-        assertTrue("Expected estimated wind direction to now be greater than 185 degrees but was "
-                + estimatedWindDirectionCached.getBearing().getDegrees(), estimatedWindDirectionCached.getBearing()
-                .getDegrees() < 185.); // remember: bearing is opposite of from; boats start with upwind
+        assertTrue(estimatedWindDirectionCached.getBearing()
+        .getDegrees() < 185., "Expected estimated wind direction to now be greater than 185 degrees but was "
+                        + estimatedWindDirectionCached.getBearing().getDegrees()); // remember: bearing is opposite of from; boats start with upwind
     }
     
     @Test
@@ -299,8 +299,8 @@ public class WindEstimationOnConstructedTracksTest extends StoredTrackBasedTest 
         setBearingForCompetitor(competitors.get(1), now, 330); // on the same tack, should give no read-out
         Wind nullWind = getTrackedRace().getEstimatedWindDirection(now);
         assertNull(
-                "Shouldn't have been able to determine estimated wind direction because no two distinct direction clusters found upwind nor downwind",
-                nullWind);
+                nullWind,
+                "Shouldn't have been able to determine estimated wind direction because no two distinct direction clusters found upwind nor downwind");
     }
 
     @Test
@@ -313,8 +313,8 @@ public class WindEstimationOnConstructedTracksTest extends StoredTrackBasedTest 
         setBearingForCompetitor(competitors.get(3), now, 145); // on the same tack, should give no read-out
         Wind nullWind = getTrackedRace().getEstimatedWindDirection(now);
         assertNull(
-                "Shouldn't have been able to determine estimated wind direction because no two distinct direction clusters found upwind nor downwind",
-                nullWind);
+                nullWind,
+                "Shouldn't have been able to determine estimated wind direction because no two distinct direction clusters found upwind nor downwind");
     }
 
     @Test

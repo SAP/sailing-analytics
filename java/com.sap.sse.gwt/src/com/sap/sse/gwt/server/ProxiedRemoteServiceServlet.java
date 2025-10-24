@@ -27,6 +27,7 @@ import com.sap.sse.common.HttpRequestHeaderConstants;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util.Triple;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
+import com.sap.sse.util.HttpRequestUtils;
 
 /**
  * Using GWT in a proxyfied environment can be tricky and leads to strange errors
@@ -151,7 +152,7 @@ public abstract class ProxiedRemoteServiceServlet extends RemoteServiceServlet {
         if (startAndEndOfProcessing == null) {
             // the processing time annotation happens only for POST requests in the doPost-->processCall-->afterProcessCall method chain
             if (req.getMethod().equals("POST")) {
-                logger.warning("A request with method POST from address "+req.getRemoteAddr()
+                logger.warning("A request with method POST from address "+HttpRequestUtils.getClientIP(req)
                     +" was processed. No timing information available. Perhaps there was an IncompatibleRemoteServiceException thrown, so the call was not processed.");
             }
         } else {

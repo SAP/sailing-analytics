@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.tracking.impl;
 
 import static com.sap.sse.common.impl.MillisecondsTimePoint.now;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -11,8 +11,8 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.CompetitorWithBoat;
@@ -29,7 +29,7 @@ public class BravoFixTrackSerializationTest {
     
     private DynamicBravoFixTrack<Competitor> track;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         CompetitorWithBoat competitor = TrackBasedTest.createCompetitorWithBoat("SAP Extreme Sailing Team");
         track = new BravoFixTrackImpl<Competitor>(competitor, BravoFixTrack.TRACK_NAME, false);

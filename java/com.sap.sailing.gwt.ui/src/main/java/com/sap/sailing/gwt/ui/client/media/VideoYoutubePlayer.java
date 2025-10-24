@@ -5,16 +5,21 @@ import java.util.List;
 
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.logical.shared.AttachEvent.Handler;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
 import com.sap.sailing.domain.common.media.MediaTrackWithSecurityDTO;
 import com.sap.sailing.gwt.ui.client.media.shared.AbstractMediaPlayer;
 import com.sap.sailing.gwt.ui.client.media.shared.MediaSynchPlayer;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
+import com.sap.sse.gwt.client.media.MediaMenuIcon;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 import com.sap.sse.gwt.client.player.Timer;
+import com.sap.sse.gwt.common.CommonSharedResources;
 
 public class VideoYoutubePlayer extends AbstractMediaPlayer implements MediaSynchPlayer, MediaSynchAdapter, IsWidget {
 
@@ -22,6 +27,11 @@ public class VideoYoutubePlayer extends AbstractMediaPlayer implements MediaSync
         void execute();
     }
 
+    /**
+     * Contains the {@link #takedownButton} and the actual {@link #videoContainer} and is what {@link #asWidget()} returns
+     */
+    private final Panel mediaWrapper;
+    
     private final Panel videoContainer;
 
     private static int videoCounter;
@@ -33,6 +43,8 @@ public class VideoYoutubePlayer extends AbstractMediaPlayer implements MediaSync
     private EditFlag editFlag;
 
     private YoutubeVideoControl videoControl;
+    
+    private final MediaMenuIcon takedownButton;
 
     /**
      * Required to indicate whether this control has been requested to close. In this case it must not call any player
@@ -43,12 +55,21 @@ public class VideoYoutubePlayer extends AbstractMediaPlayer implements MediaSync
 
     private final List<DeferredAction> deferredActions = new ArrayList<DeferredAction>();
 
-    public VideoYoutubePlayer(final MediaTrackWithSecurityDTO videoTrack, TimePoint raceStartTime, Timer raceTimer) {
+    public VideoYoutubePlayer(final MediaTrackWithSecurityDTO videoTrack, TimePoint raceStartTime, Timer raceTimer,
+            TakedownNoticeService takedownNoticeService, RegattaAndRaceIdentifier raceIdentifier) {
         super(videoTrack);
         this.raceTimer = raceTimer;
         this.raceStartTime = raceStartTime;
-
+        this.mediaWrapper = new FlowPanel();
+        mediaWrapper.addStyleName(CommonSharedResources.INSTANCE.mainCss().media_wrapper());
+        mediaWrapper.setHeight("100%");
+        mediaWrapper.setWidth("100%");
+        takedownButton = new MediaMenuIcon(takedownNoticeService, "takedownRequestForRaceVideo");
+        takedownButton.setFontSize("20px"); // aligns with the font size for the VideoJSPlayer
+        takedownButton.setData(raceIdentifier.toString(), videoTrack.url);
         this.videoContainer = new SimplePanel();
+        mediaWrapper.add(videoContainer);
+        mediaWrapper.add(takedownButton);
         this.videoContainer.setStyleName("Youtube-Video-Panel");
         final String videoContainerId = "videoContainer-" + videoTrack.url + ++videoCounter;
         this.videoContainer.getElement().setId(videoContainerId);
@@ -57,7 +78,6 @@ public class VideoYoutubePlayer extends AbstractMediaPlayer implements MediaSync
                 .setInnerText(
                         "When the Youtube video doesn't show up, click the popout button at the upper right corner to open the video in a dedicated browser window.");
         this.videoContainer.addAttachHandler(new Handler() {
-
             @Override
             public void onAttachOrDetach(AttachEvent event) {
                 // The videoContainer must be attached to the DOM before the Youtube player can be created.
@@ -72,7 +92,6 @@ public class VideoYoutubePlayer extends AbstractMediaPlayer implements MediaSync
                 }
             }
         });
-
     }
 
     private void defer(DeferredAction deferredAction) {
@@ -246,7 +265,7 @@ public class VideoYoutubePlayer extends AbstractMediaPlayer implements MediaSync
 
     @Override
     public Widget asWidget() {
-        return videoContainer;
+        return mediaWrapper;
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.vakarosadapter.test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.sensordata.BravoExtendedSensorDataMetadata;
 import com.sap.sailing.domain.common.tracking.DoubleVectorFix;
@@ -33,7 +33,7 @@ public class TestReadingVakarosFiles {
     private VakarosGPSFixImporter gpsFixImporter;
     private VakarosExtendedDataImporterImpl sensorFixImporter;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         gpsFixImporter = new VakarosGPSFixImporter();
         sensorFixImporter = new VakarosExtendedDataImporterImpl();

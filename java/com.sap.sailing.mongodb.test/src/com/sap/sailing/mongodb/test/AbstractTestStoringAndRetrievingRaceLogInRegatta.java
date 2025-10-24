@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.mongodb.MongoException;
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
@@ -43,7 +43,7 @@ public abstract class AbstractTestStoringAndRetrievingRaceLogInRegatta extends R
         super();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         now = MillisecondsTimePoint.now();
         mongoObjectFactory = PersistenceFactory.INSTANCE.getMongoObjectFactory(getMongoService());

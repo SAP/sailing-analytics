@@ -1,7 +1,6 @@
 package com.sap.sailing.gwt.autoplay.client.places.screens.afterliveraceloop.boats;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -16,6 +15,9 @@ import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.gwt.ui.leaderboard.SingleRaceLeaderboardPanel;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
+import com.sap.sse.gwt.client.ImageOnFlowPanelHelper;
+import com.sap.sse.gwt.client.media.MediaMenuIcon;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 import com.sap.sse.gwt.client.panels.ResizableFlowPanel;
 
 public class RaceEndWithBoatsViewImpl extends ResizeComposite implements RaceEndWithBoatsView {
@@ -54,12 +56,21 @@ public class RaceEndWithBoatsViewImpl extends ResizeComposite implements RaceEnd
     Label statisticValue3;
     @UiField
     Label statisticProperty3;
-
+    @UiField(provided = true)
+    MediaMenuIcon takedownButtonImage1;
+    @UiField(provided = true)
+    MediaMenuIcon takedownButtonImage2;
+    @UiField(provided = true)
+    MediaMenuIcon takedownButtonImage3;
+    
     private NumberFormat compactFormat = NumberFormat.getFormat("#.0");
 
     private ImageProvider provider;
 
-    public RaceEndWithBoatsViewImpl(ImageProvider provider) {
+    public RaceEndWithBoatsViewImpl(ImageProvider provider, TakedownNoticeService takedownNoticeService) {
+        takedownButtonImage1 = new MediaMenuIcon(takedownNoticeService, provider.getTakedownNoticeContextKey());
+        takedownButtonImage2 = new MediaMenuIcon(takedownNoticeService, provider.getTakedownNoticeContextKey());
+        takedownButtonImage3 = new MediaMenuIcon(takedownNoticeService, provider.getTakedownNoticeContextKey());
         initWidget(uiBinder.createAndBindUi(this));
         this.provider = provider;
     }
@@ -74,48 +85,40 @@ public class RaceEndWithBoatsViewImpl extends ResizeComposite implements RaceEnd
         leaderBoardHolder.add(leaderboardPanel);
     }
 
+    private void setCompetitor(int position, Label subline, FlowPanel image, MediaMenuIcon takedownButton, CompetitorDTO c) {
+        subline.setText(""+position+". " + c.getName());
+        final String imageUrl = provider.getImageUrl(c);
+        ImageOnFlowPanelHelper.setImage(image, provider.getImageUrl(c));
+        takedownButton.setData(c.getName(), imageUrl);
+    }
+
     @Override
     public void setFirst(CompetitorDTO c) {
-        subline1.setText("1. " + c.getName());
-        setImage(image1, provider.getImageUrl(c), true);
+        setCompetitor(1, subline1, image1, takedownButtonImage1, c);
     }
 
     @Override
     public void setSecond(CompetitorDTO c) {
-        subline2.setText("2. " + c.getName());
-        setImage(image2, provider.getImageUrl(c), false);
+        setCompetitor(2, subline2, image2, takedownButtonImage2, c);
     }
 
     @Override
     public void setThird(CompetitorDTO c) {
-        subline3.setText("3. " + c.getName());
-        setImage(image3, provider.getImageUrl(c), false);
-    }
-
-    private void setImage(FlowPanel image, String imageUrl, boolean slightlyLarger) {
-        image.getElement().getStyle().setBackgroundImage("url(" + imageUrl + ")");
-        image.getElement().getStyle().setWidth(slightlyLarger ? 100 : 90, Unit.PCT);
-        image.getElement().getStyle().setProperty("height", "90%");
-        image.getElement().getStyle().setProperty("margin", "auto");
-        image.getElement().getStyle().setProperty("backgroundPosition", "center bottom");
-        image.getElement().getStyle().setProperty("backgroundSize", "contain");
-        image.getElement().getStyle().setProperty("backgroundRepeat", "no-repeat");
+        setCompetitor(3, subline3, image3, takedownButtonImage3, c);
     }
 
     @Override
     public void setStatistic(int competitorCount, Distance distance, Duration duration) {
         statisticProperty1.setText(StringMessages.INSTANCE.competitors());
         statisticValue1.setText(String.valueOf(competitorCount));
-
         statisticProperty2.setText(StringMessages.INSTANCE.distance());
         if(distance == null){
             statisticValue2
             .setText(StringMessages.INSTANCE.noDataFound());
         }else{
             statisticValue2
-            .setText(compactFormat.format(distance.getSeaMiles()) + " " + StringMessages.INSTANCE.seaMiles());
+            .setText(compactFormat.format(distance.getNauticalMiles()) + " " + StringMessages.INSTANCE.nauticalMiles());
         }
-
         statisticProperty3.setText(StringMessages.INSTANCE.durationPlain());
         statisticValue3.setText(compactFormat.format(duration.asMinutes()) + " " + StringMessages.INSTANCE.minutes());
     }

@@ -165,8 +165,10 @@ load_from_release_file ()
         #   curl -L -H 'Authorization: Bearer ***' https://api.github.com/repos/SAP/sailing-analytics/releases 2>/dev/null | jq -r 'sort_by(.created_at) | reverse | map(select(.name | startswith("docker-17-")))[0].assets[] | select(.content_type=="application/x-tar").id'
         # and then on like above...
     fi
-    if [ -n "${BUILD_COMPLETE_NOTIFY}" ]; then
-      echo "Build/Deployment process has been started - it can take 5 to 20 minutes until your instance is ready. " | mail -r axel.uhl@sap.com -s "Build or Deployment of $INSTANCE_ID to $SERVER_HOME for server $SERVER_NAME starting" ${BUILD_COMPLETE_NOTIFY}
+    if which mail; then
+        if [ -n "${BUILD_COMPLETE_NOTIFY}" ]; then
+          echo "Build/Deployment process has been started - it can take 5 to 20 minutes until your instance is ready. " | mail -r noreply@sapsailing.com -s "Build or Deployment of $INSTANCE_ID to $SERVER_HOME for server $SERVER_NAME starting" ${BUILD_COMPLETE_NOTIFY}
+        fi
     fi
     RELEASE_FILE_NAME=${INSTALL_FROM_RELEASE}.tar.gz
     cd ${SERVER_HOME}
@@ -226,8 +228,10 @@ build ()
     MEM_TOTAL=`free -mt | grep Total | awk '{print $2}'`
     if [ $MEM_TOTAL -lt 924 ]; then
         echo "Could not start build process with less than 1GB of RAM!"
-        if [ -n "${BUILD_COMPLETE_NOTIFY}" ]; then
-          echo "Not enough RAM for completing the build process! You need at least 1GB. Instance NOT started!" | mail -r simon.marcel.pamies@sap.com -s "Build of $INSTANCE_ID failed" ${BUILD_COMPLETE_NOTIFY}
+        if which mail; then
+            if [ -n "${BUILD_COMPLETE_NOTIFY}" ]; then
+              echo "Not enough RAM for completing the build process! You need at least 1GB. Instance NOT started!" | mail -r noreply@sapsailing.com -s "Build of $INSTANCE_ID failed" ${BUILD_COMPLETE_NOTIFY}
+            fi
         fi
     else
         if [[ $BUILD_BEFORE_START == "True" ]]; then
@@ -265,13 +269,17 @@ deploy ()
     STATUS=$?
     if [ $STATUS -eq 0 ]; then
         echo "Deployment Successful"
-        if [ -n "${BUILD_COMPLETE_NOTIFY}" ]; then
-          echo "OK - check the attachment for more information." | mail $MAIL_ATTACH_OPTION $SERVER_HOME/last_automatic_build.txt -r simon.marcel.pamies@sap.com -s "Build or Deployment of $INSTANCE_ID complete" ${BUILD_COMPLETE_NOTIFY}
+        if which mail; then
+            if [ -n "${BUILD_COMPLETE_NOTIFY}" ]; then
+              echo "OK - check the attachment for more information." | mail -r noreply@sapsailing.com $MAIL_ATTACH_OPTION $SERVER_HOME/last_automatic_build.txt -s "Build or Deployment of $INSTANCE_ID complete" ${BUILD_COMPLETE_NOTIFY}
+            fi
         fi
     else
         echo "Deployment Failed"
-        if [ -n "${BUILD_COMPLETE_NOTIFY}" ]; then
-          echo "ERROR - check the attachment for more information." | mail $MAIL_ATTACH_OPTION $SERVER_HOME/last_automatic_build.txt -r simon.marcel.pamies@sap.com -s "Build of $INSTANCE_ID failed" ${BUILD_COMPLETE_NOTIFY}
+        if which mail; then
+            if [ -n "${BUILD_COMPLETE_NOTIFY}" ]; then
+              echo "ERROR - check the attachment for more information." | mail -r noreply@sapsailing.com $MAIL_ATTACH_OPTION $SERVER_HOME/last_automatic_build.txt -s "Build of $INSTANCE_ID failed" ${BUILD_COMPLETE_NOTIFY}
+            fi
         fi
     fi 
 }

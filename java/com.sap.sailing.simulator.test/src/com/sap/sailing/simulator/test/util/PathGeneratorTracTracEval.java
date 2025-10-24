@@ -3,7 +3,7 @@ package com.sap.sailing.simulator.test.util;
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.simulator.Path;
@@ -43,19 +43,19 @@ public class PathGeneratorTracTracEval {
 
         PathGeneratorTracTracEval.pathGenerator.setSelectionParameters(0, 0);
         Path leg0 = PathGeneratorTracTracEval.pathGenerator.getPath();
-        Assert.assertEquals(99, leg0.getPathPoints().size());
+        Assertions.assertEquals(99, leg0.getPathPoints().size());
 
         PathGeneratorTracTracEval.pathGenerator.setSelectionParameters(1, 0);
         Path leg1 = PathGeneratorTracTracEval.pathGenerator.getPath();
-        Assert.assertEquals(110, leg1.getPathPoints().size());
+        Assertions.assertEquals(110, leg1.getPathPoints().size());
 
         PathGeneratorTracTracEval.pathGenerator.setSelectionParameters(2, 0);
         Path leg2 = PathGeneratorTracTracEval.pathGenerator.getPath();
-        Assert.assertEquals(151, leg2.getPathPoints().size());
+        Assertions.assertEquals(151, leg2.getPathPoints().size());
 
         PathGeneratorTracTracEval.pathGenerator.setSelectionParameters(3, 0);
         Path leg3 = PathGeneratorTracTracEval.pathGenerator.getPath();
-        Assert.assertEquals(98, leg3.getPathPoints().size());
+        Assertions.assertEquals(98, leg3.getPathPoints().size());
     }
 
     public void testGetLegPolyline() {
@@ -64,29 +64,29 @@ public class PathGeneratorTracTracEval {
 
         PathGeneratorTracTracEval.pathGenerator.setSelectionParameters(0, 0);
         Path legPolyline0 = PathGeneratorTracTracEval.pathGenerator.getPathPolyline(maxDistance);
-        Assert.assertEquals(10, legPolyline0.getPathPoints().size());
+        Assertions.assertEquals(10, legPolyline0.getPathPoints().size());
 
         PathGeneratorTracTracEval.pathGenerator.setSelectionParameters(1, 0);
         Path legPolyline1 = PathGeneratorTracTracEval.pathGenerator.getPathPolyline(maxDistance);
-        Assert.assertEquals(7, legPolyline1.getPathPoints().size());
+        Assertions.assertEquals(7, legPolyline1.getPathPoints().size());
 
         PathGeneratorTracTracEval.pathGenerator.setSelectionParameters(2, 0);
         Path legPolyline2 = PathGeneratorTracTracEval.pathGenerator.getPathPolyline(maxDistance);
-        Assert.assertEquals(8, legPolyline2.getPathPoints().size());
+        Assertions.assertEquals(8, legPolyline2.getPathPoints().size());
 
         PathGeneratorTracTracEval.pathGenerator.setSelectionParameters(3, 0);
         Path legPolyline3 = PathGeneratorTracTracEval.pathGenerator.getPathPolyline(maxDistance);
-        Assert.assertEquals(7, legPolyline3.getPathPoints().size());
+        Assertions.assertEquals(7, legPolyline3.getPathPoints().size());
     }
 
     public void testGetLegsNames() {
 
         List<String> legsNames = PathGeneratorTracTracEval.pathGenerator.getLegsNames();
 
-        Assert.assertEquals(4, legsNames.size());
-        Assert.assertEquals("G1 Start-Finish -> G1 Mark 1", legsNames.get(0));
-        Assert.assertEquals("G1 Mark 1 -> G1 Mark 4", legsNames.get(1));
-        Assert.assertEquals("G1 Mark 4 -> G1 Mark 1", legsNames.get(2));
-        Assert.assertEquals("G1 Mark 1 -> G1 Start-Finish", legsNames.get(3));
+        Assertions.assertEquals(4, legsNames.size());
+        Assertions.assertEquals("G1 Start-Finish -> G1 Mark 1", legsNames.get(0));
+        Assertions.assertEquals("G1 Mark 1 -> G1 Mark 4", legsNames.get(1));
+        Assertions.assertEquals("G1 Mark 4 -> G1 Mark 1", legsNames.get(2));
+        Assertions.assertEquals("G1 Mark 1 -> G1 Start-Finish", legsNames.get(3));
     }
 }

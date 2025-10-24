@@ -9,6 +9,7 @@ import com.sap.sailing.gwt.home.communication.start.EventQuickfinderDTO;
 import com.sap.sailing.gwt.home.mobile.app.MobilePlacesNavigator;
 import com.sap.sailing.gwt.home.shared.app.PlaceNavigation;
 import com.sap.sailing.gwt.home.shared.partials.anniversary.AnniversariesView;
+import com.sap.sse.security.ui.client.UserService;
 
 public interface StartView {
 
@@ -20,6 +21,8 @@ public interface StartView {
         MobilePlacesNavigator getNavigator();
         
         PlaceNavigation<?> getEventNavigation(EventQuickfinderDTO event);
+
+        UserService getUserService();
     }
 
     void setFeaturedEvents(List<? extends EventLinkAndMetadataDTO> list);

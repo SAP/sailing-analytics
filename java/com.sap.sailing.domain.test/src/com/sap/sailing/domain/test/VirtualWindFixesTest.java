@@ -1,12 +1,12 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.RaceDefinition;
 import com.sap.sailing.domain.common.Position;
@@ -37,7 +37,7 @@ public class VirtualWindFixesTest {
     private TimePoint oddStart;
     private TimePoint evenStart;
     
-    @Before
+    @BeforeEach
     public void setUp() throws InvalidDateException {
         oddStart = new MillisecondsTimePoint(DateParser.parse("2017-02-15T09:59:59.9+01:00"));
         evenStart = new MillisecondsTimePoint(DateParser.parse("2017-02-15T10:00:00+01:00"));

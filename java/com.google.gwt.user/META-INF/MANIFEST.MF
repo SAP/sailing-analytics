@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: gwt-user
 Bundle-SymbolicName: com.google.gwt.user
-Bundle-Version: 2.11.0
+Bundle-Version: 2.11.1
 Bundle-Vendor: GOOGLE
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: lib/gwt-user.jar,
@@ -185,6 +185,5 @@ Export-Package: com.google.gwt.activity.shared,
  javaemul.internal,
  javaemul.internal.annotations,
  jsinterop.annotations
-Require-Bundle: org.eclipse.jetty.osgi-servlet-api;bundle-version="3.1.0",
- org.junit;bundle-version="4.8.2";resolution:=optional
+Require-Bundle: org.eclipse.jetty.osgi-servlet-api;bundle-version="3.1.0"
 Automatic-Module-Name: com.google.gwt.user

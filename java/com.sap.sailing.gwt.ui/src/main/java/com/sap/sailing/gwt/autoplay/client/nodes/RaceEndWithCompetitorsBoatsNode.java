@@ -24,14 +24,11 @@ public class RaceEndWithCompetitorsBoatsNode extends FiresPlaceNode {
 
     public void onStart() {
         RaceEndWithCompetitorsBoatsPlace place = new RaceEndWithCompetitorsBoatsPlace();
-
         RegattaAndRaceIdentifier lastRace = cf.getAutoPlayCtxSignalError().getLastRace();
         place.setLiveRace(lastRace);
         setPlaceToGo(place);
-
         cf.getDispatch().execute(new GetSixtyInchStatisticAction(lastRace.getRaceName(), lastRace.getRegattaName()),
                 new AsyncCallback<GetSixtyInchStatisticDTO>() {
-
                     @Override
                     public void onFailure(Throwable caught) {
                         LOGGER.log(Level.WARNING, "error getting statistics", caught);

@@ -11,7 +11,7 @@ import com.sap.sse.common.Speed;
 
 /**
  * For a {@link Competitor} and the {@link ORCPerformanceCurveCourse} which the competitor sailed until the creation of
- * an instance of an implementing class, this instance represents a so called "Performance Curve". This Curve is
+ * an instance of an implementing class, this instance represents a so called "Polar Curve". This Curve is
  * specified by the so called "Implied Wind" a {@link Speed} on the x-Axis and the allowance in s/NM respectively a
  * {@link Duration} on the y-Axis. It represents a simplified polar curve for the given boat and the given part of the
  * course. For a given windspeed the performance curve returns the allowance for the boat or in simpler words: how long

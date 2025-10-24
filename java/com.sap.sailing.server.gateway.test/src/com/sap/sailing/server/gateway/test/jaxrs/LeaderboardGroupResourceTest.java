@@ -1,6 +1,6 @@
 package com.sap.sailing.server.gateway.test.jaxrs;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,8 +11,8 @@ import javax.ws.rs.core.Response;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.DomainFactory;
@@ -40,7 +40,7 @@ public class LeaderboardGroupResourceTest extends AbstractJaxRsApiTest {
     private String regattaName = "TestRegatta";
     private String leaderboardGroupName = "TestLeaderboardGroup";
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         List<Series> series = new ArrayList<Series>();

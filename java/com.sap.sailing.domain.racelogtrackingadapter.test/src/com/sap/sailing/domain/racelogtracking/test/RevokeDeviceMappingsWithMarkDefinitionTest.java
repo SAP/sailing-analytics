@@ -2,8 +2,9 @@ package com.sap.sailing.domain.racelogtracking.test;
 
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
@@ -18,14 +19,12 @@ import com.sap.sailing.domain.base.impl.MarkImpl;
 import com.sap.sailing.domain.racelogtracking.impl.PingDeviceIdentifierImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
-import org.junit.Assert;
-
 public class RevokeDeviceMappingsWithMarkDefinitionTest {
     private RegattaLog regattaLog;
     private AbstractLogEventAuthor author;
     private Mark mark;
     
-    @Before
+    @BeforeEach
     public void prepare() {
         regattaLog = new RegattaLogImpl("RevokeTest");
         author = new LogEventAuthorImpl("RevokeTest", 1);
@@ -47,10 +46,10 @@ public class RevokeDeviceMappingsWithMarkDefinitionTest {
 
         for (RegattaLogEvent event : regattaLog.getUnrevokedEvents()) {
             if (event instanceof RegattaLogDefineMarkEventImpl) {
-                Assert.fail("Define mark not revoked.");
+                Assertions.fail("Define mark not revoked.");
             }
             if (event instanceof RegattaLogDeviceMarkMappingEventImpl) {
-                Assert.fail("Device mapping not revoked.");
+                Assertions.fail("Device mapping not revoked.");
             }
         }
     }
@@ -66,7 +65,7 @@ public class RevokeDeviceMappingsWithMarkDefinitionTest {
 
         for (RegattaLogEvent event : regattaLog.getUnrevokedEvents()) {
             if (event instanceof RegattaLogDefineMarkEventImpl) {
-                Assert.fail("Define mark not revoked.");
+                Assertions.fail("Define mark not revoked.");
             }
         }
     }

@@ -3,15 +3,17 @@ package com.sap.sse.mail.replication.testsupport;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.sap.sse.common.mail.MailException;
 import com.sap.sse.mail.MailService;
 import com.sap.sse.mail.MailServiceResolver;
 import com.sap.sse.mail.SerializableMultipartSupplier;
 import com.sap.sse.mail.impl.MailServiceImpl;
+import com.sap.sse.replication.FullyInitializedReplicableTracker;
 import com.sap.sse.replication.testsupport.AbstractServerReplicationTestSetUp;
 import com.sap.sse.replication.testsupport.AbstractServerWithSingleServiceReplicationTest;
+import com.sap.sse.security.SecurityService;
 
 public class AbstractMailServiceReplicationTest extends AbstractServerWithSingleServiceReplicationTest<MailService, MailServiceImpl> {
     public AbstractMailServiceReplicationTest() {
@@ -20,7 +22,7 @@ public class AbstractMailServiceReplicationTest extends AbstractServerWithSingle
 
     public static final Map<MailServiceImpl, Integer> numberOfMailsSent = new HashMap<>();
     
-    @Before
+    @BeforeEach
     public void clearNumberOfMailsSent() {
         numberOfMailsSent.clear();
     }
@@ -59,12 +61,12 @@ public class AbstractMailServiceReplicationTest extends AbstractServerWithSingle
 
     public static class MailServerReplicationTestSetUp extends AbstractServerReplicationTestSetUp<MailService, MailServiceImpl> {
         @Override
-        protected MailServiceImpl createNewMaster() throws MailException {
+        protected MailServiceImpl createNewMaster(FullyInitializedReplicableTracker<SecurityService> securityServiceTrackerMock) throws MailException {
             return createMailCountingService(true);
         }
 
         @Override
-        protected MailServiceImpl createNewReplica() throws MailException {
+        protected MailServiceImpl createNewReplica(FullyInitializedReplicableTracker<SecurityService> securityServiceTrackerMock) throws MailException {
             return createMailCountingService(false);
         }
     }

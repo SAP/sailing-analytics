@@ -1,5 +1,6 @@
 package com.sap.sailing.gwt.ui.client;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -494,8 +495,8 @@ public interface SailingServiceWriteAsync extends FileStorageManagementGwtServic
 
     void createEvent(String eventName, String eventDescription, Date startDate, Date endDate, String venue,
             boolean isPublic, List<CourseAreaDTO> courseAreas, String officialWebsiteURL, String baseURL,
-            Map<String, String> sailorsInfoWebsiteURLsByLocaleName, List<ImageDTO> images,
-            List<VideoDTO> videos, List<UUID> leaderboardGroupIDs,
+            Map<String, String> sailorsInfoWebsiteURLsByLocaleName, List<? extends ImageDTO> images,
+            List<? extends VideoDTO> videos, List<UUID> leaderboardGroupIDs,
             AsyncCallback<EventDTO> callback);
 
     /**
@@ -515,8 +516,8 @@ public interface SailingServiceWriteAsync extends FileStorageManagementGwtServic
      */
     void updateEvent(UUID eventId, String eventName, String eventDescription, Date startDate, Date endDate,
             VenueDTO venue, boolean isPublic, List<UUID> leaderboardGroupIds, String officialWebsiteURL,
-            String baseURL, Map<String, String> sailorsInfoWebsiteURLsByLocaleName, List<ImageDTO> images,
-            List<VideoDTO> videos, List<String> windFinderReviewedSpotCollectionIds, AsyncCallback<EventDTO> callback);
+            String baseURL, Map<String, String> sailorsInfoWebsiteURLsByLocaleName, List<? extends ImageDTO> images,
+            List<? extends VideoDTO> videos, List<String> windFinderReviewedSpotCollectionIds, AsyncCallback<EventDTO> callback);
 
     void createCourseAreas(UUID eventId, List<CourseAreaDTO> courseAreas, AsyncCallback<Void> callback);
 
@@ -585,7 +586,7 @@ public interface SailingServiceWriteAsync extends FileStorageManagementGwtServic
     void removeIgtimiDevice(String deviceSerialNumber, AsyncCallback<Void> asyncCallback);
 
     void importWindFromIgtimi(List<RaceDTO> selectedRaces, boolean correctByDeclination,
-            AsyncCallback<Map<RegattaAndRaceIdentifier, Integer>> asyncCallback);
+            String optionalBearerTokenOrNull, AsyncCallback<Map<RegattaAndRaceIdentifier, Integer>> asyncCallback);
 
     /**
      * The boolean result reflects whether a connection to the device identified by {@code serialNumber}
@@ -614,6 +615,27 @@ public interface SailingServiceWriteAsync extends FileStorageManagementGwtServic
      * through another replica to which the device maintains a live connection.
      */
     void sendRestartCommandToIgtimiDevice(String serialNumber, AsyncCallback<Boolean> callback);
+    
+    /**
+     * Sends the command sequence to calibrate the IMU of the Igtimi device identified by {@code serialNumber}.
+     * Waits 1s in between commands to allow the device to process them. So, expect the method invocation to take
+     * at least 5 seconds.
+     * <p>
+     * 
+     * The boolean result reflects whether a connection to the device identified by {@code serialNumber} was found on
+     * the local Igtimi Riot service; if {@code false}, the message may still have been delivered through another
+     * replica to which the device maintains a live connection.
+     */
+    void sendIMUCalibrationCommandSequenceToIgtimiDevice(String serialNumber, AsyncCallback<Boolean> callback);
+
+    /**
+     * Sends a "freestyle" command to the Igtimi device identified by {@code serialNumber}.
+     */
+    void sendIgtimiCommand(String serialNumber, String command, AsyncCallback<Boolean> asyncCallback);
+    
+    void enableIgtimiDeviceOverTheAirLog(String deviceSerialNumber, boolean enable, AsyncCallback<Boolean> asyncCallback);
+    
+    void getIgtimiDeviceLogs(String serialNumber, Duration duration, AsyncCallback<ArrayList<Pair<TimePoint, String>>> asyncCallback);
 
     /**
      * @return {@code true} if the race was not yet denoted for race log tracking and now has successfully been denoted
@@ -747,6 +769,11 @@ public interface SailingServiceWriteAsync extends FileStorageManagementGwtServic
     void getAIAgentLanguageModelName(AsyncCallback<String> callback);
     
     void hasAIAgentCredentials(AsyncCallback<Boolean> callback);
-    
+
     void setAIAgentCredentials(String credentials, AsyncCallback<Void> callback);
+    
+    void resetAIAgentCredentials(AsyncCallback<Void> callback);
+    
+    void copyPairingListFromOtherLeaderboard(String sourceLeaderboardName, String targetLeaderboardName, String fromRaceColumnName,
+            String toRaceColumnInclusiveName, AsyncCallback<Void> asyncCallback);
 }

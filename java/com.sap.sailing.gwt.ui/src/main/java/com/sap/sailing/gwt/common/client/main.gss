@@ -2,7 +2,6 @@
  * The main styling styles
  */
 *,
-*:before,
 *:after {
   -moz-box-sizing: border-box;
        box-sizing: border-box;
@@ -176,91 +175,61 @@ figcaption {
 }
 .label {
   display: inline-block;
+  position: relative;
   font-size: 0.8rem;
   font-weight: 600;
   color: #fff;
-  padding: 1px 0.666666666666667em;
-  position: relative;
-  margin-left: 0.833333333333333em;
-  height: 1.666666666666667em;
-  line-height: 1.666666666666667em;
+  height: 1.6666666667em;
+  line-height: 1.6666666667em;
+  padding: 0 0.6666666667em 0 1.5em;
+  -webkit-clip-path: polygon(0 50%, 0.8333333333em 0, 100% 0, 100% 100%, 0.8333333333em 100%);
+          clip-path: polygon(0 50%, 0.8333333333em 0, 100% 0, 100% 100%, 0.8333333333em 100%);
 }
 .mobile .label {
-  font-size: 0.666666666666667rem;
-  margin-left: 1em;
+  font-size: 0.6667rem;
   height: 1.6em;
   line-height: 1.6em;
-}
-.label:before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -0.833333333333333em;
-  width: 0;
-  height: 0;
-  border-top: 0.833333333333333em solid transparent;
-  border-bottom: 0.833333333333333em solid transparent;
-  border-right: 0.833333333333333em solid transparent;
-}
-.mobile .label:before {
-  left: -0.8em;
-  border-top: 0.8em solid transparent;
-  border-bottom: 0.8em solid transparent;
-  border-right: 0.8em solid transparent;
+  padding-left: 1.4em; /* 0.8em tip + 0.6em inner */
+  -webkit-clip-path: polygon(0 50%, 0.8em 0, 100% 0, 100% 100%, 0.8em 100%);
+          clip-path: polygon(0 50%, 0.8em 0, 100% 0, 100% 100%, 0.8em 100%);
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 .labellarge {
   height: 2em;
-  line-height: 1.75em;
-  margin-left: 1em;
+  line-height: 2em;
+  padding-left: 1.6666666667em;
+  -webkit-clip-path: polygon(0 50%, 1em 0, 100% 0, 100% 100%, 1em 100%);
+          clip-path: polygon(0 50%, 1em 0, 100% 0, 100% 100%, 1em 100%);
 }
 .mobile .labellarge {
   height: 2.4em;
-  line-height: 2.1em;
-  margin-left: 1.2em;
-}
-.labellarge:before {
-  left: -1em;
-  border-top-width: 1em;
-  border-bottom-width: 1em;
-  border-right-width: 1em;
-}
-.mobile .labellarge:before {
-  left: -1.2em;
-  border-top-width: 1.2em;
-  border-bottom-width: 1.2em;
-  border-right-width: 1.2em;
+  line-height: 2.4em;
+  padding-left: 1.8em; /* 1.2em tip + 0.6em inner */
+  -webkit-clip-path: polygon(0 50%, 1.2em 0, 100% 0, 100% 100%, 1.2em 100%);
+          clip-path: polygon(0 50%, 1.2em 0, 100% 0, 100% 100%, 1.2em 100%);
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 .label[data-labeltype='live'] {
   background-color: #e94a1b;
   vertical-align: middle;
   margin-top: -0.416666666666667em;
 }
-.label[data-labeltype='live']:before {
-  border-right-color: #e94a1b;
-}
 .label[data-labeltype='finished'] {
   background-color: #8ab54e;
   vertical-align: middle;
   margin-top: -0.416666666666667em;
-}
-.label[data-labeltype='finished']:before {
-  border-right-color: #8ab54e;
 }
 .label[data-labeltype='next'] {
   background-color: #efaa00;
   vertical-align: middle;
   margin-top: -0.416666666666667em;
 }
-.label[data-labeltype='next']:before {
-  border-right-color: #efaa00;
-}
 .label[data-labeltype='progress'] {
   background-color: #efaa00;
   vertical-align: middle;
   margin-top: -0.416666666666667em;
-}
-.label[data-labeltype='progress']:before {
-  border-right-color: #efaa00;
 }
 .label[data-labeltype='upcoming'] {
   color: #f6f9fc;
@@ -268,38 +237,6 @@ figcaption {
   vertical-align: middle;
   margin-top: -0.416666666666667em;
 }
-.label[data-labeltype='upcoming']:before {
-  border-right-color: #666;
-}
-.label[data-labeltype='new'],
-.label[data-labeltype='updated'] {
-  background-color: #efaa00;
-  text-transform: uppercase;
-  vertical-align: middle;
-}
-.label[data-labeltype='new']:before,
-.label[data-labeltype='updated']:before {
-  border-right-color: #efaa00;
-}
-.label[data-labeltype='ess'] {
-  background-color: #a71724;
-}
-.label[data-labeltype='ess']:before {
-  border-right-color: #a71724;
-}
-.label[data-labeltype='worldcup'] {
-  background-color: #c79242;
-}
-.label[data-labeltype='worldcup']:before {
-  border-right-color: #c79242;
-}
-.label[data-labeltype='bundesliga'] {
-  background-color: #005fa7;
-}
-.label[data-labeltype='bundesliga']:before {
-  border-right-color: #005fa7;
-}
-
 .label[data-labeltype='active'],
 .label[data-labeltype='cancelled'],
 .label[data-labeltype='intrial'],
@@ -310,26 +247,14 @@ figcaption {
 .label[data-labeltype='active'] {
   background-color: #8ab54e;
 }
-.label[data-labeltype='active']:before {
-  border-right-color: #8ab54e;
-}
 .label[data-labeltype='cancelled'] {
   background-color: #005fa7;
-}
-.label[data-labeltype='cancelled']:before {
-  border-right-color: #005fa7;
 }
 .label[data-labeltype='intrial'] {
   background-color: #efaa00;
 }
-.label[data-labeltype='intrial']:before {
-  border-right-color: #efaa00;
-}
 .label[data-labeltype='unknown'] {
   background-color: #e94a1b;
-}
-.label[data-labeltype='unknown']:before {
-  border-right-color: #e94a1b;
 }
 
 .morelink {
@@ -551,4 +476,50 @@ figcaption {
   border-style: solid;
   border-width: 1em 1em 0 0;
   color: transparent;
+}
+@external media_wrapper, media_menu_icon; /* required to allow for nested selectors below in @media query */
+.media_wrapper {
+  position: relative;
+  overflow: hidden;
+}
+.media_wrapper video {
+  display: block;
+  width: auto;
+  height: auto;
+}
+.media_wrapper img {
+  display: block;
+  width: auto;
+  height: auto;
+}
+.media_menu_icon {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  height: auto !important;
+  padding: 1px 5px;
+  background: rgba(0, 0, 0, 0.2);
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s ease, opacity 0.2s ease;
+
+  /* Set default visibility */
+  opacity: 1;
+  pointer-events: auto;
+}
+/* Highlight icon on hover/touch */
+.media_menu_icon:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+@media (hover: hover) and (pointer: fine) {
+  .media_menu_icon {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .media_wrapper:hover .media_menu_icon {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }

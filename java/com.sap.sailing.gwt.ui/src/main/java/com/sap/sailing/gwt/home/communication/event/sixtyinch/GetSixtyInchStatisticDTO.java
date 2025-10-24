@@ -2,8 +2,8 @@ package com.sap.sailing.gwt.home.communication.event.sixtyinch;
 
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
 import com.sap.sse.gwt.dispatch.shared.commands.Result;
+import com.sap.sse.gwt.shared.DTO;
 
 public class GetSixtyInchStatisticDTO implements DTO, Result {
     private int competitors;

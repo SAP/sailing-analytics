@@ -5,7 +5,7 @@ repositories {
 }
 
 dependencies {
-    implementation platform('software.amazon.awssdk:bom:2.25.11')
+    implementation platform('software.amazon.awssdk:bom:2.32.25')
     implementation 'software.amazon.awssdk:s3'
     implementation 'software.amazon.awssdk:lambda'
     implementation 'software.amazon.awssdk:ec2'
@@ -16,6 +16,7 @@ dependencies {
     implementation 'software.amazon.awssdk:sts'
     implementation 'software.amazon.awssdk:iam'
     implementation 'software.amazon.awssdk:acm'
+    implementation 'software.amazon.awssdk:wafv2'
     implementation group: 'software.amazon.awssdk', name: 'sdk-core', classifier: 'sources'
     implementation group: 'software.amazon.awssdk', name: 'arns', classifier: 'sources'
     implementation group: 'software.amazon.awssdk', name: 'aws-core', classifier: 'sources'
@@ -33,6 +34,7 @@ dependencies {
     implementation group: 'software.amazon.awssdk', name: 'sts', classifier: 'sources'
     implementation group: 'software.amazon.awssdk', name: 'iam', classifier: 'sources'
     implementation group: 'software.amazon.awssdk', name: 'acm', classifier: 'sources'
+    implementation group: 'software.amazon.awssdk', name: 'wafv2', classifier: 'sources'
 }
 task downloadLibs(type: Copy) {
     into file('lib')

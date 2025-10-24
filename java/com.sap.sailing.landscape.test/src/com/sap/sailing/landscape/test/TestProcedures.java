@@ -1,10 +1,10 @@
 package com.sap.sailing.landscape.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,8 +18,8 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
@@ -92,7 +92,7 @@ public class TestProcedures {
      */
     private byte[] privateKeyEncryptionPassphrase;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         privateKeyEncryptionPassphrase = ("awptyf87l"+"097384sf;,57").getBytes();
         landscape = AwsLandscape.obtain(RemoteServiceMappingConstants.pathPrefixForShardingKey);
@@ -351,7 +351,7 @@ public class TestProcedures {
             assertTrue(process.waitUntilReady(optionalTimeout));
             final String envSh = process.getEnvSh(optionalTimeout, /* optional SSH key pair name */ Optional.empty(), privateKeyEncryptionPassphrase);
             assertFalse(envSh.isEmpty());
-            assertTrue("Couldn't find SERVER_NAME=\""+serverName+"\" in env.sh:\n"+envSh, envSh.contains("SERVER_NAME=\""+serverName+"\""));
+            assertTrue(envSh.contains("SERVER_NAME=\""+serverName+"\""), "Couldn't find SERVER_NAME=\""+serverName+"\" in env.sh:\n"+envSh);
             assertEquals(14888, process.getTelnetPortToOSGiConsole(optionalTimeout, /* optional SSH key pair name */ Optional.empty(), privateKeyEncryptionPassphrase));
             // Now create an ALB mapping, assuming to create the dynamic ALB:
             final String domain = "wiesen-weg.de";

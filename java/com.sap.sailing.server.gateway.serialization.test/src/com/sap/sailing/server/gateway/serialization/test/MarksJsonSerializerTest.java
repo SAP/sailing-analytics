@@ -1,12 +1,12 @@
 package com.sap.sailing.server.gateway.serialization.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.json.simple.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Mark;
 import com.sap.sailing.domain.common.MarkType;
@@ -19,7 +19,7 @@ public class MarksJsonSerializerTest {
     
     private Mark mark;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         serializer = new MarkJsonSerializer();
         

@@ -101,7 +101,7 @@ public class RaceCourseManagementPanel extends AbstractRaceManagementPanel {
     
                                 @Override
                                 public void onFailure(Throwable caught) {
-                                    errorReporter.reportError("Could not load ORC Performance Curve leg information: " + caught.getMessage());
+                                    errorReporter.reportError("Could not load ORC Polar Curve leg information: " + caught.getMessage());
                                 }
                             });
                 }

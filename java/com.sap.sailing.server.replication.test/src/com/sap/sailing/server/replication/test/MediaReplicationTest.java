@@ -2,8 +2,8 @@ package com.sap.sailing.server.replication.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -11,21 +11,20 @@ import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
@@ -70,19 +69,14 @@ import com.sap.sse.security.shared.impl.SecuredSecurityTypes.PublicReadableActio
 import com.sap.sse.security.shared.impl.SecuredSecurityTypes.ServerActions;
 import com.sap.sse.security.shared.impl.User;
 import com.sap.sse.security.shared.impl.UserGroupImpl;
+import com.sap.sse.shared.util.Wait;
 
 public class MediaReplicationTest extends AbstractServerReplicationTest {
-    private FullyInitializedReplicableTracker<SecurityService> securityServiceTrackerMock;
-    
     @SuppressWarnings("unchecked")
     public MediaReplicationTest() {
-        this(mock(FullyInitializedReplicableTracker.class));
-    }
-    
-    private MediaReplicationTest(FullyInitializedReplicableTracker<SecurityService> securityServiceTrackerMock) {
-        super(new ServerReplicationTestSetUp() {
+        super(new ServerReplicationTestSetUp(mock(FullyInitializedReplicableTracker.class)) {
             @Override
-            public RacingEventServiceImpl createNewReplica() {
+            public RacingEventServiceImpl createNewReplica(FullyInitializedReplicableTracker<SecurityService> securityServiceTrackerMock) {
                 final MongoDBConfiguration masterMongoDBConfig = mongoDBService.getConfiguration();
                 final ConnectionString masterMongoDbUri = masterMongoDBConfig.getMongoClientURI();
                 final MongoDBConfiguration proxyReplicaMongoDBConfig = new MongoDBConfiguration(
@@ -92,6 +86,7 @@ public class MediaReplicationTest extends AbstractServerReplicationTest {
                         (proxyReplicaMongoDBConfig.getMongoClientURI().getConnectionString().indexOf("?") < 0 ? "?" : "&") +
                             masterMongoDbUri.getConnectionString().substring(masterMongoDbUri.getConnectionString().indexOf("?")+1));
                 final MongoDBService replicaMongoDBService = new MongoDBConfiguration(replicaMongoDbUri).getService();
+                replicaMongoDBService.getDB().drop(); // drop the replica DB, if it exists
                 final RacingEventServiceImpl result = new RacingEventServiceImpl(
                         (final RaceLogAndTrackedRaceResolver raceLogResolver) -> {
                             return new RacingEventServiceImpl.ConstructorParameters() {
@@ -117,7 +112,6 @@ public class MediaReplicationTest extends AbstractServerReplicationTest {
                 return result;
             }
         });
-        this.securityServiceTrackerMock = securityServiceTrackerMock;
     }
     
     private void waitSomeTime() throws InterruptedException {
@@ -252,8 +246,7 @@ public class MediaReplicationTest extends AbstractServerReplicationTest {
     }
 
     @Test
-    public void testMasterDataImportForMediaTracks() throws MalformedURLException, IOException, InterruptedException,
-            ClassNotFoundException {
+    public void testMasterDataImportForMediaTracks() throws Exception {
         UserGroupImpl defaultTenant = new UserGroupImpl(new UUID(0, 1), "defaultTenant");
         User currentUser = new UserImpl("test", "email@test", Collections.emptyMap(), null, new LockingAndBanningImpl());
         SecurityService securityService = Mockito.mock(SecurityService.class);
@@ -270,7 +263,7 @@ public class MediaReplicationTest extends AbstractServerReplicationTest {
         // Setup source service
         RacingEventServiceImpl sourceService = Mockito.spy(new RacingEventServiceImpl());
         Mockito.doReturn(securityService).when(sourceService).getSecurityService();
-        when(securityServiceTrackerMock.getInitializedService(0)).thenReturn(securityService);
+        when(testSetUp.getSecurityServiceTrackerMock().getInitializedService(0)).thenReturn(securityService);
         Set<RegattaAndRaceIdentifier> assignedRaces = new HashSet<RegattaAndRaceIdentifier>();
         String regattaName1 = "49er";
         String regattaName2 = "49er FX";
@@ -325,6 +318,7 @@ public class MediaReplicationTest extends AbstractServerReplicationTest {
             os.flush();
             // Delete all data above from the database, to allow recreating all of it on target server
             deleteAllDataFromDatabase();
+            waitSomeTime(); // ...for the DB to be empty
             // Import in new service
             domainFactory = fmaster.getBaseDomainFactory();
             // ensure that this class's class loader and with it the dependency to com.sap.sailing.domain.test
@@ -342,17 +336,20 @@ public class MediaReplicationTest extends AbstractServerReplicationTest {
         // ---Asserts---
         final Iterable<MediaTrack> targetTracksMaster = master.getAllMediaTracks();
         compareTracks(trackOnSource, targetTracksMaster);
-        waitSomeTime();
+        Wait.wait(()->replica.getDataImportLock() != null
+                && replica.getDataImportLock().getProgress(randomUUID) != null
+                && replica.getDataImportLock().getProgress(randomUUID).getOverallProgressPct() >= 1.0,
+                Optional.of(Duration.ONE_SECOND.times(5)), Duration.ONE_SECOND);
         final Iterable<MediaTrack> targetTracksReplica = replica.getAllMediaTracks();
         compareTracks(trackOnSource, targetTracksReplica);
     }
 
     private void compareTracks(MediaTrack trackOnSource, Iterable<MediaTrack> targetTracksMaster) {
-        Assert.assertEquals(1, Util.size(targetTracksMaster));
+        Assertions.assertEquals(1, Util.size(targetTracksMaster));
         MediaTrack trackOnTarget = targetTracksMaster.iterator().next();
-        Assert.assertEquals(trackOnSource.dbId, trackOnTarget.dbId);
-        Assert.assertEquals(trackOnSource.url, trackOnTarget.url);
-        Assert.assertEquals(trackOnSource.assignedRaces, trackOnTarget.assignedRaces);
+        Assertions.assertEquals(trackOnSource.dbId, trackOnTarget.dbId);
+        Assertions.assertEquals(trackOnSource.url, trackOnTarget.url);
+        Assertions.assertEquals(trackOnSource.assignedRaces, trackOnTarget.assignedRaces);
     }
 
     private <T extends AbstractSailingServerResource> T spyResource(T resource, RacingEventService service) {

@@ -45,12 +45,12 @@ public class EventOverviewStage extends Composite implements RefreshableWidget<E
             EventOverviewVideoStageDTO videoStageDTO = (EventOverviewVideoStageDTO) data;
             if (!(lastContent instanceof Video)
                     || ((Video) lastContent).shouldBeReplaced(videoStageDTO.getVideo().getSourceRef())) {
-                lastContent = new Video();
+                lastContent = new Video(presenter.getUserService(), presenter.getEventDTO().getName());
                 ((Video) lastContent).setData(videoStageDTO);
-            } 
+            }
         } else if (data instanceof EventOverviewTickerStageDTO) {
             if (!(lastContent instanceof Countdown)) {
-                lastContent = new Countdown(countdownNavigationProvider);
+                lastContent = new Countdown(countdownNavigationProvider, presenter.getUserService());
             }
             ((Countdown) lastContent).setData((EventOverviewTickerStageDTO) data);
         } else {

@@ -13,7 +13,6 @@ import com.sap.sse.security.ui.client.WithSecurity;
  *
  */
 public interface SailingClientFactory extends ClientFactory, WithSecurity, WithSailingService {
-
     SailingServiceAsync getSailingService(ProvidesLeaderboardRouting routingProvider);
 
     MediaServiceAsync getMediaService();

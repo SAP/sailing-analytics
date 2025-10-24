@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.queclinkadapter.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,9 +9,9 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.mongodb.MongoException;
 import com.sap.sailing.domain.queclinkadapter.tracker.QueclinkUDPTracker;
@@ -20,14 +20,14 @@ public class TestQueclinkUDPTracker extends AbstractQueclinkTrackerTest {
     private QueclinkUDPTracker tracker;
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() throws MongoException, IOException {
         super.setUp();
         tracker = new QueclinkUDPTracker(/* pick a port */ 0, store);
     }
 
     @Override
-    @After
+    @AfterEach
     public void after() throws IOException {
         super.after();
         tracker.stop();

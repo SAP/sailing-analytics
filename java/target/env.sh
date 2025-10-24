@@ -72,10 +72,12 @@ CODE_DIRECTORY=code
 
 # Figuring out what the "mail" tool version is so we
 # can know whether it requires -a or -A to attach a file:
-if mail -V | grep -q "GNU Mailutils" 2>/dev/null; then
-  MAIL_ATTACH_OPTION="-A"
-else
-  MAIL_ATTACH_OPTION="-a"
+if which mail; then
+    if mail -V | grep -q "GNU Mailutils" 2>/dev/null; then
+      MAIL_ATTACH_OPTION="-A"
+    else
+      MAIL_ATTACH_OPTION="-a"
+    fi
 fi
 
 INSTANCE_ID="$SERVER_NAME:$SERVER_PORT"

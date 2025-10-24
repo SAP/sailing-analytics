@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.UUID;
 
 import org.bson.Document;
-import org.junit.After;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.ReadConcern;
@@ -92,7 +92,7 @@ public abstract class AbstractStoreMergeTest {
     protected UserStore targetUserStore;
     protected AccessControlStore targetAccessControlStore;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpCausallyConsistentSession() {
         cfgForTarget = new MongoDBConfiguration(new ConnectionString(importTargetMongoDbUri));
         targetService = cfgForTarget.getService();
@@ -113,7 +113,7 @@ public abstract class AbstractStoreMergeTest {
         targetAccessControlStore = merger.getTargetAccessControlStore();
     }
     
-    @After
+    @AfterEach
     public void tearDown() {
         new MongoDatabaseWrapperWithClientSession(causallyConsistentSessionForSource, sourceService.getDB()).withReadConcern(ReadConcern.MAJORITY).withWriteConcern(WriteConcern.MAJORITY).drop();
         new MongoDatabaseWrapperWithClientSession(causallyConsistentSessionForTarget, targetService.getDB()).withReadConcern(ReadConcern.MAJORITY).withWriteConcern(WriteConcern.MAJORITY).drop();

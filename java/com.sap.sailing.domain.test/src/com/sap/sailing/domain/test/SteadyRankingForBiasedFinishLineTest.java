@@ -1,6 +1,6 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -8,8 +8,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.common.WindSourceType;
@@ -39,7 +39,7 @@ public class SteadyRankingForBiasedFinishLineTest extends OnlineTracTracBasedTes
         return "Sailing World Cup Genoa 2019";
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         URI storedUri = new URI("file:///"+new File("resources/0fb18f50-45d7-0137-24dd-021d89ada30e.mtb").getCanonicalPath().replace('\\', '/'));

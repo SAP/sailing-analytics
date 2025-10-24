@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Logger;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.common.ManeuverType;
@@ -51,7 +51,7 @@ public class TackThatLookedABitLikePenaltyCircleAtTravemuenderWoche2014Test exte
         return "Travemunder Woche 2014";
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         URI storedUri = new URI("file:///"+new File("resources/event_20140714_Travemuende-Int14-R5.mtb").getCanonicalPath().replace('\\', '/'));
@@ -74,7 +74,7 @@ public class TackThatLookedABitLikePenaltyCircleAtTravemuenderWoche2014Test exte
      * this track at this point is that the COG doesn't really match up with the actual lat/lon changes. That's
      * why maneuver recognition during what really was a penalty circle is a challenge.
      */
-    @Ignore("Together with bug5239 this test has become too brittle. Outlier elimination is not deterministic and the track used in this test has outliers. Depending on which one is classified as outlier first, either two tacks or one penalty circle result")
+    @Disabled("Together with bug5239 this test has become too brittle. Outlier elimination is not deterministic and the track used in this test has outliers. Depending on which one is classified as outlier first, either two tacks or one penalty circle result")
     @Test
     public void testTackForTruswellAndPascoe() throws ParseException, NoWindException {
         assertTack("Truswell/Pascoe", "07/25/2014-13:08:00", "07/25/2014-13:09:00", "07/25/2014-13:08:10");

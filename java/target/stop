@@ -16,7 +16,7 @@ fi
 if [[ $TELNET_PORT == "" ]] || [[ $TELNET_ACTIVE == "" ]]; then
         echo "Could not find server on telnet port $TELNET_PORT. Perhaps server is not running?"
         if [[ $SERVER_STARTUP_NOTIFY != "" ]]; then
-            echo "Stopped" | mail -s "Server $SERVER_NAME could not be stopped!" $SERVER_STARTUP_NOTIFY
+            echo "Stopped" | mail -r noreply@sapsailing.com -s "Server $SERVER_NAME could not be stopped!" $SERVER_STARTUP_NOTIFY
         fi
 else
     TN_CMD="telnet 127.0.0.1 $TELNET_PORT"
@@ -24,7 +24,7 @@ else
 
     echo "Stopped server $SERVER_NAME"
     if [[ $SERVER_STARTUP_NOTIFY != "" ]]; then
-        echo "OK" | mail -s "Server $SERVER_NAME stopped successfully!" $SERVER_STARTUP_NOTIFY
+        echo "OK" | mail -r noreply@sapsailing.com -s "Server $SERVER_NAME stopped successfully!" $SERVER_STARTUP_NOTIFY
     fi
 fi
 

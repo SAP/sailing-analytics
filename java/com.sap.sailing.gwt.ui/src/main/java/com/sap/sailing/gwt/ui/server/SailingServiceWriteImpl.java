@@ -264,6 +264,7 @@ import com.sap.sailing.expeditionconnector.ExpeditionDeviceConfiguration;
 import com.sap.sailing.expeditionconnector.ExpeditionSensorDeviceIdentifier;
 import com.sap.sailing.gwt.ui.adminconsole.RaceLogSetTrackingTimesDTO;
 import com.sap.sailing.gwt.ui.client.SailingServiceWrite;
+import com.sap.sailing.gwt.ui.client.shared.SailingVideoDTO;
 import com.sap.sailing.gwt.ui.client.shared.charts.MarkPositionService.MarkTrackDTO;
 import com.sap.sailing.gwt.ui.shared.BulkScoreCorrectionDTO;
 import com.sap.sailing.gwt.ui.shared.ControlPointDTO;
@@ -282,6 +283,7 @@ import com.sap.sailing.gwt.ui.shared.RaceLogSetFinishingAndFinishTimeDTO;
 import com.sap.sailing.gwt.ui.shared.RaceLogSetStartTimeAndProcedureDTO;
 import com.sap.sailing.gwt.ui.shared.RegattaDTO;
 import com.sap.sailing.gwt.ui.shared.RemoteSailingServerReferenceDTO;
+import com.sap.sailing.gwt.ui.shared.SailingImageDTO;
 import com.sap.sailing.gwt.ui.shared.SeriesDTO;
 import com.sap.sailing.gwt.ui.shared.ServerConfigurationDTO;
 import com.sap.sailing.gwt.ui.shared.StrippedLeaderboardDTO;
@@ -361,6 +363,7 @@ import com.sap.sailing.server.security.SailingViewerRole;
 import com.sap.sailing.server.util.WaitForTrackedRaceUtil;
 import com.sap.sailing.xrr.schema.RegattaResults;
 import com.sap.sse.ServerInfo;
+import com.sap.sse.aicore.Credentials;
 import com.sap.sse.aicore.CredentialsParser;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
@@ -1470,8 +1473,8 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
         String officialWebsiteURLString = eventDTO.getOfficialWebsiteURL();
         String baseURLAsString = eventDTO.getBaseURL();
         Map<String, String> sailorsInfoWebsiteURLsByLocaleName = eventDTO.getSailorsInfoWebsiteURLs();
-        List<ImageDTO> images = eventDTO.getImages();
-        List<VideoDTO> videos = eventDTO.getVideos();
+        List<SailingImageDTO> images = eventDTO.getImages();
+        List<SailingVideoDTO> videos = eventDTO.getVideos();
         List<String> windFinderReviewedSpotCollectionIds = eventDTO.getWindFinderReviewedSpotsCollectionIds();
         return updateEvent(eventId, eventName, eventDescription, startDate, endDate, venue, isPublic,
                 leaderboardGroupIds, officialWebsiteURLString, baseURLAsString, sailorsInfoWebsiteURLsByLocaleName,
@@ -1481,8 +1484,8 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
     @Override
     public EventDTO updateEvent(UUID eventId, String eventName, String eventDescription, Date startDate, Date endDate,
             VenueDTO venue, boolean isPublic, List<UUID> leaderboardGroupIds, String officialWebsiteURLString,
-            String baseURLAsString, Map<String, String> sailorsInfoWebsiteURLsByLocaleName, List<ImageDTO> images,
-            List<VideoDTO> videos, List<String> windFinderReviewedSpotCollectionIds)
+            String baseURLAsString, Map<String, String> sailorsInfoWebsiteURLsByLocaleName, List<? extends ImageDTO> images,
+            List<? extends VideoDTO> videos, List<String> windFinderReviewedSpotCollectionIds)
             throws MalformedURLException, UnauthorizedException {
         final TimePoint startTimePoint = startDate != null ? new MillisecondsTimePoint(startDate) : null;
         final TimePoint endTimePoint = endDate != null ? new MillisecondsTimePoint(endDate) : null;
@@ -2131,10 +2134,22 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
     }
     
     private void checkCurrentUserUpdatePermissionForIgtimiDevice(String serialNumber) {
-        final RiotServer riotServer = getRiotServer();
-        final Device existingDevice = riotServer.getDeviceBySerialNumber(serialNumber);
+        final Device existingDevice = getIgtimiDevice(serialNumber);
         if (existingDevice != null) {
             getSecurityService().checkCurrentUserUpdatePermission(existingDevice);
+        }
+    }
+
+    private Device getIgtimiDevice(String serialNumber) {
+        final RiotServer riotServer = getRiotServer();
+        final Device existingDevice = riotServer.getDeviceBySerialNumber(serialNumber);
+        return existingDevice;
+    }
+
+    private void checkCurrentUserReadPermissionForIgtimiDevice(String serialNumber) {
+        final Device existingDevice = getIgtimiDevice(serialNumber);
+        if (existingDevice != null) {
+            getSecurityService().checkCurrentUserReadPermission(existingDevice);
         }
     }
 
@@ -2161,10 +2176,46 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
         checkCurrentUserUpdatePermissionForIgtimiDevice(serialNumber);
         return getRiotServer().sendStandardCommand(serialNumber, RiotStandardCommand.CMD_RESTART);
     }
+    
+    @Override
+    public boolean sendIMUCalibrationCommandSequenceToIgtimiDevice(String serialNumber) throws IOException, InterruptedException {
+        checkCurrentUserUpdatePermissionForIgtimiDevice(serialNumber);
+        boolean result = true;
+        result = getRiotServer().sendStandardCommand(serialNumber, RiotStandardCommand.CMD_IMU_STOP) && result;
+        Thread.sleep(1000); // wait for 1s for the command to process
+        result = getRiotServer().sendStandardCommand(serialNumber, RiotStandardCommand.CMD_IMU_GYROCAL_PERFORM) && result;
+        Thread.sleep(1000); // wait for 1s for the command to process
+        result = getRiotServer().sendStandardCommand(serialNumber, RiotStandardCommand.CMD_IMU_CAL_FROM_FILE) && result;
+        Thread.sleep(1000); // wait for 1s for the command to process
+        result = getRiotServer().sendStandardCommand(serialNumber, RiotStandardCommand.CMD_IMU_GYROCAL_PERFORM) && result;
+        Thread.sleep(1000); // wait for 1s for the command to process
+        result = getRiotServer().sendStandardCommand(serialNumber, RiotStandardCommand.CMD_IMU_SAVE) && result;
+        Thread.sleep(1000); // wait for 1s for the command to process
+        result = getRiotServer().sendStandardCommand(serialNumber, RiotStandardCommand.CMD_IMU_ON) && result;
+        return result;
+    }
+
+    @Override
+    public boolean sendIgtimiCommand(String serialNumber, String command) throws IOException, InterruptedException {
+        checkCurrentUserUpdatePermissionForIgtimiDevice(serialNumber);
+        return getRiotServer().sendFreestyleCommand(serialNumber, command);
+    }
+    
+    @Override
+    public boolean enableIgtimiDeviceOverTheAirLog(String deviceSerialNumber, boolean enable) throws Exception {
+        checkCurrentUserUpdatePermissionForIgtimiDevice(deviceSerialNumber);
+        return getRiotServer().enableOverTheAirLog(deviceSerialNumber, enable);
+    }
+    
+    @Override
+    public ArrayList<Pair<TimePoint, String>> getIgtimiDeviceLogs(String serialNumber, Duration duration) throws IOException, org.json.simple.parser.ParseException {
+        checkCurrentUserReadPermissionForIgtimiDevice(serialNumber);
+        return Util.mapToArrayList(getRiotServer().getDeviceLogs(serialNumber, duration), s->s);
+    }
 
     @Override
     public Map<RegattaAndRaceIdentifier, Integer> importWindFromIgtimi(List<RaceDTO> selectedRaces,
-            boolean correctByDeclination)
+            boolean correctByDeclination, String optionalBearerTokenOrNull)
             throws IllegalStateException, ClientProtocolException, IOException, org.json.simple.parser.ParseException {
         final List<DynamicTrackedRace> trackedRaces = new ArrayList<>();
         if (selectedRaces != null && !selectedRaces.isEmpty()) {
@@ -2187,7 +2238,7 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
             }
         }
         Map<RegattaAndRaceIdentifier, Integer> numberOfWindFixesImportedPerRace = new HashMap<RegattaAndRaceIdentifier, Integer>();
-        final IgtimiConnection conn = createIgtimiConnection();
+        final IgtimiConnection conn = createIgtimiConnection(Optional.ofNullable(optionalBearerTokenOrNull));
         // filter account based on used permissions to read account:
         Map<TrackedRace, Integer> resultsForAccounts = conn.importWindIntoRace(trackedRaces, correctByDeclination);
         for (Entry<TrackedRace, Integer> resultForAccount : resultsForAccounts.entrySet()) {
@@ -4097,9 +4148,51 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
         checkAIAgentConfigPermission();
         final AIAgent aiAgent = getAIAgent();
         if (aiAgent != null) {
-            aiAgent.setCredentials(Util.hasLength(credentials)
-                    ? CredentialsParser.create().parse(credentials)
-                    : null);
+            if (Util.hasLength(credentials)) {
+                Credentials parsedCredentials;
+                try {
+                    parsedCredentials = CredentialsParser.create().parse(credentials);
+                } catch (Exception e) {
+                    throw new IllegalStateException("Credentials could not be parsed");
+                }
+                if (parsedCredentials != null) {
+                    aiAgent.setCredentials(parsedCredentials);
+                }
+            } else {
+                throw new IllegalStateException("Blank credentials received");
+            }
         }
+    }
+    
+    @Override
+    public void resetAIAgentCredentials() {
+        checkAIAgentConfigPermission();
+        final AIAgent aiAgent = getAIAgent();
+        if (aiAgent != null) {
+            aiAgent.setCredentials(null);
+        }
+    }
+
+    @Override
+    public void copyPairingListFromOtherLeaderboard(String sourceLeaderboardName, String targetLeaderboardName,
+            String fromRaceColumnName, String toRaceColumnInclusiveName)
+            throws UnauthorizedException, NotFoundException {
+        final Leaderboard sourceLeaderboard = getLeaderboardByName(sourceLeaderboardName);
+        getService().getSecurityService().checkCurrentUserUpdatePermission(sourceLeaderboard);
+        final Leaderboard targetLeaderboard = getLeaderboardByName(targetLeaderboardName);
+        getService().getSecurityService().checkCurrentUserUpdatePermission(targetLeaderboard);
+        if (!(sourceLeaderboard instanceof RegattaLeaderboard)) {
+            throw new IllegalArgumentException("Source leaderboard " + sourceLeaderboardName
+                    + " must be a regatta leaderboard, but was: " + sourceLeaderboard.getLeaderboardType());
+        }
+        if (!(targetLeaderboard instanceof RegattaLeaderboard)) {
+            throw new IllegalArgumentException("Target leaderboard " + sourceLeaderboardName
+                    + " must be a regatta leaderboard, but was: " + targetLeaderboard.getLeaderboardType());
+        }
+        // we don't need to worry about replication here because all operations carried out by
+        // the following call will only manipulate race logs and regatta logs, and those have
+        // their own listener-based replication scheme.
+        getRaceLogTrackingAdapter().copyPairingListFromOtherLeaderboard((RegattaLeaderboard) sourceLeaderboard,
+                (RegattaLeaderboard) targetLeaderboard, fromRaceColumnName, toRaceColumnInclusiveName);
     }
 }

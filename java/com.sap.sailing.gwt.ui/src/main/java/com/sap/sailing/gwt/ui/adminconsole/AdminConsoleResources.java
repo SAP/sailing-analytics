@@ -54,7 +54,10 @@ public interface AdminConsoleResources extends ClientBundle {
     
     @Source("com/sap/sailing/gwt/ui/client/images/pairinglist.png")
     ImageResource pairingList();
-    
+
+    @Source("com/sap/sailing/gwt/ui/client/images/copy_pairinglist.png")
+    ImageResource copyPairingList();
+
     @Source("com/sap/sailing/gwt/ui/client/images/print_pairinglist.png")
     ImageResource printPairingList();
     

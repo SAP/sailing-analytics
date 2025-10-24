@@ -139,6 +139,20 @@ In addition to a default re-direct for the "/" path, the following four ALB list
 - if the request method is ``GET`` then forward to the public target group
 - forward all other request for the hostname to the master target group
 
+### Web Application Firewall (WAF) and Web ACLs for Geoblocking
+
+In order to be able to block requests from certain regions or countries based on sanctions or other bans, as well as to see improved statistics about web requests hitting the site (such as the country from where requests originate, or a classification of bot vs. non-bot requests) across all our application load balancers (ALBs), we can use the AWS Web Application Firewall (WAF) and its Web Access Control Lists (Web ACLs). These Web ACLs are defined per AWS Region, so in case of a cross-region scenarios like the Olympic Summer Games, Web ACLs have to be defined in each region supported.
+
+As of today, we are required to block access from Russia, Belarus, North Korea, and Iran.
+
+Any geo-blocking Web ACL that shall automatically be associated with ALBs that are created through our landscape automation have to be tagged with tag key ``web-acl-purpose`` (see ``LandscapeConstants.WEB_ACL_PURPOSE_TAG``) with value ``geoblocking`` (see ``LandscapeConstants.WEB_ACL_GEOBLOCKING_PURPOSE``). Tagging a Web ACL, as of this writing, is not possible through the AWS Web Console but only through the command line interface (CLI) or API. A command-line way to tag a Web ACL accordingly would look like this (adjust your Web ACL's ARN...):
+```
+  aws wafv2 tag-resource \
+      --resource-arn arn:aws:wafv2:eu-west-1:017363970217:regional/webacl/GeoBlocking/1f1c421e-994c-4c67-ba15-75375448c5c5 \
+      --tags Key=web-acl-purpose,Value=geoblocking
+```
+Note that in order to run this command you have to have valid credentials for the AWS region you're targeting with the request. Also consider using the ``--region`` argument if you're trying to tag a Web ACL in a region other than your AWS CLI's default region. Check your ``~/.aws/config`` file. Also see ``configuration/environments_scripts/repo/usr/local/bin/awsmfalogon.sh`` for logging on to the AWS CLI.
+
 ### MongoDB Replica Sets
 
 There are currently three MongoDB replica sets:
@@ -607,7 +621,7 @@ The `crontab-update-authorized-keys@HOME_DIR` snippet has a randomized sleeping 
 
 ## Legacy Documentation for Manual Operations
 
-Most of the things that follow should be obsolete by now because the [automated procedures](#amazon-ec2-for-sap-sailing-analytics_automated-procedures) should avoid the need for manual steps. Yet, should automatic procedures fail or should a deeper understanding of the things that have been automated become necessary, the following documentation may still be of value.
+Most of the things that follow should be obsolete by now because the [automated procedures](#automated-procedures) should avoid the need for manual steps. Yet, should automatic procedures fail or should a deeper understanding of the things that have been automated become necessary, the following documentation may still be of value.
 
 #### Starting an instance
 

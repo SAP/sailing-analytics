@@ -12,7 +12,7 @@ import com.sap.sse.common.Speed;
 import com.sap.sse.common.TimePoint;
 
 /**
- * Marker interface for all ORC Performance Curve Scoring (PCS) ranking
+ * Marker interface for all ORC Polar Curve Scoring (PCS) ranking
  * metrics ({@link RankingMetric}).
  * 
  * @author Axel Uhl (D043530)

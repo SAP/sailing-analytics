@@ -24,10 +24,11 @@ import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimpleLayoutPanel;
+import com.sap.sailing.gwt.ui.shared.SailingImageDTO;
 import com.sap.sse.gwt.client.controls.carousel.ImageCarousel.FullscreenViewer;
-import com.sap.sse.gwt.client.media.ImageDTO;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 
-public class MobileFullscreenGallery implements FullscreenViewer<ImageDTO>{
+public class MobileFullscreenGallery implements FullscreenViewer<SailingImageDTO>{
     
     private static MobileFullscreenGalleryUiBinder uiBinder = GWT.create(MobileFullscreenGalleryUiBinder.class);
 
@@ -47,10 +48,12 @@ public class MobileFullscreenGallery implements FullscreenViewer<ImageDTO>{
     private final FullscreenPopupPanel popup = new FullscreenPopupPanel();
     private final LayoutPanel mainPanel;
     private MobileGalleryPlayer playerUi = null;
+    private final TakedownNoticeService takedownNoticeService;
     
-    public MobileFullscreenGallery() {
+    public MobileFullscreenGallery(TakedownNoticeService takedownNoticeService) {
         popup.setWidget(mainPanel = uiBinder.createAndBindUi(this));
         popup.addStyleName(style.popup());
+        this.takedownNoticeService = takedownNoticeService;
     }
     
     @UiHandler("closeActionUi")
@@ -71,8 +74,8 @@ public class MobileFullscreenGallery implements FullscreenViewer<ImageDTO>{
     }
     
     @Override
-    public void show(ImageDTO selectedImage, Collection<ImageDTO> imageList) {
-        contentUi.setWidget(playerUi = new MobileGalleryPlayer(selectedImage, imageList));
+    public void show(SailingImageDTO selectedImage, Collection<SailingImageDTO> imageList) {
+        contentUi.setWidget(playerUi = new MobileGalleryPlayer(selectedImage, imageList, takedownNoticeService));
         autoplayActionUi.setStyleName(style.is_autoplaying(), playerUi.isAutoplaying());
         contentUi.getWidget().getElement().addClassName(style.content());
         mainPanel.onResize();

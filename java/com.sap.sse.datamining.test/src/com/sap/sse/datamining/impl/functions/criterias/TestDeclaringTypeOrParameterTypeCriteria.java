@@ -3,8 +3,8 @@ package com.sap.sse.datamining.impl.functions.criterias;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.components.FilterCriterion;
 import com.sap.sse.datamining.functions.Function;
@@ -23,7 +23,7 @@ public class TestDeclaringTypeOrParameterTypeCriteria {
     
     private Function<?> libraryFunction;
     
-    @Before
+    @BeforeEach
     public void setUpFunctions() {
         getSpeedInKnotsValue = FunctionTestsUtil.getFunctionFactory().createMethodWrappingFunction(FunctionTestsUtil.getMethodFromClass(DataTypeInterface.class, "getSpeedInKnots"));
         getRaceNameLengthValue = FunctionTestsUtil.getFunctionFactory().createMethodWrappingFunction(FunctionTestsUtil.getMethodFromClass(ExtendingInterface.class, "getRaceNameLength"));

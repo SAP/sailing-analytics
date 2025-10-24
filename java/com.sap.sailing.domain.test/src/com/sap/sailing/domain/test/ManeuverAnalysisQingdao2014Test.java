@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -12,8 +12,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.common.ManeuverType;
@@ -39,7 +39,7 @@ public class ManeuverAnalysisQingdao2014Test extends AbstractManeuverDetectionTe
     }
 
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         URI storedUri = new URI("file:///"+new File("resources/event_20140429_ESSQingdao-Race_4.mtb").getCanonicalPath().replace('\\', '/'));
@@ -73,7 +73,7 @@ public class ManeuverAnalysisQingdao2014Test extends AbstractManeuverDetectionTe
         assertManeuver(maneuvers, ManeuverType.TACK, new MillisecondsTimePoint(dateFormat.parse("05/01/2014-09:08:56")), 5000);
         for (Maneuver maneuver : maneuvers) {
             // make sure there is no penalty detected in the time frame considered
-            assertNotSame("Found an unexpected penalty "+maneuver, ManeuverType.PENALTY_CIRCLE, maneuver.getType());
+            assertNotSame(ManeuverType.PENALTY_CIRCLE, maneuver.getType(), "Found an unexpected penalty "+maneuver);
         }
     }
 }

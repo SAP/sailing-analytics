@@ -3,10 +3,10 @@ package com.sap.sailing.domain.racelogtracking.test.impl;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.Timeout;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
@@ -25,10 +25,8 @@ import com.sap.sse.common.MultiTimeRange;
 import com.sap.sse.common.WithID;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
+@Timeout(value=3, unit=TimeUnit.SECONDS)
 public class DeviceMappingsAndSensorFixStoreLockingTest extends AbstractGPSFixStoreTest {
-    @Rule
-    public Timeout GPSFixStoreListenerTestTimeout = Timeout.millis(3 * 1000);
-    
     @Test
     public void deviceMappingsAndSensorFixStoreShouldNotCauseADeadlock() {
         final Competitor comp = DomainFactory.INSTANCE.getOrCreateCompetitor("comp", "comp", null, null, null,

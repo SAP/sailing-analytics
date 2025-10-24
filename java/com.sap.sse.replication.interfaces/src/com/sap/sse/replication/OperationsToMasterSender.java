@@ -50,7 +50,7 @@ public interface OperationsToMasterSender<S, O extends OperationWithResult<S, ?>
         HttpURLConnection connection = (HttpURLConnection) HttpUrlConnectionHelper.redirectConnectionWithBearerToken(
                 url, Duration.ONE_MINUTE.times(10), "POST", masterDescriptor.getBearerToken(), "application/octet-stream",
                 Optional.of(outputStream->{
-                    logger.info("Sending operation "+operation+" to master "+masterDescriptor+"'s replicable with ID "+this+" for initial execution and replication");
+                    logger.fine("Sending operation "+operation+" to master "+masterDescriptor+"'s replicable with ID "+this+" for initial execution and replication");
                     DataOutputStream dos = new DataOutputStream(outputStream);
                     dos.writeUTF(getId().toString());
                     this.writeOperation(operationWithResultWithIdWrapper, outputStream, /* closeStream */ true);

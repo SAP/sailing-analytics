@@ -31,14 +31,14 @@ import com.sap.sailing.domain.leaderboard.LeaderboardGroup;
 import com.sap.sailing.domain.leaderboard.RegattaLeaderboard;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.gwt.home.communication.event.EventAndLeaderboardReferenceWithStateDTO;
-import com.sap.sailing.gwt.home.communication.event.EventLinkDTO;
 import com.sap.sailing.gwt.home.communication.event.EventMetadataDTO;
-import com.sap.sailing.gwt.home.communication.event.EventReferenceDTO;
 import com.sap.sailing.gwt.home.communication.event.EventState;
 import com.sap.sailing.gwt.home.communication.eventlist.EventListEventDTO;
-import com.sap.sailing.gwt.home.communication.media.SailingVideoDTO;
 import com.sap.sailing.gwt.home.communication.start.EventStageDTO;
 import com.sap.sailing.gwt.home.communication.start.StageEventType;
+import com.sap.sailing.gwt.ui.client.shared.SailingVideoDTO;
+import com.sap.sailing.gwt.ui.shared.EventLinkDTO;
+import com.sap.sailing.gwt.ui.shared.EventReferenceDTO;
 import com.sap.sailing.gwt.ui.shared.TrackingConnectorInfoDTO;
 import com.sap.sailing.server.interfaces.RacingEventService;
 import com.sap.sailing.server.util.EventUtil;
@@ -306,7 +306,7 @@ public final class HomeServiceUtil {
     
     public static EventStageDTO convertToEventStageDTO(EventBase event, URL baseURL, boolean onRemoteServer, StageEventType stageType, RacingEventService service, boolean useTeaserImage) {
         EventStageDTO dto = new EventStageDTO();
-        mapToMetadataDTO(event, dto, service);
+        mapToMetadataDTO(event, dto);
         dto.setBaseURL(baseURL.toString());
         dto.setOnRemoteServer(onRemoteServer);
         dto.setStageType(stageType);
@@ -317,53 +317,51 @@ public final class HomeServiceUtil {
         return dto;
     }
     
-    public static EventListEventDTO convertToEventListDTO(EventBase event, URL baseURL, boolean onRemoteServer,
-            RacingEventService service) {
+    public static EventListEventDTO convertToEventListDTO(EventBase event, URL baseURL, boolean onRemoteServer) {
         EventListEventDTO dto = new EventListEventDTO();
-        mapToMetadataDTO(event, dto, service);
+        mapToMetadataDTO(event, dto);
         dto.setBaseURL(String.valueOf(baseURL));
         dto.setOnRemoteServer(onRemoteServer);
         return dto;
     }
     
-    public static EventMetadataDTO convertToMetadataDTO(EventBase event, RacingEventService service) {
+    public static EventMetadataDTO convertToMetadataDTO(EventBase event) {
         EventMetadataDTO dto = new EventMetadataDTO();
-        mapToMetadataDTO(event, dto, service);
+        mapToMetadataDTO(event, dto);
         return dto;
     }
     
-    public static EventLinkDTO convertToEventLinkDTO(EventBase event, URL baseURL, boolean onRemoteServer,
-            RacingEventService service) {
+    public static EventLinkDTO convertToEventLinkDTO(EventBase event, URL baseURL, boolean onRemoteServer) {
         EventLinkDTO dto = new EventLinkDTO();
-        mapToReferenceDTO(event, dto, service);
+        mapToReferenceDTO(event, dto);
         dto.setBaseURL(String.valueOf(baseURL));
         dto.setOnRemoteServer(onRemoteServer);
         return dto;
     }
     
-    public static void mapToMetadataDTO(EventBase event, EventMetadataDTO dto, RacingEventService service) {
-        mapToReferenceDTO(event, dto, service);
+    public static void mapToMetadataDTO(EventBase event, EventMetadataDTO dto) {
+        mapToReferenceDTO(event, dto);
         dto.setStartDate(event.getStartDate() == null ? null : event.getStartDate().asDate());
         dto.setEndDate(event.getEndDate() == null ? null : event.getEndDate().asDate());
         dto.setState(HomeServiceUtil.calculateEventState(event));
         dto.setVenue(event.getVenue().getName());
         if (EventUtil.isFakeSeries(event)) {
-            dto.setLocation(getLocation(event, service));
+            dto.setLocation(getLocation(event));
         }
         dto.setThumbnailImageURL(HomeServiceUtil.findEventThumbnailImageUrlAsString(event));
     }
     
-    private static void mapToReferenceDTO(EventBase event, EventReferenceDTO dto, RacingEventService service) {
+    private static void mapToReferenceDTO(EventBase event, EventReferenceDTO dto) {
         dto.setId((UUID) event.getId());
-        dto.setDisplayName(getEventDisplayName(event, service));
+        dto.setDisplayName(getEventDisplayName(event));
     }
 
-    public static String getEventDisplayName(EventBase event, RacingEventService service) {
+    public static String getEventDisplayName(EventBase event) {
         if (EventUtil.isFakeSeries(event)) {
             String seriesName = getSeriesName(event);
-            if(seriesName != null) {
-                String location = getLocation(event, service);
-                if(location != null) {
+            if (seriesName != null) {
+                String location = getLocation(event);
+                if (location != null) {
                     return seriesName + " - " + location;
                 }
             }
@@ -380,7 +378,7 @@ public final class HomeServiceUtil {
         return overallLeaderboardGroup.getDisplayName() != null ? overallLeaderboardGroup.getDisplayName() : overallLeaderboardGroup.getName();
     }
     
-    public static String getLocation(EventBase eventBase, RacingEventService service) {
+    public static String getLocation(EventBase eventBase) {
         if(!(eventBase instanceof Event)) {
             return null;
         }

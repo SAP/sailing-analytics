@@ -1,17 +1,16 @@
 package com.sap.sailing.selenium.test.leaderboard;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.WebDriver;
 
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardConfigurationPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardDetailsPanelPO;
@@ -49,7 +48,7 @@ public class TestLeaderboardConfiguration extends AbstractSeleniumTest {
     private List<RaceDescriptor> leaderboardRaces;
     
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         this.regatta = new RegattaDescriptor(REGATTA, BOAT_CLASS);
         this.trackableRaces = new ArrayList<>();
@@ -70,9 +69,9 @@ public class TestLeaderboardConfiguration extends AbstractSeleniumTest {
         configureLeaderboard();
     }
     
-    @Test
+    @SeleniumTestCase
     public void testDynamicRaceLinking() {
-        this.environment.getWindowManager().withExtraWindow((leaderboardWindow, adminConsoleWindow) -> {
+        this.environment.getWindowManager().withExtraWindow(getWebDriver(), (leaderboardWindow, adminConsoleWindow) -> {
             // Open the leaderboard and check for "empty" leaderboard
             LeaderboardPage leaderboard = LeaderboardPage.goToPage(getWebDriver(), getContextRoot(), LEADERBOARD, false);
             LeaderboardTablePO table = leaderboard.getLeaderboardTable();
@@ -108,9 +107,9 @@ public class TestLeaderboardConfiguration extends AbstractSeleniumTest {
         });
     }
     
-    @Test
+    @SeleniumTestCase
     public void testDynamicRaceDeletion() {
-        this.environment.getWindowManager().withExtraWindow((adminConsoleWindow, leaderboardWindow) -> {
+        this.environment.getWindowManager().withExtraWindow(getWebDriver(), (adminConsoleWindow, leaderboardWindow) -> {
             // Go to the administration console and link all 5 races
             AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
             LeaderboardConfigurationPanelPO leaderboardConfiguration = adminConsole.goToLeaderboardConfiguration();
@@ -142,10 +141,9 @@ public class TestLeaderboardConfiguration extends AbstractSeleniumTest {
         });
     }
     
-    @Ignore("This test belongs to bug 1892 and currently fails. It is currently enabled on branch bug1892.")
-    @Test
+    @SeleniumTestCase
     public void testDynamicRenamingOfRace() {
-        this.environment.getWindowManager().withExtraWindow((adminConsoleWindow, leaderboardWindow) -> {
+        this.environment.getWindowManager().withExtraWindow(getWebDriver(), (adminConsoleWindow, leaderboardWindow) -> {
             // Go to the administration console and link all 5 races
             AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
             LeaderboardConfigurationPanelPO leaderboardConfiguration = adminConsole.goToLeaderboardConfiguration();

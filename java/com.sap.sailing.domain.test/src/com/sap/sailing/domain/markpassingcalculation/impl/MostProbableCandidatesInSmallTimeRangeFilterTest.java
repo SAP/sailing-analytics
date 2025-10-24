@@ -2,15 +2,15 @@ package com.sap.sailing.domain.markpassingcalculation.impl;
 
 import java.util.NavigableSet;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.markpassingcalculation.Candidate;
 
 public class MostProbableCandidatesInSmallTimeRangeFilterTest extends AbstractCandidateFilterTestSupport {
     private MostProbableCandidatesInSmallTimeRangeFilter filter;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         super.setUp();
         filter = new MostProbableCandidatesInSmallTimeRangeFilter(

@@ -2,7 +2,7 @@
 
 This document describes the basics of how the Shiro framework has been selected and is being used to implement role-based access control. See [Permission Concept](/wiki/info/security/permission-concept) to understand how, based on Shiro, a security architecture with user groups, users, qualified roles, ownerships and access control lists works.
 
-As a feature of the Sports Sponsorships Engine (SSE) which underlies the SAP Sailing Analytics, our Tennis engagements, parts of the Equestrian contributions and in the future perhaps more, we are about to introduce user management to the platform. Based on [Benjamin Ebling's Bachelor thesis](/doc/theses/20140915_Ebling_Authentication_and_Authorization_for_SAP_Sailing_Analytics.pdf) we are introducing [Apache Shiro](http://shiro.apache.org) to the platform. Our Bugzilla has a separate [component for User and Account Management](http://bugzilla.sapsailing.com/bugzilla/buglist.cgi?query_format=advanced&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&component=User%20and%20Account%20Management&product=Sailing%20Race%20Analytics) that documents the open issues.
+As a feature of the Sports Sponsorships Engine (SSE) which underlies the Sailing Analytics, our Tennis engagements, parts of the Equestrian contributions and in the future perhaps more, we are about to introduce user management to the platform. Based on [Benjamin Ebling's Bachelor thesis](/doc/theses/20140915_Ebling_Authentication_and_Authorization_for_SAP_Sailing_Analytics.pdf) we are introducing [Apache Shiro](http://shiro.apache.org) to the platform. Our Bugzilla has a separate [component for User and Account Management](http://bugzilla.sapsailing.com/bugzilla/buglist.cgi?query_format=advanced&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&component=User%20and%20Account%20Management&product=Sailing%20Race%20Analytics) that documents the open issues.
 
 [[_TOC_]]
 
@@ -132,6 +132,12 @@ The entry points, as of this writing, offer a simple sign-in form (`Login.html`)
 The `LoginPanel` component may be used by applications to display sign-up/sign-in/sign-out features. Its styling is adjustable by a CSS resource which can be passed to the component's constructor, this way adjusting the component's style to that of the application using and embedding it.
 
 We plan to turn the `UserManagementPanel` which is the widget behind the `UserManagementEntryPoint` into a drop-in component for a generalized administration console concept. So, when the AdminConsole becomes an SSE concept then the user management tab can be made available to all applications using the AdminConsole concept. See also bugs [2424](http://bugzilla.sapsailing.com/bugzilla/show_bug.cgi?id=2424) and [2425](http://bugzilla.sapsailing.com/bugzilla/show_bug.cgi?id=2425).
+
+## Authorization Checks
+
+We generally check authorizations in our GWT RPC service implementations, and in our REST API service implementations. As a common pattern, both these types of service implementations will start with performing the necessary authorization check, and only then obtain an underlying OSGi service, such as ``RacingEventService`` for sailing-related things, or ``SecurityService`` for security, user, role and permission management, and invoke the actual "business logic." This keeps our business logic mostly free of authorization checks.
+
+This also means that filtering responses based on the permissions happens not in the business logic but at the "API level," so in the GWT RPC service method implementation or the REST API servlet method implementation.
 
 ## Sample Session
 

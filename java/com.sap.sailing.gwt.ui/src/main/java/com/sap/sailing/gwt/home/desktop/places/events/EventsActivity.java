@@ -44,7 +44,7 @@ public class EventsActivity extends AbstractActivity implements ProvidesNavigati
                 final EventsView eventsView = clientFactory.createEventsView();
                 panel.setWidget(eventsView.asWidget());
                 Window.setTitle(place.getTitle());
-                eventsView.setEvents(eventListView);
+                eventsView.setEvents(eventListView, clientFactory.getUserService());
             }
         });
     }

@@ -15,7 +15,7 @@ import com.sap.sse.common.Util;
 public class FixOverlay extends CanvasOverlayV3 {
     private GPSFixDTO fix;
     private final FixVectorGraphics fixVectorGraphics;
-    private final HashMap<Integer, Util.Pair<Double,Size>> fixScaleAndSizePerZoomCache;
+    private final HashMap<Double, Util.Pair<Double,Size>> fixScaleAndSizePerZoomCache;
     
     private Double lastWidth;
     private Double lastHeight;
@@ -25,15 +25,15 @@ public class FixOverlay extends CanvasOverlayV3 {
         super(map, zIndex, coordinateSystem);
         fix = fixDTO;
         fixVectorGraphics = new FixVectorGraphics(type, color);
-        fixScaleAndSizePerZoomCache = new HashMap<Integer, Util.Pair<Double,Size>>();
+        fixScaleAndSizePerZoomCache = new HashMap<>();
         setCanvasSize(50, 50);
         getCanvas().setTitle(tooltip);
     }
 
     @Override
     protected void draw() {
-        if (mapProjection != null && fix != null) {
-            int zoom = map.getZoom();
+        if (getMapProjection() != null && fix != null) {
+            double zoom = map.getZoom();
             Util.Pair<Double, Size> fixScaleAndSize = fixScaleAndSizePerZoomCache.get(zoom);
             if (fixScaleAndSize == null) {
                 fixScaleAndSize = getFixScaleAndSize();
@@ -53,7 +53,7 @@ public class FixOverlay extends CanvasOverlayV3 {
                 lastHeight = canvasHeight;
             }
             setLatLngPosition(coordinateSystem.toLatLng(fix.position));
-            Point fixPositionInPx = mapProjection.fromLatLngToDivPixel(coordinateSystem.toLatLng(fix.position));
+            Point fixPositionInPx = getMapProjection().fromLatLngToDivPixel(coordinateSystem.toLatLng(fix.position));
             setCanvasPosition(fixPositionInPx.getX() - canvasWidth / 2.0, fixPositionInPx.getY() - canvasHeight / 2.0);
         }
     }
@@ -73,7 +73,7 @@ public class FixOverlay extends CanvasOverlayV3 {
         // the original fix vector graphics is too small (2.1m x 1.5m) for higher zoom levels
         // therefore we scale the fixes with factor 2 by default
         double buoyScaleFactor = 2.0;
-        Size fixSizeInPixel = calculateBoundingBox(mapProjection, fix.position,
+        Size fixSizeInPixel = calculateBoundingBox(getMapProjection(), fix.position,
                 fixVectorGraphics.getFixWidth().scale(buoyScaleFactor), fixVectorGraphics.getFixHeight().scale(buoyScaleFactor));
         double fixHeightInPixel = fixSizeInPixel.getHeight();
         if(fixHeightInPixel < minFixHeight)

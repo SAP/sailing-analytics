@@ -1,14 +1,14 @@
 package com.sap.sse.common.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.util.NaturalComparator;
 
@@ -17,7 +17,7 @@ public class NaturalComparatorTest {
     private NaturalComparator comparator;
     private NaturalComparator caseInsensitive;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         comparator = new NaturalComparator();
         caseInsensitive = new NaturalComparator(false);

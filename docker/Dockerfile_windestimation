@@ -1,4 +1,4 @@
-ARG SAPJVM_VERSION=8.1.102
+ARG SAPJVM_VERSION=8.1.103
 FROM docker.sapsailing.com/sapjvm8:${SAPJVM_VERSION}
 LABEL maintainer=axel.uhl@sap.com
 # Download and extract the release

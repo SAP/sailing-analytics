@@ -45,11 +45,6 @@ public class RotateAndTranslateCoordinateSystem implements CoordinateSystem {
     }
 
     @Override
-    public Position map(Position position) {
-        return position.getLocalCoordinates(zeroZero, equator);
-    }
-
-    @Override
     public Position getPosition(LatLng p) {
         final Position mapped = new DegreePosition(p.getLatitude(), p.getLongitude());
         return mapped.getTargetCoordinates(/* local origin */ ZERO_ZERO, /* local equator bearing */ EQUATOR_BEARING, zeroZero, equator);
@@ -67,7 +62,7 @@ public class RotateAndTranslateCoordinateSystem implements CoordinateSystem {
 
     @Override
     public LatLng toLatLng(Position position) {
-        final Position mapped = map(position);
+        final Position mapped = position.getLocalCoordinates(zeroZero, equator);
         return LatLng.newInstance(mapped.getLatDeg(), mapped.getLngDeg());
     }
 }

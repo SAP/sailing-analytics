@@ -1,9 +1,9 @@
 package com.sap.sailing.gwt.home.communication.start;
 
-import com.sap.sailing.gwt.home.communication.event.EventReferenceDTO;
 import com.sap.sailing.gwt.home.communication.event.EventState;
+import com.sap.sailing.gwt.ui.shared.EventReferenceDTO;
 import com.sap.sse.common.TimePoint;
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
+import com.sap.sse.gwt.shared.DTO;
 
 public class EventQuickfinderDTO extends EventReferenceDTO implements DTO, Comparable<EventQuickfinderDTO> {
     private String baseURL;

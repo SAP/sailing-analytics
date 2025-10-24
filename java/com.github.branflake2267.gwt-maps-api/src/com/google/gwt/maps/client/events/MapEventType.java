@@ -136,7 +136,9 @@ public enum MapEventType {
 
   ZINDEX_CHANGED,
 
-  ZOOM_CHANGED;
+  ZOOM_CHANGED,
+  
+  RENDERINGTYPE_CHANGED;
 
   public String value() {
     return name().toLowerCase();

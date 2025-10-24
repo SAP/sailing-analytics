@@ -1,6 +1,6 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -12,13 +12,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TestRule;
-import org.junit.rules.Timeout;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Timeout;
 
 import com.sap.sailing.domain.common.PassingInstruction;
 import com.sap.sailing.domain.tractracadapter.DomainFactory;
@@ -47,6 +46,7 @@ import com.tractrac.util.lib.api.exceptions.TimeOutException;
  * @author Axel Uhl (D043530)
  *
  */
+@Timeout(value=5, unit=TimeUnit.MINUTES)
 public abstract class AbstractTracTracLiveTest extends StoredTrackBasedTest {
     private static final Logger logger = Logger.getLogger(AbstractTracTracLiveTest.class.getName());
     protected static final boolean tractracTunnel = Boolean.valueOf(System.getProperty("tractrac.tunnel", "false"));
@@ -56,14 +56,6 @@ public abstract class AbstractTracTracLiveTest extends StoredTrackBasedTest {
     private IRaceSubscriber raceSubscriber;
     private final Collection<Receiver> receivers;
 
-    /**
-     * Making this a method rule allows subclasses to adjust the timeout if required
-     */
-    @Rule
-    public TestRule getTimeoutRule() {
-        return Timeout.millis(5 * 60 * 1000);
-    }
-
     protected AbstractTracTracLiveTest() throws URISyntaxException, MalformedURLException {
         receivers = new HashSet<Receiver>();
     }
@@ -71,7 +63,7 @@ public abstract class AbstractTracTracLiveTest extends StoredTrackBasedTest {
     /**
      * Default set-up for an STG training session in Weymouth, 2011
      */
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final String eventID = "event_20110505_SailingTea";
         final String raceID = "bd8c778e-7c65-11e0-8236-406186cbf87c";
@@ -142,7 +134,7 @@ public abstract class AbstractTracTracLiveTest extends StoredTrackBasedTest {
         getRaceSubscriber().start();
     }
     
-    @After
+    @AfterEach
     public void tearDown() throws MalformedURLException, IOException, InterruptedException {
         logger.info("entering "+getClass().getName()+".tearDown()");
         for (Receiver receiver : receivers) {

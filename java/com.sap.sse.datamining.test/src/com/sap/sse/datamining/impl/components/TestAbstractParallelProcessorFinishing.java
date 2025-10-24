@@ -1,14 +1,14 @@
 package com.sap.sse.datamining.impl.components;
 
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
 
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.components.AdditionalResultDataBuilder;
 import com.sap.sse.datamining.components.Processor;
@@ -24,7 +24,7 @@ public class TestAbstractParallelProcessorFinishing {
     private boolean instructionIsWorking;
     private boolean receiverWasToldToFinish;
     
-    @Before
+    @BeforeEach
     public void initializeProcessorAndReceiver() {
         instructionIsWorking = true;
         receiverWasToldToFinish = false;

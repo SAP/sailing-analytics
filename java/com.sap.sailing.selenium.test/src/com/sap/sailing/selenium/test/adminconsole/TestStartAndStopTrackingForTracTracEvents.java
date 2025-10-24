@@ -1,11 +1,11 @@
 package com.sap.sailing.selenium.test.adminconsole;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.regatta.RegattaListCompositePO.RegattaDescriptor;
 import com.sap.sailing.selenium.pages.adminconsole.regatta.RegattaStructureManagementPanelPO;
@@ -45,7 +45,7 @@ public class TestStartAndStopTrackingForTracTracEvents extends AbstractSeleniumT
 //    private static final String BMW_CUP_RACE_8 = "BMW Cup Race 8";
     
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         this.trackableRace = new TrackableRaceDescriptor(BMW_CUP_EVENT, String.format(RACE, 1), BMW_CUP_BOAT_CLASS);
         this.trackedRace = new TrackedRaceDescriptor(BMW_CUP_REGATTA, BMW_CUP_BOAT_CLASS, String.format(RACE, 1));
@@ -56,7 +56,7 @@ public class TestStartAndStopTrackingForTracTracEvents extends AbstractSeleniumT
     /**
      * <p>Test for the correct start and stop of a tracking.</p>
      */
-    @Test
+    @SeleniumTestCase
     public void testStartAndStopTrackingWithCorrectRegatta() {
         RegattaDescriptor bmwCupDescriptor = new RegattaDescriptor(BMW_CUP_EVENT, BMW_CUP_BOAT_CLASS);
         AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
@@ -75,7 +75,7 @@ public class TestStartAndStopTrackingForTracTracEvents extends AbstractSeleniumT
         assertThat(trackedRacesList.getStatus(this.trackedRace), equalTo(Status.FINISHED));
     }
     
-    @Test
+    @SeleniumTestCase
     public void testStartTrackingWithDefaultReggataWhileReggataForBoatClassExists() {
         AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
         RegattaStructureManagementPanelPO regattaStructure = adminConsole.goToRegattaStructure();
@@ -87,7 +87,7 @@ public class TestStartAndStopTrackingForTracTracEvents extends AbstractSeleniumT
         tracTracEvents.startTrackingForRacesAndAcceptDefaultRegattaWarning(this.trackableRace);
     }
     
-    @Test
+    @SeleniumTestCase
     public void testStartTrackingWithReggataAndNoneMatchingBoatClass() {
         RegattaDescriptor bmwCupDescriptor = new RegattaDescriptor(BMW_CUP_EVENT, BMW_CUP_BOAT_CLASS);
         RegattaDescriptor idm2013Descriptor = new RegattaDescriptor(IDM_2013_EVENT, IDM_2013_BOAT_CLASS);

@@ -1,17 +1,17 @@
 package com.sap.sailing.mongodb.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.mongodb.MongoException;
 import com.sap.sailing.domain.base.Competitor;
@@ -52,7 +52,7 @@ public class TestStoringAndRetrievingLeaderboards extends AbstractMongoDBTest {
         super();
     }
     
-    @Before
+    @BeforeEach
     public void clearCompetitorStore() {
         DomainFactory.INSTANCE.getCompetitorAndBoatStore().clearCompetitors();
     }

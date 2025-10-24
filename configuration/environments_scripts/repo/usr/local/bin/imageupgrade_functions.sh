@@ -67,7 +67,7 @@ clean_startup_logs() {
   echo "Clearing bootstrap logs"
   rm -f /var/log/sailing*
   # Ensure that upon the next boot the reboot indicator is not present, indicating that it's the first boot
-  rm "${REBOOT_INDICATOR}"
+  rm -f "${REBOOT_INDICATOR}"
 }
 
 clean_servers_dir() {
@@ -452,6 +452,10 @@ EOF
 "
     sudo dnf -y update
     sudo dnf -y install mongodb-org-server mongodb-org-tools mongodb-mongosh-shared-openssl3
+    # ensure that logrotate can work nicely with SIGUSR1:
+    if ! grep "logRotate: reopen" /etc/mongod.conf; then
+      sudo sed -i -e 's/^  logAppend: true/  logAppend: true\n  logRotate: reopen/' /etc/mongod.conf
+    fi
 }
 
 # Copies the /root/secrets and /root/mail.properties file to the local instance, ensuring only root can read it

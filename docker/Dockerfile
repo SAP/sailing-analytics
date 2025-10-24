@@ -4,7 +4,7 @@ FROM eclipse-temurin:8-jdk
 # the configuration/github-download-release-assets.sh script to
 # obtain the tar.gz file for a specific or the latest "main" release.
 # To build with an SAP JVM 8 base image built using Dockerfile_sapjvm, use something like:
-#FROM sapjvm8:8.1.102
+#FROM sapjvm8:8.1.103
 ARG RELEASE
 LABEL maintainer=axel.uhl@sap.com
 LABEL org.opencontainers.image.description="Sailing Analytics with Java 8"

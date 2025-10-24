@@ -1,18 +1,18 @@
 package com.sap.sailing.selenium.test.adminconsole;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.connectors.SmartphoneTrackingEventManagementPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardConfigurationPanelPO;
@@ -57,7 +57,7 @@ public class TestRefreshableSelectionModel extends AbstractSeleniumTest {
     private List<RaceDescriptor> leaderboardRaces;
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot());
         super.setUp();
@@ -69,9 +69,9 @@ public class TestRefreshableSelectionModel extends AbstractSeleniumTest {
         return competitorsPanel;
     }
 
-    @Test
+    @SeleniumTestCase
     public void testMaintenanceOfSelectionAfterDataChanges() {
-        this.environment.getWindowManager().withExtraWindow((windowForSelection, windowForEdit) -> {
+        this.environment.getWindowManager().withExtraWindow(getWebDriver(), (windowForSelection, windowForEdit) -> {
             final WebDriver windowForEditDriver = windowForEdit.switchToWindow();
             setUpAuthenticatedSession(windowForEditDriver);
             final TrackedRacesCompetitorsPanelPO competitorsPanel = goToCompetitorsPanel(
@@ -188,9 +188,9 @@ public class TestRefreshableSelectionModel extends AbstractSeleniumTest {
         leaderboardConfiguration.createRegattaLeaderboard(this.regatta);
     }
 
-    @Test
+    @SeleniumTestCase
     public void testRefreshOfDependingUIElements() {
-        this.environment.getWindowManager().withExtraWindow((windowForSelection, windowForEdit) -> {
+        this.environment.getWindowManager().withExtraWindow(getWebDriver(), (windowForSelection, windowForEdit) -> {
             setUpTestRefreshOfDependingUIElements();
             AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
             SmartphoneTrackingEventManagementPanelPO smartphoneTrackingPanel = adminConsole.goToSmartphoneTrackingPanel();
@@ -245,7 +245,7 @@ public class TestRefreshableSelectionModel extends AbstractSeleniumTest {
         });
     }
     
-    @Test
+    @SeleniumTestCase
     public void testMaintenanceOfSelectionAfterFilteringTrackedracesOnLeaderboardConfigPanel() {
         setUpTestRefreshOfDependingUIElements();
         AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());

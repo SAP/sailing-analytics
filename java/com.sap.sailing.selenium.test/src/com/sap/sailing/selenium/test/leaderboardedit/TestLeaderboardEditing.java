@@ -1,11 +1,11 @@
 package com.sap.sailing.selenium.test.leaderboardedit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardConfigurationPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardDetailsPanelPO;
@@ -36,20 +36,20 @@ public class TestLeaderboardEditing extends AbstractSeleniumTest {
     private static final RaceDescriptor RACE_COLUMN = new RaceDescriptor("R1", "Default", false, false, 0.0);
     
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot());
         super.setUp();
     }
 
-    @Test
+    @SeleniumTestCase
     public void testSimpleLeaderboardEditing() {
         createNewLeaderboardLoadRaceAndLink(LEADERBOARD);
         LeaderboardEditingPage page = LeaderboardEditingPage.goToPage(LEADERBOARD, getWebDriver(), getContextRoot());
         LeaderboardTable table = page.getLeaderboardTable();
         assertNotNull(table);
         Iterable<DataEntryPO> rows = table.getRows();
-        assertEquals("Expected 6 rows for the six competitors but found only "+Util.size(rows), 6, Util.size(rows));
+        assertEquals(6, Util.size(rows), "Expected 6 rows for the six competitors but found only "+Util.size(rows));
     }
     
     private void createNewLeaderboardLoadRaceAndLink(String leaderboardName) {

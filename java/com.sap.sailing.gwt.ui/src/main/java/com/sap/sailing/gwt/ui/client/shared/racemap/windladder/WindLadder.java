@@ -21,11 +21,11 @@ import com.sap.sailing.gwt.ui.shared.WindDTO;
 public class WindLadder extends DoubleCanvasBuffer<WindLadderOverlay> {
     protected CoordinateSystem coordinateSystem;
 
-    protected Double windBearing;
+    protected Double windBearingRadians;
     protected Position fixPosition;
     protected long transitionTime;
 
-    protected Double previousWindBearing;
+    protected Double previousWindBearingRadians;
     protected Position previousFixPosition;
 
     /**
@@ -41,8 +41,8 @@ public class WindLadder extends DoubleCanvasBuffer<WindLadderOverlay> {
         super();
         this.coordinateSystem = coordinateSystem;
         this.buffer = new WindLadderOverlay[BUFFER_SIZE];
-        this.buffer[0] = new WindLadderOverlay(this, map, zIndex, coordinateSystem);
-        this.buffer[1] = new WindLadderOverlay(this, map, zIndex, coordinateSystem);
+        this.buffer[0] = new WindLadderOverlay(this, map, zIndex, coordinateSystem, "buffer-0");
+        this.buffer[1] = new WindLadderOverlay(this, map, zIndex, coordinateSystem, "buffer-1");
         this.apply(overlay -> overlay.setVisible(false));
         this.setVisible(true);
         this.addToMap();
@@ -54,11 +54,11 @@ public class WindLadder extends DoubleCanvasBuffer<WindLadderOverlay> {
 
     public void update(WindDTO windFix, Position fixPosition, long timeForPositionTransitionMillis) {
         // Update previous* values
-        previousWindBearing = this.windBearing; //TODO Check for off-by-one error regarding swap method
+        previousWindBearingRadians = this.windBearingRadians; //TODO Check for off-by-one error regarding swap method
         previousFixPosition = this.fixPosition;
         // Update current values
         if (windFix != null) {
-            windBearing = Math.toRadians(coordinateSystem.mapDegreeBearing(windFix.trueWindFromDeg));
+            windBearingRadians = Math.toRadians(coordinateSystem.mapDegreeBearing(windFix.trueWindFromDeg));
         }
         if (fixPosition != null) {
             this.fixPosition = fixPosition;
@@ -69,7 +69,7 @@ public class WindLadder extends DoubleCanvasBuffer<WindLadderOverlay> {
             doSwap = false;
         }
         // Check if swap is required
-        boolean swapRequired = !getActiveCanvas().update(windBearing, fixPosition, timeForPositionTransitionMillis);
+        boolean swapRequired = !getActiveCanvas().update(windBearingRadians, fixPosition, timeForPositionTransitionMillis);
         if (forceSwap || swapRequired) {
             swap();
             forceSwap = false;
@@ -83,7 +83,7 @@ public class WindLadder extends DoubleCanvasBuffer<WindLadderOverlay> {
     public void swap() {
         // Update next canvas, to where the active canvas will be stopping, before swapping during the next update
         WindLadderOverlay next = this.buffer[nextCanvasIndex()];
-        next.update(previousWindBearing, previousFixPosition, transitionTime, /* redraw */ true);
+        next.update(previousWindBearingRadians, previousFixPosition, transitionTime, /* redraw */ true);
         this.doSwap = true;
     }
 

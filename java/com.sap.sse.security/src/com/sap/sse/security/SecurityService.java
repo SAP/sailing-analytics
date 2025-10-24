@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -25,6 +26,7 @@ import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.http.HttpHeaderUtil;
 import com.sap.sse.common.mail.MailException;
+import com.sap.sse.common.media.TakedownNoticeRequestContext;
 import com.sap.sse.replication.ReplicableWithObjectInputStream;
 import com.sap.sse.security.impl.ReplicableSecurityService;
 import com.sap.sse.security.impl.SecurityServiceImpl;
@@ -209,7 +211,6 @@ public interface SecurityService extends ReplicableWithObjectInputStream<Replica
      *            if <code>null</code>, no validation will be attempted
      * @param requestClientIP
      *            used for throttling user creation requests coming from the same IP address
-     * @param enforceStrongPassword TODO
      */
     User createSimpleUser(String username, String email, String password, String fullName, String company,
             Locale locale, String validationBaseURL, UserGroup userOwner, String requestClientIP, boolean enforceStrongPassword)
@@ -888,7 +889,6 @@ public interface SecurityService extends ReplicableWithObjectInputStream<Replica
      * If two locking durations have expired without this method being invoked for equal {@cod eclientIP} and
      * {@code userAgent}, the locking record including its last locking duration is expunged from the internal data
      * structures, avoiding garbage piling up.
-     * @return TODO
      */
     LockingAndBanning failedBearerTokenAuthentication(String clientIP);
 
@@ -910,4 +910,22 @@ public interface SecurityService extends ReplicableWithObjectInputStream<Replica
      * will establish (if not yet locked) or extend the locking duration for the combination.
      */
     boolean isClientIPLockedForBearerTokenAuthentication(String clientIP);
+
+    void fileTakedownNotice(TakedownNoticeRequestContext takedownNoticeRequestContext) throws MailException;
+    
+    /**
+     * For a {@link SecuredSecurityTypes#SERVER SERVER} object identified by {@code serverName}, determines the user set
+     * as the server's owner, plus additional users that have the permission to execute
+     * {@code alsoSendToAllUsersWithThisPermissionOnReplicaSet} on that server.
+     * 
+     * @param serverName
+     *            identifies the server object; for the local server that would, e.g., be {@link ServerInfo#getName()}.
+     *            For replica sets, this is the name of the replica set.
+     * @param alsoSendToAllUsersWithThisPermissionOnReplicaSet
+     *            when not empty, all users that have permission to this {@link SecuredSecurityTypes#SERVER SERVER}
+     *            action on the {@code replicaSet} will receive the e-mail in addition to the server owner. No user will
+     *            receive the e-mail twice.
+     */
+    Iterable<User> getUsersToInformAboutReplicaSet(String serverName,
+            Optional<com.sap.sse.security.shared.HasPermissions.Action> alsoSendToAllUsersWithThisPermissionOnReplicaSet);
 }

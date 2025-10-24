@@ -155,6 +155,7 @@ import software.amazon.awssdk.services.elasticloadbalancingv2.model.DescribeTarg
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.DescribeTargetGroupsResponse;
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.DescribeTargetHealthRequest;
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.DescribeTargetHealthResponse;
+import software.amazon.awssdk.services.elasticloadbalancingv2.model.IpAddressType;
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.Listener;
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.LoadBalancer;
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.LoadBalancerAttribute;
@@ -197,6 +198,9 @@ import software.amazon.awssdk.services.route53.model.TestDnsAnswerResponse;
 import software.amazon.awssdk.services.route53.paginators.ListResourceRecordSetsIterable;
 import software.amazon.awssdk.services.sts.StsClient;
 import software.amazon.awssdk.services.sts.model.Credentials;
+import software.amazon.awssdk.services.wafv2.Wafv2Client;
+import software.amazon.awssdk.services.wafv2.model.ListWebAcLsResponse;
+import software.amazon.awssdk.services.wafv2.model.Scope;
 
 public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> {
     private static final String SSL_SECURITY_POLICY = "ELBSecurityPolicy-FS-1-2-Res-2019-08";
@@ -305,6 +309,10 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
         return getClient(ElasticLoadBalancingV2Client.builder(), region);
     }
     
+    private Wafv2Client getWafClient(Region region) {
+        return getClient(Wafv2Client.builder(), region);
+    }
+    
     private ElasticLoadBalancingV2AsyncClient getLoadBalancingAsyncClient(Region region) {
         return getClient(ElasticLoadBalancingV2AsyncClient.builder(), region);
     }
@@ -341,6 +349,7 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
         final CreateLoadBalancerResponse response = client
                 .createLoadBalancer(CreateLoadBalancerRequest.builder()
                         .name(name)
+                        .ipAddressType(IpAddressType.DUALSTACK) // IPv4 and IPv6
                         .subnetMappings(subnetMappings)
                         .securityGroups(getDefaultSecurityGroupForApplicationLoadBalancer(region).getId())
                         .build());
@@ -352,7 +361,26 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
         final ApplicationLoadBalancer<ShardingKey> result = new ApplicationLoadBalancerImpl<>(region, response.loadBalancers().iterator().next(), this);
         createLoadBalancerHttpListener(result);
         createLoadBalancerHttpsListener(result);
+        getWafACLsByTagAndAssociateWithALB(LandscapeConstants.WEB_ACL_PURPOSE_TAG, LandscapeConstants.WEB_ACL_GEOBLOCKING_PURPOSE, result.getArn(), awsRegion);
         return result;
+    }
+    
+    private void getWafACLsByTagAndAssociateWithALB(String tagKey, String tagValue, String albArn, Region region) {
+        logger.info("Trying to find WAF ACLs with tag "+tagKey+"="+tagValue+" to associate with ALB "+albArn+" in region "+region.id());
+        final Wafv2Client wafClient = getWafClient(region);
+        // Step 1: list all REGIONAL Web ACLs
+        final ListWebAcLsResponse listResp = wafClient.listWebACLs(b->b.scope(Scope.REGIONAL));
+        listResp.webACLs().stream().filter(aclSummary ->
+            // Step 2: filter the ACLs down to those with the right tag
+            wafClient.listTagsForResource(b->b.resourceARN(aclSummary.arn())).tagInfoForResource().tagList().stream()
+                    .anyMatch(tag -> tag.key().equals(tagKey) && tag.value().equals(tagValue)))
+        .forEach(aclSummary -> {
+            // Step 3: associate the ALB with those Web ACLs
+            logger.info("Associating WAF ACL "+aclSummary.arn()+" with ALB "+albArn);
+            wafClient.associateWebACL(b->b
+                        .webACLArn(aclSummary.arn())
+                        .resourceArn(albArn));
+        });
     }
     
     private Subnet getSubnetForAvailabilityZoneInSameVpcAsSecurityGroup(AwsAvailabilityZone az, SecurityGroup securityGroup, Region region) {

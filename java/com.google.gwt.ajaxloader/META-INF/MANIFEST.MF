@@ -5,7 +5,7 @@ Bundle-SymbolicName: com.google.gwt.ajaxloader
 Bundle-Version: 1.1.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
-Require-Bundle: com.google.gwt.user;bundle-version="2.10.0";resolution:=optional
+Require-Bundle: com.google.gwt.user;bundle-version="2.11.0";resolution:=optional
 Automatic-Module-Name: com.google.gwt.ajaxloader
 Bundle-ClassPath: .
 Export-Package: com.google.gwt.ajaxloader.client

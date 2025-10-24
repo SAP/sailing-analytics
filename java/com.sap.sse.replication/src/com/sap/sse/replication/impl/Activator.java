@@ -224,6 +224,7 @@ public class Activator implements BundleActivator {
         }
         // stop sending stuff to the exchange for other replicas (if this is a master)
         serverReplicationMasterService.stopAllReplicas();
+        serverReplicationMasterService.stop();
     }
     
     public static BundleContext getDefaultContext() {

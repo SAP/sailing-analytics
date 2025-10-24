@@ -1,8 +1,8 @@
 package com.sap.sailing.selenium.api.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -17,7 +17,6 @@ import java.util.Set;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.simple.parser.ParseException;
-import org.junit.Test;
 
 import com.sap.sailing.domain.igtimiadapter.DataAccessWindow;
 import com.sap.sailing.domain.igtimiadapter.Permission;
@@ -25,12 +24,13 @@ import com.sap.sailing.domain.igtimiadapter.datatypes.AWA;
 import com.sap.sailing.domain.igtimiadapter.datatypes.AWS;
 import com.sap.sailing.domain.igtimiadapter.datatypes.Fix;
 import com.sap.sailing.domain.igtimiadapter.datatypes.Type;
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 public class BasicIgtimiAdapterTest extends AbstractTestWithIgtimiConnection {
-    @Test
+    @SeleniumTestCase
     public void testGetDataAccessWindows() throws ClientProtocolException, IllegalStateException, IOException, ParseException {
         Iterable<DataAccessWindow> daws = connection.getDataAccessWindows(Permission.read, /* startTime */ null,
                 /* endTime */ null, /* deviceSerialNumbers */ Collections.singleton("DC-GD-AAED"));
@@ -41,14 +41,14 @@ public class BasicIgtimiAdapterTest extends AbstractTestWithIgtimiConnection {
         }
     }
     
-    @Test
+    @SeleniumTestCase
     public void testGetAllDataAccessWindows() throws ClientProtocolException, IllegalStateException, IOException, ParseException {
         Iterable<DataAccessWindow> daws = connection.getDataAccessWindows(Permission.read, /* startTime */ null,
                 /* endTime */ null, /* deviceSerialNumbers */ null);
         assertFalse(Util.isEmpty(daws));
     }
     
-    @Test
+    @SeleniumTestCase
     public void testGetResourceData() throws ClientProtocolException, IllegalStateException, IOException, ParseException, java.text.ParseException {
         final Map<Type, Double> typesAndCompression = new HashMap<>();
         typesAndCompression.put(Type.gps_latlong, 0.0);
@@ -60,7 +60,7 @@ public class BasicIgtimiAdapterTest extends AbstractTestWithIgtimiConnection {
         assertTrue(data.iterator().hasNext());
     }
     
-    @Test
+    @SeleniumTestCase
     public void testDataAccessWindowForGivenTimeFrame() throws java.text.ParseException, IllegalStateException, ClientProtocolException, IOException, ParseException {
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX", Locale.GERMAN);
         TimePoint start = new MillisecondsTimePoint(dateFormat.parse("2025-01-07T07:00:00Z"));
@@ -74,7 +74,7 @@ public class BasicIgtimiAdapterTest extends AbstractTestWithIgtimiConnection {
         }
     }
     
-    @Test
+    @SeleniumTestCase
     public void testResourceDataForGivenTimeFrame() throws java.text.ParseException, IllegalStateException, ClientProtocolException, IOException, ParseException {
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX", Locale.GERMAN);
         final TimePoint start = new MillisecondsTimePoint(dateFormat.parse("2025-01-07T07:00:00Z"));
@@ -94,7 +94,7 @@ public class BasicIgtimiAdapterTest extends AbstractTestWithIgtimiConnection {
         assertTrue(foundWind);
     }
     
-    @Test
+    @SeleniumTestCase
     public void testReadLatestData() throws IllegalStateException, ClientProtocolException, IOException, ParseException {
         Iterable<Fix> fixes = connection.getLatestFixes(Arrays.asList(new String[] { "DC-GD-AAED", "GA-EN-AAEA", "DD-EE-AAGA" }), Type.SOG );
         assertEquals(1, Util.size(fixes));

@@ -1,17 +1,17 @@
 package com.sap.sailing.selenium.test.leaderboard;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.WebDriver;
 
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardConfigurationPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardDetailsPanelPO;
@@ -47,7 +47,7 @@ public class TestSwitchingOffStartOfRaceInference extends AbstractSeleniumTest {
     private RaceDescriptor raceColumn;
     
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         this.regatta = new RegattaDescriptor(REGATTA, BOAT_CLASS);
         this.trackableRace = new TrackableRaceDescriptor(EVENT,  RACE, BOAT_CLASS);
@@ -58,9 +58,9 @@ public class TestSwitchingOffStartOfRaceInference extends AbstractSeleniumTest {
         configureRegattaAndLeaderboard();
     }
     
-    @Test
+    @SeleniumTestCase
     public void testCorrectDisplayOfRaceColumnWithAndWithoutStartTimeInference() {
-        this.environment.getWindowManager().withExtraWindow((adminConsoleWindow, leaderboardWindow) -> {
+        this.environment.getWindowManager().withExtraWindow(getWebDriver(), (adminConsoleWindow, leaderboardWindow) -> {
             final WebDriver leaderboardWindowDriver = leaderboardWindow.switchToWindow();
             setUpAuthenticatedSession(leaderboardWindowDriver);
             LeaderboardPage leaderboard = LeaderboardPage.goToPage(leaderboardWindowDriver, getContextRoot(), LEADERBOARD, /* race details */ false);

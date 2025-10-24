@@ -1,8 +1,8 @@
 package com.sap.sailing.server.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
@@ -35,10 +35,10 @@ import javax.ws.rs.core.StreamingOutput;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
@@ -192,13 +192,13 @@ public class MasterDataImportTest {
     private RacingEventService sourceService;
     private DummyMasterDataRessource masterDataResource;
 
-    @After
+    @AfterEach
     public void tearDown() {
         deleteAllDataFromDatabase();
     }
 
     @SuppressWarnings("unchecked")
-    @Before
+    @BeforeEach
     public void setUp() {
         UserGroupImpl defaultTenant = new UserGroupImpl(new UUID(0, 1), "defaultTenant");
         User currentUser = Mockito.mock(User.class);
@@ -421,24 +421,24 @@ public class MasterDataImportTest {
         }
         MasterDataImportObjectCreationCount creationCount = destService.getDataImportLock().getProgress(randomUUID)
                 .getResult();
-        Assert.assertNotNull(creationCount);
+        Assertions.assertNotNull(creationCount);
         Event eventOnTarget = destService.getEvent(eventUUID);
-        Assert.assertNotNull(eventOnTarget);
+        Assertions.assertNotNull(eventOnTarget);
         LeaderboardGroup leaderboardGroupOnTarget = destService.getLeaderboardGroupByID(TEST_GROUP_UUID);
-        Assert.assertNotNull(leaderboardGroupOnTarget);
+        Assertions.assertNotNull(leaderboardGroupOnTarget);
         assertSame(leaderboardGroupOnTarget, eventOnTarget.getLeaderboardGroups().iterator().next());
         Leaderboard leaderboardOnTarget = destService.getLeaderboardByName(TEST_LEADERBOARD_NAME);
-        Assert.assertNotNull(leaderboardOnTarget);
+        Assertions.assertNotNull(leaderboardOnTarget);
         Regatta regattaOnTarget = destService.getRegattaByName(TEST_LEADERBOARD_NAME);
-        Assert.assertNotNull(regattaOnTarget);
-        Assert.assertEquals(false, regattaOnTarget.getAllRaces().iterator().hasNext());
-        Assert.assertEquals(courseAreaUUID, eventOnTarget.getVenue().getCourseAreas().iterator().next().getId());
+        Assertions.assertNotNull(regattaOnTarget);
+        Assertions.assertEquals(false, regattaOnTarget.getAllRaces().iterator().hasNext());
+        Assertions.assertEquals(courseAreaUUID, eventOnTarget.getVenue().getCourseAreas().iterator().next().getId());
         RaceColumn raceColumnOnTarget = leaderboardOnTarget.getRaceColumnByName(raceColumnName);
-        Assert.assertNotNull(raceColumnOnTarget);
-        Assert.assertNull(raceColumnOnTarget.getTrackedRace(raceColumnOnTarget.getFleetByName(testFleet1Name)));
+        Assertions.assertNotNull(raceColumnOnTarget);
+        Assertions.assertNull(raceColumnOnTarget.getTrackedRace(raceColumnOnTarget.getFleetByName(testFleet1Name)));
         raceColumnOnTarget.setTrackedRace(raceColumnOnTarget.getFleets().iterator().next(), new DummyTrackedRace(
                 raceId, createCompetitorsAndBoatsMap(boatClass, competitors), regattaOnTarget, null, sourceService.getWindStore()));
-        Assert.assertTrue(leaderboardOnTarget.getScoreCorrection().hasCorrectionFor(raceColumnOnTarget));
+        Assertions.assertTrue(leaderboardOnTarget.getScoreCorrection().hasCorrectionFor(raceColumnOnTarget));
         Competitor competitorOnTarget = domainFactory.getExistingCompetitorById(competitorUUID);
         Set<Competitor> competitorsCreatedOnTarget = new HashSet<>();
         competitorsCreatedOnTarget.add(competitorOnTarget);
@@ -446,34 +446,34 @@ public class MasterDataImportTest {
         TrackedRace trackedRaceForTarget = new DummyTrackedRace(raceId, createCompetitorsAndBoatsMap(boatClass, competitorsCreatedOnTarget), regattaOnTarget,
                 null, sourceService.getWindStore());
         raceColumnOnTarget.setTrackedRace(fleet1OnTarget, trackedRaceForTarget);
-        Assert.assertEquals(factor, leaderboard.getScoringScheme().getScoreFactor(raceColumnOnTarget), 0.000001);
+        Assertions.assertEquals(factor, leaderboard.getScoringScheme().getScoreFactor(raceColumnOnTarget), 0.000001);
         Iterable<Competitor> competitorsOnTarget = leaderboardOnTarget.getAllCompetitors();
         Iterator<Competitor> competitorIterator = competitorsOnTarget.iterator();
-        Assert.assertTrue(competitorIterator.hasNext());
-        Assert.assertEquals(competitorOnTarget, competitorIterator.next());
+        Assertions.assertTrue(competitorIterator.hasNext());
+        Assertions.assertEquals(competitorOnTarget, competitorIterator.next());
         // Check for score corrections
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 scoreCorrection,
                 leaderboardOnTarget.getScoreCorrection().getExplicitScoreCorrection(competitorOnTarget,
                         raceColumnOnTarget), 0.0000001);
-        Assert.assertEquals(maxPointsReason, leaderboardOnTarget.getScoreCorrection()
+        Assertions.assertEquals(maxPointsReason, leaderboardOnTarget.getScoreCorrection()
                 .getMaxPointsReason(competitorOnTarget, raceColumnOnTarget, MillisecondsTimePoint.now()));
         // Check for carried points
-        Assert.assertEquals(carriedPoints, leaderboardOnTarget.getCarriedPoints(competitorOnTarget), 0.0000001);
+        Assertions.assertEquals(carriedPoints, leaderboardOnTarget.getCarriedPoints(competitorOnTarget), 0.0000001);
         // Check for suppressed competitor
-        Assert.assertTrue(leaderboardOnTarget.getSuppressedCompetitors().iterator().hasNext());
+        Assertions.assertTrue(leaderboardOnTarget.getSuppressedCompetitors().iterator().hasNext());
         Competitor suppressedCompetitorOnTarget = domainFactory.getCompetitorAndBoatStore().getExistingCompetitorById(
                 competitorToSuppressUUID);
-        Assert.assertEquals(suppressedCompetitorOnTarget, leaderboardOnTarget.getSuppressedCompetitors().iterator()
+        Assertions.assertEquals(suppressedCompetitorOnTarget, leaderboardOnTarget.getSuppressedCompetitors().iterator()
                 .next());
         // Check for competitor display name
-        Assert.assertEquals(nickName, leaderboardOnTarget.getDisplayName(suppressedCompetitorOnTarget));
+        Assertions.assertEquals(nickName, leaderboardOnTarget.getDisplayName(suppressedCompetitorOnTarget));
         // Check for race log event
-        Assert.assertNotNull(raceColumnOnTarget.getRaceLog(fleet1OnTarget).getFirstRawFixAtOrAfter(logTimePoint));
-        Assert.assertEquals(logEvent.getId(),
+        Assertions.assertNotNull(raceColumnOnTarget.getRaceLog(fleet1OnTarget).getFirstRawFixAtOrAfter(logTimePoint));
+        Assertions.assertEquals(logEvent.getId(),
                 raceColumnOnTarget.getRaceLog(fleet1OnTarget).getFirstRawFixAtOrAfter(logTimePoint).getId());
-        Assert.assertNotNull(raceColumnOnTarget.getRaceLog(fleet1OnTarget).getFirstFixAtOrAfter(logTimePoint2));
-        Assert.assertEquals(wind, ((RaceLogWindFixEvent) raceColumnOnTarget.getRaceLog(fleet1OnTarget)
+        Assertions.assertNotNull(raceColumnOnTarget.getRaceLog(fleet1OnTarget).getFirstFixAtOrAfter(logTimePoint2));
+        Assertions.assertEquals(wind, ((RaceLogWindFixEvent) raceColumnOnTarget.getRaceLog(fleet1OnTarget)
                 .getFirstFixAtOrAfter(logTimePoint2)).getWindFix());
         // Add new event to check persistence of post-import events (see bug 3230)
         TimePoint logTimePoint5 = new MillisecondsTimePoint(1372489310000L);
@@ -484,34 +484,34 @@ public class MasterDataImportTest {
         // Check for regatta log event
         RegattaLogRegisterCompetitorEvent registerEventOnTarget = (RegattaLogRegisterCompetitorEvent) regattaOnTarget
                 .getRegattaLog().getFirstFixAtOrAfter(regattaLogTimepoint);
-        Assert.assertNotNull(registerEventOnTarget);
-        Assert.assertEquals(registerEvent.getId(), registerEventOnTarget.getId());
-        Assert.assertEquals(competitor.getId(), registerEventOnTarget.getCompetitor().getId());
+        Assertions.assertNotNull(registerEventOnTarget);
+        Assertions.assertEquals(registerEvent.getId(), registerEventOnTarget.getId());
+        Assertions.assertEquals(competitor.getId(), registerEventOnTarget.getCompetitor().getId());
         // Check for import of racelogtracking fix
         SensorFixStore sensorFixStore = destService.getSensorFixStore();
-        Assert.assertEquals(1, sensorFixStore.getNumberOfFixes(deviceIdentifier));
+        Assertions.assertEquals(1, sensorFixStore.getNumberOfFixes(deviceIdentifier));
         verifyFix(gpsFix, sensorFixStore, logTimePoint, logTimePoint3, deviceIdentifier);
         // Check that fix counts around the batch size are imported
         verifyFixCount(sensorFixStore, deviceBatch1, 4999);
         verifyFixCount(sensorFixStore, deviceBatch2, 5000);
         verifyFixCount(sensorFixStore, deviceBatch3, 5001);
         // Check for import of sensor fix
-        Assert.assertEquals(1, sensorFixStore.getNumberOfFixes(deviceIdentifier2));
+        Assertions.assertEquals(1, sensorFixStore.getNumberOfFixes(deviceIdentifier2));
         verifyFix(doubleVectorFix, sensorFixStore, logTimePoint, logTimePoint3, deviceIdentifier2);
         // Check for persisting of race log events:
         RacingEventService dest2 = new RacingEventServiceImplMock(){};
         Leaderboard lb2 = dest2.getLeaderboardByName(TEST_LEADERBOARD_NAME);
         RaceColumn raceColumn2 = lb2.getRaceColumns().iterator().next();
         RaceLog raceLog2 = raceColumn2.getRaceLog(raceColumn2.getFleetByName(fleet1OnTarget.getName()));
-        Assert.assertEquals(logEvent.getId(), raceLog2.getFirstRawFixAtOrAfter(logTimePoint).getId());
+        Assertions.assertEquals(logEvent.getId(), raceLog2.getFirstRawFixAtOrAfter(logTimePoint).getId());
         RaceLogEvent postImportLogEventFromDB = raceLog2.getFirstRawFixAtOrAfter(logTimePoint5);
-        Assert.assertEquals(postImportEventId, postImportLogEventFromDB.getId());
+        Assertions.assertEquals(postImportEventId, postImportLogEventFromDB.getId());
         // Check for persisting of regatta log events
         Regatta regattaOnTarget2 = dest2.getRegattaByName(TEST_LEADERBOARD_NAME);
         RegattaLogRegisterCompetitorEvent registerEventOnTarget2 = (RegattaLogRegisterCompetitorEvent) regattaOnTarget2
                 .getRegattaLog().getFirstFixAtOrAfter(regattaLogTimepoint);
-        Assert.assertNotNull(registerEventOnTarget2);
-        Assert.assertEquals(registerEvent.getId(), registerEventOnTarget2.getId());
+        Assertions.assertNotNull(registerEventOnTarget2);
+        Assertions.assertEquals(registerEvent.getId(), registerEventOnTarget2.getId());
     }
 
     private DeviceIdentifier addDeviceMappingWithFixes(RacingEventService sourceService, Regatta regatta, CompetitorImpl competitor,
@@ -659,22 +659,22 @@ public class MasterDataImportTest {
         MasterDataImportObjectCreationCount creationCount = destService.getDataImportLock().getProgress(randomUUID)
                 .getResult();
 
-        Assert.assertNotNull(creationCount);
+        Assertions.assertNotNull(creationCount);
         Event eventOnTarget = destService.getEvent(eventUUID);
-        Assert.assertNotNull(eventOnTarget);
+        Assertions.assertNotNull(eventOnTarget);
         LeaderboardGroup leaderboardGroupOnTarget = destService.getLeaderboardGroupByID(TEST_GROUP_UUID);
-        Assert.assertNotNull(leaderboardGroupOnTarget);
+        Assertions.assertNotNull(leaderboardGroupOnTarget);
         Leaderboard leaderboardOnTarget = destService.getLeaderboardByName(TEST_LEADERBOARD_NAME);
-        Assert.assertNotNull(leaderboardOnTarget);
+        Assertions.assertNotNull(leaderboardOnTarget);
         Regatta regattaOnTarget = destService.getRegattaByName(TEST_LEADERBOARD_NAME);
-        Assert.assertNotNull(regattaOnTarget);
+        Assertions.assertNotNull(regattaOnTarget);
 
-        Assert.assertEquals(courseAreaUUID, eventOnTarget.getVenue().getCourseAreas().iterator().next().getId());
+        Assertions.assertEquals(courseAreaUUID, eventOnTarget.getVenue().getCourseAreas().iterator().next().getId());
 
         RaceColumn raceColumnOnTarget = leaderboardOnTarget.getRaceColumnByName(raceColumnName);
-        Assert.assertNotNull(raceColumnOnTarget);
+        Assertions.assertNotNull(raceColumnOnTarget);
 
-        Assert.assertTrue(leaderboardOnTarget.getScoreCorrection().hasCorrectionFor(raceColumnOnTarget));
+        Assertions.assertTrue(leaderboardOnTarget.getScoreCorrection().hasCorrectionFor(raceColumnOnTarget));
         Competitor competitorOnTarget = domainFactory.getExistingCompetitorById(competitorUUID);
         Competitor competitorOnTarget2 = domainFactory.getCompetitorAndBoatStore().getExistingCompetitorById(competitor2UUID);
         Set<Competitor> competitorsCreatedOnTarget = new HashSet<>();
@@ -688,21 +688,21 @@ public class MasterDataImportTest {
 
         Iterable<Competitor> competitorsOnTarget = leaderboardOnTarget.getAllCompetitors();
         Iterator<Competitor> competitorIterator = competitorsOnTarget.iterator();
-        Assert.assertTrue(competitorIterator.hasNext());
-        Assert.assertEquals(competitorOnTarget, competitorIterator.next());
+        Assertions.assertTrue(competitorIterator.hasNext());
+        Assertions.assertEquals(competitorOnTarget, competitorIterator.next());
 
         // Check for score corrections
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 scoreCorrection,
                 leaderboardOnTarget.getScoreCorrection().getExplicitScoreCorrection(competitorOnTarget,
                         raceColumnOnTarget), 0.0000001);
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 maxPointsReason,
                 leaderboardOnTarget.getScoreCorrection().getMaxPointsReason(competitorOnTarget, raceColumnOnTarget,
                         MillisecondsTimePoint.now()));
 
         // Checks if score correction was not set if not set on source
-        Assert.assertFalse(leaderboardOnTarget.getScoreCorrection().isScoreCorrected(competitorOnTarget2,
+        Assertions.assertFalse(leaderboardOnTarget.getScoreCorrection().isScoreCorrected(competitorOnTarget2,
                 raceColumnOnTarget, MillisecondsTimePoint.now()));
     }
 
@@ -828,18 +828,18 @@ public class MasterDataImportTest {
         MasterDataImportObjectCreationCount creationCount = destService.getDataImportLock().getProgress(randomUUID)
                 .getResult();
 
-        Assert.assertNotNull(creationCount);
+        Assertions.assertNotNull(creationCount);
         Event eventOnTarget = destService.getEvent(eventUUID);
-        Assert.assertNotNull(eventOnTarget);
+        Assertions.assertNotNull(eventOnTarget);
         LeaderboardGroup leaderboardGroupOnTarget = destService.getLeaderboardGroupByID(TEST_GROUP_UUID);
-        Assert.assertNotNull(leaderboardGroupOnTarget);
+        Assertions.assertNotNull(leaderboardGroupOnTarget);
         Leaderboard leaderboardOnTarget = destService.getLeaderboardByName(TEST_LEADERBOARD_NAME);
-        Assert.assertNotNull(leaderboardOnTarget);
+        Assertions.assertNotNull(leaderboardOnTarget);
         Regatta regattaOnTarget = destService.getRegattaByName(TEST_LEADERBOARD_NAME);
-        Assert.assertNotNull(regattaOnTarget);
-        Assert.assertEquals(courseAreaUUID, eventOnTarget.getVenue().getCourseAreas().iterator().next().getId());
+        Assertions.assertNotNull(regattaOnTarget);
+        Assertions.assertEquals(courseAreaUUID, eventOnTarget.getVenue().getCourseAreas().iterator().next().getId());
         RaceColumn raceColumnOnTarget = leaderboardOnTarget.getRaceColumnByName(raceColumnName);
-        Assert.assertNotNull(raceColumnOnTarget);
+        Assertions.assertNotNull(raceColumnOnTarget);
         Competitor competitorOnTarget = domainFactory.getExistingCompetitorById(competitorUUID);
         Boat boatOnTarget = domainFactory.getExistingBoatById(competitorUUID);
         Map<Competitor, Boat> competitorsAndBoatsOnTarget = new HashMap<>();
@@ -853,12 +853,12 @@ public class MasterDataImportTest {
         windTrackOnDest.lockForRead();
         try {
             Iterable<Wind> fixes = windTrackOnDest.getFixes();
-            Assert.assertNotNull(fixes);
+            Assertions.assertNotNull(fixes);
             Iterator<Wind> iterator = fixes.iterator();
-            Assert.assertTrue(iterator.hasNext());
+            Assertions.assertTrue(iterator.hasNext());
             Wind firstWindFix = iterator.next();
-            Assert.assertNotNull(firstWindFix);
-            Assert.assertFalse(iterator.hasNext());
+            Assertions.assertNotNull(firstWindFix);
+            Assertions.assertFalse(iterator.hasNext());
         } finally {
             windTrackOnDest.unlockAfterRead();
         }
@@ -989,19 +989,19 @@ public class MasterDataImportTest {
         }
         MasterDataImportObjectCreationCount creationCount = destService.getDataImportLock().getProgress(randomUUID)
                 .getResult();
-        Assert.assertNotNull(creationCount);
+        Assertions.assertNotNull(creationCount);
         Event eventOnTarget = destService.getEvent(eventUUID);
-        Assert.assertNotNull(eventOnTarget);
+        Assertions.assertNotNull(eventOnTarget);
         LeaderboardGroup leaderboardGroupOnTarget = destService.getLeaderboardGroupByID(TEST_GROUP_UUID);
-        Assert.assertNotNull(leaderboardGroupOnTarget);
+        Assertions.assertNotNull(leaderboardGroupOnTarget);
         Leaderboard leaderboardOnTarget = destService.getLeaderboardByName(TEST_LEADERBOARD_NAME);
-        Assert.assertNotNull(leaderboardOnTarget);
+        Assertions.assertNotNull(leaderboardOnTarget);
         Regatta regattaOnTarget = destService.getRegattaByName(TEST_LEADERBOARD_NAME);
-        Assert.assertNotNull(regattaOnTarget);
-        Assert.assertEquals(courseArea.getId(), eventOnTarget.getVenue().getCourseAreas().iterator().next().getId());
+        Assertions.assertNotNull(regattaOnTarget);
+        Assertions.assertEquals(courseArea.getId(), eventOnTarget.getVenue().getCourseAreas().iterator().next().getId());
         RaceColumn raceColumnOnTarget = leaderboardOnTarget.getRaceColumnByName(raceColumnName);
-        Assert.assertNotNull(raceColumnOnTarget);
-        Assert.assertTrue(leaderboardOnTarget.getScoreCorrection().hasCorrectionFor(raceColumnOnTarget));
+        Assertions.assertNotNull(raceColumnOnTarget);
+        Assertions.assertTrue(leaderboardOnTarget.getScoreCorrection().hasCorrectionFor(raceColumnOnTarget));
         Competitor competitorOnTarget = domainFactory.getCompetitorAndBoatStore().getExistingCompetitorById(competitorUUID);
         Set<Competitor> competitorsCreatedOnTarget = new HashSet<>();
         competitorsCreatedOnTarget.add(competitorOnTarget);
@@ -1011,10 +1011,10 @@ public class MasterDataImportTest {
         raceColumnOnTarget.setTrackedRace(fleet1OnTarget, trackedRaceForTarget);
         Iterable<Competitor> competitorsOnTarget = leaderboardOnTarget.getAllCompetitors();
         Iterator<Competitor> competitorIterator = competitorsOnTarget.iterator();
-        Assert.assertTrue(competitorIterator.hasNext());
-        Assert.assertEquals(competitorOnTarget, competitorIterator.next());
+        Assertions.assertTrue(competitorIterator.hasNext());
+        Assertions.assertEquals(competitorOnTarget, competitorIterator.next());
         // Check for score corrections
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 MaxPointsReason.DNS,
                 leaderboardOnTarget.getScoreCorrection().getMaxPointsReason(competitorOnTarget, raceColumnOnTarget,
                         MillisecondsTimePoint.now()));
@@ -1171,37 +1171,37 @@ public class MasterDataImportTest {
 
         // ---Asserts---
         // Test correct number of creations
-        Assert.assertNotNull(creationCount);
-        Assert.assertEquals(0, creationCount.getEventCount());
-        Assert.assertEquals(0, creationCount.getRegattaCount());
-        Assert.assertEquals(0, creationCount.getLeaderboardCount());
-        Assert.assertEquals(0, creationCount.getLeaderboardGroupCount());
+        Assertions.assertNotNull(creationCount);
+        Assertions.assertEquals(0, creationCount.getEventCount());
+        Assertions.assertEquals(0, creationCount.getRegattaCount());
+        Assertions.assertEquals(0, creationCount.getLeaderboardCount());
+        Assertions.assertEquals(0, creationCount.getLeaderboardGroupCount());
 
         Event eventOnTarget = destService.getEvent(eventUUID);
-        Assert.assertNotNull(eventOnTarget);
+        Assertions.assertNotNull(eventOnTarget);
 
         // Check if existing event survived import
-        Assert.assertEquals(venueNameNotToOverride, eventOnTarget.getVenue().getName());
+        Assertions.assertEquals(venueNameNotToOverride, eventOnTarget.getVenue().getName());
 
         // Check if existing course area survived import
-        Assert.assertEquals(courseAreaNotToOverride.getName(), eventOnTarget.getVenue().getCourseAreas().iterator()
+        Assertions.assertEquals(courseAreaNotToOverride.getName(), eventOnTarget.getVenue().getCourseAreas().iterator()
                 .next().getName());
         LeaderboardGroup leaderboardGroupOnTarget = destService.getLeaderboardGroupByID(TEST_GROUP_UUID);
-        Assert.assertNotNull(leaderboardGroupOnTarget);
+        Assertions.assertNotNull(leaderboardGroupOnTarget);
         // Check if existing leaderboard group survived import
-        Assert.assertEquals(groupNotToOverride.getDescription(), leaderboardGroupOnTarget.getDescription());
+        Assertions.assertEquals(groupNotToOverride.getDescription(), leaderboardGroupOnTarget.getDescription());
         Leaderboard leaderboardOnTarget = destService.getLeaderboardByName(TEST_LEADERBOARD_NAME);
-        Assert.assertNotNull(leaderboardOnTarget);
+        Assertions.assertNotNull(leaderboardOnTarget);
         Regatta regattaOnTarget = destService.getRegattaByName(TEST_LEADERBOARD_NAME);
-        Assert.assertNotNull(regattaOnTarget);
+        Assertions.assertNotNull(regattaOnTarget);
 
-        Assert.assertEquals(courseAreaUUID, eventOnTarget.getVenue().getCourseAreas().iterator().next().getId());
+        Assertions.assertEquals(courseAreaUUID, eventOnTarget.getVenue().getCourseAreas().iterator().next().getId());
 
         RaceColumn raceColumnOnTarget = leaderboardOnTarget.getRaceColumnByName(raceColumnNameNotToOveride);
-        Assert.assertNotNull(raceColumnOnTarget);
+        Assertions.assertNotNull(raceColumnOnTarget);
         // Check if existing leaderboard survived import
-        Assert.assertEquals(leaderboardNotToOverride.getDisplayName(), leaderboardOnTarget.getDisplayName());
-        Assert.assertFalse(leaderboardOnTarget.getScoreCorrection().hasCorrectionFor(raceColumnOnTarget));
+        Assertions.assertEquals(leaderboardNotToOverride.getDisplayName(), leaderboardOnTarget.getDisplayName());
+        Assertions.assertFalse(leaderboardOnTarget.getScoreCorrection().hasCorrectionFor(raceColumnOnTarget));
 
     }
 
@@ -1366,40 +1366,40 @@ public class MasterDataImportTest {
         MasterDataImportObjectCreationCount creationCount = destService.getDataImportLock().getProgress(randomUUID).getResult();
         // ---Asserts---
         // Test correct number of creations
-        Assert.assertNotNull(creationCount);
-        Assert.assertEquals(1, creationCount.getEventCount());
-        Assert.assertEquals(1, creationCount.getRegattaCount());
-        Assert.assertEquals(1, creationCount.getLeaderboardCount());
-        Assert.assertEquals(1, creationCount.getLeaderboardGroupCount());
+        Assertions.assertNotNull(creationCount);
+        Assertions.assertEquals(1, creationCount.getEventCount());
+        Assertions.assertEquals(1, creationCount.getRegattaCount());
+        Assertions.assertEquals(1, creationCount.getLeaderboardCount());
+        Assertions.assertEquals(1, creationCount.getLeaderboardGroupCount());
         Event eventOnTarget = destService.getEvent(eventUUID);
-        Assert.assertNotNull(eventOnTarget);
+        Assertions.assertNotNull(eventOnTarget);
         // Check if existing event didn't survive import
-        Assert.assertEquals(event.getVenue().getName(), eventOnTarget.getVenue().getName());
+        Assertions.assertEquals(event.getVenue().getName(), eventOnTarget.getVenue().getName());
         // Check if existing course area survive import
-        Assert.assertEquals(courseAreaNotToOverride.getName(), eventOnTarget.getVenue().getCourseAreas().iterator().next().getName());
+        Assertions.assertEquals(courseAreaNotToOverride.getName(), eventOnTarget.getVenue().getCourseAreas().iterator().next().getName());
         LeaderboardGroup leaderboardGroupOnTarget = destService.getLeaderboardGroupByID(TEST_GROUP_UUID);
-        Assert.assertNotNull(leaderboardGroupOnTarget);
+        Assertions.assertNotNull(leaderboardGroupOnTarget);
         // Check if existing leaderboard group didn't survive import
-        Assert.assertEquals(group.getDescription(), leaderboardGroupOnTarget.getDescription());
+        Assertions.assertEquals(group.getDescription(), leaderboardGroupOnTarget.getDescription());
         Leaderboard leaderboardOnTarget = destService.getLeaderboardByName(TEST_LEADERBOARD_NAME);
-        Assert.assertNotNull(leaderboardOnTarget);
+        Assertions.assertNotNull(leaderboardOnTarget);
         Regatta regattaOnTarget = destService.getRegattaByName(TEST_REGATTA_NAME + " (" + TEST_BOAT_CLASS_NAME + ")");
-        Assert.assertNotNull(regattaOnTarget);
+        Assertions.assertNotNull(regattaOnTarget);
         RegattaLeaderboard regattaLeaderboard = (RegattaLeaderboard) leaderboardOnTarget;
         Regatta regattaInLeaderboard = regattaLeaderboard.getRegatta();
-        Assert.assertSame(regattaOnTarget, regattaInLeaderboard);
-        Assert.assertEquals(courseAreaUUID, eventOnTarget.getVenue().getCourseAreas().iterator().next().getId());
+        Assertions.assertSame(regattaOnTarget, regattaInLeaderboard);
+        Assertions.assertEquals(courseAreaUUID, eventOnTarget.getVenue().getCourseAreas().iterator().next().getId());
         RaceColumn raceColumnOnTarget = leaderboardOnTarget.getRaceColumnByName(raceColumnName);
-        Assert.assertNotNull(raceColumnOnTarget);
+        Assertions.assertNotNull(raceColumnOnTarget);
         // Check if existing leaderboard didn't survive import
-        Assert.assertEquals(leaderboard.getDisplayName(), leaderboardOnTarget.getDisplayName());
-        Assert.assertTrue(leaderboardOnTarget.getScoreCorrection().hasCorrectionFor(raceColumnOnTarget));
+        Assertions.assertEquals(leaderboard.getDisplayName(), leaderboardOnTarget.getDisplayName());
+        Assertions.assertTrue(leaderboardOnTarget.getScoreCorrection().hasCorrectionFor(raceColumnOnTarget));
         // Check that tracked race of regatta leaderboard has been removed
-        Assert.assertNull(destService.getTrackedRace(identifierOfRegattaTrackedRace));
+        Assertions.assertNull(destService.getTrackedRace(identifierOfRegattaTrackedRace));
         // Assert that competitor details were overridden
         Competitor competitorOnTarget = destService.getBaseDomainFactory().getExistingCompetitorById(competitorUUID);
-        Assert.assertEquals(competitor.getName(), competitorOnTarget.getName());
-        Assert.assertEquals(competitor.getColor(), competitorOnTarget.getColor());
+        Assertions.assertEquals(competitor.getName(), competitorOnTarget.getName());
+        Assertions.assertEquals(competitor.getColor(), competitorOnTarget.getColor());
     }
 
     @Test
@@ -1590,10 +1590,10 @@ public class MasterDataImportTest {
                 .getResult();
 
         // ---Asserts---
-        Assert.assertNotNull(creationCount);
+        Assertions.assertNotNull(creationCount);
 
         // Check if existing event survived import
-        Assert.assertNotNull(destService.getRegattaByName(regatta.getName()));
+        Assertions.assertNotNull(destService.getRegattaByName(regatta.getName()));
 
     }
 
@@ -1722,23 +1722,23 @@ public class MasterDataImportTest {
 
         // ---Asserts---
 
-        Assert.assertNotNull(creationCount);
+        Assertions.assertNotNull(creationCount);
         Event eventOnTarget = destService.getEvent(eventUUID);
-        Assert.assertNotNull(eventOnTarget);
+        Assertions.assertNotNull(eventOnTarget);
 
         Regatta regattaOnTarget = destService.getRegattaByName(TEST_LEADERBOARD_NAME);
-        Assert.assertNotNull(regattaOnTarget);
+        Assertions.assertNotNull(regattaOnTarget);
 
         // Check if dummy race id has been imported to destination service
         ConcurrentHashMap<String, Regatta> map = destService.getPersistentRegattasForRaceIDs();
-        Assert.assertEquals(regattaOnTarget, map.get("dummy"));
-        Assert.assertEquals(regattaOnTarget, map.get("dummy2"));
+        Assertions.assertEquals(regattaOnTarget, map.get("dummy"));
+        Assertions.assertEquals(regattaOnTarget, map.get("dummy2"));
 
         // Check if persistent regatta for race id has been persisted
         RacingEventServiceImplMock destService2 = new RacingEventServiceImplMock(new DataImportProgressImpl(randomUUID)){};
         ConcurrentHashMap<String, Regatta> map2 = destService2.getPersistentRegattasForRaceIDs();
         Regatta regattaOnTarget2 = destService2.getRegattaByName(TEST_LEADERBOARD_NAME);
-        Assert.assertEquals(regattaOnTarget2, map2.get("dummy"));
+        Assertions.assertEquals(regattaOnTarget2, map2.get("dummy"));
 
     }
 
@@ -1825,19 +1825,19 @@ public class MasterDataImportTest {
 
         // ---Asserts---
 
-        Assert.assertNotNull(creationCount);
+        Assertions.assertNotNull(creationCount);
 
         Iterable<MediaTrack> targetTracks = destService.getAllMediaTracks();
 
-        Assert.assertEquals(1, Util.size(targetTracks));
+        Assertions.assertEquals(1, Util.size(targetTracks));
 
         MediaTrack trackOnTarget = targetTracks.iterator().next();
 
-        Assert.assertEquals(trackOnSource.dbId, trackOnTarget.dbId);
+        Assertions.assertEquals(trackOnSource.dbId, trackOnTarget.dbId);
 
-        Assert.assertEquals(trackOnSource.url, trackOnTarget.url);
+        Assertions.assertEquals(trackOnSource.url, trackOnTarget.url);
 
-        Assert.assertEquals(trackOnSource.assignedRaces, trackOnTarget.assignedRaces);
+        Assertions.assertEquals(trackOnSource.assignedRaces, trackOnTarget.assignedRaces);
 
     }
 
@@ -1946,20 +1946,20 @@ public class MasterDataImportTest {
                 .getResult();
 
         // Test correct number of creations
-        Assert.assertNotNull(creationCount);
-        Assert.assertEquals(1, creationCount.getEventCount());
-        Assert.assertEquals(1, creationCount.getRegattaCount());
-        Assert.assertEquals(1, creationCount.getLeaderboardCount());
-        Assert.assertEquals(2, creationCount.getLeaderboardGroupCount());
+        Assertions.assertNotNull(creationCount);
+        Assertions.assertEquals(1, creationCount.getEventCount());
+        Assertions.assertEquals(1, creationCount.getRegattaCount());
+        Assertions.assertEquals(1, creationCount.getLeaderboardCount());
+        Assertions.assertEquals(2, creationCount.getLeaderboardGroupCount());
 
         Event eventOnTarget = destService.getEvent(eventUUID);
-        Assert.assertNotNull(eventOnTarget);
+        Assertions.assertNotNull(eventOnTarget);
         LeaderboardGroup leaderboardGroupOnTarget = destService.getLeaderboardGroupByID(TEST_GROUP_UUID);
-        Assert.assertNotNull(leaderboardGroupOnTarget);
-        Assert.assertTrue(leaderboardGroupOnTarget.getLeaderboards().iterator().hasNext());
+        Assertions.assertNotNull(leaderboardGroupOnTarget);
+        Assertions.assertTrue(leaderboardGroupOnTarget.getLeaderboards().iterator().hasNext());
         LeaderboardGroup leaderboardGroup2OnTarget = destService.getLeaderboardGroupByID(TEST_GROUP_UUID2);
-        Assert.assertNotNull(leaderboardGroup2OnTarget);
-        Assert.assertTrue(leaderboardGroup2OnTarget.getLeaderboards().iterator().hasNext());
+        Assertions.assertNotNull(leaderboardGroup2OnTarget);
+        Assertions.assertTrue(leaderboardGroup2OnTarget.getLeaderboards().iterator().hasNext());
 
     }
 
@@ -2012,52 +2012,52 @@ public class MasterDataImportTest {
                 .getResult();
 
         // Test correct number of creations
-        Assert.assertEquals(1, creationCount.getLeaderboardGroupCount());
+        Assertions.assertEquals(1, creationCount.getLeaderboardGroupCount());
 
         LeaderboardGroup leaderboardGroupOnTarget = destService.getLeaderboardGroupByID(TEST_GROUP_UUID);
-        Assert.assertNotNull(leaderboardGroupOnTarget);
+        Assertions.assertNotNull(leaderboardGroupOnTarget);
         LeaderboardGroupMetaLeaderboard overallLeaderboard = (LeaderboardGroupMetaLeaderboard) leaderboardGroupOnTarget
                 .getOverallLeaderboard();
-        Assert.assertNotNull(overallLeaderboard);
+        Assertions.assertNotNull(overallLeaderboard);
         Leaderboard overallLeaderboardRetrievedByName = destService.getLeaderboardByName(overallLeaderboard.getName());
         assertSame(overallLeaderboard, overallLeaderboardRetrievedByName);
 
-        Assert.assertNotNull(overallLeaderboard.getResultDiscardingRule());
+        Assertions.assertNotNull(overallLeaderboard.getResultDiscardingRule());
 
-        Assert.assertNotNull(overallLeaderboard.getScoringScheme());
+        Assertions.assertNotNull(overallLeaderboard.getScoringScheme());
 
-        Assert.assertEquals(scheme.getType(), overallLeaderboard.getScoringScheme().getType());
+        Assertions.assertEquals(scheme.getType(), overallLeaderboard.getScoringScheme().getType());
 
-        Assert.assertEquals(3, ((ThresholdBasedResultDiscardingRule) overallLeaderboard.getResultDiscardingRule())
+        Assertions.assertEquals(3, ((ThresholdBasedResultDiscardingRule) overallLeaderboard.getResultDiscardingRule())
                 .getDiscardIndexResultsStartingWithHowManyRaces()[2]);
 
         Iterable<RaceColumn> metaColumns = overallLeaderboard.getRaceColumns();
 
         RaceColumn metaColumn = metaColumns.iterator().next();
-        Assert.assertNotNull(metaColumn);
-        Assert.assertEquals(factor, overallLeaderboard.getScoringScheme().getScoreFactor(metaColumn), 0.0000001);
+        Assertions.assertNotNull(metaColumn);
+        Assertions.assertEquals(factor, overallLeaderboard.getScoringScheme().getScoreFactor(metaColumn), 0.0000001);
 
         // Verify that overall leaderboard data has been persisted
         RacingEventService persistenceVerifier = new RacingEventServiceImplMock(){};
         LeaderboardGroup lg = persistenceVerifier.getLeaderboardGroupByID(TEST_GROUP_UUID);
-        Assert.assertNotNull(lg);
+        Assertions.assertNotNull(lg);
         overallLeaderboard = (LeaderboardGroupMetaLeaderboard) lg.getOverallLeaderboard();
-        Assert.assertNotNull(overallLeaderboard);
+        Assertions.assertNotNull(overallLeaderboard);
 
-        Assert.assertNotNull(overallLeaderboard.getResultDiscardingRule());
+        Assertions.assertNotNull(overallLeaderboard.getResultDiscardingRule());
 
-        Assert.assertNotNull(overallLeaderboard.getScoringScheme());
+        Assertions.assertNotNull(overallLeaderboard.getScoringScheme());
 
-        Assert.assertEquals(scheme.getType(), overallLeaderboard.getScoringScheme().getType());
+        Assertions.assertEquals(scheme.getType(), overallLeaderboard.getScoringScheme().getType());
 
-        Assert.assertEquals(3, ((ThresholdBasedResultDiscardingRule) overallLeaderboard.getResultDiscardingRule())
+        Assertions.assertEquals(3, ((ThresholdBasedResultDiscardingRule) overallLeaderboard.getResultDiscardingRule())
                 .getDiscardIndexResultsStartingWithHowManyRaces()[2]);
 
         metaColumns = overallLeaderboard.getRaceColumns();
 
         metaColumn = metaColumns.iterator().next();
-        Assert.assertNotNull(metaColumn);
-        Assert.assertEquals(factor, overallLeaderboard.getScoringScheme().getScoreFactor(metaColumn), 0.0000001);
+        Assertions.assertNotNull(metaColumn);
+        Assertions.assertEquals(factor, overallLeaderboard.getScoringScheme().getScoreFactor(metaColumn), 0.0000001);
 
     }
 
@@ -2197,16 +2197,16 @@ public class MasterDataImportTest {
         MasterDataImportObjectCreationCount creationCount = destService.getDataImportLock().getProgress(randomUUID)
                 .getResult();
 
-        Assert.assertNotNull(creationCount);
+        Assertions.assertNotNull(creationCount);
         LeaderboardGroup leaderboardGroupOnTarget = destService.getLeaderboardGroupByID(TEST_GROUP_UUID);
-        Assert.assertNotNull(leaderboardGroupOnTarget);
+        Assertions.assertNotNull(leaderboardGroupOnTarget);
         Leaderboard leaderboardOnTarget = destService.getLeaderboardByName(flexLeaderboardName);
-        Assert.assertNotNull(leaderboardOnTarget);
+        Assertions.assertNotNull(leaderboardOnTarget);
 
         RaceColumn raceColumnOnTarget = leaderboardOnTarget.getRaceColumns().iterator().next();
         Fleet defaultFleetOnTarget = raceColumnOnTarget.getFleets().iterator().next();
-        Assert.assertNotNull(raceColumnOnTarget);
-        Assert.assertNull(raceColumnOnTarget.getTrackedRace(defaultFleetOnTarget));
+        Assertions.assertNotNull(raceColumnOnTarget);
+        Assertions.assertNull(raceColumnOnTarget.getTrackedRace(defaultFleetOnTarget));
 
         Regatta regattaOnTarget = destService.createRegatta(
                 RegattaImpl.getDefaultName(TEST_REGATTA_NAME, TEST_BOAT_CLASS_NAME), TEST_BOAT_CLASS_NAME,
@@ -2219,46 +2219,46 @@ public class MasterDataImportTest {
         raceColumnOnTarget.setTrackedRace(defaultFleetOnTarget, new DummyTrackedRace(raceId, createCompetitorsAndBoatsMap(boatClass, competitors),
                 regattaOnTarget, null, sourceService.getWindStore()));
 
-        Assert.assertTrue(leaderboardOnTarget.getScoreCorrection().hasCorrectionFor(raceColumnOnTarget));
+        Assertions.assertTrue(leaderboardOnTarget.getScoreCorrection().hasCorrectionFor(raceColumnOnTarget));
         Competitor competitorOnTarget = domainFactory.getExistingCompetitorById(competitorUUID);
         Set<Competitor> competitorsCreatedOnTarget = new HashSet<>();
         competitorsCreatedOnTarget.add(competitorOnTarget);
 
-        Assert.assertEquals(defaultFleetOnTarget, leaderboardOnTarget.getFleet(null));
+        Assertions.assertEquals(defaultFleetOnTarget, leaderboardOnTarget.getFleet(null));
         TrackedRace trackedRaceForTarget = new DummyTrackedRace(raceId, createCompetitorsAndBoatsMap(boatClass, competitorsCreatedOnTarget), regattaOnTarget,
                 null, sourceService.getWindStore());
 
         raceColumnOnTarget.setTrackedRace(defaultFleetOnTarget, trackedRaceForTarget);
 
-        Assert.assertEquals(factor, leaderboardOnTarget.getScoringScheme().getScoreFactor(raceColumnOnTarget), 0.0000001);
+        Assertions.assertEquals(factor, leaderboardOnTarget.getScoringScheme().getScoreFactor(raceColumnOnTarget), 0.0000001);
 
         // Check for score corrections
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 scoreCorrection,
                 leaderboardOnTarget.getScoreCorrection().getExplicitScoreCorrection(competitorOnTarget,
                         raceColumnOnTarget), 0.0000001);
-        Assert.assertEquals(maxPointsReason, leaderboardOnTarget.getScoreCorrection()
+        Assertions.assertEquals(maxPointsReason, leaderboardOnTarget.getScoreCorrection()
                 .getMaxPointsReason(competitorOnTarget, raceColumnOnTarget, MillisecondsTimePoint.now()));
 
         // Check for carried points
-        Assert.assertEquals(carriedPoints, leaderboardOnTarget.getCarriedPoints(competitorOnTarget), 0.0000001);
+        Assertions.assertEquals(carriedPoints, leaderboardOnTarget.getCarriedPoints(competitorOnTarget), 0.0000001);
 
         // Check for suppressed competitor
-        Assert.assertTrue(leaderboardOnTarget.getSuppressedCompetitors().iterator().hasNext());
+        Assertions.assertTrue(leaderboardOnTarget.getSuppressedCompetitors().iterator().hasNext());
         Competitor suppressedCompetitorOnTarget = domainFactory.getCompetitorAndBoatStore().getExistingCompetitorById(
                 competitorToSuppressUUID);
-        Assert.assertEquals(suppressedCompetitorOnTarget, leaderboardOnTarget.getSuppressedCompetitors().iterator()
+        Assertions.assertEquals(suppressedCompetitorOnTarget, leaderboardOnTarget.getSuppressedCompetitors().iterator()
                 .next());
 
         // Check for competitor display name
-        Assert.assertEquals(nickName, leaderboardOnTarget.getDisplayName(suppressedCompetitorOnTarget));
+        Assertions.assertEquals(nickName, leaderboardOnTarget.getDisplayName(suppressedCompetitorOnTarget));
 
         // Check for race log event
-        Assert.assertNotNull(raceColumnOnTarget.getRaceLog(defaultFleetOnTarget).getFirstRawFixAtOrAfter(logTimePoint));
-        Assert.assertEquals(logEvent.getId(), raceColumnOnTarget.getRaceLog(defaultFleetOnTarget)
+        Assertions.assertNotNull(raceColumnOnTarget.getRaceLog(defaultFleetOnTarget).getFirstRawFixAtOrAfter(logTimePoint));
+        Assertions.assertEquals(logEvent.getId(), raceColumnOnTarget.getRaceLog(defaultFleetOnTarget)
                 .getFirstRawFixAtOrAfter(logTimePoint).getId());
-        Assert.assertNotNull(raceColumnOnTarget.getRaceLog(defaultFleetOnTarget).getFirstFixAtOrAfter(logTimePoint2));
-        Assert.assertEquals(wind, ((RaceLogWindFixEvent) raceColumnOnTarget.getRaceLog(defaultFleetOnTarget)
+        Assertions.assertNotNull(raceColumnOnTarget.getRaceLog(defaultFleetOnTarget).getFirstFixAtOrAfter(logTimePoint2));
+        Assertions.assertEquals(wind, ((RaceLogWindFixEvent) raceColumnOnTarget.getRaceLog(defaultFleetOnTarget)
                 .getFirstFixAtOrAfter(logTimePoint2)).getWindFix());
 
         // Check for persisting of race log events:
@@ -2266,7 +2266,7 @@ public class MasterDataImportTest {
         Leaderboard lb2 = dest2.getLeaderboardByName(flexLeaderboardName);
         RaceColumn raceColumn2 = lb2.getRaceColumns().iterator().next();
         RaceLog raceLog2 = raceColumn2.getRaceLog(raceColumn2.getFleets().iterator().next());
-        Assert.assertEquals(logEvent.getId(), raceLog2.getFirstRawFixAtOrAfter(logTimePoint).getId());
+        Assertions.assertEquals(logEvent.getId(), raceLog2.getFirstRawFixAtOrAfter(logTimePoint).getId());
     }
 
 }

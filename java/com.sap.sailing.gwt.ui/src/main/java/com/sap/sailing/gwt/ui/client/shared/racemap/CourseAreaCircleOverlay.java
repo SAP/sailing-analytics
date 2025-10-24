@@ -38,10 +38,10 @@ public class CourseAreaCircleOverlay extends CanvasOverlayV3 {
     
     @Override
     protected void draw() {
-        if (mapProjection != null && courseArea != null && getPosition() != null && courseArea.getRadius() != null) {
+        if (getMapProjection() != null && courseArea != null && getPosition() != null && courseArea.getRadius() != null) {
             getCanvas().setTitle(getTitle());
             // calculate canvas size
-            final double courseAreaRadiusInPixel = calculateRadiusOfBoundingBoxInPixels(mapProjection, courseArea.getCenterPosition(), courseArea.getRadius());
+            final double courseAreaRadiusInPixel = calculateRadiusOfBoundingBoxInPixels(getMapProjection(), courseArea.getCenterPosition(), courseArea.getRadius());
             final int canvasEdgeLength = 2*(int) courseAreaRadiusInPixel + (int) DEFAULT_COURSE_AREA_CIRCLE_LINE_WIDTH;
             if (canvasEdgeLength >= 2<<12 || canvasEdgeLength*canvasEdgeLength > 1<<26) {
                 GWT.log("Course area circle canvas for "+courseArea.getName()+" would get too large ("+
@@ -68,7 +68,7 @@ public class CourseAreaCircleOverlay extends CanvasOverlayV3 {
                 context2d.setTextAlign(TextAlign.CENTER);
                 context2d.setFont("16px arial");
                 context2d.fillText(courseArea.getName(), courseAreaRadiusInPixel+ (int) DEFAULT_COURSE_AREA_CIRCLE_LINE_WIDTH/2, courseAreaRadiusInPixel+ (int) DEFAULT_COURSE_AREA_CIRCLE_LINE_WIDTH/2+2*CENTER_CROSS_SIZE_IN_PIXELS);
-                Point courseAreaPositionInPx = mapProjection.fromLatLngToDivPixel(coordinateSystem.toLatLng(getPosition()));
+                Point courseAreaPositionInPx = getMapProjection().fromLatLngToDivPixel(coordinateSystem.toLatLng(getPosition()));
                 setCanvasPosition(courseAreaPositionInPx.getX() - courseAreaRadiusInPixel, courseAreaPositionInPx.getY() - courseAreaRadiusInPixel);
             }
         }

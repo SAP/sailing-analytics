@@ -75,7 +75,7 @@ public abstract class BoatOverlay extends CanvasOverlayV3 {
     }
 
     private Size getCorrelatedBoatSize(Distance hullLength, Distance hullBeam) {
-        Size boatSizeInPixel = calculateBoundingBox(mapProjection, boatFix.position, hullLength, hullBeam);
+        Size boatSizeInPixel = calculateBoundingBox(getMapProjection(), boatFix.position, hullLength, hullBeam);
         changeBoatSizeIfTooShortHull(boatSizeInPixel, hullLength, hullBeam);
         changeBoatSizeIfTooNarrowBeam(boatSizeInPixel, hullLength, hullBeam);
         return boatSizeInPixel;

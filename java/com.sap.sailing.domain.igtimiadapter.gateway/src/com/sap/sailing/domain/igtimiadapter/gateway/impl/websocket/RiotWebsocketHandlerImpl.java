@@ -172,6 +172,6 @@ public class RiotWebsocketHandlerImpl implements RiotWebsocketHandler {
         return "Riot web socket for session from "+
                 (session==null?"unknown target ":session.getRemote())+
                 ", subcribed to devices "+getDeviceSerialNumbers()+
-                " and with authenticated user "+getAuthenticatedUser();
+                " and with authenticated user "+(getAuthenticatedUser()==null?"null":getAuthenticatedUser().getName());
     }
 }

@@ -1,9 +1,9 @@
 package com.sap.sailing.domain.queclinkadapter.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,8 +11,8 @@ import java.io.Reader;
 import java.text.ParseException;
 import java.util.regex.Matcher;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.impl.DegreePosition;
@@ -30,7 +30,7 @@ public class TestQueclinkMessageParser {
     private static final double EPSILON = 0.00000001;
     private MessageParser messageParser;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.messageParser = MessageParser.create();
     }
@@ -71,7 +71,7 @@ public class TestQueclinkMessageParser {
         final TimePoint now = TimePoint.now();
         final Message ackHBD = new HBDAcknowledgementImpl(MessageParserImpl.parseProtocolVersionHex("301303"), MessageParserImpl.parseCountNumberHex("033E"), "860599004785994", null, now);
         final Matcher matcher = MessageParserImpl.messagePattern.matcher(ackHBD.getMessageString());
-        assertTrue("Pattern "+MessageParserImpl.messagePattern.toString()+" doesn't match "+ackHBD.getMessageString(), matcher.matches());
+        assertTrue(matcher.matches(), "Pattern "+MessageParserImpl.messagePattern.toString()+" doesn't match "+ackHBD.getMessageString());
         assertEquals("+ACK:", matcher.group(1));
         assertEquals("HBD", matcher.group(8));
         assertEquals("301303,860599004785994,,"+MessageParserImpl.formatAsYYYYMMDDHHMMSS(now)+",033E", matcher.group(9));
@@ -81,7 +81,7 @@ public class TestQueclinkMessageParser {
     public void simplePatternTestForSACKHeartbeatMessage() {
         final Message sackHBD = new HBDServerAcknowledgementImpl(MessageParserImpl.parseProtocolVersionHex("301303"), MessageParserImpl.parseCountNumberHex("033E"));
         final Matcher matcher = MessageParserImpl.messagePattern.matcher(sackHBD.getMessageString());
-        assertTrue("Pattern "+MessageParserImpl.messagePattern.toString()+" doesn't match "+sackHBD.getMessageString(), matcher.matches());
+        assertTrue(matcher.matches(), "Pattern "+MessageParserImpl.messagePattern.toString()+" doesn't match "+sackHBD.getMessageString());
         assertEquals("+SACK:", matcher.group(1));
         assertEquals("HBD", matcher.group(8));
         assertEquals("301303,033E", matcher.group(9));
@@ -91,7 +91,7 @@ public class TestQueclinkMessageParser {
     public void simplePatternTestForBasicSACKMessage() {
         final String sackMessage = "+SACK:11F0$";
         final Matcher matcher = MessageParserImpl.messagePattern.matcher(sackMessage);
-        assertTrue("Pattern "+MessageParserImpl.messagePattern.toString()+" doesn't match "+sackMessage, matcher.matches());
+        assertTrue(matcher.matches(), "Pattern "+MessageParserImpl.messagePattern.toString()+" doesn't match "+sackMessage);
         assertEquals("+SACK:", matcher.group(1));
         assertEquals(null, matcher.group(8));
         assertEquals("11F0", matcher.group(9));

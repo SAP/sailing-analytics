@@ -1,5 +1,10 @@
 package com.sap.sailing.media.persistence.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.List;
@@ -7,7 +12,7 @@ import java.util.Set;
 
 import org.bson.types.ObjectId;
 import org.hamcrest.core.Is;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.mongodb.MongoException;
 import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
@@ -20,10 +25,6 @@ import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.MillisecondsDurationImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.common.media.MimeType;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.*;
 
 public class MediaDBTest extends AbstractMongoDBTest {
 
@@ -69,34 +70,36 @@ public class MediaDBTest extends AbstractMongoDBTest {
         assertThat(videoTrack.title, Is.is(videoTitle));
     }
     
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testCreateVideoTrackWithNullId() {
-        final String dbId = null;
-        final String videoTitle = "Test Video";
-        final String url = "http://localhost:8888/media/HTML5/1809147112001_1842870496001_SAP-Regatta-Day02-Final_libtheora.ogv";
-        MediaDB mongoDB = MediaDBFactory.INSTANCE.getMediaDB(getMongoService());
-        TimePoint startTime = MillisecondsTimePoint.now();
-        Duration duration = MillisecondsDurationImpl.ONE_HOUR;
-        MimeType mimeType = MimeType.ogv;
-        Set<RegattaAndRaceIdentifier> assignedRaces = new HashSet<RegattaAndRaceIdentifier>();
-        assignedRaces.add(new RegattaNameAndRaceName("49er", "R1"));
-        mongoDB.insertMediaTrackWithId(dbId, videoTitle, url, startTime, duration, mimeType, assignedRaces);
-
+        assertThrows(IllegalArgumentException.class, () -> {
+            final String dbId = null;
+            final String videoTitle = "Test Video";
+            final String url = "http://localhost:8888/media/HTML5/1809147112001_1842870496001_SAP-Regatta-Day02-Final_libtheora.ogv";
+            MediaDB mongoDB = MediaDBFactory.INSTANCE.getMediaDB(getMongoService());
+            TimePoint startTime = MillisecondsTimePoint.now();
+            Duration duration = MillisecondsDurationImpl.ONE_HOUR;
+            MimeType mimeType = MimeType.ogv;
+            Set<RegattaAndRaceIdentifier> assignedRaces = new HashSet<RegattaAndRaceIdentifier>();
+            assignedRaces.add(new RegattaNameAndRaceName("49er", "R1"));
+            mongoDB.insertMediaTrackWithId(dbId, videoTitle, url, startTime, duration, mimeType, assignedRaces);
+        });
     }
     
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testCreateVideoTrackWithExistingId() {
-        final String videoTitle = "Test Video";
-        final String url = "http://localhost:8888/media/HTML5/1809147112001_1842870496001_SAP-Regatta-Day02-Final_libtheora.ogv";
-        MediaDB mongoDB = MediaDBFactory.INSTANCE.getMediaDB(getMongoService());
-        TimePoint startTime = MillisecondsTimePoint.now();
-        Duration duration = MillisecondsDurationImpl.ONE_HOUR;
-        MimeType mimeType = MimeType.ogv;
-        Set<RegattaAndRaceIdentifier> assignedRaces = new HashSet<RegattaAndRaceIdentifier>();
-        assignedRaces.add(new RegattaNameAndRaceName("49er", "R1"));
-        String dbId = mongoDB.insertMediaTrack(videoTitle, url, startTime, duration, mimeType, assignedRaces);
-        mongoDB.insertMediaTrackWithId(dbId, videoTitle, url, startTime, duration, mimeType, assignedRaces);
-
+        assertThrows(IllegalArgumentException.class, () -> {
+            final String videoTitle = "Test Video";
+            final String url = "http://localhost:8888/media/HTML5/1809147112001_1842870496001_SAP-Regatta-Day02-Final_libtheora.ogv";
+            MediaDB mongoDB = MediaDBFactory.INSTANCE.getMediaDB(getMongoService());
+            TimePoint startTime = MillisecondsTimePoint.now();
+            Duration duration = MillisecondsDurationImpl.ONE_HOUR;
+            MimeType mimeType = MimeType.ogv;
+            Set<RegattaAndRaceIdentifier> assignedRaces = new HashSet<RegattaAndRaceIdentifier>();
+            assignedRaces.add(new RegattaNameAndRaceName("49er", "R1"));
+            String dbId = mongoDB.insertMediaTrack(videoTitle, url, startTime, duration, mimeType, assignedRaces);
+            mongoDB.insertMediaTrackWithId(dbId, videoTitle, url, startTime, duration, mimeType, assignedRaces);
+        });
     }
     
 //    @Test

@@ -10,17 +10,13 @@ public abstract class AbstractChooseNameDenoteEventDialog<T> extends DataEntryDi
     
     public AbstractChooseNameDenoteEventDialog(String title, StringMessages stringMessages,
             Validator<T> validator, DialogCallback<T> callback) {
-        
         super(title, null, stringMessages.ok(), stringMessages.cancel(), validator, callback);
         this.stringMessages = stringMessages;
-        
     }
     
     @Override
     protected Widget getAdditionalWidget() {
-        final VerticalPanel panel = new VerticalPanel();
-        
-        return panel;
+        return new VerticalPanel();
     }
 
     @Override

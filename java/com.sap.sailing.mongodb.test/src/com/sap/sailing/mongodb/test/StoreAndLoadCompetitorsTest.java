@@ -1,7 +1,7 @@
 package com.sap.sailing.mongodb.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -12,8 +12,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.mongodb.MongoException;
 import com.mongodb.WriteConcern;
@@ -68,7 +68,7 @@ public class StoreAndLoadCompetitorsTest extends AbstractMongoDBTest {
         super();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         // clear the domainFactory competitor store for a clean start:
         domainFactory = new DomainFactoryImpl(DomainFactory.TEST_RACE_LOG_RESOLVER);

@@ -1,19 +1,19 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.Bounds;
 import com.sap.sailing.domain.common.Position;
@@ -46,13 +46,13 @@ public class QuadTreeTest {
     private static MeasurementXMLFile performanceReport;
     private static MeasurementCase performanceReportCase;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpMeasurement() {
         performanceReport = new MeasurementXMLFile(QuadTreeTest.class);
         performanceReportCase = performanceReport.addCase(QuadTreeTest.class.getSimpleName());
     }
     
-    @Before
+    @BeforeEach
     public void setUp() {
         quadtree = new GLatLngQuadTree(new DegreePosition(49,
                 7), new DegreePosition(51, 9), /* maxItems */30);
@@ -1215,7 +1215,7 @@ public class QuadTreeTest {
             synchronized(qt) {
                 qt.notifyAll();
             }
-            assertNull("NullPointerException "+(npe[0]==null?"":npe[0].getMessage())+" during iteration "+i, npe[0]);
+            assertNull(npe[0], "NullPointerException "+(npe[0]==null?"":npe[0].getMessage())+" during iteration "+i);
         }
         stop[0] = true;
     }
@@ -1364,7 +1364,7 @@ public class QuadTreeTest {
         assertEquals(expectedDistance, node.getDistance(p), 0.0001);
     }
     
-    @AfterClass
+    @AfterAll
     public static void writeMeasurements() throws IOException {
         performanceReport.write();
     }

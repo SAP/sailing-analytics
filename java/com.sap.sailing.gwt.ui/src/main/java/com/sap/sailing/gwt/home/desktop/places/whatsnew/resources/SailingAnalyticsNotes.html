@@ -5,6 +5,49 @@
 <div id="mainContent">
     <h4 class="articleHeadline">What's New - SAP Sailing Analytics</h4>
       <div class="innerContent">
+         <h5 class="articleSubheadline">October 2025</h5>
+         <ul class="bulletList">
+            <li>Bug fix: the "Edit Mark Passings" panel showed only up to 15 waypoints.</li>
+            <li>Competitors not assigned to any fleet will no longer be sorted in between a Gold
+                and a Silver fleet but will end up "at the bottom" of the leaderboard.</li>
+            <li>Bug fix: when a split-fleet series had results only entered manually as score
+                corrections, the progress bars for the series were not shown properly. All
+                fleets would be considered finished although some may not have seen results.</li>
+         </ul>
+         <h5 class="articleSubheadline">September 2025</h5>
+         <ul class="bulletList">
+            <li>Added CSV export for polar data histograms in Data Mining.</li>
+         </ul>
+         <h5 class="articleSubheadline">June 2025</h5>
+         <ul class="bulletList">
+            <li>Bug fix: the refresh interval in the Races/Tracking list ran into an overflow when races
+                were scheduled more than 25 days in the future, leading to "flickering" Tracking buttons
+                and excessive re-loading activity.</li>
+         </ul>
+         <h5 class="articleSubheadline">April 2025</h5>
+         <ul class="bulletList">
+           <li>Users can now file take-down requests for media assets displayed on the web site. This includes
+               event stage/logo/teaser/gallery images and videos, as well as competitor images and competitor flags.
+               For all these assets, a little semi-transparent three-dots button is displayed in the top-left
+               corner of the image/video tile. When you are logged-in, with a validated e-mail address, click the
+               three-dot button, and a popup dialog allows you to provide additional input and then submit the
+               take-down request, which will lead to an e-mail being sent to support@sapsailing.com.</li>
+         </ul>
+         <h5 class="articleSubheadline">April 2025</h5>
+         <ul class="bulletList">
+            <li>When viewing the map in wind-up (instead of north-up) orientation, we now use the "VECTOR"
+                Google Maps rendering type instead of "magically" mapping the race course to the middle of
+                the Atlantic and virtually turning the coordinate system such that the wind seems to blow
+                from the north. This way, as you zoom out from the race course you can still see the
+                race in its original environment, particularly if it's an inshore or near-shore event.<p>
+                In case your browser does not support VECTOR-based maps display, the previous "magical"
+                wind-up implementation continues to be used. This can, e.g., be necessary when you run
+                a browser inside a virtual environment, such as a VNC server or a Citrix client, or if
+                your browser or graphics drivers don't support WebGL2.
+                </li>
+            <li>The wind ladder now shows reliably when switched on in the map settings. Note that the time
+                slider needs to be at a time after the race start for the ladder to be shown.</li>
+         </ul>
          <h5 class="articleSubheadline">March 2025</h5>
          <ul class="bulletList">
             <li>A new AI Agent based on <a href="https://help.sap.com/docs/sap-ai-core/sap-ai-core-service-guide/what-is-sap-ai-core">SAP AI Core</a>

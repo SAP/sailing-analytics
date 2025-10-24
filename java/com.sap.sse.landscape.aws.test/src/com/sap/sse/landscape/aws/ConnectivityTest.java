@@ -1,11 +1,11 @@
 package com.sap.sse.landscape.aws;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -23,9 +23,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
@@ -87,7 +87,7 @@ import software.amazon.awssdk.services.sts.model.Credentials;
  * @author Axel Uhl (D043530)
  *
  */
-@Ignore("Needs AWS key ID, key secret and session token in system properties")
+@Disabled("Needs AWS key ID, key secret and session token in system properties")
 public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, SailingAnalyticsMetrics, ProcessT>> {
     private static final Logger logger = Logger.getLogger(ConnectivityTest.class.getName());
     private static final Optional<Duration> optionalTimeout = Optional.of(Duration.ONE_MINUTE.times(10));
@@ -98,7 +98,7 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
     private static final String AXELS_KEY_NAME = "Axel_ed25519";
     private static final String pathPrefixForShardingKey = "/sse/landscape/test";
     
-    @BeforeClass
+    @BeforeAll
     public static void setUp() {
         if (System.getProperty(AwsLandscape.SESSION_TOKEN_SYSTEM_PROPERTY_NAME) != null) {
             landscape = AwsLandscape.obtain(
@@ -514,7 +514,7 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
                             .conditions(r -> r.field("host-header").hostHeaderConfig(hhc -> hhc.values(hostnameCondition)))
                             .actions(a -> a.type(ActionTypeEnum.FIXED_RESPONSE).fixedResponseConfig(frc -> frc.statusCode("200").messageBody("Hello world"))).build());
             assertEquals(1, Util.size(rulesCreated));
-            assertTrue(hostnameCondition, rulesCreated.iterator().next().conditions().iterator().next().hostHeaderConfig().values().contains(hostnameCondition));
+            assertTrue(rulesCreated.iterator().next().conditions().iterator().next().hostHeaderConfig().values().contains(hostnameCondition), hostnameCondition);
         } finally {
             alb.delete();
         }

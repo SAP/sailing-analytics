@@ -18,13 +18,14 @@ import com.sap.sailing.gwt.home.desktop.partials.sharing.EventHeaderSharingButto
 import com.sap.sailing.gwt.home.desktop.places.event.regatta.overviewtab.RegattaOverviewPlace;
 import com.sap.sailing.gwt.home.desktop.places.fakeseries.SeriesView;
 import com.sap.sailing.gwt.home.desktop.places.fakeseries.SeriesView.Presenter;
-import com.sap.sailing.gwt.home.shared.SharedHomeResources;
 import com.sap.sailing.gwt.home.shared.app.PlaceNavigation;
 import com.sap.sailing.gwt.home.shared.partials.shared.SharingMetadataProvider;
 import com.sap.sailing.gwt.home.shared.places.ShareablePlaceContext;
 import com.sap.sailing.gwt.home.shared.utils.LabelTypeUtil;
+import com.sap.sailing.gwt.home.shared.utils.LogoUtil;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sse.gwt.client.LinkUtil;
+import com.sap.sse.gwt.client.media.MediaMenuIcon;
 
 public class SeriesHeader extends Composite {
     private static SeriesHeaderUiBinder uiBinder = GWT.create(SeriesHeaderUiBinder.class);
@@ -35,6 +36,7 @@ public class SeriesHeader extends Composite {
     @UiField StringMessages i18n;
     
     @UiField DivElement eventLogo;
+    @UiField(provided=true) MediaMenuIcon seriesLogoMenuButton;
     @UiField SpanElement eventName;
     @UiField DivElement eventState;
     @UiField FlowPanel venues;
@@ -48,6 +50,7 @@ public class SeriesHeader extends Composite {
         this.series = presenter.getSeriesDTO();
         this.presenter = presenter;
         SeriesHeaderResources.INSTANCE.css().ensureInjected();
+        seriesLogoMenuButton = new MediaMenuIcon(presenter.getUserService(), "takedownRequestForLogoImage");
         initWidget(uiBinder.createAndBindUi(this));
         initFields();
         initSharing();
@@ -68,10 +71,7 @@ public class SeriesHeader extends Composite {
     }
 
     private void initFields() {
-        String logoUrl = series.getLogoImage() != null ? series.getLogoImage().getSourceRef() :
-                SharedHomeResources.INSTANCE.defaultEventLogoImage().getSafeUri().asString();
-        eventLogo.getStyle().setBackgroundImage("url(" + logoUrl + ")");
-        eventLogo.setTitle(series.getDisplayName());
+        LogoUtil.setEventLogo(eventLogo, series, seriesLogoMenuButton);
         eventName.setInnerText(series.getDisplayName());
         LabelTypeUtil.renderLabelType(eventState, series.getState().getStateMarker());
         

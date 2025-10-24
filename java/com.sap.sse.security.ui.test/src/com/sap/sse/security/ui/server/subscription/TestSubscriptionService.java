@@ -6,9 +6,9 @@ import static org.mockito.Mockito.when;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.subscription.SailingSubscriptionPlan;
 import com.sap.sse.common.TimePoint;
@@ -31,7 +31,7 @@ public class TestSubscriptionService {
     private Subscription dataMiningAllYearlySubscription;
     private SubscriptionServiceImpl serviceImpl;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         user = mock(User.class);
         premiumYearlySubscription = new ChargebeeSubscription("subscriptionId1", premiumYearly.getId(), "customerId",
@@ -76,7 +76,7 @@ public class TestSubscriptionService {
         when(user.getSubscriptions())
                 .thenReturn(Stream.of(new Subscription[] { premiumYearlySubscription }).collect(Collectors.toList()));
         boolean result = serviceImpl.isNewPlanCompletelyIncludedInCurrentPlan(user, dataMiningArchiveYearly);
-        Assert.assertFalse(result);
+        Assertions.assertFalse(result);
     }
 
     @Test
@@ -84,7 +84,7 @@ public class TestSubscriptionService {
         when(user.getSubscriptions()).thenReturn(
                 Stream.of(new Subscription[] { dataMiningArchiveYearlySubscription }).collect(Collectors.toList()));
         boolean result = serviceImpl.isNewPlanCompletelyIncludedInCurrentPlan(user, premiumYearly);
-        Assert.assertTrue(result);
+        Assertions.assertTrue(result);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class TestSubscriptionService {
         when(user.getSubscriptions()).thenReturn(
                 Stream.of(new Subscription[] { dataMiningArchiveYearlySubscription }).collect(Collectors.toList()));
         boolean result = serviceImpl.isNewPlanCompletelyIncludedInCurrentPlan(user, dataMiningAllYearly);
-        Assert.assertFalse(result);
+        Assertions.assertFalse(result);
     }
 
     @Test
@@ -100,7 +100,7 @@ public class TestSubscriptionService {
         when(user.getSubscriptions()).thenReturn(
                 Stream.of(new Subscription[] { dataMiningAllYearlySubscription }).collect(Collectors.toList()));
         boolean result = serviceImpl.isNewPlanCompletelyIncludedInCurrentPlan(user, premiumYearly);
-        Assert.assertTrue(result);
+        Assertions.assertTrue(result);
     }
 
 }

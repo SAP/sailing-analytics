@@ -31,7 +31,7 @@ public class RegattaLeaderboardWithOtherTieBreakingLeaderboardCreateDialog exten
                 adjustVisibilityOfResultDiscardingRuleComponent();
             }
         });
-        otherTieBreakingLeaderboardsListBox = createSortedRegattaLeaderboardsListBox(existingLeaderboards, null);
+        otherTieBreakingLeaderboardsListBox = createSortedRegattaLeaderboardsListBox(existingLeaderboards, null, stringMessages, this);
         otherTieBreakingLeaderboardsListBox.ensureDebugId("OtherTieBreakingLeaderboardsListBox");
         discardThresholdBoxes = new DiscardThresholdBoxes(this, stringMessages);
     }

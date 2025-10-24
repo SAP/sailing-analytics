@@ -61,7 +61,7 @@ public class PathLegendCanvasOverlay extends FullCanvasOverlay {
 
     @Override
     protected void draw() {
-        if (mapProjection != null && pathOverlays != null && pathOverlays.size() > 0) {
+        if (getMapProjection() != null && pathOverlays != null && pathOverlays.size() > 0) {
             boolean containsPolyline = false;
             for (PathCanvasOverlay overlay : this.pathOverlays) {
                 if (overlay.getName().equals(PathPolyline.END_USER_NAME)) {

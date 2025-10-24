@@ -590,7 +590,7 @@ public interface SailingServiceAsync extends RemoteReplicationServiceAsync {
 
     /**
      * Obtains the {@link ImpliedWindSource} set in the race log identified by the triple {@code leaderboardName},
-     * {@code raceColumnName}, and {@code fleetName}. Note that other than in the ORC Performance Curve ranking metric
+     * {@code raceColumnName}, and {@code fleetName}. Note that other than in the ORC Polar Curve ranking metric
      * no defaulting takes place here, and {@code null} is a possible result that indicates that either no race log
      * event was found that set an implied wind source, or that event explicitly set the implied wind source to {@code null}
      * (which will have the ranking metric default to {@link OwnMaxImpliedWind}, eventually).

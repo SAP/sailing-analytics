@@ -19,7 +19,6 @@ public class PreRaceCompetitorsPresenterImpl extends AutoPlayPresenterConfigured
         super(place, clientFactory);
         this.view = slide4ViewImpl;
         selectionScroll = new Timer() {
-
             @Override
             public void run() {
                 view.move();
@@ -31,7 +30,7 @@ public class PreRaceCompetitorsPresenterImpl extends AutoPlayPresenterConfigured
     public void startConfigured(AcceptsOneWidget panel) {
         view.startingWith(this, panel);
         List<CompetitorWithBoatDTO> data = null;
-        view.setCompetitors(data);
+        view.setCompetitors(data, getClientFactory().getUserService());
         selectionScroll.scheduleRepeating(DELAY_NEXT);
     }
 }

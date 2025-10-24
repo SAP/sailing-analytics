@@ -3,6 +3,7 @@ package com.sap.sailing.gwt.autoplay.client.places.screens.afterliveraceloop.boa
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.sap.sailing.domain.common.DetailType;
@@ -23,9 +24,12 @@ import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.gwt.ui.leaderboard.LeaderboardEntryPoint;
 import com.sap.sailing.gwt.ui.leaderboard.SingleRaceLeaderboardPanel;
 import com.sap.sailing.gwt.ui.leaderboard.SixtyInchLeaderboardStyle;
+import com.sap.sailing.gwt.ui.shared.StrippedLeaderboardDTO;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
 import com.sap.sse.gwt.client.ErrorReporter;
+import com.sap.sse.gwt.client.Notification;
+import com.sap.sse.gwt.client.Notification.NotificationType;
 import com.sap.sse.gwt.client.async.AsyncActionsExecutor;
 import com.sap.sse.gwt.client.player.Timer;
 import com.sap.sse.gwt.client.player.Timer.PlayModes;
@@ -49,51 +53,57 @@ public class RaceEndWithBoatsPresenterImpl extends AutoPlayPresenterConfigured<A
 
     @Override
     public void startConfigured(AcceptsOneWidget panel) {
-        SailingServiceAsync sailingService = getClientFactory().getSailingService();
-        ErrorReporter errorReporter = getClientFactory().getErrorReporter();
+        final SailingServiceAsync sailingService = getClientFactory().getSailingService();
+        final ErrorReporter errorReporter = getClientFactory().getErrorReporter();
         view.startingWith(this, panel);
-        RegattaAndRaceIdentifier liveRace = getPlace().getLastRace();
+        final RegattaAndRaceIdentifier liveRace = getPlace().getLastRace();
         if (liveRace == null) {
             panel.setWidget(new Label("No raceIdentifier specified"));
             return;
         }
         getEventBus().fireEvent(new AutoPlayHeaderEvent(getSlideCtx().getContextDefinition().getLeaderboardName(),
                 getPlace().getLastRace().getRaceName()));
-        SecurityChildSettingsContext context = new SecurityChildSettingsContext(leaderboardPanel.getLeaderboard(), 
-                new PaywallResolverImpl(getClientFactory().getUserService(), 
-                        getClientFactory().getSubscriptionServiceFactory()));
-        final SingleRaceLeaderboardSettings leaderboardSettings = new SingleRaceLeaderboardSettings(
-                /* maneuverDetailsToShow */ null, /* legDetailsToShow */ null, /* raceDetailsToShow */ null,
-                /* overallDetailsToShow */ null, /* delayBetweenAutoAdvancesInMilliseconds */ null,
-                /* showAddedScores */ false, /* showCompetitorShortNameColumn */ true,
-                /* showCompetitorFullNameColumn */ false, /* isCompetitorNationalityColumnVisible */ false,
-                /* showCompetitorBoatInfoColumn */ false, /* showRaceRankColumn */ true, context);
-        competitorSelectionProvider = new RaceCompetitorSelectionModel(/* hasMultiSelection */ false);
-        timer = new com.sap.sse.gwt.client.player.Timer(PlayModes.Live,
-                PlayStates.Paused,
-                /* delayBetweenAutoAdvancesInMilliseconds */ LeaderboardEntryPoint.DEFAULT_REFRESH_INTERVAL_MILLIS);
-        leaderboardPanel = new SingleRaceLeaderboardPanel(null, null, sailingService, new AsyncActionsExecutor(), leaderboardSettings,
-                false, liveRace, competitorSelectionProvider, timer, null,
-                getSlideCtx().getContextDefinition().getLeaderboardName(), errorReporter, StringMessages.INSTANCE, 
-                false, null, false, null, false, true, false, false, false, new SixtyInchLeaderboardStyle(true),
-                FlagImageResolverImpl.get(), Arrays.asList(DetailType.values()), getClientFactory());
-        int competitorCount = getPlace().getStatistic().getCompetitors();
-        Distance distance  = getPlace().getStatistic().getDistance();
-        Duration duration = getPlace().getStatistic().getDuration();
-        
-        view.setStatistic(competitorCount,distance,duration);
-        
-        view.setLeaderBoard(leaderboardPanel);
-        leaderboardPanel.addLeaderboardUpdateListener(new LeaderboardUpdateListener() {
-            
+        sailingService.getLeaderboardWithSecurity(getSlideCtx().getContextDefinition().getLeaderboardName(), new AsyncCallback<StrippedLeaderboardDTO>() {
             @Override
-            public void updatedLeaderboard(LeaderboardDTO leaderboard) {
-                determinePlacement(liveRace);
+            public void onSuccess(StrippedLeaderboardDTO leaderboardAsSecurityDTO) {
+                SecurityChildSettingsContext context = new SecurityChildSettingsContext(leaderboardAsSecurityDTO,
+                        new PaywallResolverImpl(getClientFactory().getUserService(), 
+                                getClientFactory().getSubscriptionServiceFactory()));
+                final SingleRaceLeaderboardSettings leaderboardSettings = new SingleRaceLeaderboardSettings(
+                        /* maneuverDetailsToShow */ null, /* legDetailsToShow */ null, /* raceDetailsToShow */ null,
+                        /* overallDetailsToShow */ null, /* delayBetweenAutoAdvancesInMilliseconds */ null,
+                        /* showAddedScores */ false, /* showCompetitorShortNameColumn */ true,
+                        /* showCompetitorFullNameColumn */ false, /* isCompetitorNationalityColumnVisible */ false,
+                        /* showCompetitorBoatInfoColumn */ false, /* showRaceRankColumn */ true, context);
+                competitorSelectionProvider = new RaceCompetitorSelectionModel(/* hasMultiSelection */ false);
+                timer = new com.sap.sse.gwt.client.player.Timer(PlayModes.Live,
+                        PlayStates.Paused,
+                        /* delayBetweenAutoAdvancesInMilliseconds */ LeaderboardEntryPoint.DEFAULT_REFRESH_INTERVAL_MILLIS);
+                leaderboardPanel = new SingleRaceLeaderboardPanel(null, null, sailingService, new AsyncActionsExecutor(), leaderboardSettings,
+                        false, liveRace, competitorSelectionProvider, timer, null,
+                        getSlideCtx().getContextDefinition().getLeaderboardName(), errorReporter, StringMessages.INSTANCE, 
+                        false, null, false, null, false, true, false, false, false, new SixtyInchLeaderboardStyle(true),
+                        FlagImageResolverImpl.get(), Arrays.asList(DetailType.values()), getClientFactory());
+                int competitorCount = getPlace().getStatistic().getCompetitors();
+                Distance distance  = getPlace().getStatistic().getDistance();
+                Duration duration = getPlace().getStatistic().getDuration();
+                view.setStatistic(competitorCount,distance,duration);
+                view.setLeaderBoard(leaderboardPanel);
+                leaderboardPanel.addLeaderboardUpdateListener(new LeaderboardUpdateListener() {
+                    @Override
+                    public void updatedLeaderboard(LeaderboardDTO leaderboard) {
+                        determinePlacement(liveRace);
+                    }
+                    
+                    @Override
+                    public void currentRaceSelected(RaceIdentifier raceIdentifier, RaceColumnDTO raceColumn) {
+                    }
+                });
             }
             
             @Override
-            public void currentRaceSelected(RaceIdentifier raceIdentifier, RaceColumnDTO raceColumn) {
-                
+            public void onFailure(Throwable caught) {
+                Notification.notify(StringMessages.INSTANCE.errorLoadingLeaderboard(getSlideCtx().getContextDefinition().getLeaderboardName(), caught.getMessage()), NotificationType.ERROR);
             }
         });
     }

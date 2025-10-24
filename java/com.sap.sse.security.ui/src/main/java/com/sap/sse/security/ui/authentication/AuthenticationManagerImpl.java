@@ -127,6 +127,8 @@ public class AuthenticationManagerImpl implements AuthenticationManager {
                         if (caught instanceof UserManagementException) {
                             if (Util.hasLength(caught.getMessage()) && caught.getMessage().equals(USER_ALREADY_EXISTS)) {
                                 view.setErrorMessage(i18n.userAlreadyExists(name));
+                            } else if (Util.hasLength(caught.getMessage()) && caught.getMessage().equals(UserManagementException.CLIENT_CURRENTLY_LOCKED_FOR_USER_CREATION)) {
+                                view.setErrorMessage(i18n.clientCurrentlyLockedForUserCreation());
                             } else {
                                 Notification.notify(i18n.errorCreatingUser(name, caught.getMessage()==null?"":caught.getMessage()), NotificationType.ERROR);
                             }

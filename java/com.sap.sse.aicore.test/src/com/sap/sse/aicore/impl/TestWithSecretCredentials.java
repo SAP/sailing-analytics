@@ -1,9 +1,9 @@
 package com.sap.sse.aicore.impl;
 
-import static org.junit.Assert.assertNotNull;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.hamcrest.Matchers.lessThan;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -13,9 +13,9 @@ import java.util.Optional;
 import org.apache.http.client.ClientProtocolException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.aicore.AICore;
 import com.sap.sse.aicore.ChatSession;
@@ -24,12 +24,12 @@ import com.sap.sse.aicore.CredentialsParser;
 import com.sap.sse.aicore.Deployment;
 import com.sap.sse.common.Util;
 
-@Ignore("Requires system property sap.aicore.credentials to be set and contain a JSON credentials string; for format, see resources/sample_credentials.json")
+@Disabled("Requires system property sap.aicore.credentials to be set and contain a JSON credentials string; for format, see resources/sample_credentials.json")
 public class TestWithSecretCredentials {
     private Credentials credentials;
     private AICore aiCore;
 
-    @Before
+    @BeforeEach
     public void setUp() throws MalformedURLException, ParseException {
         final String credentialsJsonString = System.getProperty(AICore.CREDENTIALS_SYSTEM_PROPERTY_NAME);
         credentials = CredentialsParser.create().parse(credentialsJsonString);

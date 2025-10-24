@@ -15,9 +15,7 @@ public class YoutubePopupWindow extends AbstractPopupWindow {
     protected void initializePlayer() {
         String title = Window.Location.getParameter("title");
         Window.setTitle(title);
-
         RootLayoutPanel.get().getElement().setId(VIDEO_CONTAINER_ID);
-
         String videoUrl = Window.Location.getParameter("id");
         if (videoUrl != null) {
             loadYoutube(videoUrl, VIDEO_CONTAINER_ID);
@@ -28,9 +26,7 @@ public class YoutubePopupWindow extends AbstractPopupWindow {
     // See also: https://developers.google.com/youtube/js_api_reference
     // Code Playground: https://code.google.com/apis/ajax/playground/?exp=youtube#chromeless_player
     private native void loadYoutube(String videoUrl, String videoContainerId) /*-{
-        
 		var that = this;
-
 		// This function creates an <iframe> containing a YouTube player after the API code downloads.
 		var player;
 		$wnd.onYouTubeIframeAPIReady = function() {
@@ -53,13 +49,11 @@ public class YoutubePopupWindow extends AbstractPopupWindow {
 			});
 			that.@com.sap.sailing.gwt.ui.client.media.popup.YoutubePopupWindow::setYoutubePlayer(Lcom/google/gwt/core/client/JavaScriptObject;)(player);
 		}
-
                 // Use script tag trick to cope with browser's cross domain restrictions
                 var tag = $doc.createElement('script');
                 tag.src = "//www.youtube.com/iframe_api"; // This is a protocol-relative URL as described here: http://paulirish.com/2010/the-protocol-relative-url/
                 var firstScriptTag = $doc.getElementsByTagName('script')[0];
                 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
     }-*/;
 
     public void setYoutubePlayer(JavaScriptObject youtubePlayer) {
@@ -136,5 +130,4 @@ public class YoutubePopupWindow extends AbstractPopupWindow {
     protected void setVideoSize(int width, int height) {
         RootPanel.get(VIDEO_CONTAINER_ID).setPixelSize(width, height);
     }
-
 }

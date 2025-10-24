@@ -1,6 +1,6 @@
 package com.sap.sailing.domain.igtimiadapter.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,8 +15,8 @@ import java.util.logging.Logger;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.simple.parser.ParseException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.igtimi.IgtimiStream.Msg;
 import com.sap.sailing.domain.igtimiadapter.FixFactory;
@@ -45,12 +45,14 @@ public class TestRiotServer {
 
         @Override
         public void onMessage(Msg message) {
-            Util.addAll(new FixFactory().createFixes(message), fixes);
-            
+            final Iterable<Fix> newFixes = new FixFactory().createFixes(message);
+            synchronized (this) {
+                Util.addAll(newFixes, fixes);
+            }
         }
     }
     
-    @Before
+    @BeforeEach
     public void setUp() throws ClientProtocolException, IllegalStateException, IOException, ParseException {
         final SecurityService mockSecurityService = SecurityServiceMockFactory.mockSecurityService();
         Activator.getInstance().setSecurityService(mockSecurityService);
@@ -61,7 +63,7 @@ public class TestRiotServer {
         final MongoDBConfiguration mongoTestConfig = MongoDBConfiguration.getDefaultTestConfiguration();
         final MongoDBService mongoTestService = mongoTestConfig.getService();
         final RiotServer riot = RiotServer.create(PersistenceFactory.INSTANCE.getDomainObjectFactory(mongoTestService),
-                PersistenceFactory.INSTANCE.getMongoObjectFactory(mongoTestService));
+                PersistenceFactory.INSTANCE.getMongoObjectFactory(mongoTestService), /* OSGi Bundle Context */ null);
         final TestListener listener = new TestListener();
         riot.addListener(listener);
         try (final Socket socket = new Socket("localhost", riot.getPort())) {
@@ -87,7 +89,9 @@ public class TestRiotServer {
                     logger.log(Level.SEVERE, "Exception trying to read from test Riot server", ioe);
                 }
             }).start();
-            Wait.wait(()->Util.size(listener.getAllFixesReceived()) >= 218, /* timeout */ Optional.of(Duration.ONE_MINUTE), /* sleepBetweenAttempts */ Duration.ONE_SECOND);
+            Wait.wait(()->Util.size(listener.getAllFixesReceived()) >= 218, /* timeout */ Optional.of(Duration.ONE_MINUTE),
+                    /* sleepBetweenAttempts */ Duration.ONE_SECOND,
+                    Level.WARNING, "218 expected fixes; received "+Util.size(listener.getAllFixesReceived())+" so far");
             finished[0] = true;
             riot.stop();
             is.close();

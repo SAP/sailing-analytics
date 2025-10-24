@@ -1,6 +1,6 @@
 package com.sap.sailing.gwt.home.communication.regatta;
 
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
+import com.sap.sse.gwt.shared.DTO;
 
 public class RegattaProgressFleetDTO implements DTO {
     private int raceCount;

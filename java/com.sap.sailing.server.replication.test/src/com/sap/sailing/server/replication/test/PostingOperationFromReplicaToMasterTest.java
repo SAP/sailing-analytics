@@ -1,15 +1,14 @@
 package com.sap.sailing.server.replication.test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.Timeout;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import com.sap.sailing.domain.base.CompetitorAndBoatStore;
 import com.sap.sailing.domain.base.CourseArea;
@@ -28,9 +27,8 @@ import com.sap.sailing.server.operationaltransformation.UpdateBoat;
  * @author Frank Mittag
  * 
  */
+@Timeout(value = 30, unit = TimeUnit.SECONDS)
 public class PostingOperationFromReplicaToMasterTest extends AbstractServerReplicationTest {
-    @Rule public Timeout timeout = new Timeout(30, TimeUnit.SECONDS);
-    
     /**
      * Add a tracked race to the master that includes a competitor; check that the boat was properly replicated to
      * the replica's {@link CompetitorAndBoatStore}. Afterwards, use the {@link UpdateBoat} operation on the master to

@@ -42,7 +42,6 @@ public class HomePlacesNavigator extends AbstractPlaceNavigator {
         return createGlobalPlaceNavigation(new EventsPlace());
     }
     
-
     public PlaceNavigation<MoreLoginInformationPlace> getMoreLoginInfo() {
         return createGlobalPlaceNavigation(new MoreLoginInformationPlace());
     }

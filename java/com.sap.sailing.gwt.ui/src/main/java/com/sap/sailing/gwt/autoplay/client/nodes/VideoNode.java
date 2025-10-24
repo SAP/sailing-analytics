@@ -26,9 +26,8 @@ public class VideoNode extends FiresPlaceNode {
 
     @Override
     public void onStart() {
-        EventDTO event = cf.getAutoPlayCtxSignalError().getEvent();
-
-        List<VideoDTO> videos = event.getVideos().stream().filter(v -> v.hasTag(MediaTagConstants.BIGSCREEN.getName()))
+        final EventDTO event = cf.getAutoPlayCtxSignalError().getEvent();
+        final List<VideoDTO> videos = event.getVideos().stream().filter(v -> v.hasTag(MediaTagConstants.BIGSCREEN.getName()))
                 .collect(Collectors.toList());
         if (videos.size() == 0) {
             lastPlayed = -1;
@@ -42,9 +41,7 @@ public class VideoNode extends FiresPlaceNode {
             });
             return;
         }
-
         int nextVideo = lastPlayed + 1;
-
         if (nextVideo > videos.size() - 1) {
             nextVideo = 0;
         }

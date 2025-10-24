@@ -19,7 +19,7 @@
 
 - The ``refreshInstance.sh`` script contains around eight references to ``releases.sapsailing.com``. Some of these are about where to download releases from and shall be replaced by logic that obtains those releases from Github. The others are concerned with environments, as referenced by the ``USE_ENVIRONMENT`` variable and are currently expected to be found under ``https://releases.sapsailing.com/environments`` which is just a static share on our central reverse proxy. If that is configured for a different domain then so has the refreshInstance.sh script.
 
-- Igtimi Authentication: the Igtimi REST API and authentication scheme uses a callback URL that we have configured on the igtimi.com web site, pointing to sapsailing.com.
+- Igtimi Riot Server: we run the Riot server environment as an application replica set named ``wind`` under ``wind.sapsailing.com`` which is then used as a default for new servers in landscape automation
 
 - Google Maps API is SAP provided in our current production environment, and a different API token/key is required once SAP stops its support.
 
@@ -30,3 +30,5 @@
 - MongoDB references and rabbit references, or any other private IP references in route53. Such references can in particular be found in the ``environments/`` folder on ``releases.sapsailing.com`` for the default parameterization of certain application process types, such as ``security-service-master`` or ``archive-server``.
 
 - branch.io is used for "deep linking" for the apps. We have an integration with our Route53 hosted zone "sapsailing.com" for the specific domain names, allowing smart payload transfer through from-scratch installations, e.g., from a QR code. The branch.io account would need to be transferred and would need to have the configuration changed; or a new account would be required. The apps' deep linking capabilities are expressed in their manifests, and hence the apps would need to be adjusted to work with a different domain.
+
+- App hosting, at least for Race Manager and Buoy Pinger apps, currently runs through the SAP SE PlayStore account. If someone else was to build and deploy these apps under their own Google PlayStore account, this would affect the deep linking and QR code generation, see above on the branch.io ramifications.

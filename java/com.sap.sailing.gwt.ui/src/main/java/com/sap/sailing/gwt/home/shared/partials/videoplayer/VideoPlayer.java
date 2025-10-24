@@ -8,6 +8,7 @@ import com.sap.sailing.gwt.home.desktop.partials.mainmedia.MainMedia.MutualExclu
 import com.sap.sailing.gwt.ui.client.media.PauseEvent;
 import com.sap.sailing.gwt.ui.client.media.PlayEvent;
 import com.sap.sailing.gwt.ui.client.media.VideoJSPlayer;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 import com.sap.sse.gwt.client.media.VideoDTO;
 
 /**
@@ -20,21 +21,23 @@ public class VideoPlayer extends Composite {
     private final PlayButton playButton = new PlayButton();
     
     private boolean initialized = false;
+    private final String eventName;
     
-    public VideoPlayer() {
-        this(true, false);
+    public VideoPlayer(TakedownNoticeService takedownNoticeService, String eventName) {
+        this(true, false, takedownNoticeService, eventName);
     }
     
-    public VideoPlayer(MutualExclusionPlayHandler exclusionPlayer) {
-        this();
+    public VideoPlayer(MutualExclusionPlayHandler exclusionPlayer, TakedownNoticeService takedownNoticeService, String eventName) {
+        this(takedownNoticeService, eventName);
         exclusionPlayer.register(videoJSPlayer);
     }
     
-    public VideoPlayer(boolean fullHeightWidth, boolean autoplay) {
+    public VideoPlayer(boolean fullHeightWidth, boolean autoplay, TakedownNoticeService takedownNoticeService, String eventName) {
         style.ensureInjected();
+        this.eventName = eventName;
         panel = new FlowPanel();
         panel.addStyleName(style.videoPlayer());
-        videoJSPlayer = new VideoJSPlayer(fullHeightWidth, autoplay);
+        videoJSPlayer = new VideoJSPlayer(fullHeightWidth, autoplay, takedownNoticeService, "takedownRequestForEventGalleryVideo");
         videoJSPlayer.addPlayHandler(new PlayEvent.Handler() {
             @Override
             public void onStart(PlayEvent event) {
@@ -49,7 +52,6 @@ public class VideoPlayer extends Composite {
         });
         panel.add(videoJSPlayer);
         playButton.addDomHandler(new ClickHandler() {
-            
             @Override
             public void onClick(ClickEvent event) {
                 videoJSPlayer.play();
@@ -72,10 +74,10 @@ public class VideoPlayer extends Composite {
     }
 
     public void setVideo(VideoDTO video) {
-        if(!initialized) {
+        if (!initialized) {
             initialize();
         }
-        videoJSPlayer.setVideo(video.getMimeType(), video.getSourceRef());
+        videoJSPlayer.setVideo(video.getMimeType(), video.getSourceRef(), eventName);
     }
     
     public boolean isFullscreen() {

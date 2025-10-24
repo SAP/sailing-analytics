@@ -1,7 +1,7 @@
 package com.sap.sse.common.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -9,8 +9,8 @@ import static org.mockito.Mockito.verify;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.ColorMapper;
 import com.sap.sse.common.ColorMapper.ValueSpreader;
@@ -25,7 +25,7 @@ public class ColorMapperTest {
     Set<Integer> valueSet;
     Set<String> colorSet;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         valueRange = new ValueRangeFlexibleBoundaries(-5.0, 5.0, 0.0, 0.0);
         colorMapper = new ColorMapper(valueRange, false, ValueSpreader.LINEAR);

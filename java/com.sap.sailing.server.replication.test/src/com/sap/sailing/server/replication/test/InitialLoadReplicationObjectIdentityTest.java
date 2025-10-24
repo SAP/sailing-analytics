@@ -1,11 +1,11 @@
 package com.sap.sailing.server.replication.test;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -20,8 +20,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
@@ -114,7 +114,7 @@ public class InitialLoadReplicationObjectIdentityTest extends AbstractServerRepl
      * Drops the test DB. Sets up master and replica, starts the JMS message broker and registers the replica with the master.
      */
     @SuppressWarnings("unchecked")
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         persistenceSetUp(/* dropDB */ true);

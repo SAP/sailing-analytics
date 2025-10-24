@@ -69,6 +69,8 @@ import com.sap.sailing.domain.racelog.RaceLogAndTrackedRaceResolver;
 import com.sap.sailing.domain.racelog.tracking.SensorFixStore;
 import com.sap.sailing.domain.ranking.RankingMetric;
 import com.sap.sailing.domain.ranking.RankingMetric.RankingInfo;
+import com.sap.sailing.domain.shared.tracking.LineDetails;
+import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
 import com.sap.sailing.domain.tracking.impl.NonCachingMarkPositionAtTimePointCache;
 import com.sap.sailing.domain.tracking.impl.TrackedRaceImpl;
 import com.sap.sailing.domain.windestimation.IncrementalWindEstimation;
@@ -133,7 +135,7 @@ public interface TrackedRace
      * Tells how ranks are to be assigned to the competitors at any time during the race. For one-design boat classes
      * this will usually happen by projecting the competitors to the wind direction for upwind and downwind legs or to
      * the leg's rhumb line for reaching legs, then comparing positions. For handicap races using a time-on-time,
-     * time-on-distance, combination thereof or a more complicated scheme such as ORC Performance Curve, the ranking
+     * time-on-distance, combination thereof or a more complicated scheme such as ORC Polar Curve, the ranking
      * process needs to take into account the competitor-specific correction factors defined in the measurement
      * certificate.
      */
@@ -1416,7 +1418,7 @@ public interface TrackedRace
     }
 
     /**
-     * A so-called "implied wind" speed is determined in ORC Performance Curve Scoring (PCS) by inverting the
+     * A so-called "implied wind" speed is determined in ORC Polar Curve Scoring (PCS) by inverting the
      * performance curve functions of the competitors that maps a wind speed to the time allowance for a course that the
      * competitor gets for that wind speed. This way, a virtual wind speed can be calculated based on the time the
      * competitor actually took to complete that course.
@@ -1489,7 +1491,7 @@ public interface TrackedRace
     /**
      * Computes the {@code competitor}'s current boat speed's percentage of the target boat speed at time point
      * {@code timePoint}. For one-design classes with a one-design ranking metric, the {@link PolarDataService} is used
-     * to tell the target boat speed. For an ORC Performance Curve Scoring ranking metric we can assume that
+     * to tell the target boat speed. For an ORC Polar Curve Scoring ranking metric we can assume that
      * boat-specific measurement {@link ORCCertificate}s exist from which we can obtain a target boat speed for the
      * current conditions and point of sail.
      */

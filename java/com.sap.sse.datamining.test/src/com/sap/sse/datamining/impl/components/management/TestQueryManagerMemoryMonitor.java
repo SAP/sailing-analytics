@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.components.management.DataMiningQueryManager;
 import com.sap.sse.datamining.components.management.MemoryInfoProvider;
@@ -26,7 +26,7 @@ public class TestQueryManagerMemoryMonitor {
     
     private Test_MemoryInfoProvider infoProvider;
 
-    @Before
+    @BeforeEach
     public void initializeActionsAndInfoProvider() {
         veryLow = new Test_MemoryMonitorAction(0.9, 1l*1024*1024*1024);
         low = new Test_MemoryMonitorAction(0.8, 1l*1024*1024*1024);

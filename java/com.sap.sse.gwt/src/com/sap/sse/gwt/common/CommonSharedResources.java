@@ -29,7 +29,6 @@ public interface CommonSharedResources extends ClientBundle {
         String buttonprimary();
         String buttonprimaryoutlined();
         String buttonarrowrightwhite();
-        
         String mainsection();
         String mainsection_header();
         String mainsection_header_title();
@@ -38,6 +37,19 @@ public interface CommonSharedResources extends ClientBundle {
         String input_input();
         String input_inputerror();
         String input_errortext();
+        /**
+         * A CSS class used for a {@code div} element that represents a menu (three-dots)
+         * button displayed hovering over a media element. The media element may be a parent
+         * {@code div} with a background image, or a sibling {@code img} or {@code video} element,
+         * both enclosed by a parent {@code div} using the {@link #media_wrapper()} class.
+         */
+        String media_menu_icon();
+        /**
+         * A CSS class for a {@code div} wrapper element around a media element such as a {@code video} or {@code img} element,
+         * with a {@code div} sibling that uses the {@link #media_menu_icon()} class to display a hovering menu button on top
+         * of the media element.
+         */
+        String media_wrapper();
     }
 
     public interface CommonMediaCss extends CssResource {

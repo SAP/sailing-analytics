@@ -1,14 +1,14 @@
 package com.sap.sse.common.test;
 
 import static com.sap.sse.common.test.TimeTestHelpers.create;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.MultiTimeRange;
 import com.sap.sse.common.TimePoint;
@@ -22,10 +22,10 @@ public class TimeRangeTest {
         TimeRange outer = create(fromOuter, toOuter);
         TimeRange inner = create(fromInner, toInner);
         
-        Assert.assertTrue(inner.liesWithin(outer));
-        Assert.assertTrue(outer.includes(inner));
-        Assert.assertFalse(inner.includes(outer));
-        Assert.assertFalse(outer.liesWithin(inner));
+        Assertions.assertTrue(inner.liesWithin(outer));
+        Assertions.assertTrue(outer.includes(inner));
+        Assertions.assertFalse(inner.includes(outer));
+        Assertions.assertFalse(outer.liesWithin(inner));
     }
     
     @Test
@@ -38,11 +38,11 @@ public class TimeRangeTest {
     @Test
     public void includesTimePoint() {
         TimeRange range = create(0, 100);
-        Assert.assertTrue(range.includes(create(0)));
-        Assert.assertTrue(range.includes(create(1)));
-        Assert.assertTrue(range.includes(create(99)));
-        Assert.assertFalse(range.includes(create(100))); // exclusive end
-        Assert.assertFalse(range.includes(create(101)));
+        Assertions.assertTrue(range.includes(create(0)));
+        Assertions.assertTrue(range.includes(create(1)));
+        Assertions.assertTrue(range.includes(create(99)));
+        Assertions.assertFalse(range.includes(create(100))); // exclusive end
+        Assertions.assertFalse(range.includes(create(101)));
     }
     
     @Test
@@ -57,10 +57,10 @@ public class TimeRangeTest {
         TimeRange one = create(0, 50);
         TimeRange two = create(20, 70);
         
-        Assert.assertFalse(one.liesWithin(two));
-        Assert.assertFalse(two.liesWithin(one));
-        Assert.assertTrue(one.intersects(two));
-        Assert.assertTrue(two.intersects(one));
+        Assertions.assertFalse(one.liesWithin(two));
+        Assertions.assertFalse(two.liesWithin(one));
+        Assertions.assertTrue(one.intersects(two));
+        Assertions.assertTrue(two.intersects(one));
     }
     
     @Test
@@ -245,13 +245,13 @@ public class TimeRangeTest {
         TimeRange all = create(allFrom, allTo);
         TimeRange minuend = create(minuendFrom, minuendTo);
         MultiTimeRange diff = all.subtract(minuend);
-        assertEquals("Expected to obtain "+expected.length/2+" time ranges but got "+Util.size(diff), expected.length/2, Util.size(diff));
+        assertEquals(expected.length/2, Util.size(diff), "Expected to obtain "+expected.length/2+" time ranges but got "+Util.size(diff));
         int i=0;
         for (final TimeRange timeRangeFromDiff : diff) {
-            assertEquals("expected "+i+"-th time range's \"from\" time point with millis "+expected[2*i]+" but got "+timeRangeFromDiff.from().asMillis(),
-                    create(expected[2*i]), timeRangeFromDiff.from());
-            assertEquals("expected "+i+"-th time range's \"to\" time point with millis "+expected[2*i+1]+" but got "+timeRangeFromDiff.to().asMillis(),
-                    create(expected[2*i+1]), timeRangeFromDiff.to());
+            assertEquals(create(expected[2*i]),
+                    timeRangeFromDiff.from(), "expected "+i+"-th time range's \"from\" time point with millis "+expected[2*i]+" but got "+timeRangeFromDiff.from().asMillis());
+            assertEquals(create(expected[2*i+1]),
+                    timeRangeFromDiff.to(), "expected "+i+"-th time range's \"to\" time point with millis "+expected[2*i+1]+" but got "+timeRangeFromDiff.to().asMillis());
             i++;
         }
     }

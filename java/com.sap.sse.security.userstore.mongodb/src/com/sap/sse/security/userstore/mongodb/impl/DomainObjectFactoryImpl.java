@@ -380,17 +380,23 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
     private Role loadRoleWithProxyUserQualifier(Document rolesO, Map<UUID, RoleDefinition> roleDefinitionsById,
             Map<UUID, UserGroup> userGroups) {
         final RoleDefinition roleDefinition = roleDefinitionsById.get(rolesO.get(FieldNames.Role.ID.name()));
-       
         final Role result;
         if (roleDefinition == null) {
             result = null;
         } else {
             final UUID qualifyingTenantId = (UUID) rolesO.get(FieldNames.Role.QUALIFYING_TENANT_ID.name());
-            final UserGroup qualifyingTenant = qualifyingTenantId == null ? null : userGroups.get(qualifyingTenantId);
-            final User proxyQualifyingUser = rolesO.get(FieldNames.Role.QUALIFYING_USERNAME.name()) == null ? null
-                    : new UserProxy((String) rolesO.get(FieldNames.Role.QUALIFYING_USERNAME.name()));
-            final boolean transitive = rolesO.getBoolean(FieldNames.Role.TRANSITIVE.name(), true);
-            result = new Role(roleDefinition, qualifyingTenant, proxyQualifyingUser, transitive);
+            UserGroup qualifyingGroup = null;
+            if (qualifyingTenantId != null && (qualifyingGroup = userGroups.get(qualifyingTenantId)) == null) {
+                logger.severe("Unable to resolve tenant with ID "+qualifyingTenantId+
+                        " which serves as a role qualifier for role "+roleDefinition.getName()+
+                        "; dropping role");
+                result = null;
+            } else {
+                final User proxyQualifyingUser = rolesO.get(FieldNames.Role.QUALIFYING_USERNAME.name()) == null ? null
+                        : new UserProxy((String) rolesO.get(FieldNames.Role.QUALIFYING_USERNAME.name())); // if user proxy later cannot be resolved, role will be dropped
+                final boolean transitive = rolesO.getBoolean(FieldNames.Role.TRANSITIVE.name(), true);
+                result = new Role(roleDefinition, qualifyingGroup, proxyQualifyingUser, transitive);
+            }
         }
         return result;
     }

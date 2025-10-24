@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.igtimiadapter.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +9,8 @@ import java.util.List;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.sap.sailing.domain.igtimiadapter.FixFactory;
@@ -24,7 +24,7 @@ import com.sap.sse.common.Util;
 public class FixFactoryTest {
     private FixFactory fixFactory;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         fixFactory = new FixFactory();
     }

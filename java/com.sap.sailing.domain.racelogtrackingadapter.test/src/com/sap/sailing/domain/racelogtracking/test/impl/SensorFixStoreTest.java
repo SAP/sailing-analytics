@@ -1,6 +1,6 @@
 package com.sap.sailing.domain.racelogtracking.test.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,11 +8,11 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.mongodb.ReadConcern;
@@ -51,12 +51,12 @@ public class SensorFixStoreTest {
     protected SensorFixStore store;
     private static ClientSession clientSession;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         clientSession = MongoDBService.INSTANCE.startCausallyConsistentSession();
     }
     
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         dropPersistedData();
         newStore();
@@ -68,7 +68,7 @@ public class SensorFixStoreTest {
                 WriteConcern.MAJORITY, clientSession, clientSession);
     }
 
-    @After
+    @AfterEach
     public void after() throws Exception {
         store.getNumberOfFixes(device); // wait until all metadata updates have completed;
         // this shall avoid that pending updates are written to the metadata collection after
@@ -155,14 +155,14 @@ public class SensorFixStoreTest {
         // validate between 0 and 1 (inclusive)
         Double last = 0.0;
         for (Double progress : progressData) {
-            Assert.assertTrue(progress <= 1);
-            Assert.assertTrue(progress >= 0);
-            Assert.assertTrue(progress >= last);
+            Assertions.assertTrue(progress <= 1);
+            Assertions.assertTrue(progress >= 0);
+            Assertions.assertTrue(progress >= last);
             last = progress;
         }
         //validate that 0-100 updates do exist
-        Assert.assertFalse(progressData.isEmpty());
-        Assert.assertTrue(progressData.size() <= 100);
+        Assertions.assertFalse(progressData.isEmpty());
+        Assertions.assertTrue(progressData.size() <= 100);
     }
 
     @Test

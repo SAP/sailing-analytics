@@ -24,9 +24,9 @@ public class WindLadderOverlay extends FullCanvasOverlay {
 
     protected WindLadder windLadder;
 
-    protected ImageTileGenerator tileGen = new ImageTileGenerator(RESOURCES.windLadderTexture());
+    protected ImageTileGenerator tileGen = new ImageTileGenerator(RESOURCES.windLadderTexture(), ()->{ redraw(); draw(); });
 
-    protected Double windBearing;
+    protected Double windBearingRadians;
     protected Position fixPosition;
 
     protected Double drawnPatternSize;
@@ -36,34 +36,37 @@ public class WindLadderOverlay extends FullCanvasOverlay {
 
     protected boolean redraw = true;
     protected int transitionDisableCountdown;
+    private final String name;
 
-    public WindLadderOverlay(WindLadder windLadder, MapWidget map, int zIndex, CoordinateSystem coordinateSystem) {
+    public WindLadderOverlay(WindLadder windLadder, MapWidget map, int zIndex, CoordinateSystem coordinateSystem, String name) {
         super(map, zIndex, coordinateSystem);
         this.map.addZoomChangeHandler(event -> this.onZoomChange());
         this.windLadder = windLadder;
+        getCanvas().getElement().setId("wind-ladder-display-"+name);
+        this.name = name;
     }
 
-    public boolean update(Double windBearing, Position fixPosition, long timeForPositionTransitionMillis) {
-        return this.update(windBearing, fixPosition, timeForPositionTransitionMillis, false);
+    public boolean update(Double windBearingRadians, Position fixPosition, long timeForPositionTransitionMillis) {
+        return this.update(windBearingRadians, fixPosition, timeForPositionTransitionMillis, false);
     }
 
     /**
      * @return {@code true} if this canvas can perform the requested update
      */
-    public boolean update(Double windBearing, Position fixPosition, long timeForPositionTransitionMillis, boolean redraw) {
+    public boolean update(Double windBearingRadians, Position fixPosition, long timeForPositionTransitionMillis, boolean redraw) {
         boolean canAnimate = true;
-        if (windBearing != null) {
-            this.windBearing = windBearing;
+        if (windBearingRadians != null) {
+            this.windBearingRadians = windBearingRadians;
         }
         if (fixPosition != null ) {
             this.fixPosition = fixPosition;
         }
-        if (mapProjection != null && this.windBearing != null && this.fixPosition != null && tileGen.getReady()) {
+        if (getMapProjection() != null && this.windBearingRadians != null && this.fixPosition != null && tileGen.getReady()) {
             // Rotation
-            updateDrawingAngleAndSetCanvasRotation(Math.toDegrees(this.windBearing));
+            updateDrawingAngleAndSetCanvasRotation(Math.toDegrees(this.windBearingRadians));
             // Offset from centered position
-            Point fixPointInMap = mapProjection.fromLatLngToDivPixel(coordinateSystem.toLatLng(this.fixPosition));
-            Point windUnitVector = Point.newInstance(-Math.sin(-this.windBearing), -Math.cos(-this.windBearing));
+            Point fixPointInMap = getMapProjection().fromLatLngToDivPixel(coordinateSystem.toLatLng(this.fixPosition));
+            Point windUnitVector = Point.newInstance(-Math.sin(-this.windBearingRadians), -Math.cos(-this.windBearingRadians));
             // Dot product of the two vectors above
             final double fixPointWindwardDistance = fixPointInMap.getX() * windUnitVector.getX() + fixPointInMap.getY() * windUnitVector.getY();
             final double fixPointWindwardDistanceChange = fixPointWindwardDistance - previousFixPointWindwardDistance;
@@ -78,14 +81,16 @@ public class WindLadderOverlay extends FullCanvasOverlay {
             }
             previousOnAxisOffset = onAxisOffset;
             Point offsetVector = Point.newInstance(onAxisOffset * windUnitVector.getX(), onAxisOffset * windUnitVector.getY());
-            canAnimate = isInBounds(this.windBearing, offsetVector);
+            canAnimate = isInBounds(this.windBearingRadians, offsetVector);
             setCanvasPosition(getWidgetPosLeft() + offsetVector.getX(), getWidgetPosTop() + offsetVector.getY());
             if (transitionDisableCountdown > 0) {
                 transitionDisableCountdown -= 1;
             } else {
                 updateTransition(timeForPositionTransitionMillis);
             }
-            if (redraw) redraw();
+            if (redraw) {
+                redraw();
+            }
             draw();
         }
         return canAnimate;
@@ -129,9 +134,9 @@ public class WindLadderOverlay extends FullCanvasOverlay {
     }
 
     private double calculatePatternScale(int patternSize) {
-        Position pos1 = coordinateSystem.getPosition(mapProjection.fromDivPixelToLatLng(Point.newInstance(0, 0)));
+        Position pos1 = coordinateSystem.getPosition(getMapProjection().fromDivPixelToLatLng(Point.newInstance(0, 0)));
         Position pos2 = coordinateSystem
-                .getPosition(mapProjection.fromDivPixelToLatLng(Point.newInstance(patternSize, 0)));
+                .getPosition(getMapProjection().fromDivPixelToLatLng(Point.newInstance(patternSize, 0)));
         final double patternSizeMeters = pos1.getDistance(pos2).getMeters();
         //final double pixelsPerMeter = patternSize / patternSizeMeters;
         //TODO Use multiple of boat size instead?
@@ -168,22 +173,20 @@ public class WindLadderOverlay extends FullCanvasOverlay {
         int size = Math.max(mapWidth, mapHeight);
         int reserve = (int) (size * CANVAS_RESERVE);
         int sizeWithReserve = size + reserve;
-
         canvas.setWidth(String.valueOf(sizeWithReserve));
         canvas.setHeight(String.valueOf(sizeWithReserve));
         canvas.setCoordinateSpaceWidth(sizeWithReserve);
         canvas.setCoordinateSpaceHeight(sizeWithReserve);
-
         int widthReserve = sizeWithReserve - mapWidth;
         int heightReserve = sizeWithReserve - mapHeight;
-
-        Point sw = mapProjection.fromLatLngToDivPixel(getMap().getBounds().getSouthWest());
-        Point ne = mapProjection.fromLatLngToDivPixel(getMap().getBounds().getNorthEast());
-        setWidgetPosLeft(Math.min(sw.getX(), ne.getX()) - widthReserve / 2);
-        setWidgetPosTop(Math.min(sw.getY(), ne.getY()) - heightReserve / 2);
-
-        setCanvasPosition(getWidgetPosLeft(), getWidgetPosTop());
-        updateDrawingAngleAndSetCanvasRotation(0.0);
+        if (getMapProjection() != null) {
+            final Point upperLeftCorner = getMapProjection().fromLatLngToDivPixel(getMapProjection().fromContainerPixelToLatLng(Point.newInstance(0, 0)));
+            setWidgetPosLeft(Math.round(upperLeftCorner.getX()) - widthReserve / 2);
+            setWidgetPosTop(Math.round(upperLeftCorner.getY()) - heightReserve / 2);
+            setCanvasPosition(getWidgetPosLeft(), getWidgetPosTop());
+        }
+        updateDrawingAngleAndSetCanvasRotation(windBearingRadians==null?0.0:Math.toDegrees(windBearingRadians));
+        redraw();
     }
 
     /**
@@ -227,8 +230,8 @@ public class WindLadderOverlay extends FullCanvasOverlay {
 
     @Override
     protected void drawCenterChanged() {
+        windLadder.swap();
         update(null, null, -1);
-        windLadder.forceSwap();
     }
 
     protected void onZoomChange() {
@@ -258,5 +261,10 @@ public class WindLadderOverlay extends FullCanvasOverlay {
             mapHeight = getMap().getDiv().getClientHeight();
         }
         return mapHeight;
+    }
+    
+    @Override
+    public String toString() {
+        return super.toString()+" "+name;
     }
 }

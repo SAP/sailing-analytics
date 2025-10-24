@@ -10,7 +10,6 @@ import com.sap.sailing.gwt.home.communication.event.GetRegattaStatisticsAction;
 import com.sap.sailing.gwt.home.communication.event.eventoverview.GetEventOverviewStageAction;
 import com.sap.sailing.gwt.home.communication.event.news.GetEventOverviewNewsAction;
 import com.sap.sailing.gwt.home.communication.event.statistics.GetEventStatisticsAction;
-import com.sap.sailing.gwt.home.communication.media.SailingImageDTO;
 import com.sap.sailing.gwt.home.mobile.partials.eventdescription.EventDescription;
 import com.sap.sailing.gwt.home.mobile.partials.impressions.Impressions;
 import com.sap.sailing.gwt.home.mobile.partials.statisticsBox.MobileStatisticsBoxView;
@@ -18,7 +17,7 @@ import com.sap.sailing.gwt.home.mobile.partials.updatesBox.UpdatesBox;
 import com.sap.sailing.gwt.home.mobile.places.event.AbstractEventView;
 import com.sap.sailing.gwt.home.mobile.places.event.EventViewBase;
 import com.sap.sailing.gwt.home.shared.partials.statistics.EventStatisticsBox;
-import com.sap.sse.gwt.client.media.ImageDTO;
+import com.sap.sailing.gwt.ui.shared.SailingImageDTO;
 
 public abstract class AbstractEventOverview extends AbstractEventView<EventViewBase.Presenter> {
     
@@ -60,8 +59,8 @@ public abstract class AbstractEventOverview extends AbstractEventView<EventViewB
     
     public void setMediaForImpressions(int nrOfImages, int nrOfVideos, Collection<SailingImageDTO> images) {
         impressionsUi.getElement().getStyle().setDisplay(Display.BLOCK);
-        impressionsUi.setStatistis(nrOfImages, nrOfVideos);
-        impressionsUi.addImages(new LinkedHashSet<ImageDTO>(images));
+        impressionsUi.setStatistics(nrOfImages, nrOfVideos);
+        impressionsUi.addImages(new LinkedHashSet<SailingImageDTO>(images), currentPresenter.getUserService());
         // TODO: desktop media navigation
         impressionsUi.setClickDestinaton(currentPresenter.getMediaPageNavigation());
     }

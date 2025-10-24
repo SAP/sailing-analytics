@@ -1,14 +1,14 @@
 package com.sap.sailing.domain.racelogtracking.test;
 
 import static com.sap.sse.common.Util.size;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import java.util.Collections;
 import java.util.UUID;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.mongodb.ReadConcern;
 import com.mongodb.WriteConcern;
@@ -45,8 +45,8 @@ import com.sap.sailing.domain.racelog.tracking.test.mock.MockSmartphoneImeiServi
 import com.sap.sailing.domain.racelogtracking.impl.SmartphoneImeiIdentifierImpl;
 import com.sap.sailing.domain.ranking.OneDesignRankingMetric;
 import com.sap.sailing.domain.regattalog.impl.EmptyRegattaLogStore;
+import com.sap.sailing.domain.shared.tracking.Track;
 import com.sap.sailing.domain.tracking.DynamicTrackedRegatta;
-import com.sap.sailing.domain.tracking.Track;
 import com.sap.sailing.domain.tracking.impl.DynamicTrackedRaceImpl;
 import com.sap.sailing.domain.tracking.impl.DynamicTrackedRegattaImpl;
 import com.sap.sailing.domain.tracking.impl.EmptyWindStore;
@@ -81,7 +81,7 @@ public class AbstractGPSFixStoreTest extends RaceLogTrackingTestHelper {
                 new MillisecondsTimePoint(millis));
     }
 
-    @Before
+    @BeforeEach
     public void setServiceAndRaceLog() {
         service = new RacingEventServiceImpl(null, null, serviceFinderFactory);
         raceLog = new RaceLogImpl("racelog");
@@ -93,7 +93,7 @@ public class AbstractGPSFixStoreTest extends RaceLogTrackingTestHelper {
                 serviceFinderFactory, ReadConcern.MAJORITY, WriteConcern.MAJORITY, clientSession, metadataCollectionClientSession);
     }
 
-    @After
+    @AfterEach
     public void after() {
         dropPersistedData();
         clientSession.close();

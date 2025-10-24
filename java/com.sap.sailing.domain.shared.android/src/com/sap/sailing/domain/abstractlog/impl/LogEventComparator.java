@@ -6,7 +6,7 @@ import java.util.Comparator;
 import com.sap.sailing.domain.abstractlog.AbstractLogEvent;
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.race.RaceLogEvent;
-import com.sap.sailing.domain.tracking.impl.TimedComparator;
+import com.sap.sailing.domain.shared.tracking.impl.TimedComparator;
 import com.sap.sse.common.Timed;
 import com.sap.sse.common.Util;
 

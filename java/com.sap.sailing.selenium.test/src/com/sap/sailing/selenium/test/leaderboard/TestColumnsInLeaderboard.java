@@ -1,17 +1,17 @@
 package com.sap.sailing.selenium.test.leaderboard;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardConfigurationPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardDetailsPanelPO;
@@ -47,7 +47,7 @@ public class TestColumnsInLeaderboard extends AbstractSeleniumTest {
     private RaceDescriptor raceColumn;
     
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         this.regatta = new RegattaDescriptor(REGATTA, BOAT_CLASS);
         this.trackableRace = new TrackableRaceDescriptor(EVENT, RACE, BOAT_CLASS);
@@ -58,8 +58,8 @@ public class TestColumnsInLeaderboard extends AbstractSeleniumTest {
         configureLeaderboard();
     }
     
-    @Ignore
-    @Test
+    @Disabled
+    @SeleniumTestCase
     public void testCorrectDisplayOfAllColumns() {
         LeaderboardPage leaderboard = LeaderboardPage.goToPage(getWebDriver(), getContextRoot(), LEADERBOARD, true);
         LeaderboardTablePO leaderboardTable = leaderboard.getLeaderboardTable();
@@ -93,7 +93,7 @@ public class TestColumnsInLeaderboard extends AbstractSeleniumTest {
     /**
      * See bug 2425, comments 5, 6 and 7. This is testing that the leaderboard panel receives a refresh when shown.
      */
-    @Test
+    @SeleniumTestCase
     public void testLeaderboardPanelRefresh() {
         // Open the admin console
         AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
