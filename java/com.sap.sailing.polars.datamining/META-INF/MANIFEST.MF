@@ -25,3 +25,5 @@ Bundle-ActivationPolicy: lazy
 Export-Package: com.sap.sailing.polars.datamining.data,
  com.sap.sailing.polars.datamining.data.impl
 Automatic-Module-Name: com.sap.sailing.polars.datamining
+Import-Package: org.apache.shiro;version="[1.7.0,2.0.0]",
+ org.apache.shiro.subject;version="[1.7.0,2.0.0]"

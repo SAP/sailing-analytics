@@ -3,6 +3,7 @@ package com.sap.sse.replication;
 import java.io.Serializable;
 import java.util.UUID;
 
+import com.sap.sse.ServerInfo;
 import com.sap.sse.common.WithID;
 
 /**
@@ -19,6 +20,7 @@ public class OperationWithResultWithIdWrapper<S, R> implements OperationWithResu
     private static final long serialVersionUID = -5435955633510008283L;
     private final Serializable id;
     private final OperationWithResult<S, R> delegate;
+    private final String originServerName;
 
     /**
      * Creates a new UUID for this wrapper operation
@@ -34,6 +36,7 @@ public class OperationWithResultWithIdWrapper<S, R> implements OperationWithResu
         super();
         this.id = id;
         this.delegate = delegate;
+        this.originServerName = delegate.getOriginServerName() == null ? ServerInfo.getName() : delegate.getOriginServerName();
     }
 
     /**
@@ -41,7 +44,7 @@ public class OperationWithResultWithIdWrapper<S, R> implements OperationWithResu
      */
     @Override
     public Class<?> getClassForLogging() {
-        return delegate.getClass();
+        return delegate.getClassForLogging();
     }
     
     @Override
@@ -95,7 +98,12 @@ public class OperationWithResultWithIdWrapper<S, R> implements OperationWithResu
     }
     
     @Override
+    public String getOriginServerName() {
+        return originServerName;
+    }
+
+    @Override
     public String toString() {
-        return ""+delegate+" with ID "+getId();
+        return ""+delegate+" with ID "+getId()+(originServerName==null?"":(" from server \""+getOriginServerName()+"\""));
     }
 }

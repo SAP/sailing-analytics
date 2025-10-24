@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -186,7 +186,7 @@ public class CreateReverseProxyInClusterDialog
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return proxyName;
     }
 

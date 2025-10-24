@@ -188,7 +188,7 @@ public class WindGridCanvasOverlay extends FullCanvasOverlay implements TimeList
     @Override
     protected void draw() {
         super.draw();
-        if (mapProjection != null && windFieldDTO != null) {
+        if (getMapProjection() != null && windFieldDTO != null) {
             clear();
             drawWindGrid();
         }
@@ -242,10 +242,10 @@ public class WindGridCanvasOverlay extends FullCanvasOverlay implements TimeList
             final SimulatorWindDTO windDTO2 = windDTOList.get(1);
 
             final LatLng positionLatLng1 = LatLng.newInstance(windDTO1.position.getLatDeg(), windDTO1.position.getLngDeg());
-            final Point canvasPositionInPx1 = mapProjection.fromLatLngToDivPixel(positionLatLng1);
+            final Point canvasPositionInPx1 = getMapProjection().fromLatLngToDivPixel(positionLatLng1);
 
             final LatLng positionLatLng2 = LatLng.newInstance(windDTO2.position.getLatDeg(), windDTO2.position.getLngDeg());
-            final Point canvasPositionInPx2 = mapProjection.fromLatLngToDivPixel(positionLatLng2);
+            final Point canvasPositionInPx2 = getMapProjection().fromLatLngToDivPixel(positionLatLng2);
 
             return canvasPositionInPx2.getX() - canvasPositionInPx1.getX();
         }
@@ -267,10 +267,10 @@ public class WindGridCanvasOverlay extends FullCanvasOverlay implements TimeList
             final SimulatorWindDTO windDTO2 = windDTOList.get(1);
 
             final LatLng positionLatLng1 = LatLng.newInstance(windDTO1.position.getLatDeg(), windDTO1.position.getLngDeg());
-            final Point canvasPositionInPx1 = mapProjection.fromLatLngToDivPixel(positionLatLng1);
+            final Point canvasPositionInPx1 = getMapProjection().fromLatLngToDivPixel(positionLatLng1);
 
             final LatLng positionLatLng2 = LatLng.newInstance(windDTO2.position.getLatDeg(), windDTO2.position.getLngDeg());
-            final Point canvasPositionInPx2 = mapProjection.fromLatLngToDivPixel(positionLatLng2);
+            final Point canvasPositionInPx2 = getMapProjection().fromLatLngToDivPixel(positionLatLng2);
 
             return canvasPositionInPx2.getY() - canvasPositionInPx1.getY();
         }
@@ -409,13 +409,13 @@ public class WindGridCanvasOverlay extends FullCanvasOverlay implements TimeList
 
     private void drawGridCell(final GridCell cell) {
         LatLng positionLatLng = coordinateSystem.toLatLng(cell.bottomLeft);
-        final Point blPoint = mapProjection.fromLatLngToDivPixel(positionLatLng);
+        final Point blPoint = getMapProjection().fromLatLngToDivPixel(positionLatLng);
         positionLatLng = coordinateSystem.toLatLng(cell.bottomRight);
-        final Point brPoint = mapProjection.fromLatLngToDivPixel(positionLatLng);
+        final Point brPoint = getMapProjection().fromLatLngToDivPixel(positionLatLng);
         positionLatLng = coordinateSystem.toLatLng(cell.topLeft);
-        final Point tlPoint = mapProjection.fromLatLngToDivPixel(positionLatLng);
+        final Point tlPoint = getMapProjection().fromLatLngToDivPixel(positionLatLng);
         positionLatLng = coordinateSystem.toLatLng(cell.topRight);
-        final Point trPoint = mapProjection.fromLatLngToDivPixel(positionLatLng);
+        final Point trPoint = getMapProjection().fromLatLngToDivPixel(positionLatLng);
         /*
          * Uncomment to see the center of the grid for debug drawCircle(blPoint.getX()-this.getWidgetPosLeft(),
          * blPoint.getY()-this.getWidgetPosTop(),2,"red"); drawCircle(brPoint.getX()-this.getWidgetPosLeft(),

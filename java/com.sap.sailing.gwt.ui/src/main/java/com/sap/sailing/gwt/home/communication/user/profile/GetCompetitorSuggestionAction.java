@@ -1,12 +1,13 @@
 package com.sap.sailing.gwt.home.communication.user.profile;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import com.google.gwt.core.shared.GwtIncompatible;
 import com.sap.sailing.domain.base.Boat;
 import com.sap.sailing.domain.base.Competitor;
+import com.sap.sailing.domain.base.CompetitorWithBoat;
 import com.sap.sailing.gwt.home.communication.SailingAction;
 import com.sap.sailing.gwt.home.communication.SailingDispatchContext;
 import com.sap.sailing.gwt.home.communication.event.SimpleCompetitorWithIdDTO;
@@ -31,7 +32,17 @@ public class GetCompetitorSuggestionAction implements SailingAction<CompetitorSu
     private final AbstractListFilter<Competitor> competitorFilter = new AbstractListFilter<Competitor>() {
         @Override
         public Iterable<String> getStrings(Competitor competitor) {
-            return Arrays.asList(competitor.getName());
+            // This shall return those strings rendered into the competitor display by
+            // class SuggestedMultiSelectionCompetitorItemDescription and what it shows
+            final List<String> result = new ArrayList<>();
+            if (competitor.hasBoat()) {
+                final String sailID = ((CompetitorWithBoat) competitor).getBoat().getSailID();
+                if (Util.hasLength(sailID)) {
+                    result.add(sailID);
+                }
+            }
+            result.add(competitor.getName());
+            return result;
         }
     };
     

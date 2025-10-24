@@ -43,6 +43,8 @@ import com.sap.sailing.domain.leaderboard.impl.RankAndRankComparable;
 import com.sap.sailing.domain.polars.PolarDataService;
 import com.sap.sailing.domain.ranking.RankingMetric;
 import com.sap.sailing.domain.ranking.RankingMetric.RankingInfo;
+import com.sap.sailing.domain.shared.tracking.LineDetails;
+import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
 import com.sap.sailing.domain.tracking.impl.DynamicTrackedRegattaImpl;
 import com.sap.sailing.domain.tracking.impl.EmptyWindStore;
 import com.sap.sailing.domain.windestimation.IncrementalWindEstimation;
@@ -78,6 +80,10 @@ public class DummyTrackedRace extends TrackedRaceWithWindEssentials {
     public DummyTrackedRace(final String raceName, final Serializable raceId) {
         super(new RaceDefinitionImpl(raceName, new CourseImpl("Dummy Course", Collections.<Waypoint> emptyList()),
                 /* boatClass */ null, Collections.<Competitor, Boat>emptyMap(), raceId), null, EmptyWindStore.INSTANCE, -1);
+    }
+
+    @Override
+    public void initializeAfterDeserialization() {
     }
 
     @Override
@@ -839,6 +845,12 @@ public class DummyTrackedRace extends TrackedRaceWithWindEssentials {
 
     @Override
     public UUID getCourseAreaId() {
+        return null;
+    }
+
+    @Override
+    public Double getPercentTargetBoatSpeed(Competitor competitor, TimePoint timePoint,
+            WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache) {
         return null;
     }
 }

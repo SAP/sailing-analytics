@@ -9,14 +9,15 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.sap.sailing.gwt.common.client.SharedResources;
-import com.sap.sailing.gwt.home.communication.event.EventLinkDTO;
-import com.sap.sailing.gwt.home.communication.media.SailingImageDTO;
 import com.sap.sailing.gwt.home.desktop.app.DesktopPlacesNavigator;
 import com.sap.sailing.gwt.home.shared.SharedHomeResources;
 import com.sap.sailing.gwt.home.shared.app.PlaceNavigation;
 import com.sap.sailing.gwt.home.shared.partials.fullscreen.FullscreenContainer;
 import com.sap.sailing.gwt.home.shared.places.event.EventDefaultPlace;
+import com.sap.sailing.gwt.ui.shared.EventLinkDTO;
+import com.sap.sailing.gwt.ui.shared.SailingImageDTO;
 import com.sap.sse.gwt.client.controls.carousel.ImageCarousel.FullscreenViewer;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 
 /**
  * Fullscreen viewer for the image gallery that shows the current image in a big view and lists all images on the bottom
@@ -33,13 +34,16 @@ public class SailingFullscreenViewer extends FullscreenContainer<SailingGalleryP
     private final Image autoRefreshControl = new Image(SharedHomeResources.INSTANCE.reload().getSafeUri());
     private SailingGalleryPlayer player = null;
 
+    private final TakedownNoticeService takedownNoticeService;
+
     /**
      * Creates a new {@link SailingFullscreenViewer} without navigation to the respectively related event.
+     * @param takedownNoticeService TODO
      * 
-     * @see #SailingFullscreenViewer(DesktopPlacesNavigator)
+     * @see #SailingFullscreenViewer(DesktopPlacesNavigator, TakedownNoticeService)
      */
-    public SailingFullscreenViewer() {
-        this(null);
+    public SailingFullscreenViewer(TakedownNoticeService takedownNoticeService) {
+        this(null, takedownNoticeService);
     }
 
     /**
@@ -49,8 +53,9 @@ public class SailingFullscreenViewer extends FullscreenContainer<SailingGalleryP
      * @param navigator
      *            {@link DesktopPlacesNavigator} to navigate to the respectively related event page
      */
-    public SailingFullscreenViewer(final DesktopPlacesNavigator navigator) {
+    public SailingFullscreenViewer(final DesktopPlacesNavigator navigator, TakedownNoticeService takedownNoticeService) {
         SailingFullscreenViewerResources.INSTANCE.css().ensureInjected();
+        this.takedownNoticeService = takedownNoticeService;
         eventNavigationHandler = new EventNavigationHandler(navigator);
         if (eventNavigationHandler.isNavigationConfigured()) {
             eventLinkControl.addStyleName(SharedResources.INSTANCE.mainCss().buttonarrowrightwhite());
@@ -63,7 +68,7 @@ public class SailingFullscreenViewer extends FullscreenContainer<SailingGalleryP
     }
 
     public void show(SailingImageDTO selected, Collection<SailingImageDTO> images) {
-        showContent(player = new SailingGalleryPlayer(selected, images));
+        showContent(player = new SailingGalleryPlayer(selected, images, takedownNoticeService));
         if (eventNavigationHandler.isNavigationConfigured()) {
             player.addSelectionChangeHandler(eventNavigationHandler);
             player.addClickHandler(eventNavigationHandler);

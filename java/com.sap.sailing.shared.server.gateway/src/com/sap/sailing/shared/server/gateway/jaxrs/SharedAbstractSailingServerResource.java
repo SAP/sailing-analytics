@@ -4,9 +4,6 @@ import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import javax.servlet.ServletContext;
-import javax.ws.rs.core.Context;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -23,47 +20,13 @@ import com.sap.sailing.server.interfaces.RacingEventService;
 import com.sap.sailing.shared.server.SharedSailingData;
 import com.sap.sse.InvalidDateException;
 import com.sap.sse.common.TimePoint;
-import com.sap.sse.common.TypeBasedServiceFinderFactory;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
-import com.sap.sse.osgi.CachedOsgiTypeBasedServiceFinderFactory;
 import com.sap.sse.replication.ReplicationService;
-import com.sap.sse.rest.StreamingOutputUtil;
 import com.sap.sse.security.SecurityService;
 import com.sap.sse.util.DateParser;
-import com.sun.jersey.api.core.ResourceContext;
 
-public abstract class SharedAbstractSailingServerResource extends StreamingOutputUtil {
+public abstract class SharedAbstractSailingServerResource extends SharedAbstractSecuredServerResource {
     private static final String SLASH_ENCODING = "__";
-    @Context ServletContext servletContext;
-    @Context ResourceContext resourceContext;
-    
-    protected ServletContext getServletContext() {
-        return servletContext;
-    }
-    
-    protected ResourceContext getResourceContext() {
-        return resourceContext;
-    }
-    
-    public <T> T getService(Class<T> clazz) {
-        BundleContext context = getBundleContext();
-        ServiceTracker<T, T> tracker = new ServiceTracker<T, T>(context, clazz, null);
-        tracker.open();
-        T service = tracker.getService();
-        tracker.close();
-        return service;
-    }
-
-    protected BundleContext getBundleContext() {
-        BundleContext context = (BundleContext) servletContext
-                .getAttribute(RestServletContainer.OSGI_RFC66_WEBBUNDLE_BUNDLECONTEXT_NAME);
-        return context;
-    }
-    
-    protected TypeBasedServiceFinderFactory getServiceFinderFactory () {
-        return new CachedOsgiTypeBasedServiceFinderFactory(getBundleContext());
-    }
-
     public RacingEventService getService() {
         @SuppressWarnings("unchecked")
         ServiceTracker<RacingEventService, RacingEventService> tracker = (ServiceTracker<RacingEventService, RacingEventService>) servletContext.getAttribute(RestServletContainer.RACING_EVENT_SERVICE_TRACKER_NAME);

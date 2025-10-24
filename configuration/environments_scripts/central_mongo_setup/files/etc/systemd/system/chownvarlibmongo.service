@@ -1,0 +1,13 @@
+[Unit]
+Description=Ensures all files under /var/lib/mongo are owned by mongod user/group
+Requires=ephemeralvolume.service
+After=ephemeralvolume.service
+Before=mongod.service
+
+[Install]
+RequiredBy=mongod.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/bin/chown -R mongod:mongod /var/lib/mongodb/

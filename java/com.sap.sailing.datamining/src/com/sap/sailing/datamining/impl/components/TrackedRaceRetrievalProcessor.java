@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
+
 import com.sap.sailing.datamining.data.HasLeaderboardContext;
 import com.sap.sailing.datamining.data.HasTrackedRaceContext;
 import com.sap.sailing.datamining.impl.data.TrackedRaceWithContext;
@@ -13,6 +16,7 @@ import com.sap.sailing.domain.base.Regatta;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sse.datamining.components.Processor;
 import com.sap.sse.datamining.impl.components.AbstractRetrievalProcessor;
+import com.sap.sse.security.shared.HasPermissions.DefaultActions;
 
 public class TrackedRaceRetrievalProcessor extends AbstractRetrievalProcessor<HasLeaderboardContext, HasTrackedRaceContext> {
 
@@ -36,13 +40,17 @@ public class TrackedRaceRetrievalProcessor extends AbstractRetrievalProcessor<Ha
                     break;
                 }
                 TrackedRace trackedRace = raceColumn.getTrackedRace(fleet);
-                if (trackedRace != null) {
+                final Subject subject = SecurityUtils.getSubject();
+                if (trackedRace != null
+                        && subject.isPermitted(trackedRace.getIdentifier().getStringPermission(DefaultActions.READ))) {
                     Regatta regatta = trackedRace.getTrackedRegatta().getRegatta();
-                    HasTrackedRaceContext trackedRaceWithContext = new TrackedRaceWithContext(element, regatta, raceColumn, fleet, trackedRace);
-                    trackedRacesWithContext.add(trackedRaceWithContext);
+                    if (subject.isPermitted(regatta.getIdentifier().getStringPermission(DefaultActions.READ))) {
+                        HasTrackedRaceContext trackedRaceWithContext = new TrackedRaceWithContext(element, regatta, raceColumn, fleet, trackedRace);
+                        trackedRacesWithContext.add(trackedRaceWithContext);
+                    }
                 } 
                 else {
-                    //no tracked race found
+                    // no tracked race found
                     HasTrackedRaceContext trackedRaceWithContext = new TrackedRaceWithContext(element, /* regatta */ null, raceColumn, fleet, /* trackedRace */ null);
                     trackedRacesWithContext.add(trackedRaceWithContext);
                 }
@@ -50,5 +58,4 @@ public class TrackedRaceRetrievalProcessor extends AbstractRetrievalProcessor<Ha
         }
         return trackedRacesWithContext;
     }
-
 }

@@ -21,6 +21,7 @@ import com.sap.sse.ServerStartupConstants;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
+import com.sap.sse.security.SecurityService;
 import com.sap.sse.security.shared.UserManagementException;
 import com.sap.sse.security.shared.impl.User;
 import com.sap.sse.security.shared.subscription.Subscription;
@@ -51,59 +52,65 @@ public class ChargebeeSubscriptionWriteServiceImpl extends ChargebeeSubscription
         SubscriptionListDTO subscriptionDto;
         try {
             final User user = getCurrentUser();
-            final Result result = HostedPage.acknowledge(data.getHostedPageId()).request();
-            final Content content = result.hostedPage().content();
-            final String customerId = content.customer().id();
-            if (customerId != null && !customerId.equals(user.getName())) {
-                throw new UserManagementException("User does not match!");
-            }
-            final String transactionType;
-            final String transactionStatus;
-            final Transaction transaction = content.transaction();
-            if (transaction != null) {
-                transactionType = transaction.type().name().toLowerCase();
-                transactionStatus = transaction.status().name().toLowerCase();
-            } else {
-                transactionType = null;
-                transactionStatus = null;
-            }
-            final Invoice invoice = content.invoice();
-            final String invoiceId;
-            final String invoiceStatus;
-            if (invoice != null) {
-                invoiceId = invoice.id();
-                invoiceStatus = invoice.status().name().toLowerCase();
-            } else {
-                invoiceId = null;
-                invoiceStatus = null;
-            }
-            com.chargebee.models.Subscription contentSubscription = content.subscription();
-            final Timestamp trialStart = contentSubscription.trialStart();
-            final Timestamp trialEnd = contentSubscription.trialEnd();
-            //TODO: bug5510 this ignores potential Addons or Charges contained in the Subscription
-            SubscriptionPlan plan = null;
-            for (SubscriptionItem item : contentSubscription.subscriptionItems()) {
-                if(item.itemType().equals(ItemType.PLAN)) {
-                    final String itemPriceId = item.itemPriceId();
-                    plan = getSecurityService().getSubscriptionPlanByItemPriceId(itemPriceId);
-                    break;
+            final SecurityService securityService = getSecurityService();
+            securityService.lockSubscriptionsForUser(user);
+            try {
+                final Result result = HostedPage.acknowledge(data.getHostedPageId()).request();
+                final Content content = result.hostedPage().content();
+                final String customerId = content.customer().id();
+                if (customerId != null && !customerId.equals(user.getName())) {
+                    throw new UserManagementException("User does not match!");
                 }
+                final String transactionType;
+                final String transactionStatus;
+                final Transaction transaction = content.transaction();
+                if (transaction != null) {
+                    transactionType = transaction.type().name().toLowerCase();
+                    transactionStatus = transaction.status().name().toLowerCase();
+                } else {
+                    transactionType = null;
+                    transactionStatus = null;
+                }
+                final Invoice invoice = content.invoice();
+                final String invoiceId;
+                final String invoiceStatus;
+                if (invoice != null) {
+                    invoiceId = invoice.id();
+                    invoiceStatus = invoice.status().name().toLowerCase();
+                } else {
+                    invoiceId = null;
+                    invoiceStatus = null;
+                }
+                com.chargebee.models.Subscription contentSubscription = content.subscription();
+                final Timestamp trialStart = contentSubscription.trialStart();
+                final Timestamp trialEnd = contentSubscription.trialEnd();
+                // TODO: bug5510 this ignores potential Addons or Charges contained in the Subscription
+                SubscriptionPlan plan = null;
+                for (SubscriptionItem item : contentSubscription.subscriptionItems()) {
+                    if(item.itemType().equals(ItemType.PLAN)) {
+                        final String itemPriceId = item.itemPriceId();
+                        plan = getSecurityService().getSubscriptionPlanByItemPriceId(itemPriceId);
+                        break;
+                    }
+                }
+                if (plan == null) {
+                    throw new IllegalArgumentException("No such Subscriptionplan");
+                }
+                final String paymentStatus = ChargebeeSubscription.determinePaymentStatus(transactionType, transactionStatus, invoiceStatus);
+                final Subscription subscription = new ChargebeeSubscription(contentSubscription.id(), plan.getId(),
+                        customerId, trialStart == null ? Subscription.emptyTime() : TimePoint.of(trialStart),
+                        trialStart == null ? Subscription.emptyTime() : TimePoint.of(trialEnd),
+                        contentSubscription.status().name().toLowerCase(), paymentStatus, transactionType, transactionStatus,
+                        invoiceId, invoiceStatus, contentSubscription.mrr(), contentSubscription.currencyCode(), getTime(contentSubscription.createdAt()),
+                        getTime(contentSubscription.updatedAt()), getTime(contentSubscription.activatedAt()),
+                        getTime(contentSubscription.nextBillingAt()), getTime(contentSubscription.currentTermEnd()),
+                        getTime(contentSubscription.cancelledAt()), Subscription.emptyTime(), Subscription.emptyTime());
+                updateUserSubscription(user, subscription);
+                cancelOldSubscriptionIfCoveredByNewOne(user.getSubscriptions(), subscription);
+                subscriptionDto = getSubscriptions(true);
+            } finally {
+                securityService.unlockSubscriptionsForUser(user);
             }
-            if (plan == null) {
-                throw new IllegalArgumentException("No such Subscriptionplan");
-            }
-            final String paymentStatus = ChargebeeSubscription.determinePaymentStatus(transactionType, transactionStatus, invoiceStatus);
-            final Subscription subscription = new ChargebeeSubscription(contentSubscription.id(), plan.getId(),
-                    customerId, trialStart == null ? Subscription.emptyTime() : TimePoint.of(trialStart),
-                    trialStart == null ? Subscription.emptyTime() : TimePoint.of(trialEnd),
-                    contentSubscription.status().name().toLowerCase(), paymentStatus, transactionType, transactionStatus,
-                    invoiceId, invoiceStatus, contentSubscription.mrr(), contentSubscription.currencyCode(), getTime(contentSubscription.createdAt()),
-                    getTime(contentSubscription.updatedAt()), getTime(contentSubscription.activatedAt()),
-                    getTime(contentSubscription.nextBillingAt()), getTime(contentSubscription.currentTermEnd()),
-                    getTime(contentSubscription.cancelledAt()), Subscription.emptyTime(), Subscription.emptyTime());
-            updateUserSubscription(user, subscription);
-            cancelOldSubscriptionIfCoveredByNewOne(user.getSubscriptions(), subscription);
-            subscriptionDto = getSubscriptions(true);
         } catch(UserManagementException e) {
             logger.log(Level.FINE, "No user is logged in.");
             subscriptionDto = new SubscriptionListDTO(null, e.getMessage());
@@ -210,37 +217,43 @@ public class ChargebeeSubscriptionWriteServiceImpl extends ChargebeeSubscription
         boolean result;
         try {
             User user = getCurrentUser();
-            Subscription subscription = user.getSubscriptionByPlan(planId);
-            if (isValidSubscription(subscription)) {
-                logger.info(() -> "Cancel user subscription, user " + user.getName() + ", plan " + planId);
-                SubscriptionApiService apiService = getApiService();
-                if (apiService != null) {
-                    SubscriptionCancelResult cancelResult = requestCancelSubscription(apiService,
-                            subscription.getSubscriptionId()).get();
-                    if (cancelResult.isSuccess()) {
-                        logger.info(() -> "Cancel subscription successful");
-                        result = true;
-                        if (cancelResult.getSubscription() != null) {
-                            updateUserSubscription(user, cancelResult.getSubscription());
+            final SecurityService securityService = getSecurityService();
+            securityService.lockSubscriptionsForUser(user);
+            try {
+                Subscription subscription = user.getSubscriptionByPlan(planId);
+                if (isValidSubscription(subscription)) {
+                    logger.info(() -> "Cancel user subscription, user " + user.getName() + ", plan " + planId);
+                    SubscriptionApiService apiService = getApiService();
+                    if (apiService != null) {
+                        SubscriptionCancelResult cancelResult = requestCancelSubscription(apiService,
+                                subscription.getSubscriptionId()).get();
+                        if (cancelResult.isSuccess()) {
+                            logger.info(() -> "Cancel subscription successful");
+                            result = true;
+                            if (cancelResult.getSubscription() != null) {
+                                updateUserSubscription(user, cancelResult.getSubscription());
+                            }
+                        } else {
+                            result = false;
+                            if (cancelResult.isDeleted()) {
+                                logger.info(() -> "Subscription for plan was deleted");
+                                Subscription emptySubscription = ChargebeeSubscription.createEmptySubscription(planId,
+                                        subscription.getLatestEventTime(), TimePoint.now());
+                                updateUserSubscription(user, emptySubscription);
+                            } else {
+                                logger.info(() -> "Cancel subscription failed");
+                            }
                         }
                     } else {
+                        logger.info(() -> "No active api service found");
                         result = false;
-                        if (cancelResult.isDeleted()) {
-                            logger.info(() -> "Subscription for plan was deleted");
-                            Subscription emptySubscription = ChargebeeSubscription.createEmptySubscription(planId,
-                                    subscription.getLatestEventTime(), TimePoint.now());
-                            updateUserSubscription(user, emptySubscription);
-                        } else {
-                            logger.info(() -> "Cancel subscription failed");
-                        }
                     }
                 } else {
-                    logger.info(() -> "No active api service found");
+                    logger.info(() -> "Invalid subscription");
                     result = false;
                 }
-            } else {
-                logger.info(() -> "Invalid subscription");
-                result = false;
+            } finally {
+                securityService.unlockSubscriptionsForUser(user);
             }
         } catch(UserManagementException e) {
             logger.log(Level.FINE, "No user is logged in.");
@@ -257,37 +270,43 @@ public class ChargebeeSubscriptionWriteServiceImpl extends ChargebeeSubscription
         boolean result;
         try {
             User user = getCurrentUser();
-            Subscription subscription = user.getSubscriptionByPlan(planId);
-            if (isValidSubscription(subscription)) {
-                logger.info(() -> "Set user subscription to non renewing, user " + user.getName() + ", plan " + planId);
-                SubscriptionApiService apiService = getApiService();
-                if (apiService != null) {
-                    SubscriptionNonRenewingResult nonRenewingResult = requestNonRenewingSubscription(apiService,
-                            subscription.getSubscriptionId()).get();
-                    if (nonRenewingResult.isSuccess()) {
-                        logger.info(() -> "Setting subscription to non renewing successful");
-                        result = true;
-                        if (nonRenewingResult.getSubscription() != null) {
-                            updateUserSubscription(user, nonRenewingResult.getSubscription());
+            final SecurityService securityService = getSecurityService();
+            securityService.lockSubscriptionsForUser(user);
+            try {
+                final Subscription subscription = user.getSubscriptionByPlan(planId);
+                if (isValidSubscription(subscription)) {
+                    logger.info(() -> "Set user subscription to non renewing, user " + user.getName() + ", plan " + planId);
+                    SubscriptionApiService apiService = getApiService();
+                    if (apiService != null) {
+                        SubscriptionNonRenewingResult nonRenewingResult = requestNonRenewingSubscription(apiService,
+                                subscription.getSubscriptionId()).get();
+                        if (nonRenewingResult.isSuccess()) {
+                            logger.info(() -> "Setting subscription to non renewing successful");
+                            result = true;
+                            if (nonRenewingResult.getSubscription() != null) {
+                                updateUserSubscription(user, nonRenewingResult.getSubscription());
+                            }
+                        } else {
+                            result = false;
+                            if (nonRenewingResult.isDeleted()) {
+                                logger.info(() -> "Subscription for plan was deleted");
+                                final Subscription emptySubscription = ChargebeeSubscription.createEmptySubscription(planId,
+                                        subscription.getLatestEventTime(), TimePoint.now());
+                                updateUserSubscription(user, emptySubscription);
+                            } else {
+                                logger.info(() -> "Setting subscription to non renewing failed");
+                            }
                         }
                     } else {
+                        logger.info(() -> "No active api service found");
                         result = false;
-                        if (nonRenewingResult.isDeleted()) {
-                            logger.info(() -> "Subscription for plan was deleted");
-                            Subscription emptySubscription = ChargebeeSubscription.createEmptySubscription(planId,
-                                    subscription.getLatestEventTime(), TimePoint.now());
-                            updateUserSubscription(user, emptySubscription);
-                        } else {
-                            logger.info(() -> "Setting subscription to non renewing failed");
-                        }
                     }
                 } else {
-                    logger.info(() -> "No active api service found");
+                    logger.info(() -> "Invalid subscription");
                     result = false;
                 }
-            } else {
-                logger.info(() -> "Invalid subscription");
-                result = false;
+            } finally {
+                securityService.unlockSubscriptionsForUser(user);
             }
         } catch(UserManagementException e) {
             logger.log(Level.FINE, "No user is logged in.");

@@ -1,6 +1,6 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.TimeZone;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.Mark;
@@ -44,7 +44,7 @@ public class ManeuverDetectionOnMdM2011SemifinalTest extends OnlineTracTracBased
         return "Academy Tracking 2011";
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         super.setUp("event_20110505_SailingTea", // Semifinale
@@ -54,8 +54,8 @@ public class ManeuverDetectionOnMdM2011SemifinalTest extends OnlineTracTracBased
         TimePoint epoch = new MillisecondsTimePoint(0l);
         TimePoint now = MillisecondsTimePoint.now();
         Map<String, Position> markPositions = new HashMap<String, Position>();
-        markPositions.put("CR Start (1)", new DegreePosition(53.562944999999985, 10.010104000000046));
-        markPositions.put("CR Start (2)", new DegreePosition(53.562944999999985, 10.010104000000046));
+        markPositions.put("CR Start - 1", new DegreePosition(53.562944999999985, 10.010104000000046));
+        markPositions.put("CR Start - 2", new DegreePosition(53.562944999999985, 10.010104000000046));
         markPositions.put("Leeward mark", new DegreePosition(53.562145000000015, 10.009252));
         markPositions.put("Luvtonne", new DegreePosition(53.560581899999995, 10.005657));
         for (Waypoint w : getTrackedRace().getRace().getCourse().getWaypoints()) {

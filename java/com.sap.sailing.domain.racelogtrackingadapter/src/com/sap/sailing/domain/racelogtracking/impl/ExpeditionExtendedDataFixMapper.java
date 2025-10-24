@@ -15,7 +15,7 @@ import com.sap.sailing.domain.tracking.DynamicTrackedRace;
 import com.sap.sailing.domain.tracking.impl.CompetitorBravoFixTrackImpl;
 
 /**
- * {@link SensorFixMapper} implementation to product {@link BravoExtendedFix}es from {@link DoubleVectorFix}es
+ * {@link SensorFixMapper} implementation to produce {@link BravoExtendedFix}es from {@link DoubleVectorFix}es
  * interpreted as "Expedition" data. The data has significant overlap with what we typically receive from the
  * "Bravo" devices. Ultimately, the naming may need to be adjusted, better reflecting that the "Bravo" extended
  * tracks now assume general responsibility for a broader set of sensor values that may be assigned to a

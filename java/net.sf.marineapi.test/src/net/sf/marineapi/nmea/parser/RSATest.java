@@ -1,14 +1,15 @@
 package net.sf.marineapi.nmea.parser;
 
-import static org.junit.Assert.assertEquals;
 import net.sf.marineapi.nmea.sentence.RSASentence;
 import net.sf.marineapi.nmea.sentence.SentenceId;
 import net.sf.marineapi.nmea.sentence.TalkerId;
 import net.sf.marineapi.nmea.util.DataStatus;
 import net.sf.marineapi.nmea.util.Side;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class RSATest {
 
@@ -17,7 +18,7 @@ public class RSATest {
 	RSASentence empty;
 	RSASentence instance;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		empty = new RSAParser(TalkerId.II);
 		instance = new RSAParser(EXAMPLE);

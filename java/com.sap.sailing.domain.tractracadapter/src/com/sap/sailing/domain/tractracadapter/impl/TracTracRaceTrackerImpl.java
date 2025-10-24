@@ -62,7 +62,7 @@ import com.tractrac.model.lib.api.event.DataSource;
 import com.tractrac.model.lib.api.event.IEvent;
 import com.tractrac.model.lib.api.event.IRace;
 import com.tractrac.model.lib.api.event.IRaceCompetitor;
-import com.tractrac.model.lib.api.route.IControl;
+import com.tractrac.model.lib.api.map.IMapItem;
 import com.tractrac.subscription.lib.api.IEventSubscriber;
 import com.tractrac.subscription.lib.api.IRaceSubscriber;
 import com.tractrac.subscription.lib.api.SubscriberInitializationException;
@@ -79,7 +79,7 @@ public class TracTracRaceTrackerImpl extends AbstractRaceTrackerImpl<RaceTrackin
     private static final Logger logger = Logger.getLogger(TracTracRaceTrackerImpl.class.getName());
     
     /**
-     * A scheduler for the periodic checks of the paramURL documents for the advent of {@link IControl control points}
+     * A scheduler for the periodic checks of the paramURL documents for the advent of {@link IMapItem control points}
      * with static position information otherwise not available through {@link MarkPassingReceiver}'s events.
      */
     static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, new ThreadFactoryWithPriority(Thread.NORM_PRIORITY, /* daemon */ true));

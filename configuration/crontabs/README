@@ -1,7 +1,27 @@
 This is the crontab repo and it contains one line crontabs for all the different environments.
 These files are concatenated by the build-crontab-and-cp-files script. Any time the crontab should contain
-a user's home directory, instead write PATH_OF_HOME_DIR_TO_REPLACE; if the crontab should
-contain the path to the git directory, instead write PATH_OF_GIT_HOME_DIR_TO_REPLACE.
-These are replaced by the build-crontab-and-cp-filesscript.
+a user's home directory, instead write PATH_OF_HOME_DIR_TO_REPLACE.
+These are replaced by the build-crontab-and-cp-files script found under
+configuration/environments_scripts.
+
+Further replacements in the crontab snippets can be controlled by the names used for the
+files or symbolic links used in the users/ directories, as follows:
+
+    crontab-snippet@{PARAM1}={VALUE1}@{PARAM2}={VALUE2}...
+
+will replace all occurrences of PARAM1 in the snippet by VALUE1, etc. The values can be
+empty. If a value shall contain an @ sign, use @@ instead. For a / (slash) character
+use an underscore _ character, and to produce a single underscore, double it (__), as
+illustrated by the following example:
+
+    crontab-snippet@EMAIL_ADDRESS=john.doe@@example.com@HOME_DIR=_home_john__doe_
+
+It is good practice to name a reusable crontab snippet such that its parameters are
+listed in its name, separated from the name and from each other with @-signs, as in
+
+    crontab-snippet@USER@EMAIL_ADDRESS
+
+which would indicate that two placeholders exist in the snippet that a name for a symbolic
+link referencing this snippet shall configure.
 
 Note: theses files are symbolically linked to, so beware of the ramifications of changes.

@@ -1005,7 +1005,6 @@ public class RegattaImpl extends NamedImpl implements Regatta, RaceColumnListene
     public void registerCompetitors(Iterable<Competitor> competitors) {
         RegattaLog regattaLog = getRegattaLike().getRegattaLog();
         TimePoint now = MillisecondsTimePoint.now();
-
         for (Competitor competitor: competitors) {
             regattaLog.add(new RegattaLogRegisterCompetitorEventImpl(now, now, regattaLogEventAuthorForRegatta,
                     UUID.randomUUID(), competitor));

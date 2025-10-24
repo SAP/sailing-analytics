@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Upgrades the AWS EC2 MongoDB instance that this script is assumed to be executed on.
+# The steps are as follows:
+
+. imageupgrade_functions.sh
+
+clean_mongo_pid() {
+  rm -f /var/run/mongodb/mongod.pid
+}
+
+LOGON_USER_HOME=/home/ec2-user
+METADATA=$( get_ec2_user_data )
+echo "Metadata: ${METADATA}"
+if echo "${METADATA}" | grep -q "^image-upgrade$"; then
+  echo "Image upgrade..."
+  run_dnf_upgrade
+  build_crontab_and_setup_files mongo_instance_setup
+  clean_startup_logs
+  clean_mongo_pid
+  finalize
+fi

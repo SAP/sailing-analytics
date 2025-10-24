@@ -8,8 +8,8 @@ import com.sap.sailing.domain.abstractlog.impl.AbstractLogImpl;
 import com.sap.sailing.domain.abstractlog.race.RaceLog;
 import com.sap.sailing.domain.abstractlog.race.RaceLogEvent;
 import com.sap.sailing.domain.abstractlog.race.RaceLogEventVisitor;
-import com.sap.sailing.domain.tracking.Track;
-import com.sap.sailing.domain.tracking.impl.TrackImpl;
+import com.sap.sailing.domain.shared.tracking.Track;
+import com.sap.sailing.domain.shared.tracking.impl.TrackImpl;
 
 /**
  * {@link Track} implementation for {@link RaceLogEvent}s.

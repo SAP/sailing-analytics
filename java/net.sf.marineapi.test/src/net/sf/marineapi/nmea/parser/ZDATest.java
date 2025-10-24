@@ -1,9 +1,9 @@
 package net.sf.marineapi.nmea.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -12,8 +12,8 @@ import net.sf.marineapi.nmea.sentence.TalkerId;
 import net.sf.marineapi.nmea.util.Date;
 import net.sf.marineapi.nmea.util.Time;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the ZDA sentence parser.
@@ -28,7 +28,7 @@ public class ZDATest {
 	private ZDAParser empty;
 	private ZDAParser zda;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		try {
 			empty = new ZDAParser(TalkerId.GP);

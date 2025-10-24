@@ -1,5 +1,5 @@
 #!/bin/bash
-#OPERATORS="axel.uhl@sap.com jan.hamann@sapsailing.com alessandro.stoltenberg@sap.com alstolten@gmail.com"
-OPERATORS="axel.uhl@sap.com"
+OPERATORS="axel.uhl@sap.com jan.hamann@sapsailing.com alstolten@gmail.com"
+#OPERATORS="axel.uhl@sap.com"
 logger -t sailing "Sending notification e-mail with subject $1 to ${OPERATORS}"
 mail -s "$1" ${OPERATORS}

@@ -1,7 +1,6 @@
 package com.sap.sailing.selenium.core;
 
 import java.text.MessageFormat;
-
 import java.util.List;
 
 import org.openqa.selenium.By;

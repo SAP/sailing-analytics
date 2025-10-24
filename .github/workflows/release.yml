@@ -5,12 +5,69 @@ on:
       - 'wiki/**'
       - '.github/workflows/*'
       - '**/*.md'
-  workflow_dispatch: {}
+      - 'README.md'
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: Skip tests (set to "true" to skip all tests)
+        default: 'false'
+      local_target_platform:
+        description: Build with a local target platform (set to "true" to use local target platform)
+        default: 'false'
+      runner_cpus:
+        description: Empty means ubuntu-latest, usually 4 CPUs with little disk/memory, but if you have runners named ubuntu-latest-Xcpu, it can be 4, 8, 16, and 64 as well, using, e.g., ubuntu-latest-16cpu; default is ubuntu-latest
+        default: ''
+      firefox_version:
+        description: Version to use for Selenium tests; default is 137.0, but could, e.g., be "141.0" or "latest"
+        default: '140.0'
+
 jobs:
   build:
-    runs-on: ubuntu-latest-64cpu
-    #runs-on: ubuntu-latest-4cpu
+    permissions:
+      contents: write
+      checks: write
+      actions: read
+    runs-on: ${{ github.event.inputs.runner_cpus != '' && format('ubuntu-latest-{0}cpu', github.event.inputs.runner_cpus) || 'ubuntu-latest' }}
     steps:
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: false
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: false
+          swap-storage: true
+      - name: Allocate swap space
+        shell: bash
+        run: |
+          sudo dd if=/dev/zero of=/mnt/large-swapfile bs=1G count=30
+          sudo chmod 600 /mnt/large-swapfile
+          sudo mkswap /mnt/large-swapfile
+          sudo chown root:root /mnt/large-swapfile
+          sudo swapon /mnt/large-swapfile
+      - name: Create TMP space under /mnt/tmp
+        shell: bash
+        run: |
+          sudo mkdir /mnt/tmp
+          sudo chmod 777 /mnt/tmp
+      - name: Collect Workflow Telemetry
+        uses: catchpoint/workflow-telemetry-action@94c3c3d9567a0205de6da68a76c428ce4e769af1 # v2.0.0
+        with:
+          comment_on_pr: false
+      - name: Setup firefox
+        id: setup-firefox
+        uses: browser-actions/setup-firefox@5914774dda97099441f02628f8d46411fcfbd208 # v1.7.0
+        with:
+          firefox-version: ${{  github.event.inputs.firefox_version == '' && '140.0' || github.event.inputs.firefox_version }}
+      - run: |
+          echo Installed firefox versions: ${{ steps.setup-firefox.outputs.firefox-version }}
+          ${{ steps.setup-firefox.outputs.firefox-path }} --version
       - name: Check out the repository to the runner
         uses: actions/checkout@v4
         with:
@@ -21,26 +78,40 @@ jobs:
           distribution: 'temurin' # See 'Supported distributions' for available options
           java-version: '8'
           mvn-toolchain-id: 'JavaSE-1.8'
+      - name: Install JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin' # See 'Supported distributions' for available options
+          java-version: '17'
+          mvn-toolchain-id: 'JavaSE-17'
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3.2.2
         with:
           log-accepted-android-sdk-licenses: 'false'
           cmdline-tools-version: 9123335  # This corresponds to human-friendly version number 8.0
       - name: Start MongoDB
-        uses: supercharge/mongodb-github-action@1.10.0
+        uses: supercharge/mongodb-github-action@90004df786821b6308fb02299e5835d0dae05d0d #v1.12.0
         with:
-          mongodb-version: 4.4
+          mongodb-version: 7.0
       - name: Start RabbitMQ
-        uses: namoshek/rabbitmq-github-action@v1
+        uses: namoshek/rabbitmq-github-action@58b841360ede0e19fc5e4929fc2477ecc09193d8 # v1.1.0
         with:
           version: '3.8.9'
           ports: '5672:5672'
       - shell: bash
         env: # Or as an environment variable
-          APP_PARAMETERS: "-Daws.region=eu-west-1 -Dgoogle.maps.authenticationparams=${{ secrets.GOOGLE_MAPS_AUTHENTICATIONPARAMS }} -Daws.s3.test.s3AccessId=${{ secrets.AWS_S3_TEST_S3ACCESSID }} -Daws.s3.test.s3AccessKey=${{ secrets.AWS_S3_TEST_S3ACCESSKEY }}"
+          TMP: /mnt/tmp
+          AWS_S3_TEST_S3ACCESSID: ${{ secrets.AWS_S3_TEST_S3ACCESSID }}
+          AWS_S3_TEST_S3ACCESSKEY: ${{ secrets.AWS_S3_TEST_S3ACCESSKEY }}
+          GEONAMES_ORG_USERNAMES: ${{ secrets.GEONAMES_ORG_USERNAMES }}
+          GOOGLE_MAPS_AUTHENTICATION_PARAMS: ${{ secrets.GOOGLE_MAPS_AUTHENTICATION_PARAMS }}
+          APP_PARAMETERS: "-Daws.region=eu-west-1"
           JAVA8_HOME: ${{env.JAVA_HOME_8_X64}}
         run: |
-          ./configuration/buildAndUpdateProduct.sh -x 60 build 2>&1 | tee build.log
+            ./configuration/buildAndUpdateProduct.sh -x ${{ github.event.inputs.runner_cpus == '' && '4' || github.event.inputs.runner_cpus }} ${{ github.event.inputs.skip_tests == 'true' && '-t' || '' }} ${{ github.event.inputs.local_target_platform == 'true' && '-v' || '' }} build 2>&1
+      - name: show disk stats
+        if: always()
+        run: df -h
       - name: Upload build log
         uses: actions/upload-artifact@v4
         if: always()
@@ -49,7 +120,7 @@ jobs:
             path: build.log
             retention-days: 90
       - name: Collect Test Reports
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@31a54ee7ebcacc03a09ea97a7e5465a47b84aea5 # v1.9.1
         if: always()
         with:
           name: Maven Tests
@@ -59,10 +130,11 @@ jobs:
           list-tests: failed
           reporter: java-junit
           fail-on-error: true
-      - shell: bash
-        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/docker-17' || startsWith(github.ref, 'refs/heads/releases/') }}
+      - name: Build Release
+        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/docker-24' || startsWith(github.ref, 'refs/heads/releases/') }}
+        shell: bash
         run: |
-          ./configuration/buildAndUpdateProduct.sh -u -L release
+          ./configuration/buildAndUpdateProduct.sh -u -L ${{ github.event.inputs.skip_tests == 'true' && '-n untested' || '' }} release
       - name: Determine release name
         run: |
           echo "SIMPLE_VERSION_INFO=$( basename dist/* )" >>${GITHUB_ENV}
@@ -76,25 +148,23 @@ jobs:
             retention-days: 90
       - name: Upload distribution artifact
         uses: actions/upload-artifact@v4
-        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/docker-17' || startsWith(github.ref, 'refs/heads/releases/') }}
+        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/docker-24' || startsWith(github.ref, 'refs/heads/releases/') }}
         with:
             name: ${{ env.SIMPLE_VERSION_INFO }}
             path: dist/**/*
             retention-days: 90
       - name: Create Release
         id: create_release
-        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/docker-17' || startsWith(github.ref, 'refs/heads/releases/') }}
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/docker-24' || startsWith(github.ref, 'refs/heads/releases/') }}
+        uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2.2.1
         with:
           tag_name: ${{ env.SIMPLE_VERSION_INFO }}
-          release_name: ${{ env.SIMPLE_VERSION_INFO }}
+          name: ${{ env.SIMPLE_VERSION_INFO }}
           draft: false
           prerelease: false
       - name: Upload Release Asset tar.gz
         id: upload-release-asset-tar-gz
-        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/docker-17' || startsWith(github.ref, 'refs/heads/releases/') }}
+        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/docker-24' || startsWith(github.ref, 'refs/heads/releases/') }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -105,7 +175,7 @@ jobs:
           asset_content_type: application/x-tar
       - name: Upload Release Asset release_notes.txt
         id: upload-release-asset-release-notes-txt
-        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/docker-17' || startsWith(github.ref, 'refs/heads/releases/') }}
+        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/docker-24' || startsWith(github.ref, 'refs/heads/releases/') }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -115,11 +185,19 @@ jobs:
           asset_name: release-notes.txt
           asset_content_type: text/plain
       - name: Trigger Hudson job
-        if: always()
+        env:
+          HUDSON_JOB_USERNAME: ${{ secrets.HUDSON_JOB_USERNAME }}
+          HUDSON_JOB_PASSWORD: ${{ secrets.HUDSON_JOB_PASSWORD }}
+          HUDSON_JOB_TOKEN: ${{ secrets.HUDSON_JOB_TOKEN }}
+        if: ${{ always() && env.HUDSON_JOB_USERNAME != '' && env.HUDSON_JOB_PASSWORD != '' && env.HUDSON_JOB_TOKEN != '' }}
         shell: bash
         run: |
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            JOB=SAPSailingAnalytics-master
+            if [ "${{ github.event.inputs.skip_tests }}" = "true" ]; then
+              JOB=SAPSailingAnalytics-master-fasttrack-no-tests
+            else
+              JOB=SAPSailingAnalytics-master
+            fi
           elif [[ "${{ github.ref }}" =~ refs/heads/releases/.* ]]; then
             JOB=$( echo "${{ github.ref }}" | sed -e 's/^refs\/heads\/releases\///' )
           else

@@ -1,9 +1,5 @@
 package net.sf.marineapi.nmea.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import net.sf.marineapi.nmea.sentence.TalkerId;
 import net.sf.marineapi.nmea.util.CompassPoint;
 import net.sf.marineapi.nmea.util.DataStatus;
@@ -12,8 +8,13 @@ import net.sf.marineapi.nmea.util.FaaMode;
 import net.sf.marineapi.nmea.util.Position;
 import net.sf.marineapi.nmea.util.Time;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the RMC sentence parser.
@@ -32,7 +33,7 @@ public class RMCTest {
 	RMCParser rmc;
 	RMCParser legacy;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		try {
 			empty = new RMCParser(TalkerId.GP);

@@ -1,6 +1,6 @@
 package com.sap.sailing.gwt.ui.adminconsole.yellowbrick;
 
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
@@ -80,7 +80,7 @@ public class YellowBrickConfigurationDialog extends DataEntryDialog<YellowBrickC
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return raceURLTextBox;
     }
 

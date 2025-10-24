@@ -1,13 +1,13 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.common.Position;

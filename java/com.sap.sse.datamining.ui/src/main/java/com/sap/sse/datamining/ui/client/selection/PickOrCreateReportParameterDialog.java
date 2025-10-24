@@ -6,7 +6,7 @@ import java.util.Set;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -137,7 +137,7 @@ public class PickOrCreateReportParameterDialog extends DataEntryDialog<FilterDim
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return parametersListBox;
     }
     
@@ -176,7 +176,7 @@ public class PickOrCreateReportParameterDialog extends DataEntryDialog<FilterDim
         }
         
         @Override
-        protected FocusWidget getInitialFocusWidget() {
+        protected Focusable getInitialFocusWidget() {
             return nameField;
         }
         

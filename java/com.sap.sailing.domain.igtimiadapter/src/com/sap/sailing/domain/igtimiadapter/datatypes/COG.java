@@ -19,8 +19,12 @@ public class COG extends Fix {
     private final Bearing courseOverGround;
     
     public COG(TimePoint timePoint, Sensor sensor, Map<Integer, Object> valuesPerSubindex) {
+        this(timePoint, sensor, new DegreeBearingImpl(((Number) valuesPerSubindex.get(1)).doubleValue())); 
+    }
+
+    public COG(TimePoint timePoint, Sensor sensor, Bearing courseOverGround) {
         super(sensor, timePoint);
-        courseOverGround = new DegreeBearingImpl(((Number) valuesPerSubindex.get(1)).doubleValue());
+        this.courseOverGround = courseOverGround;
     }
 
     public Bearing getCourseOverGround() {

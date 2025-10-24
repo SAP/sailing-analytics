@@ -23,6 +23,16 @@ public class TagDTO implements Serializable {
     public final static String TAG_URL_PARAMETER = "tag";
 
     private String tag, comment, username, imageURL, resizedImageURL;
+    
+    /**
+     * Data that will not be displayed to the end user; it may be visible, e.g., when viewing the technical race log
+     * entries or user preference objects, so don't use this to store secrets. But it can be used, e.g., to store
+     * information that identifies the tag in some unique way, for example, when the tag was automatically produced by
+     * some rule or agent, and that rule or agent later needs to decide whether or not there already is a tag produced
+     * by that rule/agent for the race to which the tag pertains.
+     */
+    private String hiddenInfo;
+    
     private boolean visibleForPublic;
     /**
      * By default every tag should have set the attributes {@link #raceTimepoint} and {@link #createdAt}.<br/>
@@ -51,6 +61,12 @@ public class TagDTO implements Serializable {
      *            title of tag
      * @param comment
      *            comment of tag, may be <code>null</code> as comment is optional
+     * @param hiddenInfo
+     *            Data that will not be displayed to the end user; it may be visible, e.g., when viewing the technical
+     *            race log entries or user preference objects, so don't use this to store secrets. But it can be used,
+     *            e.g., to store information that identifies the tag in some unique way, for example, when the tag was
+     *            automatically produced by some rule or agent, and that rule or agent later needs to decide whether or
+     *            not there already is a tag produced by that rule/agent for the race to which the tag pertains.
      * @param imageURL
      *            image URL of tag, may be <code>null</code> as image is optional
      * @param resizedImageURL
@@ -64,9 +80,9 @@ public class TagDTO implements Serializable {
      * @param createdAt
      *            timepoint where <code>username</code> created the tag
      */
-    public TagDTO(String tag, String comment, String imageURL, String resizedImageURL, boolean visibleForPublic,
-            String username, TimePoint raceTimepoint, TimePoint createdAt) {
-        this(tag, comment, imageURL, resizedImageURL, visibleForPublic, username, raceTimepoint, createdAt, null);
+    public TagDTO(String tag, String comment, String hiddenInfo, String imageURL, String resizedImageURL,
+            boolean visibleForPublic, String username, TimePoint raceTimepoint, TimePoint createdAt) {
+        this(tag, comment, hiddenInfo, imageURL, resizedImageURL, visibleForPublic, username, raceTimepoint, createdAt, null);
     }
 
     /**
@@ -76,6 +92,12 @@ public class TagDTO implements Serializable {
      *            title of tag
      * @param comment
      *            comment of tag, may be <code>null</code> as comment is optional
+     * @param hiddenInfo
+     *            Data that will not be displayed to the end user; it may be visible, e.g., when viewing the technical
+     *            race log entries or user preference objects, so don't use this to store secrets. But it can be used,
+     *            e.g., to store information that identifies the tag in some unique way, for example, when the tag was
+     *            automatically produced by some rule or agent, and that rule or agent later needs to decide whether or
+     *            not there already is a tag produced by that rule/agent for the race to which the tag pertains.
      * @param imageURL
      *            image URL of tag, may be <code>null</code> as image is optional
      * @param resizedImageURL
@@ -91,8 +113,8 @@ public class TagDTO implements Serializable {
      * @param revokedAt
      *            timepoint where tag got revoked, may be <code>null</code> if tag is not revoked
      */
-    public TagDTO(String tag, String comment, String imageURL, String resizedImageURL, boolean visibleForPublic,
-            String username, TimePoint raceTimepoint, TimePoint createdAt, TimePoint revokedAt) {
+    public TagDTO(String tag, String comment, String hiddenInfo, String imageURL, String resizedImageURL,
+            boolean visibleForPublic, String username, TimePoint raceTimepoint, TimePoint createdAt, TimePoint revokedAt) {
         this.tag = tag;
         this.comment = comment;
         this.imageURL = imageURL;
@@ -102,6 +124,7 @@ public class TagDTO implements Serializable {
         this.raceTimepoint = raceTimepoint;
         this.createdAt = createdAt;
         this.revokedAt = revokedAt;
+        this.hiddenInfo = hiddenInfo;
     }
 
     /**
@@ -120,6 +143,15 @@ public class TagDTO implements Serializable {
      */
     public String getComment() {
         return comment;
+    }
+    
+    /**
+     * Returns an optional hidden info that is not to be displayed to the end user
+     * 
+     * @return may be {@code null}
+     */
+    public String getHiddenInfo() {
+        return hiddenInfo;
     }
 
     /**
@@ -186,73 +218,22 @@ public class TagDTO implements Serializable {
     }
 
     /**
-     * Compares attributes {@link #tag}, {@link #comment}, {@link #imageURL}, {@link #resizedImageURL},
-     * {@link #visibleForPublic}, {@link #username} and {@link #raceTimepoint}, but <b>NOT</b> attributes
-     * {@link #createdAt} and {@link #revokedAt}.
-     * 
-     * The key is chosen this way (incl. imageURL, resizedImageURL and comment) to identify each tag without using
-     * generated custom key. This allows users to create tags at the same time point without having to worry about using
-     * different titles or moving the time slider just a little bit forward to comment on the same situation with just
-     * multiple images or comments.
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        TagDTO other = (TagDTO) obj;
-        if (tag == null) {
-            if (other.tag != null)
-                return false;
-        } else if (!tag.equals(other.tag))
-            return false;
-        if (comment == null) {
-            if (other.comment != null)
-                return false;
-        } else if (!comment.equals(other.comment))
-            return false;
-        if (imageURL == null) {
-            if (other.imageURL != null)
-                return false;
-        } else if (!imageURL.equals(other.imageURL))
-            return false;
-        if (resizedImageURL == null) {
-            if (other.resizedImageURL != null)
-                return false;
-        } else if (!resizedImageURL.equals(other.resizedImageURL))
-            return false;
-        if (isVisibleForPublic() != other.isVisibleForPublic()) {
-            return false;
-        }
-        if (username == null) {
-            if (other.username != null)
-                return false;
-        } else if (!username.equals(other.username)) {
-            return false;
-        }
-        if (raceTimepoint == null) {
-            if (other.raceTimepoint != null)
-                return false;
-        } else if (!raceTimepoint.equals(other.raceTimepoint))
-            return false;
-        return true;
-    }
-
-    /**
      * Compares {@link TagDTO} with given attributes.
      * 
      * @return <code>true</code> if all parameters match the key attributes of {@link TagDTO}, otherwise
      *         <code>false</code>
      */
-    public boolean equals(String tag, String comment, String imageURL, String resizedImageURL, boolean visibleForPublic,
-            String username, TimePoint raceTimepoint) {
+    public boolean equals(String tag, String comment, String hiddenInfo, String imageURL, String resizedImageURL,
+            boolean visibleForPublic, String username, TimePoint raceTimepoint) {
         if (this.comment == null) {
             if (comment != null)
                 return false;
         } else if (!this.comment.equals(comment))
+            return false;
+        if (this.hiddenInfo == null) {
+            if (hiddenInfo != null)
+                return false;
+        } else if (!this.hiddenInfo.equals(hiddenInfo))
             return false;
         if (this.imageURL == null) {
             if (imageURL != null)
@@ -289,6 +270,80 @@ public class TagDTO implements Serializable {
         } else if (!this.raceTimepoint.equals(raceTimepoint)) {
             return false;
         }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((comment == null) ? 0 : comment.hashCode());
+        result = prime * result + ((hiddenInfo == null) ? 0 : hiddenInfo.hashCode());
+        result = prime * result + ((imageURL == null) ? 0 : imageURL.hashCode());
+        result = prime * result + ((raceTimepoint == null) ? 0 : raceTimepoint.hashCode());
+        result = prime * result + ((resizedImageURL == null) ? 0 : resizedImageURL.hashCode());
+        result = prime * result + ((tag == null) ? 0 : tag.hashCode());
+        result = prime * result + ((username == null) ? 0 : username.hashCode());
+        result = prime * result + (visibleForPublic ? 1231 : 1237);
+        return result;
+    }
+
+    /**
+     * Compares attributes {@link #tag}, {@link #comment}, {@link #hiddenInfo}, {@link #imageURL}, {@link #resizedImageURL},
+     * {@link #visibleForPublic}, {@link #username} and {@link #raceTimepoint}, but <b>NOT</b> attributes
+     * {@link #createdAt} and {@link #revokedAt}.
+     * 
+     * The key is chosen this way (incl. imageURL, resizedImageURL and comment) to identify each tag without using
+     * generated custom key. This allows users to create tags at the same time point without having to worry about using
+     * different titles or moving the time slider just a little bit forward to comment on the same situation with just
+     * multiple images or comments.
+     */
+   @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        TagDTO other = (TagDTO) obj;
+        if (comment == null) {
+            if (other.comment != null)
+                return false;
+        } else if (!comment.equals(other.comment))
+            return false;
+        if (hiddenInfo == null) {
+            if (other.hiddenInfo != null)
+                return false;
+        } else if (!hiddenInfo.equals(other.hiddenInfo))
+            return false;
+        if (imageURL == null) {
+            if (other.imageURL != null)
+                return false;
+        } else if (!imageURL.equals(other.imageURL))
+            return false;
+        if (raceTimepoint == null) {
+            if (other.raceTimepoint != null)
+                return false;
+        } else if (!raceTimepoint.equals(other.raceTimepoint))
+            return false;
+        if (resizedImageURL == null) {
+            if (other.resizedImageURL != null)
+                return false;
+        } else if (!resizedImageURL.equals(other.resizedImageURL))
+            return false;
+        if (tag == null) {
+            if (other.tag != null)
+                return false;
+        } else if (!tag.equals(other.tag))
+            return false;
+        if (username == null) {
+            if (other.username != null)
+                return false;
+        } else if (!username.equals(other.username))
+            return false;
+        if (visibleForPublic != other.visibleForPublic)
+            return false;
         return true;
     }
 

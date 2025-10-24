@@ -6,6 +6,7 @@
   
   <inherits name="com.sap.sse.security.ui.SecurityLocalesSinglePermutation" />
   <inherits name="com.sap.sse.security.ui.LoginPanel"/>
+  <inherits name="com.sap.sse.landscape.aws.common.SSELandscapeAWSCommon" />
   
   <!-- Specify the app entry point class.                         -->
   <entry-point class='com.sap.sse.security.ui.login.LoginEntryPoint'/>

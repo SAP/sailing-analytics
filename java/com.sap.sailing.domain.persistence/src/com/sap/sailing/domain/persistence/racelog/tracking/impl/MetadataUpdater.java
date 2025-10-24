@@ -105,16 +105,23 @@ public class MetadataUpdater {
         assert runningUpdateTask == null && nextUpdate != null;
         runningUpdateTask = executor.submit((Callable<Void>) ()->{
             logger.fine(()->"Starting metadata updater task for device "+forDevice);
+            boolean currentUpdateNullInSynchronizedBlock; // the "finished" marker, outside of synchronized blocks equivalent to runningUpdateTask == null
             synchronized (MetadataUpdater.this) {
                 currentUpdate = getNextUpdate();
-                if (currentUpdate == null) {
+                // need to remember the currentUpdate null status from within the synchronized block;
+                // if runningUpdateTask is set to null because currentUpdate was null, and the synchronized
+                // block is left, another thread may call scheduleUpdate and start and set a new runningUpdateTask
+                // with a new currentUpdate; if this thread then sees currentUpdate != null, it would erroneously
+                // continue to run, on the same currentUpdate that has scheduled a new runningUpdateTask
+                currentUpdateNullInSynchronizedBlock = currentUpdate == null;
+                if (currentUpdateNullInSynchronizedBlock) {
                     runningUpdateTask = null;
                 } else {
                     setNextUpdate(null);
                 }
             }
             do {
-                if (currentUpdate != null) {
+                if (!currentUpdateNullInSynchronizedBlock) {
                     boolean success = false;
                     int retryCount = 3;
                     do {
@@ -129,7 +136,8 @@ public class MetadataUpdater {
                     } while (!success && retryCount-- > 0);
                     synchronized (MetadataUpdater.this) {
                         currentUpdate = getNextUpdate();
-                        if (currentUpdate == null) {
+                        currentUpdateNullInSynchronizedBlock = currentUpdate == null;
+                        if (currentUpdateNullInSynchronizedBlock) {
                             runningUpdateTask = null;
                         } else {
                             setNextUpdate(null);
@@ -138,7 +146,7 @@ public class MetadataUpdater {
                         MetadataUpdater.this.notifyAll();
                     }
                 }
-            } while (currentUpdate != null);
+            } while (!currentUpdateNullInSynchronizedBlock);
             logger.fine(()->"Terminating metadata updater task for device "+forDevice);
             return null;
         });

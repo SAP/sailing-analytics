@@ -1,24 +1,15 @@
 #!/bin/bash
 
-# Script to deploy on an instance that has an ephemeral volume as /dev/nvme0n1 (adjust env var PARTITION if different)
-# Ensures the partition is xfs-formatted, any existing partition contents will be overwritten if formatted otherwise.
-# An existing xfs partition will be left alone.
 . imageupgrade_functions.sh
-
-get_ec2_user_data() {
-  /bin/ec2-metadata -d | sed -e 's/^user-data: //'
-}
 
 METADATA=$( get_ec2_user_data )
 echo "Metadata: ${METADATA}"
 if echo "${METADATA}" | grep -q "^image-upgrade$"; then
   echo "Image upgrade..."
-  GIT_COPY_USER="trac"
-  RELATIVE_PATH_TO_GIT="gitcopy"
   LOGON_USER_HOME="ec2-user"
   ENVIRONMENT_TYPE="reverse_proxy"
-  run_yum_update
-  build_crontab_and_setup_files "${ENVIRONMENT_TYPE}" "${GIT_COPY_USER}" "${RELATIVE_PATH_TO_GIT}"
+  run_dnf_upgrade
+  build_crontab_and_setup_files "${ENVIRONMENT_TYPE}"
   finalize
 fi
 

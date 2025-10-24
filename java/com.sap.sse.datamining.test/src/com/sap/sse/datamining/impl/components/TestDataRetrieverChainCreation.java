@@ -3,14 +3,15 @@ package com.sap.sse.datamining.impl.components;
 import static com.sap.sse.datamining.test.util.ConcurrencyTestsUtil.getSharedExecutor;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
 
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.settings.SerializableSettings;
 import com.sap.sse.datamining.components.DataRetrieverChainBuilder;
@@ -48,7 +49,7 @@ public class TestDataRetrieverChainCreation {
     };
 
     @SuppressWarnings("unchecked")
-    @Before
+    @BeforeEach
     public void initializeRetrieverChain() {
         dataRetrieverChainDefinition = new SimpleDataRetrieverChainDefinition<>((Class<Collection<Test_Regatta>>)(Class<?>) Collection.class, Test_HasLegOfCompetitorContext.class, "TestRetrieverChain");
         dataRetrieverChainDefinition.startWith(TestRegattaRetrievalProcessor.class, Test_Regatta.class, "regatta");
@@ -62,7 +63,7 @@ public class TestDataRetrieverChainCreation {
                                              Test_HasLegOfCompetitorContext.class, "legOfCompetitor");
     }
     
-    @Before
+    @BeforeEach
     public void initializeFilters() {
         raceFilter = new AbstractFilterCriterion<Test_HasRaceContext>(Test_HasRaceContext.class) {
             @Override
@@ -80,17 +81,19 @@ public class TestDataRetrieverChainCreation {
     }
     
     @SuppressWarnings("unchecked")
-    @Test(expected=IllegalStateException.class)
+    @Test
     public void testCreationWithExistingChainDefinition() {
-        DataRetrieverChainDefinition<Collection<Test_Regatta>, ?> chainClone = new SimpleDataRetrieverChainDefinition<>(dataRetrieverChainDefinition, Void.class, "TestRetrieverChain");
-        assertThat(chainClone.getDataSourceType().equals(dataRetrieverChainDefinition.getDataSourceType()), is(true));
-        
-        List<DataRetrieverLevel<?, ?>> cloneDataRetrieverTypesWithInformation = (List<DataRetrieverLevel<?, ?>>) chainClone.getDataRetrieverLevels();
-        assertThat(cloneDataRetrieverTypesWithInformation, is(dataRetrieverChainDefinition.getDataRetrieverLevels()));
-
-        assertThat(chainClone, not(dataRetrieverChainDefinition));
-        
-        chainClone.startBuilding(ConcurrencyTestsUtil.getSharedExecutor());
+        try {
+            DataRetrieverChainDefinition<Collection<Test_Regatta>, ?> chainClone = new SimpleDataRetrieverChainDefinition<>(dataRetrieverChainDefinition, Void.class, "TestRetrieverChain");
+            assertThat(chainClone.getDataSourceType().equals(dataRetrieverChainDefinition.getDataSourceType()), is(true));
+            List<DataRetrieverLevel<?, ?>> cloneDataRetrieverTypesWithInformation = (List<DataRetrieverLevel<?, ?>>) chainClone.getDataRetrieverLevels();
+            assertThat(cloneDataRetrieverTypesWithInformation, is(dataRetrieverChainDefinition.getDataRetrieverLevels()));
+            assertThat(chainClone, not(dataRetrieverChainDefinition));
+            chainClone.startBuilding(ConcurrencyTestsUtil.getSharedExecutor());
+            fail("Expected IllegalStateException because the chain definition is already initialized.");
+        } catch (IllegalStateException e) {
+            // expected
+        }
     }
     
     @Test
@@ -148,121 +151,136 @@ public class TestDataRetrieverChainCreation {
     }
     
     @SuppressWarnings("unchecked")
-    @Test(expected=IllegalStateException.class)
+    @Test
     public void testAddAfterWithoutStarting() {
-        DataRetrieverChainDefinition<Collection<Test_Regatta>, ?> dataRetrieverChainDefinition = new SimpleDataRetrieverChainDefinition<>((Class<Collection<Test_Regatta>>)(Class<?>) Collection.class, Void.class, "TestRetrieverChain");
-
-        Class<Processor<Collection<Test_Regatta>, Test_Regatta>> regattaRetrieverClass = (Class<Processor<Collection<Test_Regatta>, Test_Regatta>>)(Class<?>) TestRegattaRetrievalProcessor.class;
-        Class<Processor<Test_Regatta, Test_HasRaceContext>> raceRetrieverClass = 
-                (Class<Processor<Test_Regatta, Test_HasRaceContext>>)(Class<?>) TestRaceWithContextRetrievalProcessor.class;
-        dataRetrieverChainDefinition.addAfter(regattaRetrieverClass,
-                                               raceRetrieverClass,
-                                               Test_HasRaceContext.class, "race");
+        assertThrows(IllegalStateException.class, () -> {
+            DataRetrieverChainDefinition<Collection<Test_Regatta>, ?> dataRetrieverChainDefinition = new SimpleDataRetrieverChainDefinition<>((Class<Collection<Test_Regatta>>)(Class<?>) Collection.class, Void.class, "TestRetrieverChain");
+            Class<Processor<Collection<Test_Regatta>, Test_Regatta>> regattaRetrieverClass = (Class<Processor<Collection<Test_Regatta>, Test_Regatta>>)(Class<?>) TestRegattaRetrievalProcessor.class;
+            Class<Processor<Test_Regatta, Test_HasRaceContext>> raceRetrieverClass = 
+                    (Class<Processor<Test_Regatta, Test_HasRaceContext>>)(Class<?>) TestRaceWithContextRetrievalProcessor.class;
+            dataRetrieverChainDefinition.addAfter(regattaRetrieverClass,
+                                                   raceRetrieverClass,
+                                                   Test_HasRaceContext.class, "race");
+        });
     }
     
     @SuppressWarnings("unchecked")
-    @Test(expected=IllegalStateException.class)
+    @Test
     public void testStartingTwice() {
-        DataRetrieverChainDefinition<Collection<Test_Regatta>, ?> dataRetrieverChainDefinition = new SimpleDataRetrieverChainDefinition<>((Class<Collection<Test_Regatta>>)(Class<?>) Collection.class, Void.class, "TestRetrieverChain");
-        Class<Processor<Collection<Test_Regatta>, Test_Regatta>> regattaRetrieverClass = (Class<Processor<Collection<Test_Regatta>, Test_Regatta>>)(Class<?>) TestRegattaRetrievalProcessor.class;
-        dataRetrieverChainDefinition.startWith(regattaRetrieverClass, Test_Regatta.class, "regatta");
-        dataRetrieverChainDefinition.startWith(regattaRetrieverClass, Test_Regatta.class, "regatta");
+        assertThrows(IllegalStateException.class, () -> {
+            DataRetrieverChainDefinition<Collection<Test_Regatta>, ?> dataRetrieverChainDefinition = new SimpleDataRetrieverChainDefinition<>((Class<Collection<Test_Regatta>>)(Class<?>) Collection.class, Void.class, "TestRetrieverChain");
+            Class<Processor<Collection<Test_Regatta>, Test_Regatta>> regattaRetrieverClass = (Class<Processor<Collection<Test_Regatta>, Test_Regatta>>)(Class<?>) TestRegattaRetrievalProcessor.class;
+            dataRetrieverChainDefinition.startWith(regattaRetrieverClass, Test_Regatta.class, "regatta");
+            dataRetrieverChainDefinition.startWith(regattaRetrieverClass, Test_Regatta.class, "regatta");
+        });
     }
     
     @SuppressWarnings("unchecked")
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testStartingWithProcessorWithoutUsableConstructor() {
-        DataRetrieverChainDefinition<Collection<Test_Regatta>, ?> dataRetrieverChainDefinition = new SimpleDataRetrieverChainDefinition<>((Class<Collection<Test_Regatta>>)(Class<?>) Collection.class, Void.class, "TestRetrieverChain");
-        dataRetrieverChainDefinition.startWith((Class<Processor<Collection<Test_Regatta>, Test_Regatta>>)(Class<?>) Processor.class, Test_Regatta.class, "regatta");
+        assertThrows(IllegalArgumentException.class, () -> {
+            DataRetrieverChainDefinition<Collection<Test_Regatta>, ?> dataRetrieverChainDefinition = new SimpleDataRetrieverChainDefinition<>((Class<Collection<Test_Regatta>>)(Class<?>) Collection.class, Void.class, "TestRetrieverChain");
+            dataRetrieverChainDefinition.startWith((Class<Processor<Collection<Test_Regatta>, Test_Regatta>>)(Class<?>) Processor.class, Test_Regatta.class, "regatta");
+        });
     }
     
     @SuppressWarnings("unchecked")
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testAddingProcessorWithoutUsableConstructor() {
-        DataRetrieverChainDefinition<Collection<Test_Regatta>, ?> dataRetrieverChainDefinition = new SimpleDataRetrieverChainDefinition<>((Class<Collection<Test_Regatta>>)(Class<?>) Collection.class, Void.class, "TestRetrieverChain");
-        Class<Processor<Collection<Test_Regatta>, Test_Regatta>> regattaRetrieverClass = (Class<Processor<Collection<Test_Regatta>, Test_Regatta>>)(Class<?>) TestRegattaRetrievalProcessor.class;
-        dataRetrieverChainDefinition.startWith(regattaRetrieverClass, Test_Regatta.class, "regatta");
-        
-        dataRetrieverChainDefinition.addAfter(regattaRetrieverClass,
-                                              (Class<Processor<Test_Regatta, Test_HasRaceContext>>)(Class<?>) Processor.class,
-                                              Test_HasRaceContext.class, "race");
+        assertThrows(IllegalArgumentException.class, () -> {
+            DataRetrieverChainDefinition<Collection<Test_Regatta>, ?> dataRetrieverChainDefinition = new SimpleDataRetrieverChainDefinition<>((Class<Collection<Test_Regatta>>)(Class<?>) Collection.class, Void.class, "TestRetrieverChain");
+            Class<Processor<Collection<Test_Regatta>, Test_Regatta>> regattaRetrieverClass = (Class<Processor<Collection<Test_Regatta>, Test_Regatta>>)(Class<?>) TestRegattaRetrievalProcessor.class;
+            dataRetrieverChainDefinition.startWith(regattaRetrieverClass, Test_Regatta.class, "regatta");
+            dataRetrieverChainDefinition.addAfter(regattaRetrieverClass,
+                                                  (Class<Processor<Test_Regatta, Test_HasRaceContext>>)(Class<?>) Processor.class,
+                                                  Test_HasRaceContext.class, "race");
+        });
     }
     
     @SuppressWarnings("unchecked")
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testAddingRetrieverThatDoesntMatch() {
-        DataRetrieverChainDefinition<Collection<Test_Regatta>, ?> dataRetrieverChainDefinition = new SimpleDataRetrieverChainDefinition<>((Class<Collection<Test_Regatta>>)(Class<?>) Collection.class, Void.class, "TestRetrieverChain");
-        Class<Processor<Collection<Test_Regatta>, Test_Regatta>> regattaRetrieverClass = (Class<Processor<Collection<Test_Regatta>, Test_Regatta>>)(Class<?>) TestRegattaRetrievalProcessor.class;
-        dataRetrieverChainDefinition.startWith(regattaRetrieverClass, Test_Regatta.class, "regatta");
-        
-        Class<Processor<Test_Regatta, Test_HasRaceContext>> raceRetrieverClass = 
-                (Class<Processor<Test_Regatta, Test_HasRaceContext>>)(Class<?>) TestRaceWithContextRetrievalProcessor.class;
-        Class<Processor<Test_HasRaceContext, Test_HasLegOfCompetitorContext>> legRetrieverClass = 
-                (Class<Processor<Test_HasRaceContext, Test_HasLegOfCompetitorContext>>)(Class<?>) TestLegOfCompetitorWithContextRetrievalProcessor.class;
-        dataRetrieverChainDefinition.addAfter(raceRetrieverClass,
-                                               legRetrieverClass,
-                                               Test_HasLegOfCompetitorContext.class, "legOfCompetitor");
+        assertThrows(IllegalArgumentException.class, () -> {
+            DataRetrieverChainDefinition<Collection<Test_Regatta>, ?> dataRetrieverChainDefinition = new SimpleDataRetrieverChainDefinition<>((Class<Collection<Test_Regatta>>)(Class<?>) Collection.class, Void.class, "TestRetrieverChain");
+            Class<Processor<Collection<Test_Regatta>, Test_Regatta>> regattaRetrieverClass = (Class<Processor<Collection<Test_Regatta>, Test_Regatta>>)(Class<?>) TestRegattaRetrievalProcessor.class;
+            dataRetrieverChainDefinition.startWith(regattaRetrieverClass, Test_Regatta.class, "regatta");
+            Class<Processor<Test_Regatta, Test_HasRaceContext>> raceRetrieverClass = 
+                    (Class<Processor<Test_Regatta, Test_HasRaceContext>>)(Class<?>) TestRaceWithContextRetrievalProcessor.class;
+            Class<Processor<Test_HasRaceContext, Test_HasLegOfCompetitorContext>> legRetrieverClass = 
+                    (Class<Processor<Test_HasRaceContext, Test_HasLegOfCompetitorContext>>)(Class<?>) TestLegOfCompetitorWithContextRetrievalProcessor.class;
+            dataRetrieverChainDefinition.addAfter(raceRetrieverClass,
+                                                   legRetrieverClass,
+                                                   Test_HasLegOfCompetitorContext.class, "legOfCompetitor");
+        });
     }
     
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testSettingAFilterWithWrongElementType() {
-        DataRetrieverChainBuilder<Collection<Test_Regatta>> chainBuilder = dataRetrieverChainDefinition.startBuilding(ConcurrencyTestsUtil.getSharedExecutor());
-        chainBuilder.stepFurther(); //Initialization
-        
-        chainBuilder.setFilter(raceFilter);
+        assertThrows(IllegalArgumentException.class, () -> {
+            DataRetrieverChainBuilder<Collection<Test_Regatta>> chainBuilder = dataRetrieverChainDefinition.startBuilding(ConcurrencyTestsUtil.getSharedExecutor());
+            chainBuilder.stepFurther(); //Initialization
+            chainBuilder.setFilter(raceFilter);
+        });
     }
     
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testSettingAResultReceiverWithWrongInputType() {
-        DataRetrieverChainBuilder<Collection<Test_Regatta>> chainBuilder = dataRetrieverChainDefinition.startBuilding(ConcurrencyTestsUtil.getSharedExecutor());
-        chainBuilder.stepFurther(); //Initialization
-        
-        chainBuilder.addResultReceiver(legReceiver);
+        assertThrows(IllegalArgumentException.class, () -> {
+            DataRetrieverChainBuilder<Collection<Test_Regatta>> chainBuilder = dataRetrieverChainDefinition.startBuilding(ConcurrencyTestsUtil.getSharedExecutor());
+            chainBuilder.stepFurther(); //Initialization
+            chainBuilder.addResultReceiver(legReceiver);
+        });
     }
     
     @SuppressWarnings("unchecked")
-    @Test(expected=IllegalStateException.class)
+    @Test
     public void testEndingTwice() {
-        Class<Processor<Test_Regatta, Test_HasRaceContext>> raceRetrieverClass = 
-                (Class<Processor<Test_Regatta, Test_HasRaceContext>>)(Class<?>) TestRaceWithContextRetrievalProcessor.class;
-        Class<Processor<Test_HasRaceContext, Test_HasLegOfCompetitorContext>> legRetrieverClass = 
-                (Class<Processor<Test_HasRaceContext, Test_HasLegOfCompetitorContext>>)(Class<?>) TestLegOfCompetitorWithContextRetrievalProcessor.class;
-        dataRetrieverChainDefinition.endWith(raceRetrieverClass, legRetrieverClass, Test_HasLegOfCompetitorContext.class, "legOfCompetitor");
+        assertThrows(IllegalStateException.class, () -> {
+            Class<Processor<Test_Regatta, Test_HasRaceContext>> raceRetrieverClass = 
+                    (Class<Processor<Test_Regatta, Test_HasRaceContext>>)(Class<?>) TestRaceWithContextRetrievalProcessor.class;
+            Class<Processor<Test_HasRaceContext, Test_HasLegOfCompetitorContext>> legRetrieverClass = 
+                    (Class<Processor<Test_HasRaceContext, Test_HasLegOfCompetitorContext>>)(Class<?>) TestLegOfCompetitorWithContextRetrievalProcessor.class;
+            dataRetrieverChainDefinition.endWith(raceRetrieverClass, legRetrieverClass, Test_HasLegOfCompetitorContext.class, "legOfCompetitor");
+        });
     }
     
     @SuppressWarnings("unchecked")
-    @Test(expected=IllegalStateException.class)
+    @Test
     public void testAddingRetrieverAfterCompletion() {
-        Class<Processor<Test_Regatta, Test_HasRaceContext>> raceRetrieverClass = 
-                (Class<Processor<Test_Regatta, Test_HasRaceContext>>)(Class<?>) TestRaceWithContextRetrievalProcessor.class;
-        Class<Processor<Test_HasRaceContext, Test_HasLegOfCompetitorContext>> legRetrieverClass = 
-                (Class<Processor<Test_HasRaceContext, Test_HasLegOfCompetitorContext>>)(Class<?>) TestLegOfCompetitorWithContextRetrievalProcessor.class;
-        dataRetrieverChainDefinition.addAfter(raceRetrieverClass, legRetrieverClass, Test_HasLegOfCompetitorContext.class, "legOfCompetitor");
+        assertThrows(IllegalStateException.class, () -> {
+            Class<Processor<Test_Regatta, Test_HasRaceContext>> raceRetrieverClass = 
+                    (Class<Processor<Test_Regatta, Test_HasRaceContext>>)(Class<?>) TestRaceWithContextRetrievalProcessor.class;
+            Class<Processor<Test_HasRaceContext, Test_HasLegOfCompetitorContext>> legRetrieverClass = 
+                    (Class<Processor<Test_HasRaceContext, Test_HasLegOfCompetitorContext>>)(Class<?>) TestLegOfCompetitorWithContextRetrievalProcessor.class;
+            dataRetrieverChainDefinition.addAfter(raceRetrieverClass, legRetrieverClass, Test_HasLegOfCompetitorContext.class, "legOfCompetitor");
+        });
     }
     
     @SuppressWarnings("unchecked")
-    @Test(expected=IllegalStateException.class)
+    @Test
     public void testStartBuildingWithIncompleteChain() {
-        DataRetrieverChainDefinition<Collection<Test_Regatta>, Test_HasLegOfCompetitorContext> dataRetrieverChainDefinition = new SimpleDataRetrieverChainDefinition<>((Class<Collection<Test_Regatta>>)(Class<?>) Collection.class, Test_HasLegOfCompetitorContext.class, "TestRetrieverChain");
-        Class<Processor<Collection<Test_Regatta>, Test_Regatta>> regattaRetrieverClass = (Class<Processor<Collection<Test_Regatta>, Test_Regatta>>)(Class<?>) TestRegattaRetrievalProcessor.class;
-        dataRetrieverChainDefinition.startWith(regattaRetrieverClass, Test_Regatta.class, "regatta");
-        
-        Class<Processor<Test_Regatta, Test_HasRaceContext>> raceRetrieverClass = 
-                (Class<Processor<Test_Regatta, Test_HasRaceContext>>)(Class<?>) TestRaceWithContextRetrievalProcessor.class;
-        dataRetrieverChainDefinition.addAfter(regattaRetrieverClass,
-                                               raceRetrieverClass,
-                                               Test_HasRaceContext.class, "race");
-        
-        dataRetrieverChainDefinition.startBuilding(ConcurrencyTestsUtil.getSharedExecutor());
+        assertThrows(IllegalStateException.class, () -> {
+            DataRetrieverChainDefinition<Collection<Test_Regatta>, Test_HasLegOfCompetitorContext> dataRetrieverChainDefinition = new SimpleDataRetrieverChainDefinition<>((Class<Collection<Test_Regatta>>)(Class<?>) Collection.class, Test_HasLegOfCompetitorContext.class, "TestRetrieverChain");
+            Class<Processor<Collection<Test_Regatta>, Test_Regatta>> regattaRetrieverClass = (Class<Processor<Collection<Test_Regatta>, Test_Regatta>>)(Class<?>) TestRegattaRetrievalProcessor.class;
+            dataRetrieverChainDefinition.startWith(regattaRetrieverClass, Test_Regatta.class, "regatta");
+            Class<Processor<Test_Regatta, Test_HasRaceContext>> raceRetrieverClass = 
+                    (Class<Processor<Test_Regatta, Test_HasRaceContext>>)(Class<?>) TestRaceWithContextRetrievalProcessor.class;
+            dataRetrieverChainDefinition.addAfter(regattaRetrieverClass,
+                                                   raceRetrieverClass,
+                                                   Test_HasRaceContext.class, "race");
+            dataRetrieverChainDefinition.startBuilding(ConcurrencyTestsUtil.getSharedExecutor());
+        });
     }
     
-    @Test(expected=IllegalStateException.class)
+    @Test
     public void testSteppingToFar() {
-        DataRetrieverChainBuilder<Collection<Test_Regatta>> chainBuilder = dataRetrieverChainDefinition.startBuilding(ConcurrencyTestsUtil.getSharedExecutor());
-        while (chainBuilder.canStepFurther()) {
+        assertThrows(IllegalStateException.class, () -> {
+            DataRetrieverChainBuilder<Collection<Test_Regatta>> chainBuilder = dataRetrieverChainDefinition.startBuilding(ConcurrencyTestsUtil.getSharedExecutor());
+            while (chainBuilder.canStepFurther()) {
+                chainBuilder.stepFurther();
+            }
             chainBuilder.stepFurther();
-        }
-        chainBuilder.stepFurther();
+        });
     }
     
     @Test
@@ -296,33 +314,39 @@ public class TestDataRetrieverChainCreation {
         return lastRetriever;
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test
     public void testRetrieverChainDefinitionWithSettingsButWithoutDefaultSettings() {
-        DataRetrieverChainDefinition<Collection<Test_Regatta>, Test_HasLegOfCompetitorContext> chainWithSettings = 
-                new SimpleDataRetrieverChainDefinition<>(dataRetrieverChainDefinition, Test_HasLegOfCompetitorContext.class, "TestRetrieverChain");
-        chainWithSettings.endWith(TestLegOfCompetitorWithContextRetrievalProcessor.class, Test_RetrievalProcessorWithSettings.class, Test_HasLegOfCompetitorContext.class,
-                Test_RetrievalProcessorSettings.class, null, "legOfCompetitor");
+        assertThrows(NullPointerException.class, () -> {
+            DataRetrieverChainDefinition<Collection<Test_Regatta>, Test_HasLegOfCompetitorContext> chainWithSettings = 
+                    new SimpleDataRetrieverChainDefinition<>(dataRetrieverChainDefinition, Test_HasLegOfCompetitorContext.class, "TestRetrieverChain");
+            chainWithSettings.endWith(TestLegOfCompetitorWithContextRetrievalProcessor.class, Test_RetrievalProcessorWithSettings.class, Test_HasLegOfCompetitorContext.class,
+                    Test_RetrievalProcessorSettings.class, null, "legOfCompetitor");
+        });
     }
     
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testRetrieverChainWithWrongSettingsCreation() {
-        DataRetrieverChainDefinition<Collection<Test_Regatta>, Test_HasLegOfCompetitorContext> chainWithSettings = 
-                new SimpleDataRetrieverChainDefinition<>(dataRetrieverChainDefinition, Test_HasLegOfCompetitorContext.class, "TestRetrieverChain");
-        chainWithSettings.endWith(TestLegOfCompetitorWithContextRetrievalProcessor.class, Test_RetrievalProcessorWithSettings.class, Test_HasLegOfCompetitorContext.class,
-                Test_RetrievalProcessorSettings.class, new Test_RetrievalProcessorSettings("Default Settings"), "legOfCompetitor");
-        
-        DataRetrieverChainBuilder<Collection<Test_Regatta>> chainBuilder = chainWithSettings.startBuilding(getSharedExecutor());
-        while (chainBuilder.canStepFurther()) {
-            chainBuilder.stepFurther();
-        }
-        chainBuilder.setSettings(new WrongSettings());
+        assertThrows(IllegalArgumentException.class, () -> {
+            DataRetrieverChainDefinition<Collection<Test_Regatta>, Test_HasLegOfCompetitorContext> chainWithSettings = 
+                    new SimpleDataRetrieverChainDefinition<>(dataRetrieverChainDefinition, Test_HasLegOfCompetitorContext.class, "TestRetrieverChain");
+            chainWithSettings.endWith(TestLegOfCompetitorWithContextRetrievalProcessor.class, Test_RetrievalProcessorWithSettings.class, Test_HasLegOfCompetitorContext.class,
+                    Test_RetrievalProcessorSettings.class, new Test_RetrievalProcessorSettings("Default Settings"), "legOfCompetitor");
+            
+            DataRetrieverChainBuilder<Collection<Test_Regatta>> chainBuilder = chainWithSettings.startBuilding(getSharedExecutor());
+            while (chainBuilder.canStepFurther()) {
+                chainBuilder.stepFurther();
+            }
+            chainBuilder.setSettings(new WrongSettings());
+        });
     }
     
-    @Test(expected=IllegalStateException.class)
+    @Test
     public void testRetrieverWithNoSettingsButSettedSettingsCreated() {
-        DataRetrieverChainBuilder<Collection<Test_Regatta>> chainBuilder = dataRetrieverChainDefinition.startBuilding(ConcurrencyTestsUtil.getSharedExecutor());
-        chainBuilder.stepFurther(); // Initialization
-        chainBuilder.setSettings(new WrongSettings());
+        assertThrows(IllegalStateException.class, () -> {
+            DataRetrieverChainBuilder<Collection<Test_Regatta>> chainBuilder = dataRetrieverChainDefinition.startBuilding(ConcurrencyTestsUtil.getSharedExecutor());
+            chainBuilder.stepFurther(); // Initialization
+            chainBuilder.setSettings(new WrongSettings());
+        });
     }
     
     public class WrongSettings extends SerializableSettings {

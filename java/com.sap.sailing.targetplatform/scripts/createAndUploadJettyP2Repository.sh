@@ -5,6 +5,7 @@ P2_URL="https://download.eclipse.org/jetty/updates/jetty-bundles-9.x/${VERSION}/
 TARGET_BASE_PLUGINS_DIR=../../com.sap.sailing.targetplatform.base/plugins/target-base
 TMP_FOLDER="${TMP}/jetty-${VERSION}"
 rm -rf "${TMP_FOLDER}"
+# Note how the following two lines differ: the first runs the "metadata," the second the "artifact" application, so both are required!
 eclipse -nosplash -verbose -application org.eclipse.equinox.p2.metadata.repository.mirrorApplication -source https://download.eclipse.org/jetty/updates/jetty-bundles-9.x/${VERSION}/ -destination file:${TMP_FOLDER}
 eclipse -nosplash -verbose -application org.eclipse.equinox.p2.artifact.repository.mirrorApplication -source https://download.eclipse.org/jetty/updates/jetty-bundles-9.x/${VERSION}/ -destination file:${TMP_FOLDER}
 echo "Uploading the ${TMP_FOLDER} folder to trac@sapsailing.com:p2-repositories/jetty-${VERSION} ..."

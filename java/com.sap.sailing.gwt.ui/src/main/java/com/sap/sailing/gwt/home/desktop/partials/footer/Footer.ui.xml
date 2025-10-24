@@ -20,12 +20,15 @@
             <a ui:field="privacyAnchorLink" href="https://www.sap.com/about/legal/privacy.html?campaigncode=CRM-XH21-OSP-Sailing" target="_blank" class="{local_res.css.sitefooter_links_link}">
               <ui:text from='{i18n.footerPrivacy}' />
             </a>
+            <a ui:field="sapJobsAnchor" href="https://jobs.sapsailing.com" target="_blank" class="{local_res.css.sitefooter_links_link}">
+              <ui:text from='{i18n.footerJobs}'/>
+            </a>
             <a ui:field="supportAnchor" href="https://support.sapsailing.com" target="_blank" class="{local_res.css.sitefooter_links_link}">
               <ui:text from='{i18n.footerSupport}' />
             </a>
-            <a ui:field="mobileUi" href="HomeMobile.html" 
+            <a ui:field="mobileUi" title="{i18n.mobile}" href=""
             		class="{local_res.css.sitefooter_links_link} {res.mediaCss.showonsmall} {res.mediaCss.hideonmedium} {res.mediaCss.hideonlarge}">
-              Mobile
+              <ui:text from='{i18n.mobile}' />
             </a>
             <a ui:field="whatsNewAnchor" href="{releaseNotesNavigation.getSafeTargetUrl}" class="{local_res.css.sitefooter_links_link}">
               <ui:text from='{i18n.whatsNew}' />

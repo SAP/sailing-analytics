@@ -4,12 +4,8 @@ logger -t sailing "Cloning security_service DB from eu-west-1 live replica set t
 logger -t sailing "Copying an existing local security_service DB to security_service_bak..."
 cd /tmp
 rm -rf /tmp/dump
-ssh ec2-user@paris-ssh.sapsailing.com "set -e; cd /tmp; rm -rf /tmp/dump; mongodump --host live/mongo0.internal.sapsailing.com,mongo1.internal.sapsailing.com,dbserver.internal.sapsailing.com:10203 --db security_service; tar czvpf - dump" | tar xzvpf - && logger -t sailing "mongodump finished with $?. Restoring dump of security_service DB from eu-west-1 locally..." || ( logger -t sailing "SEVERE: mongodump finished with $?. Aborting..."; echo "exiting with code 1"; exit 1 )
-echo 'use security_service_bak
-db.dropDatabase()
-db.copyDatabase("security_service", "security_service_bak")
-quit()' | mongo "mongodb://localhost/security_service_bak?replicaSet=security_service&retryWrites=true&readPreference=nearest" && logger -t sailing "Succesful, continuing..." || ( logger -t sailing "SEVERE: mongo finished with $?"; exit 1 )
-mongorestore --drop --host security_service/localhost && logger -t sailing "mongorestore finished with $?. Done cloning security_service DB from eu-west-1 live replica set to local paris2024 replica set." || ( logger -t sailing "SEVERE: mongorestore finished with $?. Aborting..."; echo 'use security_service
-db.dropDatabase()
-db.copyDatabase("security_service_bak", "security_service")
-quit()' | mongo "mongodb://localhost/security_service_bak?replicaSet=security_service&retryWrites=true&readPreference=nearest"; logger -t sailing "SEVERE: Restored old backup, dropped security_service_bak"; exit 1 )
+ssh ec2-user@paris-ssh.sapsailing.com "set -e; cd /tmp; rm -rf /tmp/dump; mongodump --host=live/mongo0.internal.sapsailing.com,mongo1.internal.sapsailing.com,dbserver.internal.sapsailing.com:10203 --db=security_service; tar czvpf - dump" | tar xzvpf - && logger -t sailing "mongodump finished with $?. Restoring dump of security_service DB from eu-west-1 locally..." || ( logger -t sailing "SEVERE: mongodump finished with $?. Aborting..."; echo "exiting with code 1"; exit 1 )
+mongodump --archive=/tmp/security_service.mongodump --host=security_service/localhost --db=security_service
+mongorestore --drop --archive=/tmp/security_service.mongodump --host=security_service/localhost --nsFrom='security_service.*' --nsTo='security_service_bak.*'
+rm /tmp/security_service.mongodump
+mongorestore --drop --host=security_service/localhost && logger -t sailing "mongorestore finished with $?. Done cloning security_service DB from eu-west-1 live replica set to local paris2024 replica set." || ( logger -t sailing "SEVERE: mongorestore finished with $?. Aborting..."; mongodump --archive=/tmp/security_service.mongodump --host=security_service/localhost --db=security_service_bak; mongorestore --drop --archive=/tmp/security_service.mongodump --host=security_service/localhost --nsFrom='security_service_bak.*' --nsTo='security_service.*'; rm /tmp/security_service.mongodump; logger -t sailing "SEVERE: Restored old backup, dropped security_service_bak"; exit 1 )

@@ -1,11 +1,11 @@
 package net.sf.marineapi.nmea.io;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,9 +19,9 @@ import net.sf.marineapi.nmea.parser.SentenceFactory;
 import net.sf.marineapi.nmea.sentence.Sentence;
 import net.sf.marineapi.nmea.sentence.SentenceId;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class SentenceReaderTest {
 
@@ -37,7 +37,7 @@ public class SentenceReaderTest {
 	private boolean stopped;
 	private InputStream stream;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		File file = new File(TEST_DATA);
 		stream = new FileInputStream(file);
@@ -76,7 +76,7 @@ public class SentenceReaderTest {
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	public void testSetDatagramSocket() {
 		// TODO mock socket
 	}

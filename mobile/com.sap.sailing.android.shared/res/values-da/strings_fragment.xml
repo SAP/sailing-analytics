@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><resources>
+<?xml version="1.0" encoding="utf-8" standalone="no"?><resources>
     <string name="scan_qr">"Scan QR-kode"</string>
     <string name="scan_hint">"QR-koden kan findes på din bekræftelse på deltagelse"</string>
     <string name="no_qr_code">"Har du ikke en QR-kode?"</string>

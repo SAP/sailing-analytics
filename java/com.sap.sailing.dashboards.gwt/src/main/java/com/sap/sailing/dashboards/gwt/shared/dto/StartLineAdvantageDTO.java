@@ -9,7 +9,7 @@ public class StartLineAdvantageDTO extends AverageDTO implements Result {
     
     public Double startLineAdvantage;
     public Double distanceToRCBoatInMeters;
-    public StartlineAdvantageType startLineAdvatageType;
+    public StartlineAdvantageType startLineAdvantageType;
     public Double confidence;
     
     public StartLineAdvantageDTO(){}

@@ -53,6 +53,23 @@
          ]
       },
       {
+         "collectionName":"Replication",
+         "folders":[  
+            {  
+               "startingFolderPath":"java/com.sap.sse.replication/resources/stringmessages",
+               "sourceFilters":[  
+                  "**/Replication_StringMessages*.properties"
+               ],
+               "excludedSourceFilters":[
+               	"**/*_zh.properties"
+               	],
+               "xlfFolderPath":"./XLF",
+	       "targetFolderPath":".",
+	       "pseudoLocFolderPath":"."
+            }
+         ]
+      },
+      {
          "collectionName":"SailingLandscape",
          "folders":[  
             {  

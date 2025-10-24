@@ -1,6 +1,6 @@
 package com.sap.sailing.gwt.home.desktop.places.user.profile.subscriptionstab;
 
-import static com.sap.sailing.gwt.ui.common.client.DateAndTimeFormatterUtil.formatDateAndTime;
+import static com.sap.sse.gwt.client.DateAndTimeFormatterUtil.formatDateAndTime;
 
 import java.util.ArrayList;
 import java.util.Arrays;

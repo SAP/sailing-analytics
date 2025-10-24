@@ -10,6 +10,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.sap.sailing.gwt.home.communication.eventlist.EventListYearDTO;
 import com.sap.sailing.gwt.home.desktop.app.DesktopPlacesNavigator;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 
 public class EventsOverviewRecent extends Composite {
 
@@ -29,15 +30,13 @@ public class EventsOverviewRecent extends Composite {
         initWidget(uiBinder.createAndBindUi(this));
     }
 
-    public void updateEvents(List<EventListYearDTO> years) {
+    public void updateEvents(List<EventListYearDTO> years, TakedownNoticeService takedownNoticeService) {
         // remove old widgets
         year.clear();
-        
         boolean oneYearIsExpanded = false;
         for (EventListYearDTO yearDTO : years) {
-            EventsOverviewRecentYear recentEventsOfOneYear = new EventsOverviewRecentYear(yearDTO, navigator, !oneYearIsExpanded);
+            EventsOverviewRecentYear recentEventsOfOneYear = new EventsOverviewRecentYear(yearDTO, navigator, !oneYearIsExpanded, takedownNoticeService);
             year.add(recentEventsOfOneYear);
-            
             oneYearIsExpanded = true;
         }
     }

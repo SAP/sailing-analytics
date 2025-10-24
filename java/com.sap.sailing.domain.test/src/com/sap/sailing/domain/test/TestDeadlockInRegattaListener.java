@@ -9,11 +9,11 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.Timeout;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import com.sap.sailing.domain.base.Course;
 import com.sap.sailing.domain.base.RaceDefinition;
@@ -37,10 +37,8 @@ import com.sap.sailing.server.interfaces.RacingEventService;
 import com.sap.sse.replication.FullyInitializedReplicableTracker;
 import com.sap.sse.util.ThreadLocalTransporter;
 
+@Timeout(value = 100, unit = TimeUnit.SECONDS) // fail after 1s
 public class TestDeadlockInRegattaListener {
-    @Rule
-    public Timeout globalTimeout = Timeout.millis(100000); // fail after 1s
-
     @Test
     public void testDeadlockInRegattaListener() throws InterruptedException, BrokenBarrierException, MalformedURLException, IOException {
         CyclicBarrier latch = new CyclicBarrier(2);

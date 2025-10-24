@@ -32,23 +32,20 @@ public class WebDriverWindow {
     public void close() {
         WebDriver driver = switchToWindow();
         driver.close();
-        
         this.handle = null;
     }
 
     public WebDriver switchToWindow() {
         checkForClosed();
-        
         TargetLocator locator = this.driver.switchTo();
-        
         return locator.window(this.handle);
     }
 
     private void checkForClosed() {
         Set<String> handles = this.driver.getWindowHandles();
-        
-        if(!handles.contains(this.handle))
+        if (!handles.contains(this.handle)) {
             throw new WebDriverException("Window closed or not initialized"); //$NON-NLS-1$
+        }
     }
     
     public WebDriver getWebDriver() {

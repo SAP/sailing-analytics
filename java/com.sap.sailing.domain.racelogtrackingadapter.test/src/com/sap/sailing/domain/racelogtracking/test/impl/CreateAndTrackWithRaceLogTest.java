@@ -1,10 +1,10 @@
 package com.sap.sailing.domain.racelogtracking.test.impl;
 
 import static com.sap.sse.common.Util.size;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -16,12 +16,11 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.Timeout;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import com.mongodb.MongoException;
 import com.mongodb.ReadConcern;
@@ -63,16 +62,16 @@ import com.sap.sailing.domain.persistence.impl.CollectionNames;
 import com.sap.sailing.domain.persistence.racelog.tracking.MongoSensorFixStoreFactory;
 import com.sap.sailing.domain.racelog.tracking.SensorFixStore;
 import com.sap.sailing.domain.racelog.tracking.test.mock.MockSmartphoneImeiServiceFinderFactory;
-import com.sap.sailing.domain.racelog.tracking.test.mock.SmartphoneImeiIdentifier;
 import com.sap.sailing.domain.racelogtracking.RaceLogTrackingAdapter;
 import com.sap.sailing.domain.racelogtracking.RaceLogTrackingAdapterFactory;
+import com.sap.sailing.domain.racelogtracking.impl.SmartphoneImeiIdentifierImpl;
 import com.sap.sailing.domain.racelogtracking.impl.fixtracker.RaceLogFixTrackerManager;
 import com.sap.sailing.domain.racelogtracking.test.RaceLogTrackingTestHelper;
 import com.sap.sailing.domain.ranking.OneDesignRankingMetric;
+import com.sap.sailing.domain.shared.tracking.Track;
 import com.sap.sailing.domain.tracking.DynamicTrackedRace;
 import com.sap.sailing.domain.tracking.RaceHandle;
 import com.sap.sailing.domain.tracking.RaceTrackingHandler.DefaultRaceTrackingHandler;
-import com.sap.sailing.domain.tracking.Track;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.domain.tracking.impl.AbstractRaceChangeListener;
 import com.sap.sailing.server.impl.RacingEventServiceImpl;
@@ -85,6 +84,7 @@ import com.sap.sse.common.impl.DegreeBearingImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.mongodb.MongoDBService;
 
+@Timeout(value=3, unit=TimeUnit.MINUTES)
 public class CreateAndTrackWithRaceLogTest extends RaceLogTrackingTestHelper {
     private RacingEventService service;
     private final static BoatClass boatClass = new BoatClassImpl("505", /* typicallyStartsUpwind */ true);
@@ -97,10 +97,7 @@ public class CreateAndTrackWithRaceLogTest extends RaceLogTrackingTestHelper {
 
     private long time = 0;
 
-    @Rule
-    public Timeout CreateAndTrackWithRaceLogTestTimeout = Timeout.millis(3 * 60 * 1000);
-
-    @Before
+    @BeforeEach
     public void setup() throws UnknownHostException, MongoException {
         final ClientSession clientSession = MongoDBService.INSTANCE.startCausallyConsistentSession();
         final ClientSession metadataCollectionClientSession = MongoDBService.INSTANCE.startCausallyConsistentSession();
@@ -132,7 +129,7 @@ public class CreateAndTrackWithRaceLogTest extends RaceLogTrackingTestHelper {
         DomainFactory.INSTANCE.getCompetitorAndBoatStore().clear();
     }
     
-    @After
+    @AfterEach
     public void tearDown() throws MalformedURLException, IOException, InterruptedException {
         service.removeRegatta(regatta);
     }
@@ -154,7 +151,7 @@ public class CreateAndTrackWithRaceLogTest extends RaceLogTrackingTestHelper {
     public void cantAddBeforeDenoting() throws MalformedURLException, FileNotFoundException, URISyntaxException,
             Exception {
         RaceColumn column = leaderboard.getRaceColumnByName(columnName);
-        Assert.assertThrows(NotDenotedForRaceLogTrackingException.class, ()->trackAndGetRace(column));
+        Assertions.assertThrows(NotDenotedForRaceLogTrackingException.class, ()->trackAndGetRace(column));
     }
 
     private void testSize(Track<?> track, int expected) {
@@ -218,7 +215,7 @@ public class CreateAndTrackWithRaceLogTest extends RaceLogTrackingTestHelper {
         Boat boat1 = new BoatImpl("id12345", "boat1", boatClass, /* sailID */ null);
         Competitor comp1 = DomainFactory.INSTANCE.getOrCreateCompetitor("comp1", "comp1", "c", null, null, null, null,
                 /* timeOnTimeFactor */ null, /* timeOnDistanceAllowancePerNauticalMile */ null, null, /* storePersistently */ true);
-        DeviceIdentifier dev1 = new SmartphoneImeiIdentifier("dev1");
+        DeviceIdentifier dev1 = new SmartphoneImeiIdentifierImpl("dev1");
         regattaLog.add(new RegattaLogDeviceCompetitorMappingEventImpl(t(), t(), author, 0, comp1, dev1, t(0), t(10)));
         addFixes0(dev1);
         raceLog.add(new RaceLogUseCompetitorsFromRaceLogEventImpl(t(), author, t(), UUID.randomUUID(), 0));
@@ -295,7 +292,7 @@ public class CreateAndTrackWithRaceLogTest extends RaceLogTrackingTestHelper {
         Boat boat1 = new BoatImpl("id12345", "boat1", boatClass, /* sailID */ null);
         CompetitorWithBoat comp1 = DomainFactory.INSTANCE.getOrCreateCompetitorWithBoat("comp1", "comp1", "c1", null, null, null, null,
                 /* timeOnTimeFactor */ null, /* timeOnDistanceAllowancePerNauticalMile */ null, null, (DynamicBoat) boat1, /* storePersistently */ true);
-        DeviceIdentifier dev1 = new SmartphoneImeiIdentifier("dev1");
+        DeviceIdentifier dev1 = new SmartphoneImeiIdentifierImpl("dev1");
         regattaLog.add(new RegattaLogDeviceCompetitorMappingEventImpl(t(), t(), author, UUID.randomUUID(), comp1, dev1,
                 t(0), t(10)));
         addFixes0(dev1);

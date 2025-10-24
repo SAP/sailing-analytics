@@ -15,10 +15,12 @@ public class TimePanelSettings extends AbstractGenericSerializableSettings {
     }
 
     public TimePanelSettings(long refreshInterval) {
+        this();
         this.refreshInterval.setValue(refreshInterval);
     }
 
     public TimePanelSettings() {
+        super();
     }
 
     public long getRefreshInterval() {

@@ -29,8 +29,8 @@ import com.sap.sailing.gwt.home.communication.user.profile.domain.SailorProfileN
 import com.sap.sailing.gwt.home.communication.user.profile.domain.SailorProfileNumericStatisticType.StatisticType;
 import com.sap.sailing.gwt.home.communication.user.profile.domain.SailorProfileStatisticDTO;
 import com.sap.sailing.gwt.home.communication.user.profile.domain.SailorProfileStatisticDTO.SingleEntry;
-import com.sap.sailing.server.impl.preferences.model.SailorProfilePreference;
-import com.sap.sailing.server.impl.preferences.model.SailorProfilePreferences;
+import com.sap.sailing.server.preferences.SailorProfilePreference;
+import com.sap.sailing.server.preferences.SailorProfilePreferences;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Speed;
 import com.sap.sse.common.TimePoint;

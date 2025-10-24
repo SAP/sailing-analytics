@@ -1,7 +1,14 @@
 package com.sap.sailing.server.gateway.trackfiles.impl;
 
-import org.junit.Assert;
-import org.junit.Test;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import com.sap.sailing.domain.trackimport.FormatNotSupportedException;
+import com.sap.sailing.server.trackfiles.impl.ExpeditionImportFileHandler;
 
 public class ExpeditionImportFilenameUtilsTest {
 
@@ -69,7 +76,14 @@ public class ExpeditionImportFilenameUtilsTest {
     }
 
     private void testCase(String actualFilename, String expectedResult) {
-        Assert.assertEquals(expectedResult, ExpeditionImportFilenameUtils.truncateFilenameExtentions(actualFilename));
+        Assertions.assertEquals(expectedResult, ExpeditionImportFilenameUtils.truncateFilenameExtentions(actualFilename, new ExpeditionImportFileHandler() {
+            @Override
+            protected void handleExpeditionFile(String fileName, InputStream inputStream, Charset charset)
+                    throws IOException, FormatNotSupportedException {
+                // used only to resolve the file name extensions
+            }
+            
+        }));
     }
 
 }

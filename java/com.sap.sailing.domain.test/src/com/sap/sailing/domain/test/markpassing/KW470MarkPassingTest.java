@@ -3,7 +3,7 @@ package com.sap.sailing.domain.test.markpassing;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class KW470MarkPassingTest extends AbstractMarkPassingTest {
 

@@ -1,10 +1,10 @@
 package com.sap.sailing.server.gateway.serialization.test.racelog;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.json.simple.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
 import com.sap.sailing.domain.abstractlog.race.RaceLogEndOfTrackingEvent;

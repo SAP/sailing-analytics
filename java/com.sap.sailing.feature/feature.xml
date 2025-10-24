@@ -27,527 +27,334 @@ Computes leaderboard information for sailing races and offers RESTful APIs to al
 
    <plugin
          id="com.sap.sailing.geocoding"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.domain.common"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.domain"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.news"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.domain.tractracadapter"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.expeditionconnector"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
+
+   <plugin
+         id="com.sap.sailing.domain.vakarosadapter"
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.domain.windfinderadapter"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.server"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.server.gateway"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.server.gateway.interfaces"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.declination"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.domain.persistence"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.domain.swisstimingadapter"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.domain.swisstimingadapter.persistence"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.domain.swisstimingreplayadapter"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.domain.tractracadapter.persistence"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.gwt.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.udpconnector"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.simulator"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.www"
-         download-size="0"
-         install-size="0"
          version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.resultimport"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.kiworesultimport"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.ess40.resultimport"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.freg.resultimport"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.barbados.resultimport"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.sailwave.resultimport"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
+
+   <plugin
+         id="com.sap.sailing.sailwave.html.resultimport"
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.manage2sail.resultimport"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.sailti.resultimport"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.yachtscoring.resultimport"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.velum.resultimport"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.monitoring"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.xrr.resultimport"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.domain.igtimiadapter"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
+
+   <plugin
+         id="com.sap.sailing.domain.igtimiadapter.server"
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.domain.igtimiadapter.persistence"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.domain.racelogtrackingadapter"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.domain.deckmanadapter"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.domain.oceanraceadapter"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.domain.yellowbrickadapter"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.domain.yellowbrickadapter.persistence"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.xrr.structureimport"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.server.gateway.serialization.shared.android"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.server.gateway.serialization"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.dashboards.gwt"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.dashboards.gwt"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.datamining"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.datamining.shared"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.polars"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.windestimation"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.polars.datamining"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.domain.shared.android"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.manage2sail"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.polars.datamining.shared"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.xrr.schema"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.server.trackfiles"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.competitorimport"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.datamining.provider"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.grib"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.nmeaconnector"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.domain.expeditionadapter"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.expeditionconnector.persistence"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.expeditionconnector.common"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.domain.bravoadapter"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="net.sf.marineapi"
-         download-size="0"
-         install-size="0"
-         version="0.5.0.qualifier"
-         unpack="false"/>
+         version="0.5.0.qualifier"/>
 
    <plugin
          id="com.sap.sailing.routeconverterjava11extension"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.server.interface"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sse.datamining.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.domain.igtimiadapter.gateway"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.shared.server"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.shared.server.gateway"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.shared.persistence"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.landscape"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.landscape.gateway"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.landscape.common"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.landscape.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.sap.sailing.hanaexport"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
+
+   <plugin
+         id="com.sap.sailing.domain.queclinkadapter"
+         version="0.0.0"/>
+
+   <plugin
+         id="com.sap.sailing.aiagent.interfaces"
+         version="0.0.0"/>
+
+   <plugin
+         id="com.sap.sailing.aiagent"
+         version="0.0.0"/>
+
+   <plugin
+         id="com.sap.sailing.aiagent.persistence"
+         version="0.0.0"/>
+
+   <plugin
+         id="com.sap.sailing.aiagent.gateway"
+         version="0.0.0"/>
 
 </feature>

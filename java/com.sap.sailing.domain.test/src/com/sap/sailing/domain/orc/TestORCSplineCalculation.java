@@ -1,6 +1,6 @@
 package com.sap.sailing.domain.orc;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.apache.commons.math3.analysis.FunctionUtils;
 import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
@@ -8,7 +8,7 @@ import org.apache.commons.math3.analysis.differentiation.UnivariateDifferentiabl
 import org.apache.commons.math3.analysis.function.Constant;
 import org.apache.commons.math3.analysis.solvers.NewtonRaphsonSolver;
 import org.apache.commons.math3.exception.DimensionMismatchException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.Course;

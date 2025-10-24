@@ -36,12 +36,19 @@ public interface GPSFixImporter {
     String FILE_EXTENSION_PROPERTY = "fileExt";
     
     /**
-     * Callback through which fixes found in the source stream are passed back.
+     * Callback through which fixes found in the source stream are passed back. Implementing classes may choose to
+     * override {@link #addFixes(Iterable, TrackFileImportDeviceIdentifier)} in case they have a better way to process a
+     * whole set of fixes from the same device than adding one by one.
+     * 
      * @author Fredrik Teschke
      *
      */
     interface Callback {
         void addFix(GPSFix fix, TrackFileImportDeviceIdentifier device);
+        
+        default void addFixes(Iterable<GPSFix> fixes, TrackFileImportDeviceIdentifier device) {
+            fixes.forEach(fix->addFix(fix, device));
+        }
     }
 
     /**

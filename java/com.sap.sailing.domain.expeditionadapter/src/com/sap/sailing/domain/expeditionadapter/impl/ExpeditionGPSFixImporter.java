@@ -44,56 +44,61 @@ public class ExpeditionGPSFixImporter implements GPSFixImporter {
         TrackFileImportDeviceIdentifier device = new TrackFileImportDeviceIdentifierImpl(sourceName, getType() + "@" + new Date());
         final AtomicBoolean importedFixes = new AtomicBoolean(false);
         CompressedStreamsUtil.handlePotentiallyCompressedFiles(sourceName, inputStream,
-                charset, new ExpeditionImportFileHandler() {
-                    @Override
-                    protected void handleExpeditionFile(String fileName, InputStream stream, Charset charset) throws IOException {
-                        final BufferedReader br = new BufferedReader(new InputStreamReader(stream, charset));
-                        final String headerLine = br.readLine();
-                        final Map<String, Integer> columnDefinitions = ExpeditionExtendedDataImporterImpl
-                                .parseHeader(headerLine);
-                        final AtomicInteger lineNr = new AtomicInteger(0);
-                        br.lines().forEach(line -> {
-                            if (!line.trim().isEmpty()) {
-                                ExpeditionExtendedDataImporterImpl.parseLine(lineNr.incrementAndGet(), fileName, line,
-                                        columnDefinitions, (timePoint, columnValues, columns) -> {
-                                            final double latDeg = Double
-                                                    .parseDouble(columnValues[columns.get(LAT_COLUMN_HEADING)]);
-                                            final double lonDeg = Double
-                                                    .parseDouble(columnValues[columns.get(LON_COLUMN_HEADING)]);
-                                            final double cogDeg = Double
-                                                    .parseDouble(columnValues[columns.get(COG_COLUMN_HEADING)]);
-                                            final double sogKnots = Double
-                                                    .parseDouble(columnValues[columns.get(SOG_COLUMN_HEADING)]);
-                                            final DegreePosition position = new DegreePosition(latDeg, lonDeg);
-                                            Bearing optionalTrueHeading;
-                                            if (columns.containsKey(HDT_COLUMN_HEADING)) {
-                                                try {
-                                                    optionalTrueHeading = new DegreeBearingImpl(Double.parseDouble(columnValues[columns.get(HDT_COLUMN_HEADING)]))
-                                                            .add(DeclinationService.INSTANCE.getDeclination(timePoint, position, /* timeout ms */ 1000).getBearingCorrectedTo(timePoint));
-                                                } catch (NumberFormatException | IOException | ParseException e) {
-                                                    logger.log(Level.WARNING, "Problem obtaining declination for Expedition fix heading", e);
-                                                    optionalTrueHeading = null;
-                                                }
-                                            } else {
-                                                optionalTrueHeading = null;
-                                            }
-                                            final GPSFixMoving fix = new GPSFixMovingImpl(
-                                                    position, timePoint,
-                                                    new KnotSpeedWithBearingImpl(sogKnots,
-                                                            new DegreeBearingImpl(cogDeg)), optionalTrueHeading);
-                                            callback.addFix(fix, device);
-                                            importedFixes.set(true);
-                                        });
-                            }
-                        });
+                charset, getExpeditionImportFileHandler(callback, device, importedFixes));
+        return importedFixes.get();
+    }
+
+    protected ExpeditionImportFileHandler getExpeditionImportFileHandler(Callback callback,
+            TrackFileImportDeviceIdentifier device, final AtomicBoolean importedFixes) {
+        return new ExpeditionImportFileHandler() {
+            @Override
+            protected void handleExpeditionFile(String fileName, InputStream stream, Charset charset) throws IOException {
+                final BufferedReader br = new BufferedReader(new InputStreamReader(stream, charset));
+                final String headerLine = br.readLine();
+                final ExpeditionExtendedDataImporterImpl importer = new ExpeditionExtendedDataImporterImpl();
+                final Map<String, Integer> columnDefinitions = importer.parseHeader(headerLine);
+                final AtomicInteger lineNr = new AtomicInteger(0);
+                br.lines().forEach(line -> {
+                    if (!line.trim().isEmpty()) {
+                        importer.parseLine(lineNr.incrementAndGet(), fileName, line,
+                                columnDefinitions, (timePoint, columnValues, columns) -> {
+                                    final double latDeg = Double
+                                            .parseDouble(columnValues[columns.get(LAT_COLUMN_HEADING)]);
+                                    final double lonDeg = Double
+                                            .parseDouble(columnValues[columns.get(LON_COLUMN_HEADING)]);
+                                    final double cogDeg = Double
+                                            .parseDouble(columnValues[columns.get(COG_COLUMN_HEADING)]);
+                                    final double sogKnots = Double
+                                            .parseDouble(columnValues[columns.get(SOG_COLUMN_HEADING)]);
+                                    final DegreePosition position = new DegreePosition(latDeg, lonDeg);
+                                    Bearing optionalTrueHeading;
+                                    if (columns.containsKey(HDT_COLUMN_HEADING)) {
+                                        try {
+                                            optionalTrueHeading = new DegreeBearingImpl(Double.parseDouble(columnValues[columns.get(HDT_COLUMN_HEADING)]))
+                                                    .add(DeclinationService.INSTANCE.getDeclination(timePoint, position, /* timeout ms */ 1000).getBearingCorrectedTo(timePoint));
+                                        } catch (NumberFormatException | IOException | ParseException e) {
+                                            logger.log(Level.WARNING, "Problem obtaining declination for Expedition fix heading", e);
+                                            optionalTrueHeading = null;
+                                        }
+                                    } else {
+                                        optionalTrueHeading = null;
+                                    }
+                                    final GPSFixMoving fix = new GPSFixMovingImpl(
+                                            position, timePoint,
+                                            new KnotSpeedWithBearingImpl(sogKnots,
+                                                    new DegreeBearingImpl(cogDeg)), optionalTrueHeading);
+                                    callback.addFix(fix, device);
+                                    importedFixes.set(true);
+                                });
                     }
                 });
-        return importedFixes.get();
+            }
+        };
     }
 
     @Override
     public Iterable<String> getSupportedFileExtensions() {
-        return ExpeditionImportFileHandler.supportedExpeditionLogFileExtensions;
+        return getExpeditionImportFileHandler(null, null, null).getSupportedFileExtensions();
     }
 
     @Override

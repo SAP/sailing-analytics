@@ -8,7 +8,7 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Label;
@@ -274,7 +274,7 @@ public abstract class AbstractCompetitorsFilterSetDialog extends DataEntryDialog
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return filterSetNameTextBox;
     }
 }

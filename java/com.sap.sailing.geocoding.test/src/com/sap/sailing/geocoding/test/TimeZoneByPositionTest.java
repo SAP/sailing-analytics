@@ -1,7 +1,7 @@
 package com.sap.sailing.geocoding.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import org.json.simple.parser.ParseException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.geocoding.impl.ReverseGeocoderImpl;

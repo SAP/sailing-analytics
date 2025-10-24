@@ -100,3 +100,49 @@
   font-size: 0.8em;
   margin: -0.266666666666667em 0 0.333333333333333em;
 }
+@external media_wrapper, media_menu_icon; /* required to allow for nested selectors below in @media query */
+.media_wrapper {
+  position: relative;
+  overflow: hidden;
+}
+.media_wrapper video {
+  display: block;
+  width: auto;
+  height: auto;
+}
+.media_wrapper img {
+  display: block;
+  width: auto;
+  height: auto;
+}
+.media_menu_icon {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  height: auto !important;
+  padding: 1px 5px;
+  background: rgba(0, 0, 0, 0.2);
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s ease, opacity 0.2s ease;
+
+  /* Set default visibility */
+  opacity: 1;
+  pointer-events: auto;
+}
+/* Highlight icon on hover/touch */
+.media_menu_icon:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+@media (hover: hover) and (pointer: fine) {
+  .media_menu_icon {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .media_wrapper:hover .media_menu_icon {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}

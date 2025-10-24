@@ -12,6 +12,7 @@ import com.sap.sailing.landscape.SailingAnalyticsProcess;
 import com.sap.sailing.landscape.SailingReleaseRepository;
 import com.sap.sailing.landscape.common.SharedLandscapeConstants;
 import com.sap.sse.common.Util;
+import com.sap.sse.debranding.ClientConfigurationListener;
 import com.sap.sse.landscape.DefaultProcessConfigurationVariables;
 import com.sap.sse.landscape.ProcessConfigurationVariable;
 import com.sap.sse.landscape.Release;
@@ -51,6 +52,8 @@ extends AwsApplicationConfiguration<ShardingKey, SailingAnalyticsMetrics, Sailin
         BuilderT setTelnetPort(int telnetPort);
         
         BuilderT setExpeditionPort(int expeditionPort);
+        
+        BuilderT setIgtimiRiotPort(int igtimiRiotPort);
 
         BuilderT setServerDirectory(String serverDirectory);
     }
@@ -66,6 +69,7 @@ extends AwsApplicationConfiguration<ShardingKey, SailingAnalyticsMetrics, Sailin
         private Integer port;
         private Integer telnetPort;
         private Integer expeditionPort;
+        private Integer igtimiRiotPort;
         private String serverDirectory;
 
         protected Integer getPort() {
@@ -107,6 +111,20 @@ extends AwsApplicationConfiguration<ShardingKey, SailingAnalyticsMetrics, Sailin
         @Override
         public BuilderT setExpeditionPort(int expeditionPort) {
             this.expeditionPort = expeditionPort;
+            return self();
+        }
+
+        protected Integer getIgtimiRiotPort() {
+            return igtimiRiotPort;
+        }
+        
+        protected boolean isIgtimiRiotPortSet() {
+            return igtimiRiotPort != null;
+        }
+        
+        @Override
+        public BuilderT setIgtimiRiotPort(int igtimiRiotPort) {
+            this.igtimiRiotPort = igtimiRiotPort;
             return self();
         }
 
@@ -159,6 +177,9 @@ extends AwsApplicationConfiguration<ShardingKey, SailingAnalyticsMetrics, Sailin
             addUserDataForPort(result, DefaultProcessConfigurationVariables.SERVER_PORT, getPort());
             addUserDataForPort(result, DefaultProcessConfigurationVariables.TELNET_PORT, getTelnetPort());
             addUserDataForPort(result, SailingProcessConfigurationVariables.EXPEDITION_PORT, getExpeditionPort());
+            if (getIgtimiRiotPort() != null) {
+                addUserDataForPort(result, SailingProcessConfigurationVariables.IGTIMI_RIOT_PORT, getIgtimiRiotPort());
+            }
             final List<String> newAdditionalJavaArgsVariableValue = new ArrayList<>();
             newAdditionalJavaArgsVariableValue.add("${"+DefaultProcessConfigurationVariables.ADDITIONAL_JAVA_ARGS.name()+"}");
             Util.addAll(getAdditionalJavaArgs(), newAdditionalJavaArgsVariableValue);
@@ -174,10 +195,15 @@ extends AwsApplicationConfiguration<ShardingKey, SailingAnalyticsMetrics, Sailin
          *         {@link DefaultProcessConfigurationVariables#ADDITIONAL_JAVA_ARGS ${ADDITIONAL_JAVA_ARGS}} variable.
          *         An example string in the resulting sequence could be {@code "-Da=b"}. This implementation returns the
          *         system properties required to configure security shared across the
-         *         {@link SharedLandscapeConstants#DEFAULT_DOMAIN_NAME} domain.
+         *         {@link SharedLandscapeConstants#DEFAULT_DOMAIN_NAME} domain, as well as the activation of SAP branding,
+         *         assuming that this runs under the {@link SharedLandscapeConstants#DEFAULT_DOMAIN_NAME default domain}.
          */
         protected Iterable<String> getAdditionalJavaArgs() {
-            return getAdditionalJavaArgsForSharedSecurity(SharedLandscapeConstants.DEFAULT_DOMAIN_NAME, SharedLandscapeConstants.DEFAULT_SECURITY_SERVICE_REPLICA_SET_NAME);
+            final List<String> result = new ArrayList<>();
+            Util.addAll(getAdditionalJavaArgsForSharedSecurity(SharedLandscapeConstants.DEFAULT_DOMAIN_NAME, SharedLandscapeConstants.DEFAULT_SECURITY_SERVICE_REPLICA_SET_NAME), result);
+            // TODO check whether we're really running under the default sapsailing.com domain, before activating SAP branding...
+            result.add("-D"+ClientConfigurationListener.DEBRANDING_PROPERTY_NAME+"=false"); // activate branding when running under default SAP domain
+            return result;
         }
 
         protected void addUserDataForPort(final Map<ProcessConfigurationVariable, String> result, ProcessConfigurationVariable variable, Integer port) {
@@ -216,6 +242,7 @@ extends AwsApplicationConfiguration<ShardingKey, SailingAnalyticsMetrics, Sailin
     private final Integer port;
     private final Integer telnetPort;
     private final Integer expeditionPort;
+    private final Integer igtimiRiotPort;
     private final String serverDirectory;
     
     public static <BuilderT extends Builder<BuilderT, T, ShardingKey>,
@@ -231,6 +258,7 @@ extends AwsApplicationConfiguration<ShardingKey, SailingAnalyticsMetrics, Sailin
         this.port = builder.getPort();
         this.telnetPort = builder.getTelnetPort();
         this.expeditionPort = builder.getExpeditionPort();
+        this.igtimiRiotPort = builder.getIgtimiRiotPort();
         this.serverDirectory = builder.getServerDirectory();
     }
 
@@ -244,6 +272,10 @@ extends AwsApplicationConfiguration<ShardingKey, SailingAnalyticsMetrics, Sailin
 
     protected Integer getExpeditionPort() {
         return expeditionPort;
+    }
+    
+    protected Integer getIgtimiRiotPort() {
+        return igtimiRiotPort;
     }
 
     protected String getServerDirectory() {

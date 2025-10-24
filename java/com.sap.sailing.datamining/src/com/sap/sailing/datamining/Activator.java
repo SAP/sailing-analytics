@@ -25,6 +25,7 @@ import com.sap.sailing.datamining.data.HasRaceResultOfCompetitorContext;
 import com.sap.sailing.datamining.data.HasTackTypeSegmentContext;
 import com.sap.sailing.datamining.data.HasTrackedLegContext;
 import com.sap.sailing.datamining.data.HasTrackedLegOfCompetitorContext;
+import com.sap.sailing.datamining.data.HasTrackedLegSliceOfCompetitorContext;
 import com.sap.sailing.datamining.data.HasTrackedRaceContext;
 import com.sap.sailing.datamining.data.HasWindFixContext;
 import com.sap.sailing.datamining.data.HasWindTrackContext;
@@ -107,6 +108,7 @@ public class Activator extends AbstractDataMiningActivatorWithPredefinedQueries 
         internalClasses.add(HasRaceResultOfCompetitorContext.class);
         internalClasses.add(HasTrackedLegContext.class);
         internalClasses.add(HasTrackedLegOfCompetitorContext.class);
+        internalClasses.add(HasTrackedLegSliceOfCompetitorContext.class);
         internalClasses.add(HasGPSFixContext.class);
         internalClasses.add(HasWindTrackContext.class);
         internalClasses.add(HasWindFixContext.class);

@@ -58,7 +58,7 @@ public class ChargebeeApiSubscriptionData {
     private int calculateReoccuringPaymentValue() {
         int reoccuringPaymentValue = 0;
         for (SubscriptionItem item : subscription.subscriptionItems()){
-            if(item.amount() != null) {
+            if (item.amount() != null) {
                 reoccuringPaymentValue += item.amount();
             }
         }

@@ -15,6 +15,9 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 import com.sap.sailing.domain.base.Nationality;
 import com.sap.sailing.domain.base.impl.NationalityImpl;
@@ -60,7 +63,7 @@ public class CompetitorResolver {
      * 
      * @return A Map, with sets of Regatta names as values, keyed by the events they belong to
      */
-    public Map<String, Set<String>> getHasCompetitorsForRegattasInEvent() throws IOException, URISyntaxException {
+    public Map<String, Set<String>> getHasCompetitorsForRegattasInEvent() throws IOException, URISyntaxException, SAXException, ParserConfigurationException {
         Map<String, Set<String>> result = new HashMap<>();
         for (ResultDocumentDescriptor resultDocDescr : documentProvider.getResultDocumentDescriptors()) {
             final String eventName = resultDocDescr.getEventName();
@@ -85,7 +88,7 @@ public class CompetitorResolver {
      * @return A List of CompetitorDescriptors competing in a specified Event and Regatta
      */
     public Iterable<CompetitorDescriptor> getCompetitorDescriptors(String eventName, String regattaName)
-            throws JAXBException, IOException, URISyntaxException {
+            throws JAXBException, IOException, URISyntaxException, SAXException, ParserConfigurationException {
         final List<CompetitorDescriptor> result = new ArrayList<>();
         final Map<String, CompetitorDescriptor> resultsByTeamID = new HashMap<>();
         final Map<String, CompetitorDescriptor> teamsWithoutRaceAssignments = new HashMap<>(); // keys are the teamID

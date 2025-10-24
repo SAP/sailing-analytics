@@ -94,7 +94,7 @@ public class ParallelGroupedNumberPairAverageAggregationProcessor
                 break;
             }
             GroupKey key = sumAggregationEntry.getKey();
-            result.put(key, new PairWithStatsImpl<Number>(new Pair<>(sumAggregationEntry.getValue().getA() != null ? sumAggregationEntry.getValue().getA().doubleValue() / elementAmountPerKey.get(key).get() : null, sumAggregationEntry.getValue().getB() != null ? sumAggregationEntry.getValue().getB().doubleValue() / elementAmountPerKey.get(key).get() : null) ,
+            result.put(key, new PairWithStatsImpl<Number>(new Pair<Number, Number>(sumAggregationEntry.getValue().getA() != null ? sumAggregationEntry.getValue().getA().doubleValue() / elementAmountPerKey.get(key).get() : null, sumAggregationEntry.getValue().getB() != null ? sumAggregationEntry.getValue().getB().doubleValue() / elementAmountPerKey.get(key).get() : null) ,
                     minPerKey.get(key), maxPerKey.get(key),
                     /* median */ null,
                     /* standardDeviation */ null,

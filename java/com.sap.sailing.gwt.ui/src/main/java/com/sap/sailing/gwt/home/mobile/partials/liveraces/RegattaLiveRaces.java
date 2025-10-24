@@ -16,6 +16,7 @@ import com.sap.sailing.gwt.home.shared.refresh.RefreshableWidget;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sse.gwt.dispatch.shared.commands.SortedSetResult;
 import com.sap.sse.security.ui.client.premium.PaywallResolver;
+import com.sap.sse.security.ui.client.premium.PaywallResolverImpl;
 
 public class RegattaLiveRaces extends Composite implements RefreshableWidget<SortedSetResult<LiveRaceDTO>> {
 
@@ -40,7 +41,7 @@ public class RegattaLiveRaces extends Composite implements RefreshableWidget<Sor
     public void setData(final SortedSetResult<LiveRaceDTO> data) {
         setVisible(data != null && !data.isEmpty());
         mobileSection.clearContent();
-        final PaywallResolver paywallResolver = new PaywallResolver(presenter.getUserService(),
+        final PaywallResolver paywallResolver = new PaywallResolverImpl(presenter.getUserService(),
                 presenter.getSubscriptionServiceFactory());
         if (data != null) {
             for (final LiveRaceDTO liveRace : data.getValues()) {

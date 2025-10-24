@@ -14,8 +14,8 @@ import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.impl.DynamicTeam;
 import com.sap.sailing.domain.base.impl.NationalityImpl;
@@ -36,7 +36,7 @@ public class CompetitorsResourceTeamImageTest extends AbstractJaxRsApiTest {
     
     private FileStorageService storageService;
 
-    @Before
+    @BeforeEach
     public void setUpSubClass() throws Exception {
         super.setUp();
         storageService = AmazonS3TestSupport.createService(securityService);

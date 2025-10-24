@@ -1,6 +1,6 @@
 package com.sap.sailing.landscape.ui.client;
 
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -31,7 +31,7 @@ public class EnsureReplicaStopReplicatingRemoveMasterFromTargetGroupsDialog exte
     }
 
     @Override
-    public FocusWidget getInitialFocusWidget() {
+    public Focusable getInitialFocusWidget() {
         return replicaReplicationBearerTokenBox;
     }
     

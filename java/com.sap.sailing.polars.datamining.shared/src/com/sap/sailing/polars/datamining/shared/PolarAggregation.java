@@ -15,6 +15,10 @@ public interface PolarAggregation extends Serializable {
     
     PolarDataMiningSettings getSettings();
     
+    /**
+     * Keys are the angles in degrees (0...359). The {@link Double} key of the inner map is the histogram x-value (e.g.
+     * 5.0 for wind speed 4.5...5.5 with step 1.0).
+     */
     Map<Integer, Map<Double, Integer>> getCountHistogramPerAngle();
     
 }

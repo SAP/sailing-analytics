@@ -2,7 +2,7 @@ package com.sap.sailing.gwt.ui.adminconsole;
 
 import java.util.Collection;
 
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.gwt.ui.shared.RegattaDTO;
 import com.sap.sailing.gwt.ui.shared.StrippedLeaderboardDTO;
@@ -25,7 +25,7 @@ public class RegattaLeaderboardEditDialog<LD extends LeaderboardDescriptor> exte
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return displayNameTextBox;
     }
 }

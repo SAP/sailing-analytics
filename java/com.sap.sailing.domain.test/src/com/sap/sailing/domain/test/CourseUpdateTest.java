@@ -1,11 +1,11 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
@@ -22,9 +22,9 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.sap.sailing.domain.base.Competitor;
@@ -56,14 +56,15 @@ import com.sap.sailing.domain.tracking.impl.DynamicTrackedRegattaImpl;
 import com.sap.sailing.domain.tracking.impl.EmptyWindStore;
 import com.sap.sailing.domain.tractracadapter.DomainFactory;
 import com.sap.sailing.domain.tractracadapter.Receiver;
-import com.sap.sailing.domain.tractracadapter.impl.ControlPointAdapter;
 import com.sap.sailing.domain.tractracadapter.impl.DomainFactoryImpl;
 import com.sap.sailing.domain.tractracadapter.impl.RaceCourseReceiver;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.Util.Triple;
 import com.tractrac.model.lib.api.event.IRace;
-import com.tractrac.model.lib.api.route.IControl;
+import com.tractrac.model.lib.api.map.IMapItem;
+import com.tractrac.model.lib.api.map.IPositionedItem;
+import com.tractrac.model.lib.api.metadata.IMetadata;
 import com.tractrac.model.lib.api.route.IControlRoute;
 import com.tractrac.subscription.lib.api.event.IConnectionStatusListener;
 import com.tractrac.subscription.lib.api.event.ILiveDataEvent;
@@ -87,7 +88,7 @@ public class CourseUpdateTest extends AbstractTracTracLiveTest {
         super();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         routeDataFuture = new CompletableFuture<>();
@@ -244,8 +245,8 @@ public class CourseUpdateTest extends AbstractTracTracLiveTest {
     public void testLastWaypointRemoved() throws PatchFailedException, InterruptedException {
         final boolean[] result = new boolean[1];
         final IControlRoute routeData = waitForRouteData();
-        final List<IControl> controlPoints = new ArrayList<>(routeData.getControls());
-        final IControl removedControlPoint = controlPoints.remove(controlPoints.size()-1);
+        final List<IMapItem> controlPoints = new ArrayList<>(routeData.getControls());
+        final IMapItem removedControlPoint = controlPoints.remove(controlPoints.size()-1);
         course.addCourseListener(new CourseListener() {
             @Override
             public void waypointAdded(int zeroBasedIndex, Waypoint waypointThatGotAdded) {
@@ -255,7 +256,7 @@ public class CourseUpdateTest extends AbstractTracTracLiveTest {
             @Override
             public void waypointRemoved(int zeroBasedIndex, Waypoint waypointThatGotRemoved) {
                 System.out.println("waypointRemoved " + zeroBasedIndex + " / " + waypointThatGotRemoved);
-                ControlPoint cp = domainFactory.getOrCreateControlPoint(new ControlPointAdapter(removedControlPoint));
+                ControlPoint cp = domainFactory.getOrCreateControlPoint(removedControlPoint);
                 result[0] = zeroBasedIndex == controlPoints.size() && waypointThatGotRemoved.getControlPoint() == cp;
             }
         });
@@ -268,8 +269,8 @@ public class CourseUpdateTest extends AbstractTracTracLiveTest {
     public void testLastButOneWaypointRemoved() throws PatchFailedException, InterruptedException {
         final boolean[] result = new boolean[1];
         final IControlRoute routeData = waitForRouteData();
-        final List<IControl> controlPoints = new ArrayList<>(routeData.getControls());
-        final IControl removedControlPoint = controlPoints.remove(1);
+        final List<IMapItem> controlPoints = new ArrayList<>(routeData.getControls());
+        final IMapItem removedControlPoint = controlPoints.remove(1);
         course.addCourseListener(new CourseListener() {
             @Override
             public void waypointAdded(int zeroBasedIndex, Waypoint waypointThatGotAdded) {
@@ -279,7 +280,7 @@ public class CourseUpdateTest extends AbstractTracTracLiveTest {
             @Override
             public void waypointRemoved(int zeroBasedIndex, Waypoint waypointThatGotRemoved) {
                 System.out.println("waypointRemoved " + zeroBasedIndex + " / " + waypointThatGotRemoved);
-                ControlPoint cp = domainFactory.getOrCreateControlPoint(new ControlPointAdapter(removedControlPoint));
+                ControlPoint cp = domainFactory.getOrCreateControlPoint(removedControlPoint);
                 result[0] = zeroBasedIndex == 1 && waypointThatGotRemoved.getControlPoint() == cp;
             }
         });
@@ -299,15 +300,15 @@ public class CourseUpdateTest extends AbstractTracTracLiveTest {
     @Test
     public void testWaypointAddedAtEnd() throws PatchFailedException, InterruptedException {
         final boolean[] result = new boolean[1];
-        final IControl cp1 = createMockedControlPoint("CP1", 1, UUID.randomUUID());
+        final IMapItem cp1 = createMockedControlPoint("CP1", 1, UUID.randomUUID());
         final IControlRoute routeData = waitForRouteData();
-        final List<IControl> controlPoints = new ArrayList<>(routeData.getControls());
+        final List<IMapItem> controlPoints = new ArrayList<>(routeData.getControls());
         controlPoints.add(cp1);
         course.addCourseListener(new CourseListener() {
             @Override
             public void waypointAdded(int zeroBasedIndex, Waypoint waypointThatGotAdded) {
                 System.out.println("waypointAdded " + zeroBasedIndex + " / " + waypointThatGotAdded);
-                ControlPoint cp = domainFactory.getOrCreateControlPoint(new ControlPointAdapter(cp1));
+                ControlPoint cp = domainFactory.getOrCreateControlPoint(cp1);
                 result[0] = zeroBasedIndex == controlPoints.size() - 1 && waypointThatGotAdded.getControlPoint() == cp;
             }
 
@@ -326,26 +327,38 @@ public class CourseUpdateTest extends AbstractTracTracLiveTest {
         }
     }
 
-    private IControl createMockedControlPoint(String name, int numberOfMarks, UUID id) {
-        final IControl cp1 = Mockito.mock(IControl.class);
+    private IMapItem createMockedControlPoint(String name, int numberOfMarks, UUID id) {
+        final IMapItem cp1 = Mockito.mock(IMapItem.class);
         Mockito.when(cp1.getName()).thenReturn(name);
         Mockito.when(cp1.getSize()).thenReturn(numberOfMarks);
         Mockito.when(cp1.getId()).thenReturn(id);
+        final List<IPositionedItem> markMocks = new ArrayList<>();
+        for (int i=0; i<numberOfMarks; i++) {
+            final IPositionedItem markMock = Mockito.mock(IPositionedItem.class);
+            final UUID markId = UUID.randomUUID();
+            Mockito.when(markMock.getId()).thenReturn(markId);
+            Mockito.when(markMock.getName()).thenReturn(name+" ("+i+")");
+            final IMetadata markMockMetadata = Mockito.mock(IMetadata.class);
+            Mockito.when(markMockMetadata.getText()).thenReturn("");
+            Mockito.when(markMock.getMetadata()).thenReturn(markMockMetadata);
+            markMocks.add(markMock);
+        }
+        Mockito.when(cp1.getPositionedItems()).thenReturn(markMocks);
         return cp1;
     }
     
     @Test
     public void testTrackedRacesTrackedLegsUpdatedProperly() throws InterruptedException, PatchFailedException {
         final boolean[] result = new boolean[1];
-        final IControl cp1 = createMockedControlPoint("CP1", 1, UUID.randomUUID());
+        final IMapItem cp1 = createMockedControlPoint("CP1", 1, UUID.randomUUID());
         final IControlRoute routeData = waitForRouteData();
-        final List<IControl> controlPoints = new ArrayList<>(routeData.getControls());
+        final List<IMapItem> controlPoints = new ArrayList<>(routeData.getControls());
         controlPoints.add(cp1);
         course.addCourseListener(new CourseListener() {
             @Override
             public void waypointAdded(int zeroBasedIndex, Waypoint waypointThatGotAdded) {
                 System.out.println("waypointAdded " + zeroBasedIndex + " / " + waypointThatGotAdded);
-                ControlPoint cp = domainFactory.getOrCreateControlPoint(new ControlPointAdapter(cp1));
+                ControlPoint cp = domainFactory.getOrCreateControlPoint(cp1);
                 result[0] = zeroBasedIndex == controlPoints.size() - 1 && waypointThatGotAdded.getControlPoint() == cp;
             }
 
@@ -359,7 +372,7 @@ public class CourseUpdateTest extends AbstractTracTracLiveTest {
         testLegStructure(3);
     }
     
-    @After
+    @AfterEach
     public void tearDown() throws MalformedURLException, IOException, InterruptedException {
         super.tearDown();
         routeDataFuture = null;

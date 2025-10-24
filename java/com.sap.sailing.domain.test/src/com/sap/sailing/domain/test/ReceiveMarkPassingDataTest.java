@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.net.MalformedURLException;
@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.RaceDefinition;
 import com.sap.sailing.domain.base.Waypoint;
@@ -30,7 +30,6 @@ import com.sap.sailing.domain.tractracadapter.DomainFactory;
 import com.sap.sailing.domain.tractracadapter.LoadingQueueDoneCallBack;
 import com.sap.sailing.domain.tractracadapter.Receiver;
 import com.sap.sailing.domain.tractracadapter.ReceiverType;
-import com.sap.sailing.domain.tractracadapter.impl.ControlPointAdapter;
 import com.tractrac.model.lib.api.data.IControlPassing;
 import com.tractrac.model.lib.api.data.IControlPassings;
 import com.tractrac.model.lib.api.event.IRace;
@@ -54,7 +53,7 @@ public class ReceiveMarkPassingDataTest extends AbstractTracTracLiveTest {
      * into {@link #firstTracked} and {@link #firstData}. All events are converted into {@link GPSFixMovingImpl}
      * objects and appended to the {@link DynamicTrackedRace}s.
      */
-    @Before
+    @BeforeEach
     public void setupListener() {
         final IRace race = getTracTracRace();
         logger.info("Setting up listener for race "+race.getName()+" with ID "+race.getId());
@@ -157,18 +156,17 @@ public class ReceiveMarkPassingDataTest extends AbstractTracTracLiveTest {
         }
         assertNotNull(firstData[0]);
         assertTrue(firstData[0].getPassings().size() > 0);
-        IControlPassing entry = firstData[0].getPassings().iterator().next();
+        final IControlPassing entry = firstData[0].getPassings().iterator().next();
         assertNotNull(entry);
         // we expect to find the mark passings in order, so as we traverse the course for
         // its waypoints and compare their control points to the control point received,
         // the first waypoint is used
         boolean found = false;
         for (Waypoint waypoint : raceDefinition.getCourse().getWaypoints()) {
-            if (waypoint.getControlPoint() == DomainFactory.INSTANCE.getOrCreateControlPoint(new ControlPointAdapter(entry.getControl()))) {
+            if (waypoint.getControlPoint() == DomainFactory.INSTANCE.getOrCreateControlPoint(entry.getControl())) {
                 found = true;
             }
         }
         assertTrue(found);
     }
-
 }

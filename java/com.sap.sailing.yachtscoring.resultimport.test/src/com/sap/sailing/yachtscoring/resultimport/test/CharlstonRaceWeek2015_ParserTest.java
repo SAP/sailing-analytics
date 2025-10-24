@@ -1,7 +1,7 @@
 package com.sap.sailing.yachtscoring.resultimport.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.util.Set;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 import com.sap.sailing.domain.common.RegattaScoreCorrections;
@@ -29,7 +29,7 @@ import com.sap.sse.common.Util;
 
 public class CharlstonRaceWeek2015_ParserTest extends AbstractCharlstonRaceWeek2015Test {
     @Test
-    public void testSimpleParsingSomeYachtscoringDocuments() throws JAXBException, IOException {
+    public void testSimpleParsingSomeYachtscoringDocuments() throws JAXBException, IOException, SAXException, ParserConfigurationException {
         RegattaResults regattaResults = ParserFactory.INSTANCE.createParser(getInputStream(CHARLSTONRACEWEEK2015_TESTFILE_XRR), CHARLSTONRACEWEEK2015_EVENT_NAME).parse();
         assertNotNull(regattaResults);
     }

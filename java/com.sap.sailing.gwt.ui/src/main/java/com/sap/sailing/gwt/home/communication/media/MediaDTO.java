@@ -3,6 +3,8 @@ package com.sap.sailing.gwt.home.communication.media;
 import java.util.Collection;
 import java.util.TreeSet;
 
+import com.sap.sailing.gwt.ui.client.shared.SailingVideoDTO;
+import com.sap.sailing.gwt.ui.shared.SailingImageDTO;
 import com.sap.sse.gwt.dispatch.shared.commands.Result;
 
 public class MediaDTO implements Result {

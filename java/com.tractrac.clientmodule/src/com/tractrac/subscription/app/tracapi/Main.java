@@ -11,6 +11,7 @@ import com.tractrac.model.lib.api.event.IEvent;
 import com.tractrac.model.lib.api.event.IEventFactory;
 import com.tractrac.model.lib.api.event.IRace;
 import com.tractrac.subscription.lib.api.*;
+import com.tractrac.util.lib.api.autolog.LoggerLocator;
 
 import java.io.IOException;
 import java.net.URI;
@@ -27,6 +28,8 @@ public class Main {
     public static void main(String[] args) throws IOException,
             SubscriberInitializationException, CreateModelException {
 
+        LoggerLocator.getLoggerManager().init(1, "println");
+
         Object[] myArgs = parseArguments(args);
         URI paramURI = (URI) myArgs[0];
         boolean measureDelay = (boolean) myArgs[1];
@@ -35,6 +38,8 @@ public class Main {
         IEventFactory eventFactory = ModelLocator.getEventFactory();
         IRace race = eventFactory.createRace(paramURI);
         IEvent event = race.getEvent();
+
+        event.getPositionedItems().forEach(positionedItem -> System.out.println(positionedItem.getMetadata().getText()));
 
         // Create the subscriber
         ISubscriberFactory subscriberFactory = SubscriptionLocator.getSusbcriberFactory();
@@ -50,17 +55,19 @@ public class Main {
         eventSubscriber.subscribeConnectionStatus(listener);
         eventSubscriber.subscribeEventMessages(listener);
         eventSubscriber.subscribeRaces(listener);
-        eventSubscriber.subscribeControls(listener);
+        eventSubscriber.subscribeMapItems(listener);
         eventSubscriber.subscribeCompetitors(listener);
 
-        IRaceSubscriber raceSubscriber = subscriberFactory.createRaceSubscriber(race);
+        IRaceSubscriber raceSubscriber = subscriberFactory.createRaceSubscriber(
+                race
+        );
         raceSubscriber.subscribeConnectionStatus(listener);
-        raceSubscriber.subscribeControlPositions(listener);
+        //raceSubscriber.subscribePositionedItemPositions(listener);
         raceSubscriber.subscribePositions(listener);
         //raceSubscriber.subscribePositionsSnapped(listener);
         raceSubscriber.subscribeControlPassings(listener);
-        raceSubscriber.subscribeCompetitorSensorData(listener);
-        raceSubscriber.subscribeRaceMessages(listener);
+        //raceSubscriber.subscribeCompetitorSensorData(listener);
+        //raceSubscriber.subscribeRaceMessages(listener);
         raceSubscriber.subscribeRaceTimesChanges(listener);
         raceSubscriber.subscribeRouteChanges(listener);
         raceSubscriber.subscribeRaceCompetitor(listener);

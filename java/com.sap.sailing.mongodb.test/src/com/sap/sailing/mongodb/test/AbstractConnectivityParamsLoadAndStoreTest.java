@@ -2,7 +2,7 @@ package com.sap.sailing.mongodb.test;
 
 import java.net.UnknownHostException;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.mongodb.MongoException;
 import com.sap.sailing.domain.persistence.DomainObjectFactory;
@@ -20,7 +20,7 @@ public abstract class AbstractConnectivityParamsLoadAndStoreTest extends Abstrac
         super();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         serviceFinderFactory = new MockConnectivityParamsServiceFinderFactory();
         racingEventService = new RacingEventServiceImpl(/* clearPersistentCompetitorStore */ true, /* sensorFixStore */ null,

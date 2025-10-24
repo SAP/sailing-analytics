@@ -1,12 +1,12 @@
 package com.sap.sailing.server.gateway.serialization.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import org.json.simple.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.BoatClass;
 import com.sap.sailing.domain.base.DomainFactory;

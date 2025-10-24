@@ -1,14 +1,15 @@
 package com.sap.sse.datamining.impl.functions;
 
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.functions.Function;
 import com.sap.sse.datamining.test.data.impl.ContainerElement;
@@ -27,7 +28,7 @@ public class TestCompoundFunction {
     private Function<String> compoundFunction;
     private Function<String> compoundFunctionWithSecondTakingSingleIntParameter;
     
-    @Before
+    @BeforeEach
     public void initializeCompoundFunction() throws ClassCastException, NoSuchMethodException, SecurityException {
         {
         List<Function<?>> functions = new ArrayList<>();
@@ -46,11 +47,13 @@ public class TestCompoundFunction {
         }
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testConstruction() {
-        List<Function<?>> functions = new ArrayList<>();
-        functions.add(getContainerElementFunction);
-        new ConcatenatingCompoundFunction<String>(functions, String.class);
+        assertThrows(IllegalArgumentException.class, () -> {
+            List<Function<?>> functions = new ArrayList<>();
+            functions.add(getContainerElementFunction);
+            new ConcatenatingCompoundFunction<String>(functions, String.class);
+        });
     }
     
     @Test

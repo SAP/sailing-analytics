@@ -16,6 +16,9 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 import com.sap.sailing.domain.base.BoatClass;
 import com.sap.sailing.domain.base.DomainFactory;
@@ -131,7 +134,7 @@ public class StructureImporter {
                 public void run() {
                     try {
                         result.add(new Pair<>(selectedRegatta, parseRegattaXML(selectedRegatta.getXrrEntriesUrl())));
-                    } catch (JAXBException | IOException e) {
+                    } catch (JAXBException | IOException | SAXException | ParserConfigurationException e) {
                         logger.info("Parse error during XRR import. Ignoring document " + selectedRegatta.getName());
                     }
                 }
@@ -297,7 +300,7 @@ public class StructureImporter {
         return team;
     }
 
-    private RegattaResults parseRegattaXML(String url) throws FileNotFoundException, JAXBException, IOException {
+    private RegattaResults parseRegattaXML(String url) throws FileNotFoundException, JAXBException, IOException, SAXException, ParserConfigurationException {
         return ParserFactory.INSTANCE.createParser(getInputStream(url), "").parse();
     }
 

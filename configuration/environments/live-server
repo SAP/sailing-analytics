@@ -18,6 +18,8 @@ REPLICATE_ON_START=com.sap.sse.security.impl.SecurityServiceImpl,com.sap.sailing
 REPLICATE_MASTER_SERVLET_HOST=security-service.sapsailing.com
 REPLICATE_MASTER_SERVLET_PORT=443
 REPLICATE_MASTER_EXCHANGE_NAME=security_service
+# Activate SAP Branding
+ADDITIONAL_JAVA_ARGS="$ADDITIONAL_JAVA_ARGS -Dcom.sap.sse.debranding=false"
 
 # Provide authentication credentials for a user on security-service.sapsailing.com permitted to replicate, either by username/password...
 #REPLICATE_MASTER_USERNAME=(user for replicator login on security-service.sapsailing.com server having SERVER:REPLICATE:&lt;server-name&gt; permission)

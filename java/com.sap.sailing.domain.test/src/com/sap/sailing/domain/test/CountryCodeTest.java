@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,8 +15,8 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.CountryCode;
 import com.sap.sse.common.CountryCodeFactory;
@@ -25,7 +25,7 @@ import com.sap.sse.common.Util;
 public class CountryCodeTest {
     private static final int NUMBER_OF_COUNTRY_CODES = 262;
 
-    @Ignore
+    @Disabled
     @Test
     public void convertHTML() throws IOException {
         InputStream is = Util.class.getResourceAsStream("countrycodes.csv");
@@ -103,7 +103,7 @@ public class CountryCodeTest {
     public void testGermanyCountryCode() {
         for (String iso2 : Locale.getISOCountries()) {
             final CountryCode cc = CountryCodeFactory.INSTANCE.getFromTwoLetterISOName(iso2);
-            assertNotNull("No country code found for two-letter ISO code "+iso2, cc);
+            assertNotNull(cc, "No country code found for two-letter ISO code "+iso2);
             assertEquals(iso2, cc.getTwoLetterISOCode());
         }
         assertEquals("DEU", Locale.GERMANY.getISO3Country());

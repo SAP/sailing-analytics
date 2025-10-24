@@ -18,7 +18,7 @@ public class File extends Fix {
     public File(TimePoint timePoint, Sensor sensor, Map<Integer, Object> valuesPerSubindex) {
         super(sensor, timePoint);
         start = timePoint;
-        end = timePoint; // TODO how are start and end timepoints encoded here?
+        end = timePoint; // a bit strange with start/end for a file... in the protobuf File message, endTimePoint is field #2...
         fileName = ((String) valuesPerSubindex.get(1));
         md5 = ((String) valuesPerSubindex.get(2));
         contentType = ((String) valuesPerSubindex.get(3));

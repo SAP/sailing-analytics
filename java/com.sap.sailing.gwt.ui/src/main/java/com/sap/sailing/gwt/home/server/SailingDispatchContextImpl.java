@@ -25,7 +25,6 @@ public class SailingDispatchContextImpl implements SailingDispatchContext {
     private final RacingEventService racingEventService;
     private final EventNewsService eventNewsService;
     private final Date currentClientTime;
-//    private final Date currentServerTime = new Date();
     private String clientLocaleName;
     private final HttpServletRequest request;
     private final SecurityService securityService;

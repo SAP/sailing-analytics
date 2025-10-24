@@ -26,6 +26,7 @@ import com.sap.sailing.domain.tracking.BravoFixTrack;
 import com.sap.sailing.domain.tracking.GPSFixTrack;
 import com.sap.sailing.domain.tracking.Maneuver;
 import com.sap.sailing.domain.tracking.MarkPassing;
+import com.sap.sailing.domain.tracking.TrackedLeg;
 import com.sap.sailing.domain.tracking.TrackedLegOfCompetitor;
 import com.sap.sailing.domain.tracking.WindLegTypeAndLegBearingAndORCPerformanceCurveCache;
 import com.sap.sailing.domain.tracking.WindPositionMode;
@@ -272,11 +273,11 @@ public class TrackedLegOfCompetitorImpl implements TrackedLegOfCompetitor {
     private Distance getWindwardDistanceTo(LegType legTypeOrNull, Waypoint waypoint, TimePoint at,
             WindPositionMode windPositionMode, WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache) {
         final Distance result;
-        Position estimatedPosition = getTrackedRace().getTrack(getCompetitor()).getEstimatedPosition(at, false);
+        Position estimatedPosition = getTrackedRace().getTrack(getCompetitor()).getEstimatedPosition(at, /* extrapolate */ false);
         if (!hasStartedLeg(at) || estimatedPosition == null) {
             // covers the case with no fixes for this leg yet, also if the mark passing has already been received
             estimatedPosition = getTrackedRace().getOrCreateTrack(getLeg().getFrom().getMarks().iterator().next())
-                    .getEstimatedPosition(at, false);
+                    .getEstimatedPosition(at, /* extrapolate */ false);
         }
         if (estimatedPosition == null) { // may happen if mark positions haven't been received yet
             result = null;
@@ -543,7 +544,7 @@ public class TrackedLegOfCompetitorImpl implements TrackedLegOfCompetitor {
     @Override
     public Distance getAverageAbsoluteCrossTrackError(TimePoint timePoint, boolean waitForLatestAnalysis) {
         final Distance result;
-        MarkPassing legStart = getMarkPassingForLegStart();
+        final MarkPassing legStart = getMarkPassingForLegStart();
         if (legStart != null) {
             final TimePoint to = getTimePointNotAfterFinishingOfLeg(timePoint);
             if (to != null) {
@@ -565,7 +566,27 @@ public class TrackedLegOfCompetitorImpl implements TrackedLegOfCompetitor {
         if (legStartMarkPassing != null) {
             TimePoint legStart = legStartMarkPassing.getTimePoint();
             final TimePoint to = getTimePointNotAfterFinishingOfLeg(timePoint);
-            result = getTrackedRace().getAverageSignedCrossTrackError(competitor, legStart, to, /* upwindOnly */ false, waitForLatestAnalysis);
+            if (to != null) {
+                result = getTrackedRace().getAverageSignedCrossTrackError(competitor, legStart, to, /* upwindOnly */ false, waitForLatestAnalysis);
+            } else {
+                result = null;
+            }
+        } else {
+            result = null;
+        }
+        return result;
+    }
+    
+    private Distance getSomeCrossTrackError(TimePoint timePoint, BiFunction<TrackedLeg, Position, Distance> crossTrackCalculatorAtTimePoint) {
+        final Distance result;
+        final GPSFixTrack<Competitor, GPSFixMoving> track = getTrackedRace().getTrack(getCompetitor());
+        if (track != null) {
+            final Position estimatedPosition = track.getEstimatedPosition(timePoint, /* extrapolate */ true);
+            if (estimatedPosition != null) {
+                result = crossTrackCalculatorAtTimePoint.apply(getTrackedLeg(), estimatedPosition);
+            } else {
+                result = null;
+            }
         } else {
             result = null;
         }
@@ -574,36 +595,22 @@ public class TrackedLegOfCompetitorImpl implements TrackedLegOfCompetitor {
 
     @Override
     public Distance getAbsoluteCrossTrackError(TimePoint timePoint) {
-        final Distance result;
-        final GPSFixTrack<Competitor, GPSFixMoving> track = getTrackedRace().getTrack(getCompetitor());
-        if (track != null) {
-            final Position estimatedPosition = track.getEstimatedPosition(timePoint, /* extrapolate */ true);
-            if (estimatedPosition != null) {
-                result = getTrackedLeg().getAbsoluteCrossTrackError(estimatedPosition, timePoint);
-            } else {
-                result = null;
-            }
-        } else {
-            result = null;
-        }
-        return result;
+        return getSomeCrossTrackError(timePoint, (trackedLeg, estimatedPosition)->getTrackedLeg().getAbsoluteCrossTrackError(estimatedPosition, timePoint));
     }
 
     @Override
     public Distance getSignedCrossTrackError(TimePoint timePoint) {
-        final Distance result;
-        final GPSFixTrack<Competitor, GPSFixMoving> track = getTrackedRace().getTrack(getCompetitor());
-        if (track != null) {
-            final Position estimatedPosition = track.getEstimatedPosition(timePoint, /* extrapolate */ true);
-            if (estimatedPosition != null) {
-                result = getTrackedLeg().getSignedCrossTrackError(estimatedPosition, timePoint);
-            } else {
-                result = null;
-            }
-        } else {
-            result = null;
-        }
-        return result;
+        return getSomeCrossTrackError(timePoint, (trackedLeg, estimatedPosition)->getTrackedLeg().getSignedCrossTrackError(estimatedPosition, timePoint));
+    }
+
+    @Override
+    public Distance getUnsignedCrossTrackErrorToWindAxis(TimePoint timePoint) {
+        return getSomeCrossTrackError(timePoint, (trackedLeg, estimatedPosition)->getTrackedLeg().getUnsignedCrossTrackErrorToWindAxis(estimatedPosition, timePoint));
+    }
+
+    @Override
+    public Distance getSignedCrossTrackErrorToWindAxis(TimePoint timePoint) {
+        return getSomeCrossTrackError(timePoint, (trackedLeg, estimatedPosition)->getTrackedLeg().getSignedCrossTrackErrorToWindAxis(estimatedPosition, timePoint));
     }
 
     @Override
@@ -1023,6 +1030,11 @@ public class TrackedLegOfCompetitorImpl implements TrackedLegOfCompetitor {
     }
     
     @Override
+    public Double getExpeditionKickerTensionIfAvailable(TimePoint at) {
+        return getExpeditionValueFromBravoFixTrackIfLegIsStarted(at, BravoFixTrack::getExpeditionKickerTensionIfAvailable);
+    }
+
+    @Override
     public Double getAverageExpeditionAWA(TimePoint at) {
         return getAverageExpeditionValueWithTimeRangeFromBravoFixTrackIfLegIsStarted(at, BravoFixTrack::getAverageExpeditionAWAIfAvailable);
     }
@@ -1215,6 +1227,11 @@ public class TrackedLegOfCompetitorImpl implements TrackedLegOfCompetitor {
     @Override
     public Double getAverageExpeditionMastButtIfAvailable(TimePoint at) {
         return getAverageExpeditionValueWithTimeRangeFromBravoFixTrackIfLegIsStarted(at, BravoFixTrack::getAverageExpeditionMastButtIfAvailable);
+    }
+    
+    @Override
+    public Double getAverageExpeditionKickerTensionIfAvailable(TimePoint at) {
+        return getAverageExpeditionValueWithTimeRangeFromBravoFixTrackIfLegIsStarted(at, BravoFixTrack::getAverageExpeditionKickerTensionIfAvailable);
     }
     
     private <R> R getExpeditionValueFromBravoFixTrackIfLegIsStarted(TimePoint at, BiFunction<BravoFixTrack<Competitor>, TimePoint, R> valueExtractor) {

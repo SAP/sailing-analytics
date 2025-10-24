@@ -58,7 +58,7 @@ public class EventHeaderSharingButtons extends Composite {
         final UrlBuilder mailtoLink = new UrlBuilder().setProtocol("mailto").setParameter("subject", shortText).setParameter("body", urlToShare);
         // URLBuilder encodes spaces in parameters using "+" instead of "%20". This causes problems in Mail programs that do not decode "+" as space.
         mail.setHref(mailtoLink.buildString().replace("+", "%20"));
-        final UrlBuilder twitterLink = new UrlBuilder().setProtocol("https").setHost("twitter.com").setPath("intent/tweet").setParameter("text", shortText).setParameter("url", urlToShare).setParameter("short_url_length", "8");
+        final UrlBuilder twitterLink = new UrlBuilder().setProtocol("https").setHost("x.com").setPath("intent/tweet").setParameter("text", shortText).setParameter("url", urlToShare).setParameter("short_url_length", "8");
         twitter.setHref(twitterLink.buildString());
         final UrlBuilder facebookLink = new UrlBuilder().setProtocol("https").setHost("www.facebook.com")
                 .setPath("sharer/sharer.php").setParameter("u", urlToShare);

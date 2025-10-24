@@ -54,6 +54,7 @@ public enum ExpeditionExtendedSensorDataMetadata {
     EXPEDITION_JIB_CAR_PORT("jibcarport", BravoExtendedSensorDataMetadata.EXPEDITION_JIB_CAR_PORT), //
     EXPEDITION_JIB_CAR_STBD("jibcarstbd", BravoExtendedSensorDataMetadata.EXPEDITION_JIB_CAR_STBD), //
     EXPEDITION_MAST_BUTT("mastbutt", BravoExtendedSensorDataMetadata.EXPEDITION_MAST_BUTT), //
+    EXPEDITION_KICKER_TENSION("kickertension", BravoExtendedSensorDataMetadata.EXPEDITION_KICKER_TENSION), //
     ;
 
     private String columnName;

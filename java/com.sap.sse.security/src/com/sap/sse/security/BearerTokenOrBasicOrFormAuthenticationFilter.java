@@ -13,6 +13,7 @@ import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 
 import com.sap.sse.security.impl.FormAuthenticationFilterWithPublicCreateToken;
 import com.sap.sse.security.jaxrs.api.SecurityResource;
+import com.sap.sse.util.HttpRequestUtils;
 
 /**
  * Looks for an "Authorization: Bearer &lt;token&gt;" HTTP header. If found, tries to authenticate a user
@@ -51,7 +52,9 @@ public class BearerTokenOrBasicOrFormAuthenticationFilter extends BasicHttpAuthe
         if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
             String[] authTokens = authorizationHeader.split(" ");
             if (authTokens[0].equalsIgnoreCase(BEARER)) {
-                return authTokens.length < 2 ? null : new BearerAuthenticationToken(authTokens[1]);
+                return authTokens.length < 2 ? null : new BearerAuthenticationToken(authTokens[1],
+                        request instanceof HttpServletRequest ? HttpRequestUtils.getClientIP((HttpServletRequest) request) : null,
+                        request instanceof HttpServletRequest ? HttpRequestUtils.getUserAgent((HttpServletRequest) request) : null);
             } else if (authTokens[0].equalsIgnoreCase(HttpServletRequest.BASIC_AUTH)) {
                 return super.createToken(request, response);
             }
@@ -61,7 +64,7 @@ public class BearerTokenOrBasicOrFormAuthenticationFilter extends BasicHttpAuthe
 
     @Override
     protected boolean isLoginAttempt(ServletRequest request, ServletResponse response) {
-        String authzScheme = BEARER.toLowerCase(Locale.ENGLISH);
+        final String authzScheme = BEARER.toLowerCase(Locale.ENGLISH);
         final String authzHeader = getAuthzHeader(request);
         return (authzHeader != null && authzHeader.toLowerCase(Locale.ENGLISH).startsWith(authzScheme)) ||
                 super.isLoginAttempt(request, response) || formAuthenticationFilter.isLoginSubmission(request, response);

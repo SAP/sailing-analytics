@@ -1,9 +1,9 @@
 package com.sap.sailing.server.gateway.serialization.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -13,8 +13,8 @@ import java.util.UUID;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Boat;
 import com.sap.sailing.domain.base.Competitor;
@@ -38,7 +38,7 @@ public class CompetitorJsonSerializerTest {
     private CompetitorJsonSerializer serializer;
     private CompetitorJsonDeserializer deserializer;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         competitor = mock(Competitor.class);
         mockTeam(competitor);

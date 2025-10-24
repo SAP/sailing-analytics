@@ -2,14 +2,13 @@ package com.sap.sailing.datamining.data;
 
 import com.sap.sailing.domain.common.NoWindException;
 import com.sap.sailing.domain.common.SpeedWithBearing;
-import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.tracking.BravoFix;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Speed;
 import com.sap.sse.datamining.annotations.Connector;
 import com.sap.sse.datamining.annotations.Statistic;
 
-public interface HasBravoFixContext {
+public interface HasBravoFixContext extends HasWindOnTrackedLegOfCompetitor {
     @Connector(scanForStatistics=false)
     HasTrackedLegOfCompetitorContext getTrackedLegOfCompetitorContext();
     
@@ -18,11 +17,6 @@ public interface HasBravoFixContext {
     
     @Connector(messageKey="")
     SpeedWithBearing getSpeed();
-    
-    @Connector(messageKey="Wind")
-    default Wind getWind() {
-        return getTrackedLegOfCompetitorContext().getWind();
-    }
     
     @Statistic(messageKey="TrueWindAngle")
     Bearing getTrueWindAngle() throws NoWindException;

@@ -34,6 +34,7 @@ import com.sap.sse.common.filter.AbstractListFilter;
 import com.sap.sse.common.search.KeywordQuery;
 import com.sap.sse.common.search.Result;
 import com.sap.sse.common.search.ResultImpl;
+import com.sap.sse.security.SecurityService;
 
 /**
  * Searches a {@link RacingEventService} instance for regattas that somehow match with a
@@ -49,35 +50,40 @@ public class RegattaByKeywordSearchService {
     private static final Logger logger = Logger.getLogger(RegattaByKeywordSearchService.class.getName());
     
     Result<LeaderboardSearchResult> search(final RacingEventService racingEventService, KeywordQueryWithOptionalEventQualification query) {
-        ResultImpl<LeaderboardSearchResult> result = new ResultImpl<>(query, new LeaderboardSearchResultRanker(racingEventService));
+        final SecurityService securityService = racingEventService.getSecurityService();
+        final ResultImpl<LeaderboardSearchResult> result = new ResultImpl<>(query, new LeaderboardSearchResultRanker(racingEventService));
         final Map<LeaderboardGroup, Set<Event>> eventsForLeaderboardGroup = new HashMap<>();
         final Map<Leaderboard, Set<LeaderboardGroup>> leaderboardGroupsForLeaderboard = new HashMap<>();
         final Map<CourseArea, Event> eventForCourseArea = new HashMap<>();
         final Map<Event, Set<String>> stringsForEvent = new HashMap<>();
         final Map<LeaderboardGroup, Set<String>> stringsForLeaderboardGroup = new HashMap<>();
         for (final Event event : racingEventService.getEventsSelectively(query.isInclude(), query.getEventUUIDs())) {
-            final Set<String> s4e = new HashSet<>();
-            s4e.add(event.getName());
-            s4e.add(event.getVenue().getName());
-            stringsForEvent.put(event, s4e);
-            for (final LeaderboardGroup leaderboardGroup : event.getLeaderboardGroups()) {
-                Util.add(eventsForLeaderboardGroup, leaderboardGroup, event);
-            }
-            for (final CourseArea courseArea : event.getVenue().getCourseAreas()) {
-                eventForCourseArea.put(courseArea, event);
+            if (securityService.hasCurrentUserReadPermission(event)) {
+                final Set<String> s4e = new HashSet<>();
+                s4e.add(event.getName());
+                s4e.add(event.getVenue().getName());
+                stringsForEvent.put(event, s4e);
+                for (final LeaderboardGroup leaderboardGroup : event.getLeaderboardGroups()) {
+                    Util.add(eventsForLeaderboardGroup, leaderboardGroup, event);
+                }
+                for (final CourseArea courseArea : event.getVenue().getCourseAreas()) {
+                    eventForCourseArea.put(courseArea, event);
+                }
             }
         }
         for (final LeaderboardGroup leaderboardGroup : racingEventService.getLeaderboardGroups().values()) {
-            final Set<String> s4lg = new HashSet<>();
-            s4lg.add(leaderboardGroup.getName());
-            s4lg.add(leaderboardGroup.getDescription());
-            stringsForLeaderboardGroup.put(leaderboardGroup, s4lg);
-            for (final Leaderboard leaderboard : leaderboardGroup.getLeaderboards()) {
-                Util.add(leaderboardGroupsForLeaderboard, leaderboard, leaderboardGroup);
+            if (securityService.hasCurrentUserReadPermission(leaderboardGroup)) {
+                final Set<String> s4lg = new HashSet<>();
+                s4lg.add(leaderboardGroup.getName());
+                s4lg.add(leaderboardGroup.getDescription());
+                stringsForLeaderboardGroup.put(leaderboardGroup, s4lg);
+                for (final Leaderboard leaderboard : leaderboardGroup.getLeaderboards()) {
+                    Util.add(leaderboardGroupsForLeaderboard, leaderboard, leaderboardGroup);
+                }
             }
         }
         final TaggingService taggingService = racingEventService.getTaggingService();
-        AbstractListFilter<Leaderboard> leaderboardFilter = new AbstractListFilter<Leaderboard>() {
+        final AbstractListFilter<Leaderboard> leaderboardFilter = new AbstractListFilter<Leaderboard>() {
             @Override
             public Iterable<String> getStrings(Leaderboard leaderboard) {
                 // TODO allow recording which part of the leaderboard was matched by the keywords by returning "annotated strings" that the matcher can understand
@@ -137,9 +143,12 @@ public class RegattaByKeywordSearchService {
                 return leaderboardStrings;
             }
         };
-        final Set<Leaderboard> leaderboardsToConsider = StreamSupport.stream(racingEventService.getAllEvents().spliterator(), /* parallel */ false).filter(e->e.isPublic()).
-            flatMap(e->StreamSupport.stream(e.getLeaderboardGroups().spliterator(), /* parallel */ false)).
-            flatMap(lg->StreamSupport.stream(lg.getLeaderboards().spliterator(), /* parallel */ false)).
+        final Set<Leaderboard> leaderboardsToConsider = StreamSupport.stream(racingEventService.getAllEvents().spliterator(), /* parallel */ false).
+            filter(e->e.isPublic() && securityService.hasCurrentUserReadPermission(e)).
+            flatMap(e->StreamSupport.stream(e.getLeaderboardGroups().spliterator(), /* parallel */ false).
+                           filter(lg->securityService.hasCurrentUserReadPermission(lg))).
+            flatMap(lg->StreamSupport.stream(lg.getLeaderboards().spliterator(), /* parallel */ false).
+                           filter(l->securityService.hasCurrentUserReadPermission(l))).
             collect(Collectors.toSet());
         for (Leaderboard matchingLeaderboard : leaderboardFilter.applyFilter(query.getKeywords(), leaderboardsToConsider)) {
             result.addHit(new LeaderboardSearchResultImpl(matchingLeaderboard,

@@ -27,6 +27,7 @@ import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.CellPreviewEvent.Handler;
 import com.google.gwt.view.client.NoSelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
+import com.sap.sailing.domain.common.RaceIdentifier;
 import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
 import com.sap.sailing.domain.common.dto.FleetDTO;
 import com.sap.sailing.domain.common.dto.RaceColumnDTO;
@@ -170,7 +171,7 @@ public class TaggingComponent extends ComponentWithoutSettings
     public TaggingComponent(Component<?> parent, ComponentContext<?> context, StringMessages stringMessages,
             SailingServiceAsync sailingService, UserService userService, Timer timer,
             RaceTimesInfoProvider raceTimesInfoProvider, TimePoint timePointToHighlight, String tagToHighlight,
-            StrippedLeaderboardDTO leaderboardDTO, SailingServiceWriteAsync sailingServiceWrite) {
+            StrippedLeaderboardDTO leaderboardDTO, SailingServiceWriteAsync sailingServiceWrite, RaceIdentifier raceIdentifier) {
         super(parent, context);
         this.stringMessages = stringMessages;
         this.sailingService = sailingService;
@@ -185,7 +186,7 @@ public class TaggingComponent extends ComponentWithoutSettings
         style.ensureInjected();
         TaggingPanelResources.INSTANCE.cellListStyle().ensureInjected();
         TaggingPanelResources.INSTANCE.cellTableStyle().ensureInjected();
-        tagCellList = new CellList<TagDTO>(new TagCell(this, stringMessages, userService, false),
+        tagCellList = new CellList<TagDTO>(new TagCell(this, stringMessages, userService, false, raceIdentifier),
                 TaggingPanelResources.INSTANCE);
         tagSelectionModel = new SingleSelectionModel<TagDTO>();
         tagListProvider = new TagListProvider();
@@ -200,7 +201,7 @@ public class TaggingComponent extends ComponentWithoutSettings
             }
         };
         filterbarAndContentPanel = new HeaderPanel();
-        tagFooterPanel = new TagFooterPanel(this, sailingService, stringMessages, userService);
+        tagFooterPanel = new TagFooterPanel(this, sailingService, stringMessages, userService, raceIdentifier);
         footerPanel = new ScrollPanel(tagFooterPanel);
         filterbarPanel = new TagFilterPanel(this, stringMessages, userService);
         contentPanel = new FlowPanel();
@@ -337,18 +338,19 @@ public class TaggingComponent extends ComponentWithoutSettings
     /**
      * Saves tag at current timer position.
      * 
-     * @see #saveTag(String, Sting, String, boolean, TimePoint, boolean)
+     * @see #saveTag(String, Sting, String, String, boolean, TimePoint, boolean)
      */
-    protected void saveTag(String tag, String comment, String imageURL, boolean visibleForPublic) {
+    protected void saveTag(String tag, String comment, String hiddenInfo, String imageURL, boolean visibleForPublic) {
         getResizedImageURLForImageURL(imageURL, new AsyncCallback<String>() {
             @Override
             public void onFailure(Throwable caught) {
+                saveTag(tag, comment, hiddenInfo, imageURL, /* resizedImageURL */ null, visibleForPublic, null);
                 GWT.log(caught.getMessage());
             }
 
             @Override
             public void onSuccess(String resizedImageURL) {
-                saveTag(tag, comment, imageURL, resizedImageURL, visibleForPublic, null);
+                saveTag(tag, comment, hiddenInfo, imageURL, resizedImageURL, visibleForPublic, null);
             }
         });
     }
@@ -381,7 +383,7 @@ public class TaggingComponent extends ComponentWithoutSettings
                         int imageHeight = result.getB();
                         if (imageWidth < MediaTagConstants.TAGGING_IMAGE.getMinWidth()
                                 || imageHeight < MediaTagConstants.TAGGING_IMAGE.getMinHeight()) {
-                            callback.onFailure(new IllegalArgumentException("Image is to small for resizing!"));
+                            callback.onFailure(new IllegalArgumentException("Image is too small for resizing!"));
                         } else {
                             if (imageWidth > MediaTagConstants.TAGGING_IMAGE.getMaxWidth()
                                     || imageHeight > MediaTagConstants.TAGGING_IMAGE.getMaxHeight()) {
@@ -422,10 +424,11 @@ public class TaggingComponent extends ComponentWithoutSettings
      * Checks parameters for valid values and replaces optional parameters with value <code>null</code> by default
      * values: <code>comment</code> and <code>imageURL</code> will be replaced by an empty string,
      * <code>raceTimePoint</code> by current {@link #getTimerTime() timer position}.
+     * @param hiddenInfo TODO
      */
-    protected void saveTag(String tag, String comment, String imageURL, String resizedImageURL,
-            boolean visibleForPublic, TimePoint raceTimePoint) {
-        if (tagAlreadyExists(tag, comment, imageURL, resizedImageURL, visibleForPublic, raceTimePoint)) {
+    protected void saveTag(String tag, String comment, String hiddenInfo, String imageURL,
+            String resizedImageURL, boolean visibleForPublic, TimePoint raceTimePoint) {
+        if (tagAlreadyExists(tag, comment, hiddenInfo, imageURL, resizedImageURL, visibleForPublic, raceTimePoint)) {
             // tag does already exist
             Notification.notify(stringMessages.tagNotSavedReason(" " + stringMessages.tagAlreadyExists()),
                     NotificationType.WARNING);
@@ -440,8 +443,8 @@ public class TaggingComponent extends ComponentWithoutSettings
             final String saveComment = (comment == null ? "" : comment);
             final TimePoint saveRaceTimePoint = (raceTimePoint == null ? new MillisecondsTimePoint(getTimerTime())
                     : raceTimePoint);
-            sailingServiceWrite.addTag(leaderboardName, raceColumn.getName(), fleet.getName(), tag, saveComment, imageURL,
-                    resizedImageURL, visibleForPublic, saveRaceTimePoint, new AsyncCallback<SuccessInfo>() {
+            sailingServiceWrite.addTag(leaderboardName, raceColumn.getName(), fleet.getName(), tag, saveComment, hiddenInfo,
+                    imageURL, resizedImageURL, visibleForPublic, saveRaceTimePoint, new AsyncCallback<SuccessInfo>() {
                         @Override
                         public void onFailure(Throwable caught) {
                             Notification.notify(stringMessages.tagNotSavedReason(caught.toString()),
@@ -518,49 +521,54 @@ public class TaggingComponent extends ComponentWithoutSettings
      * 
      * @see TagDTO
      */
-    protected void updateTag(TagDTO tagToUpdate, String tag, String comment, String imageURL,
-            boolean visibleForPublic) {
+    protected void updateTag(TagDTO tagToUpdate, String tag, String comment, String hiddenInfo, String imageURL, boolean visibleForPublic) {
         // A new resized image gets created every time a tag is updated (if tag shall contain an image)
         getResizedImageURLForImageURL(imageURL, new AsyncCallback<String>() {
             @Override
             public void onFailure(Throwable caught) {
-                Notification.notify(stringMessages.tagNotSavedReason(caught.getMessage()), NotificationType.ERROR);
+                Notification.notify(caught.getMessage(), NotificationType.WARNING);
+                updateTag(tagToUpdate, tag, comment, hiddenInfo, imageURL, visibleForPublic, /* resizedImageURL */ null);
                 GWT.log(caught.getMessage());
             }
 
             @Override
             public void onSuccess(String resizedImageURL) {
-                sailingServiceWrite.updateTag(leaderboardName, raceColumn.getName(), fleet.getName(), tagToUpdate, tag,
-                        comment, imageURL, resizedImageURL, visibleForPublic, new AsyncCallback<SuccessInfo>() {
-                            @Override
-                            public void onFailure(Throwable caught) {
-                                Notification.notify(stringMessages.tagNotSavedReason(caught.getMessage()),
-                                        NotificationType.ERROR);
-                                GWT.log(caught.getMessage());
-                            }
-
-                            @Override
-                            public void onSuccess(SuccessInfo result) {
-                                if (result.isSuccessful()) {
-                                    tagListProvider.remove(tagToUpdate);
-                                    // If old tag was or new tag is private, reload all private tags. Otherwise just
-                                    // refresh UI.
-                                    if (!tagToUpdate.isVisibleForPublic() || !visibleForPublic) {
-                                        reloadPrivateTags();
-                                        firePrivateTagUpdateEvent(userService.getStorage());
-                                    } else {
-                                        updateContent();
-                                    }
-                                    Notification.notify(stringMessages.tagSavedSuccessfully(),
-                                            NotificationType.SUCCESS);
-                                } else {
-                                    Notification.notify(stringMessages.tagNotSavedReason(result.getMessage()),
-                                            NotificationType.ERROR);
-                                }
-                            }
-                        });
+                updateTag(tagToUpdate, tag, comment, hiddenInfo, imageURL, visibleForPublic, resizedImageURL);
             }
         });
+    }
+
+    protected void updateTag(TagDTO tagToUpdate, String tag, String comment, String hiddenInfo, String imageURL,
+            boolean visibleForPublic, String resizedImageURL) {
+        sailingServiceWrite.updateTag(leaderboardName, raceColumn.getName(), fleet.getName(), tagToUpdate, tag,
+                comment, hiddenInfo, imageURL, resizedImageURL, visibleForPublic, new AsyncCallback<SuccessInfo>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        Notification.notify(stringMessages.tagNotSavedReason(caught.getMessage()),
+                                NotificationType.ERROR);
+                        GWT.log(caught.getMessage());
+                    }
+
+                    @Override
+                    public void onSuccess(SuccessInfo result) {
+                        if (result.isSuccessful()) {
+                            tagListProvider.remove(tagToUpdate);
+                            // If old tag was or new tag is private, reload all private tags. Otherwise just
+                            // refresh UI.
+                            if (!tagToUpdate.isVisibleForPublic() || !visibleForPublic) {
+                                reloadPrivateTags();
+                                firePrivateTagUpdateEvent(userService.getStorage());
+                            } else {
+                                updateContent();
+                            }
+                            Notification.notify(stringMessages.tagSavedSuccessfully(),
+                                    NotificationType.SUCCESS);
+                        } else {
+                            Notification.notify(stringMessages.tagNotSavedReason(result.getMessage()),
+                                    NotificationType.ERROR);
+                        }
+                    }
+                });
     }
 
     /**
@@ -568,11 +576,11 @@ public class TaggingComponent extends ComponentWithoutSettings
      * 
      * @return <code>true</code> if tag already exists (only checked client side), otherwise <code>false</code>
      */
-    protected boolean tagAlreadyExists(String tag, String comment, String imageURL, String resizedImageURL,
-            boolean visibleForPublic, TimePoint raceTimePoint) {
+    protected boolean tagAlreadyExists(String tag, String comment, String hiddenInfo, String imageURL,
+            String resizedImageURL, boolean visibleForPublic, TimePoint raceTimePoint) {
         for (TagDTO tagDTO : tagListProvider.getAllTags()) {
-            if (tagDTO.equals(tag, comment, imageURL, resizedImageURL, visibleForPublic,
-                    userService.getCurrentUser().getName(), new MillisecondsTimePoint(getTimerTime()))) {
+            if (tagDTO.equals(tag, comment, hiddenInfo, imageURL, resizedImageURL,
+                    visibleForPublic, userService.getCurrentUser().getName(), new MillisecondsTimePoint(getTimerTime()))) {
                 return true;
             }
         }
@@ -636,8 +644,8 @@ public class TaggingComponent extends ComponentWithoutSettings
      */
     protected void addTagButton(TagButton tagButton) {
         tagButton.addClickHandler(event -> {
-            saveTag(tagButton.getTag(), tagButton.getComment(), tagButton.getImageURL(),
-                    tagButton.isVisibleForPublic());
+            saveTag(tagButton.getTag(), tagButton.getComment(), /* hidden info */ null,
+                    tagButton.getImageURL(), tagButton.isVisibleForPublic());
         });
         tagButtons.add(tagButton);
     }

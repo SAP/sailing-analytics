@@ -1,6 +1,6 @@
 package com.sap.sailing.selenium.pages;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.text.MessageFormat;
 import java.time.Duration;
@@ -73,7 +73,7 @@ public class PageObject {
             ".//div[contains(@class, \"gwt-VerticalTabLayoutPanelTabInner\")]/div[text()=\"{0}\"]/../..");
     
     /**
-     * </p>The default timeout of 15 seconds for the lookup of other elements.</p>
+     * </p>The default timeout of 60 seconds for the lookup of other elements.</p>
      */
     protected static final int DEFAULT_LOOKUP_TIMEOUT = 60;
     

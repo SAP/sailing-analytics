@@ -74,7 +74,7 @@ public class LandscapeResource extends AbstractSecurityResource {
                 TimePoint.now(), keyName, publicKey.getBytes(), encryptedPrivateKey.getBytes());
         final AwsLandscapeState landscape = Activator.getInstance().getLandscapeState();
         try {
-            getService().setOwnershipCheckPermissionForObjectCreationAndRevertOnError(sshKeyPair.getPermissionType(),
+            getSecurityService().setOwnershipCheckPermissionForObjectCreationAndRevertOnError(sshKeyPair.getPermissionType(),
                 sshKeyPair.getIdentifier().getTypeRelativeObjectIdentifier(), keyName,
                 ()->landscape.addSSHKeyPair(sshKeyPair));
             response = Response.ok(streamingOutput(sshKeyPairJsonSerializer.serialize(sshKeyPair))).build();

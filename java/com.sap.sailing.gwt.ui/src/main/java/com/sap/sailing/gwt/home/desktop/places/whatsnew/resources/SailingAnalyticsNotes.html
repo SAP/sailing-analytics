@@ -5,6 +5,200 @@
 <div id="mainContent">
     <h4 class="articleHeadline">What's New - SAP Sailing Analytics</h4>
       <div class="innerContent">
+         <h5 class="articleSubheadline">October 2025</h5>
+         <ul class="bulletList">
+            <li>Bug fix: the "Edit Mark Passings" panel showed only up to 15 waypoints.</li>
+            <li>Competitors not assigned to any fleet will no longer be sorted in between a Gold
+                and a Silver fleet but will end up "at the bottom" of the leaderboard.</li>
+            <li>Bug fix: when a split-fleet series had results only entered manually as score
+                corrections, the progress bars for the series were not shown properly. All
+                fleets would be considered finished although some may not have seen results.</li>
+         </ul>
+         <h5 class="articleSubheadline">September 2025</h5>
+         <ul class="bulletList">
+            <li>Added CSV export for polar data histograms in Data Mining.</li>
+         </ul>
+         <h5 class="articleSubheadline">June 2025</h5>
+         <ul class="bulletList">
+            <li>Bug fix: the refresh interval in the Races/Tracking list ran into an overflow when races
+                were scheduled more than 25 days in the future, leading to "flickering" Tracking buttons
+                and excessive re-loading activity.</li>
+         </ul>
+         <h5 class="articleSubheadline">April 2025</h5>
+         <ul class="bulletList">
+           <li>Users can now file take-down requests for media assets displayed on the web site. This includes
+               event stage/logo/teaser/gallery images and videos, as well as competitor images and competitor flags.
+               For all these assets, a little semi-transparent three-dots button is displayed in the top-left
+               corner of the image/video tile. When you are logged-in, with a validated e-mail address, click the
+               three-dot button, and a popup dialog allows you to provide additional input and then submit the
+               take-down request, which will lead to an e-mail being sent to support@sapsailing.com.</li>
+         </ul>
+         <h5 class="articleSubheadline">April 2025</h5>
+         <ul class="bulletList">
+            <li>When viewing the map in wind-up (instead of north-up) orientation, we now use the "VECTOR"
+                Google Maps rendering type instead of "magically" mapping the race course to the middle of
+                the Atlantic and virtually turning the coordinate system such that the wind seems to blow
+                from the north. This way, as you zoom out from the race course you can still see the
+                race in its original environment, particularly if it's an inshore or near-shore event.<p>
+                In case your browser does not support VECTOR-based maps display, the previous "magical"
+                wind-up implementation continues to be used. This can, e.g., be necessary when you run
+                a browser inside a virtual environment, such as a VNC server or a Citrix client, or if
+                your browser or graphics drivers don't support WebGL2.
+                </li>
+            <li>The wind ladder now shows reliably when switched on in the map settings. Note that the time
+                slider needs to be at a time after the race start for the ladder to be shown.</li>
+         </ul>
+         <h5 class="articleSubheadline">March 2025</h5>
+         <ul class="bulletList">
+            <li>A new AI Agent based on <a href="https://help.sap.com/docs/sap-ai-core/sap-ai-core-service-guide/what-is-sap-ai-core">SAP AI Core</a>
+                has been integrated with the solution. When configured for an event (see also <a href="/release_notes_admin.html">the administration release notes for March 2025</a>),
+                the agent will generate comments in the race viewer's Tags column (right of the map) that explain what
+                happens during the race.</li>
+            <li>We introduced stricter Cross-Origin Resource Sharing (CORS) headers in our responses and by default now
+                disallow the integration of our solution in &lt;iframe&gt; HTML elements for security reasons.
+                Should you have a scenario that is impeded by these security measures and you feel your scenario
+                is a valid one that we should support, please get in touch
+                (<a href="mailto:support@sapsailing.com">support@sapsailing.com</a>).</li>
+            <li>Failed password authentication attempts now lead to an increasing delay for accepting
+                the next password authentication attempt for the same user.</li>
+            <li>User account creation is limited now to one new user account per client IP address per minute.</li>
+            <li>A failing attempt to authenticate a request with a bearer token, as obtained from
+                <a href="https://sapsailing.com/security/api/restsecurity/access_token">/security/api/restsecurity/access_token</a>,
+                will ban the requesting client IP address for a gradually increasing amount of time.</li>
+            <li>The minimum complexity of new passwords has been increased.</li>
+            <li>Added missing <tt>startTack</tt> field to <tt>.../startanalysis</tt> REST API method</li>
+         </ul>
+         <h5 class="articleSubheadline">February 2025</h5>
+         <ul class="bulletList">
+            <li>There are new importers for the Vakaros CSV file format. See details in the
+                <a href="/release_notes_admin.html">administrative release notes</a>.</li>
+            <li>Premium users now see a new leaderboard column for "Percent Target Boat Speed" which
+                corresponds with the figures shown in the respective tail color and competitor chart
+                selection.</li>
+            <li>Percent Target Boat Speed for ORC Performance Curve Scoring (PCS) is now calculated based
+                on each boat's measurement certificate, using the ratio between the implied wind at the
+                current time point and the actual wind speed for the boat's position at that time.</li>
+            <li>Fixed Data Mining issue: maneuvers, GPS, and Bravo fixes were filtered by average leg wind
+                conditions instead of the maneuvers/GPS/Bravo fix's specific wind conditions. However,
+                when reporting the results respect the specific wind conditions, potentially leading to
+                inconsistencies.</li>
+            <li>Assembling a "Sailor Profile" (see
+                <a href="https://www.sapsailing.com/gwt/Home.html#/user/profile/sailorprofile/:">https://www.sapsailing.com/gwt/Home.html#/user/profile/sailorprofile/:</a>)
+                now has an improved competitor search facility. The search keywords will be split along
+                whitespace characters, so you can use multiple keywords in your search and split them by
+                spaces. Sail numbers of competitors with fixed boat assignments will now be considered in
+                the search, making this consistent with the display of the suggested items which also
+                contain the sail numbers where available. Furthermore, the suggest box no longer suggests
+                items that are already contained in the sailor profile's competitor selection. This makes
+                assembling the competitor set of a sailor profile easier for larger numbers of items.</li>
+            <li>Event seasons such as historic Extreme Sailing Series events or some league events were
+                troubled by a data migration issue in connection with a new TracAPI major release 4.0.0
+                and did not load correct course mark positions anymore. This problem has now been fixed
+                on TracTrac's side, and after loading all content again, all events should now have their mark
+                positions back.</li>
+            <li>Added "Start Delay" as a statistic to the "Race of Competitor" data mining category.</li>
+         </ul>
+         <h5 class="articleSubheadline">January 2025</h5>
+         <ul class="bulletList">
+            <li>Export of Polar data as CSV has been fixed now in Data Mining.</li>
+            <li>The link format for <tt>/gwt/Home.html</tt> has changed. We're now using a Base64-encoded version
+                of the regatta name instead of the URL-encoded regatta name. We're trying to remain backward-compatible
+                by assuming that if you're link doesn't parse as a Base64-encoded regatta name, it may have been the
+                simply URL-encoded regatta name; so except for very strange corner cases, you're old links and
+                bookmarks should still work.</li>
+            <li>We introduced two new metrics for tail color and competitor chart: Change of Gap, and Change of Gap to Leader.
+                These represent an average of the respective gap value change over the last approximately five position fixes,
+                e.g., 5s for a 1Hz sampling rate.</li>
+            <li>When using tail colors to visualize metrics, so far we spread the value range across the colors available
+                in a "linear" way. This made outliers and maneuvers waste a lot of the color space. Instead, for all
+                metrics except  over ground (COG) we now use a cubic root function that reserves most of
+                the available color space to the values in the middle of the range to be visualized, whereas
+                the values closer to the boundaries of the range are assigned less space of the color range.
+                See how the color key displayed at the top of the map changed.</li>
+            <li>Introduced a new metric for visualization in the competitor chart and as a tail color: percent
+                target boat speed. This is computed from the polar data and the local wind conditions (TWS, TWA)
+                at the position of the competitor at the given time point.</li>
+            <li>Hovering over a colored tail on the map where the color represents a detail value as selected by the user,
+                the tool tip that pops up will now display the detail value at the point over which the mouse pointer
+                is hovering.</li>
+            <li>Another fix to the polar data CSV export from the Data Mining module; the ";" separators were missing
+                for the negative (port tack) angles.</li>
+         </ul>
+         <h5 class="articleSubheadline">December 2024</h5>
+         <ul class="bulletList">
+            <li>Polar data in Data Mining can now be filtered and grouped by sailor profiles.</li>
+            <li>Added a new REST API method: <tt>/api/v1/regattas/{regattaname}/races/{racename}/competitordata</tt>
+                for requesting time series of values for one or more parameters such as rank or distance, for one or more competitors.
+                See <a href="/sailingserver/webservices/api/v1/raceDetailsGetCompetitorData.html">here</a> for more details on what it does.</li>
+            <li>Bug Fix: Accidentally, when hardening the data mining security, Competitor entities were only processed anymore if
+                the user had <tt>READ</tt> and not only <tt>READ_PUBLIC</tt> permission, often leading to empty results.
+                The bug had been introduced late November 2024. Apologies to all data mining users.</li>
+         </ul>
+         <h5 class="articleSubheadline">November 2024</h5>
+         <ul class="bulletList">
+            <li>Added a data mining dimension "tenth of leg" for competitor position fixes, such that, e.g.,
+                the first or last tenth of a leg (based on the windward distance) can be excluded during
+                data collection.</li>
+            <li>Introduced an extended data mining retriever chain that allows users to drill into ten
+                equal-duration sub-slices of each leg to, e.g., compare average performance across different
+                parts of legs.</li>
+            <li>Added metrics for a "relative" cross-track error (XTE) in the data mining environment, both,
+                signed and unsigned. To allow for a comparison of XTE values across legs of different lengths,
+                the distances from the course middle line are divided by half the leg's length at that point
+                in time. This way, e.g., a position on one far side of an upwind leg after having sailed half
+                the leg, in a boat class that has approximately a 90° tacking angle would result in a value
+                close to <tt>(+/-) 1.0</tt>, regardless the length of the leg.</li>
+            <li>Added cross-track error (XTE) metrics that don't project onto the course middle line ("rhumb line",
+                although instead of the "rhumb line" (see <a href="https://en.wikipedia.org/wiki/Rhumb_line">the Wikipedia definition</a>)
+                we use a great circle segment connecting the leg's waypoints), but onto the wind vector attached to the
+                leg's end waypoint (e.g., the windward mark for an upwind leg). The metrics are again
+                available in signed/unsigned as well as in absolute and relative (to half the leg distance)
+                variants.</li>
+            <li>Introduced a new Data Mining dimension "Sailor Profile Name." With this, if a user in their "User Details"
+                creates one or more "Sailor Profiles" to group multiple occurrences of what is to be considered "the same sailor"
+                into one profile, these profiles can be used for filtering and grouping in data mining.</li>
+            <li>Bug fix: data mining now correctly propagates the current user session to all data retrieval processes,
+                and all security checks for object readability by the current subject are now in place.</li>
+            <li>User e-mail and password changes were not always updated properly to the persistent storage
+                and may have gotten reset, e.g., during a software update. This is now fixed.</li>
+         </ul>
+         <h5 class="articleSubheadline">October 2024</h5>
+         <ul class="bulletList">
+            <li>Bug fix: for match racing tie breaks, under very special circumstances the tie breaking
+                algorithm (based on a topological ordering based on wins/losses) could have run into an
+                endless loop.</li>
+         </ul>
+         <h5 class="articleSubheadline">August 2024</h5>
+         <ul class="bulletList">
+            <li>Extended simulator timeouts to avoid failing to compute a path with "out-of-bounds"in
+                more situations and under high load scenarios.</li>
+            <li>No more tool tips for course area circles. They kept tool tips for lines (such as start/finish
+                lines or course middle lines) from showing when hovering the mouse over them.</li>
+            <li>In Data Mining, race results now have a new dimension "Discarded" for grouping and filtering.</li>
+            <li>Races of competitors now have a new statistic in Data Mining: duration since start to first tack.</li>
+            <li>New data mining dimension for races: type of first leg. This way, races can be filtered or results can
+                be grouped by whether a race's first leg is an upwind, reaching or downwind leg.</li>
+         </ul>
+         <h5 class="articleSubheadline">July 2024</h5>
+         <ul class="bulletList">
+            <li>Fixed a problem with the REST API, asked for maneuvers when a leg hasn't started yet.</li>
+            <li>Simulator overlay now remembers path selection across updates.</li>
+            <li>Adjusted Formula Kite dimensions.</li>
+         </ul>
+         <h5 class="articleSubheadline">June 2024</h5>
+         <ul class="bulletList">
+            <li>Added the <tt>timepoint-ms</tt> and <tt>lastScoringUpdate-ms</tt> fields to the
+                <tt>/sailingserver/api/v1/leaderboardgroups/{id|name}</tt>
+                response which reports the time point as the number of milliseconds since the epoch (1970-01-01T00:00:00Z, "Unix time").
+                The <tt>timepoint</tt> and <tt>lastScoringUpdate</tt> fields' format is not easily machine-readable,
+                but we're not changing the format for reasons of backward compatibility.</li>
+            <li>The REST API for <tt>/sailingserver/api/v1/events/{event-id}</tt> and <tt>/sailingserver/api/v1/leaderboardgroups/{leaderboardgroup-name-or-id}</tt>
+                now have the new <tt>overallLeaderboardName</tt> field for the leaderboard group(s), and the latter now also has
+                the <tt>hasOverallLeaderboard</tt> Boolean field. The <tt>overallLeaderboardName</tt> field is present if and only if
+                <tt>hasOverallLeaderboard</tt> is <tt>true</tt>.</li>
+            <li>Boat visualization for OK Dinghy for downwind legs now without spinnaker.</li>
+            <li>Boat visualization for RS Tera for downwind legs now without spinnaker.</li>
+         </ul>
          <h5 class="articleSubheadline">April 2024</h5>
          <ul class="bulletList">
             <li>Added the <tt>trueheading-deg</tt> field to the competitor GPS fix export if the tracker has provided it.</li>

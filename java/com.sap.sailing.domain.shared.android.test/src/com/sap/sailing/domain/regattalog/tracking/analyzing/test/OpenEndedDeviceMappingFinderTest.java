@@ -1,12 +1,12 @@
 package com.sap.sailing.domain.regattalog.tracking.analyzing.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.regatta.events.impl.RegattaLogDeviceMarkMappingEventImpl;
 import com.sap.sailing.domain.abstractlog.regatta.impl.OpenEndedDeviceMappingFinder;
@@ -21,7 +21,7 @@ public class OpenEndedDeviceMappingFinderTest extends AbstractRegattaLogTracking
     private Mark mappedToMark;
     private UUID deviceUuid;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         mappedToMark = new MarkImpl(UUID.randomUUID(), "Random Mark");
         deviceUuid = UUID.randomUUID();

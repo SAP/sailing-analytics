@@ -14,7 +14,8 @@
     <application
             android:name="com.sap.sailing.android.shared.application.LoggableApplication"
             android:allowBackup="true"
-            android:hardwareAccelerated="true">
+            android:hardwareAccelerated="true"
+            android:networkSecurityConfig="@xml/network_security_config">
         <meta-data
                 android:name="com.google.android.gms.version"
                 android:value="@integer/google_play_services_version" />

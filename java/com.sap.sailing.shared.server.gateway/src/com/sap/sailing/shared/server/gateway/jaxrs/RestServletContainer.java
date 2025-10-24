@@ -59,7 +59,7 @@ public class RestServletContainer extends ServletContainer {
     @Override
     public void init(ServletConfig config) throws ServletException {  
        super.init(config);
-       BundleContext context = (BundleContext) config.getServletContext().getAttribute(OSGI_RFC66_WEBBUNDLE_BUNDLECONTEXT_NAME);
+       BundleContext context = getBundleContext(config);
        racingEventServiceTracker = ServiceTrackerFactory.createAndOpen(context, RacingEventService.class);
        sharedSailingDataTracker = ServiceTrackerFactory.createAndOpen(context, SharedSailingData.class);
        replicationServiceTracker = ServiceTrackerFactory.createAndOpen(context, ReplicationService.class);
@@ -73,4 +73,8 @@ public class RestServletContainer extends ServletContainer {
        config.getServletContext().setAttribute(SAILING_SERVER_FACTORY_TRACKER_NAME, sailingServerFactoryTracker);
        config.getServletContext().setAttribute(DATA_MINING_SERVER_TRACKER_NAME, dataMiningServerTracker);
    }
+
+    protected BundleContext getBundleContext(ServletConfig config) {
+        return (BundleContext) config.getServletContext().getAttribute(OSGI_RFC66_WEBBUNDLE_BUNDLECONTEXT_NAME);
+    }
 }

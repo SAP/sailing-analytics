@@ -24,8 +24,9 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasEnabled;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -612,9 +613,9 @@ public abstract class DataEntryDialog<T> {
         }
         validateAndUpdate();
         dataEntryDialog.center();
-        final FocusWidget focusWidget = getInitialFocusWidget();
+        final Focusable focusWidget = getInitialFocusWidget();
         if (focusWidget != null) {
-            if (focusWidget.isEnabled()) {
+            if (!(focusWidget instanceof HasEnabled) || ((HasEnabled) focusWidget).isEnabled()) {
                 Scheduler.get().scheduleFinally(new ScheduledCommand() {
                     @Override
                     public void execute() {
@@ -639,7 +640,7 @@ public abstract class DataEntryDialog<T> {
      * Defines the {@link #okButton} as the default initial focus widget. Subclasses may redefine. Return
      * {@code null} to not set the focus on any widget.
      */
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return okButton;
     }
 

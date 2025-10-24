@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -43,6 +44,7 @@ import com.sap.sse.security.shared.impl.Role;
 import com.sap.sse.security.shared.impl.SecuredSecurityTypes;
 import com.sap.sse.security.shared.impl.User;
 import com.sap.sse.security.shared.impl.UserGroup;
+import com.sap.sse.util.HttpRequestUtils;
 import com.sun.jersey.api.client.ClientResponse.Status;
 
 @Path(SecurityResource.RESTSECURITY)
@@ -101,14 +103,14 @@ public class SecurityResource extends AbstractSecurityResource {
         final TimePoint start = TimePoint.now();
         try {
             final WildcardPermission wildcardPermission = new WildcardPermission(permission);
-            final Iterable<User> usersWithPermission = getService().getUsersWithPermissions(wildcardPermission);
+            final Iterable<User> usersWithPermission = getSecurityService().getUsersWithPermissions(wildcardPermission);
             final JSONArray usernames = new JSONArray();
             for (final User userWithPermission : usersWithPermission) {
-                if (getService().hasCurrentUserReadPermission(userWithPermission)) {
+                if (getSecurityService().hasCurrentUserReadPermission(userWithPermission)) {
                     usernames.add(userWithPermission.getName());
                 }
             }
-            logger.info("Request for users with permission took "+start.until(TimePoint.now()));
+            logger.fine(()->"Request for users with permission took "+start.until(TimePoint.now()));
             return Response.status(Status.OK).entity(streamingOutput(usernames)).build();
         } catch (Exception e) {
             return Response.status(Status.PRECONDITION_FAILED).entity(e.getMessage()).build();
@@ -140,11 +142,11 @@ public class SecurityResource extends AbstractSecurityResource {
     @Path(CHANGE_PASSWORD_METHOD)
     @Produces("text/plain;charset=UTF-8")
     public Response changePassword(@FormParam(USERNAME) String username, @FormParam(PASSWORD) String password) {
-        if (!getService().hasCurrentUserUpdatePermission(getService().getUserByName(username))) {
+        if (!getSecurityService().hasCurrentUserUpdatePermission(getSecurityService().getUserByName(username))) {
             return Response.status(Status.UNAUTHORIZED).build();
         } else {
             try {
-                getService().updateSimpleUserPassword(username, password);
+                getSecurityService().updateSimpleUserPassword(username, password);
                 return Response.ok().build();
             } catch (UserManagementException e) {
                 return Response.status(Status.PRECONDITION_FAILED).entity(e.getMessage()).build();
@@ -160,16 +162,16 @@ public class SecurityResource extends AbstractSecurityResource {
         try {
             final User user;
             if (username != null) {
-                user = getService().getUserByName(username);
+                user = getSecurityService().getUserByName(username);
             } else if (email != null) {
-                user = getService().getUserByEmail(email);
+                user = getSecurityService().getUserByEmail(email);
             } else {
                 return Response.status(Status.PRECONDITION_FAILED).entity("username or email must be provided").build();
             }
             if (user == null) {
                 return Response.status(Status.PRECONDITION_FAILED).entity("user not found").build();
             } else {
-                getService().resetPassword(user.getName(), getPasswordResetURL(uriInfo, application));
+                getSecurityService().resetPassword(user.getName(), getPasswordResetURL(uriInfo, application));
                 return Response.ok().build();
             }
         } catch (UserManagementException | MailException e) {
@@ -185,9 +187,11 @@ public class SecurityResource extends AbstractSecurityResource {
             @QueryParam(EMAIL) String queryEmail, @FormParam(EMAIL) String formEmail,
             @QueryParam(PASSWORD) String queryPassword, @FormParam(PASSWORD) String formPassword,
             @QueryParam(FULL_NAME) String queryFullName, @FormParam(FULL_NAME) String formFullName,
-            @QueryParam(COMPANY) String queryCompany, @FormParam(COMPANY) String formCompany) {
+            @QueryParam(COMPANY) String queryCompany, @FormParam(COMPANY) String formCompany,
+            @Context HttpServletRequest request) {
         try {
-            User user = getService().checkPermissionForObjectCreationAndRevertOnErrorForUserCreation(queryUsername,
+            final String clientIP = HttpRequestUtils.getClientIP(request);
+            User user = getSecurityService().checkPermissionForUserCreationAndRevertOnErrorForUserCreation(queryUsername,
                     new Callable<User>() {
                         @Override
                         public User call() throws Exception {
@@ -197,8 +201,8 @@ public class SecurityResource extends AbstractSecurityResource {
                             final String emailToUse = preferFirstIfNotNullOrElseSecond(formEmail, queryEmail);
                             final String fullNameToUse = preferFirstIfNotNullOrElseSecond(formFullName, queryFullName);
                             final String companyToUse = preferFirstIfNotNullOrElseSecond(formCompany, queryCompany);
-                            User newUser = getService().createSimpleUser(usernameToUse, emailToUse, passwordToUse, fullNameToUse, companyToUse,
-                                    Locale.ENGLISH, validationBaseURL, getService().getDefaultTenantForCurrentUser());
+                            User newUser = getSecurityService().createSimpleUser(usernameToUse, emailToUse, passwordToUse, fullNameToUse, companyToUse,
+                                    Locale.ENGLISH, validationBaseURL, getSecurityService().getDefaultTenantForCurrentUser(), clientIP, /* enforce strong password */ true);
                             SecurityUtils.getSubject().login(new UsernamePasswordToken(usernameToUse, passwordToUse));
                             return newUser;
                         }
@@ -241,14 +245,14 @@ public class SecurityResource extends AbstractSecurityResource {
     @Produces("application/json;charset=UTF-8")
     public Response getUser(@QueryParam(USERNAME) String username) {
         final Subject subject = SecurityUtils.getSubject();
-        final User user = getService().getUserByName(username == null ? subject.getPrincipal().toString() : username);
+        final User user = getSecurityService().getUserByName(username == null ? subject.getPrincipal().toString() : username);
         if (user == null) {
             return Response.status(Status.PRECONDITION_FAILED).entity("User "+username+" not known").build();
-        } else if (getService().hasCurrentUserReadPermission(user) || getService()
+        } else if (getSecurityService().hasCurrentUserReadPermission(user) || getSecurityService()
                 .hasCurrentUserOneOfExplicitPermissions(user, SecuredSecurityTypes.PublicReadableActions.READ_PUBLIC)) {
             JSONObject result = new JSONObject();
             result.put(USERNAME, user.getName());
-            if (getService().hasCurrentUserReadPermission(user)) {
+            if (getSecurityService().hasCurrentUserReadPermission(user)) {
                 result.put(FULL_NAME, user.getFullName());
                 result.put(EMAIL, user.getEmail());
                 result.put(COMPANY, user.getCompany());
@@ -263,11 +267,11 @@ public class SecurityResource extends AbstractSecurityResource {
     @Path(USER_METHOD)
     @Produces("text/plain;charset=UTF-8")
     public Response deleteUser(@QueryParam(USERNAME) String username) {
-        User user = getService().getUserByName(username);
+        User user = getSecurityService().getUserByName(username);
         if (user != null) {
-            return getService().checkPermissionAndDeleteOwnershipForObjectRemoval(user, () -> {
+            return getSecurityService().checkPermissionAndDeleteOwnershipForObjectRemoval(user, () -> {
                 try {
-                    getService().deleteUser(username);
+                    getSecurityService().deleteUser(username);
                     return Response.ok().build();
                 } catch (UserManagementException e) {
                     return Response.status(Status.PRECONDITION_FAILED).entity(e.getMessage()).build();
@@ -287,36 +291,36 @@ public class SecurityResource extends AbstractSecurityResource {
         final Response response;
         try {
             // get user for which to add a role
-            final User user = getService().getUserByName(username);
+            final User user = getSecurityService().getUserByName(username);
             if (user == null) {
                 response = Response.status(Status.NOT_FOUND).entity("User not found").build();
             } else {
                 // get user for which the role is qualified, if one exists
-                final User qualifiedForUser = qualifyingUserName == null ? null : getService().getUserByName(qualifyingUserName);
+                final User qualifiedForUser = qualifyingUserName == null ? null : getSecurityService().getUserByName(qualifyingUserName);
                 if (qualifyingUserName != null && qualifiedForUser == null) {
                     response = Response.status(Status.NOT_FOUND).entity("Qualifying user not found").build();
                 } else {
                     // get the group tenant the role is qualified for if one exists
-                    final UserGroup qualifyingGroup = qualifyingGroupId == null ? null : getService().getUserGroup(UUID.fromString(qualifyingGroupId));
+                    final UserGroup qualifyingGroup = qualifyingGroupId == null ? null : getSecurityService().getUserGroup(UUID.fromString(qualifyingGroupId));
                     if (qualifyingGroupId != null && qualifyingGroup == null) {
                         response = Response.status(Status.NOT_FOUND).entity("Qualifying group not found").build();
                     } else {
-                        final Role role = getService().getOrThrowRoleFromIDsAndCheckMetaPermissions(
+                        final Role role = getSecurityService().getOrThrowRoleFromIDsAndCheckMetaPermissions(
                                 roleDefinitionId == null ? null : UUID.fromString(roleDefinitionId),
                                 qualifyingGroup == null ? null : qualifyingGroup.getId(),
                                 qualifiedForUser == null ? null : qualifiedForUser.getName(), transitive);
                         final TypeRelativeObjectIdentifier associationTypeIdentifier = PermissionAndRoleAssociation.get(role, user);
                         final String message = "User "+SecurityUtils.getSubject().getPrincipal()+" added role " + role.getName() + " for user " + username;
-                        getService().setOwnershipWithoutCheckPermissionForObjectCreationAndRevertOnError(
+                        getSecurityService().setOwnershipWithoutCheckPermissionForObjectCreationAndRevertOnError(
                                 SecuredSecurityTypes.ROLE_ASSOCIATION, associationTypeIdentifier,
                                 associationTypeIdentifier.toString(), new Action() {
                                     @Override
                                     public void run() throws Exception {
                                         final QualifiedObjectIdentifier qualifiedObjectAssociationIdentifier = SecuredSecurityTypes.ROLE_ASSOCIATION
                                                 .getQualifiedObjectIdentifier(associationTypeIdentifier);
-                                        getService().addToAccessControlList(qualifiedObjectAssociationIdentifier,
+                                        getSecurityService().addToAccessControlList(qualifiedObjectAssociationIdentifier,
                                                 null, DefaultActions.READ.name());
-                                        getService().addRoleForUser(user, role);
+                                        getSecurityService().addRoleForUser(user, role);
                                         logger.info(message);
                                     }
                                 });
@@ -335,16 +339,16 @@ public class SecurityResource extends AbstractSecurityResource {
     @Produces("application/json;charset=UTF-8")
     public Response getRoles(@QueryParam(USERNAME) String username) {
         final JSONArray result = new JSONArray();
-        final User user = username == null ? getService().getCurrentUser() : getService().getUserByName(username);
+        final User user = username == null ? getSecurityService().getCurrentUser() : getSecurityService().getUserByName(username);
         if (user != null) {
-            getService().checkCurrentUserReadPermission(user);
+            getSecurityService().checkCurrentUserReadPermission(user);
             for (final Role role : user.getRoles()) {
                 final JSONObject roleJson = new JSONObject();
                 result.add(roleJson);
                 final TypeRelativeObjectIdentifier associationTypeIdentifier = PermissionAndRoleAssociation.get(role, user);
                 final QualifiedObjectIdentifier qualifiedObjectIdentifierForRoleAssociation = SecuredSecurityTypes.ROLE_ASSOCIATION.getQualifiedObjectIdentifier(associationTypeIdentifier);
-                if (getService().hasCurrentUserAnyPermission(qualifiedObjectIdentifierForRoleAssociation.getPermission(DefaultActions.READ))) {
-                    final OwnershipAnnotation ownership = getService().getOwnership(qualifiedObjectIdentifierForRoleAssociation);
+                if (getSecurityService().hasCurrentUserAnyPermission(qualifiedObjectIdentifierForRoleAssociation.getPermission(DefaultActions.READ))) {
+                    final OwnershipAnnotation ownership = getSecurityService().getOwnership(qualifiedObjectIdentifierForRoleAssociation);
                     roleJson.put(ROLE_DEFINITION_ID, role.getRoleDefinition().getIdAsString());
                     roleJson.put(ROLE_NAME, role.getRoleDefinition().getName());
                     roleJson.put(OWNING_GROUP_ID, ownership == null ? null : ownership.getAnnotation() == null ? null : ownership.getAnnotation().getTenantOwner() == null ? null : ownership.getAnnotation().getTenantOwner().getId().toString());
@@ -364,17 +368,17 @@ public class SecurityResource extends AbstractSecurityResource {
     public Response updateUser(@Context UriInfo uriInfo, @QueryParam(USERNAME) String username,
             @QueryParam(EMAIL) String email, @QueryParam(FULL_NAME) String fullName,
             @QueryParam(COMPANY) String company) {
-        if (!getService().hasCurrentUserUpdatePermission(getService().getUserByName(username))) {
+        if (!getSecurityService().hasCurrentUserUpdatePermission(getSecurityService().getUserByName(username))) {
             return Response.status(Status.UNAUTHORIZED).build();
         } else {
             try {
-                final User user = getService().getUserByName(username);
+                final User user = getSecurityService().getUserByName(username);
                 if (user == null) {
                     return Response.status(Status.PRECONDITION_FAILED).entity("User "+username+" not known").build();
                 } else {
-                    getService().updateUserProperties(username, fullName, company, user.getLocale());
+                    getSecurityService().updateUserProperties(username, fullName, company, user.getLocale());
                     if (!Util.equalsWithNull(user.getEmail(), email)) {
-                        getService().updateSimpleUserEmail(username, email, getEmailValidationBaseURL(uriInfo));
+                        getSecurityService().updateSimpleUserEmail(username, email, getEmailValidationBaseURL(uriInfo));
                     }
                     return Response.ok().build();
                 }
@@ -409,7 +413,7 @@ public class SecurityResource extends AbstractSecurityResource {
     @Path(LOGOUT_METHOD)
     @Produces("application/json;charset=UTF-8")
     public Response logoutPost() {
-        getService().logout();
+        getSecurityService().logout();
         return Response.ok().build();
     }
 
@@ -434,6 +438,13 @@ public class SecurityResource extends AbstractSecurityResource {
         }
         return result;
     }
+
+    public Response respondToRemoveAccessTokenForUser(final String username) {
+        final Response result;
+        getSecurityService().removeAccessToken(username);
+        result = respondWithAccessTokenForAuthenticatedSubject();
+        return result;
+    }
     
     @GET
     @Path(HAS_PERMISSION_METHOD)
@@ -447,13 +458,6 @@ public class SecurityResource extends AbstractSecurityResource {
             entry.put(GRANTED, SecurityUtils.getSubject().isPermitted(permissionAsString));
         }
         return Response.ok(streamingOutput(result), MediaType.APPLICATION_JSON_TYPE).build(); 
-    }
-
-    Response respondToRemoveAccessTokenForUser(final String username) {
-        final Response result;
-        getService().removeAccessToken(username);
-        result = Response.ok().build();
-        return result;
     }
 
     private Response respondWithAccessTokenForAuthenticatedSubject() {
@@ -471,12 +475,12 @@ public class SecurityResource extends AbstractSecurityResource {
     Response respondWithAccessTokenForUser(final String username) {
         JSONObject response = new JSONObject();
         response.put(USERNAME, username);
-        getService().checkCurrentUserReadPermission(getService().getUserByName(username));
+        getSecurityService().checkCurrentUserReadPermission(getSecurityService().getUserByName(username));
         String accessToken;
-        if (getService().hasCurrentUserUpdatePermission(getService().getUserByName(username))) {
-            accessToken = getService().getOrCreateAccessToken(username);
+        if (getSecurityService().hasCurrentUserUpdatePermission(getSecurityService().getUserByName(username))) {
+            accessToken = getSecurityService().getOrCreateAccessToken(username);
         } else {
-            accessToken = getService().getAccessToken(username);
+            accessToken = getSecurityService().getAccessToken(username);
             if (accessToken == null) {
                 throw new AuthorizationException(
                         "No access token was found and the permission to create one is lacking.");

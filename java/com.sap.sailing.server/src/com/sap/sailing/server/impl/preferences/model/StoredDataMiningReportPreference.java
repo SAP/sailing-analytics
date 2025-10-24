@@ -15,9 +15,11 @@ public class StoredDataMiningReportPreference extends AbstractGenericSerializabl
     private transient StringSetting serializedReport;
 
     public StoredDataMiningReportPreference() {
+        super();
     }
 
     public StoredDataMiningReportPreference(String name, UUID uuid, String serializedReport) {
+        this();
         this.name.setValue(name);
         this.id.setValue(uuid);
         this.serializedReport.setValue(serializedReport);

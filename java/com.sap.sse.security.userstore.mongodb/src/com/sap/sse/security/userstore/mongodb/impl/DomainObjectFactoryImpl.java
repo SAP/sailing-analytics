@@ -18,6 +18,8 @@ import org.bson.types.Binary;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.sap.sse.common.Duration;
+import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.security.interfaces.Social;
 import com.sap.sse.security.interfaces.UserImpl;
@@ -35,6 +37,8 @@ import com.sap.sse.security.shared.UserManagementException;
 import com.sap.sse.security.shared.UsernamePasswordAccount;
 import com.sap.sse.security.shared.WildcardPermission;
 import com.sap.sse.security.shared.impl.AccessControlList;
+import com.sap.sse.security.shared.impl.LockingAndBanning;
+import com.sap.sse.security.shared.impl.LockingAndBanningImpl;
 import com.sap.sse.security.shared.impl.Ownership;
 import com.sap.sse.security.shared.impl.QualifiedObjectIdentifierImpl;
 import com.sap.sse.security.shared.impl.Role;
@@ -280,12 +284,17 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
         final String company = (String) userDBObject.get(FieldNames.User.COMPANY.name());
         final String localeRaw = (String) userDBObject.get(FieldNames.User.LOCALE.name());
         final Locale locale = localeRaw != null ? Locale.forLanguageTag(localeRaw) : null;
-        Boolean emailValidated = (Boolean) userDBObject.get(FieldNames.User.EMAIL_VALIDATED.name());
-        String passwordResetSecret = (String) userDBObject.get(FieldNames.User.PASSWORD_RESET_SECRET.name());
-        String validationSecret = (String) userDBObject.get(FieldNames.User.VALIDATION_SECRET.name());
-        Set<Role> roles = new HashSet<>();
-        Set<String> permissions = new HashSet<>();
-        List<?> rolesO = (List<?>) userDBObject.get(FieldNames.User.ROLE_IDS.name());
+        final Boolean emailValidated = (Boolean) userDBObject.get(FieldNames.User.EMAIL_VALIDATED.name());
+        final String passwordResetSecret = (String) userDBObject.get(FieldNames.User.PASSWORD_RESET_SECRET.name());
+        final String validationSecret = (String) userDBObject.get(FieldNames.User.VALIDATION_SECRET.name());
+        final Long lockedUntilMillis = userDBObject.getLong(FieldNames.User.LOCKED_UNTIL_MILLIS.name());
+        final Long nextLockingDurationMillis = userDBObject.getLong(FieldNames.User.NEXT_LOCKING_DURATION_MILLIS.name());
+        final LockingAndBanning lockingAndBanning = new LockingAndBanningImpl(
+                lockedUntilMillis == null ? TimePoint.BeginningOfTime : TimePoint.of(lockedUntilMillis),
+                nextLockingDurationMillis == null ? LockingAndBanningImpl.DEFAULT_INITIAL_LOCKING_DELAY : Duration.ofMillis(nextLockingDurationMillis));
+        final Set<Role> roles = new HashSet<>();
+        final Set<String> permissions = new HashSet<>();
+        final List<?> rolesO = (List<?>) userDBObject.get(FieldNames.User.ROLE_IDS.name());
         boolean rolesMigrated = false; // if a role needs migration, user needs an update in the DB
         if (rolesO != null) {
             for (Object o : rolesO) {
@@ -349,7 +358,7 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
         Map<AccountType, Account> accounts = createAccountMapFromdDBObject(accountsMap);
         User result = new UserImpl(username, email, fullName, company, locale,
                 emailValidated == null ? false : emailValidated, passwordResetSecret, validationSecret, defaultTenant,
-                accounts.values(), userGroupProvider);
+                accounts.values(), userGroupProvider, lockingAndBanning);
         for (final Role role : roles) {
             result.addRole(role);
         }
@@ -371,17 +380,23 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
     private Role loadRoleWithProxyUserQualifier(Document rolesO, Map<UUID, RoleDefinition> roleDefinitionsById,
             Map<UUID, UserGroup> userGroups) {
         final RoleDefinition roleDefinition = roleDefinitionsById.get(rolesO.get(FieldNames.Role.ID.name()));
-       
         final Role result;
         if (roleDefinition == null) {
             result = null;
         } else {
             final UUID qualifyingTenantId = (UUID) rolesO.get(FieldNames.Role.QUALIFYING_TENANT_ID.name());
-            final UserGroup qualifyingTenant = qualifyingTenantId == null ? null : userGroups.get(qualifyingTenantId);
-            final User proxyQualifyingUser = rolesO.get(FieldNames.Role.QUALIFYING_USERNAME.name()) == null ? null
-                    : new UserProxy((String) rolesO.get(FieldNames.Role.QUALIFYING_USERNAME.name()));
-            final boolean transitive = rolesO.getBoolean(FieldNames.Role.TRANSITIVE.name(), true);
-            result = new Role(roleDefinition, qualifyingTenant, proxyQualifyingUser, transitive);
+            UserGroup qualifyingGroup = null;
+            if (qualifyingTenantId != null && (qualifyingGroup = userGroups.get(qualifyingTenantId)) == null) {
+                logger.severe("Unable to resolve tenant with ID "+qualifyingTenantId+
+                        " which serves as a role qualifier for role "+roleDefinition.getName()+
+                        "; dropping role");
+                result = null;
+            } else {
+                final User proxyQualifyingUser = rolesO.get(FieldNames.Role.QUALIFYING_USERNAME.name()) == null ? null
+                        : new UserProxy((String) rolesO.get(FieldNames.Role.QUALIFYING_USERNAME.name())); // if user proxy later cannot be resolved, role will be dropped
+                final boolean transitive = rolesO.getBoolean(FieldNames.Role.TRANSITIVE.name(), true);
+                result = new Role(roleDefinition, qualifyingGroup, proxyQualifyingUser, transitive);
+            }
         }
         return result;
     }

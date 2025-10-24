@@ -19,6 +19,5 @@ public class IdlePreEventNode extends FiresPlaceNode {
         getBus().fireEvent(new AutoPlayHeaderEvent(eventName, ""));
         setPlaceToGo(new IdlePreEventPlace());
         firePlaceChangeAndStartTimer();
-
     }
 }

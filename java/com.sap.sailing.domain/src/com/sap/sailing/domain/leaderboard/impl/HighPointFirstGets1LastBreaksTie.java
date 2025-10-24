@@ -65,18 +65,18 @@ public class HighPointFirstGets1LastBreaksTie extends HighPointFirstGetsFixedSco
         // node in the edge. This graph will be sorted such that competitors precede those over which
         // they won, except if there is a cycle in the graph in which case competitors on the cycle
         // will be ranked equal by this method, leaving the decision to other criteria
-        final Double o1NetPoints = leaderboard.getNetPoints(o1, timePoint);
-        final Double o2NetPoints = leaderboard.getNetPoints(o2, timePoint);
+        final Double o1NetPoints = leaderboard.getNetPoints(o1, raceColumnsToConsider, timePoint);
+        final Double o2NetPoints = leaderboard.getNetPoints(o2, raceColumnsToConsider, timePoint);
         assert Math.abs(o1NetPoints-o2NetPoints) < 0.00001;
         final Set<Competitor> nodesInGraph = new HashSet<>();
         nodesInGraph.add(o1);
         nodesInGraph.add(o2);
         for (final Competitor c : leaderboard.getCompetitors()) {
-            if (leaderboard.getNetPoints(c, timePoint).equals(o1NetPoints)) {
+            if (leaderboard.getNetPoints(c, raceColumnsToConsider, timePoint).equals(o1NetPoints)) {
                 nodesInGraph.add(c);
             }
         }
-        final Set<DirectedEdge<Competitor>> edges = constructEdges(nodesInGraph, leaderboard, timePoint, nullScoresAreBetter);
+        final Set<DirectedEdge<Competitor>> edges = constructEdges(nodesInGraph, leaderboard, raceColumnsToConsider, timePoint, nullScoresAreBetter);
         final DirectedGraph<Competitor> graph = DirectedGraph.create(nodesInGraph, edges);
         final TopologicalComparator<Competitor> comparator = new TopologicalComparator<>(graph);
         final int resultBasedOnGraphSort = comparator.compare(o1, o2);
@@ -121,11 +121,11 @@ public class HighPointFirstGets1LastBreaksTie extends HighPointFirstGetsFixedSco
      * {@code nodesInGraph} competed, and adds an edge to the result for each pair of competitors in that same
      * race, leading from the better to the worse competitor.
      */
-    private Set<DirectedEdge<Competitor>> constructEdges(Set<Competitor> nodesInGraph, Leaderboard leaderboard, TimePoint timePoint,
-            boolean nullScoresAreBetter) {
+    private Set<DirectedEdge<Competitor>> constructEdges(Set<Competitor> nodesInGraph, Leaderboard leaderboard,
+            Iterable<RaceColumn> raceColumnsToConsider, TimePoint timePoint, boolean nullScoresAreBetter) {
         final Comparator<Double> pureScoreComparator = getScoreComparator(nullScoresAreBetter);
         final Set<DirectedEdge<Competitor>> edges = new HashSet<>();
-        for (final RaceColumn raceColumn : leaderboard.getRaceColumns()) {
+        for (final RaceColumn raceColumn : raceColumnsToConsider) {
             for (final Fleet fleet : raceColumn.getFleets()) {
                 final Iterable<Competitor> competitorsInRace = leaderboard.getCompetitors(raceColumn, fleet);
                 final Set<Competitor> equalRankedCompetitorsInRace = new HashSet<>();
@@ -138,7 +138,11 @@ public class HighPointFirstGets1LastBreaksTie extends HighPointFirstGetsFixedSco
                 });
                 for (int i=0; i<competitorsInRaceOrderedByScoreInRace.size(); i++) {
                     for (int j=i+1; j<competitorsInRaceOrderedByScoreInRace.size(); j++) {
-                        edges.add(DirectedEdge.create(competitorsInRaceOrderedByScoreInRace.get(i), competitorsInRaceOrderedByScoreInRace.get(j)));
+                        // add an edge only if the score comparison result is non-zero
+                        if (pureScoreComparator.compare(leaderboard.getTotalPoints(competitorsInRaceOrderedByScoreInRace.get(i), raceColumn, timePoint),
+                                                        leaderboard.getTotalPoints(competitorsInRaceOrderedByScoreInRace.get(j), raceColumn, timePoint)) < 0) {
+                            edges.add(DirectedEdge.create(competitorsInRaceOrderedByScoreInRace.get(i), competitorsInRaceOrderedByScoreInRace.get(j)));
+                        }
                     }
                 }
             }

@@ -1,7 +1,7 @@
 package com.sap.sse.security.test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -17,8 +17,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.apache.shiro.subject.PrincipalCollection;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.security.SecuredDomainType;
 import com.sap.sse.security.AbstractCompositeAuthorizingRealm;
@@ -39,6 +39,7 @@ import com.sap.sse.security.shared.UserManagementException;
 import com.sap.sse.security.shared.WildcardPermission;
 import com.sap.sse.security.shared.impl.AccessControlList;
 import com.sap.sse.security.shared.impl.HasPermissionsImpl;
+import com.sap.sse.security.shared.impl.LockingAndBanningImpl;
 import com.sap.sse.security.shared.impl.Ownership;
 import com.sap.sse.security.shared.impl.Role;
 import com.sap.sse.security.shared.impl.User;
@@ -78,7 +79,7 @@ public class PermissionCheckerTest {
     private HasPermissions type2 = new HasPermissionsImpl("TEST", DefaultActions.READ, DefaultActions.DELETE);
     private Iterable<HasPermissions> allHasPermissions = Arrays.asList(type1, type2);
     
-    @Before
+    @BeforeEach
     public void setUp() throws UserGroupManagementException, UserManagementException {
         final String adminTenantName = "admin-tenant";
         userStore = new UserStoreImpl(adminTenantName);
@@ -93,7 +94,7 @@ public class PermissionCheckerTest {
             userStore.deleteUser("jonas");
         }
         userTenant = userStore.createUserGroup(userTenantId, "jonas-tenant");
-        user = userStore.createUser("jonas", "jonas@dann.io");
+        user = userStore.createUser("jonas", "jonas@dann.io", new LockingAndBanningImpl());
         userTenant.add(user);
         userStore.updateUserGroup(userTenant);
         ownership = new Ownership(user, userTenant);

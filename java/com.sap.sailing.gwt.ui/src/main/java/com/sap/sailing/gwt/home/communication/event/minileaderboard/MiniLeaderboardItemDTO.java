@@ -1,7 +1,7 @@
 package com.sap.sailing.gwt.home.communication.event.minileaderboard;
 
 import com.sap.sailing.gwt.home.communication.event.SimpleCompetitorDTO;
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
+import com.sap.sse.gwt.shared.DTO;
 
 public class MiniLeaderboardItemDTO implements DTO {
     private SimpleCompetitorDTO competitor;

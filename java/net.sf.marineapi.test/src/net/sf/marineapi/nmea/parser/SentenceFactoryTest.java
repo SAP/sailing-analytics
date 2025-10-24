@@ -1,10 +1,10 @@
 package net.sf.marineapi.nmea.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.List;
 
@@ -17,8 +17,8 @@ import net.sf.marineapi.test.util.FOOParser;
 import net.sf.marineapi.test.util.FOOSentence;
 import net.sf.marineapi.test.util.VDMParser;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kimmo Tuukkanen
@@ -30,7 +30,7 @@ public class SentenceFactoryTest {
 	/**
 	 * @throws java.lang.Exception
 	 */
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		instance.reset();
 	}
@@ -44,7 +44,7 @@ public class SentenceFactoryTest {
 	public void testSupportedTypesRegistered() {
 		for (SentenceId id : SentenceId.values()) {
 			String msg = "Parser not registered: " + id;
-			assertTrue(msg, instance.hasParser(id.toString()));
+			assertTrue(instance.hasParser(id.toString()), msg);
 		}
 	}
 

@@ -23,7 +23,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.sap.sailing.domain.common.DeviceIdentifier;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
-import com.sap.sailing.domain.tracking.impl.TimedComparator;
+import com.sap.sailing.domain.shared.tracking.impl.TimedComparator;
 import com.sap.sailing.server.gateway.deserialization.impl.GPSFixMovingJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.Helpers;
 import com.sap.sailing.server.gateway.serialization.impl.GPSFixMovingJsonSerializer;

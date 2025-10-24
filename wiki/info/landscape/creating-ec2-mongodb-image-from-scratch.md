@@ -57,7 +57,6 @@ storage:
     enabled: true
   directoryPerDB: true
 #  engine:
-#  mmapv1:
 #  wiredTiger:
 
 # how the process runs
@@ -77,7 +76,7 @@ net:
 #operationProfiling:
 
 replication:
-  replSetName: live
+  replSetName: "live"
 
 #sharding:
 

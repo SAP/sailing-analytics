@@ -531,6 +531,13 @@ public class LegEntryDTO implements Serializable {
         }   
     }
 
+    public void setExpeditionKickerTensionIfAvailable(Double expeditionKickerTension) {
+        if (expeditionKickerTension != null) {
+            ensureExpeditionHolder();
+            expeditionHolder.expeditionKickerTension = expeditionKickerTension;
+        }   
+    }
+
     public Double getExpeditionAWA() {
         return expeditionHolder == null ? null : expeditionHolder.expeditionAWA;
     }
@@ -687,6 +694,10 @@ public class LegEntryDTO implements Serializable {
         return expeditionHolder == null ? null : expeditionHolder.expeditionMastButt;
     }
     
+    public Double getExpeditionKickerTension() {
+        return expeditionHolder == null ? null : expeditionHolder.expeditionKickerTension;
+    }
+    
     public static class ExpeditionLegHolder implements Serializable {
         private static final long serialVersionUID = -2507536984016949734L;
         
@@ -729,6 +740,7 @@ public class LegEntryDTO implements Serializable {
         public Double expeditionCourseDetail;
         public Double expeditionDistanceToPinDetail;
         public Double expeditionVMGTargVMGDelta;
+        public Double expeditionKickerTension;
         
         @Override
         public int hashCode() {
@@ -784,6 +796,7 @@ public class LegEntryDTO implements Serializable {
                     + ((expeditionTimeToStbLayline == null) ? 0 : expeditionTimeToStbLayline.hashCode());
             result = prime * result + ((expeditionVMG == null) ? 0 : expeditionVMG.hashCode());
             result = prime * result + ((expeditionVMGTargVMGDelta == null) ? 0 : expeditionVMGTargVMGDelta.hashCode());
+            result = prime * result + ((expeditionKickerTension == null) ? 0 : expeditionKickerTension.hashCode());
             return result;
         }
         
@@ -990,6 +1003,11 @@ public class LegEntryDTO implements Serializable {
                 if (other.expeditionVMGTargVMGDelta != null)
                     return false;
             } else if (!expeditionVMGTargVMGDelta.equals(other.expeditionVMGTargVMGDelta))
+                return false;
+            if (expeditionKickerTension == null) {
+                if (other.expeditionKickerTension != null)
+                    return false;
+            } else if (!expeditionKickerTension.equals(other.expeditionKickerTension))
                 return false;
             return true;
         }

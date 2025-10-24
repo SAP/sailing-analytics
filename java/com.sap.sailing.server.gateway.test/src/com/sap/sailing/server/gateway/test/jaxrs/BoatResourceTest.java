@@ -1,11 +1,11 @@
 package com.sap.sailing.server.gateway.test.jaxrs;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.BoatClass;
 import com.sap.sailing.domain.base.impl.BoatClassImpl;
@@ -21,7 +21,7 @@ public class BoatResourceTest extends AbstractJaxRsApiTest {
     private final String sailId = "GER 1";
     private final BoatClass boatClass = new BoatClassImpl(boatClassName, true);
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         racingEventService.getBaseDomainFactory().getOrCreateBoat(id, boatName, boatClass, sailId, null, /* storePersistently */ true);

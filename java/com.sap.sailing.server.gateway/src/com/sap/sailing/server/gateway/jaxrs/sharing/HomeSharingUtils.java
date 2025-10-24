@@ -130,11 +130,14 @@ public class HomeSharingUtils {
     public static Map<String, String> createReplacementMap(String title, String description,
             String imageUrl, String placeUrl, String userAgent) {
         final Map<String, String> replacementMap = new HashMap<String, String>();
-        String disabledStart = "";
-        String disabledEnd = "";
-        if(userAgent != null && userAgent.contains("facebookexternalhit")) {
+        final String disabledStart;
+        final String disabledEnd;
+        if (userAgent != null && userAgent.contains("facebookexternalhit")) {
             disabledStart = HTML_COMMENT_START;
             disabledEnd = HTML_COMMENT_END;
+        } else {
+            disabledStart = "";
+            disabledEnd = "";
         }
         replacementMap.put(REPLACEMENT_KEY_TITLE, title);
         replacementMap.put(REPLACEMENT_KEY_DESCRIPTION, description);

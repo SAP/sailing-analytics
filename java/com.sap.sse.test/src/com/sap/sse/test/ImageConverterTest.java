@@ -1,15 +1,15 @@
 package com.sap.sse.test;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.util.ImageConverter;
 import com.sap.sse.util.ImageConverter.ImageWithMetadata;
@@ -36,7 +36,7 @@ public class ImageConverterTest {
     /**
      * Setting up the testing environment
      */
-    @Before
+    @BeforeEach
     public void setUp() {
         converter = new ImageConverter();
         pngImage = converter.loadImage(new ByteArrayInputStream(onePixelPngExample), "png");

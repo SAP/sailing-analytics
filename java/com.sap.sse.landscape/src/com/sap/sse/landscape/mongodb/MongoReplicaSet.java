@@ -1,6 +1,5 @@
 package com.sap.sse.landscape.mongodb;
 
-import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -24,18 +23,18 @@ public interface MongoReplicaSet extends Named, MongoEndpoint {
      */
     @Override
     default URI getURI(Optional<Database> optionalDb) throws URISyntaxException {
-        return getURI(optionalDb, mongoProcess->mongoProcess.getHost().getPrivateAddress());
+        return getURI(optionalDb, mongoProcess->mongoProcess.getHost().getHostname());
     }
 
-    default URI getURI(Optional<Database> optionalDb, Function<MongoProcess, InetAddress> addressSupplier) throws URISyntaxException {
+    default URI getURI(Optional<Database> optionalDb, Function<MongoProcess, String> addressSupplier) throws URISyntaxException {
         final StringBuilder result = new StringBuilder("mongodb://");
         final List<String> hostSpecs = new ArrayList<>();
         for (final MongoProcess mongoProcess : getInstances()) {
-            final InetAddress address = addressSupplier.apply(mongoProcess);
-            if (address != null) {
-                logger.fine("Adding MongoDB process running on "+address+" to replica set "+this.getName());
+            final String hostname = addressSupplier.apply(mongoProcess);
+            if (hostname != null) {
+                logger.fine("Adding MongoDB process running on "+hostname+" to replica set "+this.getName());
                 final StringBuilder hostSpec = new StringBuilder();
-                hostSpec.append(address.getHostAddress());
+                hostSpec.append(hostname);
                 if (mongoProcess.getPort() != MongoDBConstants.DEFAULT_PORT) {
                     hostSpec.append(":");
                     hostSpec.append(mongoProcess.getPort());
@@ -57,7 +56,7 @@ public interface MongoReplicaSet extends Named, MongoEndpoint {
     default URI getURI(Optional<Database> optionalDb, Optional<Duration> timeoutEmptyMeansForever) throws URISyntaxException {
         return getURI(optionalDb, mongoProcess->{
             try {
-                return mongoProcess.getHost().getPublicAddress(timeoutEmptyMeansForever);
+                return mongoProcess.getHost().getPublicAddress(timeoutEmptyMeansForever).getHostAddress();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

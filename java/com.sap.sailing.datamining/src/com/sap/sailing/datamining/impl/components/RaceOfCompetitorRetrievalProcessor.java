@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
+
 import com.sap.sailing.datamining.data.HasRaceOfCompetitorContext;
 import com.sap.sailing.datamining.data.HasTrackedRaceContext;
 import com.sap.sailing.datamining.impl.data.RaceOfCompetitorWithContext;
@@ -11,6 +14,7 @@ import com.sap.sailing.datamining.shared.TackTypeSegmentsDataMiningSettings;
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sse.datamining.components.Processor;
 import com.sap.sse.datamining.impl.components.AbstractRetrievalProcessor;
+import com.sap.sse.security.shared.impl.SecuredSecurityTypes;
 
 public class RaceOfCompetitorRetrievalProcessor extends AbstractRetrievalProcessor<HasTrackedRaceContext, HasRaceOfCompetitorContext> {
     /**
@@ -37,8 +41,11 @@ public class RaceOfCompetitorRetrievalProcessor extends AbstractRetrievalProcess
                 if (isAborted()) {
                     break;
                 }
-                HasRaceOfCompetitorContext raceOfCompetitorWithContext = new RaceOfCompetitorWithContext(element, competitor, settings);
-                raceOfCompetitorsWithContext.add(raceOfCompetitorWithContext);
+                final Subject subject = SecurityUtils.getSubject();
+                if (subject.isPermitted(competitor.getIdentifier().getStringPermission(SecuredSecurityTypes.PublicReadableActions.READ_PUBLIC))) {
+                    HasRaceOfCompetitorContext raceOfCompetitorWithContext = new RaceOfCompetitorWithContext(element, competitor, settings);
+                    raceOfCompetitorsWithContext.add(raceOfCompetitorWithContext);
+                }
             }
         }
         return raceOfCompetitorsWithContext;

@@ -6,11 +6,9 @@ import java.util.UUID;
 
 import com.sap.sailing.news.NewsItem;
 
-public class AbstractNewsItem implements NewsItem {
+public abstract class AbstractNewsItem implements NewsItem {
     private final UUID id;
     
-    private String category;
-
     private String title;
     
     private String message;
@@ -19,55 +17,36 @@ public class AbstractNewsItem implements NewsItem {
     
     private Date createdAtDate;
 
-    public AbstractNewsItem(String title, String message, Date createdAtDate,  String category) {
-        this(title, message, createdAtDate, category, null);
-    }
-
-    public AbstractNewsItem(String title, String message, Date createdAtDate, String category, URL relatedItemLink) {
+    protected AbstractNewsItem(String title, String message, Date createdAtDate, URL relatedItemLink) {
         this.title = title;
         this.message = message;
-        this.category = category;
         this.createdAtDate = createdAtDate;
         this.relatedItemLink = relatedItemLink;
         this.id = UUID.randomUUID();
     }
 
-    public String getCategory() {
-        return category;
-    }
-
+    @Override
     public String getTitle() {
         return title;
     }
 
+    @Override
     public String getMessage() {
         return message;
     }
 
+    @Override
     public URL getRelatedItemLink() {
         return relatedItemLink;
     }
 
+    @Override
     public Date getCreatedAtDate() {
         return createdAtDate;
     }
 
+    @Override
     public UUID getId() {
         return id;
-    }
-
-    @Override
-    public int compareTo(NewsItem o) {
-        Date otherCreatedAtDate = o.getCreatedAtDate();
-        if(createdAtDate == otherCreatedAtDate) {
-            return 0;
-        }
-        if(createdAtDate == null) {
-            return 1;
-        }
-        if(otherCreatedAtDate == null) {
-            return -1;
-        }
-        return -createdAtDate.compareTo(otherCreatedAtDate);
     }
 }

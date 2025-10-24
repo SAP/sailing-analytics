@@ -32,7 +32,6 @@ public class TestEnvironmentImpl implements TestEnvironment {
     public TestEnvironmentImpl(Supplier<WebDriver> webDriverFactory, String root, File screenshotsFolder) {
         this.root = root;
         this.screenshotsFolder = screenshotsFolder;
-        
         this.manager = new WindowManager(webDriverFactory);
     }
     

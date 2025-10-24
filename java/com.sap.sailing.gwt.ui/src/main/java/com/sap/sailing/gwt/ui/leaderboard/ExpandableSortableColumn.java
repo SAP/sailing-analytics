@@ -117,15 +117,13 @@ public abstract class ExpandableSortableColumn<C> extends LeaderboardSortableCol
      *            if {@code true}, returns only columns for {@link DetailType}s for which the user has permissions to
      *            view
      */
-    protected Iterable<AbstractSortableColumnWithMinMax<LeaderboardRowDTO, ?>> getDirectChildren(boolean filterByPermissions) {
+    protected Iterable<AbstractSortableColumnWithMinMax<LeaderboardRowDTO, ?>> getDirectChildren() {
         List<AbstractSortableColumnWithMinMax<LeaderboardRowDTO, ?>> result;
         if (isExpanded()) {
             result = new ArrayList<AbstractSortableColumnWithMinMax<LeaderboardRowDTO,?>>();
             for (DetailType detailColumnType : detailSelection) {
                 AbstractSortableColumnWithMinMax<LeaderboardRowDTO, ?> selectedColumn = detailColumnsMap.get(detailColumnType);
-                if (selectedColumn != null &&
-                        (!filterByPermissions || detailColumnType.getPremiumAction() == null ||
-                         getLeaderboardPanel().getPaywallResolver().hasPermission(detailColumnType.getPremiumAction(), getLeaderboardPanel().getLeaderboard()))) {
+                if (selectedColumn != null) {
                     result.add(selectedColumn);
                 }
             }
@@ -151,19 +149,16 @@ public abstract class ExpandableSortableColumn<C> extends LeaderboardSortableCol
      * Note that for columns not currently visible or currently being expanded (see
      * {@link #changeExpansionState(boolean)}), the column collection returned does not necessarily contain only columns
      * really part of the {@link CellTable} used to display this column.
-     * 
-     * @param filterByPermissions
-     *            if {@code true}, returns only columns for {@link DetailType}s for which the user has permissions to view
      */
-    private Collection<AbstractSortableColumnWithMinMax<LeaderboardRowDTO, ?>> getAllVisibleChildren(boolean filterByPermissions) {
+    private Collection<AbstractSortableColumnWithMinMax<LeaderboardRowDTO, ?>> getAllVisibleChildren() {
         List<AbstractSortableColumnWithMinMax<LeaderboardRowDTO, ?>> transitiveChildren = new ArrayList<>();
         if (isExpanded()) {
-            for (AbstractSortableColumnWithMinMax<LeaderboardRowDTO, ?> childColumn : getDirectChildren(filterByPermissions)) {
+            for (AbstractSortableColumnWithMinMax<LeaderboardRowDTO, ?> childColumn : getDirectChildren()) {
                 transitiveChildren.add(childColumn);
                 if (childColumn instanceof ExpandableSortableColumn<?>) {
                     @SuppressWarnings("unchecked")
                     ExpandableSortableColumn<C> expandableChild = (ExpandableSortableColumn<C>) childColumn;
-                    transitiveChildren.addAll(expandableChild.getAllVisibleChildren(/* filterByPermissions */ true));
+                    transitiveChildren.addAll(expandableChild.getAllVisibleChildren());
                 }
             }
         }
@@ -206,7 +201,7 @@ public abstract class ExpandableSortableColumn<C> extends LeaderboardSortableCol
                         if (isExpanded()) { // but only if currently expanded
                             // don't filter by permissions; if we need to collapse columns after the user lost permissions or was logged out,
                             // columns currently still shown wouldn't be returned from getAllVisibleChildren otherwise
-                            for (AbstractSortableColumnWithMinMax<LeaderboardRowDTO, ?> column : getAllVisibleChildren(/* filterByPermissions */ false)) {
+                            for (AbstractSortableColumnWithMinMax<LeaderboardRowDTO, ?> column : getAllVisibleChildren()) {
                                 getLeaderboardPanel().removeColumn(column); // removes only the children currently displayed
                             }
                             // important: toggle expanded state after asking for all visible children
@@ -227,7 +222,7 @@ public abstract class ExpandableSortableColumn<C> extends LeaderboardSortableCol
                                         if (insertIndex != -1) {
                                             insertIndex++;
                                             // for expanding we filter by permissions in order to only show what the user is allowed to see
-                                            for (AbstractSortableColumnWithMinMax<LeaderboardRowDTO, ?> column : getAllVisibleChildren(/* filterByPermissions */ true)) {
+                                            for (AbstractSortableColumnWithMinMax<LeaderboardRowDTO, ?> column : getAllVisibleChildren()) {
                                                 column.updateMinMax();
                                                 if (table.getColumnIndex(column) < 0) {
                                                     getLeaderboardPanel().insertColumn(insertIndex++, column);

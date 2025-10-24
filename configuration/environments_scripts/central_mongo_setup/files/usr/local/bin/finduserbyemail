@@ -1,0 +1,18 @@
+#!/bin/sh
+useremail=$1
+for port in 10201 10202 10203; do
+  for db in `echo "rs.secondaryOk()
+  show dbs
+  quit()" | mongo --port $port | tail -n +3 | grep -v "^bye$" | awk '{print $1;}'`; do
+    match_1=`echo "rs.secondaryOk()
+                   db.USERS.find({EMAIL: \"$useremail\"})" | mongo --quiet --port $port $db`
+    match_2=`echo "rs.secondaryOk()
+                   db.COMPETITORS.find({email: \"$useremail\"})" | mongo --quiet --port $port $db`
+    if [ "$match_1" != ""  -o "$match_2" != "" ]; then
+      echo ${db} on port $port: $match_1 $match_2
+    fi
+  done
+done
+# Run this from a device with access to root@sapsailing.com to easily find a user by their email, where $1 is the user:
+# ssh -A root@sapsailing.com ssh -A ec2-user@dbserver.internal.sapsailing.com finduserbyemail $1
+

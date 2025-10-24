@@ -6,7 +6,6 @@ import com.sap.sailing.domain.common.media.MediaTrackWithSecurityDTO;
 
 
 public interface MediaPlayer {
-
     boolean isMediaPaused();
 
     void pauseMedia();
@@ -31,6 +30,5 @@ public interface MediaPlayer {
 
     void shutDown();
 
-	boolean isCoveringCurrentRaceTime();
-
+    boolean isCoveringCurrentRaceTime();
 }

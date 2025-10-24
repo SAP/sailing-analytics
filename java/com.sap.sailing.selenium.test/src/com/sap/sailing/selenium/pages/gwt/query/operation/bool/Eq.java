@@ -3,7 +3,6 @@ package com.sap.sailing.selenium.pages.gwt.query.operation.bool;
 import java.util.Objects;
 
 import com.sap.sailing.selenium.pages.gwt.query.Expression;
-
 import com.sap.sailing.selenium.pages.gwt.query.operation.PredicateOperation;
 
 public class Eq extends PredicateOperation {

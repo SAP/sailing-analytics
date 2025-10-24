@@ -1,1 +1,0 @@
-environments_scripts/sailing_server/files/etc/profile.d/sailing.sh

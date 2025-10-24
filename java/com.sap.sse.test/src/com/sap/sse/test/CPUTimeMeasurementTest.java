@@ -1,7 +1,7 @@
 package com.sap.sse.test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
@@ -9,16 +9,16 @@ import java.util.function.IntConsumer;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class CPUTimeMeasurementTest {
     private static final Logger logger = Logger.getLogger(CPUTimeMeasurementTest.class.getName());
 
     private final static ThreadMXBean threadMxBean = ManagementFactory.getThreadMXBean();
     
-    @BeforeClass
+    @BeforeAll
     public static void setUp() {
         logger.info("CPU time enabled by default: "+threadMxBean.isThreadCpuTimeEnabled());
         if (!threadMxBean.isThreadCpuTimeEnabled()) {
@@ -26,7 +26,7 @@ public class CPUTimeMeasurementTest {
         }
     }
     
-    @Ignore("Use this to find out whether there is a significant penalty for CPU metering; it seems there isn't...")
+    @Disabled("Use this to find out whether there is a significant penalty for CPU metering; it seems there isn't...")
     @Test
     public void measurePerformancePenalty() {
         final int AMOUNT_OF_WORK = 10_000_000;
@@ -49,8 +49,8 @@ public class CPUTimeMeasurementTest {
         final long cpuTimeConsumedInMillis = cpuTimeConsumedInNanos / 1_000_000;
         final double factor = (double) Math.max(durationWithCpuTimeEnabledInMillis, cpuTimeConsumedInMillis) / (double) Math.min(durationWithCpuTimeEnabledInMillis, cpuTimeConsumedInMillis);
         logger.info("CPU time measured: "+cpuTimeConsumedInMillis+"ms; duration measured: "+durationWithCpuTimeEnabledInMillis+"ms; factor "+factor);
-        assertTrue("off by more than factor "+FACTOR_THRESHOLD+" ("+factor+"): cpuTimeConsumed="+cpuTimeConsumedInMillis+"; actual duration: "+durationWithCpuTimeEnabledInMillis,
-                (double) Math.max(durationWithCpuTimeEnabledInMillis, cpuTimeConsumedInMillis) / (double) Math.min(durationWithCpuTimeEnabledInMillis, cpuTimeConsumedInMillis) < FACTOR_THRESHOLD);
+        assertTrue((double) Math.max(durationWithCpuTimeEnabledInMillis, cpuTimeConsumedInMillis) / (double) Math.min(durationWithCpuTimeEnabledInMillis, cpuTimeConsumedInMillis) < FACTOR_THRESHOLD,
+                "off by more than factor "+FACTOR_THRESHOLD+" ("+factor+"): cpuTimeConsumed="+cpuTimeConsumedInMillis+"; actual duration: "+durationWithCpuTimeEnabledInMillis);
     }
     
     @Test
@@ -92,8 +92,8 @@ public class CPUTimeMeasurementTest {
         // we assume that running each thread did take CPU time in the area of overall duration, with true parallelism
         final double factor = (double) Math.max(duration, averageCpuTimeMillis) / (double) Math.min(duration, averageCpuTimeMillis);
         logger.info("CPU time average: "+averageCpuTimeMillis+"ms; duration measured: "+duration+"ms; factor "+factor);
-        assertTrue("off by more than factor "+FACTOR_THRESHOLD+" ("+factor+"): cpuTimeConsumed="+averageCpuTimeMillis+"; actual duration: "+duration,
-                (double) Math.max(duration, averageCpuTimeMillis) / (double) Math.min(duration, averageCpuTimeMillis) < FACTOR_THRESHOLD);
+        assertTrue((double) Math.max(duration, averageCpuTimeMillis) / (double) Math.min(duration, averageCpuTimeMillis) < FACTOR_THRESHOLD,
+                "off by more than factor "+FACTOR_THRESHOLD+" ("+factor+"): cpuTimeConsumed="+averageCpuTimeMillis+"; actual duration: "+duration);
     }
     
     private long useSingleCPUOnCurrentThread(int howMuch) {

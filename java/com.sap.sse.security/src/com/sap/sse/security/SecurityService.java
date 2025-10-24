@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -12,6 +13,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.cache.CacheManager;
@@ -19,8 +21,12 @@ import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
 import org.osgi.framework.BundleContext;
 
+import com.sap.sse.common.Duration;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.Util.Pair;
+import com.sap.sse.common.http.HttpHeaderUtil;
 import com.sap.sse.common.mail.MailException;
+import com.sap.sse.common.media.TakedownNoticeRequestContext;
 import com.sap.sse.replication.ReplicableWithObjectInputStream;
 import com.sap.sse.security.impl.ReplicableSecurityService;
 import com.sap.sse.security.impl.SecurityServiceImpl;
@@ -29,22 +35,25 @@ import com.sap.sse.security.interfaces.PreferenceConverter;
 import com.sap.sse.security.interfaces.UserImpl;
 import com.sap.sse.security.interfaces.UserStore;
 import com.sap.sse.security.operations.SecurityOperation;
+import com.sap.sse.security.persistence.PersistenceFactory;
 import com.sap.sse.security.shared.AccessControlListAnnotation;
 import com.sap.sse.security.shared.BasicUserStore;
 import com.sap.sse.security.shared.HasPermissions;
-import com.sap.sse.security.shared.HasPermissionsProvider;
 import com.sap.sse.security.shared.HasPermissions.DefaultActions;
+import com.sap.sse.security.shared.HasPermissionsProvider;
 import com.sap.sse.security.shared.OwnershipAnnotation;
 import com.sap.sse.security.shared.PermissionChecker;
 import com.sap.sse.security.shared.QualifiedObjectIdentifier;
 import com.sap.sse.security.shared.RoleDefinition;
 import com.sap.sse.security.shared.RolePrototype;
+import com.sap.sse.security.shared.SubscriptionPlanProvider;
 import com.sap.sse.security.shared.TypeRelativeObjectIdentifier;
 import com.sap.sse.security.shared.UserGroupManagementException;
 import com.sap.sse.security.shared.UserManagementException;
 import com.sap.sse.security.shared.WildcardPermission;
 import com.sap.sse.security.shared.WithQualifiedObjectIdentifier;
 import com.sap.sse.security.shared.impl.AccessControlList;
+import com.sap.sse.security.shared.impl.LockingAndBanning;
 import com.sap.sse.security.shared.impl.Ownership;
 import com.sap.sse.security.shared.impl.Role;
 import com.sap.sse.security.shared.impl.SecuredSecurityTypes;
@@ -54,6 +63,7 @@ import com.sap.sse.security.shared.impl.UserGroup;
 import com.sap.sse.security.shared.subscription.Subscription;
 import com.sap.sse.security.shared.subscription.SubscriptionPlan;
 import com.sap.sse.shared.classloading.ClassLoaderRegistry;
+import com.sap.sse.util.HttpRequestUtils;
 
 /**
  * A service interface for security management. Intended to be used as an OSGi service that can be registered, e.g., by
@@ -73,6 +83,12 @@ public interface SecurityService extends ReplicableWithObjectInputStream<Replica
     String ALL_USERNAME = "<all>";
     String TENANT_SUFFIX = "-tenant";
     String REPLICABLE_FULLY_QUALIFIED_CLASSNAME = SecurityServiceImpl.class.getName();
+    /**
+     * The default locking duration per client IP address for user creation.
+     * 
+     * @see HttpRequestUtils#getClientIP(HttpServletRequest)
+     */
+    Duration DEFAULT_CLIENT_IP_BASED_USER_CREATION_LOCKING_DURATION = Duration.ONE_MINUTE;
 
     SecurityManager getSecurityManager();
 
@@ -191,12 +207,13 @@ public interface SecurityService extends ReplicableWithObjectInputStream<Replica
 
     /**
      * This version should only be used for tests, normally the defaultTenand handling should be used
-     * 
      * @param validationBaseURL
      *            if <code>null</code>, no validation will be attempted
+     * @param requestClientIP
+     *            used for throttling user creation requests coming from the same IP address
      */
     User createSimpleUser(String username, String email, String password, String fullName, String company,
-            Locale locale, String validationBaseURL, UserGroup userOwner)
+            Locale locale, String validationBaseURL, UserGroup userOwner, String requestClientIP, boolean enforceStrongPassword)
             throws UserManagementException, MailException, UserGroupManagementException;
 
     void updateSimpleUserPassword(String name, String newPassword) throws UserManagementException;
@@ -604,8 +621,8 @@ public interface SecurityService extends ReplicableWithObjectInputStream<Replica
     
     void copyUsersAndRoleAssociations(UserGroup source, UserGroup destination, RoleCopyListener callback);
 
-    User checkPermissionForObjectCreationAndRevertOnErrorForUserCreation(String username,
-            Callable<User> createActionReturningCreatedObject);
+    User checkPermissionForUserCreationAndRevertOnErrorForUserCreation(String username,
+            Callable<User> createActionReturningCreatedObject) throws UserManagementException;
 
     /**
      * Do only use this, if it is not possible to get the actual instance of the object to delete using the
@@ -809,4 +826,106 @@ public interface SecurityService extends ReplicableWithObjectInputStream<Replica
      */
     Role getOrThrowRoleFromIDsAndCheckMetaPermissions(UUID roleDefinitionId, UUID qualifyingGroupId, String userQualifierName,
             boolean transitive) throws UserManagementException;
+
+    /**
+     * When updating a user's {@link User#getSubscriptions() subscriptions}, use this method to obtain a write lock. For
+     * complex operations, such as first reading the current subscriptions, then manipulating them and writing them back
+     * to the user object, ensure the lock is held throughout the complex operation sequence.
+     * <p>
+     * 
+     * Unlock again using {@ink #unlockSubscriptionsForUser(User)}, always in a {@code finally} clause, to avoid hanging
+     * locks.
+     * <p>
+     * 
+     * The lock will also be obtained upon processing a replication operation (see, e.g.,
+     * {@link ReplicableSecurityService#internalUpdateSubscription(String, Subscription)}) internally. This way,
+     * compound operations are also protected against concurrent manipulation through replicated transactions.
+     */
+    void lockSubscriptionsForUser(User user);
+
+    /**
+     * Releases the lock obtained with {@link #lockSubscriptionsForUser(User)}. Always call this in a {@code finally} clause
+     * that follows the {@link #lockSubscriptionsForUser(User)} call, so a lock can never hang.
+     */
+    void unlockSubscriptionsForUser(User user);
+
+    /**
+     * For the application replica set identified by {@code serverName} sets the CORS filter to allow REST requests from
+     * all origins (*). The change is made persistent through the {@link PersistenceFactory} and will hence be restored
+     * when this process instance is a primary/master node upon initialization.
+     */
+    void setCORSFilterConfigurationToWildcard(String serverName);
+
+    /**
+     * For the application replica set identified by {@code serverName} sets the CORS filter to allow REST requests from
+     * the origins named in {@code allowedOrigins}. Passing {@code null} for {@code allowedOrigins} is equivalent to
+     * passing an empty array. The change is made persistent through the {@link PersistenceFactory} and will hence be
+     * restored when this process instance is a primary/master node upon initialization.
+     * 
+     * @param allowedOrigins
+     *            the origins, including their scheme (e.g., {@code https://www.example.com}) from which REST requests
+     *            coming from that browser origin are to be permitted; {@code null} is handled like an empty array
+     * @throws IllegalArgumentException
+     *             in case any of the {@code allowedOrigins} does not fulfill the criteria of
+     *             {@link HttpHeaderUtil#isValidOriginHeaderValue(String)}.
+     */
+    void setCORSFilterConfigurationAllowedOrigins(String serverName, String... allowedOrigins) throws IllegalArgumentException;
+
+    Pair<Boolean, Set<String>> getCORSFilterConfiguration(String serverName);
+
+    LockingAndBanning failedPasswordAuthentication(User user);
+
+    void successfulPasswordAuthentication(User user);
+
+    /**
+     * Records failure to authenticate with a bearer token, with the request coming from {@code clientIP} and the user
+     * agent as provided by argument {@code userAgent}. The locking will start with a minimum locking/banning duration
+     * (typically one second). After the locking duration expires, the record of the {@code clientIP/userAgent}
+     * combination is kept around for another locking duration, so that if another call to this method with an equal
+     * combination of {@code clientIP} and {@code userAgent} is made, that combination will remain
+     * {@link #isClientIPLockedForBearerTokenAuthentication(String) locked}, and the locking duration is increased.
+     * <p>
+     * 
+     * If two locking durations have expired without this method being invoked for equal {@cod eclientIP} and
+     * {@code userAgent}, the locking record including its last locking duration is expunged from the internal data
+     * structures, avoiding garbage piling up.
+     */
+    LockingAndBanning failedBearerTokenAuthentication(String clientIP);
+
+    /**
+     * Call this when the combination of {@code clientIP} and {@code userAgent} was not
+     * {@link #isClientIPLockedForBearerTokenAuthentication(String) locked} and a successful bearer token-based
+     * authentication attempt was made. This will remove the locking record for the combination,
+     * and in case of an unsuccessful future attempt the locking duration will start at
+     * the low default.
+     */
+    void successfulBearerTokenAuthentication(String clientIP);
+
+    /**
+     * Used in conjunction with {@link #failedBearerTokenAuthentication(String)} and
+     * {@link #successfulBearerTokenAuthentication(String)}. If and only if a locking state for the combination
+     * of {@code clientIP} and {@code userAgent} is known and still locked, {@code true} is returned. Unlocking
+     * will bappen by calling {@link #successfulBearerTokenAuthentication(String)} with an equal combination
+     * of {@code clientIP} and {@code userAgent}. Invoking {@link #failedBearerTokenAuthentication(String)}
+     * will establish (if not yet locked) or extend the locking duration for the combination.
+     */
+    boolean isClientIPLockedForBearerTokenAuthentication(String clientIP);
+
+    void fileTakedownNotice(TakedownNoticeRequestContext takedownNoticeRequestContext) throws MailException;
+    
+    /**
+     * For a {@link SecuredSecurityTypes#SERVER SERVER} object identified by {@code serverName}, determines the user set
+     * as the server's owner, plus additional users that have the permission to execute
+     * {@code alsoSendToAllUsersWithThisPermissionOnReplicaSet} on that server.
+     * 
+     * @param serverName
+     *            identifies the server object; for the local server that would, e.g., be {@link ServerInfo#getName()}.
+     *            For replica sets, this is the name of the replica set.
+     * @param alsoSendToAllUsersWithThisPermissionOnReplicaSet
+     *            when not empty, all users that have permission to this {@link SecuredSecurityTypes#SERVER SERVER}
+     *            action on the {@code replicaSet} will receive the e-mail in addition to the server owner. No user will
+     *            receive the e-mail twice.
+     */
+    Iterable<User> getUsersToInformAboutReplicaSet(String serverName,
+            Optional<com.sap.sse.security.shared.HasPermissions.Action> alsoSendToAllUsersWithThisPermissionOnReplicaSet);
 }

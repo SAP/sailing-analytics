@@ -1,1 +1,0 @@
-15 12 * * * PATH_OF_GIT_HOME_DIR_TO_REPLACE/configuration/downloadNewArchivedTracTracEvents.sh PATH_OF_HOME_DIR_TO_REPLACE/static/TracTracTracks "PATH_OF_GIT_HOME_DIR_TO_REPLACE">PATH_OF_HOME_DIR_TO_REPLACE/downloadNewArchivedTracTracEvents.out 2>PATH_OF_HOME_DIR_TO_REPLACE/downloadNewArchivedTracTracEvents.err

@@ -11,8 +11,12 @@ public class BatteryLevel extends Fix {
     private final double percentage;
     
     public BatteryLevel(TimePoint timePoint, Sensor sensor, Map<Integer, Object> valuesPerSubindex) {
+        this(timePoint, sensor, ((Number) valuesPerSubindex.get(1)).doubleValue());
+    }
+
+    public BatteryLevel(TimePoint timePoint, Sensor sensor, double percentage) {
         super(sensor, timePoint);
-        percentage = ((Number) valuesPerSubindex.get(1)).doubleValue();
+        this.percentage = percentage;
     }
 
     public double getPercentage() {

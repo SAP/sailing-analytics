@@ -27,9 +27,11 @@ public class LeaderboardWithZoomingPerspectiveSettings extends AbstractGenericSe
     }
 
     public LeaderboardWithZoomingPerspectiveSettings() {
+        super();
     }
 
     public LeaderboardWithZoomingPerspectiveSettings(boolean leaderboardAutoZoom, Double leaderboardZoomFactor) {
+        this();
         this.leaderboardAutoZoom.setValue(leaderboardAutoZoom);
         this.leaderboardZoomFactor.setValue(leaderboardZoomFactor);
     }

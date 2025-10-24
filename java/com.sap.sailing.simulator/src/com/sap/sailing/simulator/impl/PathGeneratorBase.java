@@ -5,15 +5,12 @@ import com.sap.sailing.simulator.PathGenerator;
 import com.sap.sailing.simulator.SimulationParameters;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
-import com.sap.sse.common.impl.MillisecondsDurationImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 public class PathGeneratorBase implements PathGenerator {
-    // maximum duration of one path generation
-    private final static long MAX_DURATION_OF_PATH_GENERATION_MILLIS = 40 * 1000; // 40 seconds
-    
     protected SimulationParameters parameters;
-    protected final Duration algorithmMaxDuration = new MillisecondsDurationImpl(MAX_DURATION_OF_PATH_GENERATION_MILLIS); 
+    // maximum duration of one path generation; two minutes
+    protected final Duration algorithmMaxDuration = Duration.ONE_MINUTE.times(2); 
     protected TimePoint algorithmStartTime;
     protected boolean algorithmTimedOut = false;
 

@@ -24,7 +24,6 @@ public abstract class AbstractEntryPoint<S extends StringMessages> implements En
         this.stringMessages = createStringMessages();
         this.errorReporter = new DefaultErrorReporter<StringMessages>(stringMessages);
         this.userAgent = new UserAgentDetails(Window.Navigator.getUserAgent());
-        
         if (DebugInfo.isDebugIdEnabled()) {
             PendingAjaxCallBundle bundle = GWT.create(PendingAjaxCallBundle.class);
             TextResource script = bundle.ajaxSemaphoreJS();

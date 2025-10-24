@@ -1,6 +1,6 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -11,7 +11,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.Random;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * See bug 3015. How sure can we be that multiple {@link ObjectOutputStream}s can be concatenated in one

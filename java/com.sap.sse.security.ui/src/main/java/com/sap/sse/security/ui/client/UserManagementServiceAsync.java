@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.Util.Triple;
 import com.sap.sse.gwt.client.ServerInfoDTO;
+import com.sap.sse.landscape.aws.common.shared.SecuredAwsLandscapeType;
 import com.sap.sse.security.shared.HasPermissions;
 import com.sap.sse.security.shared.QualifiedObjectIdentifier;
 import com.sap.sse.security.shared.TypeRelativeObjectIdentifier;
@@ -72,7 +74,7 @@ public interface UserManagementServiceAsync {
      */
     void getOrCreateAccessToken(String username, AsyncCallback<String> callback);
 
-    void serializationDummy(TypeRelativeObjectIdentifier typeRelativeObjectIdentifier, HasPermissions hasPermissions,
+    void serializationDummy(TypeRelativeObjectIdentifier typeRelativeObjectIdentifier, HasPermissions hasPermissions,SecuredAwsLandscapeType securedAwsLandscapeType,
             AsyncCallback<SerializationDummy> callback);
 
     void getRolesAndPermissionsForUser(String username, AsyncCallback<RolesAndPermissionsForUserDTO> callback);
@@ -101,4 +103,6 @@ public interface UserManagementServiceAsync {
      * in the {@code callback} passed.
      */
     void addSecurityInformation(SecuredDTO securedDTO, AsyncCallback<SecuredDTO> callback);
+    
+    void getCORSFilterConfiguration(AsyncCallback<Pair<Boolean, ArrayList<String>>> callback);
 }

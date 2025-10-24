@@ -19,8 +19,12 @@ public class HDG extends Fix {
     private final Bearing trueHeading;
     
     public HDG(TimePoint timePoint, Sensor sensor, Map<Integer, Object> valuesPerSubindex) {
+        this(timePoint, sensor, new DegreeBearingImpl((((Number) valuesPerSubindex.get(1)).doubleValue()+360.)%360.));
+    }
+
+    public HDG(TimePoint timePoint, Sensor sensor, Bearing trueHeading) {
         super(sensor, timePoint);
-        trueHeading = new DegreeBearingImpl((((Number) valuesPerSubindex.get(1)).doubleValue()+360.)%360.);
+        this.trueHeading = trueHeading;
     }
 
     public Bearing getTrueHeading() {

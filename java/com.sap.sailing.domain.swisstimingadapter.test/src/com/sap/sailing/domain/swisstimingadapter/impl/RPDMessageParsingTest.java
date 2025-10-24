@@ -1,13 +1,13 @@
 package com.sap.sailing.domain.swisstimingadapter.impl;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.Collection;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.swisstimingadapter.Fix;
 import com.sap.sailing.domain.swisstimingadapter.RaceStatus;

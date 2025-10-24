@@ -815,7 +815,7 @@ public class RegattaRaceStatesComponent extends AbstractCompositeComponent<Regat
     @Override
     public SettingsDialogComponent<RegattaRaceStatesSettings> getSettingsDialogComponent(RegattaRaceStatesSettings settings) {
         return new RegattaRaceStatesSettingsDialogComponent(settings, stringMessages,
-                Collections.unmodifiableList(eventDTO.venue.getCourseAreas()),
+                Collections.unmodifiableList(eventDTO.getVenue().getCourseAreas()),
                 Collections.unmodifiableList(raceGroupDTOs));
     }
 
@@ -847,7 +847,7 @@ public class RegattaRaceStatesComponent extends AbstractCompositeComponent<Regat
 
     private void setDefaultCourseAreas() {
         if (eventDTO != null) {
-            settings.setDefaultCourseAreas(eventDTO.venue.getCourseAreas());
+            settings.setDefaultCourseAreas(eventDTO.getVenue().getCourseAreas());
         }
     }
 

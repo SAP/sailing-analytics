@@ -1,5 +1,8 @@
 #!/bin/bash
-pkill -f .autossh.*stso
+pkill -f .autossh.*paris.*.tractrac.com
 sleep 2
 # Tunnel to localhost for TracTrac port forwards
-autossh -M 0 -f -A -N -L 4400:stso2:4400 -L 4401:stso2:4401 localhost
+AUTOSSH_LOGLEVEL=7 AUTOSSH_POLL=5 autossh -M 0 -f -A -N \
+  -L 4400:paris2.tractrac.com:4400 \
+  -L 4401:paris2.tractrac.com:4401 \
+  localhost

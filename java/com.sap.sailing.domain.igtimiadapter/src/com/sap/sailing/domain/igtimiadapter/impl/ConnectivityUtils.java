@@ -59,7 +59,6 @@ public class ConnectivityUtils {
             urlParameters.add(new BasicNameValuePair(nameValue.getKey(), nameValue.getValue()));
         }
         post.setEntity(new UrlEncodedFormEntity(urlParameters));
-        // TODO check if this is necessary at all
         post.setHeader("Origin", baseUrl);
         post.setHeader("Referer", referer);
         post.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101 Safari/537.36");

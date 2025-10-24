@@ -1,9 +1,9 @@
 package com.sap.sse.datamining.impl;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,7 +16,8 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import com.sap.sse.datamining.AdditionalQueryData;
 import com.sap.sse.datamining.Query;
@@ -48,7 +49,8 @@ public class TestProcessorQuery {
     
     private QueryResult<?> resultAfterAbortion;
 
-    @Test(timeout=2000)
+    @Timeout(value=2, unit=TimeUnit.SECONDS)
+    @Test
     public void testQueryTimeouting() {
         receivedElementOrFinished = false;
         receivedAbort = false;
@@ -86,7 +88,8 @@ public class TestProcessorQuery {
         assertThat("The processing should be aborted, but didn't receive abort", receivedAbort, is(true));
     }
 
-    @Test(timeout=2000)
+    @Timeout(value=2, unit=TimeUnit.SECONDS)
+    @Test
     public void testQueryAbortion() throws InterruptedException {
         receivedElementOrFinished = false;
         receivedAbort = false;
@@ -130,7 +133,6 @@ public class TestProcessorQuery {
     }
     
     private class AbortResultReceiver extends NullProcessor<Double, Void> {
-
         private final Processor<Map<GroupKey, Double>, Void> queryResultReceiver;
         
         public AbortResultReceiver(Processor<Map<GroupKey, Double>, Void> queryResultReceiver) {

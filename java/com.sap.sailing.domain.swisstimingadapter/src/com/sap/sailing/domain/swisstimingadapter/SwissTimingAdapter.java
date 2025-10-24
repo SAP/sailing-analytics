@@ -5,6 +5,9 @@ import java.net.UnknownHostException;
 import java.text.ParseException;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 import com.sap.sailing.domain.base.BoatClass;
 import com.sap.sailing.domain.common.RegattaIdentifier;
@@ -37,7 +40,7 @@ public interface SwissTimingAdapter {
 
     StartList readStartListForRace(String raceId, RegattaResults regattaResults);
     
-    RegattaResults readRegattaEntryListFromXrrUrl(String xrrEntryListUrl) throws IOException, JAXBException;
+    RegattaResults readRegattaEntryListFromXrrUrl(String xrrEntryListUrl) throws IOException, JAXBException, SAXException, ParserConfigurationException;
     
     SwissTimingFactory getSwissTimingFactory();
 

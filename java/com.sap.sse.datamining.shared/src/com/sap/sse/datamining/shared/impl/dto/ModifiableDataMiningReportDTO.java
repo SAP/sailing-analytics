@@ -45,33 +45,6 @@ public class ModifiableDataMiningReportDTO implements DataMiningReportDTO {
     
     private transient Set<ParameterModelListener> parameterModelListeners;
     
-    public static class ParameterValueChangeListener implements ParameterModelListener, Serializable {
-        private static final long serialVersionUID = 402977347893177440L;
-        
-        private ModifiableDataMiningReportDTO report;
-
-        @Deprecated // for GWT serialization only
-        ParameterValueChangeListener() {}
-        
-        public ParameterValueChangeListener(ModifiableDataMiningReportDTO report) {
-            super();
-            this.report = report;
-        }
-
-        @Override
-        public void parameterAdded(DataMiningReportDTO report, FilterDimensionParameter parameter) {
-        }
-
-        @Override
-        public void parameterRemoved(DataMiningReportDTO report, FilterDimensionParameter parameter) {
-        }
-
-        @Override
-        public void parameterValueChanged(FilterDimensionParameter parameter, Iterable<? extends Serializable> oldValues) {
-            report.adjustAllDimensionFiltersInQueriesUsingParameter(parameter);
-        }
-    }
-    
     /**
      * Creates an empty report with no queries and hence no parameter usages.
      */
@@ -94,7 +67,7 @@ public class ModifiableDataMiningReportDTO implements DataMiningReportDTO {
      * {@link StatisticQueryDefinitionDTO#getFilterSelection() filter selections} are adjusted to reflect the new
      * parameter's {@link FilterDimensionParameter#getValues() value set}.
      */
-    private void adjustAllDimensionFiltersInQueriesUsingParameter(FilterDimensionParameter parameter) {
+    void adjustAllDimensionFiltersInQueriesUsingParameter(FilterDimensionParameter parameter) {
         for (final Pair<StatisticQueryDefinitionDTO, FilterDimensionIdentifier> usage : getParameterUsages(parameter)) {
             // the following cast is safe because addQueryDefinition accepts only ModifiableStatisticQueryDefinitionDTO objects
             final ModifiableStatisticQueryDefinitionDTO query = (ModifiableStatisticQueryDefinitionDTO) usage.getA();

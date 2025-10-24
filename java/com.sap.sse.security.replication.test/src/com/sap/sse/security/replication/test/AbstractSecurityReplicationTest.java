@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 
 import com.sap.sse.common.mail.MailException;
 import com.sap.sse.mongodb.MongoDBService;
+import com.sap.sse.replication.FullyInitializedReplicableTracker;
 import com.sap.sse.replication.testsupport.AbstractServerReplicationTestSetUp;
 import com.sap.sse.replication.testsupport.AbstractServerWithSingleServiceReplicationTest;
 import com.sap.sse.security.SecurityService;
@@ -33,26 +34,26 @@ public abstract class AbstractSecurityReplicationTest extends AbstractServerWith
         }
 
         @Override
-        protected SecurityServiceImpl createNewMaster() throws MalformedURLException, IOException, InterruptedException,
+        protected SecurityServiceImpl createNewMaster(FullyInitializedReplicableTracker<SecurityService> securityServiceTrackerMock) throws MalformedURLException, IOException, InterruptedException,
                 MailException, UserStoreManagementException {
             final UserStoreImpl userStore = new UserStoreImpl("TestDefaultTenant");
             userStore.ensureDefaultRolesExist();
             userStore.loadAndMigrateUsers();
             final AccessControlStore accessControlStore = new AccessControlStoreImpl(userStore);
-            SecurityServiceImpl result = new SecurityServiceImpl(null, userStore, accessControlStore,
-                    SecuredSecurityTypes::getAllInstances, SSESubscriptionPlan::getAllInstances);
+            SecurityServiceImpl result = new SecurityServiceImpl(/* mailServiceTracker */ null, /* corsFilterConfigurationTracker */ null, userStore,
+                    accessControlStore, SecuredSecurityTypes::getAllInstances, SSESubscriptionPlan::getAllInstances);
             return result;
         }
 
         @Override
-        protected SecurityServiceImpl createNewReplica()
+        protected SecurityServiceImpl createNewReplica(FullyInitializedReplicableTracker<SecurityService> securityServiceTrackerMock)
                 throws UserStoreManagementException, MalformedURLException, IOException, InterruptedException {
             final UserStoreImpl userStore = new UserStoreImpl("TestDefaultTenant");
             userStore.ensureDefaultRolesExist();
             userStore.loadAndMigrateUsers();
             final AccessControlStore accessControlStore = new AccessControlStoreImpl(userStore);
-            return new SecurityServiceImpl(/* mailServiceTracker */ null, userStore, accessControlStore,
-                    SecuredSecurityTypes::getAllInstances, SSESubscriptionPlan::getAllInstances);
+            return new SecurityServiceImpl(/* mailServiceTracker */ null, /* corsFilterConfigurationTracker */ null, userStore,
+                    accessControlStore, SecuredSecurityTypes::getAllInstances, SSESubscriptionPlan::getAllInstances);
         }
     }
 }

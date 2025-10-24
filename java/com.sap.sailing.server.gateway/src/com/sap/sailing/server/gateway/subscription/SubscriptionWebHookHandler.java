@@ -17,7 +17,7 @@ public abstract class SubscriptionWebHookHandler {
     private static final Logger logger = Logger.getLogger(SubscriptionWebHookHandler.class.getName());
 
     protected SubscriptionWebHookServlet context;
-
+    
     /**
      * Handle webhook
      */
@@ -37,7 +37,7 @@ public abstract class SubscriptionWebHookHandler {
     protected User getUser(String customerId) {
         return context.getSecurityService().getUserByName(customerId);
     }
-
+    
     protected void updateUserSubscription(User user, Subscription subscription) throws UserManagementException {
         logger.info(() -> "Update subscription, user " + user.getName() + ", new subscription "
                 + (subscription != null ? subscription.toString() : "null"));

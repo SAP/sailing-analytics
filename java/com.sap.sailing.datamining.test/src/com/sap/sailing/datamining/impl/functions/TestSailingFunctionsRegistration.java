@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.datamining.Activator;
 import com.sap.sailing.datamining.data.HasGPSFixContext;
@@ -30,7 +30,7 @@ public class TestSailingFunctionsRegistration {
     
     private OpenFunctionManager functionRegistry;
     
-    @Before
+    @BeforeEach
     public void setUpFunctionRegistryAndProvider() {
         functionRegistry = new OpenFunctionManager();
         functionRegistry.registerAllClasses(Activator.getDefault().getClassesWithMarkedMethods());

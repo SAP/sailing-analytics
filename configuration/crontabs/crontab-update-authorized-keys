@@ -1,1 +1,0 @@
-* * * * *       export PATH=/bin:/usr/bin:/usr/local/bin; sleep $(( $RANDOM * 60 / 32768 )); update_authorized_keys_for_landscape_managers_if_changed $( cat PATH_OF_HOME_DIR_TO_REPLACE/ssh-key-reader.token ) https://security-service.sapsailing.com PATH_OF_HOME_DIR_TO_REPLACE  # 2>&1 >>/var/log/sailing.err

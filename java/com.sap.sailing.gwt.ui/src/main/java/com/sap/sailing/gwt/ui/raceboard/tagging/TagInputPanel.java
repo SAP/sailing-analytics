@@ -3,7 +3,7 @@ package com.sap.sailing.gwt.ui.raceboard.tagging;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextArea;
@@ -24,6 +24,7 @@ public class TagInputPanel extends FlowPanel {
 
     private static final String DEFAULT_TAG = "";
     private static final String DEFAULT_COMMENT = "";
+    private static final String DEFAULT_HIDDEN_INFO = "";
     private static final String DEFAULT_IMAGE_URL = "";
     private static final boolean DEFAULT_VISIBLE_FOR_PUBLIC = false;
 
@@ -37,6 +38,7 @@ public class TagInputPanel extends FlowPanel {
         private final TaggingComponent taggingComponent;
         private final TextBox tagTextBox;
         private final TextArea commentTextArea;
+        private final TextArea hiddenInfoTextArea;
         private final CheckBox visibleForPublicCheckBox;
         private final URLFieldWithFileUpload imageUploadPanel;
 
@@ -51,6 +53,7 @@ public class TagInputPanel extends FlowPanel {
             this.taggingComponent = taggingComponent;
             tagTextBox = createTextBox(DEFAULT_TAG);
             commentTextArea = createTextArea(DEFAULT_COMMENT);
+            hiddenInfoTextArea = createTextArea(DEFAULT_HIDDEN_INFO);
             visibleForPublicCheckBox = createCheckbox(stringMessages.tagVisibleForPublicCheckBox());
             visibleForPublicCheckBox.setValue(DEFAULT_VISIBLE_FOR_PUBLIC);
             imageUploadPanel = new URLFieldWithFileUpload(stringMessages, null);
@@ -72,8 +75,8 @@ public class TagInputPanel extends FlowPanel {
             } else if (tagToValidate.getTag() == null || tagToValidate.getTag().isEmpty()) {
                 result = stringMessages.tagNotSpecified();
             } else if (taggingComponent.tagAlreadyExists(tagToValidate.getTag(), tagToValidate.getComment(),
-                    tagToValidate.getImageURL(), tagToValidate.getResizedImageURL(), tagToValidate.isVisibleForPublic(),
-                    tagToValidate.getRaceTimepoint())) {
+                    tagToValidate.getHiddenInfo(), tagToValidate.getImageURL(), tagToValidate.getResizedImageURL(),
+                    tagToValidate.isVisibleForPublic(), tagToValidate.getRaceTimepoint())) {
                 result = stringMessages.tagAlreadyExists();
             } else {
                 result = null;
@@ -87,6 +90,10 @@ public class TagInputPanel extends FlowPanel {
 
         public TextArea getCommentTextArea() {
             return commentTextArea;
+        }
+        
+        private TextArea getHiddenInfoTextArea() {
+            return hiddenInfoTextArea;
         }
 
         public CheckBox getVisibleForPublicCheckBox() {
@@ -119,11 +126,11 @@ public class TagInputPanel extends FlowPanel {
         @Override
         protected TagDTO getResult() {
             return new TagDTO(getTagTextBox().getValue(), getCommentTextArea().getValue(),
-                    getImageUploadPanel().getUri(), null, getVisibleForPublicCheckBox().getValue(), null, null, null);
+                    getHiddenInfoTextArea().getValue(), getImageUploadPanel().getUri(), null, getVisibleForPublicCheckBox().getValue(), null, null, null);
         }
 
         @Override
-        protected FocusWidget getInitialFocusWidget() {
+        protected Focusable getInitialFocusWidget() {
             return null;
         }
 
@@ -207,6 +214,10 @@ public class TagInputPanel extends FlowPanel {
     protected TextArea getCommentTextArea() {
         return tagEntryFields.getCommentTextArea();
     }
+    
+    protected TextArea getHiddenInfoTextArea() {
+        return tagEntryFields.getHiddenInfoTextArea();
+    }
 
     protected URLFieldWithFileUpload getImageURLTextBox() {
         return tagEntryFields.getImageUploadPanel();
@@ -222,6 +233,10 @@ public class TagInputPanel extends FlowPanel {
 
     protected String getComment() {
         return getCommentTextArea().getValue();
+    }
+    
+    protected String getHiddenInfo() {
+        return getHiddenInfoTextArea().getValue();
     }
 
     protected boolean isVisibleForPublic() {
@@ -239,6 +254,10 @@ public class TagInputPanel extends FlowPanel {
     protected void setComment(String comment) {
         getCommentTextArea().setValue(comment);
     }
+    
+    protected void setHiddenInfo(String hiddenInfo) {
+        getHiddenInfoTextArea().setValue(hiddenInfo);
+    }
 
     protected void setImageURL(String imageURL) {
         getImageURLTextBox().setUri(imageURL);
@@ -254,6 +273,7 @@ public class TagInputPanel extends FlowPanel {
     protected void clearAllValues() {
         setTag(DEFAULT_TAG);
         setComment(DEFAULT_COMMENT);
+        setHiddenInfo(DEFAULT_HIDDEN_INFO);
         setImageURL(DEFAULT_IMAGE_URL);
         setVisibleForPublic(DEFAULT_VISIBLE_FOR_PUBLIC);
         setCurrentStatus();
@@ -268,7 +288,7 @@ public class TagInputPanel extends FlowPanel {
      *         <code>false</code>
      */
     protected boolean compareFieldsToTag(TagDTO tag) {
-        return tag != null && getTag().equals(tag.getTag()) && Util.equalsWithNull(getComment(), tag.getComment())
+        return tag != null && getTag().equals(tag.getTag()) && Util.equalsWithNull(getComment(), tag.getComment()) && Util.equalsWithNull(getHiddenInfo(), tag.getHiddenInfo())
                 && (Util.equalsWithNull(getImageURL(), tag.getImageURL())
                         || (getImageURL() == null && tag.getImageURL() == ""))
                 && isVisibleForPublic() == tag.isVisibleForPublic();
@@ -310,6 +330,7 @@ public class TagInputPanel extends FlowPanel {
     protected void setTag(TagDTO tag) {
         setTag(tag.getTag());
         setComment(tag.getComment());
+        setHiddenInfo(tag.getHiddenInfo());
         setImageURL(tag.getImageURL());
         setVisibleForPublic(tag.isVisibleForPublic());
         setCurrentStatus();

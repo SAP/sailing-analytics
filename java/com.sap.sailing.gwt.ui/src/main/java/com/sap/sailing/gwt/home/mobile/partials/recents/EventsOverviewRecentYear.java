@@ -26,6 +26,7 @@ import com.sap.sailing.gwt.home.shared.places.event.EventDefaultPlace;
 import com.sap.sailing.gwt.home.shared.places.fakeseries.SeriesContext;
 import com.sap.sailing.gwt.home.shared.utils.CollapseAnimation;
 import com.sap.sailing.gwt.ui.client.StringMessages;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 
 public class EventsOverviewRecentYear extends Composite {
 
@@ -49,14 +50,16 @@ public class EventsOverviewRecentYear extends Composite {
     private final CollapseAnimation animation;
 
     private final List<EventListEventDTO> events;
+
+    private final TakedownNoticeService takedownNoticeService;
     
-    public EventsOverviewRecentYear(EventListYearDTO yearDTO, MobilePlacesNavigator navigator, boolean showInitial) {
+    public EventsOverviewRecentYear(EventListYearDTO yearDTO, MobilePlacesNavigator navigator, boolean showInitial, TakedownNoticeService takedownNoticeService) {
         isContentVisible = showInitial;
+        this.takedownNoticeService = takedownNoticeService;
         events = yearDTO.getEvents();
         eventStage = new Stage(navigator, false);
         EventsOverviewRecentResources.INSTANCE.css().ensureInjected();
         initWidget(uiBinder.createAndBindUi(this));
-        
         this.year.setInnerText(String.valueOf(yearDTO.getYear()));
         this.eventsCount.setInnerText(i18n.eventsCount(yearDTO.getEventCount()));
         boolean first = true;
@@ -84,7 +87,6 @@ public class EventsOverviewRecentYear extends Composite {
         statisticsBox.getElement().getStyle().setPaddingLeft(1, Unit.EM);
         statisticsBox.getElement().getStyle().setPaddingRight(1, Unit.EM);
         recentEventsTeaserPanel.add(statisticsBox);
-        
         initStageContents();
         headerDiv.addDomHandler(new ClickHandler() {
             @Override
@@ -99,7 +101,7 @@ public class EventsOverviewRecentYear extends Composite {
 
     private void initStageContents() {
         if (isContentVisible && !isStageInitialized) {
-            eventStage.setFeaturedEvents(events);
+            eventStage.setFeaturedEvents(events, takedownNoticeService);
             isStageInitialized = true;
         }
     }

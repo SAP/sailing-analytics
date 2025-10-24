@@ -12,6 +12,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.sap.sailing.gwt.home.communication.start.EventStageDTO;
 import com.sap.sailing.gwt.home.desktop.app.DesktopPlacesNavigator;
 import com.sap.sse.gwt.client.controls.carousel.WidgetCarousel;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 
 public class Stage extends Composite {
 
@@ -32,18 +33,18 @@ public class Stage extends Composite {
         initWidget(uiBinder.createAndBindUi(this));
     }
 
-    public void setFeaturedEvents(List<EventStageDTO> list) {
+    public void setFeaturedEvents(List<EventStageDTO> list, TakedownNoticeService takedownNoticeService) {
         final List<Widget> stageWidgets = new ArrayList<>();
         for (EventStageDTO event : list) {
             switch (event.getStageType()) {
             case POPULAR:
-                stageTeaser = new PopularEventStageTeaser(event, placeNavigator);
+                stageTeaser = new PopularEventStageTeaser(event, placeNavigator, takedownNoticeService);
                 break;
             case RUNNING:
-                stageTeaser = new LiveEventStageTeaser(event, placeNavigator);
+                stageTeaser = new LiveEventStageTeaser(event, placeNavigator, takedownNoticeService);
                 break;
             case UPCOMING_SOON:
-                stageTeaser = new UpcomingEventStageTeaser(event, placeNavigator);
+                stageTeaser = new UpcomingEventStageTeaser(event, placeNavigator, takedownNoticeService);
                 break;
             }
             stageWidgets.add(stageTeaser);

@@ -1,13 +1,13 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 
 import com.sap.sailing.domain.base.Competitor;
@@ -41,7 +41,7 @@ public class TWATest {
     private TrackedLegOfCompetitor trackedLegOfCompetitor;
     
     @SuppressWarnings("unchecked")
-    @Before
+    @BeforeEach
     public void setUp() {
         competitor = mock(CompetitorImpl.class);
         trackedRace = mock(DynamicTrackedRaceImpl.class);

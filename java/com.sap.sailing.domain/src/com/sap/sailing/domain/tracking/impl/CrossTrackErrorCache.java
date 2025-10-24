@@ -19,11 +19,12 @@ import com.sap.sailing.domain.common.NoWindException;
 import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
-import com.sap.sailing.domain.tracking.AddResult;
+import com.sap.sailing.domain.shared.tracking.AddResult;
+import com.sap.sailing.domain.shared.tracking.Track;
+import com.sap.sailing.domain.shared.tracking.impl.TrackImpl;
 import com.sap.sailing.domain.tracking.GPSFixTrack;
 import com.sap.sailing.domain.tracking.MarkPassing;
 import com.sap.sailing.domain.tracking.RaceChangeListener;
-import com.sap.sailing.domain.tracking.Track;
 import com.sap.sailing.domain.tracking.TrackedLeg;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sse.common.Distance;
@@ -251,7 +252,7 @@ public class CrossTrackErrorCache extends AbstractRaceChangeListener {
         Track<CrossTrackErrorSumAndNumberOfFixes> cacheForCompetitor = cachePerCompetitor.get(competitor, waitForLatest);
         double distanceInMeters = 0;
         int count = 0;
-        if (cacheForCompetitor != null) {
+        if (to != null && cacheForCompetitor != null) {
             owner.getRace().getCourse().lockForRead(); // make sure that course updates don't happen while we're computing
             try {
                 CrossTrackErrorSumAndNumberOfFixes startAggregate = null;

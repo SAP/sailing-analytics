@@ -6,8 +6,8 @@ import static org.mockito.Mockito.verify;
 import java.util.Collections;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
@@ -87,7 +87,7 @@ public class RaceLogEventSerializerTest {
 
 
     @SuppressWarnings("unchecked")
-    @Before
+    @BeforeEach
     public void setUp() {
         flagEventSerializer = mock(JsonSerializer.class);
         startTimeSerializer = mock(JsonSerializer.class);
@@ -292,7 +292,7 @@ public class RaceLogEventSerializerTest {
     @Test
     public void testTagSerializer() {
         // we use the real event type here because we do not want to re-implement the dispatching.
-        RaceLogEvent event = new RaceLogTagEventImpl("", "", "", "", MillisecondsTimePoint.now(), author, 0);
+        RaceLogEvent event = new RaceLogTagEventImpl("", "", /* hiddenInfo */ null, "", "", MillisecondsTimePoint.now(), author, 0);
         serializer.serialize(event);
         verify(tagEventSerializer).serialize(event);
     }

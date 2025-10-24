@@ -1,0 +1,32 @@
+/var/log/mongodb/archive.log
+{
+   compress
+   delaycompress
+   rotate 5
+   weekly
+   postrotate
+       /usr/bin/kill -SIGUSR1 $( cat /var/lib/mongodb/archive/mongod.lock )
+   endscript
+}
+
+/var/log/mongodb/slow.log
+{
+   compress
+   delaycompress
+   rotate 5
+   weekly
+   postrotate
+       /usr/bin/kill -SIGUSR1 $( cat /var/lib/mongodb/slow/mongod.lock )
+   endscript
+}
+
+/var/log/mongodb/hidden-live-replica.log
+{
+   compress
+   delaycompress
+   rotate 5
+   weekly
+   postrotate
+       /usr/bin/kill -SIGUSR1 $( cat /var/lib/mongodb/hidden-live-replica/mongod.lock )
+   endscript
+}

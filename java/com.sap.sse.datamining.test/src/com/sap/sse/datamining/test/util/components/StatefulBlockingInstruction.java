@@ -30,19 +30,23 @@ public class StatefulBlockingInstruction<ResultType> extends StatefulProcessorIn
     protected ResultType internalComputeResult() throws Exception {
         if (getTotalBlockDuration() > 0) {
             actionBeforeBlock();
-            for (int i = 0; i < numberOfSteps; i++) {
-                if (isAborted()) {
-                    actionBeforeAbort();
-                    computeResultWasAborted = true;
-                    break;
-                }
+            for (int i = 0; !checkIsAborted() && i < numberOfSteps; i++) {
                 Thread.sleep(stepDuration);
             }
             actionAfterBlock();
         }
         return result;
     }
-
+    
+    private boolean checkIsAborted() {
+        final boolean result = isAborted();
+        if (result) {
+            actionBeforeAbort();
+            computeResultWasAborted = true;
+        }
+        return result;
+    }
+    
     protected void actionBeforeBlock() { }
     protected void actionBeforeAbort() { }
     protected void actionAfterBlock() { }
@@ -54,5 +58,4 @@ public class StatefulBlockingInstruction<ResultType> extends StatefulProcessorIn
     public boolean computeResultWasAborted() {
         return computeResultWasAborted;
     }
-    
 }

@@ -30,22 +30,18 @@ public class FloatingMediaPlayerContainer extends AbstractMediaContainer impleme
     private final WindowBox dialogBox;
     private final MediaSynchControl mediaSynchControl;
     private final PopupPositionProvider popupPositionProvider;
-    private Anchor edit;
+    private final Anchor edit;
 
     public FloatingMediaPlayerContainer(MediaSynchPlayer mediaPlayer, PopupPositionProvider popupPositionProvider,
-            UserService userservice, MediaServiceWriteAsync mediaServiceWrite, ErrorReporter errorReporter,
+            UserService userService, MediaServiceWriteAsync mediaServiceWrite, ErrorReporter errorReporter,
             PlayerCloseListener playerCloseListener, PopoutListener popoutListener) {
         super(new FlowPanel(), mediaPlayer, popoutListener, playerCloseListener);
-
         this.popupPositionProvider = popupPositionProvider;
-
         rootPanel.addStyleName("video-root-panel");
         rootPanel.add(mediaPlayer.asWidget());
-
         this.edit = new Anchor();
         this.edit.getElement().getStyle().setBackgroundImage("url('" + res.editIcon().getSafeUri().asString() + "')");
         EditButtonProxy proxy = new EditButtonProxy() {
-
             @Override
             public void setTitle(String string) {
                 edit.setTitle(string);
@@ -66,15 +62,12 @@ public class FloatingMediaPlayerContainer extends AbstractMediaContainer impleme
                 edit.getElement().getStyle().setDisplay(b ? Display.BLOCK : Display.NONE);
             }
         };
-        mediaSynchControl = new MediaSynchControl(this.mediaPlayer, mediaServiceWrite, errorReporter, proxy, userservice);
+        mediaSynchControl = new MediaSynchControl(this.mediaPlayer, mediaServiceWrite, errorReporter, proxy, userService);
         mediaSynchControl.widget().addStyleName("media-synch-control");
         rootPanel.add(mediaSynchControl.widget());
-
         mediaPlayer.setEditFlag(mediaSynchControl);
-
         this.dialogBox = new WindowBox(mediaPlayer.getMediaTrack().title, mediaPlayer.getMediaTrack().toString(),
                 rootPanel, new WindowBox.PopoutHandler() {
-
                     @Override
                     public void popout() {
                         FloatingMediaPlayerContainer.this.popoutListener
@@ -87,30 +80,25 @@ public class FloatingMediaPlayerContainer extends AbstractMediaContainer impleme
             dialogBox.addBeforeBarButtons(edit);
         }
         dialogBox.addCloseHandler(new CloseHandler<PopupPanel>() {
-
             @Override
             public void onClose(CloseEvent<PopupPanel> event) {
                 FloatingMediaPlayerContainer.this.mediaPlayer.pauseMedia();
                 FloatingMediaPlayerContainer.this.popupCloseListener.playerClosed();
             }
-
         });
-
         show();
-
         // hook into the click events but relay them also
         // Event.sinkEvents(dialogBox.getElement(), Event.ONCLICK);
         EventListener originalListener = Event.getEventListener(dialogBox.getElement());
         Event.setEventListener(dialogBox.getElement(), new EventListener() {
             @Override
             public void onBrowserEvent(Event event) {
-                if(event.getTypeInt() == Event.ONMOUSEDOWN || event.getTypeInt() == Event.ONTOUCHSTART) {
+                if (event.getTypeInt() == Event.ONMOUSEDOWN || event.getTypeInt() == Event.ONTOUCHSTART) {
                     moveToTop();
                 }
                 originalListener.onBrowserEvent(event);
             }
         });
-        
         moveToTop();
     }
 
@@ -133,7 +121,6 @@ public class FloatingMediaPlayerContainer extends AbstractMediaContainer impleme
     void show() {
         dialogBox.show();
         dialogBox.setVisible(false);
-
         Scheduler.get().scheduleDeferred(new ScheduledCommand() {
             @Override
             public void execute() {
@@ -144,12 +131,10 @@ public class FloatingMediaPlayerContainer extends AbstractMediaContainer impleme
                 dialogBox.setVisible(true);
             }
         });
-
     }
 
     @Override
     void hide() {
         dialogBox.hide();
     }
-
 }

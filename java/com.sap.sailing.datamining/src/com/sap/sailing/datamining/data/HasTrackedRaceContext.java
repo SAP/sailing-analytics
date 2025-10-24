@@ -6,7 +6,9 @@ import com.sap.sailing.domain.base.Fleet;
 import com.sap.sailing.domain.base.RaceColumn;
 import com.sap.sailing.domain.base.RaceDefinition;
 import com.sap.sailing.domain.base.Regatta;
+import com.sap.sailing.domain.common.LegType;
 import com.sap.sailing.domain.common.NauticalSide;
+import com.sap.sailing.domain.common.NoWindException;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
@@ -87,6 +89,9 @@ public interface HasTrackedRaceContext {
     
     @Dimension(messageKey="Day")
     public String getDayAsISO();
+    
+    @Dimension(messageKey="TypeOfFirstLeg")
+    public LegType getTypeOfFirstLeg() throws NoWindException;
 
     // Convenience methods for race dependent calculation to avoid code duplication
     public Double getRelativeScoreForCompetitor(Competitor competitor);

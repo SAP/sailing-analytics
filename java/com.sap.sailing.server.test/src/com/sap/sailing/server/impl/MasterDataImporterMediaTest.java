@@ -20,8 +20,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bson.types.ObjectId;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
@@ -48,7 +48,7 @@ public class MasterDataImporterMediaTest {
     private RacingEventService racingEventService;
     private Collection<MediaTrack> mediaTracksToImport;
 
-    @Before
+    @BeforeEach
     public void before() {
         mediaTracksToImport = new ArrayList<MediaTrack>();
     }

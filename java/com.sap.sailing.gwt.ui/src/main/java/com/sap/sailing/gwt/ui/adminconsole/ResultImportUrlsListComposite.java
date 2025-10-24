@@ -1,5 +1,6 @@
 package com.sap.sailing.gwt.ui.adminconsole;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -82,6 +83,7 @@ public class ResultImportUrlsListComposite extends Composite {
         sailingServiceWrite.getUrlResultProviderNamesAndOptionalSampleURL(new AsyncCallback<List<Pair<String, String>>>() {
             @Override
             public void onSuccess(List<Pair<String, String>> urlProviderNamesAndOptionalSampleURL) {
+                Collections.sort(urlProviderNamesAndOptionalSampleURL, (u1, u2)->u1.getA().compareTo(u2.getA()));
                 urlProviderListBox.clear();
                 urlProviderListBox.addItem(stringMessages.pleaseSelectAURLProvider());
                 for (Pair<String, String> urlProviderNameAndSampleURL : urlProviderNamesAndOptionalSampleURL) {

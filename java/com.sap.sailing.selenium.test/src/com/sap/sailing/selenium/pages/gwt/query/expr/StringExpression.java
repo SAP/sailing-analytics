@@ -1,7 +1,6 @@
 package com.sap.sailing.selenium.pages.gwt.query.expr;
 
 import com.sap.sailing.selenium.pages.gwt.query.Expression;
-
 import com.sap.sailing.selenium.pages.gwt.query.operation.BooleanOperation;
 import com.sap.sailing.selenium.pages.gwt.query.operation.string.Matches;
 

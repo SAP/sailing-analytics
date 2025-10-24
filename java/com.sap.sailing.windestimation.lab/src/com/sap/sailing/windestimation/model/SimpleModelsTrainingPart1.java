@@ -89,7 +89,7 @@ public class SimpleModelsTrainingPart1 {
         maneuverForEstimationPersistenceManager.dropCollection();
         new RegularManeuversForEstimationPersistenceManager().dropCollection();
         logger.info("Scheduling import of polar data");
-        executeInThreadPool(() -> new PolarDataImporter().importPolarData());
+        executeInThreadPool(() -> new PolarDataImporter().importPolarData(bearerToken));
         logger.info("Scheduling import of regattas with a bearer token of length "+bearerToken.length());
         executeInThreadPool(() -> new ManeuverAndWindImporter().importAllRegattas(bearerToken));
         awaitThreadPoolCompletion();

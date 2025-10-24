@@ -250,10 +250,18 @@ public class ORCCertificatesCollectionJSON extends AbstractORCCertificatesCollec
                 runVMGPredictionPerTrueWindSpeed.put(tws, getSpeedPredictionFromTimeAllowance(predefinedAllowanceDurationsPerTrueWindSpeed, RUN, tws));
                 runAllowancePerTrueWindSpeed.put(tws, predefinedAllowanceDurationsPerTrueWindSpeed.get(RUN).get(tws));
                 windwardLeewardSpeedPredictionPerTrueWindSpeed.put(tws, getSpeedPredictionFromTimeAllowance(predefinedAllowanceDurationsPerTrueWindSpeed, WINDWARD_LEEWARD, tws));
-                longDistanceSpeedPredictionPerTrueWindSpeed.put(tws, getSpeedPredictionFromTimeAllowance(predefinedAllowanceDurationsPerTrueWindSpeed, LONG_DISTANCE, tws));
-                circularRandomSpeedPredictionPerTrueWindSpeed.put(tws, getSpeedPredictionFromTimeAllowance(predefinedAllowanceDurationsPerTrueWindSpeed, CIRCULAR_RANDOM, tws));
-                nonSpinnakerSpeedPredictionPerTrueWindSpeed.put(tws, getSpeedPredictionFromTimeAllowance(predefinedAllowanceDurationsPerTrueWindSpeed, NON_SPINNAKER, tws));
-
+                final Speed longDistanceSpeedPrediction = getSpeedPredictionFromTimeAllowance(predefinedAllowanceDurationsPerTrueWindSpeed, LONG_DISTANCE, tws);
+                if (longDistanceSpeedPrediction != null) {
+                    longDistanceSpeedPredictionPerTrueWindSpeed.put(tws, longDistanceSpeedPrediction);
+                }
+                final Speed circularRandomSpeedPrediction = getSpeedPredictionFromTimeAllowance(predefinedAllowanceDurationsPerTrueWindSpeed, CIRCULAR_RANDOM, tws);
+                if (circularRandomSpeedPrediction != null) {
+                    circularRandomSpeedPredictionPerTrueWindSpeed.put(tws, circularRandomSpeedPrediction);
+                }
+                final Speed nonSpinnakerSpeedPrediction = getSpeedPredictionFromTimeAllowance(predefinedAllowanceDurationsPerTrueWindSpeed, NON_SPINNAKER, tws);
+                if (nonSpinnakerSpeedPrediction != null) {
+                    nonSpinnakerSpeedPredictionPerTrueWindSpeed.put(tws, nonSpinnakerSpeedPrediction);
+                }
             }
             final Bearing[] dynamicAllowancesTrueWindAngles = trueWindAngleMap.values().toArray(new Bearing[trueWindAngleMap.values().size()]);
             final Speed[] dynamicAllowancesTrueWindSpeeds = trueWindSpeedMap.values().toArray(new Speed[trueWindSpeedMap.values().size()]);
@@ -285,7 +293,7 @@ public class ORCCertificatesCollectionJSON extends AbstractORCCertificatesCollec
         if (timeAllowances != null && (timeAllowance = timeAllowances.get(tws)) != null) {
             speedPrediction = ORCCertificate.NAUTICAL_MILE.inTime(timeAllowance);
         } else {
-            speedPrediction = new KnotSpeedImpl(Double.POSITIVE_INFINITY);
+            speedPrediction = null;
         }
         return speedPrediction;
     }

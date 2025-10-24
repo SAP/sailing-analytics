@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 import com.sap.sailing.domain.resultimport.ResultUrlProvider;
 import com.sap.sailing.resultimport.ResultDocumentDescriptor;
@@ -37,7 +40,7 @@ public abstract class UrlBasedXRRResultDocumentProvider implements ResultDocumen
     }
 
     @Override
-    public Iterable<ResultDocumentDescriptor> getResultDocumentDescriptors() throws IOException {
+    public Iterable<ResultDocumentDescriptor> getResultDocumentDescriptors() throws IOException, SAXException, ParserConfigurationException {
         List<ResultDocumentDescriptor> result = new ArrayList<>();
         for (URL url : resultUrlProvider.getReadableUrls()) {
             URLConnection eventResultConn = HttpUrlConnectionHelper.redirectConnection(url);

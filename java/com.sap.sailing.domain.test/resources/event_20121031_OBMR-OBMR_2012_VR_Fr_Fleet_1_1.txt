@@ -1,13 +1,19 @@
-stored-uri:datafiles/event_20121031_OBMR-OBMR_2012_VR_Fr_Fleet_1_1.mtb
+stored-uri:datafiles/65099a64-245d-11e2-9635-10bf48d758ce.mtb
 StartReplay:1
 
-// Input from params_static:
-
-// Input from event_parameters:
-
+PerformanceTableLayout:[{"key":"Pos","header":"Pos","tooltip":"Position","options":null},{"key":"Name","header":"Name","tooltip":"Name","options":null},{"key":"Short","header":"Short","tooltip":"Short name","options":null},{"key":"Country","header":"Country","tooltip":"Country","options":null},{"key":"After","header":"After","tooltip":"After","options":null},{"key":"Leg pos","header":"Leg pos","tooltip":"Leg position","options":null},{"key":"Leg time","header":"Leg time","tooltip":"Leg time","options":null},{"key":"SOG","header":"SOG","tooltip":"SOG","options":null},{"key":"VMG","header":"VMG","tooltip":"VMG","options":null},{"key":"Top speed","header":"Top Speed","tooltip":"Top Speed","options":null},{"key":"Distance","header":"Distance","tooltip":"Distance","options":null}]
+DefaultPanel:
+ResultColumn1Tooltip:
+ResultColumn2Tooltip:
+ResultColumn3Tooltip:
+ResultColumn4Tooltip:
+ResultColumn5Tooltip:
 CompMarkerUUID:1
 CodanIsSponsor:0
 DefaultTailLength:60
+StartTimeType:Race
+ws-uri:ws://tracms.traclive.dk:8888
+smsParams:0,34606764698,4525720572,3,10,15
 APzoomChangeTime:2500
 disableAutoProduce:0
 autoProduce:0
@@ -18,8 +24,15 @@ APwholeLegBehindMarks:0.15
 APmarkSwitch:0.13
 APmarkZoomBehindMarks:0.10
 APmarkZoomInFrontOfMarks:0.20
+enableDiplomas:0
 PopupMarkerUUID:2
 ManualUrl:http://www.tractrac.com/files/userguide_sailing.pdf
+MapUrl:http://tile.traclive.dk/osm
+ResultColumn1DefaultOrder:1
+ResultColumn2DefaultOrder:0
+ResultColumn3DefaultOrder:0
+ResultColumn4DefaultOrder:0
+ResultColumn5DefaultOrder:0
 Marker1UUID:1
 Marker1Type:RGBMarkerFactory
 Marker1Directional:1
@@ -32,7 +45,7 @@ MaxMetersPerSecond:20
 PrecisionMeters:20
 ShortAvgTime:180
 LongAvgTime:900
-TimeZone:1
+TimeZone:0
 CompMarkerTimeout:60
 FramesPerSecond:8
 replayspeedup:5
@@ -58,7 +71,18 @@ DisableRotation:0
 ControlPointMarkerRadius:13
 disableselection:0
 disableleaderline:0
+delayIntervals:3,10,15
 DisableChangeRace:0
+MarkerSymbol:standardBoat
+MarkerMinPixelSize:36
+ShowFlagInLabel:0
+ShowRankInLabel:1
+TailOpacity:70
+TailWidth:1
+dimmingLevel:1
+LaggingThreshold:5
+LowBatteryThreshold:5
+DatabaseVersion:01.00.20
 PopUpRow1Name:
 PopUpRow1Type:Name
 PopUpRow2Name:Knots
@@ -69,6 +93,13 @@ PopUpRow4Name:Sail
 PopUpRow4Type:Ini
 PopUpRow5Name:After
 PopUpRow5Type:BoatAfter
+dimmingLevel:1
+BatteryLevelWarn:20
+BatteryLevelDanger:13
+dimmingSeconds:60
+EnableResults:0
+ResultsLayout:[{"key":"Order","header":"#","description":"Position","printable":true,"align":"right","collapsible":false},{"key":"Name","header":"Name","description":"Competitor's name","printable":true,"align":"left","collapsible":false},{"key":"ShortName","header":"Short Name","description":"Competitor's short name","printable":true,"align":"left","collapsible":true},{"key":"LegTime","header":"Leg","description":"Leg time","printable":false,"align":"right","collapsible":true},{"key":"LegPosition","header":"#","description":"Leg position","printable":false,"align":"right","collapsible":true},{"key":"Time","header":"Total","description":"Total time","printable":true,"align":"right","collapsible":false},{"key":"After","header":"Total &Delta;","description":"Total &Delta;","printable":true,"align":"right","collapsible":false}]
+LabelNoBackground:0
 ResultColumn1Name:#
 ResultColumn1Size:20
 ResultColumn1Type:RowNumber
@@ -89,8 +120,8 @@ ResultColumn6Type:BoatSpeed
 DisableLeaderboard:0
 DisableAnalysis:0
 TableFontSize:11
-//live-uri:tcp://germanmaster.traclive.dk:4400
-//stored-uri:tcp://germanmaster.traclive.dk:4401
+//live-uri:tcp://tracms.traclive.dk:4400
+//stored-uri:tcp://tracms.traclive.dk:4401
 compInitialsFontSize:11
 AutoRotate:0
 MassStart:0
@@ -100,14 +131,22 @@ ReCalcDirAndSpeed:0
 RaceHandicapSystem:NONE
 TeamCompetitionType:NONE
 LiveDelaySecs: 20
+LiveDelaySecsRace: 
+LiveDelaySecsEvent: 20
 
-//-------- AUTO GENERATED PARAMETERS START ----------------
+Maps:[]
 
 EventID:56fdadb4-2338-11e2-9d6f-10bf48d758ce
 EventName:OBMR 2012
+EventAnalyticsName:OBMR 2012
 EventDB:event_20121031_OBMR
 EventStartTime:2012-10-31 08:00:00
 EventEndTime:2012-11-04 23:00:00
+EventType:a1b74ca0-fdd8-11dc-8811-005056c00008
+EventJSON:https://historical1.tractrac.com/events/event_20121031_OBMR/jsonservice.php
+DBReplicaEnabled:0
+HighLoadEnabled:
+MultipleDataservers:0
 
 RaceID:65099a64-245d-11e2-9635-10bf48d758ce
 RaceName:OBMR 2012 VR Fr Fleet 1 1
@@ -115,6 +154,7 @@ RaceStartTime:2012-11-02 12:00:00
 RaceEndTime:
 RaceTrackingStartTime:2012-11-02 11:56:16
 RaceTrackingEndTime:2012-11-02 12:20:46
+Initialized:1
 RaceDefaultRouteUUID:650b2190-245d-11e2-9635-10bf48d758ce
 RaceHandicapSystem:NONE
 
@@ -125,53 +165,35 @@ Image1Image:pictures/8017b12a-24d9-11e2-9635-10bf48d758ce/Sk_billede_2012-11-02_
 
 Class1UUID:d64cebc4-2348-11e2-9d6f-10bf48d758ce
 Class1Name:Laser SB3
+Class1BoatClassId:
 
-Team1UUID:e6a0ac0e-2348-11e2-9d6f-10bf48d758ce
-Team1Name:2.4mR
-Team1Comp1UUID:e9e89acc-2350-11e2-9d6f-10bf48d758ce
+Team1UUID:121b0dde-2349-11e2-9d6f-10bf48d758ce
+Team1Name:49erFX
+Team1Comp1UUID:bbf50750-234f-11e2-9d6f-10bf48d758ce
 
-Team2UUID:f839a0ce-2348-11e2-9d6f-10bf48d758ce
-Team2Name:470er Frauen
+Team2UUID:1a2007d2-2349-11e2-9d6f-10bf48d758ce
+Team2Name:Laser Radial
+Team2Comp1UUID:bc00b186-234f-11e2-9d6f-10bf48d758ce
 
-Team3UUID:03a270d0-2349-11e2-9d6f-10bf48d758ce
-Team3Name:470er Männer
+Team3UUID:2f4bc376-2349-11e2-9d6f-10bf48d758ce
+Team3Name:Mixed
+Team3Comp1UUID:bc2238b0-234f-11e2-9d6f-10bf48d758ce
 
-Team4UUID:0ba3a9a2-2349-11e2-9d6f-10bf48d758ce
-Team4Name:49er
+Team4UUID:42380558-2349-11e2-9d6f-10bf48d758ce
+Team4Name:Schümann
+Team4Comp1UUID:bc48f46e-234f-11e2-9d6f-10bf48d758ce
 
-Team5UUID:121b0dde-2349-11e2-9d6f-10bf48d758ce
-Team5Name:49erFX
-Team5Comp1UUID:bbf50750-234f-11e2-9d6f-10bf48d758ce
+Team5UUID:485aa102-2349-11e2-9d6f-10bf48d758ce
+Team5Name:Sonar
+Team5Comp1UUID:bc59a854-234f-11e2-9d6f-10bf48d758ce
 
-Team6UUID:1a2007d2-2349-11e2-9d6f-10bf48d758ce
-Team6Name:Laser Radial
-Team6Comp1UUID:bc00b186-234f-11e2-9d6f-10bf48d758ce
-
-Team7UUID:2109d050-2349-11e2-9d6f-10bf48d758ce
-Team7Name:Laser Standard
-
-Team8UUID:2f4bc376-2349-11e2-9d6f-10bf48d758ce
-Team8Name:Mixed
-Team8Comp1UUID:bc2238b0-234f-11e2-9d6f-10bf48d758ce
-
-Team9UUID:37ea8e7c-2349-11e2-9d6f-10bf48d758ce
-Team9Name:RS:X Surfboard
-
-Team10UUID:42380558-2349-11e2-9d6f-10bf48d758ce
-Team10Name:Schümann
-Team10Comp1UUID:bc48f46e-234f-11e2-9d6f-10bf48d758ce
-
-Team11UUID:485aa102-2349-11e2-9d6f-10bf48d758ce
-Team11Name:Sonar
-Team11Comp1UUID:bc59a854-234f-11e2-9d6f-10bf48d758ce
-
-Team12UUID:4e841a72-2349-11e2-9d6f-10bf48d758ce
-Team12Name:Starboot
+Team6UUID:e6a0ac0e-2348-11e2-9d6f-10bf48d758ce
+Team6Name:2.4mR
+Team6Comp1UUID:e9e89acc-2350-11e2-9d6f-10bf48d758ce
 
 Comp1UUID:bbf50750-234f-11e2-9d6f-10bf48d758ce
 Comp1Name:Victoria Jurczok
 Comp1NameShort:49erFX
-Comp1Color:00FF00
 Comp1Nationality:GER
 Comp1Description:Anika Lorenz, Tina Lutz, Susann Beucke (Crew)
 Comp1Handicap:1.0000000000
@@ -179,11 +201,11 @@ Comp1HandicapDistance:0.00000
 Comp1StartTime:2012-11-02 12:00:00
 Comp1ClassUUID:d64cebc4-2348-11e2-9d6f-10bf48d758ce
 Comp1RouteUUID:650b2190-245d-11e2-9635-10bf48d758ce
+Comp1Color:00FF00
 
 Comp2UUID:bc00b186-234f-11e2-9d6f-10bf48d758ce
 Comp2Name:Franziska Goltz
 Comp2NameShort:Laser Radial
-Comp2Color:000080
 Comp2Nationality:GER
 Comp2Description:Lisa Rattemeyer, Maximilian Müller, Eric Johannesen
 Comp2Handicap:1.0000000000
@@ -191,11 +213,11 @@ Comp2HandicapDistance:0.00000
 Comp2StartTime:2012-11-02 12:00:00
 Comp2ClassUUID:d64cebc4-2348-11e2-9d6f-10bf48d758ce
 Comp2RouteUUID:650b2190-245d-11e2-9635-10bf48d758ce
+Comp2Color:000080
 
 Comp3UUID:bc2238b0-234f-11e2-9d6f-10bf48d758ce
 Comp3Name:Thomas Piesker
 Comp3NameShort:Mixed
-Comp3Color:800080
 Comp3Nationality:GER
 Comp3Description:Sammy Ostertag, Tim Kröger, Monika Sozanska
 Comp3Handicap:1.0000000000
@@ -203,11 +225,11 @@ Comp3HandicapDistance:0.00000
 Comp3StartTime:2012-11-02 12:00:00
 Comp3ClassUUID:d64cebc4-2348-11e2-9d6f-10bf48d758ce
 Comp3RouteUUID:650b2190-245d-11e2-9635-10bf48d758ce
+Comp3Color:800080
 
 Comp4UUID:bc48f46e-234f-11e2-9d6f-10bf48d758ce
 Comp4Name:Jochen Schümann
 Comp4NameShort:Schümann
-Comp4Color:FF0000
 Comp4Nationality:GER
 Comp4Description:Ingo Borowski, Gunnar Bahr, Britta Oppelt
 Comp4Handicap:1.0000000000
@@ -215,11 +237,11 @@ Comp4HandicapDistance:0.00000
 Comp4StartTime:2012-11-02 12:00:00
 Comp4ClassUUID:d64cebc4-2348-11e2-9d6f-10bf48d758ce
 Comp4RouteUUID:650b2190-245d-11e2-9635-10bf48d758ce
+Comp4Color:FF0000
 
 Comp5UUID:bc59a854-234f-11e2-9d6f-10bf48d758ce
 Comp5Name:Jens Kroker
 Comp5NameShort:Sonar
-Comp5Color:000000
 Comp5Nationality:GER
 Comp5Description:Robert Prem, Siegmund Mainka, Thomas Dehler (Crew)
 Comp5Handicap:1.0000000000
@@ -227,11 +249,11 @@ Comp5HandicapDistance:0.00000
 Comp5StartTime:2012-11-02 12:00:00
 Comp5ClassUUID:d64cebc4-2348-11e2-9d6f-10bf48d758ce
 Comp5RouteUUID:650b2190-245d-11e2-9635-10bf48d758ce
+Comp5Color:000000
 
 Comp6UUID:e9e89acc-2350-11e2-9d6f-10bf48d758ce
 Comp6Name:Heiko Kröger
 Comp6NameShort:2.4mR
-Comp6Color:FF00FF
 Comp6Nationality:GER
 Comp6Description:Bernd Zirkelbach, Oliver Freitag, Carina Bär
 Comp6Handicap:1.0000000000
@@ -239,64 +261,115 @@ Comp6HandicapDistance:0.00000
 Comp6StartTime:2012-11-02 12:00:00
 Comp6ClassUUID:d64cebc4-2348-11e2-9d6f-10bf48d758ce
 Comp6RouteUUID:650b2190-245d-11e2-9635-10bf48d758ce
+Comp6Color:FF00FF
 
-ControlPoint1UUID:00384c0a-2469-11e2-9635-10bf48d758ce
-ControlPoint1Name:SIDE2
-ControlPoint1HasTwoPoints:0
-ControlPoint1ShortName:
-ControlPoint1DataSheet:SIDELINE=LEFT;LEE
-ControlPoint1Mark1Lon:13.170560
-ControlPoint1Mark1Lat:52.426140
+PositionedItem1UUID:487e1a20-854a-013d-8ab3-1c6b00518c70
+PositionedItem1Name:SIDE2
+PositionedItem1CourseArea:
+PositionedItem1Static:0
+PositionedItem1Positions:
+PositionedItem1DataSheet:SIDELINE=LEFT;LEE
 
-ControlPoint2UUID:1c0c8e28-2469-11e2-9635-10bf48d758ce
-ControlPoint2Name:SIDE4
-ControlPoint2HasTwoPoints:0
-ControlPoint2ShortName:
-ControlPoint2DataSheet:SIDELINE=RIGHT;LEE
-ControlPoint2Mark1Lon:13.167548
-ControlPoint2Mark1Lat:52.427422
+PositionedItem2UUID:48bf40a0-854a-013d-8ab4-1c6b00518c70
+PositionedItem2Name:LEE TONNE
+PositionedItem2CourseArea:
+PositionedItem2Static:0
+PositionedItem2Positions:
+PositionedItem2DataSheet:
 
-ControlPoint3UUID:2abc3a72-2469-11e2-9635-10bf48d758ce
-ControlPoint3Name:SIDE3
-ControlPoint3HasTwoPoints:0
-ControlPoint3ShortName:
-ControlPoint3DataSheet:SIDELINE=RIGHT;LUV
-ControlPoint3Mark1Lon:13.165682
-ControlPoint3Mark1Lat:52.426170
+PositionedItem3UUID:492af960-854a-013d-8ab5-1c6b00518c70
+PositionedItem3Name:LEE GATE - 1
+PositionedItem3CourseArea:
+PositionedItem3Static:0
+PositionedItem3Positions:
+PositionedItem3DataSheet:
 
-ControlPoint4UUID:8407d06e-245a-11e2-9635-10bf48d758ce
-ControlPoint4Name:LEE GATE
-ControlPoint4HasTwoPoints:1
-ControlPoint4ShortName:
-ControlPoint4Mark1Lon:13.170787
-ControlPoint4Mark1Lat:52.427922
-ControlPoint4Mark2Lon:13.171217
-ControlPoint4Mark2Lat:52.427800
+PositionedItem4UUID:4996c760-854a-013d-8ab6-1c6b00518c70
+PositionedItem4Name:LEE GATE - 2
+PositionedItem4CourseArea:
+PositionedItem4Static:0
+PositionedItem4Positions:
+PositionedItem4DataSheet:
 
-ControlPoint5UUID:e5094f82-245a-11e2-9635-10bf48d758ce
-ControlPoint5Name:START-FINISH
-ControlPoint5HasTwoPoints:1
-ControlPoint5ShortName:
-ControlPoint5Mark1Lon:13.170845
-ControlPoint5Mark1Lat:52.428497
-ControlPoint5Mark2Lon:13.171792
-ControlPoint5Mark2Lat:52.428005
+PositionedItem5UUID:4a53c690-854a-013d-8ab9-1c6b00518c70
+PositionedItem5Name:START-FINISH - 1
+PositionedItem5CourseArea:
+PositionedItem5Static:0
+PositionedItem5Positions:
+PositionedItem5DataSheet:
 
-ControlPoint6UUID:e93edbf4-2468-11e2-9635-10bf48d758ce
-ControlPoint6Name:SIDE1
-ControlPoint6HasTwoPoints:0
-ControlPoint6ShortName:
-ControlPoint6DataSheet:SIDELINE=LEFT;LUV
-ControlPoint6Mark1Lon:13.169505
-ControlPoint6Mark1Lat:52.424587
+PositionedItem6UUID:4ac925a0-854a-013d-8aba-1c6b00518c70
+PositionedItem6Name:START-FINISH - 2
+PositionedItem6CourseArea:
+PositionedItem6Static:0
+PositionedItem6Positions:
+PositionedItem6DataSheet:
 
-ControlPoint7UUID:ee2fe04e-245a-11e2-9635-10bf48d758ce
-ControlPoint7Name:LUVTONNE
-ControlPoint7HasTwoPoints:0
-ControlPoint7ShortName:
-ControlPoint7Mark1Lon:13.166038
-ControlPoint7Mark1Lat:52.424465
+PositionedItem7UUID:4b3a5d81-854a-013d-8abd-1c6b00518c70
+PositionedItem7Name:SIDE1
+PositionedItem7CourseArea:
+PositionedItem7Static:0
+PositionedItem7Positions:
+PositionedItem7DataSheet:SIDELINE=LEFT;LUV
 
+PositionedItem8UUID:4b7c5f50-854a-013d-8abe-1c6b00518c70
+PositionedItem8Name:LUVTONNE
+PositionedItem8CourseArea:
+PositionedItem8Static:0
+PositionedItem8Positions:
+PositionedItem8DataSheet:
+
+MapItem1UUID:00384c0a-2469-11e2-9635-10bf48d758ce
+MapItem1Name:SIDE2
+MapItem1ShortName:
+MapItem1PositionedItemIds:["487e1a20-854a-013d-8ab3-1c6b00518c70"]
+MapItem1DataSheet:SIDELINE=LEFT;LEE
+
+MapItem2UUID:3b81a4e2-25d5-11e2-9635-10bf48d758ce
+MapItem2Name:LEE TONNE
+MapItem2ShortName:
+MapItem2PositionedItemIds:["48bf40a0-854a-013d-8ab4-1c6b00518c70"]
+
+MapItem3UUID:4a2a2730-854a-013d-8ab7-1c6b00518c70
+MapItem3Name:LEE GATE - 1
+MapItem3ShortName:
+MapItem3PositionedItemIds:["492af960-854a-013d-8ab5-1c6b00518c70"]
+
+MapItem4UUID:4a328ad0-854a-013d-8ab8-1c6b00518c70
+MapItem4Name:LEE GATE - 2
+MapItem4ShortName:
+MapItem4PositionedItemIds:["4996c760-854a-013d-8ab6-1c6b00518c70"]
+
+MapItem5UUID:4b33d1f0-854a-013d-8abb-1c6b00518c70
+MapItem5Name:START-FINISH - 1
+MapItem5ShortName:
+MapItem5PositionedItemIds:["4a53c690-854a-013d-8ab9-1c6b00518c70"]
+
+MapItem6UUID:4b379ec0-854a-013d-8abc-1c6b00518c70
+MapItem6Name:START-FINISH - 2
+MapItem6ShortName:
+MapItem6PositionedItemIds:["4ac925a0-854a-013d-8aba-1c6b00518c70"]
+
+MapItem7UUID:8407d06e-245a-11e2-9635-10bf48d758ce
+MapItem7Name:LEE GATE
+MapItem7ShortName:
+MapItem7PositionedItemIds:["492af960-854a-013d-8ab5-1c6b00518c70", "4996c760-854a-013d-8ab6-1c6b00518c70"]
+
+MapItem8UUID:e5094f82-245a-11e2-9635-10bf48d758ce
+MapItem8Name:START-FINISH
+MapItem8ShortName:
+MapItem8PositionedItemIds:["4a53c690-854a-013d-8ab9-1c6b00518c70", "4ac925a0-854a-013d-8aba-1c6b00518c70"]
+
+MapItem9UUID:e93edbf4-2468-11e2-9635-10bf48d758ce
+MapItem9Name:SIDE1
+MapItem9ShortName:
+MapItem9PositionedItemIds:["4b3a5d81-854a-013d-8abd-1c6b00518c70"]
+MapItem9DataSheet:SIDELINE=LEFT;LUV
+
+MapItem10UUID:ee2fe04e-245a-11e2-9635-10bf48d758ce
+MapItem10Name:LUVTONNE
+MapItem10ShortName:
+MapItem10PositionedItemIds:["4b7c5f50-854a-013d-8abe-1c6b00518c70"]
 
 SegmentFile:segments.php
 Route1UUID:650b2190-245d-11e2-9635-10bf48d758ce
@@ -308,4 +381,3 @@ Route1ControlPoint3UUID:8407d06e-245a-11e2-9635-10bf48d758ce
 Route1ControlPoint4UUID:ee2fe04e-245a-11e2-9635-10bf48d758ce
 Route1ControlPoint5UUID:e5094f82-245a-11e2-9635-10bf48d758ce
 
-//-------- AUTO GENERATED PARAMETERS END ------------------

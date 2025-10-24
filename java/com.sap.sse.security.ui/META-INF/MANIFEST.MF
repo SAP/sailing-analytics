@@ -7,6 +7,7 @@ Bundle-Activator: com.sap.sse.security.ui.server.Activator
 Bundle-Vendor: SAP
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: com.sap.sse,
+ com.sap.sse.landscape.aws.common.shared,
  com.sap.sse.util,
  org.osgi.framework;version="1.3.0",
  org.osgi.util.tracker;version="1.5.1"
@@ -28,7 +29,9 @@ Require-Bundle: org.eclipse.jetty.osgi-servlet-api;bundle-version="3.1.0",
  com.sap.sse.security.common,
  com.sap.sse.mail
 Web-ContextPath: /security/ui
-Export-Package: com.google.gwt.user.client.rpc.core.com.sap.sse.security.shared,
+Export-Package: com.google.gwt.user.client.rpc.core.com.sap.sse.common.media,
+ com.google.gwt.user.client.rpc.core.com.sap.sse.landscape.aws.common.shared,
+ com.google.gwt.user.client.rpc.core.com.sap.sse.security.shared,
  com.google.gwt.user.client.rpc.core.com.sap.sse.security.shared.impl,
  com.google.gwt.user.client.rpc.core.com.sap.sse.security.ui.shared,
  com.sap.sse.security.ui.authentication,
@@ -50,6 +53,7 @@ Export-Package: com.google.gwt.user.client.rpc.core.com.sap.sse.security.shared,
  com.sap.sse.security.ui.client.i18n,
  com.sap.sse.security.ui.client.i18n.subscription,
  com.sap.sse.security.ui.client.premium,
+ com.sap.sse.security.ui.client.premium.settings,
  com.sap.sse.security.ui.client.subscription,
  com.sap.sse.security.ui.client.subscription.chargebee,
  com.sap.sse.security.ui.client.usermanagement,

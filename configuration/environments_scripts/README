@@ -1,16 +1,36 @@
-The environments_scripts directory contains more directories, which map to environment types, each holding scripts and files useful to that environment. Each environment type also contains a "users" folder, which contains subfolders for each user on the system.
-The build-crontab-and-cp-files script uses the contents of these subfolders to create and install a customised crontab for each user in the folder. It does this by concatenating one liner crontabs into an uber crontab.
-Any time the crontab should contain a user's home directory, instead write PATH_OF_HOME_DIR_TO_REPLACE; if the crontab should
-contain the path to the git directory, instead write PATH_OF_GIT_HOME_DIR_TO_REPLACE.
-These are replaced by the build-crontab-and-cp-files script with the correct paths
+The environments_scripts directory contains more directories, which map to environment
+types, each holding scripts and files useful to that environment.
+Each environment type also contains a "users" folder, which contains
+subfolders for each user on the system.
+The build-crontab-and-cp-files script uses the contents of these subfolders to
+create and install a customised crontab for each user in the folder.
+It does this by concatenating one liner crontab files/links following the naming
+pattern "crontab*" into an uber crontab.
+
+For crontab snippet placeholder substitutions, please see
+${GIT_ROOT}/configuration/crontabs/README.
 
 environment_scripts (directory)
 |
-|_environement_type (directory)
+|_{environment_type} (directory)
     |
     |_usefulScripts
+    |_files (directory)
+    |   |
+    |   |_{contents to copy to environment, starting from / folder}
+    |
     |_users (directory)
         |
         |_user1 (directory)
             |
             |_symbolicLinks (to configuration/crontabs)
+
+
+The build-crontab-and-cp-files script is not installed to /usr/local/bin,
+so in order to actually perform this crontab setup and file copying from 
+on an instance, you will need to use the build_crontab_and_setup-files function
+from imageupgrade_functions.sh, which copies the latest environment_scripts 
+folder onto the local instance and then executes the build-crontab-and-cp-files 
+script, within the directory. This allows for a single dependency and calling method.
+Furthermore, it means the latest version of the build-crontab-and-cp-files script 
+is always used.

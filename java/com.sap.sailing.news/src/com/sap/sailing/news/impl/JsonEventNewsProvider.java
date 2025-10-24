@@ -29,6 +29,39 @@ import com.sap.sailing.domain.base.Event;
 import com.sap.sailing.news.EventNewsItem;
 import com.sap.sailing.news.EventNewsProvider;
 
+/**
+ * A simple news provider that feeds off a static JSON file that can be edited outside the application. It is requested
+ * from <a href="htt code and
+ * ps://static.sapsailing.com/events_news/news.json">https://static.sapsailing.com/events_news/news.json</a>. This is
+ * experimental. It can construct multi-lingual output.
+ * <p>
+ * 
+ * Example JSON file:
+ * 
+ * <pre>
+ * [
+ *   {
+ *     "event": "a9d6c5d5-cac3-47f2-9b5c-506e441819a1",
+ *     "timestamp": 1434030000000,
+ *     "title": "Winner's party",
+ *     "titles": {
+ *       "de": "Siegerfeier"
+ *     },
+ *     "message": "... is starting at 9pm",
+ *     "messages": {
+ *       "de": "... beginnt um 21:00 Uhr"
+ *     }
+ *   },
+ *   {
+ *     "event": "a9d6c5d5-cac3-47f2-9b5c-506e441819a1",
+ *     "timestamp": 1434050000000,
+ *     "title": "Test KW2015 2",
+ *     "message": "Test KW2015 2 content",
+ *     "url": "https://www.sapsailing.com/"
+ *   }
+ * ]
+ * </pre>
+ */
 public class JsonEventNewsProvider implements EventNewsProvider {
     private static final int UPDATE_INTERVAL = 60_000;
     private static final int CONNECTION_TIMEOUT = 15_000;
@@ -42,7 +75,7 @@ public class JsonEventNewsProvider implements EventNewsProvider {
     
     static {
         try {
-            staticNewsURL = new URL("http://static.sapsailing.com/events_news/news.json");
+            staticNewsURL = new URL("https://static.sapsailing.com/events_news/news.json");
         } catch (MalformedURLException e) {
         }
     }
@@ -51,12 +84,11 @@ public class JsonEventNewsProvider implements EventNewsProvider {
     }
     
     private synchronized void update() {
-        if(nextUpdate >= System.currentTimeMillis()) {
+        if (nextUpdate >= System.currentTimeMillis()) {
             // update already done
             return;
         }
         nextUpdate = System.currentTimeMillis() + UPDATE_INTERVAL;
-        
         try {
             BufferedReader bufferedReader = null;
             try {
@@ -79,7 +111,7 @@ public class JsonEventNewsProvider implements EventNewsProvider {
                     Map<Locale, String> messages = readI18nText(eventAsJson, "messages");
                     String newsURL = (String) eventAsJson.get("url");
                     UUID eventId = UUID.fromString(eventIdAsString);
-                    InfoEventNewsItem newsItem = new InfoEventNewsItem(eventId, title, message, new Date(timestamp.longValue()), null, newsURL == null ? null : new URL(newsURL), titles, messages);
+                    InfoEventNewsItem newsItem = new InfoEventNewsItem(eventId, title, message, new Date(timestamp.longValue()), newsURL == null ? null : new URL(newsURL), titles, messages);
                     newNews.add(newsItem);
                 }
                 news = newNews;
@@ -95,7 +127,7 @@ public class JsonEventNewsProvider implements EventNewsProvider {
     
     private Map<Locale, String> readI18nText(JSONObject eventAsJson, String field) {
         Object object = eventAsJson.get(field);
-        if(object == null) {
+        if (object == null) {
             return Collections.emptyMap();
         }
         JSONObject texts = (JSONObject) object;
@@ -109,34 +141,16 @@ public class JsonEventNewsProvider implements EventNewsProvider {
 
     @Override
     public Collection<? extends EventNewsItem> getNews(Event event) {
-        if(nextUpdate < System.currentTimeMillis()) {
+        if (nextUpdate < System.currentTimeMillis()) {
             update();
         }
-        
         UUID eventId = event.getId();
         List<InfoEventNewsItem> result = new LinkedList<>();
-        for(InfoEventNewsItem newsEntry: news) {
-            if(eventId.equals(newsEntry.getEventUUID())) {
+        for (InfoEventNewsItem newsEntry : news) {
+            if (eventId.equals(newsEntry.getEventUUID())) {
                 result.add(newsEntry);
             }
         }
-        
         return result;
     }
-
-    @Override
-    public Collection<? extends EventNewsItem> getNews(Event event, Date startingFrom) {
-        return getNews(event);
-    }
-
-    @Override
-    public boolean hasNews(Event event, Date startingFrom) {
-        return news.size() > 0;
-    }
-
-    @Override
-    public boolean hasNews(Event event) {
-        return news.size() > 0;
-    }
-
 }

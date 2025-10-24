@@ -1,6 +1,6 @@
 package com.sap.sailing.server.replication.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.server.operationaltransformation.CreateLeaderboardGroup;
 import com.sap.sse.replication.ReplicaDescriptor;
@@ -21,7 +21,7 @@ public class ReplicationInstancesManagerLoggingPerformanceTest {
     private CreateLeaderboardGroup operation;
     private ReplicaDescriptor replica;
 
-    @Before
+    @BeforeEach
     public void setUp() throws UnknownHostException {
         replicationInstanceManager = new ReplicationInstancesManager();
         replica = new ReplicaDescriptorImpl(InetAddress.getLocalHost(), 8888, UUID.randomUUID(), "", /* replicableIds */ new String[] { "Humba" });

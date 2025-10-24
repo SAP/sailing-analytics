@@ -159,10 +159,12 @@ public interface ReplicableWithObjectInputStream<S, O extends OperationWithResul
     }
 
     /**
-     * The operation is executed by immediately {@link Operation#internalApplyTo(Object) applying} it to this
-     * service object. It is then replicated to all replicas if and only if the operation is marked as
+     * The operation is executed by immediately {@link Operation#internalApplyTo(Object) applying} it to this service
+     * object. It is then replicated to all replicas if and only if the operation is marked as
      * {@link OperationWithResult#isRequiresExplicitTransitiveReplication()}.
      * 
+     * @return the result of applying the operation locally; results of applying the operation on other nodes of the
+     *         replica set are not considered
      * @see {@link #replicate(RacingEventServiceOperation)}
      */
     default <T> T applyReplicated(O operation) {

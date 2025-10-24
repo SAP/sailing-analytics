@@ -2,7 +2,7 @@ package com.sap.sailing.gwt.ui.adminconsole.coursecreation;
 
 import java.util.UUID;
 
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -40,7 +40,7 @@ public class MarkRoleEditDialog extends DataEntryDialog<MarkRoleDTO> {
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return nameTextBox;
     }
 

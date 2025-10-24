@@ -246,10 +246,10 @@ To overcome this issue the stretchFactor is introduced wich is supposed to refle
   - Step 3. Instead of using the timeSailedByFastestCompetitor use the clacTime@fastest of the median or slowest competitor.
   - Step 6. From the position of the fastest competitor in the race compute the timeToAdd based on the slowest or median competitor.
 
-### ORC Performance Curve >= 2015
+### ORC Polar Curve Scoring (PCS) >= 2015 (formerly "Performance Curve Scoring")
 
 For PCS >= 2015, the delta between allowance and sailed time is formed for every competitor. Subsequently, the percentage of the course that the competitor has already sailed is recorded. Finally, it is determined how large the delta would be if the competitor continued sailing with his current performance until he reaches the finish. These computed deltas are then used for comparison in the leaderboard.
 
-### ORC Performance Curve < 2015
+### ORC Polar Curve Scoring (PCS) < 2015 (formerly "Performance Curve Scoring")
 
 Just order the competitors across all fleets by their implied wind. In order to have calculated times reflect the merged order then a common scratch boat would have to be chosen for converting the implied wind values to times. But this would lead to different calculated times in the individual races compared to the merged view, and this makes things more complicated than necessary. Also, a common scratch boat can still be chosen for those races manually, providing a clean solution to this problem. With the implied wind as the sorting criteria it is also easy for users to select this column and validate and comprehend the ordering.

@@ -4,9 +4,10 @@ import java.util.Date;
 
 import javax.xml.bind.DatatypeConverter;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.event.EventConfigurationPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardConfigurationPanelPO;
@@ -19,8 +20,6 @@ import com.sap.sailing.selenium.pages.adminconsole.regatta.SeriesEditDialogPO;
 import com.sap.sailing.selenium.pages.leaderboard.PairinfListCreationDialogPO;
 import com.sap.sailing.selenium.pages.leaderboard.PairingListCreationSetupDialogPO;
 import com.sap.sailing.selenium.test.AbstractSeleniumTest;
-
-import org.junit.Assert;
 
 public class PairinglistTest extends AbstractSeleniumTest {
     private static final String EVENT = "TestEvent";
@@ -38,13 +37,13 @@ public class PairinglistTest extends AbstractSeleniumTest {
     private static final String SERIES_DEFAULT = "Default";
     
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot());
         super.setUp();
     }
 
-    @Test
+    @SeleniumTestCase
     public void createEventAndTestPOForCalculation() throws InterruptedException {
         final RegattaDescriptor regattaDescriptor = new RegattaDescriptor(REGATTA_49ER, BOAT_CLASS_49ER);
         {
@@ -75,19 +74,19 @@ public class PairinglistTest extends AbstractSeleniumTest {
             LeaderboardEntryPO leaderboardEntryPO = leaderboardConfigurationPanelPO.getLeaderboardTable()
                     .getEntry(REGATTA_49ER_WITH_SUFFIX);
             PairingListCreationSetupDialogPO dialog = leaderboardEntryPO.getLeaderboardPairingListCreationSetupDialog();
-            Assert.assertTrue(!dialog.isOkButtonEnabled());
+            Assertions.assertTrue(!dialog.isOkButtonEnabled());
             dialog.setCompetitorsCount("1");
-            Assert.assertTrue(dialog.isOkButtonEnabled());
+            Assertions.assertTrue(dialog.isOkButtonEnabled());
             dialog.setCompetitorsCount("-1");
-            Assert.assertTrue(!dialog.isOkButtonEnabled());
+            Assertions.assertTrue(!dialog.isOkButtonEnabled());
             dialog.setCompetitorsCount("17");
-            Assert.assertTrue(dialog.isOkButtonEnabled());
+            Assertions.assertTrue(dialog.isOkButtonEnabled());
             dialog.setCompetitorsCount("18");
-            Assert.assertTrue(dialog.isOkButtonEnabled());
+            Assertions.assertTrue(dialog.isOkButtonEnabled());
             PairinfListCreationDialogPO dialog2 = dialog.pressOk();
-            Assert.assertEquals("12", dialog2.getValueOfFlightsLabel());
-            Assert.assertEquals("1", dialog2.getValueOfGroupsLabel());
-            Assert.assertEquals("18", dialog2.getValueOfCompetitorsLabel());
+            Assertions.assertEquals("12", dialog2.getValueOfFlightsLabel());
+            Assertions.assertEquals("1", dialog2.getValueOfGroupsLabel());
+            Assertions.assertEquals("18", dialog2.getValueOfCompetitorsLabel());
             dialog2.pressClose();
         }
         {
@@ -99,24 +98,24 @@ public class PairinglistTest extends AbstractSeleniumTest {
                     .getEntry(REGATTA_49ER_WITH_SUFFIX);
             PairingListCreationSetupDialogPO dialog = leaderboardEntryPO.getLeaderboardPairingListCreationSetupDialog();
             dialog.setCompetitorsCount("18");
-            Assert.assertTrue(!dialog.isFlightMultiplierBoxEnabled());
+            Assertions.assertTrue(!dialog.isFlightMultiplierBoxEnabled());
             for (int i = 0; i < 1000; i++) {
                 dialog.clickFlightMultiplierCheckBox();
                 if (dialog.getValueOfFlightMultiplierCheckBox()) {
                     break;
                 }
             }
-            Assert.assertTrue(dialog.isFlightMultiplierBoxEnabled());
+            Assertions.assertTrue(dialog.isFlightMultiplierBoxEnabled());
             Thread.sleep(5000);
             dialog.setFlightMultiplier("0");
-            Assert.assertTrue(!dialog.isOkButtonEnabled());
+            Assertions.assertTrue(!dialog.isOkButtonEnabled());
             dialog.setFlightMultiplier("2");
-            Assert.assertTrue(dialog.isOkButtonEnabled());
+            Assertions.assertTrue(dialog.isOkButtonEnabled());
             PairinfListCreationDialogPO dialog2 = dialog.pressOk();
-            Assert.assertEquals("12", dialog2.getValueOfFlightsLabel());
-            Assert.assertEquals("1", dialog2.getValueOfGroupsLabel());
-            Assert.assertEquals("18", dialog2.getValueOfCompetitorsLabel());
-            Assert.assertEquals("2", dialog2.getValueOfMultiplerLabel());
+            Assertions.assertEquals("12", dialog2.getValueOfFlightsLabel());
+            Assertions.assertEquals("1", dialog2.getValueOfGroupsLabel());
+            Assertions.assertEquals("18", dialog2.getValueOfCompetitorsLabel());
+            Assertions.assertEquals("2", dialog2.getValueOfMultiplerLabel());
             dialog2.pressClose();
         }
     }

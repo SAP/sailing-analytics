@@ -1,13 +1,13 @@
 package com.sap.sse.shared.android.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.filter.TextOperator;
 import com.sap.sse.common.filter.TextOperator.Operators;
@@ -31,6 +31,7 @@ public abstract class AbstractSettingsSerializationTestWithSettingsMap<SOT> exte
         private transient StringSetting booleanSetting;
         
         public UntypedSettings(String enumValue, Collection<String> enumValues, String numberValue, String booleanValue) {
+            super();
             enumSetting.setValue(enumValue);
             enumSetSetting.setValues(enumValues);
             numberSetting.setValue(numberValue);
@@ -47,6 +48,10 @@ public abstract class AbstractSettingsSerializationTestWithSettingsMap<SOT> exte
     }
     
     private static class TypedSettings extends AbstractGenericSerializableSettings {
+        public TypedSettings() {
+            super();
+        }
+
         private static final long serialVersionUID = -2265305217290147424L;
         @SuppressWarnings("unused")
         private transient EnumSetting<TextOperator.Operators> enumSetting;

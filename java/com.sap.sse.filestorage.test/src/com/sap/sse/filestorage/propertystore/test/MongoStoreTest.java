@@ -5,9 +5,9 @@ import static org.hamcrest.Matchers.equalTo;
 
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.TypeBasedServiceFinder;
 import com.sap.sse.common.impl.SingleTypeBasedServiceFinderImpl;
@@ -23,12 +23,12 @@ import com.sap.sse.mongodb.MongoDBConfiguration;
 public class MongoStoreTest {
     private MongoDBConfiguration config = MongoDBConfiguration.getDefaultTestConfiguration();
 
-    @Before
+    @BeforeEach
     public void setup() {
         config.getService().getDB().drop();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         config.getService().getDB().drop();
     }

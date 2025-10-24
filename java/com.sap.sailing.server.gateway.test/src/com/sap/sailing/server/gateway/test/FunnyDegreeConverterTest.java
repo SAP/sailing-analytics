@@ -1,8 +1,8 @@
 package com.sap.sailing.server.gateway.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.server.gateway.windimport.bravo.FunnyDegreeConverter;
 

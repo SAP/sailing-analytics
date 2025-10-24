@@ -35,7 +35,7 @@ import com.sap.sse.common.Util.Pair;
 import com.sap.sse.util.HttpUrlConnectionHelper;
 
 public class YellowBrickTrackingAdapterImpl implements YellowBrickTrackingAdapter {
-    private final static Duration TIMEOUT_FOR_RACE_LOADING = Duration.ONE_MINUTE;
+    private final static Duration TIMEOUT_FOR_RACE_LOADING = Duration.ONE_MINUTE.times(2);
     final static Duration DEFAULT_POLLING_INTERVAL = Duration.ONE_MINUTE.times(1);
     
     /**

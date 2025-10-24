@@ -1,16 +1,16 @@
 package com.sap.sailing.domain.tracking.impl;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixImpl;
 import com.sap.sse.common.Duration;
 
 public class PositionInterpolationAndExtrapolationWithoutSpeedInfoTest extends PositionInterpolationAndExtrapolationTest<GPSFix> {
-    @Before
+    @BeforeEach
     public void setUp() {
         super.setUp();
         setTrack(new DynamicGPSFixTrackImpl<>(new Object(), /* millisecondsOverWhichToAverage */ 8000));

@@ -1,55 +1,47 @@
 package com.sap.sailing.domain.igtimiadapter.gateway.impl;
 
-import java.io.IOException;
-
-import org.apache.http.client.ClientProtocolException;
-import org.json.simple.parser.ParseException;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
 
-import com.sap.sailing.domain.igtimiadapter.Client;
-import com.sap.sailing.domain.igtimiadapter.IgtimiConnectionFactory;
+import com.sap.sailing.domain.igtimiadapter.server.riot.RiotServer;
 import com.sap.sse.replication.FullyInitializedReplicableTracker;
 import com.sap.sse.security.SecurityService;
 import com.sap.sse.util.ServiceTrackerFactory;
 
 /**
- * Maintains data about a default {@link Client} that represents this application when interacting with the Igtimi
- * server. The corresponding default {@link IgtimiConnectionFactory} can be obtained from within this bundle using
- * {@link #getInstance()}.{@link #getConnectionFactory()}. Clients outside this bundle shall track the
- * {@link IgtimiConnectionFactory} OSGi service that this activator registers with the OSGi system upon
- * {@link #start(BundleContext)}.
+ * Maintains a tracker for the {@link SecurityService} that REST resources in this bundle can access through
+ * the {@link #getInstance()}.{@link #getSecurityService()} combination.
  * 
  * @author Axel Uhl (d043530)
  * 
  */
 public class Activator implements BundleActivator {
     private static Activator INSTANCE;
-    private ServiceTracker<IgtimiConnectionFactory, IgtimiConnectionFactory> igtimiConnectionFactoryTracker;
     private FullyInitializedReplicableTracker<SecurityService> securityServiceTracker;
+    private ServiceTracker<RiotServer, RiotServer> riotServerTracker;
     
-    public Activator() throws ClientProtocolException, IllegalStateException, IOException, ParseException {
+    public Activator() {
     }
 
     @Override
     public void start(final BundleContext context) throws Exception {
         INSTANCE = this;
-        igtimiConnectionFactoryTracker = ServiceTrackerFactory.createAndOpen(context, IgtimiConnectionFactory.class);
         securityServiceTracker = FullyInitializedReplicableTracker.createAndOpen(context, SecurityService.class);
+        riotServerTracker = ServiceTrackerFactory.createAndOpen(context, RiotServer.class);
     }
     
-    public static Activator getInstance() throws ClientProtocolException, IllegalStateException, IOException, ParseException {
+    public static Activator getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new Activator(); // probably non-OSGi case, as in test execution
         }
         return INSTANCE;
     }
     
-    public IgtimiConnectionFactory getConnectionFactory() {
-        return igtimiConnectionFactoryTracker.getService();
+    public RiotServer getRiotServer() {
+        return riotServerTracker.getService();
     }
-
+    
     public SecurityService getSecurityService() {
         try {
             return securityServiceTracker.getInitializedService(0);
@@ -60,8 +52,6 @@ public class Activator implements BundleActivator {
 
     @Override
     public void stop(BundleContext context) throws Exception {
-        igtimiConnectionFactoryTracker.close();
-        igtimiConnectionFactoryTracker = null;
         securityServiceTracker.close();
         securityServiceTracker = null;
     }

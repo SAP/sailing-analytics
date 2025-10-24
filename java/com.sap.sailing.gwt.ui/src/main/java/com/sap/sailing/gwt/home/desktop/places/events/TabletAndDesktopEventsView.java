@@ -13,6 +13,7 @@ import com.sap.sailing.gwt.home.shared.places.events.EventsPlace;
 import com.sap.sailing.gwt.home.shared.places.start.StartPlace;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sse.gwt.client.breadcrumb.BreadcrumbPane;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 
 public class TabletAndDesktopEventsView extends AbstractEventsView {
     private static EventsPageViewUiBinder uiBinder = GWT.create(EventsPageViewUiBinder.class);
@@ -57,8 +58,8 @@ public class TabletAndDesktopEventsView extends AbstractEventsView {
     }
 
     @Override 
-    protected void updateEventsUI() {
-        recentEventsWidget.updateEvents(eventListView.getRecentEvents());
+    protected void updateEventsUI(TakedownNoticeService takedownNoticeService) {
+        recentEventsWidget.updateEvents(eventListView.getRecentEvents(), takedownNoticeService);
         upcomingEventsWidget.updateEvents(eventListView.getUpcomingEvents());
     }
 }

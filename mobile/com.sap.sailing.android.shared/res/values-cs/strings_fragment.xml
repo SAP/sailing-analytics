@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><resources>
+<?xml version="1.0" encoding="utf-8" standalone="no"?><resources>
     <string name="scan_qr">"Skenovat QR kód"</string>
     <string name="scan_hint">"QR kód naleznete v potvrzení účasti."</string>
     <string name="no_qr_code">"Nemáte QR kód?"</string>

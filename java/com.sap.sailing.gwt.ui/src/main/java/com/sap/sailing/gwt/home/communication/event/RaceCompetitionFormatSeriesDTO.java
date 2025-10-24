@@ -3,7 +3,7 @@ package com.sap.sailing.gwt.home.communication.event;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
+import com.sap.sse.gwt.shared.DTO;
 
 public class RaceCompetitionFormatSeriesDTO implements DTO {
 

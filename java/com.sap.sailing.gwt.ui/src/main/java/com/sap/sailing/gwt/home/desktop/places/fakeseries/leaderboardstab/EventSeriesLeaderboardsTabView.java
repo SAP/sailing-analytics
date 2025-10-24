@@ -36,6 +36,7 @@ import com.sap.sse.gwt.client.shared.settings.DefaultOnSettingsLoadedCallback;
 import com.sap.sse.gwt.shared.GwtHttpRequestUtils;
 import com.sap.sse.security.ui.client.UserService;
 import com.sap.sse.security.ui.client.premium.PaywallResolver;
+import com.sap.sse.security.ui.client.premium.PaywallResolverImpl;
 import com.sap.sse.security.ui.client.subscription.SubscriptionServiceFactory;
 import com.sap.sse.security.ui.settings.PlaceBasedComponentContextWithSettingsStorage;
 import com.sap.sse.security.ui.settings.StoredSettingsLocation;
@@ -162,7 +163,7 @@ public class EventSeriesLeaderboardsTabView extends Composite implements SeriesT
 
     private ComponentContext<MultiRaceLeaderboardSettings> createLeaderboardComponentContext(String leaderboardName, UserService userService,
             SubscriptionServiceFactory subscriptionServiceFactory, String placeToken, Iterable<DetailType> availableDetailTypes, AbstractLeaderboardDTO leaderboardDTO) {
-        PaywallResolver paywallResolver = new PaywallResolver(userService, subscriptionServiceFactory);
+        PaywallResolver paywallResolver = new PaywallResolverImpl(userService, subscriptionServiceFactory);
         final MultipleMultiLeaderboardPanelLifecycle lifecycle = new MultipleMultiLeaderboardPanelLifecycle(StringMessages.INSTANCE, availableDetailTypes, paywallResolver, leaderboardDTO);
         final StoredSettingsLocation storageDefinition = StoredSettingsLocationFactory.createStoredSettingsLocatorForSeriesRegattaLeaderboards(leaderboardName);
 

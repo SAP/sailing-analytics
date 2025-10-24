@@ -9,9 +9,12 @@ public class PairingListContextDefinition extends AbstractGenericSerializableSet
     
     private transient StringSetting leaderboardName;
 
-    public PairingListContextDefinition() { }
+    public PairingListContextDefinition() {
+        super();
+    }
     
     public PairingListContextDefinition(String leaderboardName) {
+        this();
         this.leaderboardName.setValue(leaderboardName);
     }
     

@@ -1,6 +1,7 @@
 package com.sap.sse.gwt.adminconsole;
 
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
 import com.sap.sse.gwt.client.celltable.CellTableWithCheckboxResources;
 import com.sap.sse.gwt.client.celltable.CellTableWithCheckboxStyle;
 
@@ -60,6 +61,11 @@ public interface AdminConsoleTableResources extends CellTableWithCheckboxResourc
          * Applied to the disabled rows
          */
         String cellTableDisabledRow();
+
+        /**
+         * Can be applied to table {@link Column}s to let them wrap their text
+         */
+        String cellTableWrapText();
     }
 
     @Override

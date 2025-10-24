@@ -2,6 +2,8 @@
 
 [[_TOC_]]
 
+(Deprecated)
+
 This is a package to enable running the SAP Sailing Analytics from a stick.
 It is provided as-is without warranty. The most common usecase is to have a laptop 
 running in a lounge that replicates data from a master server that runs in the cloud.

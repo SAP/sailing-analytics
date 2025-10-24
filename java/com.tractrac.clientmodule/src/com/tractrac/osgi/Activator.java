@@ -5,9 +5,9 @@ import org.osgi.framework.BundleContext;
 
 import com.tractrac.dataflow.lib.api.DataflowLocator;
 import com.tractrac.dataflow.lib.impl.DefaultDataProviderFactory;
-import com.tractrac.dataflow.lib.prov.live.tcp.provider.TCPLiveProviderFactory;
+import com.tractrac.dataflow.lib.prov.live.tcp.LiveDataProviderTCPFactory;
 import com.tractrac.dataflow.lib.prov.stored.mtb.MTBStoredDataProviderFactory;
-import com.tractrac.dataflow.lib.prov.stored.tcp.TCPStoredProviderFactory;
+import com.tractrac.dataflow.lib.prov.stored.tcp.StoredDataProviderTCPFactory;
 import com.tractrac.dataflow.lib.spi.DataflowProviderLocator;
 import com.tractrac.message.system.lib.api.MessageSystemLocator;
 import com.tractrac.message.system.lib.impl.client.ClientSocketFactory;
@@ -31,8 +31,8 @@ public class Activator implements BundleActivator {
         LoggerLocator.registerParameterSetFactory(new DefaultLoggerManager());
         UtilLocator.registerParameterSetFactory(new DefaultParameterSetFactory());
         DataflowLocator.registerDataProviderFactory(new DefaultDataProviderFactory());
-        DataflowProviderLocator.registerLiveDataProviderFactory(new TCPLiveProviderFactory());
-        DataflowProviderLocator.registerStoredDataProviderFactory(new TCPStoredProviderFactory());
+        DataflowProviderLocator.registerLiveDataProviderFactory(new LiveDataProviderTCPFactory());
+        DataflowProviderLocator.registerStoredDataProviderFactory(new StoredDataProviderTCPFactory());
         DataflowProviderLocator.registerStoredDataProviderFactory(new MTBStoredDataProviderFactory());
         ModelLocator.registerAttachmentManager(new DefaultAttachmentManager());
         ModelLocator.registerEventFactory(new EventFactory());

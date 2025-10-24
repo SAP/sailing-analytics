@@ -2,8 +2,8 @@ package com.sap.sailing.gwt.home.communication.regatta;
 
 import java.io.Serializable;
 
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
 import com.sap.sse.gwt.dispatch.shared.commands.Result;
+import com.sap.sse.gwt.shared.DTO;
 
 public class SimpleRegattaDTO implements DTO, Result, Serializable {
 

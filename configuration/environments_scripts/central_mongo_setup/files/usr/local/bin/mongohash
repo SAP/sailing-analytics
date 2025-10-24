@@ -1,0 +1,54 @@
+#!/bin/bash
+PORT=27017
+HOST=localhost
+
+if [ -z "$1" ]; then
+  echo "Usage: $0 [ OPTIONS ] [ \"mongodb://...\" ]"
+  echo "Where [ OPTIONS ] are:"
+  echo " -p PORT	the port to use, default $PORT"
+  echo " -d DATABASE	the name of the database to use; mandatory, if no URI is specified"
+  echo " -h HOST	the host to use, default $HOST"
+  echo " -r REPLICA_SET	the name of the replica set; no default, assuming connecting to PRIMARY"
+  echo " -a		show all hashes of all collections in the database specified, not just the DB hash"
+  echo
+  echo "Prints the dbHash(...) output to stdout and the URI used to stderr."
+  echo "Example: $0 \"mongodb://localhost:10203/49er?replicaSet=live\""
+  echo " stderr: URI=mongodb://localhost:10203/49er?replicaSet=live"
+  echo " stdout: f17293af5ff32f9e2ad76056b1ff9897"
+  echo "Example: $0 -h dbserver.internal.sapsailing.com -p 10202 -d 49er"
+  echo " stderr: URI=mongodb://dbserver.internal.sapsailing.com:1020r/49er"
+  echo " stdout: f17293af5ff32f9e2ad76056b1ff9897"
+  exit 1
+fi
+
+options='p:d:h:r:a'
+while getopts $options option
+do
+    case $option in
+	a) ALL=1;;
+	p) PORT=$OPTARG;;
+	d) DB=$OPTARG;;
+	h) HOST=$OPTARG;;
+	r) REPLICA_SET=$OPTARG;;
+        \?) echo "Invalid option" >&2
+            exit 4;;
+    esac
+done
+# Consume the remaining argument as an optional URI:
+URI=${!OPTIND}
+if [ -z "$DB" -a -z "$URI" ]; then
+  echo "Database unknown. Either -d or URI argument required." >&2
+  exit 5
+fi
+if [ -z "$URI" ]; then
+  URI="mongodb://$HOST:$PORT/$DB"
+  if [ -n "$REPLICA_SET" ]; then
+    URI="${URI}?replicaSet=$REPLICA_SET"
+  fi
+fi
+echo "URI: $URI" >&2
+if [ -z $ALL ]; then
+  mongosh --eval "db.runCommand({dbHash: 1}).md5" --quiet "$URI"
+else 
+  mongosh --eval "db.runCommand({dbHash: 1}).md5" --quiet "$URI"
+fi

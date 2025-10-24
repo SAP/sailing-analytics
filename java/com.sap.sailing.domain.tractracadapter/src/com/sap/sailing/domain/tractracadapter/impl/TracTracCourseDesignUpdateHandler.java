@@ -13,7 +13,7 @@ import com.sap.sailing.domain.tracking.impl.CourseDesignUpdateHandler;
 import com.sap.sailing.domain.tractracadapter.DomainFactory;
 import com.sap.sse.common.Util;
 import com.tractrac.model.lib.api.event.IRace;
-import com.tractrac.model.lib.api.route.IControl;
+import com.tractrac.model.lib.api.map.IMapItem;
 
 public class TracTracCourseDesignUpdateHandler extends CourseDesignUpdateHandler {
     private final IRace tractracRace;
@@ -27,7 +27,7 @@ public class TracTracCourseDesignUpdateHandler extends CourseDesignUpdateHandler
 
     @Override
     protected CourseBase replaceControlPointsByMatchingExistingControlPoints(CourseBase courseDesign) {
-        final Iterable<IControl> candidates = domainFactory.getControlsForCourseArea(tractracRace.getEvent(), tractracRace.getCourseArea());
+        final Iterable<IMapItem> candidates = domainFactory.getControlsForCourseArea(tractracRace.getEvent(), tractracRace.getCourseArea());
         final CourseBase result = new CourseDataImpl(courseDesign.getName());
         int zeroBasedPosition = 0;
         boolean changed = false;

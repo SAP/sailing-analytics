@@ -1,0 +1,86 @@
+name: Create Docker Image
+permissions:
+  contents: read
+  packages: write
+on:
+  workflow_run:
+    workflows: [release]
+    types: [completed]
+    branches: [main, docker-24]
+  workflow_dispatch:
+    inputs:
+      release:
+        description: Release
+        default: ''
+jobs:
+  create-docker-image-job:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Convert repo name to lowercase GHCR package
+        id: ghcr
+        env:
+            GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          # $GITHUB_REPOSITORY is in format owner/repo
+          OWNER=${GITHUB_REPOSITORY%%/*}          # extract owner
+          REPO=${GITHUB_REPOSITORY##*/}           # extract repo
+          OWNER_LOWER=$(echo "$OWNER" | tr '[:upper:]' '[:lower:]')  # lowercase owner
+          REPO_LOWER=$(echo "$REPO" | tr '[:upper:]' '[:lower:]')  # lowercase repo
+          PACKAGE="$OWNER_LOWER/$REPO_LOWER"
+          echo "PACKAGE=${PACKAGE}" >> $GITHUB_OUTPUT
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.workflow_dispatch.ref || github.event.workflow_run.head_branch }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@53851d14592bedcffcf25ea515637cff71ef929a
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5 # v3.8.0
+      - name: Login to ghcr.io to upload sailing-analytics image
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Copy a few files
+        shell: bash
+        run: |
+          cp "java/target/env.sh" docker/
+          cp "java/target/start" docker/
+          cp "java/target/configuration/JavaSE-11.profile" docker/
+      - name: Determine release
+        shell: bash
+        run: |
+          echo "BRANCH=$( git branch --show-current )
+          RELEASE_PREFIX=$( if [ "${{ github.event.inputs.release }}" = "" ]; then
+            echo "$( git branch --show-current )-"
+          else
+            echo "${{ github.event.inputs.release }}"
+          fi )
+          BEARER_TOKEN=${{ secrets.GITHUB_TOKEN }}" >>${GITHUB_ENV}
+      - name: Download release
+        shell: bash
+        run: |
+          RELEASE_TAR_GZ_FILENAME=$( configuration/github-download-release-assets.sh ${{ secrets.GITHUB_TOKEN }} ${{ env.RELEASE_PREFIX }} ${{ github.repository }} )
+          RELEASE=$( echo ${RELEASE_TAR_GZ_FILENAME} | sed -e 's/\.tar\.gz$//' )
+          if [ -n ${RELEASE_TAR_GZ_FILENAME} ]; then
+            mv ${RELEASE_TAR_GZ_FILENAME} docker/
+          fi
+          echo "RELEASE=${RELEASE}" >>${GITHUB_ENV}
+      - name: Build & push Docker image
+        uses: docker/build-push-action@ca877d9245402d1537745e0e356eab47c3520991 # v6.13.0
+        with:
+          build-args: RELEASE=${{ env.RELEASE }}
+          tags: ghcr.io/${{steps.ghcr.outputs.PACKAGE}}:${{ env.RELEASE }}${{ env.BRANCH == 'main' && github.event.inputs.release == '' && format(',ghcr.io/{0}:latest', steps.ghcr.outputs.PACKAGE) || env.BRANCH == 'docker-17' && github.event.inputs.release == '' && format(',ghcr.io/{0}:latest-17', steps.ghcr.outputs.PACKAGE) || env.BRANCH == 'docker-21' && github.event.inputs.release == '' && format(',ghcr.io/{0}:latest-21', steps.ghcr.outputs.PACKAGE) || env.BRANCH == 'docker-24' && github.event.inputs.release == '' && format(',ghcr.io/{0}:latest-24', steps.ghcr.outputs.PACKAGE) || '' }}
+          annotations: |
+            maintainer=axel.uhl@sap.com
+            index:org.opencontainers.image.title=Sailing Analytics
+            index:org.opencontainers.image.description=The Sailing Analytics Web Application
+          file: ${{ env.BRANCH == 'docker-17' && 'docker/Dockerfile_sapsailing_on_sapmachine17' || env.BRANCH == 'docker-21' && 'docker/Dockerfile_sapsailing_on_sapmachine21' || env.BRANCH == 'docker-24' && 'docker/Dockerfile_sapsailing_on_sapmachine24' || 'docker/Dockerfile' }}
+          context: docker/
+          platforms: linux/amd64,linux/arm64
+          push: true
+      - name: Clean up copied files
+        shell: bash
+        run: rm docker/start docker/env.sh docker/JavaSE-11.profile docker/${{ env.RELEASE }}.tar.gz release-notes.txt

@@ -26,8 +26,10 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
+import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.util.NaturalComparator;
+import com.sap.sse.gwt.client.DateAndTimeFormatterUtil;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.celltable.AbstractSortableTextColumn;
 import com.sap.sse.gwt.client.celltable.CellTableWithCheckboxResources;
@@ -156,6 +158,10 @@ extends TableWrapper<UserDTO, S, StringMessages, TR> {
                 return new NaturalComparator().compare(r1.getRoles().toString(), r2.getRoles().toString());
             }
         });
+        final TextColumn<UserDTO> lockedUntilColumn = new AbstractSortableTextColumn<UserDTO>(
+                user->user.getLockedUntil() != null && user.getLockedUntil().after(TimePoint.now()) ?
+                        DateAndTimeFormatterUtil.dateTimeMedium.render(user.getLockedUntil().asDate()) : "",
+                userColumnListHandler);
         final HasPermissions type = SecuredSecurityTypes.USER;
         final AccessControlledActionsColumn<UserDTO, DefaultActionsImagesBarCell> userActionColumn = create(
                 new DefaultActionsImagesBarCell(stringMessages), userService);
@@ -223,6 +229,7 @@ extends TableWrapper<UserDTO, S, StringMessages, TR> {
         table.addColumn(groupsColumn, stringMessages.groups());
         table.addColumn(rolesColumn, stringMessages.roles());
         table.addColumn(permissionsColumn, stringMessages.permissions());
+        table.addColumn(lockedUntilColumn, stringMessages.lockedUntil());
         SecuredDTOOwnerColumn.configureOwnerColumns(table, userColumnListHandler, stringMessages);
         table.addColumn(userActionColumn, stringMessages.actions());
         table.ensureDebugId("UsersTable");

@@ -1,24 +1,24 @@
 package com.sap.sailing.declination.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.text.ParseException;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.declination.Declination;
 import com.sap.sailing.declination.impl.ColoradoImporter;
 import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
-@Ignore("currently, http://magcalc.geomag.info/ seems down")
+@Disabled("currently, http://magcalc.geomag.info/ seems down")
 public class ColoradoDeclinationServiceTest extends DeclinationServiceTest<ColoradoImporter> {
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         importer = new ColoradoImporter();
         super.setUp();

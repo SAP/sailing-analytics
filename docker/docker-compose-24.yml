@@ -1,0 +1,19 @@
+version: "3.10"
+services:
+  sailing-analytics:
+    image: "ghcr.io/sap/sailing-analytics:latest-24"
+    ports:
+      - "8888:8888"
+      - "6666:6666"
+      - "14888:14888"
+    environment:
+      MONGODB_URI: mongodb://mongo/test
+      SERVER_NAME: test
+      REPLICATION_HOST: rabbitmq
+      REPLICATION_CHANNEL: test
+      REPLICATION_PORT: 5672
+  mongo:
+    image: "mongo:7"
+  rabbitmq:
+    image: "rabbitmq:3.13"
+

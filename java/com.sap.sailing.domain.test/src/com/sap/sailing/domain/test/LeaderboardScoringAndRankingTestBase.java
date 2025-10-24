@@ -1,6 +1,6 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,12 +32,12 @@ import com.sap.sailing.domain.leaderboard.ScoringScheme;
 import com.sap.sailing.domain.leaderboard.impl.RegattaLeaderboardImpl;
 import com.sap.sailing.domain.leaderboard.impl.ThresholdBasedResultDiscardingRuleImpl;
 import com.sap.sailing.domain.ranking.OneDesignRankingMetric;
+import com.sap.sailing.domain.shared.tracking.impl.TimedComparator;
 import com.sap.sailing.domain.test.mock.MockedTrackedRaceWithStartTimeAndRanks;
 import com.sap.sailing.domain.test.mock.MockedTrackedRaceWithStartTimeAndZeroRanks;
 import com.sap.sailing.domain.tracking.MarkPassing;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.domain.tracking.impl.MarkPassingImpl;
-import com.sap.sailing.domain.tracking.impl.TimedComparator;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.MillisecondsTimePoint;

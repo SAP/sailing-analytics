@@ -175,10 +175,10 @@ maxretry = 5
 
 ## Basic setup for disposable reverse proxy instance
 
-From a fresh Amazon Linux 2023 instance (HVM), run the `configuration\environments_scripts\reverse_proxy\setup-disposable-reverse-proxy.sh` script, passing the IP address of the instance and the ssh-key-reader.token (needed for accessing the landscape without mfa).
+From a fresh Amazon Linux 2023 instance (HVM), run the `configuration/environments_scripts/reverse_proxy/setup-disposable-reverse-proxy.sh` script, passing the IP address of the instance and the ssh-key-reader.token (needed for accessing the landscape without mfa).
 
 The script sets up nfs/nvme mounts, installs/updates httpd + software for scripts, sets up the httpd, sets up crontabs and copies files (via the`configuration\environments_scripts\build-crontab-and-cp-files`), enables service units, makes the ssh connections more resilient, sets up logrotation, configures fail2ban and alters postfix to enable mail sending.
 
 ## Read Also
 
-Check out the details in [amazon-ec2](https://wiki.sapsailing.com/wiki/info/landscape/amazon-ec2#amazon-ec2-for-sap-sailing-analytics_landscape-overview_apache-httpd-the-central-reverse-proxy-webserver-and-disposable-reverse-proxies) on the disposables and central: namely the target group healthcheck and shared httpd configuration Git repo. Also, look over the key_vault and the build_crontab_and_setup_files detailed there.
+Check out the details in [amazon-ec2](https://wiki.sapsailing.com/wiki/info/landscape/amazon-ec2#amazon-ec2-for-sap-sailing-analytics_landscape-overview_apache-httpd-the-central-reverse-proxy-webserver-and-disposable-reverse-proxies) on the disposables and central: namely the target group healthcheck and shared httpd configuration Git repo. Also, look over the key_vault and the ``build_crontab_and_setup_files`` detailed there.

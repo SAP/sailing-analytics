@@ -1,11 +1,12 @@
 package com.sap.sailing.polars.regression.test;
 
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 import org.hamcrest.number.IsCloseTo;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.polars.NotEnoughDataHasBeenAddedException;
 import com.sap.sailing.polars.regression.IncrementalLeastSquares;
@@ -136,10 +137,12 @@ public class IncrementalLinearRegressionOrderOneTest {
         assertThat(y, new IsCloseTo(0, EPSILON));
     }
 
-    @Test(expected = NotEnoughDataHasBeenAddedException.class)
+    @Test
     public void testNoDataExceptionThrowing() throws NotEnoughDataHasBeenAddedException {
-        IncrementalLeastSquares leastSquares = new IncrementalAnyOrderLeastSquaresImpl(1);
-        leastSquares.getOrCreatePolynomialFunction().value(15);
+        assertThrows(NotEnoughDataHasBeenAddedException.class, () -> {
+            IncrementalLeastSquares leastSquares = new IncrementalAnyOrderLeastSquaresImpl(1);
+            leastSquares.getOrCreatePolynomialFunction().value(15);
+        });
     }
 
     /**

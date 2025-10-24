@@ -15,6 +15,7 @@ import com.sap.sse.security.shared.RoleDefinition;
 import com.sap.sse.security.shared.UserGroupManagementException;
 import com.sap.sse.security.shared.UserManagementException;
 import com.sap.sse.security.shared.WildcardPermission;
+import com.sap.sse.security.shared.impl.LockingAndBanning;
 import com.sap.sse.security.shared.impl.Ownership;
 import com.sap.sse.security.shared.impl.User;
 import com.sap.sse.security.shared.subscription.Subscription;
@@ -117,4 +118,17 @@ public interface ReplicableSecurityService extends SecurityService {
     
     Void internalUpdateSubscriptionPlanPrices(Map<String, BigDecimal> updatedItemPrices);
 
+    Void internalSetCORSFilterConfigurationToWildcard(String serverName);
+
+    Void internalSetCORSFilterConfigurationAllowedOrigins(String serverName, String... allowedOrigins);
+
+    LockingAndBanning internalFailedPasswordAuthentication(String username);
+
+    Boolean internalSuccessfulPasswordAuthentication(String username);
+
+    Boolean internalSuccessfulBearerTokenAuthentication(String clientIP);
+
+    LockingAndBanning internalFailedBearerTokenAuthentication(String clientIP);
+
+    LockingAndBanning internalRecordUserCreationFromClientIP(String clientIP);
 }

@@ -5,9 +5,8 @@ import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.Set;
 
-import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
@@ -205,14 +204,14 @@ public class PolarDiagramCSVTest {
 
     private static void testMapOfSpeedsAndSpeeds(NavigableMap<Speed, Speed> expectedMap,
             NavigableMap<Speed, Speed> actualMap, String mapName, String polarDiagramType) {
-        Assert.assertEquals("Incorrect size for actual map object.", expectedMap.size(), actualMap.size());
+        Assertions.assertEquals(expectedMap.size(), actualMap.size(), "Incorrect size for actual map object.");
         Set<Speed> expectedKeys = expectedMap.keySet();
         String debugMessage = "";
 
         for (Speed speedKey : expectedKeys) {
             debugMessage = " (mapName = " + mapName + ", polarDiagramType = " + polarDiagramType
                     + ", speedKey.getKnots() = " + speedKey.getKnots() + ")";
-            Assert.assertTrue("Actual map does not contain key " + speedKey.getKnots(), actualMap.containsKey(speedKey));
+            Assertions.assertTrue(actualMap.containsKey(speedKey), "Actual map does not contain key " + speedKey.getKnots());
 
             testSpeeds(expectedMap.get(speedKey), actualMap.get(speedKey), debugMessage);
         }
@@ -220,14 +219,14 @@ public class PolarDiagramCSVTest {
 
     private static void testMapOfSpeedsAndBearings(NavigableMap<Speed, Bearing> expectedMap,
             NavigableMap<Speed, Bearing> actualMap, String mapName, String polarDiagramType) {
-        Assert.assertEquals("Incorrect size for actual map object.", expectedMap.size(), actualMap.size());
+        Assertions.assertEquals(expectedMap.size(), actualMap.size(), "Incorrect size for actual map object.");
         Set<Speed> expectedKeys = expectedMap.keySet();
         String debugMessage = "";
 
         for (Speed speedKey : expectedKeys) {
             debugMessage = " (mapName = " + mapName + ", polarDiagramType = " + polarDiagramType
                     + ", speedKey.getKnots() = " + speedKey.getKnots() + ")";
-            Assert.assertTrue("Actual map does not contain key " + speedKey.getKnots(), actualMap.containsKey(speedKey));
+            Assertions.assertTrue(actualMap.containsKey(speedKey), "Actual map does not contain key " + speedKey.getKnots());
 
             testBearing(expectedMap.get(speedKey), actualMap.get(speedKey), debugMessage);
         }
@@ -270,9 +269,9 @@ public class PolarDiagramCSVTest {
         Set<Bearing> expectedPDPValuesKeys = null;
         String debugMessage = "";
 
-        Assert.assertEquals("Incorrect size for actual Polar Diagram Plot object.\r\n" + "Expected: \r\n"
-                + convertToString(expectedMap) + "\r\n" + "Actual: \r\n" + convertToString(actualMap),
-                expectedMap.size(), actualMap.size());
+        Assertions.assertEquals(expectedMap.size(),
+                actualMap.size(), "Incorrect size for actual Polar Diagram Plot object.\r\n" + "Expected: \r\n"
+                        + convertToString(expectedMap) + "\r\n" + "Actual: \r\n" + convertToString(actualMap));
 
         expectedPDPKeys = expectedMap.keySet();
 
@@ -280,20 +279,20 @@ public class PolarDiagramCSVTest {
             debugMessage = "(speedKey = " + speedKey.getKnots() + ", typeName = " + polarDiagramType + ", mapName = "
                     + mapName + ")";
 
-            Assert.assertTrue("\r\nActual Polar Diagram Plot does not contain key! \r\n" + debugMessage + " \r\n",
-                    actualMap.containsKey(speedKey));
+            Assertions.assertTrue(actualMap.containsKey(speedKey),
+                    "\r\nActual Polar Diagram Plot does not contain key! \r\n" + debugMessage + " \r\n");
 
             expectedPDPValues = expectedMap.get(speedKey);
             actualPDPValues = actualMap.get(speedKey);
 
-            Assert.assertEquals("\r\nIncorrect size for actual Polar Diagram Plot Values object! \r\n" + debugMessage
-                    + " \r\n", expectedPDPValues.size(), actualPDPValues.size());
+            Assertions.assertEquals(expectedPDPValues.size(), actualPDPValues.size(), "\r\nIncorrect size for actual Polar Diagram Plot Values object! \r\n" + debugMessage
+                            + " \r\n");
 
             expectedPDPValuesKeys = expectedPDPValues.keySet();
 
             for (Bearing bearingKey : expectedPDPValuesKeys) {
-                Assert.assertTrue("\r\nActual Polar Diagram Plot Values does not contain key: " + bearingKey + "\r\n"
-                        + debugMessage + " \r\n", actualPDPValues.containsKey(bearingKey));
+                Assertions.assertTrue(actualPDPValues.containsKey(bearingKey), "\r\nActual Polar Diagram Plot Values does not contain key: " + bearingKey + "\r\n"
+                                + debugMessage + " \r\n");
 
                 debugMessage = " (typeName = " + polarDiagramType + ", bearingKey = " + bearingKey + ", speedKey = "
                         + speedKey.getKnots() + ")";
@@ -304,37 +303,37 @@ public class PolarDiagramCSVTest {
 
     private static void testBearing(Bearing expectedBearing, Bearing actualBearing, String debugMessage) {
         if (expectedBearing == null) {
-            Assert.assertNull("Actual bearing value must be NULL!" + debugMessage, actualBearing);
+            Assertions.assertNull(actualBearing, "Actual bearing value must be NULL!" + debugMessage);
         } else {
-            Assert.assertNotNull("Actual bearing value must not be NULL!" + debugMessage, actualBearing);
+            Assertions.assertNotNull(actualBearing, "Actual bearing value must not be NULL!" + debugMessage);
 
-            Assert.assertEquals("Beaufort values do not match!" + debugMessage, expectedBearing.getDegrees(),
-                    actualBearing.getDegrees(), expectedBearing.getDegrees() * DELTA_PERCENTAGE);
+            Assertions.assertEquals(expectedBearing.getDegrees(), actualBearing.getDegrees(),
+                    expectedBearing.getDegrees() * DELTA_PERCENTAGE, "Beaufort values do not match!" + debugMessage);
 
-            Assert.assertEquals("KilometersPerHour values do not match!" + debugMessage, expectedBearing.getRadians(),
-                    actualBearing.getRadians(), expectedBearing.getRadians() * DELTA_PERCENTAGE);
+            Assertions.assertEquals(expectedBearing.getRadians(), actualBearing.getRadians(),
+                    expectedBearing.getRadians() * DELTA_PERCENTAGE, "KilometersPerHour values do not match!" + debugMessage);
         }
     }
 
     private static void testSpeeds(Speed expectedSpeed, Speed actualSpeed, String debugMessage) {
         if (expectedSpeed == null) {
-            Assert.assertNull("Actual speed value must be NULL!" + debugMessage, actualSpeed);
+            Assertions.assertNull(actualSpeed, "Actual speed value must be NULL!" + debugMessage);
         } else {
-            Assert.assertNotNull("Actual speed value must not be NULL!" + debugMessage, actualSpeed);
+            Assertions.assertNotNull(actualSpeed, "Actual speed value must not be NULL!" + debugMessage);
 
-            Assert.assertEquals("Beaufort values do not match!" + debugMessage, expectedSpeed.getBeaufort(),
-                    actualSpeed.getBeaufort(), expectedSpeed.getBeaufort() * DELTA_PERCENTAGE);
+            Assertions.assertEquals(expectedSpeed.getBeaufort(), actualSpeed.getBeaufort(),
+                    expectedSpeed.getBeaufort() * DELTA_PERCENTAGE, "Beaufort values do not match!" + debugMessage);
 
-            Assert.assertEquals("KilometersPerHour values do not match!" + debugMessage,
-                    expectedSpeed.getKilometersPerHour(), actualSpeed.getKilometersPerHour(),
-                    expectedSpeed.getKilometersPerHour() * DELTA_PERCENTAGE);
+            Assertions.assertEquals(expectedSpeed.getKilometersPerHour(),
+                    actualSpeed.getKilometersPerHour(), expectedSpeed.getKilometersPerHour() * DELTA_PERCENTAGE,
+                    "KilometersPerHour values do not match!" + debugMessage);
 
-            Assert.assertEquals("Knots values do not match!" + debugMessage, expectedSpeed.getKnots(),
-                    actualSpeed.getKnots(), expectedSpeed.getKnots() * DELTA_PERCENTAGE);
+            Assertions.assertEquals(expectedSpeed.getKnots(), actualSpeed.getKnots(),
+                    expectedSpeed.getKnots() * DELTA_PERCENTAGE, "Knots values do not match!" + debugMessage);
 
-            Assert.assertEquals("MetersPerSecond values do not match!" + debugMessage,
-                    expectedSpeed.getMetersPerSecond(), actualSpeed.getMetersPerSecond(),
-                    expectedSpeed.getMetersPerSecond() * DELTA_PERCENTAGE);
+            Assertions.assertEquals(expectedSpeed.getMetersPerSecond(),
+                    actualSpeed.getMetersPerSecond(), expectedSpeed.getMetersPerSecond() * DELTA_PERCENTAGE,
+                    "MetersPerSecond values do not match!" + debugMessage);
         }
     }
 }

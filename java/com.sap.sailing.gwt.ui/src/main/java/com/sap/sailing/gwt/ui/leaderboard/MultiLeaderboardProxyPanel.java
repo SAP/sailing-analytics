@@ -235,7 +235,6 @@ public class MultiLeaderboardProxyPanel extends AbstractLazyComponent<MultiRaceL
             }
             
             selectedLeaderboardFlowPanel = (FlowPanel) leaderboardsTabPanel.getWidget(newTabIndex);
-
             MultiRaceLeaderboardSettings toMerge = contextStore.get(newSelectedLeaderboardName);
             if (toMerge != null) {
                 toMerge = loadedSettings.withRaceColumnSelectionValuesFrom(toMerge);

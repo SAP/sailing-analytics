@@ -14,11 +14,11 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.sap.sailing.gwt.ui.client.StringMessages;
-import com.sap.sailing.gwt.ui.common.client.DateAndTimeFormatterUtil;
 import com.sap.sailing.gwt.ui.shared.AbstractLogDTO;
 import com.sap.sailing.gwt.ui.shared.AbstractLogEventDTO;
 import com.sap.sse.common.util.NaturalComparator;
 import com.sap.sse.gwt.adminconsole.AdminConsoleTableResources;
+import com.sap.sse.gwt.client.DateAndTimeFormatterUtil;
 import com.sap.sse.gwt.client.celltable.BaseCelltable;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog;
 

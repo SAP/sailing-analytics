@@ -1,8 +1,8 @@
 package com.sap.sailing.datamining.data;
 
 import com.sap.sailing.domain.base.Boat;
-import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.tracking.TrackedLegOfCompetitor;
+import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.Speed;
@@ -11,86 +11,99 @@ import com.sap.sse.datamining.annotations.Dimension;
 import com.sap.sse.datamining.annotations.Statistic;
 import com.sap.sse.datamining.shared.impl.dto.ClusterDTO;
 
-public interface HasTrackedLegOfCompetitorContext extends HasWindOnTrackedLeg {
+/**
+ * A "slice" of a competitor's tracked leg; slicing may happen in the retriever, perhaps influenced by some
+ * configuration parameters, e.g., based on windward distance sailed, time spent, or rhumb line distance sailed.
+ * A full leg is a special case of this.
+ * 
+ * @author Axel Uhl (d043530)
+ *
+ */
+public interface HasTrackedLegOfCompetitorContext extends HasSomethingOfCompetitorContextWithTrackedRaceContext {
     @Connector(scanForStatistics=false)
-    public HasTrackedLegContext getTrackedLegContext();
+    HasTrackedLegContext getTrackedLegContext();
     
-    public TrackedLegOfCompetitor getTrackedLegOfCompetitor();
+    default TrackedRace getTrackedRace() {
+        return getTrackedLegContext().getTrackedRaceContext().getTrackedRace();
+    }
+    
+    TrackedLegOfCompetitor getTrackedLegOfCompetitor();
+    
+    default HasTrackedRaceContext getTrackedRaceContext() {
+        return getTrackedLegContext().getTrackedRaceContext();
+    }
     
     @Dimension(messageKey="RelativeScoreInRaceInPercent", ordinal=12)
-    public ClusterDTO getPercentageClusterForRelativeScoreInRace();
+    ClusterDTO getPercentageClusterForRelativeScoreInRace();
     
     @Connector(messageKey="Boat")
-    public Boat getBoat();
-    
-    @Connector(messageKey="Competitor")
-    public Competitor getCompetitor();
+    Boat getBoat();
     
     @Statistic(messageKey="DistanceTraveled", resultDecimals=2, ordinal=0)
-    public Distance getDistanceTraveled();
+    Distance getDistanceTraveled();
     
     @Statistic(messageKey="SpeedAverage", resultDecimals=2, ordinal=0)
-    public Double getSpeedAverage();
+    Double getSpeedAverageInKnots();
     
     @Statistic(messageKey="RankGainsOrLosses", resultDecimals=2, ordinal=1)
-    public Integer getRankGainsOrLosses();
+    Integer getRankGainsOrLosses();
     
     @Statistic(messageKey="RelativeScore", resultDecimals=2, ordinal=2)
-    public Double getRelativeRank();
+    Double getRelativeRank();
     
     @Statistic(messageKey="AbsoluteRank", resultDecimals=0, ordinal=3)
-    public Integer getRankAtFinish();
+    Integer getRankAtSliceFinish();
     
     @Statistic(messageKey="AbsoluteRankAfterFirstQuarter", resultDecimals=0, ordinal=4)
-    public Integer getRankAfterFirstQuarter();
+    Integer getRankAfterFirstQuarter();
     
     @Statistic(messageKey="AbsoluteRankAfterSecondQuarter", resultDecimals=0, ordinal=5)
-    public Integer getRankAfterSecondQuarter();
+    Integer getRankAfterSecondQuarter();
     
     @Statistic(messageKey="AbsoluteRankAfterThirdQuarter", resultDecimals=0, ordinal=6)
-    public Integer getRankAfterThirdQuarter();
+    Integer getRankAfterThirdQuarter();
     
     @Statistic(messageKey="AbsoluteRankAverageAcrossFirstThreeQuarters", resultDecimals=2, ordinal=7)
-    public Double getRankAverageAcrossFirstThreeQuarters();
+    Double getRankAverageAcrossFirstThreeQuarters();
     
     @Statistic(messageKey="AbsoluteRankRhumbLineBasedAfterFirstQuarter", resultDecimals=0, ordinal=8)
-    public Integer getRankRhumbLineBasedAfterFirstQuarter();
+    Integer getRankRhumbLineBasedAfterFirstQuarter();
     
     @Statistic(messageKey="AbsoluteRankRhumbLineBasedAfterSecondQuarter", resultDecimals=0, ordinal=9)
-    public Integer getRankRhumbLineBasedAfterSecondQuarter();
+    Integer getRankRhumbLineBasedAfterSecondQuarter();
     
     @Statistic(messageKey="AbsoluteRankRhumbLineBasedAfterThirdQuarter", resultDecimals=0, ordinal=10)
-    public Integer getRankRhumbLineBasedAfterThirdQuarter();
+    Integer getRankRhumbLineBasedAfterThirdQuarter();
     
     @Statistic(messageKey="AbsoluteRankRhumbLineBasedAverageAcrossFirstThreeQuarters", resultDecimals=2, ordinal=11)
-    public Double getRankRhumbLineBasedAverageAcrossFirstThreeQuarters();
+    Double getRankRhumbLineBasedAverageAcrossFirstThreeQuarters();
     
     @Statistic(messageKey="AbsoluteRankPredictionErrorAfterFirstQuarter", resultDecimals=2, ordinal=12)
-    public Double getRankPredictionErrorAfterFirstQuarter();
+    Double getRankPredictionErrorAfterFirstQuarter();
     
     @Statistic(messageKey="AbsoluteRankPredictionErrorAfterSecondQuarter", resultDecimals=2, ordinal=13)
-    public Double getRankPredictionErrorAfterSecondQuarter();
+    Double getRankPredictionErrorAfterSecondQuarter();
     
     @Statistic(messageKey="AbsoluteRankPredictionErrorAfterThirdQuarter", resultDecimals=2, ordinal=14)
-    public Double getRankPredictionErrorAfterThirdQuarter();
+    Double getRankPredictionErrorAfterThirdQuarter();
     
     @Statistic(messageKey="AbsoluteRankPredictionErrorAcrossFirstThreeQuarters", resultDecimals=2, ordinal=15)
-    public Double getRankPredictionErrorAcrossFirstThreeQuarters();
+    Double getRankPredictionErrorAcrossFirstThreeQuarters();
     
     @Statistic(messageKey="AbsoluteRankPredictionErrorRhumbLineBasedAfterFirstQuarter", resultDecimals=2, ordinal=16)
-    public Double getRankPredictionErrorRhumbLineBasedAfterFirstQuarter();
+    Double getRankPredictionErrorRhumbLineBasedAfterFirstQuarter();
     
     @Statistic(messageKey="AbsoluteRankPredictionErrorRhumbLineBasedAfterSecondQuarter", resultDecimals=2, ordinal=17)
-    public Double getRankPredictionErrorRhumbLineBasedAfterSecondQuarter();
+    Double getRankPredictionErrorRhumbLineBasedAfterSecondQuarter();
     
     @Statistic(messageKey="AbsoluteRankPredictionErrorRhumbLineBasedAfterThirdQuarter", resultDecimals=2, ordinal=18)
-    public Double getRankPredictionErrorRhumbLineBasedAfterThirdQuarter();
+    Double getRankPredictionErrorRhumbLineBasedAfterThirdQuarter();
     
     @Statistic(messageKey="AbsoluteRankPredictionErrorRhumbLineBasedAcrossFirstThreeQuarters", resultDecimals=2, ordinal=19)
-    public Double getRankPredictionErrorRhumbLineBasedAcrossFirstThreeQuarters();
+    Double getRankPredictionErrorRhumbLineBasedAcrossFirstThreeQuarters();
     
     @Statistic(messageKey="TimeSpentInSeconds", resultDecimals=0, ordinal=4)
-    public Long getTimeTakenInSeconds();
+    Long getTimeTakenInSeconds();
 
     @Statistic(messageKey="timeSpentFoiling", resultDecimals=1)
     Duration getTimeSpentFoiling();
@@ -99,20 +112,20 @@ public interface HasTrackedLegOfCompetitorContext extends HasWindOnTrackedLeg {
     Distance getDistanceSpentFoiling();
     
     @Statistic(messageKey="NumberOfManeuvers", resultDecimals=0)
-    public Integer getNumberOfManeuvers();
+    Integer getNumberOfManeuvers();
     
     @Statistic(messageKey="NumberOfJibes", resultDecimals=0)
-    public Integer getNumberOfJibes();
+    Integer getNumberOfJibes();
     
     @Statistic(messageKey="NumberOfTacks", resultDecimals=0)
-    public Integer getNumberOfTacks();
+    Integer getNumberOfTacks();
     
     @Statistic(messageKey="VMG", resultDecimals=2)
-    public Speed getVelocityMadeGood();
+    Speed getVelocityMadeGood();
     
     @Statistic(messageKey="RatioDurationLongVsShortTack", resultDecimals=2)
-    public double getRatioDurationLongVsShortTack();
+    double getRatioDurationLongVsShortTack();
     
     @Statistic(messageKey="RatioDistanceLongVsShortTack", resultDecimals=2)
-    public double getRatioDistanceLongVsShortTack();
+    double getRatioDistanceLongVsShortTack();
 }

@@ -1,10 +1,13 @@
-stored-uri:datafiles/event_20110929_Internatio-Champions_Cup_Final.mtb
+stored-uri:datafiles/92073072-ed26-11e0-a523-406186cbf87c.mtb
 StartReplay:1
 
-// Input from params_static:
-
-// Input from event_parameters:
-
+PerformanceTableLayout:[{"key":"Pos","header":"Pos","tooltip":"Position","options":null},{"key":"Name","header":"Name","tooltip":"Name","options":null},{"key":"Short","header":"Short","tooltip":"Short name","options":null},{"key":"Country","header":"Country","tooltip":"Country","options":null},{"key":"After","header":"After","tooltip":"After","options":null},{"key":"Leg pos","header":"Leg pos","tooltip":"Leg position","options":null},{"key":"Leg time","header":"Leg time","tooltip":"Leg time","options":null},{"key":"SOG","header":"SOG","tooltip":"SOG","options":null},{"key":"VMG","header":"VMG","tooltip":"VMG","options":null},{"key":"Top speed","header":"Top Speed","tooltip":"Top Speed","options":null},{"key":"Distance","header":"Distance","tooltip":"Distance","options":null}]
+DefaultPanel:
+ResultColumn1Tooltip:
+ResultColumn2Tooltip:
+ResultColumn3Tooltip:
+ResultColumn4Tooltip:
+ResultColumn5Tooltip:
 CompMarkerUUID:1
 PopUpRow1Name:
 PopUpRow1Type:Name
@@ -18,6 +21,11 @@ PopUpRow5Name:Rank in race
 PopUpRow5Type:RowNumber
 CodanIsSponsor:0
 DefaultTailLength:60
+StartTimeType:Race
+LabelNoBackground:0
+ws-uri:ws://tracms.traclive.dk:8888
+smsParams:0,4521446454,4521446454,3,10,15
+enableDiplomas:0
 APzoomChangeTime:2500
 disableAutoProduce:0
 autoProduce:1
@@ -29,7 +37,13 @@ APmarkSwitch:0.13
 APmarkZoomBehindMarks:0.10
 APmarkZoomInFrontOfMarks:0.20
 PopupMarkerUUID:2
+MapUrl:http://tile.traclive.dk/osm
 ManualUrl:http://www.tractrac.com/files/userguide_sailing.pdf
+ResultColumn1DefaultOrder:1
+ResultColumn2DefaultOrder:0
+ResultColumn3DefaultOrder:0
+ResultColumn4DefaultOrder:0
+ResultColumn5DefaultOrder:0
 Marker1UUID:1
 Marker1Type:RGBMarkerFactory
 Marker1Directional:1
@@ -68,7 +82,24 @@ DisableRotation:0
 ControlPointMarkerRadius:13
 disableselection:0
 disableleaderline:0
+delayIntervals:3,10,15
 DisableChangeRace:0
+MarkerSymbol:standardBoat
+MarkerMinPixelSize:36
+ShowFlagInLabel:0
+ShowRankInLabel:1
+TailOpacity:70
+TailWidth:1
+dimmingLevel:1
+LaggingThreshold:5
+LowBatteryThreshold:5
+DatabaseVersion:01.00.20
+dimmingLevel:1
+BatteryLevelWarn:20
+BatteryLevelDanger:13
+dimmingSeconds:60
+EnableResults:0
+ResultsLayout:[{"key":"Order","header":"#","description":"Position","printable":true,"align":"right","collapsible":false},{"key":"Name","header":"Name","description":"Competitor's name","printable":true,"align":"left","collapsible":false},{"key":"ShortName","header":"Short Name","description":"Competitor's short name","printable":true,"align":"left","collapsible":true},{"key":"LegTime","header":"Leg","description":"Leg time","printable":false,"align":"right","collapsible":true},{"key":"LegPosition","header":"#","description":"Leg position","printable":false,"align":"right","collapsible":true},{"key":"Time","header":"Total","description":"Total time","printable":true,"align":"right","collapsible":false},{"key":"After","header":"Total &Delta;","description":"Total &Delta;","printable":true,"align":"right","collapsible":false}]
 ResultColumn1Name:#
 ResultColumn1Size:20
 ResultColumn1Type:RowNumber
@@ -89,8 +120,8 @@ ResultColumn6Type:BoatSpeed
 DisableLeaderboard:0
 DisableAnalysis:0
 TableFontSize:11
-//live-uri:tcp://germanmaster.traclive.dk:4400
-//stored-uri:tcp://germanmaster.traclive.dk:4401
+//live-uri:tcp://tracms.traclive.dk:4400
+//stored-uri:tcp://tracms.traclive.dk:4401
 compInitialsFontSize:11
 AutoRotate:1
 MassStart:0
@@ -100,14 +131,22 @@ ReCalcDirAndSpeed:0
 RaceHandicapSystem:NONE
 TeamCompetitionType:NONE
 LiveDelaySecs: 20
+LiveDelaySecsRace: 
+LiveDelaySecsEvent: 20
 
-//-------- AUTO GENERATED PARAMETERS START ----------------
+Maps:[]
 
 EventID:47a4bfbc-e917-11e0-a523-406186cbf87c
 EventName:Internationale Deutche Meisterschaft
+EventAnalyticsName:Internationale Deutche Meisterschaft
 EventDB:event_20110929_Internatio
 EventStartTime:2011-09-29 01:00:00
 EventEndTime:2011-10-03 22:00:00
+EventType:a1b74ca0-fdd8-11dc-8811-005056c00008
+EventJSON:https://historical1.tractrac.com/events/event_20110929_Internatio/jsonservice.php
+DBReplicaEnabled:0
+HighLoadEnabled:
+MultipleDataservers:0
 
 RaceID:92073072-ed26-11e0-a523-406186cbf87c
 RaceName:Champions Cup Final
@@ -115,13 +154,14 @@ RaceStartTime:2011-10-03 13:41:00
 RaceEndTime:
 RaceTrackingStartTime:2011-10-03 13:30:54
 RaceTrackingEndTime:2011-10-03 13:56:31
+Initialized:1
 RaceDefaultRouteUUID:4af1f26c-ed26-11e0-a523-406186cbf87c
 RaceHandicapSystem:NONE
 
 Image1UUID:0c021234-ec4b-11e0-a523-406186cbf87c
 Image1Type:Logo
 Image1Description:IDM
-Image1Image:pictures/0c021234-ec4b-11e0-a523-406186cbf87c/original_IDM2011.png
+Image1Image:pictures/0c021234-ec4b-11e0-a523-406186cbf87c/IDM2011.png
 
 Image2UUID:47fbde6c-ed38-11e0-a523-406186cbf87c
 Image2Type:Logo
@@ -165,36 +205,18 @@ Image9Image:pictures/f5087f78-ec4a-11e0-a523-406186cbf87c/Norddeutche.png
 
 Class1UUID:daf83cca-ed37-11e0-a523-406186cbf87c
 Class1Name:Champions
+Class1BoatClassId:
 
-Team1UUID:a8504744-ed38-11e0-a523-406186cbf87c
-Team1Name:CZE
-
-Team2UUID:68fb3eca-eda9-11e0-a523-406186cbf87c
-Team2Name:DEN
-
-Team3UUID:85e4b25c-ec44-11e0-a523-406186cbf87c
-Team3Name:GER
-Team3Comp1UUID:87aa2e1c-edb3-11e0-a523-406186cbf87c
-Team3Comp2UUID:a2d00aae-edb8-11e0-a523-406186cbf87c
-Team3Comp3UUID:eec6f52c-edb2-11e0-a523-406186cbf87c
-Team3Comp4UUID:bf5a99dc-edb8-11e0-a523-406186cbf87c
-
-Team4UUID:a9d71408-ed38-11e0-a523-406186cbf87c
-Team4Name:NED
-
-Team5UUID:47e6b3f2-ed38-11e0-a523-406186cbf87c
-Team5Name:NZL
-
-Team6UUID:ac7a7014-ec44-11e0-a523-406186cbf87c
-Team6Name:SUI
-
-Team7UUID:5058b7a0-ec3a-11e0-a523-406186cbf87c
-Team7Name:Test
+Team1UUID:85e4b25c-ec44-11e0-a523-406186cbf87c
+Team1Name:GER
+Team1Comp1UUID:bf5a99dc-edb8-11e0-a523-406186cbf87c
+Team1Comp2UUID:eec6f52c-edb2-11e0-a523-406186cbf87c
+Team1Comp3UUID:a2d00aae-edb8-11e0-a523-406186cbf87c
+Team1Comp4UUID:87aa2e1c-edb3-11e0-a523-406186cbf87c
 
 Comp1UUID:eec6f52c-edb2-11e0-a523-406186cbf87c
 Comp1Name:Kamrath+Buhl+Lewin
 Comp1NameShort:Blau
-Comp1Color:000080
 Comp1Nationality:GER
 Comp1Description:
 Comp1Handicap:1.0000000000
@@ -203,11 +225,11 @@ Comp1StartTime:2011-10-03 13:41:00
 Comp1PictureUUID:85e73068-ec44-11e0-a523-406186cbf87c
 Comp1ClassUUID:daf83cca-ed37-11e0-a523-406186cbf87c
 Comp1RouteUUID:4af1f26c-ed26-11e0-a523-406186cbf87c
+Comp1Color:000080
 
 Comp2UUID:87aa2e1c-edb3-11e0-a523-406186cbf87c
 Comp2Name:Heil+Plössel+Baumann
 Comp2NameShort:Grün
-Comp2Color:008000
 Comp2Nationality:GER
 Comp2Description:
 Comp2Handicap:1.0000000000
@@ -216,11 +238,11 @@ Comp2StartTime:2011-10-03 13:41:00
 Comp2PictureUUID:85e73068-ec44-11e0-a523-406186cbf87c
 Comp2ClassUUID:daf83cca-ed37-11e0-a523-406186cbf87c
 Comp2RouteUUID:4af1f26c-ed26-11e0-a523-406186cbf87c
+Comp2Color:008000
 
 Comp3UUID:a2d00aae-edb8-11e0-a523-406186cbf87c
 Comp3Name:Kadelbach+Belcher+Stanczyk
 Comp3NameShort:Gelb
-Comp3Color:FFFF00
 Comp3Nationality:GER
 Comp3Description:
 Comp3Handicap:1.0000000000
@@ -229,11 +251,11 @@ Comp3StartTime:2011-10-03 13:41:00
 Comp3PictureUUID:85e73068-ec44-11e0-a523-406186cbf87c
 Comp3ClassUUID:daf83cca-ed37-11e0-a523-406186cbf87c
 Comp3RouteUUID:4af1f26c-ed26-11e0-a523-406186cbf87c
+Comp3Color:FFFF00
 
 Comp4UUID:bf5a99dc-edb8-11e0-a523-406186cbf87c
 Comp4Name:Polgar+Koy+Seelig
 Comp4NameShort:Rot
-Comp4Color:FF0000
 Comp4Nationality:GER
 Comp4Description:
 Comp4Handicap:1.0000000000
@@ -242,71 +264,171 @@ Comp4StartTime:2011-10-03 13:41:00
 Comp4PictureUUID:85e73068-ec44-11e0-a523-406186cbf87c
 Comp4ClassUUID:daf83cca-ed37-11e0-a523-406186cbf87c
 Comp4RouteUUID:4af1f26c-ed26-11e0-a523-406186cbf87c
+Comp4Color:FF0000
 
-ControlPoint1UUID:03b75c68-ec43-11e0-a523-406186cbf87c
-ControlPoint1Name:G1 Start-Finish
-ControlPoint1HasTwoPoints:1
-ControlPoint1ShortName:SF
-ControlPoint1Mark1Lon:10.894043
-ControlPoint1Mark1Lat:53.967922
-ControlPoint1Mark2Lon:10.878700
-ControlPoint1Mark2Lat:53.959983
+PositionedItem1UUID:20e9f080-84a6-013d-7c5b-1c6b00518c70
+PositionedItem1Name:G1 Start-Finish - 1
+PositionedItem1CourseArea:
+PositionedItem1Static:0
+PositionedItem1Positions:
+PositionedItem1DataSheet:
 
-ControlPoint2UUID:0dc52248-ec3a-11e0-a523-406186cbf87c
-ControlPoint2Name:Test2
-ControlPoint2HasTwoPoints:0
-ControlPoint2ShortName:T2
-ControlPoint2Mark1Lon:10.898781
-ControlPoint2Mark1Lat:53.967296
+PositionedItem2UUID:21309780-84a6-013d-7c5c-1c6b00518c70
+PositionedItem2Name:G1 Start-Finish - 2
+PositionedItem2CourseArea:
+PositionedItem2Static:0
+PositionedItem2Positions:
+PositionedItem2DataSheet:
 
-ControlPoint3UUID:21d1d520-ec43-11e0-a523-406186cbf87c
-ControlPoint3Name:G1 Mark 1
-ControlPoint3HasTwoPoints:0
-ControlPoint3ShortName:1
-ControlPoint3Mark1Lon:10.878867
-ControlPoint3Mark1Lat:53.959983
+PositionedItem3UUID:21b486e0-84a6-013d-7c60-1c6b00518c70
+PositionedItem3Name:Test2
+PositionedItem3CourseArea:
+PositionedItem3Static:0
+PositionedItem3Positions:
+PositionedItem3DataSheet:
 
-ControlPoint4UUID:2dec7b44-ec43-11e0-a523-406186cbf87c
-ControlPoint4Name:G1 Mark 4
-ControlPoint4HasTwoPoints:1
-ControlPoint4ShortName:4
-ControlPoint4Mark1Lon:10.878912
-ControlPoint4Mark1Lat:53.960288
-ControlPoint4Mark2Lon:10.878687
-ControlPoint4Mark2Lat:53.959980
+PositionedItem4UUID:21ddb560-84a6-013d-7c61-1c6b00518c70
+PositionedItem4Name:G1 Mark 1
+PositionedItem4CourseArea:
+PositionedItem4Static:0
+PositionedItem4Positions:
+PositionedItem4DataSheet:
 
-ControlPoint5UUID:3d734be2-ed24-11e0-a523-406186cbf87c
-ControlPoint5Name:G2 Start-Finish
-ControlPoint5HasTwoPoints:1
-ControlPoint5ShortName:SF
-ControlPoint5Mark1Lon:10.894012
-ControlPoint5Mark1Lat:53.967983
-ControlPoint5Mark2Lon:10.894412
-ControlPoint5Mark2Lat:53.967442
+PositionedItem5UUID:2238af30-84a6-013d-7c62-1c6b00518c70
+PositionedItem5Name:G1 Mark 4 - 1
+PositionedItem5CourseArea:
+PositionedItem5Static:0
+PositionedItem5Positions:
+PositionedItem5DataSheet:
 
-ControlPoint6UUID:4b8bda0a-ed24-11e0-a523-406186cbf87c
-ControlPoint6Name:G2 Mark1
-ControlPoint6HasTwoPoints:0
-ControlPoint6ShortName:1
-ControlPoint6Mark1Lon:10.888957
-ControlPoint6Mark1Lat:53.965057
+PositionedItem6UUID:229b3810-84a6-013d-7c63-1c6b00518c70
+PositionedItem6Name:G1 Mark 4 - 2
+PositionedItem6CourseArea:
+PositionedItem6Static:0
+PositionedItem6Positions:
+PositionedItem6DataSheet:
 
-ControlPoint7UUID:5f3bf4f4-ed24-11e0-a523-406186cbf87c
-ControlPoint7Name:G2 Mark4
-ControlPoint7HasTwoPoints:1
-ControlPoint7ShortName:4
-ControlPoint7Mark1Lon:10.893390
-ControlPoint7Mark1Lat:53.967182
-ControlPoint7Mark2Lon:10.893758
-ControlPoint7Mark2Lat:53.966885
+PositionedItem7UUID:2316acd0-84a6-013d-7c66-1c6b00518c70
+PositionedItem7Name:G2 Start-Finish - 1
+PositionedItem7CourseArea:
+PositionedItem7Static:0
+PositionedItem7Positions:
+PositionedItem7DataSheet:
 
-ControlPoint8UUID:e3505cc6-ec39-11e0-a523-406186cbf87c
-ControlPoint8Name:Test1
-ControlPoint8HasTwoPoints:0
-ControlPoint8ShortName:T1
-ControlPoint8Mark1Lon:10.896206
-ControlPoint8Mark1Lat:53.972243
+PositionedItem8UUID:234078c0-84a6-013d-7c67-1c6b00518c70
+PositionedItem8Name:G2 Start-Finish - 2
+PositionedItem8CourseArea:
+PositionedItem8Static:0
+PositionedItem8Positions:
+PositionedItem8DataSheet:
 
+PositionedItem9UUID:23c1fb20-84a6-013d-7c6a-1c6b00518c70
+PositionedItem9Name:G2 Mark1
+PositionedItem9CourseArea:
+PositionedItem9Static:0
+PositionedItem9Positions:
+PositionedItem9DataSheet:
+
+PositionedItem10UUID:2402a5d0-84a6-013d-7c6b-1c6b00518c70
+PositionedItem10Name:G2 Mark4 - 1
+PositionedItem10CourseArea:
+PositionedItem10Static:0
+PositionedItem10Positions:
+PositionedItem10DataSheet:
+
+PositionedItem11UUID:2455b300-84a6-013d-7c6c-1c6b00518c70
+PositionedItem11Name:G2 Mark4 - 2
+PositionedItem11CourseArea:
+PositionedItem11Static:0
+PositionedItem11Positions:
+PositionedItem11DataSheet:
+
+PositionedItem12UUID:24aa6440-84a6-013d-7c70-1c6b00518c70
+PositionedItem12Name:Test1
+PositionedItem12CourseArea:
+PositionedItem12Static:0
+PositionedItem12Positions:
+PositionedItem12DataSheet:
+
+MapItem1UUID:03b75c68-ec43-11e0-a523-406186cbf87c
+MapItem1Name:G1 Start-Finish
+MapItem1ShortName:SF
+MapItem1PositionedItemIds:["20e9f080-84a6-013d-7c5b-1c6b00518c70", "21309780-84a6-013d-7c5c-1c6b00518c70"]
+
+MapItem2UUID:0dc52248-ec3a-11e0-a523-406186cbf87c
+MapItem2Name:Test2
+MapItem2ShortName:T2
+MapItem2PositionedItemIds:["21b486e0-84a6-013d-7c60-1c6b00518c70"]
+
+MapItem3UUID:219c1870-84a6-013d-7c5d-1c6b00518c70
+MapItem3Name:G1 Start-Finish - 1
+MapItem3ShortName:SF
+MapItem3PositionedItemIds:["20e9f080-84a6-013d-7c5b-1c6b00518c70"]
+
+MapItem4UUID:21aba790-84a6-013d-7c5e-1c6b00518c70
+MapItem4Name:G1 Start-Finish - 2
+MapItem4ShortName:SF
+MapItem4PositionedItemIds:["21309780-84a6-013d-7c5c-1c6b00518c70"]
+
+MapItem5UUID:21d1d520-ec43-11e0-a523-406186cbf87c
+MapItem5Name:G1 Mark 1
+MapItem5ShortName:1
+MapItem5PositionedItemIds:["21ddb560-84a6-013d-7c61-1c6b00518c70"]
+
+MapItem6UUID:23014df0-84a6-013d-7c64-1c6b00518c70
+MapItem6Name:G1 Mark 4 - 1
+MapItem6ShortName:4
+MapItem6PositionedItemIds:["2238af30-84a6-013d-7c62-1c6b00518c70"]
+
+MapItem7UUID:23071cd0-84a6-013d-7c65-1c6b00518c70
+MapItem7Name:G1 Mark 4 - 2
+MapItem7ShortName:4
+MapItem7PositionedItemIds:["229b3810-84a6-013d-7c63-1c6b00518c70"]
+
+MapItem8UUID:23becfc0-84a6-013d-7c68-1c6b00518c70
+MapItem8Name:G2 Start-Finish - 1
+MapItem8ShortName:SF
+MapItem8PositionedItemIds:["2316acd0-84a6-013d-7c66-1c6b00518c70"]
+
+MapItem9UUID:23c13ef0-84a6-013d-7c69-1c6b00518c70
+MapItem9Name:G2 Start-Finish - 2
+MapItem9ShortName:SF
+MapItem9PositionedItemIds:["234078c0-84a6-013d-7c67-1c6b00518c70"]
+
+MapItem10UUID:24a2d770-84a6-013d-7c6e-1c6b00518c70
+MapItem10Name:G2 Mark4 - 1
+MapItem10ShortName:4
+MapItem10PositionedItemIds:["2402a5d0-84a6-013d-7c6b-1c6b00518c70"]
+
+MapItem11UUID:24a3ff10-84a6-013d-7c6f-1c6b00518c70
+MapItem11Name:G2 Mark4 - 2
+MapItem11ShortName:4
+MapItem11PositionedItemIds:["2455b300-84a6-013d-7c6c-1c6b00518c70"]
+
+MapItem12UUID:2dec7b44-ec43-11e0-a523-406186cbf87c
+MapItem12Name:G1 Mark 4
+MapItem12ShortName:4
+MapItem12PositionedItemIds:["2238af30-84a6-013d-7c62-1c6b00518c70", "229b3810-84a6-013d-7c63-1c6b00518c70"]
+
+MapItem13UUID:3d734be2-ed24-11e0-a523-406186cbf87c
+MapItem13Name:G2 Start-Finish
+MapItem13ShortName:SF
+MapItem13PositionedItemIds:["2316acd0-84a6-013d-7c66-1c6b00518c70", "234078c0-84a6-013d-7c67-1c6b00518c70"]
+
+MapItem14UUID:4b8bda0a-ed24-11e0-a523-406186cbf87c
+MapItem14Name:G2 Mark1
+MapItem14ShortName:1
+MapItem14PositionedItemIds:["23c1fb20-84a6-013d-7c6a-1c6b00518c70"]
+
+MapItem15UUID:5f3bf4f4-ed24-11e0-a523-406186cbf87c
+MapItem15Name:G2 Mark4
+MapItem15ShortName:4
+MapItem15PositionedItemIds:["2402a5d0-84a6-013d-7c6b-1c6b00518c70", "2455b300-84a6-013d-7c6c-1c6b00518c70"]
+
+MapItem16UUID:e3505cc6-ec39-11e0-a523-406186cbf87c
+MapItem16Name:Test1
+MapItem16ShortName:T1
+MapItem16PositionedItemIds:["24aa6440-84a6-013d-7c70-1c6b00518c70"]
 
 SegmentFile:segments.php
 Route1UUID:4af1f26c-ed26-11e0-a523-406186cbf87c
@@ -318,4 +440,3 @@ Route1ControlPoint3UUID:5f3bf4f4-ed24-11e0-a523-406186cbf87c
 Route1ControlPoint4UUID:4b8bda0a-ed24-11e0-a523-406186cbf87c
 Route1ControlPoint5UUID:3d734be2-ed24-11e0-a523-406186cbf87c
 
-//-------- AUTO GENERATED PARAMETERS END ------------------

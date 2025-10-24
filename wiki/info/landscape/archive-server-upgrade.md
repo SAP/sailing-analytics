@@ -3,20 +3,46 @@
 ## TL;DR
 
 - Optionally, to accelerate DB reads, launch MongoDB replica for ``archive`` replica set (see [here](https://security-service.sapsailing.com/gwt/AdminConsole.html#LandscapeManagementPlace:)); wait until MongoDB replica is in ``SECONDARY`` state
-- Launch "more like this" based on existing primary archive, adjusting the ``INSTALL_FROM_RELEASE`` user data entry to the release of choice and the ``Name`` tag to "SL Archive (New Candidate)"
-- Wait until the new instance is done with its background tasks and CPU utilization goes to 0% (approximately 36h)
+- Launch "more like this" based on existing primary archive, adjusting the ``INSTALL_FROM_RELEASE`` user data entry to the release of choice and the ``Name`` tag to "SL Archive (New Candidate)" and adjusting the availability zone (AZ) such that it does not equal the AZ of the current production ARCHIVE and ideally has either the central reverse proxy or a disposable reverse proxy in that AZ so that cross-AZ traffic is avoided.
+- Wait until the new instance is done with its background tasks and CPU utilization goes to 0% (approximately 48h)
 - Create an entry in the reverse proxy's ``/etc/httpd/conf.d/001-events.conf`` file like this:
 ```
   Use Plain archive-candidate.sapsailing.com 172.31.46.203 8888
 ```
 with ``172.31.46.203`` being an example of the internal IP address your new archive candidate instance got assigned.
-- Compare server contents, either with ``compareServers`` script or through REST API, and fix any differences
+ - Check the configuration by running ``httpd -t``. If you get an "OK" as the output, commit and distribute the configuration change to all reverse proxies like this:
+```
+  git checkout main
+  git commit -a
+  git push
+```
+This will disseminate the configuration to all reverse proxies through a Git hook, merge as required and check out the appropriate configuration for that environment again, then reload the configuration in ``httpd``.
+- Compare server contents, either with ``compareServers`` script and fix any differences
 ```
   java/target/compareServers -ael https://www.sapsailing.com https://archive-candidate.sapsailing.com
 ```
-- Do some spot checks on the new instance
-- Switch reverse proxy, by adjusting the archive IP definitions at the top of ``root@sapsailing.com:/etc/httpd/conf.d/000-macros.conf``, followed by ``service httpd reload``
-- Terminate old fail-over EC2 instance; you will have to disabel its termination protection first.
+which uses the REST API to run a full comparison, showing the differences in JSON format; and/or
+```
+  java/target/compareServers -el https://www.sapsailing.com https://archive-candidate.sapsailing.com
+```
+which runs a rather "classic" comparison of the leaderboard groups' JSON representations, showing regular "diff" output and stopping at the first leaderboard group that has differences. After having fixed the differences, you can continue with the previously differing leaderboard group using the ``-c`` option, like this:
+```
+  java/target/compareServers -cel https://www.sapsailing.com https://archive-candidate.sapsailing.com
+```
+- Do some spot checks on the new instance using the ``https://archive-candidate.sapsailing.com`` domain. Note that some links may lead back to the production instance ``www.sapsailing.com`` and replace ``www`` by ``archive-candidate`` accordingly in the URL in these cases.
+- Switch reverse proxy, by adjusting the archive IP definitions at the top of ``root@sapsailing.com:/etc/httpd/conf.d/000-macros.conf``. The file contains two lines close to its top, looking like this:
+```
+Define ARCHIVE_IP 172.31.42.246
+Define ARCHIVE_FAILOVER_IP 172.31.45.7
+```
+Comment out or delete the ``ARCHIVE_FAILOVER_IP`` line. Change ``ARCHIVE_IP`` into ``ARCHIVE_FAILOVER_IP`` to "demote" the current production ARCHIVE to being the failover instance. Insert a new ``ARCHIVE_IP`` definition with the internal IP address of the new archive server. Then, to check and then activate the changes, again:
+```
+  httpd -t   # ensure you get "OK" as the response
+  git checkout main
+  git commit -a
+  git push
+```
+- Terminate old fail-over EC2 instance; you will have to disable its termination protection first.
 - Adjust Name tags for what is now the fail-over and what is now the primary archive server in EC2 console
 
 [[_TOC_]]
@@ -66,7 +92,7 @@ But note: having launched the loading of all races doesn't make the new archive 
 ```
 INFO: Thread[MarkPassingCalculator for race R14 initialization,4,main]: Timeout waiting for future task com.sap.sse.util.impl.ThreadPoolAwareFutureTask@39f29211 (retrying); scheduled with executor com.sap.sse.util.impl.NamedTracingScheduledThreadPoolExecutor@51517746[Running, pool size = 7, active threads = 7, queued tasks = 352521, completed tasks = 610095][name=Default background executor]
 ```
-that will keep repeating. Watch out for the ``queued tasks`` count. It should be decreasing, and when done it should go down to 0 eventually.
+that will keep repeating. Watch out for the ``queued tasks`` count. It should be decreasing, and when done it should go down to 0 eventually, although you may not see a log entry with "queued tasks = 0" necessarily.
 
 ### Create a Temporary Mapping in ``/etc/httpd/conf.d/001-events.conf`` to Make New Server Accessible Before Switching
 
@@ -76,7 +102,7 @@ Grab the internal IP address of your freshly launched archive server candidate (
     Use Plain archive-candidate.sapsailing.com 172.31.35.213 8888
 ```
 
-in the file ``root@sapsailing.com:/etc/httpd/conf.d/001-events.conf``, preferably towards the top of the file where it can be quickly found. Save the changes and check the configuration using the ``apachectl configtest`` command. It should give an output saying ``Syntax OK``. Only in this case reload the configuration by issuing the ``service httpd reload`` command as user ``root``. After this command has completed, you can watch your archive server candidate start up at [https://archive-candidate.sapsailing.com/gwt/status](https://archive-candidate.sapsailing.com/gwt/status) and make any changes necessary when the ``compareServers`` script (see below) notifies you of any differences that need handling.
+in the file ``root@sapsailing.com:/etc/httpd/conf.d/001-events.conf``, preferably towards the top of the file where it can be quickly found. Save the changes and check the configuration using the ``apachectl configtest`` or the equivalend ``httpd -t`` command. It should give an output saying ``Syntax OK``. Only in this case reload the configuration by issuing the ``service httpd reload`` command as user ``root``. After this command has completed, you can watch your archive server candidate start up at [https://archive-candidate.sapsailing.com/gwt/status](https://archive-candidate.sapsailing.com/gwt/status) and make any changes necessary when the ``compareServers`` script (see below) notifies you of any differences that need handling.
 
 ### Comparing Contents with Primary ARCHIVE Server
 

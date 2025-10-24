@@ -32,5 +32,4 @@ public class CompetitorWithClubnameItemDescription extends Widget {
         sailIdUi.setInnerText(competitor.getShortInfo());
         clubnameUi.setInnerHTML(competitor.getName());
     }
-    
 }

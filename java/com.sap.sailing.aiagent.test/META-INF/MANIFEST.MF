@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Test
+Bundle-SymbolicName: com.sap.sailing.aiagent.test
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: SAP
+Fragment-Host: com.sap.sailing.aiagent;bundle-version="1.0.0.qualifier"
+Automatic-Module-Name: com.sap.sailing.aiagent.test
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8

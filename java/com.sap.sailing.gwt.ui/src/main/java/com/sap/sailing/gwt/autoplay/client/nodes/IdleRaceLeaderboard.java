@@ -44,19 +44,15 @@ public class IdleRaceLeaderboard extends FiresPlaceNode {
         boolean withFullscreenButton = settings.getPerspectiveOwnSettings().isFullscreen();
         PerspectiveCompositeSettings<LeaderboardWithZoomingPerspectiveSettings> leaderboardSettings = settings
                 .findSettingsByComponentId(autoplayLifecycle.getLeaderboardLifecycle().getComponentId());
-
         StringMessages stringMessages = StringMessages.INSTANCE;
-
         SAPHeaderComponentLifecycle sapHeaderLifecycle = autoplayLifecycle.getLeaderboardLifecycle().getSapHeaderLifecycle();
         SAPHeaderComponentSettings headerSettings = leaderboardSettings.findSettingsByComponentId(sapHeaderLifecycle.getComponentId());
-        
         MultiRaceLeaderboardWithZoomingPerspective leaderboardPerspective = new MultiRaceLeaderboardWithZoomingPerspective(null, null,
                 autoplayLifecycle.getLeaderboardLifecycle(), leaderboardSettings, cf.getSailingService(),
                 cf.getUserService(), AutoplayHelper.asyncActionsExecutor,
                 new CompetitorSelectionModel(/* hasMultiSelection */ true), leaderboardTimer,
                 cf.getAutoPlayCtxSignalError().getContextDefinition().getLeaderboardName(), cf.getErrorReporter(), stringMessages,
                 withFullscreenButton, Arrays.asList(DetailType.values()), cf);
-
         setPlaceToGo(new LeaderboardPlace(leaderboardPerspective));
         getBus().fireEvent(new AutoPlayHeaderEvent(headerSettings.getTitle(), ""));
         firePlaceChangeAndStartTimer();

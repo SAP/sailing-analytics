@@ -199,7 +199,7 @@ public class SubscriptionWebHookEvent {
             for (int i = 0; i < subscriptionItems.size(); i++) {
                 final Long amount = getJsonValue((JSONObject) subscriptionItems.get(i), "amount");
                 if (amount != null) {
-                    reocurringPaymentValue += amount;
+                    reocurringPaymentValue += amount.intValue();
                 }
             }
         }

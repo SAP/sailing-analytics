@@ -20,8 +20,12 @@ public class AWA extends Fix {
     private final Bearing apparentWindAngle;
     
     public AWA(TimePoint timePoint, Sensor sensor, Map<Integer, Object> valuesPerSubindex) {
+        this(timePoint, sensor, new DegreeBearingImpl(((Number) valuesPerSubindex.get(1)).doubleValue()));
+    }
+
+    public AWA(TimePoint timePoint, Sensor sensor, Bearing apparentWindAngle) {
         super(sensor, timePoint);
-        apparentWindAngle = new DegreeBearingImpl(((Number) valuesPerSubindex.get(1)).doubleValue());
+        this.apparentWindAngle = apparentWindAngle;
     }
 
     public Bearing getApparentWindAngle() {

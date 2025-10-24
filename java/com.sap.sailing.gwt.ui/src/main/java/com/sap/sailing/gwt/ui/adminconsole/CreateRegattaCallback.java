@@ -220,8 +220,8 @@ public class CreateRegattaCallback implements DialogCallback<RegattaDTO>{
         EventDTO result = null;
         eventLoop:
         for (final EventDTO event : existingEvents) {
-            if (event.venue != null) {
-                if (Util.containsAny(event.venue.getCourseAreas(), courseAreas)) {
+            if (event.getVenue() != null) {
+                if (Util.containsAny(event.getVenue().getCourseAreas(), courseAreas)) {
                     result = event;
                     break eventLoop;
                 }

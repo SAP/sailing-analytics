@@ -8,10 +8,11 @@ import com.sap.sailing.domain.common.DetailType;
 import com.sap.sailing.gwt.ui.leaderboard.LeaderboardEntryPoint;
 import com.sap.sailing.gwt.ui.leaderboard.LeaderboardPanel;
 import com.sap.sse.common.Util;
-import com.sap.sse.common.settings.generic.AbstractGenericSerializableSettings;
+import com.sap.sse.common.settings.generic.AbstractGenericSerializableSettingsWithContext;
 import com.sap.sse.common.settings.generic.BooleanSetting;
-import com.sap.sse.common.settings.generic.EnumSetSetting;
 import com.sap.sse.common.settings.generic.LongSetting;
+import com.sap.sse.security.ui.client.SecurityChildSettingsContext;
+import com.sap.sse.security.ui.client.premium.settings.SecuredEnumSetSetting;
 
 /**
  * Settings for the {@link LeaderboardPanel} component. If you change here, please also visit
@@ -21,13 +22,13 @@ import com.sap.sse.common.settings.generic.LongSetting;
  * @author Axel Uhl (d043530)
  *
  */
-public abstract class LeaderboardSettings extends AbstractGenericSerializableSettings {
+public abstract class LeaderboardSettings extends AbstractGenericSerializableSettingsWithContext<SecurityChildSettingsContext> {
     private static final long serialVersionUID = 2625004077963291333L;
     
-    protected EnumSetSetting<DetailType> maneuverDetailsToShow;
-    protected EnumSetSetting<DetailType> legDetailsToShow;
-    protected EnumSetSetting<DetailType> raceDetailsToShow;
-    protected EnumSetSetting<DetailType> overallDetailsToShow;
+    protected SecuredEnumSetSetting<DetailType> maneuverDetailsToShow;
+    protected SecuredEnumSetSetting<DetailType> legDetailsToShow;
+    protected SecuredEnumSetSetting<DetailType> raceDetailsToShow;
+    protected SecuredEnumSetSetting<DetailType> overallDetailsToShow;
     protected LongSetting delayBetweenAutoAdvancesInMilliseconds;
     protected BooleanSetting isShowCompetitorNationality;
     
@@ -41,25 +42,27 @@ public abstract class LeaderboardSettings extends AbstractGenericSerializableSet
     protected BooleanSetting showCompetitorBoatInfoColumn;
         
     @Override
-    protected void addChildSettings() {
+    protected void addChildSettings(SecurityChildSettingsContext context) {
         isShowCompetitorNationality = new BooleanSetting("showCompetitorNationality", this, false);
         List<DetailType> maneuverDetails = new ArrayList<>();
         maneuverDetails.add(DetailType.TACK);
         maneuverDetails.add(DetailType.JIBE);
         maneuverDetails.add(DetailType.PENALTY_CIRCLE);
-        maneuverDetailsToShow = new EnumSetSetting<>("maneuverDetailsToShow", this, maneuverDetails, DetailType::valueOfString);
+        maneuverDetailsToShow = new SecuredEnumSetSetting<>("maneuverDetailsToShow", this, maneuverDetails, DetailType::valueOfString, 
+                context);
         List<DetailType> legDetails = new ArrayList<>();
-        legDetails.add(DetailType.LEG_DISTANCE_TRAVELED);
-        legDetails.add(DetailType.LEG_AVERAGE_SPEED_OVER_GROUND_IN_KNOTS);
         legDetails.add(DetailType.LEG_RANK_GAIN);
-        legDetailsToShow = new EnumSetSetting<>("legDetailsToShow", this, legDetails, DetailType::valueOfString);
+        legDetailsToShow = new SecuredEnumSetSetting<>("legDetailsToShow", this, legDetails, DetailType::valueOfString, 
+                context);
         List<DetailType> raceDetails = new ArrayList<>();
         raceDetails.add(DetailType.RACE_DISPLAY_LEGS);
         raceDetails.add(DetailType.RACE_DISPLAY_BOATS);
-        raceDetailsToShow = new EnumSetSetting<>("raceDetailsToShow", this, raceDetails, DetailType::valueOfString);
+        raceDetailsToShow = new SecuredEnumSetSetting<>("raceDetailsToShow", this, raceDetails, DetailType::valueOfString, 
+                context);
         List<DetailType> overallDetails = new ArrayList<>();
         overallDetails.add(DetailType.REGATTA_RANK);
-        overallDetailsToShow = new EnumSetSetting<>("overallDetailsToShow", this, overallDetails, DetailType::valueOfString);
+        overallDetailsToShow = new SecuredEnumSetSetting<>("overallDetailsToShow", this, overallDetails, DetailType::valueOfString, 
+                context);
         delayBetweenAutoAdvancesInMilliseconds = new LongSetting("delayBetweenAutoAdvancesInMilliseconds", this, LeaderboardEntryPoint.DEFAULT_REFRESH_INTERVAL_MILLIS);
         showAddedScores = new BooleanSetting("showAddedScores", this, false);
         showCompetitorShortNameColumn = new BooleanSetting("showCompetitorShortNameColumn", this, true);
@@ -67,7 +70,8 @@ public abstract class LeaderboardSettings extends AbstractGenericSerializableSet
         showCompetitorBoatInfoColumn = new BooleanSetting("showCompetitorBoatInfoColumn", this, false);
     }
     
-    public LeaderboardSettings(boolean showCompetitorBoatInfoColumnDefault) {
+    public LeaderboardSettings(boolean showCompetitorBoatInfoColumnDefault, SecurityChildSettingsContext context) {
+        super(context);
         showCompetitorBoatInfoColumn.setDefaultValue(showCompetitorBoatInfoColumnDefault);
     }
     
@@ -79,7 +83,8 @@ public abstract class LeaderboardSettings extends AbstractGenericSerializableSet
             Long delayBetweenAutoAdvancesInMilliseconds, 
             boolean showAddedScores, boolean showCompetitorShortNameColumn, 
             boolean showCompetitorFullNameColumn, boolean showCompetitorBoatInfoColumn,
-            boolean isCompetitorNationalityColumnVisible) {
+            boolean isCompetitorNationalityColumnVisible, SecurityChildSettingsContext context) {
+        this(showCompetitorBoatInfoColumn, context);
         this.legDetailsToShow.setValues(legDetailsToShow);
         this.raceDetailsToShow.setValues(raceDetailsToShow);
         this.overallDetailsToShow.setValues(overallDetailsToShow);
@@ -88,7 +93,6 @@ public abstract class LeaderboardSettings extends AbstractGenericSerializableSet
         this.showAddedScores.setValue(showAddedScores);
         this.showCompetitorShortNameColumn.setValue(showCompetitorShortNameColumn);
         this.showCompetitorFullNameColumn.setValue(showCompetitorFullNameColumn);
-        this.showCompetitorBoatInfoColumn.setValue(showCompetitorBoatInfoColumn);
         this.isShowCompetitorNationality.setValue(isCompetitorNationalityColumnVisible);
     }
   

@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.ModifiableDataMiningServer;
 import com.sap.sse.datamining.Query;

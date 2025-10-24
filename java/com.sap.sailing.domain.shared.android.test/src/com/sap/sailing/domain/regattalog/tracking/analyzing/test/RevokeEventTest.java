@@ -2,9 +2,8 @@ package com.sap.sailing.domain.regattalog.tracking.analyzing.test;
 
 import java.util.UUID;
 
-import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.regatta.RegattaLogEvent;
 import com.sap.sailing.domain.abstractlog.regatta.events.RegattaLogRevokeEvent;
@@ -23,7 +22,7 @@ public class RevokeEventTest extends AbstractRegattaLogTrackingTest {
         log.add(revokeEvent);
         
         log.lockForRead();
-        Assert.assertFalse(Util.contains(log.getUnrevokedEvents(), event));
+        Assertions.assertFalse(Util.contains(log.getUnrevokedEvents(), event));
         log.unlockAfterRead();
     }
     
@@ -37,7 +36,7 @@ public class RevokeEventTest extends AbstractRegattaLogTrackingTest {
         log.add(revokeEvent);
         
         log.lockForRead();
-        Assert.assertTrue(Util.contains(log.getUnrevokedEvents(), event));
+        Assertions.assertTrue(Util.contains(log.getUnrevokedEvents(), event));
         log.unlockAfterRead();
     }
     
@@ -53,9 +52,9 @@ public class RevokeEventTest extends AbstractRegattaLogTrackingTest {
         log.add(revokeEvent);
         
         log.lockForRead();
-        Assert.assertFalse(Util.contains(log.getUnrevokedEvents(), event));
-        Assert.assertFalse(Util.contains(log.getUnrevokedEvents(), revokeEvent));
-        Assert.assertFalse(Util.contains(log.getUnrevokedEvents(), revokeEvent2));
+        Assertions.assertFalse(Util.contains(log.getUnrevokedEvents(), event));
+        Assertions.assertFalse(Util.contains(log.getUnrevokedEvents(), revokeEvent));
+        Assertions.assertFalse(Util.contains(log.getUnrevokedEvents(), revokeEvent2));
         log.unlockAfterRead();
     }
 }

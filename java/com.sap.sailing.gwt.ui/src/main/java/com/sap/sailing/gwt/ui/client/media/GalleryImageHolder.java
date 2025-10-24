@@ -19,13 +19,14 @@ import com.sap.sailing.gwt.common.client.SharedResources;
 import com.sap.sailing.gwt.home.desktop.partials.media.MediaPageResources;
 import com.sap.sailing.gwt.home.shared.SharedHomeResources;
 import com.sap.sse.gwt.client.media.ImageDTO;
+import com.sap.sse.gwt.client.media.MediaMenuIcon;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 
 public class GalleryImageHolder extends Composite implements HasClickHandlers {
 
     private static VideoThumbnailUiBinder uiBinder = GWT.create(VideoThumbnailUiBinder.class);
     private final String imageSourceRef;
     private final Date imageCreateAt;
-
     interface VideoThumbnailUiBinder extends UiBinder<Widget, GalleryImageHolder> {
     }
 
@@ -35,8 +36,11 @@ public class GalleryImageHolder extends Composite implements HasClickHandlers {
     Anchor deleteAnchor;
     @UiField
     DivElement overlay;
+    @UiField(provided=true)
+    MediaMenuIcon imageMenuButton;
 
-    public GalleryImageHolder(ImageDTO image, ClickHandler deleteHandler) {
+    public GalleryImageHolder(ImageDTO image, ClickHandler deleteHandler, TakedownNoticeService takedownNoticeService, String eventName) {
+        imageMenuButton = new MediaMenuIcon(takedownNoticeService, "takedownRequestForEventGalleryImage");
         initWidget(uiBinder.createAndBindUi(this));
         SharedResources.INSTANCE.mainCss().ensureInjected();
         MediaPageResources.INSTANCE.css().ensureInjected();
@@ -46,6 +50,7 @@ public class GalleryImageHolder extends Composite implements HasClickHandlers {
         deleteAnchor.addClickHandler(deleteHandler);
         imageHolderUi.getStyle()
                 .setBackgroundImage("url(\"" + UriUtils.fromString(image.getSourceRef()).asString() + "\")");
+        imageMenuButton.setData(eventName, image.getSourceRef());
     }
 
     public boolean isImage(ImageDTO image) {

@@ -1,9 +1,9 @@
 package com.sap.sailing.xrr.resultimport.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,7 +24,7 @@ import java.util.TimeZone;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 import com.sap.sailing.domain.common.MaxPointsReason;
@@ -75,13 +75,13 @@ public class ParserTest {
     }
 
     @Test
-    public void testSimpleParsingSomeLaserDocument() throws JAXBException, IOException {
+    public void testSimpleParsingSomeLaserDocument() throws JAXBException, IOException, SAXException, ParserConfigurationException {
         RegattaResults o = ParserFactory.INSTANCE.createParser(getInputStream(SAMPLE_INPUT_NAME_LASER), SAMPLE_INPUT_NAME_LASER).parse();
         assertNotNull(o);
     }
 
     @Test
-    public void testSimpleParsingSomeStarDocument() throws JAXBException, IOException {
+    public void testSimpleParsingSomeStarDocument() throws JAXBException, IOException, SAXException, ParserConfigurationException {
         RegattaResults o = ParserFactory.INSTANCE.createParser(getInputStream(SAMPLE_INPUT_NAME_STAR), SAMPLE_INPUT_NAME_STAR).parse();
         assertNotNull(o);
     }

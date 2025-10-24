@@ -1,9 +1,9 @@
 package com.sap.sse.security.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.UnknownHostException;
 import java.util.Collections;
@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoDatabase;
@@ -23,12 +23,13 @@ import com.sap.sse.mongodb.MongoDBService;
 import com.sap.sse.security.interfaces.AccessControlStore;
 import com.sap.sse.security.interfaces.UserImpl;
 import com.sap.sse.security.interfaces.UserStore;
-import com.sap.sse.security.shared.UserStoreManagementException;
 import com.sap.sse.security.shared.QualifiedObjectIdentifier;
 import com.sap.sse.security.shared.RoleDefinition;
 import com.sap.sse.security.shared.TypeRelativeObjectIdentifier;
 import com.sap.sse.security.shared.UserGroupManagementException;
+import com.sap.sse.security.shared.UserStoreManagementException;
 import com.sap.sse.security.shared.WildcardPermission;
+import com.sap.sse.security.shared.impl.LockingAndBanningImpl;
 import com.sap.sse.security.shared.impl.QualifiedObjectIdentifierImpl;
 import com.sap.sse.security.shared.impl.User;
 import com.sap.sse.security.shared.impl.UserGroup;
@@ -53,7 +54,7 @@ public class AccessControlStoreTest {
     private User testOwner;
     private UserGroup adminTenant;
 
-    @Before
+    @BeforeEach
     public void setUp() throws UnknownHostException, MongoException, UserGroupManagementException {
         final MongoDBConfiguration dbConfiguration = MongoDBConfiguration.getDefaultTestConfiguration();
         final MongoDBService service = dbConfiguration.getService();
@@ -68,7 +69,7 @@ public class AccessControlStoreTest {
         Map<String, UserGroup> defaultTenantForUser = new HashMap<>();
         defaultTenantForUser.put("dummyServer", adminTenant);
         testOwner = new UserImpl("admin", "admin@sapsailing.com", defaultTenantForUser,
-                /* userGroupProvider */ null);
+                /* userGroupProvider */ null, new LockingAndBanningImpl());
     }
 
     private void newStores() {

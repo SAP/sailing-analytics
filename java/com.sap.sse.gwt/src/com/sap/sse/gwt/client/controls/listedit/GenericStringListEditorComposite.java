@@ -183,7 +183,7 @@ public abstract class GenericStringListEditorComposite<ValueType> extends ListEd
             inputBox.addKeyUpHandler(new KeyUpHandler() {
                 @Override
                 public void onKeyUp(KeyUpEvent event) {
-                    addButton.setEnabled(!inputBox.getValue().isEmpty());
+                    enableAddButtonBasedOnInputBoxText(inputBox);
                 }
             });
             inputBox.addKeyPressHandler(new KeyPressHandler() {
@@ -194,12 +194,13 @@ public abstract class GenericStringListEditorComposite<ValueType> extends ListEd
                     }
                 }
             });
+            inputBox.addValueChangeHandler(vch->enableAddButtonBasedOnInputBoxText(inputBox));
             // Add addition handler for selection because cannot use one handler for changed SuggestBox value by reason
             // of gwt bug https://github.com/gwtproject/gwt/issues/1642
             inputBox.addSelectionHandler(new SelectionHandler<Suggestion>() {
                 @Override
                 public void onSelection(SelectionEvent<Suggestion> event) {
-                    addButton.setEnabled(!inputBox.getValue().isEmpty());
+                    enableAddButtonBasedOnInputBoxText(inputBox);
                 }
             });
         }
@@ -219,6 +220,22 @@ public abstract class GenericStringListEditorComposite<ValueType> extends ListEd
         @Override
         protected Widget createValueWidget(int rowIndex, ValueType newValue) {
             return new Label(getContext().toString(newValue));
+        }
+
+        /**
+         * Invoked after key-up and other value change events on the input box; uses {@link #isToEnableAddButtonBasedOnValueOfInputBoxText(SuggestBox)}
+         * to determine whether to enable or disable the {@link #addButton Add button} and enables or disables it.
+         */
+        protected void enableAddButtonBasedOnInputBoxText(final SuggestBox inputBox) {
+            addButton.setEnabled(isToEnableAddButtonBasedOnValueOfInputBoxText(inputBox));
+        }
+
+        /**
+         * Invoked after key-up and other value change events on the input box; based on this method's
+         * result, the {@link #addButton Add button} is enabled or disabled.
+         */
+        protected boolean isToEnableAddButtonBasedOnValueOfInputBoxText(final SuggestBox inputBox) {
+            return !inputBox.getValue().isEmpty();
         }
     }
 }

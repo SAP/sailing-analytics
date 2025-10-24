@@ -10,9 +10,14 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.ResizeComposite;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.sap.sailing.gwt.ui.shared.SailingImageDTO;
 import com.sap.sse.common.Util;
 import com.sap.sse.gwt.client.media.ImageDTO;
+import com.sap.sse.gwt.client.media.MediaMenuIcon;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
+import com.sap.sse.gwt.common.CommonSharedResources;
 
 public class MobileGalleryPlayer extends ResizeComposite {
    
@@ -26,20 +31,27 @@ public class MobileGalleryPlayer extends ResizeComposite {
     private int selectedIdx;
     private boolean autoplay;
 
-    public MobileGalleryPlayer(ImageDTO selected, Collection<? extends ImageDTO> images) {
+    public MobileGalleryPlayer(ImageDTO selected, Collection<SailingImageDTO> images, TakedownNoticeService takedownNoticeService) {
+        CommonSharedResources.INSTANCE.mainCss().ensureInjected();
         initWidget(uiBinder.createAndBindUi(this));
         selectedIdx = Math.max(selectedIdx, Util.indexOf(images, selected));
-        for (ImageDTO i : images) {
-            mainSliderUi.appendChild(createMainImgElement(i));
+        for (SailingImageDTO i : images) {
+            mainSliderUi.appendChild(createMainImgElement(i, takedownNoticeService));
         }
     }
     
-    private DivElement createMainImgElement(ImageDTO i) {
+    private DivElement createMainImgElement(SailingImageDTO i, TakedownNoticeService takedownNoticeService) {
         DivElement img = Document.get().createDivElement();
         img.getStyle().setBackgroundImage("url(\"" + i.getSourceRef() + "\")");
         img.getStyle().setProperty("backgroundSize", "contain");
         img.getStyle().setProperty("backgroundRepeat", "no-repeat");
         img.getStyle().setProperty("backgroundPosition", "center");
+        img.addClassName(CommonSharedResources.INSTANCE.mainCss().media_wrapper());
+        final MediaMenuIcon mmi = new MediaMenuIcon(takedownNoticeService, "takedownRequestForEventGalleryImage");
+        mmi.setFontSize("20px");
+        RootPanel.get().add(mmi); // required to attach to the DOM and let the mouse click handler become effective
+        mmi.setData(i.getEventLink().getDisplayName(), i.getSourceRef());
+        img.appendChild(mmi.getElement());
         return img;
     }
 

@@ -177,4 +177,6 @@ com.sap.sse.gwt.adminconsole.StringMessages {
     String runOnExisting();
     String publicIp();
     String privateIp();
+    String igtimiRiotPort();
+    String examplePort(int examplePort);
 }

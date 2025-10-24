@@ -27,9 +27,11 @@ import net.sf.marineapi.nmea.sentence.TalkerId;
 import net.sf.marineapi.nmea.util.CompassPoint;
 import net.sf.marineapi.nmea.util.Position;
 import net.sf.marineapi.nmea.util.Time;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * GNS parser tests
@@ -43,7 +45,7 @@ public class GNSTest {
     GNSSentence gns;
     GNSSentence empty;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         gns = new GNSParser(EXAMPLE);

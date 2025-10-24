@@ -48,7 +48,8 @@ import com.sap.sailing.domain.markpassingcalculation.MarkPassingCalculator;
 import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprintRegistry;
 import com.sap.sailing.domain.racelog.RaceLogAndTrackedRaceResolver;
 import com.sap.sailing.domain.ranking.RankingMetricConstructor;
-import com.sap.sailing.domain.tracking.AddResult;
+import com.sap.sailing.domain.shared.tracking.AddResult;
+import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
 import com.sap.sailing.domain.tracking.CourseDesignChangedListener;
 import com.sap.sailing.domain.tracking.DynamicGPSFixTrack;
 import com.sap.sailing.domain.tracking.DynamicSensorFixTrack;
@@ -65,7 +66,6 @@ import com.sap.sailing.domain.tracking.TrackFactory;
 import com.sap.sailing.domain.tracking.TrackedLeg;
 import com.sap.sailing.domain.tracking.TrackedRaceStatus;
 import com.sap.sailing.domain.tracking.TrackedRegatta;
-import com.sap.sailing.domain.tracking.TrackingConnectorInfo;
 import com.sap.sailing.domain.tracking.TrackingDataLoader;
 import com.sap.sailing.domain.tracking.WindStore;
 import com.sap.sailing.domain.tracking.WindTrack;
@@ -167,7 +167,7 @@ DynamicTrackedRace, GPSTrackListener<Competitor, GPSFixMoving> {
         for (final RaceLog raceLog : attachedRaceLogs.values()) {
             getRaceState(raceLog).addChangedListener(raceStateBasedStartTimeChangedListener);
         }
-        listeners = new HashSet<RaceChangeListener>();
+        listeners = getListeners(); // force creation only if default read object or superclass constructor didn't create it yet
         logListener = new DynamicTrackedRaceLogListener(this);
         courseDesignChangedListeners = new HashSet<>();
         startTimeChangedListeners = new HashSet<>();

@@ -8,7 +8,12 @@ import com.sap.sse.common.Timed;
  * not throw an exception.
  */
 public interface DoubleVectorFix extends Timed {
+    /**
+     * Obtains a copy of the array of {@link Double} values in this fix. Changes to the array returned
+     * do <em>not</em> modify this fix.
+     */
     Double[] get();
+
     Double get(int index);
     /**
      * Tells whether at least one component is not {@code null}

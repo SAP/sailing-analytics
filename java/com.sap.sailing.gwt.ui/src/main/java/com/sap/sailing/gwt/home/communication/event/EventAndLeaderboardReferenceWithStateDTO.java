@@ -2,6 +2,8 @@ package com.sap.sailing.gwt.home.communication.event;
 
 import java.util.UUID;
 
+import com.sap.sailing.gwt.ui.shared.EventReferenceDTO;
+
 public class EventAndLeaderboardReferenceWithStateDTO extends EventReferenceDTO {
     
     // TODO replace with RegattaState

@@ -2,9 +2,7 @@ package com.sap.sailing.selenium.pages.gwt.query.expr;
 
 import com.sap.sailing.selenium.pages.gwt.query.Expression;
 import com.sap.sailing.selenium.pages.gwt.query.Predicate;
-
 import com.sap.sailing.selenium.pages.gwt.query.operation.BooleanOperation;
-
 import com.sap.sailing.selenium.pages.gwt.query.operation.bool.And;
 import com.sap.sailing.selenium.pages.gwt.query.operation.bool.Not;
 import com.sap.sailing.selenium.pages.gwt.query.operation.bool.Or;

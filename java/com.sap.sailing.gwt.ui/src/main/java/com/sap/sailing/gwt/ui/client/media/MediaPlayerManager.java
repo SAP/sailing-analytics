@@ -48,10 +48,6 @@ public interface MediaPlayerManager {
     
     void closeFloatingPlayer(MediaTrackWithSecurityDTO videoTrack);
     
-    void playDockedVideo(MediaTrackWithSecurityDTO videoTrack);
-    
-    void closeDockedVideo();
-    
     void addMediaTrack();
     
     boolean deleteMediaTrack(MediaTrackWithSecurityDTO mediaTrack);
@@ -78,8 +74,6 @@ public interface MediaPlayerManager {
 
     List<MediaTrack> getVideoTracks();
 
-    MediaTrack getDockedVideoTrack();
-
     UserAgentDetails getUserAgent();
 
     RegattaAndRaceIdentifier getCurrentRace();
@@ -91,6 +85,5 @@ public interface MediaPlayerManager {
     ErrorReporter getErrorReporter();
 
     Status getMediaTrackStatus(MediaTrack track);
-
 }
 

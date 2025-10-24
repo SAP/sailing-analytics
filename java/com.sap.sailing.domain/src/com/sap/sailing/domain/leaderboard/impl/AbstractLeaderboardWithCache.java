@@ -69,6 +69,7 @@ import com.sap.sailing.domain.common.dto.LegEntryDTO;
 import com.sap.sailing.domain.common.dto.MetaLeaderboardRaceColumnDTO;
 import com.sap.sailing.domain.common.dto.RaceColumnDTO;
 import com.sap.sailing.domain.common.dto.RaceDTO;
+import com.sap.sailing.domain.common.polars.NotEnoughDataHasBeenAddedException;
 import com.sap.sailing.domain.common.sharding.ShardingType;
 import com.sap.sailing.domain.common.tracking.BravoExtendedFix;
 import com.sap.sailing.domain.common.tracking.BravoFix;
@@ -142,20 +143,22 @@ public abstract class AbstractLeaderboardWithCache implements Leaderboard {
         private final Distance averageAbsoluteCrossTrackError;
         private final Distance averageSignedCrossTrackError;
         private final Duration gapToLeaderInOwnTime;
+        private final Double percentTargetBoatSpeed;
         private final Duration timeSailedSinceRaceStart;
         private final Duration correctedTime;
         private final Duration correctedTimeAtEstimatedArrivalAtCompetitorFarthestAhead;
 
         public RaceDetails(List<LegEntryDTO> legDetails, Distance windwardDistanceToCompetitorFarthestAhead,
                 Distance averageAbsoluteCrossTrackError, Distance averageSignedCrossTrackError,
-                Duration gapToLeaderInOwnTime, Duration timeSailedSinceRaceStart,
-                Duration correctedTime, Duration correctedTimeAtEstimatedArrivalAtCompetitorFarthestAhead) {
+                Duration gapToLeaderInOwnTime, Double percentTargetBoatSpeed,
+                Duration timeSailedSinceRaceStart, Duration correctedTime, Duration correctedTimeAtEstimatedArrivalAtCompetitorFarthestAhead) {
             super();
             this.legDetails = legDetails;
             this.windwardDistanceToCompetitorFarthestAhead = windwardDistanceToCompetitorFarthestAhead;
             this.averageAbsoluteCrossTrackError = averageAbsoluteCrossTrackError;
             this.averageSignedCrossTrackError = averageSignedCrossTrackError;
             this.gapToLeaderInOwnTime = gapToLeaderInOwnTime;
+            this.percentTargetBoatSpeed = percentTargetBoatSpeed;
             this.correctedTime = correctedTime;
             this.timeSailedSinceRaceStart = timeSailedSinceRaceStart;
             this.correctedTimeAtEstimatedArrivalAtCompetitorFarthestAhead = correctedTimeAtEstimatedArrivalAtCompetitorFarthestAhead;
@@ -183,6 +186,9 @@ public abstract class AbstractLeaderboardWithCache implements Leaderboard {
         }
         public Duration getCorrectedTimeAtEstimatedArrivalAtCompetitorFarthestAhead() {
             return correctedTimeAtEstimatedArrivalAtCompetitorFarthestAhead;
+        }
+        public Double getPercentTargetBoatSpeed() {
+            return percentTargetBoatSpeed;
         }
     }
 
@@ -656,10 +662,11 @@ public abstract class AbstractLeaderboardWithCache implements Leaderboard {
      *            the correction was removed.
      */
     private LeaderboardEntryDTO getLeaderboardEntryDTO(Entry entry, RaceColumn raceColumn, Competitor competitor,
-            TimePoint timePoint, boolean addLegDetails, RankingInfo rankingInfo,
-            boolean waitForLatestAnalyses, Map<Leg, LinkedHashMap<Competitor, Integer>> legRanksCache,
-            DomainFactory baseDomainFactory, boolean fillTotalPointsUncorrected, WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache) {
-        LeaderboardEntryDTO entryDTO = new LeaderboardEntryDTO();
+            TimePoint timePoint, boolean addLegDetails, RankingInfo rankingInfo, boolean waitForLatestAnalyses,
+            Map<Leg, LinkedHashMap<Competitor, Integer>> legRanksCache, DomainFactory baseDomainFactory,
+            boolean fillTotalPointsUncorrected, WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache)
+            throws NotEnoughDataHasBeenAddedException {
+        final LeaderboardEntryDTO entryDTO = new LeaderboardEntryDTO();
         final TrackedRace trackedRace = raceColumn.getTrackedRace(competitor);
         entryDTO.race = trackedRace == null ? null : trackedRace.getRaceIdentifier();
         Boat boat = getBoatOfCompetitor(competitor, raceColumn);
@@ -708,6 +715,7 @@ public abstract class AbstractLeaderboardWithCache implements Leaderboard {
                 }
                 entryDTO.calculatedTimeAtEstimatedArrivalAtCompetitorFarthestAhead = raceDetails.getCorrectedTimeAtEstimatedArrivalAtCompetitorFarthestAhead();
                 entryDTO.gapToLeaderInOwnTime = raceDetails.getGapToLeaderInOwnTime();
+                entryDTO.percentTargetBoatSpeed = raceDetails.getPercentTargetBoatSpeed();
                 try {
                     BravoFixTrack<Competitor> sensorTrack = trackedRace.getSensorTrack(competitor, BravoFixTrack.TRACK_NAME);
                     if (sensorTrack != null) {
@@ -880,7 +888,9 @@ public abstract class AbstractLeaderboardWithCache implements Leaderboard {
      */
     private RaceDetails getRaceDetails(TrackedRace trackedRace, Competitor competitor, TimePoint timePoint,
             boolean waitForLatestAnalyses, Map<Leg, LinkedHashMap<Competitor, Integer>> legRanksCache,
-            RankingInfo rankingInfo, WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache) throws InterruptedException, ExecutionException {
+            RankingInfo rankingInfo, WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache)
+            throws InterruptedException, ExecutionException, MaxIterationsExceededException,
+            FunctionEvaluationException, NotEnoughDataHasBeenAddedException {
         final RaceDetails raceDetails;
         if (trackedRace.getEndOfTracking() != null && trackedRace.getEndOfTracking().compareTo(timePoint) < 0) {
             raceDetails = getRaceDetailsForEndOfTrackingFromCacheOrCalculateAndCache(trackedRace, competitor, legRanksCache, rankingInfo, cache);
@@ -933,7 +943,8 @@ public abstract class AbstractLeaderboardWithCache implements Leaderboard {
 
     private RaceDetails calculateRaceDetails(TrackedRace trackedRace, Competitor competitor, TimePoint timePoint,
             boolean waitForLatestAnalyses, Map<Leg, LinkedHashMap<Competitor, Integer>> legRanksCache,
-            WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache, final RankingInfo rankingInfo) {
+            WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache, final RankingInfo rankingInfo)
+            throws MaxIterationsExceededException, FunctionEvaluationException, NotEnoughDataHasBeenAddedException {
         final List<LegEntryDTO> legDetails = new ArrayList<LegEntryDTO>();
         final Course course = trackedRace.getRace().getCourse();
         course.lockForRead(); // hold back any course re-configurations while looping over the legs
@@ -962,9 +973,9 @@ public abstract class AbstractLeaderboardWithCache implements Leaderboard {
             final CompetitorRankingInfo competitorRankingInfo = rankingInfo.getCompetitorRankingInfo().apply(competitor);
             return new RaceDetails(legDetails, windwardDistanceToCompetitorFarthestAhead, averageAbsoluteCrossTrackError, averageSignedCrossTrackError,
                     trackedRace.getRankingMetric().getGapToLeaderInOwnTime(rankingInfo, competitor, cache),
+                    trackedRace.getPercentTargetBoatSpeed(competitor, timePoint, cache),
                     trackedRace.getTimeSailedSinceRaceStart(competitor, timePoint),
-                    competitorRankingInfo == null ? null : competitorRankingInfo.getCorrectedTime(),
-                    competitorRankingInfo == null ? null : competitorRankingInfo.getCorrectedTimeAtEstimatedArrivalAtCompetitorFarthestAhead());
+                    competitorRankingInfo == null ? null : competitorRankingInfo.getCorrectedTime(), competitorRankingInfo == null ? null : competitorRankingInfo.getCorrectedTimeAtEstimatedArrivalAtCompetitorFarthestAhead());
         } finally {
             course.unlockAfterRead();
         }
@@ -1165,6 +1176,7 @@ public abstract class AbstractLeaderboardWithCache implements Leaderboard {
             result.setExpeditionJibCarPortIfAvailable(extractDoubleValue.apply(TrackedLegOfCompetitor::getExpeditionJibCarPortIfAvailable, TrackedLegOfCompetitor::getAverageExpeditionJibCarPortIfAvailable));
             result.setExpeditionJibCarStbdIfAvailable(extractDoubleValue.apply(TrackedLegOfCompetitor::getExpeditionJibCarStbdIfAvailable, TrackedLegOfCompetitor::getAverageExpeditionJibCarStbdIfAvailable));
             result.setExpeditionMastButtIfAvailable(extractDoubleValue.apply(TrackedLegOfCompetitor::getExpeditionMastButtIfAvailable, TrackedLegOfCompetitor::getAverageExpeditionMastButtIfAvailable));
+            result.setExpeditionKickerTensionIfAvailable(extractDoubleValue.apply(TrackedLegOfCompetitor::getExpeditionKickerTensionIfAvailable, TrackedLegOfCompetitor::getAverageExpeditionKickerTensionIfAvailable));
         }
         return result;
     }

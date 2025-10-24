@@ -2,8 +2,8 @@ package com.sap.sailing.gwt.home.communication.anniversary;
 
 import java.util.Collection;
 
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
 import com.sap.sse.gwt.dispatch.shared.commands.ListResult;
+import com.sap.sse.gwt.shared.DTO;
 
 /**
  * This class is used to transmit current anniversary states to the front-end. It is used to highlight anniversaries

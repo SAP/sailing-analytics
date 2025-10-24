@@ -1,10 +1,10 @@
 package com.sap.sailing.freg.resultimport.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.resultimport.CompetitorRow;
 import com.sap.sailing.resultimport.RegattaResults;
@@ -103,7 +103,7 @@ public class SimpleHtmlParsingTest {
         resourceAsStream.close();
         for (int i=2; i<rowContents.size()-1; i++) {
             List<String> tdContent = parser.getTagContents(rowContents.get(i), "td");
-            assertEquals("Expected "+tdContent+" index "+i+" to have size 14 but was "+tdContent.size(), 14, tdContent.size());
+            assertEquals(14, tdContent.size(), "Expected "+tdContent+" index "+i+" to have size 14 but was "+tdContent.size());
         }
     }
     

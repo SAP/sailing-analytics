@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.sap.sailing.gwt.home.communication.race.FleetMetadataDTO;
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
+import com.sap.sse.gwt.shared.DTO;
 
 public class RegattaProgressSeriesDTO implements DTO {
     private String name;

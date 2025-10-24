@@ -13,6 +13,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * A runnable received for UDP messages; when run, it starts listening for incoming UDP datagrams on the port specified to the
+ * {@link #UDPReceiver(int) constructor}. Non-empty datagrams are then submitted to the {@link UDPMessageParser} returned by
+ * {@link #getParser()} which concrete subclasses have to implement. The parser produces messages of type {@code MessageType}.
+ * Those will be forwarded to {@link #addListener(UDPMessageListener, boolean) registered} {@link UDPMessageListener listeners}.
+ * 
+ * @author Axel Uhl (d043530)
+ */
 public abstract class UDPReceiver<MessageType extends UDPMessage, ListenerType extends UDPMessageListener<MessageType>> implements Runnable {
     private static final Logger logger = Logger.getLogger(UDPReceiver.class.getName());
     
@@ -91,9 +99,9 @@ public abstract class UDPReceiver<MessageType extends UDPMessage, ListenerType e
      * start this object in a new thread.
      */
     public UDPReceiver(int listeningOnPort) throws SocketException {
-        udpSocket = new DatagramSocket(listeningOnPort);
+        udpSocket = listeningOnPort == 0 ? new DatagramSocket() : new DatagramSocket(listeningOnPort);
         listeners = new ConcurrentHashMap<>();
-        this.listeningOnPort = listeningOnPort;
+        this.listeningOnPort = udpSocket.getLocalPort();
         dispatchingToListenersThread = null;
     }
     
@@ -132,13 +140,12 @@ public abstract class UDPReceiver<MessageType extends UDPMessage, ListenerType e
     }
 
     public void run() {
-        byte[] buf = new byte[MAX_PACKET_SIZE];
-        DatagramPacket p = new DatagramPacket(buf, buf.length);
+        final byte[] buf = new byte[MAX_PACKET_SIZE];
+        final DatagramPacket p = new DatagramPacket(buf, buf.length);
         while (!stopped) {
             try {
                 udpSocket.receive(p);
-                String packetAsString = new String(p.getData(), p.getOffset(), p.getLength()).trim();
-                if (packetAsString.length() > 0) {
+                if (p.getLength() > 0) { // don't try to parse empty datagrams
                     MessageType msg = getParser().parse(p);
                     if (msg != null) {
                         synchronized (this) {
@@ -178,6 +185,10 @@ public abstract class UDPReceiver<MessageType extends UDPMessage, ListenerType e
 
     public int getPort() {
         return listeningOnPort;
+    }
+    
+    public DatagramSocket getSocket() {
+        return udpSocket;
     }
 
     protected abstract UDPMessageParser<MessageType> getParser();

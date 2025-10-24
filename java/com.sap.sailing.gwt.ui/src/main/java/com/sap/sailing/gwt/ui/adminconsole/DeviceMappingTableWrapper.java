@@ -9,9 +9,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.sap.sailing.gwt.ui.client.MappableToDeviceFormatter;
 import com.sap.sailing.gwt.ui.client.SailingServiceWriteAsync;
 import com.sap.sailing.gwt.ui.client.StringMessages;
-import com.sap.sailing.gwt.ui.common.client.DateAndTimeFormatterUtil;
 import com.sap.sailing.gwt.ui.shared.DeviceMappingDTO;
 import com.sap.sse.common.Util;
+import com.sap.sse.gwt.client.DateAndTimeFormatterUtil;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.celltable.RefreshableSingleSelectionModel;
 

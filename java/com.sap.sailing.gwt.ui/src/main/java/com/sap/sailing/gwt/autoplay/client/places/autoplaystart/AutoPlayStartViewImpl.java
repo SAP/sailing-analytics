@@ -30,6 +30,7 @@ import com.sap.sse.common.Util;
 import com.sap.sse.gwt.client.GWTLocaleUtil;
 import com.sap.sse.gwt.client.shared.perspective.PerspectiveCompositeSettings;
 import com.sap.sse.security.ui.client.premium.PaywallResolver;
+import com.sap.sse.security.ui.client.premium.PaywallResolverImpl;
 
 public class AutoPlayStartViewImpl extends Composite implements AutoPlayStartView {
     private static StartPageViewUiBinder uiBinder = GWT.create(StartPageViewUiBinder.class);
@@ -146,7 +147,7 @@ public class AutoPlayStartViewImpl extends Composite implements AutoPlayStartVie
 
     @UiHandler("settingsButton")
     void onOpenSettings(ClickEvent event) {
-        PaywallResolver paywallResolver = new PaywallResolver(currentPresenter.getUserService(),
+        PaywallResolver paywallResolver = new PaywallResolverImpl(currentPresenter.getUserService(),
                 currentPresenter.getSubscriptionServiceFactory());
         selectedAutoPlayType.getConfig().openSettingsDialog(selectedEvent, selectedLeaderboard,
                 new OnSettingsCallback() {
@@ -198,7 +199,7 @@ public class AutoPlayStartViewImpl extends Composite implements AutoPlayStartVie
             settingsButton.removeStyleName(SharedResources.INSTANCE.mainCss().buttoninactive());
             startAutoPlayButton.removeStyleName(SharedResources.INSTANCE.mainCss().buttoninactive());
             apcd = new AutoPlayContextDefinitionImpl(selectedAutoPlayType, selectedEvent.id, selectedLeaderboardName);
-            apcd.getType().getConfig().loadSettingsDefault(selectedEvent, apcd, selectedLeaderboard, currentPresenter.getUserService(),
+            apcd.getType().getConfig().loadSettingsDefault(apcd, selectedLeaderboard, currentPresenter.getUserService(),
                     currentPresenter.getSubscriptionServiceFactory(),
                     new OnSettingsCallback() {
                         @Override

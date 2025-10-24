@@ -5,7 +5,7 @@ package com.sap.sse.common;
  * particularly during de-serialization when the de-serialized instance needs to be replaced by an instance managed by
  * the domain factory.<p>
  * 
- * If the de-serializing stream is a {@link ObjectInputStreamResolvingAgainstDomainFactory} stream, it will automatically
+ * If the de-serializing stream is a {@link ObjectInputStreamResolvingAgainstCache} stream, it will automatically
  * do a {@link #resolve(Object)} for instances whose classes implement this interface. Implementing classes need to
  * delegate accordingly to the domain factory passed as argument.
  * 

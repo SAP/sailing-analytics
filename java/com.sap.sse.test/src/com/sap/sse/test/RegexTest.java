@@ -1,14 +1,15 @@
 package com.sap.sse.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class RegexTest {
     private static final Logger logger = Logger.getLogger(RegexTest.class.getName());
@@ -64,5 +65,33 @@ public class RegexTest {
         final String escaped = "\""+value.replaceAll("\\\\", "\\\\\\\\").replaceAll("\"", "\\\\\"").replaceAll("'", "\\\\'")+"\"";
         logger.info("Escaped value: "+escaped);
         assertEquals("\"abc\\\\\\'\\\"\\\\\\\"\"", escaped);
+    }
+
+    @Test
+    public void testNonExponentialExpeditionPattern() {
+        final Pattern completeLinePattern = Pattern
+                .compile("#([0-9]*)((,([0-9][0-9]*),(-?[0-9]*(\\.[0-9]*)?))*)\\*X?([0-9a-fA-F][0-9a-fA-F]*)");
+        final Matcher m1 = completeLinePattern.matcher("#,0,,0,,0,,0,,0,,0,,0,,0,,0,,0,,0,,0,,0,,0,,0,,0,X");
+        assertFalse(m1.matches());
+        final Matcher m2 = completeLinePattern.matcher("#,0,,0,,0,,0,,0,,0,,0,,0,,0,,0,,0,,0,,0,,0,,0,,0,*35");
+        assertTrue(m2.matches());
+    }
+    
+    @Test
+    public void testPolynomialSailwaveRaceScorePattern() {
+        final Pattern oneRaceScorePattern = Pattern.compile("^\\(?([0-9]+\\.[0-9]+)( ([A-Z][A-Z][A-Z]))?.*$");
+        final Matcher m1 = oneRaceScorePattern.matcher("0.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000_ OCS");
+        assertTrue(m1.matches());
+    }
+    
+    @Test
+    public void testPolynomialSailwaveNationalityPattern() {
+        final Pattern nationalityPattern = Pattern.compile("^(<img .*\\btitle=\")?([A-Za-z][A-Za-z][A-Za-z])(\".*>)?$");
+        final StringBuilder sb = new StringBuilder().append("AAA\" ");
+        for (int i=0; i<1000; i++) {
+            sb.append("btitle=\"aaa\" ");
+        }
+        final Matcher m1 = nationalityPattern.matcher(sb.toString());
+        assertFalse(m1.matches());
     }
 }

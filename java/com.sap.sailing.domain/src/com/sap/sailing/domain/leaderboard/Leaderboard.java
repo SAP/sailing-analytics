@@ -420,8 +420,7 @@ public interface Leaderboard extends LeaderboardBase, HasRaceColumns, HasCPUMete
      * across all race columns listed in <code>raceColumnsToconsider</code>, respecting the
      * {@link RaceColumn#isStartsWithZeroScore()} property.
      */
-    Double getNetPoints(Competitor competitor, Iterable<RaceColumn> raceColumnsToConsider, TimePoint timePoint)
-            throws NoWindException;
+    Double getNetPoints(Competitor competitor, Iterable<RaceColumn> raceColumnsToConsider, TimePoint timePoint);
 
     /**
      * Sorts the competitors according to their ranking in the race column specified. Only competitors who have a score

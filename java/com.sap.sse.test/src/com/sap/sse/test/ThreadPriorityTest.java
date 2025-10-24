@@ -2,7 +2,7 @@ package com.sap.sse.test;
 
 import java.util.logging.Logger;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.util.ThreadPoolUtil;
 

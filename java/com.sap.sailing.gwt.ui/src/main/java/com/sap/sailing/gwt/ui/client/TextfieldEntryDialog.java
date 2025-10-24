@@ -1,6 +1,6 @@
 package com.sap.sailing.gwt.ui.client;
 
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog;
@@ -31,7 +31,7 @@ public class TextfieldEntryDialog extends DataEntryDialog<String> {
     }
     
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return entryField;
     }
 

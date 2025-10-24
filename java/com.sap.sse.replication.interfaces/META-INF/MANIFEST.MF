@@ -12,6 +12,6 @@ Import-Package: com.rabbitmq.client;version="2.8.4",
  org.json.simple,
  org.osgi.framework;version="1.8.0",
  org.osgi.util.tracker;version="1.5.1"
-Require-Bundle: com.sap.sse.operationaltransformation;bundle-version="1.0.0",
- com.sap.sse.common;bundle-version="1.0.0",
- com.sap.sse;bundle-version="1.0.0"
+Require-Bundle: com.sap.sse.operationaltransformation,
+ com.sap.sse.common,
+ com.sap.sse

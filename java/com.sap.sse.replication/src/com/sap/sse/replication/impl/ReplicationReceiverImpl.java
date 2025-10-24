@@ -6,10 +6,13 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -27,15 +30,23 @@ import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.QueueingConsumer;
 import com.rabbitmq.client.QueueingConsumer.Delivery;
 import com.rabbitmq.client.ShutdownSignalException;
+import com.sap.sse.ServerInfo;
 import com.sap.sse.common.Named;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
+import com.sap.sse.common.mail.MailException;
+import com.sap.sse.i18n.ResourceBundleStringMessages;
+import com.sap.sse.i18n.impl.ResourceBundleStringMessagesImpl;
 import com.sap.sse.operationaltransformation.Operation;
+import com.sap.sse.replication.FullyInitializedReplicableTracker;
 import com.sap.sse.replication.OperationWithResult;
 import com.sap.sse.replication.Replicable;
 import com.sap.sse.replication.ReplicablesProvider;
 import com.sap.sse.replication.ReplicationMasterDescriptor;
 import com.sap.sse.replication.ReplicationReceiver;
+import com.sap.sse.security.SecurityService;
+import com.sap.sse.security.shared.HasPermissions.DefaultActions;
+import com.sap.sse.security.shared.impl.User;
 import com.sap.sse.util.ThreadPoolUtil;
 
 /**
@@ -66,6 +77,8 @@ import com.sap.sse.util.ThreadPoolUtil;
  */
 public class ReplicationReceiverImpl implements ReplicationReceiver, Runnable {
     private final static Logger logger = Logger.getLogger(ReplicationReceiverImpl.class.getName());
+    
+    private static final String STRING_MESSAGES_BASE_NAME = "stringmessages/Replication_StringMessages";
     
     private static final long CHECK_INTERVAL_MILLIS = 5000; // how long (milliseconds) to pause before checking connection again
     private static final int CHECK_COUNT = Integer.MAX_VALUE; // how long to check, value is CHECK_INTERVAL second steps
@@ -148,6 +161,8 @@ public class ReplicationReceiverImpl implements ReplicationReceiver, Runnable {
      * which would only let them wait for each other without creating any real parallelism.
      */
     private final OperationQueueByKeyExecutor operationQueueByKeyExecutor;
+
+    private FullyInitializedReplicableTracker<SecurityService> securityServiceTracker;
     
     /**
      * @param master
@@ -175,6 +190,7 @@ public class ReplicationReceiverImpl implements ReplicationReceiver, Runnable {
         } catch (Exception e) {
             _queue = null;
         }
+        securityServiceTracker = Activator.getDefaultContext() == null ? null : FullyInitializedReplicableTracker.createAndOpen(Activator.getDefaultContext(), SecurityService.class);
     }
     
     /**
@@ -297,7 +313,9 @@ public class ReplicationReceiverImpl implements ReplicationReceiver, Runnable {
                     break;
                 }
                 if (sse.isInitiatedByApplication()) {
-                    logger.severe("Application shut down messaging queue for " + this.toString());
+                    logger.severe("Application shut down messaging queue for " + this.toString()+
+                            ", indicated by exception "+sse.getMessage());
+                    sendMailAboutShutdownSignalException(sse);
                     break;
                 }
                 logger.severe("RabbitMQ channel was shut down: "+sse.getMessage()+"; trying to re-connect");
@@ -340,6 +358,36 @@ public class ReplicationReceiverImpl implements ReplicationReceiver, Runnable {
         synchronized (this) {
             stopped = true;
             notifyAll();
+        }
+    }
+
+    private void sendMailAboutShutdownSignalException(ShutdownSignalException sse) {
+        final ResourceBundleStringMessages stringMessages = new ResourceBundleStringMessagesImpl(STRING_MESSAGES_BASE_NAME, getClass().getClassLoader(), StandardCharsets.UTF_8.name());
+        final SecurityService securityService = getSecurityService();
+        if (securityService == null) {
+            logger.warning("No security service available; cannot send mail about shutdown signal exception");
+        } else {
+            final String serverName = ServerInfo.getName();
+            for (final User userToSendMailTo : securityService.getUsersToInformAboutReplicaSet(serverName, Optional.of(DefaultActions.UPDATE))) {
+                if (userToSendMailTo.isEmailValidated()) {
+                    final String subject = stringMessages.get(userToSendMailTo.getLocaleOrDefault(), "MailSubjectShutdownSignalException", serverName);
+                    final String body = stringMessages.get(userToSendMailTo.getLocaleOrDefault(), "MailBodyShutdownSignalException", serverName, sse.getMessage());
+                    try {
+                        securityService.sendMail(userToSendMailTo.getName(), subject, body);
+                    } catch (MailException e) {
+                        logger.log(Level.WARNING, "Error sending mail to "+userToSendMailTo.getName(), e);
+                    }
+                }
+            }
+        }
+    }
+
+    private SecurityService getSecurityService() {
+        try {
+            return securityServiceTracker == null ? null : securityServiceTracker.getInitializedService(0);
+        } catch (InterruptedException e) {
+            logger.log(Level.WARNING, "Error getting security service", e);
+            return null;
         }
     }
 

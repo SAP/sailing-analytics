@@ -31,7 +31,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.http.HttpMessage;
@@ -60,6 +59,7 @@ import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.util.LaxRedirectStrategyForAllRedirectResponseCodes;
+import com.sap.sse.util.XmlUtil;
 
 public class ORCPublicCertificateDatabaseImpl implements ORCPublicCertificateDatabase {
     private static final Logger logger = Logger.getLogger(ORCPublicCertificateDatabaseImpl.class.getName());
@@ -365,7 +365,7 @@ public class ORCPublicCertificateDatabaseImpl implements ORCPublicCertificateDat
         logger.fine(()->"Searching for "+params+"...");
         final HttpResponse processorResponse = client.execute(postRequest);
         final InputStream content = processorResponse.getEntity().getContent();
-        final DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        final DocumentBuilder builder = XmlUtil.getSecureDocumentBuilderFactory().newDocumentBuilder();
         final Document document = builder.parse(content);
         final NodeList dataNodes = document.getElementsByTagName(ROOT_ELEMENT).item(0).getChildNodes();
         for (int dataNodeIndex=0; dataNodeIndex<dataNodes.getLength(); dataNodeIndex++) {
@@ -399,7 +399,7 @@ public class ORCPublicCertificateDatabaseImpl implements ORCPublicCertificateDat
         logger.fine(()->"Searching for "+params+"...");
         final HttpResponse processorResponse = client.execute(getRequest);
         final InputStream content = processorResponse.getEntity().getContent();
-        final DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        final DocumentBuilder builder = XmlUtil.getSecureDocumentBuilderFactory().newDocumentBuilder();
         final Document document = builder.parse(content);
         final NodeList dataNodes = document.getElementsByTagName(ROOT_ELEMENT).item(0).getChildNodes();
         for (int dataNodeIndex=0; dataNodeIndex<dataNodes.getLength(); dataNodeIndex++) {

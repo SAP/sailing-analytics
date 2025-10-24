@@ -16,8 +16,8 @@ import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixImpl;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixMovingImpl;
-import com.sap.sailing.domain.racelog.tracking.test.mock.SmartphoneImeiIdentifier;
-import com.sap.sailing.domain.racelog.tracking.test.mock.SmartphoneImeiJsonHandler;
+import com.sap.sailing.domain.racelogtracking.impl.SmartphoneImeiIdentifierImpl;
+import com.sap.sailing.domain.racelogtracking.impl.SmartphoneImeiJsonHandler;
 import com.sap.sailing.domain.racelogtracking.test.AbstractJsonOverHttpTest;
 import com.sap.sailing.server.gateway.serialization.impl.DeviceAndSessionIdentifierWithGPSFixesSerializer;
 import com.sap.sailing.server.gateway.serialization.impl.DeviceIdentifierJsonSerializer;
@@ -29,15 +29,15 @@ import com.sap.sse.common.impl.DegreeBearingImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 public class PostFixes extends AbstractJsonOverHttpTest {
-    protected static final SmartphoneImeiIdentifier device = new SmartphoneImeiIdentifier("a");
+    protected static final SmartphoneImeiIdentifierImpl device = new SmartphoneImeiIdentifierImpl("a");
 
-    private final DeviceAndSessionIdentifierWithGPSFixesSerializer<SmartphoneImeiIdentifier, GPSFixMoving> fixSerializer =
+    private final DeviceAndSessionIdentifierWithGPSFixesSerializer<SmartphoneImeiIdentifierImpl, GPSFixMoving> fixSerializer =
             new DeviceAndSessionIdentifierWithGPSFixesSerializer<>(DeviceIdentifierJsonSerializer.create(
-                    new SmartphoneImeiJsonHandler(), SmartphoneImeiIdentifier.TYPE), new GPSFixMovingJsonSerializer());
+                    new SmartphoneImeiJsonHandler(), SmartphoneImeiIdentifierImpl.TYPE), new GPSFixMovingJsonSerializer());
 
             private void recordFix(GPSFixMoving... fix) throws IOException {
                 String request = fixSerializer.serialize(
-                        new Util.Triple<SmartphoneImeiIdentifier, Serializable, List<GPSFixMoving>>(
+                        new Util.Triple<SmartphoneImeiIdentifierImpl, Serializable, List<GPSFixMoving>>(
                                 device, null, Arrays.asList(fix))).toJSONString();
 
                 executeRequest("POST", getUrl(URL_TR + "/recordFixes"), request);

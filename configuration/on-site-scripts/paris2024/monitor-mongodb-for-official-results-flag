@@ -1,10 +1,8 @@
 #!/bin/bash
 for MONGODB_URI in "mongodb://localhost:10201,localhost:10202,localhost:10203/paris2024?replicaSet=paris2024&retryWrites=true&readPreference=nearest" "mongodb://sap-p1-1,sap-p1-2/paris2024?replicaSet=security_service&retryWrites=true&readPreference=nearest"; do
-  FOUND=$( echo "db.CONNECTIVITY_PARAMS_FOR_RACES_TO_BE_RESTORED.find({type: \"TRAC_TRAC\", useOfficialEventsToUpdateRaceLog: false})" | \
-    mongo --quiet "${MONGODB_URI}" )
+  FOUND=$( mongosh --quiet --eval "db.CONNECTIVITY_PARAMS_FOR_RACES_TO_BE_RESTORED.find({type: \"TRAC_TRAC\", useOfficialEventsToUpdateRaceLog: false})" "${MONGODB_URI}" )
   if [ -n "${FOUND}" ]; then
-    PARAM_URL=$( echo "db.CONNECTIVITY_PARAMS_FOR_RACES_TO_BE_RESTORED.find({type: \"TRAC_TRAC\", useOfficialEventsToUpdateRaceLog: false}, {_id: 0, paramURL: 1})" | \
-      mongo --quiet "${MONGODB_URI}" )
+    PARAM_URL=$( mongosh --quiet --eval "db.CONNECTIVITY_PARAMS_FOR_RACES_TO_BE_RESTORED.find({type: \"TRAC_TRAC\", useOfficialEventsToUpdateRaceLog: false}, {_id: 0, paramURL: 1}) "${MONGODB_URI}" )
   echo "The following TracTrac race URL(s) has been connected to without
 ticking the \"Automatically update from "official" results published by TracTrac\"
 check-box in the ${MONGODB_URI} database:

@@ -6,9 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.PathType;
 import com.sap.sailing.domain.common.Position;
@@ -67,8 +66,8 @@ public class SimulatorTest {
         paths.put(PathType.OMNISCIENT, pathOmniscient);
         paths.put(PathType.OPPORTUNIST_LEFT, pathOpportunist);
         
-        Assert.assertNotNull(paths.get(PathType.OPPORTUNIST_LEFT).getPathPoints());
-        Assert.assertNotNull(paths.get(PathType.OMNISCIENT).getPathPoints());
+        Assertions.assertNotNull(paths.get(PathType.OPPORTUNIST_LEFT).getPathPoints());
+        Assertions.assertNotNull(paths.get(PathType.OMNISCIENT).getPathPoints());
     }
 
 }

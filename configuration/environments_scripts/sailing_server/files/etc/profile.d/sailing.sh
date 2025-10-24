@@ -1,7 +1,9 @@
 # Script to be linked from /etc/profile.d
 # Appends to PATH, sets DISPLAY for VNC running on :2, exports JAVA_HOME and Amazon EC2 variables
 
-ulimit -n 100000
+if [[ "$USER" == "root" ]]; then
+    ulimit -n 100000
+fi
 ulimit -u 40000
 
 # SAP JVM

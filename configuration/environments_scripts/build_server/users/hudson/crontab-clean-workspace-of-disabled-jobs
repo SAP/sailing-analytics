@@ -1,0 +1,1 @@
+23 3 * * *      export PATH=${PATH}:/usr/local/bin; for i in /home/hudson/repo/jobs/*; do if [ "$( xq -x /project/disabled ${i}/config.xml 2>/dev/null )" = "true" ]; then rm -rf "${i}/workspace"; fi; done

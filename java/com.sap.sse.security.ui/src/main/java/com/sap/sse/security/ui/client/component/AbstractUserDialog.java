@@ -1,7 +1,7 @@
 package com.sap.sse.security.ui.client.component;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
@@ -172,7 +172,7 @@ public class AbstractUserDialog extends DataEntryDialog<UserData> {
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return nameBox;
     }
 

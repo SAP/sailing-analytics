@@ -1,7 +1,7 @@
 package com.sap.sailing.gwt.ui.shared.util;
 
-import static com.sap.sailing.gwt.ui.common.client.DateAndTimeFormatterUtil.hoursAndMinutesTimeFormatterUTC;
-import static com.sap.sailing.gwt.ui.common.client.DateAndTimeFormatterUtil.minutesTimeFormatterUTC;
+import static com.sap.sse.gwt.client.DateAndTimeFormatterUtil.hoursAndMinutesTimeFormatterUTC;
+import static com.sap.sse.gwt.client.DateAndTimeFormatterUtil.minutesTimeFormatterUTC;
 
 import java.util.Date;
 

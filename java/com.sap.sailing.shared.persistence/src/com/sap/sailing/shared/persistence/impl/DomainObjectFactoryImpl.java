@@ -252,14 +252,13 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
         final List<CourseTemplate> result = new ArrayList<>();
         final MongoCollection<Document> configurationCollection = database
                 .getCollection(CollectionNames.COURSE_TEMPLATES.name());
-        try {
-            for (final Document dbObject : configurationCollection.find()) {
+        for (final Document dbObject : configurationCollection.find()) {
+            try {
                 final CourseTemplate entry = loadCourseTemplateEntry(dbObject, markTemplateResolver, markRoleResolver);
                 result.add(entry);
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Error connecting to MongoDB, unable to load a course template. Continuing with other course templates...", e);
             }
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error connecting to MongoDB, unable to load course templates.");
-            logger.log(Level.SEVERE, "loadAllCourseTemplates", e);
         }
         return result;
     }

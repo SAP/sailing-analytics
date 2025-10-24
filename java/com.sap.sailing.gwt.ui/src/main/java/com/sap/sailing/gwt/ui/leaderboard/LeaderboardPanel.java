@@ -89,7 +89,6 @@ import com.sap.sailing.gwt.ui.client.SailingServiceAsync;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.gwt.ui.client.shared.filter.FilterWithUI;
 import com.sap.sailing.gwt.ui.client.shared.filter.LeaderboardFetcher;
-import com.sap.sailing.gwt.ui.common.client.DateAndTimeFormatterUtil;
 import com.sap.sailing.gwt.ui.leaderboard.DetailTypeColumn.DataExtractor;
 import com.sap.sailing.gwt.ui.shared.RaceTimesInfoDTO;
 import com.sap.sse.common.Bearing;
@@ -104,6 +103,7 @@ import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.filter.Filter;
 import com.sap.sse.common.filter.FilterSet;
 import com.sap.sse.common.impl.InvertibleComparatorAdapter;
+import com.sap.sse.gwt.client.DateAndTimeFormatterUtil;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.async.AsyncAction;
 import com.sap.sse.gwt.client.async.AsyncActionsExecutor;
@@ -128,11 +128,11 @@ import com.sap.sse.gwt.client.shared.components.ComponentResources;
 import com.sap.sse.gwt.client.shared.components.IsEmbeddableComponent;
 import com.sap.sse.gwt.client.shared.components.SettingsDialog;
 import com.sap.sse.gwt.client.shared.settings.ComponentContext;
-import com.sap.sse.security.shared.HasPermissions.Action;
 import com.sap.sse.security.shared.dto.UserDTO;
 import com.sap.sse.security.ui.client.UserStatusEventHandler;
 import com.sap.sse.security.ui.client.WithSecurity;
 import com.sap.sse.security.ui.client.premium.PaywallResolver;
+import com.sap.sse.security.ui.client.premium.PaywallResolverImpl;
 
 /**
  * A leaderboard essentially consists of a table widget that in its columns displays the entries.
@@ -239,7 +239,6 @@ public abstract class LeaderboardPanel<LS extends LeaderboardSettings> extends A
     private final MultiSelectionModel<LeaderboardRowDTO> leaderboardSelectionModel;
 
     protected LeaderboardDTO leaderboard;
-    final Map<Action, Boolean> premiumLeaderboardPermissions = new HashMap<>();
 
     private final TotalRankColumn totalRankColumn;
     
@@ -478,7 +477,7 @@ public abstract class LeaderboardPanel<LS extends LeaderboardSettings> extends A
         LEG_COLUMN_STYLE = style.getTableresources().cellTableStyle().cellTableLegColumn();
         LEG_DETAIL_COLUMN_STYLE = style.getTableresources().cellTableStyle().cellTableLegDetailColumn();
         TOTAL_COLUMN_STYLE = style.getTableresources().cellTableStyle().cellTableTotalColumn();
-        this.paywallResolver = new PaywallResolver(sailingCF.getUserService(), sailingCF.getSubscriptionServiceFactory());
+        this.paywallResolver = new PaywallResolverImpl(sailingCF.getUserService(), sailingCF.getSubscriptionServiceFactory());
         // Now register a user status event handler that notices changes in user sign-in/out or premium status change.
         // Leaderboard columns can depend on permissions, and currently (and we should change that!) the filtering
         // happens in the LeaderboardSettingsComponentDialog. Therefore, in order to filter the current settings
@@ -1220,6 +1219,10 @@ public abstract class LeaderboardPanel<LS extends LeaderboardSettings> extends A
                     new FormattedDoubleLeaderboardRowDTODetailTypeColumn(DetailType.RACE_GAP_TO_LEADER_IN_SECONDS,
                             new RaceGapToLeaderInSeconds(), LEG_COLUMN_HEADER_STYLE, LEG_COLUMN_STYLE,
                             LeaderboardPanel.this));
+            result.put(DetailType.PERCENT_TARGET_BOAT_SPEED,
+                    new FormattedDoubleLeaderboardRowDTODetailTypeColumn(DetailType.PERCENT_TARGET_BOAT_SPEED,
+                            new PercentTargetBoatSpeed(), LEG_COLUMN_HEADER_STYLE, LEG_COLUMN_STYLE,
+                            LeaderboardPanel.this));
             result.put(DetailType.RACE_CURRENT_SPEED_OVER_GROUND_IN_KNOTS,
                     new FormattedDoubleLeaderboardRowDTODetailTypeColumn(DetailType.RACE_CURRENT_SPEED_OVER_GROUND_IN_KNOTS,
                             new RaceCurrentSpeedOverGroundInKnots(), LEG_COLUMN_HEADER_STYLE, LEG_COLUMN_STYLE,
@@ -1508,9 +1511,9 @@ public abstract class LeaderboardPanel<LS extends LeaderboardSettings> extends A
         }
 
         @Override
-        protected Iterable<AbstractSortableColumnWithMinMax<LeaderboardRowDTO, ?>> getDirectChildren(boolean filterByPermissions) {
+        protected Iterable<AbstractSortableColumnWithMinMax<LeaderboardRowDTO, ?>> getDirectChildren() {
             List<AbstractSortableColumnWithMinMax<LeaderboardRowDTO, ?>> result = new ArrayList<>();
-            for (AbstractSortableColumnWithMinMax<LeaderboardRowDTO, ?> column : super.getDirectChildren(filterByPermissions)) {
+            for (AbstractSortableColumnWithMinMax<LeaderboardRowDTO, ?> column : super.getDirectChildren()) {
                 result.add(column);
             }
             if (isExpanded() && getLeaderboard().canBoatsOfCompetitorsChangePerRace && selectedRaceDetails.contains(DetailType.RACE_DISPLAY_BOATS)) {
@@ -1943,6 +1946,18 @@ public abstract class LeaderboardPanel<LS extends LeaderboardSettings> extends A
                 if (fieldsForRace != null) {
                     result = fieldsForRace.gapToLeaderInOwnTime == null ? null
                             : fieldsForRace.gapToLeaderInOwnTime.asSeconds();
+                }
+                return result;
+            }
+        }
+        
+        private class PercentTargetBoatSpeed implements DataExtractor<Double, LeaderboardRowDTO> {
+            @Override
+            public Double get(LeaderboardRowDTO row) {
+                Double result = null;
+                final LeaderboardEntryDTO fieldsForRace = row.fieldsByRaceColumnName.get(getRaceColumnName());
+                if (fieldsForRace != null) {
+                    result = fieldsForRace.percentTargetBoatSpeed == null ? null : fieldsForRace.percentTargetBoatSpeed;
                 }
                 return result;
             }
@@ -2592,15 +2607,6 @@ public abstract class LeaderboardPanel<LS extends LeaderboardSettings> extends A
      */
     public void updateLeaderboard(LeaderboardDTO leaderboard) {
         if (leaderboard != null) {
-            // check premium leaderboard permissions only on total set of actions defined on DetailType (should be less)
-            // instead of call hasPermission on each single DetailType and collect result in premiumLeaderboardPermissions map.
-            Set<Action> premiumLeaderboardActions = DetailType
-                    .getAllPremiumActionsFromSubset(overallDetailColumnMap.keySet());
-            premiumLeaderboardPermissions.clear();
-            premiumLeaderboardPermissions.putAll(paywallResolver
-                    .getHasPermissionMap(premiumLeaderboardActions, leaderboard));
-        }
-        if (leaderboard != null) {
             Collection<RaceColumn<?>> columnsToCollapseAndExpandAgain = getExpandedRaceColumnsWhoseDisplayedLegCountChanged(
                     leaderboard);
             for (RaceColumn<?> columnToCollapseAndExpandAgain : columnsToCollapseAndExpandAgain) {
@@ -2894,8 +2900,7 @@ public abstract class LeaderboardPanel<LS extends LeaderboardSettings> extends A
         for (DetailType overallDetailType : DetailType.getAvailableOverallDetailColumnTypes()) {
             if (selectedOverallDetailColumns.contains(overallDetailType)
                     && overallDetailColumnMap.containsKey(overallDetailType)
-                    && (overallDetailType.getPremiumAction() == null
-                            || premiumLeaderboardPermissions.get(overallDetailType.getPremiumAction()))) {
+                    ) {
                 overallDetailColumnsToShow.add(overallDetailColumnMap.get(overallDetailType));
             }
         }

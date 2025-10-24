@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
+
 import com.sap.sailing.datamining.data.HasLeaderboardContext;
 import com.sap.sailing.datamining.data.HasRaceResultOfCompetitorContext;
 import com.sap.sailing.datamining.data.HasTrackedRaceContext;
@@ -11,6 +14,7 @@ import com.sap.sailing.datamining.impl.data.RaceResultOfCompetitorWithContext;
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sse.datamining.components.Processor;
 import com.sap.sse.datamining.impl.components.AbstractRetrievalProcessor;
+import com.sap.sse.security.shared.HasPermissions.DefaultActions;
 
 public class CompetitorOfRaceInLeaderboardRetrievalProcessor
         extends AbstractRetrievalProcessor<HasTrackedRaceContext, HasRaceResultOfCompetitorContext> {
@@ -30,10 +34,13 @@ public class CompetitorOfRaceInLeaderboardRetrievalProcessor
             if (isAborted()) {
                 break;
             }
-            HasRaceResultOfCompetitorContext raceResultOfCompetitorContext = new RaceResultOfCompetitorWithContext(
-                    leaderboardContext, element.getRaceColumn(), competitor,
-                    leaderboardContext.getLeaderboardGroupContext().getPolarDataService(), element);
-            raceResultsOfCompetitor.add(raceResultOfCompetitorContext);
+            final Subject subject = SecurityUtils.getSubject();
+            if (subject.isPermitted(competitor.getIdentifier().getStringPermission(DefaultActions.READ))) {
+                HasRaceResultOfCompetitorContext raceResultOfCompetitorContext = new RaceResultOfCompetitorWithContext(
+                        leaderboardContext, element.getRaceColumn(), competitor,
+                        leaderboardContext.getLeaderboardGroupContext().getPolarDataService(), element);
+                raceResultsOfCompetitor.add(raceResultOfCompetitorContext);
+            }
         }
         return raceResultsOfCompetitor;
     }

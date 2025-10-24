@@ -22,4 +22,5 @@ public class SerializationDummy implements Serializable {
     KnotSpeedImpl knotSpeedImpl;
     KilometersPerHourSpeedImpl kmhSpeedImpl;
     HasPermissions hasPermissions;
+    IgtimiDeviceWithSecurityDTO igtimiDeviceWithSecurityDTO;
 }

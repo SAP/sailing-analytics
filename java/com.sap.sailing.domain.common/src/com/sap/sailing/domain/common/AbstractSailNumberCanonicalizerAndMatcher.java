@@ -24,7 +24,7 @@ import java.util.Map;
  *
  */
 public abstract class AbstractSailNumberCanonicalizerAndMatcher<CompetitorType> {
-    protected static final String sailIdRegexpPattern = "^([A-Z][A-Z][A-Z])\\s*[^0-9]*([0-9]*)$";
+    protected static final String sailIdRegexpPattern = "^([A-Z][A-Z][A-Z])?\\s*[^0-9]*([0-9]*)$";
 
     public static class SailNumberMatch {
         private final String iocCode;
@@ -43,7 +43,7 @@ public abstract class AbstractSailNumberCanonicalizerAndMatcher<CompetitorType> 
     }
     
     /**
-     * Parses a sail number into a nationality code expected at the beginning of the string,
+     * Parses a sail number into a nationality code expected at the beginning of the string but possibly empty,
      * and a numeric part assumed to be at the end of the string. Before matching, the {@code sailId}
      * string will be {@link String#trim() trimmed}, removing leading and trailing whitespace. If
      * the parameter matches the {@link #sailIdRegexpPattern} then a valid {@link SailNumberMatch}
@@ -102,10 +102,10 @@ public abstract class AbstractSailNumberCanonicalizerAndMatcher<CompetitorType> 
     }
 
     public Map<String, CompetitorType> canonicalizeLeaderboardSailIDs(final Iterable<CompetitorType> competitors) {
-        Map<String, CompetitorType> result = new HashMap<>();
+        final Map<String, CompetitorType> result = new HashMap<>();
         for (final CompetitorType competitor : competitors) {
             final String competitorIdentifyingText = getCompetitorIdentifyingText(competitor);
-            String canonicalizedSailID = canonicalizeSailID(competitorIdentifyingText.trim(), getThreeLetterIocCountryCode(competitor).trim());
+            final String canonicalizedSailID = canonicalizeSailID(competitorIdentifyingText.trim(), getThreeLetterIocCountryCode(competitor).trim());
             if (canonicalizedSailID != null) {
                 result.put(canonicalizedSailID, competitor);
             }

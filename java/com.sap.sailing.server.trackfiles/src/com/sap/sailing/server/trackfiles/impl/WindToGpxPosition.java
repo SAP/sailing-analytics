@@ -16,19 +16,19 @@ public enum WindToGpxPosition implements WaypointCreator<Wind> {
 
     @Override
     public GpxPosition getPosition(Wind waypoint) {
-        if (waypoint == null || waypoint.getPosition() == null)
-            return null;
-
-        GpxPosition p = new GpxPosition(waypoint.getPosition().getLngDeg(), // lon
-                waypoint.getPosition().getLatDeg(), // lat
-                0., // elevation
-                waypoint.getKilometersPerHour(), // speed
-                CompactCalendar.fromDate(waypoint.getTimePoint().asDate()), // time
-                "" // comment
-        );
-
-        p.setHeading(waypoint.getBearing().getDegrees());
-        return p;
+        final GpxPosition result;
+        if (waypoint == null || waypoint.getPosition() == null) {
+            result = null;
+        } else {
+            GpxPosition p = new GpxPosition(waypoint.getPosition().getLngDeg(), // lon
+                    waypoint.getPosition().getLatDeg(), // lat
+                    0., // elevation
+                    waypoint.getKilometersPerHour(), // speed
+                    CompactCalendar.fromDate(waypoint.getTimePoint().asDate()), // time
+                    "" /* comment */);
+            p.setHeading(waypoint.getBearing().getDegrees());
+            result = p;
+        }
+        return result;
     }
-
 }

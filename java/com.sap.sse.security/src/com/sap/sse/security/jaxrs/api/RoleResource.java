@@ -41,12 +41,12 @@ public class RoleResource extends AbstractSecurityResource {
     @Produces("application/json;charset=UTF-8")
     public Response createRole(@FormParam(KEY_ROLE_NAME) String roleName) {
         final String roleDefinitionIdAsString = UUID.randomUUID().toString();
-        final RoleDefinition role = getService().setOwnershipWithoutCheckPermissionForObjectCreationAndRevertOnError(
+        final RoleDefinition role = getSecurityService().setOwnershipWithoutCheckPermissionForObjectCreationAndRevertOnError(
                 SecuredSecurityTypes.ROLE_DEFINITION, new TypeRelativeObjectIdentifier(roleDefinitionIdAsString),
                 roleName, new Callable<RoleDefinition>() {
                     @Override
                     public RoleDefinition call() throws Exception {
-                        return getService().createRoleDefinition(UUID.fromString(roleDefinitionIdAsString), roleName);
+                        return getSecurityService().createRoleDefinition(UUID.fromString(roleDefinitionIdAsString), roleName);
                     }
                 });
         final Response resp;
@@ -71,15 +71,15 @@ public class RoleResource extends AbstractSecurityResource {
             // parse UUID
             final UUID roleUUID = UUID.fromString(roleId);
             // get role definition from role id
-            final RoleDefinition roleDefinition = getService().getRoleDefinition(roleUUID);
+            final RoleDefinition roleDefinition = getSecurityService().getRoleDefinition(roleUUID);
             // null check role definition
             if (roleDefinition == null) {
                 resp = Response.status(Status.NOT_FOUND).entity(String.format("No role with id '%s' found.", roleUUID))
                         .build();
             } else {
                 // check delete permission and remove role
-                getService().checkPermissionAndDeleteOwnershipForObjectRemoval(roleDefinition, () -> {
-                    getService().deleteRoleDefinition(roleDefinition);
+                getSecurityService().checkPermissionAndDeleteOwnershipForObjectRemoval(roleDefinition, () -> {
+                    getSecurityService().deleteRoleDefinition(roleDefinition);
                 });
                 resp = Response.status(Status.NO_CONTENT).build();
             }
@@ -101,14 +101,14 @@ public class RoleResource extends AbstractSecurityResource {
             // parse UUID
             final UUID roleUUID = UUID.fromString(roleId);
             // get role definition from role id
-            final RoleDefinition roleDefinition = getService().getRoleDefinition(roleUUID);
+            final RoleDefinition roleDefinition = getSecurityService().getRoleDefinition(roleUUID);
             // null check role definition
             if (roleDefinition == null) {
                 resp = Response.status(Status.NOT_FOUND).entity(String.format("No role with id '%s' found.", roleUUID))
                         .build();
             } else {
                 // check update permission on role
-                getService().checkCurrentUserUpdatePermission(roleDefinition);
+                getSecurityService().checkCurrentUserUpdatePermission(roleDefinition);
                 // create permission objects
                 final Set<WildcardPermission> permissions = new HashSet<>();
                 final JSONObject body = (JSONObject) new JSONParser().parse(json);
@@ -122,11 +122,11 @@ public class RoleResource extends AbstractSecurityResource {
                 addedPermissions.removeAll(permissions);
                 final Set<WildcardPermission> removedPermissions = new HashSet<>(permissions);
                 removedPermissions.removeAll(roleDefinition.getPermissions());
-                if (!getService().hasUserAllWildcardPermissionsForAlreadyRealizedQualifications(roleDefinition,
+                if (!getSecurityService().hasUserAllWildcardPermissionsForAlreadyRealizedQualifications(roleDefinition,
                         addedPermissions)) {
                     resp = Response.status(Status.UNAUTHORIZED)
                             .entity("Not permitted to grant permissions for role " + roleDefinition.getName()).build();
-                } else if (!getService().hasUserAllWildcardPermissionsForAlreadyRealizedQualifications(roleDefinition,
+                } else if (!getSecurityService().hasUserAllWildcardPermissionsForAlreadyRealizedQualifications(roleDefinition,
                         removedPermissions)) {
                     resp = Response.status(Status.UNAUTHORIZED)
                             .entity("Not permitted to revoke permissions for role " + roleDefinition.getName()).build();
@@ -137,7 +137,7 @@ public class RoleResource extends AbstractSecurityResource {
                     if (roleName != null) {
                         roleDefinition.setName(roleName);
                     }
-                    getService().updateRoleDefinition(roleDefinition);
+                    getSecurityService().updateRoleDefinition(roleDefinition);
                     resp = Response.ok().build();
                 }
             }
@@ -158,14 +158,14 @@ public class RoleResource extends AbstractSecurityResource {
             // parse UUID
             final UUID roleUUID = UUID.fromString(roleId);
             // get role definition from role id
-            final RoleDefinition roleDefinition = getService().getRoleDefinition(roleUUID);
+            final RoleDefinition roleDefinition = getSecurityService().getRoleDefinition(roleUUID);
             // null check role definition
             if (roleDefinition == null) {
                 resp = Response.status(Status.NOT_FOUND).entity(String.format("No role with id '%s' found.", roleUUID))
                         .build();
             } else {
                 // check read permission on role
-                getService().checkCurrentUserReadPermission(roleDefinition);
+                getSecurityService().checkCurrentUserReadPermission(roleDefinition);
                 // build json result with permissions and id
                 final JSONObject jsonResult = new JSONObject();
                 final JSONArray jsonPermissions = new JSONArray();

@@ -10,5 +10,4 @@ RequiredBy=mongod.service
 [Service]
 Type=oneshot
 RemainAfterExit=true
-ExecStart=/bin/chown -R mongod /var/lib/mongo/
-ExecStart=/bin/chgrp -R mongod /var/lib/mongo/
+ExecStart=/bin/chown -R mongod:mongod /var/lib/mongo/

@@ -6,7 +6,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.util.Comparator;
 import java.util.Locale;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.data.Cluster;
 import com.sap.sse.datamining.data.ClusterBoundary;

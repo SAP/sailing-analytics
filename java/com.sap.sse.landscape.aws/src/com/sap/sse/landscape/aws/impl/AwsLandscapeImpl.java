@@ -20,7 +20,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -33,10 +35,10 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.KeyPair;
-import com.sap.sse.landscape.aws.LandscapeConstants;
 import com.sap.sailing.landscape.common.SharedLandscapeConstants;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
@@ -62,6 +64,7 @@ import com.sap.sse.landscape.aws.AwsInstance;
 import com.sap.sse.landscape.aws.AwsLandscape;
 import com.sap.sse.landscape.aws.AwsLandscapeState;
 import com.sap.sse.landscape.aws.HostSupplier;
+import com.sap.sse.landscape.aws.LandscapeConstants;
 import com.sap.sse.landscape.aws.ReverseProxyCluster;
 import com.sap.sse.landscape.aws.Tags;
 import com.sap.sse.landscape.aws.TargetGroup;
@@ -83,6 +86,7 @@ import com.sap.sse.landscape.ssh.SSHKeyPair;
 import com.sap.sse.mongodb.MongoDBService;
 import com.sap.sse.security.SessionUtils;
 import com.sap.sse.util.ThreadPoolUtil;
+
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
@@ -95,15 +99,16 @@ import software.amazon.awssdk.services.acm.model.CertificateStatus;
 import software.amazon.awssdk.services.autoscaling.AutoScalingAsyncClient;
 import software.amazon.awssdk.services.autoscaling.AutoScalingClient;
 import software.amazon.awssdk.services.autoscaling.model.AutoScalingGroup;
-import software.amazon.awssdk.services.autoscaling.model.BlockDeviceMapping;
-import software.amazon.awssdk.services.autoscaling.model.CreateLaunchConfigurationRequest;
 import software.amazon.awssdk.services.autoscaling.model.DeleteAutoScalingGroupResponse;
 import software.amazon.awssdk.services.autoscaling.model.EnableMetricsCollectionRequest;
-import software.amazon.awssdk.services.autoscaling.model.LaunchConfiguration;
+import software.amazon.awssdk.services.autoscaling.model.LaunchTemplateSpecification;
 import software.amazon.awssdk.services.autoscaling.model.MetricType;
+import software.amazon.awssdk.services.ec2.Ec2AsyncClient;
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.CreateKeyPairRequest;
 import software.amazon.awssdk.services.ec2.model.CreateKeyPairResponse;
+import software.amazon.awssdk.services.ec2.model.CreateLaunchTemplateVersionRequest;
+import software.amazon.awssdk.services.ec2.model.CreateLaunchTemplateVersionResponse;
 import software.amazon.awssdk.services.ec2.model.CreateTagsRequest;
 import software.amazon.awssdk.services.ec2.model.DeleteKeyPairRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeAvailabilityZonesRequest;
@@ -120,6 +125,8 @@ import software.amazon.awssdk.services.ec2.model.ImportKeyPairRequest;
 import software.amazon.awssdk.services.ec2.model.Instance;
 import software.amazon.awssdk.services.ec2.model.InstanceType;
 import software.amazon.awssdk.services.ec2.model.KeyPairInfo;
+import software.amazon.awssdk.services.ec2.model.LaunchTemplate;
+import software.amazon.awssdk.services.ec2.model.LaunchTemplateVersion;
 import software.amazon.awssdk.services.ec2.model.Placement;
 import software.amazon.awssdk.services.ec2.model.Reservation;
 import software.amazon.awssdk.services.ec2.model.ResourceType;
@@ -148,6 +155,7 @@ import software.amazon.awssdk.services.elasticloadbalancingv2.model.DescribeTarg
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.DescribeTargetGroupsResponse;
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.DescribeTargetHealthRequest;
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.DescribeTargetHealthResponse;
+import software.amazon.awssdk.services.elasticloadbalancingv2.model.IpAddressType;
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.Listener;
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.LoadBalancer;
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.LoadBalancerAttribute;
@@ -181,6 +189,7 @@ import software.amazon.awssdk.services.route53.model.ChangeInfo;
 import software.amazon.awssdk.services.route53.model.ChangeResourceRecordSetsRequest;
 import software.amazon.awssdk.services.route53.model.ChangeResourceRecordSetsResponse;
 import software.amazon.awssdk.services.route53.model.GetChangeRequest;
+import software.amazon.awssdk.services.route53.model.HostedZone;
 import software.amazon.awssdk.services.route53.model.ListResourceRecordSetsResponse;
 import software.amazon.awssdk.services.route53.model.RRType;
 import software.amazon.awssdk.services.route53.model.ResourceRecord;
@@ -189,6 +198,9 @@ import software.amazon.awssdk.services.route53.model.TestDnsAnswerResponse;
 import software.amazon.awssdk.services.route53.paginators.ListResourceRecordSetsIterable;
 import software.amazon.awssdk.services.sts.StsClient;
 import software.amazon.awssdk.services.sts.model.Credentials;
+import software.amazon.awssdk.services.wafv2.Wafv2Client;
+import software.amazon.awssdk.services.wafv2.model.ListWebAcLsResponse;
+import software.amazon.awssdk.services.wafv2.model.Scope;
 
 public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> {
     private static final String SSL_SECURITY_POLICY = "ELBSecurityPolicy-FS-1-2-Res-2019-08";
@@ -285,12 +297,20 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
         return getClient(Ec2Client.builder(), region);
     }
     
+    private Ec2AsyncClient getEc2AsyncClient(Region region) {
+        return getClient(Ec2AsyncClient.builder(), region);
+    }
+    
     private AcmAsyncClient getAcmAsyncClient(Region region) {
         return getClient(AcmAsyncClient.builder(), region);
     }
     
     private ElasticLoadBalancingV2Client getLoadBalancingClient(Region region) {
         return getClient(ElasticLoadBalancingV2Client.builder(), region);
+    }
+    
+    private Wafv2Client getWafClient(Region region) {
+        return getClient(Wafv2Client.builder(), region);
     }
     
     private ElasticLoadBalancingV2AsyncClient getLoadBalancingAsyncClient(Region region) {
@@ -329,6 +349,7 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
         final CreateLoadBalancerResponse response = client
                 .createLoadBalancer(CreateLoadBalancerRequest.builder()
                         .name(name)
+                        .ipAddressType(IpAddressType.DUALSTACK) // IPv4 and IPv6
                         .subnetMappings(subnetMappings)
                         .securityGroups(getDefaultSecurityGroupForApplicationLoadBalancer(region).getId())
                         .build());
@@ -340,7 +361,26 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
         final ApplicationLoadBalancer<ShardingKey> result = new ApplicationLoadBalancerImpl<>(region, response.loadBalancers().iterator().next(), this);
         createLoadBalancerHttpListener(result);
         createLoadBalancerHttpsListener(result);
+        getWafACLsByTagAndAssociateWithALB(LandscapeConstants.WEB_ACL_PURPOSE_TAG, LandscapeConstants.WEB_ACL_GEOBLOCKING_PURPOSE, result.getArn(), awsRegion);
         return result;
+    }
+    
+    private void getWafACLsByTagAndAssociateWithALB(String tagKey, String tagValue, String albArn, Region region) {
+        logger.info("Trying to find WAF ACLs with tag "+tagKey+"="+tagValue+" to associate with ALB "+albArn+" in region "+region.id());
+        final Wafv2Client wafClient = getWafClient(region);
+        // Step 1: list all REGIONAL Web ACLs
+        final ListWebAcLsResponse listResp = wafClient.listWebACLs(b->b.scope(Scope.REGIONAL));
+        listResp.webACLs().stream().filter(aclSummary ->
+            // Step 2: filter the ACLs down to those with the right tag
+            wafClient.listTagsForResource(b->b.resourceARN(aclSummary.arn())).tagInfoForResource().tagList().stream()
+                    .anyMatch(tag -> tag.key().equals(tagKey) && tag.value().equals(tagValue)))
+        .forEach(aclSummary -> {
+            // Step 3: associate the ALB with those Web ACLs
+            logger.info("Associating WAF ACL "+aclSummary.arn()+" with ALB "+albArn);
+            wafClient.associateWebACL(b->b
+                        .webACLArn(aclSummary.arn())
+                        .resourceArn(albArn));
+        });
     }
     
     private Subnet getSubnetForAvailabilityZoneInSameVpcAsSecurityGroup(AwsAvailabilityZone az, SecurityGroup securityGroup, Region region) {
@@ -1553,7 +1593,7 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
     
                     @Override
                     public String getNodeName() {
-                        return anyRabbitMQHost.getPrivateAddress().getHostAddress();
+                        return anyRabbitMQHost.getHostname();
                     }
                 };
             } else {
@@ -1605,17 +1645,18 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
         final CompletableFuture<Map<TargetGroup<ShardingKey>, Iterable<TargetHealthDescription>>> allTargetGroupsInRegion = getTargetGroupsAsync(region);
         final CompletableFuture<Map<Listener, Iterable<Rule>>> allLoadBalancerRulesInRegion = getLoadBalancerListenerRulesAsync(region, allLoadBalancersInRegion);
         final CompletableFuture<Iterable<AutoScalingGroup>> allAutoScalingGroups = getAutoScalingGroupsAsync(region);
-        final CompletableFuture<Iterable<LaunchConfiguration>> allLaunchConfigurations = getLaunchConfigurationsAsync(region);
+        final CompletableFuture<Iterable<LaunchTemplate>> allLaunchTemplates = getLaunchTemplatesAsync(region);
+        final CompletableFuture<Iterable<LaunchTemplateVersion>> allLaunchTemplateDefaultVersions = getLaunchTemplateDefaultVersionsAsync(region);
         final Iterable<HostT> hosts = hostsSupplier.get();
         final Map<String, ProcessT> mastersByServerName = new HashMap<>();
         final Map<String, Set<ProcessT>> replicasByServerName = new HashMap<>();
-        final ConcurrentLinkedQueue<Future<?>> tasksToWaitFor = new ConcurrentLinkedQueue<>();
+        final ConcurrentLinkedQueue<Pair<Future<?>, String>> tasksToWaitForAndLogStringForTimeout = new ConcurrentLinkedQueue<>();
         final ScheduledExecutorService backgroundExecutor = ThreadPoolUtil.INSTANCE.createBackgroundTaskThreadPoolExecutor("Application Process Discovery "+UUID.randomUUID());
         for (final ApplicationProcessHost<ShardingKey, MetricsT, ProcessT> host : hosts) {
-            tasksToWaitFor.add(backgroundExecutor.submit(()->{
+            tasksToWaitForAndLogStringForTimeout.add(new Pair<>(backgroundExecutor.submit(()->{
                 try {
                     for (final ProcessT applicationProcess : host.getApplicationProcesses(optionalTimeout, optionalKeyName, privateKeyEncryptionPassphrase)) {
-                        tasksToWaitFor.add(backgroundExecutor.submit(()->{
+                        tasksToWaitForAndLogStringForTimeout.add(new Pair<>(backgroundExecutor.submit(()->{
                             String serverName;
                             try {
                                 serverName = applicationProcess.getServerName(optionalTimeout, optionalKeyName, privateKeyEncryptionPassphrase);
@@ -1642,20 +1683,21 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
-                        }));
+                        }), "Host: "+host.toString()+", process "+applicationProcess.toString()));
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-            }));
+            }), "Host: "+host.toString()));
         }
         // wait for all application processes on all hosts to be discovered
-        Future<?> taskToWaitFor;
-        while ((taskToWaitFor=tasksToWaitFor.poll()) != null) {
+        Pair<Future<?>, String> taskToWaitForAndTimeoutString;
+        while ((taskToWaitForAndTimeoutString=tasksToWaitForAndLogStringForTimeout.poll()) != null) {
+            final Future<?> taskToWaitFor = taskToWaitForAndTimeoutString.getA();
             try {
                 waitForFuture(taskToWaitFor, optionalTimeout);
             } catch (Exception e) {
-                logger.log(Level.WARNING, "Problem waiting for "+taskToWaitFor, e);
+                logger.log(Level.WARNING, "Problem waiting for "+taskToWaitFor+" for "+taskToWaitForAndTimeoutString.getB(), e);
             }
         }
         backgroundExecutor.shutdown();
@@ -1668,7 +1710,8 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
                 final Set<ProcessT> replicas = replicasByServerName.get(serverName);
                 final AwsApplicationReplicaSet<ShardingKey, MetricsT, ProcessT> replicaSet = getApplicationReplicaSet(
                         serverName, master, replicas, allLoadBalancersInRegion, allTargetGroupsInRegion,
-                        allLoadBalancerRulesInRegion, allAutoScalingGroups, allLaunchConfigurations, dnsCache);
+                        allLoadBalancerRulesInRegion, allAutoScalingGroups, allLaunchTemplates, allLaunchTemplateDefaultVersions, dnsCache, 
+                        optionalTimeout, optionalKeyName, privateKeyEncryptionPassphrase);
                 result.add(replicaSet);
             }
         }
@@ -1678,15 +1721,18 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
     @Override
     public <MetricsT extends ApplicationProcessMetrics, ProcessT extends AwsApplicationProcess<ShardingKey, MetricsT, ProcessT>>
     AwsApplicationReplicaSet<ShardingKey, MetricsT, ProcessT> getApplicationReplicaSet(com.sap.sse.landscape.Region region,
-            final String serverName, final ProcessT master, final Iterable<ProcessT> replicas) throws InterruptedException, ExecutionException, TimeoutException {
+            final String serverName, final ProcessT master, final Iterable<ProcessT> replicas, Optional<Duration> optionalTimeout,
+            Optional<String> optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws InterruptedException, ExecutionException, TimeoutException {
         final CompletableFuture<Iterable<ApplicationLoadBalancer<ShardingKey>>> allLoadBalancersInRegion = getLoadBalancersAsync(region);
         final CompletableFuture<Map<TargetGroup<ShardingKey>, Iterable<TargetHealthDescription>>> allTargetGroupsInRegion = getTargetGroupsAsync(region);
         final CompletableFuture<Map<Listener, Iterable<Rule>>> allLoadBalancerRulesInRegion = getLoadBalancerListenerRulesAsync(region, allLoadBalancersInRegion);
         final CompletableFuture<Iterable<AutoScalingGroup>> autoScalingGroups = getAutoScalingGroupsAsync(region);
-        final CompletableFuture<Iterable<LaunchConfiguration>> launchConfigurations = getLaunchConfigurationsAsync(region);
+        final CompletableFuture<Iterable<LaunchTemplate>> launchTemplates = getLaunchTemplatesAsync(region);
+        final CompletableFuture<Iterable<LaunchTemplateVersion>> launchTemplateDefaultVersions = getLaunchTemplateDefaultVersionsAsync(region);
         final DNSCache dnsCache = getNewDNSCache();
         return getApplicationReplicaSet(serverName, master, replicas, allLoadBalancersInRegion, allTargetGroupsInRegion,
-                allLoadBalancerRulesInRegion, autoScalingGroups, launchConfigurations, dnsCache);
+                allLoadBalancerRulesInRegion, autoScalingGroups, launchTemplates, launchTemplateDefaultVersions, dnsCache,
+                optionalTimeout, optionalKeyName, privateKeyEncryptionPassphrase);
     }
 
     private <MetricsT extends ApplicationProcessMetrics, ProcessT extends AwsApplicationProcess<ShardingKey, MetricsT, ProcessT>>
@@ -1696,10 +1742,12 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
             final CompletableFuture<Map<TargetGroup<ShardingKey>, Iterable<TargetHealthDescription>>> allTargetGroupsInRegion,
             final CompletableFuture<Map<Listener, Iterable<Rule>>> allLoadBalancerRulesInRegion,
             final CompletableFuture<Iterable<AutoScalingGroup>> allAutoScalingGroups,
-            CompletableFuture<Iterable<LaunchConfiguration>> allLaunchConfigurations, final DNSCache dnsCache) throws InterruptedException, ExecutionException, TimeoutException {
+            final CompletableFuture<Iterable<LaunchTemplate>> allLaunchTemplates, CompletableFuture<Iterable<LaunchTemplateVersion>> allLaunchTemplateDefaultVersions,
+            final DNSCache dnsCache, Optional<Duration> optionalTimeout, Optional<String> optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws InterruptedException, ExecutionException, TimeoutException {
         final AwsApplicationReplicaSet<ShardingKey, MetricsT, ProcessT> replicaSet = new AwsApplicationReplicaSetImpl<ShardingKey, MetricsT, ProcessT>(
                 serverName, master, Optional.ofNullable(replicas), allLoadBalancersInRegion, allTargetGroupsInRegion,
-                allLoadBalancerRulesInRegion, this, allAutoScalingGroups, allLaunchConfigurations, dnsCache, pathPrefixForShardingKey);
+                allLoadBalancerRulesInRegion, this, allAutoScalingGroups, allLaunchTemplates, allLaunchTemplateDefaultVersions, dnsCache, pathPrefixForShardingKey,
+                optionalTimeout, optionalKeyName, privateKeyEncryptionPassphrase);
         return replicaSet;
     }
     
@@ -1753,6 +1801,74 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
             Util.filter(response.resourceRecordSets(), resourceRecordSet->AwsLandscape.removeTrailingDotFromHostname(resourceRecordSet.name()).equals(hostname)));
     }
     
+    /**
+     * Stores {@link ResourceRecordSet}s keyed by the private IP address(es) (as {@link String}) to which they map.
+     * The values in this map are pairs whose {@link Pair#getA() first} component is the resource record set, the
+     * {@link Pair#getB() second} is the time point at which the resource record was cached.<p>
+     * 
+     * When a lookup finds an entry that, based on its {@link ResourceRecordSet#ttl() TTL} has already expired,
+     * the entry is removed from the cache, and a new lookup is triggered. If a lookup cannot find an entry,
+     * the {@code null} result is cached with the minimum TTL of 60s.<p>
+     * 
+     * Lookups using the {@link #findHostnamesForIP(String)} method must synchronize on this map to avoid duplicate
+     * and parallel remote DNS lookups.
+     */
+    private static final ConcurrentMap<String, Pair<ResourceRecordSet, TimePoint>> reverseDNSCache = new ConcurrentHashMap<>();
+    private static final Duration MINIMUM_DNS_CACHE_TTL_FOR_NOT_FOUND_ENTRIES = Duration.ONE_SECOND.times(60);
+    private static TimePoint timePointOfLastDNSListing;
+    @Override
+    public String findHostnamesForIP(String ipAddress) {
+        synchronized (reverseDNSCache) {
+            final TimePoint now = TimePoint.now();
+            final boolean validCacheEntryFound; // has an entry or a null result been found that is still within the TTL?
+            final Pair<ResourceRecordSet, TimePoint> cacheEntryForPrivateIP = reverseDNSCache.get(ipAddress);
+            final ResourceRecordSet cachedRRS;
+            if (cacheEntryForPrivateIP != null) {
+                if (cacheEntryForPrivateIP.getB().plus(Duration.ONE_SECOND.times(cacheEntryForPrivateIP.getA().ttl())).before(now)) {
+                    // the entry existed but has expired
+                    reverseDNSCache.remove(ipAddress);
+                    cachedRRS = null;
+                    validCacheEntryFound = false;
+                } else {
+                    cachedRRS = cacheEntryForPrivateIP.getA();
+                    validCacheEntryFound = true;
+                }
+            } else {
+                cachedRRS = null;
+                // the null entry is a valid cache statement if the last full listing happened less than our minimum cache TTL ago
+                validCacheEntryFound = timePointOfLastDNSListing != null && !timePointOfLastDNSListing.plus(MINIMUM_DNS_CACHE_TTL_FOR_NOT_FOUND_ENTRIES).before(now);
+            }
+            String result;
+            if (validCacheEntryFound) {
+                if (cachedRRS != null) {
+                    result = getNameWithoutTrailingDotFromRRS(cachedRRS);
+                } else {
+                    result = null; // a null result was cached and is still within the 60s TTL
+                }
+            } else {
+                // perform a lookup
+                timePointOfLastDNSListing = now;
+                result = null;
+                final Route53Client route53Client = getRoute53Client();
+                for (final HostedZone hostedZone : route53Client.listHostedZones().hostedZones()) {
+                    for (final ResourceRecordSet resourceRecordSet : route53Client.listResourceRecordSets(b->b.hostedZoneId(hostedZone.id())).resourceRecordSets()) {
+                        for (final ResourceRecord resourceRecord : resourceRecordSet.resourceRecords()) {
+                            reverseDNSCache.put(resourceRecord.value(), new Pair<>(resourceRecordSet, now)); // cache all that we visit
+                            if (Util.equalsWithNull(resourceRecord.value(), ipAddress)) {
+                                result = getNameWithoutTrailingDotFromRRS(resourceRecordSet); // don't abort the inner loop but cache all we got
+                            }
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+    }
+
+    private String getNameWithoutTrailingDotFromRRS(final ResourceRecordSet cachedRRS) {
+        return cachedRRS.name().replaceFirst("\\.$", "");
+    }
+    
     @Override
     public Iterable<ResourceRecordSet> getResourceRecordSets(String hostname) {
         final Route53Client route53Client = getRoute53Client();
@@ -1796,10 +1912,17 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
     }
     
     @Override
-    public CompletableFuture<Iterable<LaunchConfiguration>> getLaunchConfigurationsAsync(com.sap.sse.landscape.Region region) {
-        final Set<LaunchConfiguration> result = new HashSet<>();
-        return getAutoScalingAsyncClient(getRegion(region)).describeLaunchConfigurationsPaginator().subscribe(response->
-            result.addAll(response.launchConfigurations())).handle((v, e)->Collections.unmodifiableCollection(result));
+    public CompletableFuture<Iterable<LaunchTemplate>> getLaunchTemplatesAsync(com.sap.sse.landscape.Region region) {
+        final Set<LaunchTemplate> result = new HashSet<>();
+        return getEc2AsyncClient(getRegion(region)).describeLaunchTemplatesPaginator().subscribe(response->
+            result.addAll(response.launchTemplates())).handle((v, e)->Collections.unmodifiableCollection(result));
+    }
+    
+    @Override
+    public CompletableFuture<Iterable<LaunchTemplateVersion>> getLaunchTemplateDefaultVersionsAsync(com.sap.sse.landscape.Region region) {
+        final Set<LaunchTemplateVersion> result = new HashSet<>();
+        return getEc2AsyncClient(getRegion(region)).describeLaunchTemplateVersionsPaginator(b->b.versions(LandscapeConstants.DEFAULT_LAUNCH_TEMPLATE_VERSION_NAME)).subscribe(response->
+            result.addAll(response.launchTemplateVersions())).handle((v, e)->Collections.unmodifiableCollection(result));
     }
     
     private CompletableFuture<Map<Listener, Iterable<Rule>>> getListenerToRulesMap(com.sap.sse.landscape.Region region, Iterable<ApplicationLoadBalancer<ShardingKey>> loadBalancers) {
@@ -1924,151 +2047,96 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
 
     @Override
     public void updateReleaseInAutoScalingGroups(com.sap.sse.landscape.Region region,
-            LaunchConfiguration oldLaunchConfiguration, Iterable<AwsAutoScalingGroup> autoScalingGroups,
+            LaunchTemplate oldLaunchTemplate, Iterable<AwsAutoScalingGroup> autoScalingGroups,
             String replicaSetName, Release release) {
         logger.info("Adjusting release for auto-scaling groups "+Util.join(", ", autoScalingGroups)+" to "+release);
-        final String releaseName = release.getName();
-        final String newLaunchConfigurationName = getLaunchConfigurationName(replicaSetName, releaseName);
-        final String oldUserData = new String(Base64.getDecoder().decode(oldLaunchConfiguration.userData().getBytes()));
+        final Ec2Client ec2Client = getEc2Client(getRegion(region));
+        final LaunchTemplateVersion oldLaunchTemplateVersion = ec2Client.describeLaunchTemplateVersions(b->b
+                .launchTemplateName(oldLaunchTemplate.launchTemplateName())
+                .versions(LandscapeConstants.DEFAULT_LAUNCH_TEMPLATE_VERSION_NAME)).launchTemplateVersions().iterator().next();
+        final String oldUserData = new String(Base64.getDecoder().decode(oldLaunchTemplateVersion.launchTemplateData().userData().getBytes()));
         final String newUserData = oldUserData.replaceFirst(
                 "(?m)^"+DefaultProcessConfigurationVariables.INSTALL_FROM_RELEASE.name()+"=(.*)$",
                 DefaultProcessConfigurationVariables.INSTALL_FROM_RELEASE.name() + "=\"" + release.getName() + "\"");
-        updateLaunchConfiguration(region, oldLaunchConfiguration, autoScalingGroups, newLaunchConfigurationName,
-                b -> b.userData(Base64.getEncoder().encodeToString(newUserData.getBytes())));
+        createUpdatedDefaultLaunchTemplateVersion(region, autoScalingGroups, "Using release "+release.getName(),
+                b -> b.launchTemplateData(ldtb->ldtb.userData(Base64.getEncoder().encodeToString(newUserData.getBytes()))));
     }
     
-    private CreateLaunchConfigurationRequest.Builder copyLaunchConfigurationToCreateRequestBuilder(LaunchConfiguration launchConfigurationToCopy) {
-        return CreateLaunchConfigurationRequest.builder()
-            .associatePublicIpAddress(launchConfigurationToCopy.associatePublicIpAddress())
-            .blockDeviceMappings(new BlockDeviceMapping[0]) // empty the block device mappings, forcing AMI device mappings to be used
-            .classicLinkVPCId(launchConfigurationToCopy.classicLinkVPCId())
-            .classicLinkVPCSecurityGroups(launchConfigurationToCopy.classicLinkVPCSecurityGroups())
-            .ebsOptimized(launchConfigurationToCopy.ebsOptimized())
-            .iamInstanceProfile(launchConfigurationToCopy.iamInstanceProfile())
-            .imageId(launchConfigurationToCopy.imageId())
-            .instanceMonitoring(launchConfigurationToCopy.instanceMonitoring())
-            .instanceType(launchConfigurationToCopy.instanceType())
-            .keyName(launchConfigurationToCopy.keyName())
-            .launchConfigurationName(launchConfigurationToCopy.launchConfigurationName())
-            .placementTenancy(launchConfigurationToCopy.placementTenancy())
-            .securityGroups(launchConfigurationToCopy.securityGroups())
-            .spotPrice(launchConfigurationToCopy.spotPrice())
-            .userData(launchConfigurationToCopy.userData());
+    private CreateLaunchTemplateVersionRequest.Builder copyLaunchTemplateVersionToCreateRequestBuilder(LaunchTemplate launchTemplateToCreateNewVersionFor, com.sap.sse.landscape.Region region) {
+        return CreateLaunchTemplateVersionRequest.builder().launchTemplateId(launchTemplateToCreateNewVersionFor.launchTemplateId()).sourceVersion(LandscapeConstants.DEFAULT_LAUNCH_TEMPLATE_VERSION_NAME);
     }
 
     @Override
     public void updateImageInAutoScalingGroups(com.sap.sse.landscape.Region region, Iterable<AwsAutoScalingGroup> autoScalingGroups, String replicaSetName, AmazonMachineImage<ShardingKey> ami) {
         logger.info("Adjusting AMI for auto-scaling group(s) "+Util.join(", ", autoScalingGroups)+" to "+ami);
-        final String newLaunchConfigurationName = getLaunchConfigurationName(replicaSetName, ami.getId());
-        updateLaunchConfiguration(region, autoScalingGroups, newLaunchConfigurationName, b->b.imageId(ami.getId()));
+        createUpdatedDefaultLaunchTemplateVersion(region, autoScalingGroups,
+                "Using AMI "+ami.getName()+" with ID "+ami.getId(),
+                b->b.launchTemplateData(ltdb->ltdb.imageId(ami.getId())));
     }
 
     @Override
     public void updateInstanceTypeInAutoScalingGroup(com.sap.sse.landscape.Region region, Iterable<AwsAutoScalingGroup> autoScalingGroups, String replicaSetName, InstanceType instanceType) {
         logger.info("Adjusting instance type for auto-scaling group(s) "+Util.join(", ", autoScalingGroups)+" to "+instanceType);
-        final LaunchConfiguration oldLaunchConfiguration = Util.first(autoScalingGroups).getLaunchConfiguration();
-        final String newLaunchConfigurationName = oldLaunchConfiguration.launchConfigurationName()+"-"+instanceType.name();
-        updateLaunchConfiguration(region, autoScalingGroups, newLaunchConfigurationName, b->b.instanceType(instanceType.toString()));
+        createUpdatedDefaultLaunchTemplateVersion(region, autoScalingGroups,
+                "Using new instance type "+instanceType.name(),
+                b->b.launchTemplateData(ltdb->ltdb.instanceType(instanceType)));
     }
 
-    private void updateLaunchConfigurationForAutoScalingGroups(final AutoScalingClient autoScalingClient,
-            Iterable<AwsAutoScalingGroup> autoScalingGroups, final LaunchConfiguration oldLaunchConfiguration,
-            final String newLaunchConfigurationName) {
-        for (AwsAutoScalingGroup autoScalingGroup : autoScalingGroups) {
-            logger.info("Telling auto-scaling group " + autoScalingGroup.getName() + " to use new launch configuration "
-                    + newLaunchConfigurationName);
-            autoScalingClient.updateAutoScalingGroup(
-                    b -> b.autoScalingGroupName(autoScalingGroup.getAutoScalingGroup().autoScalingGroupName())
-                            .launchConfigurationName(newLaunchConfigurationName));
-        }
-        logger.info("Removing old launch configuration " + oldLaunchConfiguration.launchConfigurationName());
-        autoScalingClient.deleteLaunchConfiguration(
-                b -> b.launchConfigurationName(oldLaunchConfiguration.launchConfigurationName()));
-    }
-    
     /**
-     * Creates a copy of the {@code autoScalingGroup}'s launch configuration (see also
-     * {@link #copyLaunchConfigurationToCreateRequestBuilder(LaunchConfiguration)}) and adjusts it by letting the
-     * {@code builderConsumer} apply changes to the copy builder. The new launch configuration is created and set as the
-     * {@code autoScalingGroup}'s new launch configuration. Its previous launch configuration is removed in the process.
+     * Creates a new version of the launch template used by the {@code autoScalingGroups}. This method assumes that all
+     * of the auto-scaling groups use the same launch template. The new launch template version will be made the
+     * "$Default" version, hence all {@code autoScalingGroups} will use the new version automatically since we assume
+     * that those groups are all set to use the {@code $Default} version of the launch template.
      * 
-     * @param newLaunchConfigurationName
-     *            must not be {@code null} and must not equal the current name of the auto-scaling group's launch
-     *            configuration; will be used to set the new launch configuration's name by calling
-     *            {@link CreateLaunchConfigurationRequest.Builder#launchConfigurationName(String)}. By making this a
-     *            mandatory parameter, callers cannot forget specifying a new name.
-     * 
-     * @see #updateLaunchConfigurationForAutoScalingGroup(AutoScalingClient, AwsAutoScalingGroup, LaunchConfiguration,
-     *      String)
+     * @param builderConsumer
+     *            allows the caller to specify the new version by making modifications to the current "$Default" launch
+     *            template version
      */
-    private void updateLaunchConfiguration(com.sap.sse.landscape.Region region, LaunchConfiguration oldLaunchConfiguration, Iterable<AwsAutoScalingGroup> affectedAutoScalingGroups,
-            String newLaunchConfigurationName, Consumer<CreateLaunchConfigurationRequest.Builder> builderConsumer) {
-        if (newLaunchConfigurationName == null) {
-            throw new NullPointerException("New launch configuration name for auto-scaling groups "+Util.join(", ", affectedAutoScalingGroups)+" must not be null");
-        }
-        logger.info("Adjusting launch configuration for auto-scaling groups "+Util.join(", ", affectedAutoScalingGroups));
-        final AutoScalingClient autoScalingClient = getAutoScalingClient(getRegion(region));
-        if (newLaunchConfigurationName.equals(oldLaunchConfiguration.launchConfigurationName())) {
-            throw new IllegalArgumentException("New launch configuration name "+newLaunchConfigurationName+" for auto-scaling groups "+
-                    Util.join(", ", affectedAutoScalingGroups)+" equals the old one");
-        }
-        final CreateLaunchConfigurationRequest.Builder createLaunchConfigurationRequestBuilder = copyLaunchConfigurationToCreateRequestBuilder(oldLaunchConfiguration);
-        builderConsumer.accept(createLaunchConfigurationRequestBuilder);
-        createLaunchConfigurationRequestBuilder.launchConfigurationName(newLaunchConfigurationName);
-        final CreateLaunchConfigurationRequest createLaunchConfigurationRequest = createLaunchConfigurationRequestBuilder.build();
-        logger.info("Creating new launch configuration "+newLaunchConfigurationName);
-        autoScalingClient.createLaunchConfiguration(createLaunchConfigurationRequest);
-        updateLaunchConfigurationForAutoScalingGroups(autoScalingClient, affectedAutoScalingGroups, oldLaunchConfiguration, newLaunchConfigurationName);
-    }
-    
-    private void updateLaunchConfiguration(com.sap.sse.landscape.Region region, Iterable<AwsAutoScalingGroup> autoScalingGroups,
-            String newLaunchConfigurationName, Consumer<CreateLaunchConfigurationRequest.Builder> builderConsumer) {
+    private void createUpdatedDefaultLaunchTemplateVersion(com.sap.sse.landscape.Region region, Iterable<AwsAutoScalingGroup> autoScalingGroups,
+            String newLaunchTemplateVersionDescription, Consumer<CreateLaunchTemplateVersionRequest.Builder> builderConsumer) {
         if (Util.isEmpty(autoScalingGroups)) {
-            throw new IllegalArgumentException("At least one auto-scaling group must be provided for updating a launch configuration");
+            throw new IllegalArgumentException("At least one auto-scaling group must be provided for updating a launch template");
         }
-        if (newLaunchConfigurationName == null) {
-            throw new NullPointerException("New launch configuration name for auto-scaling group(s) "+Util.join(", ", autoScalingGroups)+" must not be null");
-        }
-        logger.info("Adjusting launch configuration for auto-scaling group(s) "+Util.join(", ", autoScalingGroups));
-        final AutoScalingClient autoScalingClient = getAutoScalingClient(getRegion(region));
-        final LaunchConfiguration oldLaunchConfiguration = Util.first(autoScalingGroups).getLaunchConfiguration();
-        if (newLaunchConfigurationName.equals(oldLaunchConfiguration.launchConfigurationName())) {
-            throw new IllegalArgumentException("New launch configuration name "+newLaunchConfigurationName+" for auto-scaling group(s) "+
-                    Util.join(", ", autoScalingGroups)+" equals the old one");
-        }
-        final CreateLaunchConfigurationRequest.Builder createLaunchConfigurationRequestBuilder = copyLaunchConfigurationToCreateRequestBuilder(oldLaunchConfiguration);
-        builderConsumer.accept(createLaunchConfigurationRequestBuilder);
-        createLaunchConfigurationRequestBuilder.launchConfigurationName(newLaunchConfigurationName);
-        final CreateLaunchConfigurationRequest createLaunchConfigurationRequest = createLaunchConfigurationRequestBuilder.build();
-        logger.info("Creating new launch configuration "+newLaunchConfigurationName);
-        autoScalingClient.createLaunchConfiguration(createLaunchConfigurationRequest);
-        updateLaunchConfigurationForAutoScalingGroups(autoScalingClient, autoScalingGroups, oldLaunchConfiguration, newLaunchConfigurationName);
+        logger.info("Creating a new, adjusted default launch template version for auto-scaling group(s) "+Util.join(", ", autoScalingGroups));
+        final LaunchTemplate launchTemplate = Util.first(autoScalingGroups).getLaunchTemplate();
+        final CreateLaunchTemplateVersionRequest.Builder createLaunchTemplateVersionRequestBuilder = copyLaunchTemplateVersionToCreateRequestBuilder(launchTemplate, region);
+        createLaunchTemplateVersionRequestBuilder
+            .versionDescription(newLaunchTemplateVersionDescription);
+        builderConsumer.accept(createLaunchTemplateVersionRequestBuilder);
+        final CreateLaunchTemplateVersionRequest createLaunchTemplateVersionRequest = createLaunchTemplateVersionRequestBuilder.build();
+        logger.info("Creating new launch template version \""+newLaunchTemplateVersionDescription+"\" for launch template "+launchTemplate.launchTemplateName());
+        final Ec2Client ec2Client = getEc2Client(getRegion(region));
+        final CreateLaunchTemplateVersionResponse launchTemplateVersionResponse = ec2Client.createLaunchTemplateVersion(createLaunchTemplateVersionRequest);
+        ec2Client.modifyLaunchTemplate(b->b
+                .launchTemplateId(launchTemplate.launchTemplateId())
+                .defaultVersion(launchTemplateVersionResponse.launchTemplateVersion().versionNumber().toString()));
     }
 
     @Override
     public <MetricsT extends ApplicationProcessMetrics, ProcessT extends AwsApplicationProcess<ShardingKey, MetricsT, ProcessT>>
-    void createLaunchConfigurationAndAutoScalingGroup(
+    void createLaunchTemplateAndAutoScalingGroup(
             com.sap.sse.landscape.Region region, String replicaSetName, Optional<Tags> tags,
             TargetGroup<ShardingKey> publicTargetGroup, String keyName, InstanceType instanceType,
             String imageId, AwsApplicationConfiguration<ShardingKey, MetricsT, ProcessT> replicaConfiguration,
             int minReplicas, int maxReplicas, int maxRequestsPerTarget) {
-        logger.info("Creating launch configuration for replica set "+replicaSetName);
+        logger.info("Creating launch template for replica set "+replicaSetName);
         final Region awsRegion = getRegion(region);
+        final Ec2Client ec2Client = getEc2Client(awsRegion);
         final AutoScalingClient autoScalingClient = getAutoScalingClient(awsRegion);
-        final String releaseName = replicaConfiguration.getRelease().map(r->r.getName()).orElse("UnknownRelease");
-        final String launchConfigurationName = getLaunchConfigurationName(replicaSetName, releaseName);
+        final String launchTemplateName = replicaSetName;
         final String autoScalingGroupName = getAutoScalingGroupName(replicaSetName);
         final Iterable<AwsAvailabilityZone> availabilityZones = getAvailabilityZones(region);
         final SecurityGroup securityGroup = getDefaultSecurityGroupForApplicationHosts(region);
         final int instanceWarmupTimeInSeconds = (int) Duration.ONE_MINUTE.times(3).asSeconds();
-        autoScalingClient.createLaunchConfiguration(b->b
-                .launchConfigurationName(launchConfigurationName)
-                .keyName(keyName)
-                .imageId(imageId)
-                .instanceMonitoring(i->i.enabled(true))
-                .securityGroups(securityGroup.getId())
-                .userData(Base64.getEncoder().encodeToString(replicaConfiguration.getAsEnvironmentVariableAssignments().getBytes()))
-                .instanceType(instanceType.toString()));
+        ec2Client.createLaunchTemplate(b->b
+                .launchTemplateName(launchTemplateName)
+                .launchTemplateData(ltdb->ltdb
+                    .keyName(keyName)
+                    .imageId(imageId)
+                    .monitoring(i->i.enabled(true))
+                    .securityGroupIds(securityGroup.getId())
+                    .userData(Base64.getEncoder().encodeToString(replicaConfiguration.getAsEnvironmentVariableAssignments().getBytes()))
+                    .instanceType(instanceType.toString())));
         logger.info("Creating auto-scaling group for replica set "+replicaSetName);
         String vpcIdentifier = String.join(",", Util.mapToArrayList(availabilityZones,
                 az -> getSubnetForAvailabilityZoneInSameVpcAsSecurityGroup(az, securityGroup, awsRegion).subnetId())
@@ -2077,7 +2145,9 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
             b.minSize(minReplicas).maxSize(maxReplicas).healthCheckGracePeriod(instanceWarmupTimeInSeconds)
                     .autoScalingGroupName(autoScalingGroupName).vpcZoneIdentifier(vpcIdentifier)
                     .targetGroupARNs(publicTargetGroup.getTargetGroupArn())
-                    .launchConfigurationName(launchConfigurationName);
+                    .launchTemplate(LaunchTemplateSpecification.builder()
+                            .launchTemplateName(launchTemplateName)
+                            .version(LandscapeConstants.DEFAULT_LAUNCH_TEMPLATE_VERSION_NAME).build());
             tags.ifPresent(t -> {
                 final List<software.amazon.awssdk.services.autoscaling.model.Tag> awsTags = new ArrayList<>();
                 for (final Entry<String, String> tag : t) {
@@ -2097,10 +2167,6 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
         client.enableMetricsCollection(request);
     }
 
-    private String getLaunchConfigurationName(String replicaSetName, final String releaseName) {
-        return replicaSetName + "-" + releaseName;
-    }
-
     public String getAutoScalingGroupName(String replicaSetName) {
         return replicaSetName+AUTO_SCALING_GROUP_NAME_SUFFIX;
     }
@@ -2117,13 +2183,16 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
     }
 
     @Override
-    public CompletableFuture<Void> removeAutoScalingGroupAndLaunchConfiguration(AwsAutoScalingGroup autoScalingGroup) {
-        final String launchConfigurationName = autoScalingGroup.getAutoScalingGroup().launchConfigurationName();
-        final AutoScalingAsyncClient autoScalingAsyncClient = getAutoScalingAsyncClient(getRegion(autoScalingGroup.getRegion()));
+    public CompletableFuture<Void> removeAutoScalingGroupAndLaunchTemplate(AwsAutoScalingGroup autoScalingGroup) {
+        final String launchTemplateId = autoScalingGroup.getAutoScalingGroup().launchTemplate()==null?null:autoScalingGroup.getAutoScalingGroup().launchTemplate().launchTemplateId();
+        final String launchTemplateName = autoScalingGroup.getAutoScalingGroup().launchTemplate()==null?null:autoScalingGroup.getAutoScalingGroup().launchTemplate().launchTemplateName();
+        final Ec2AsyncClient ec2AsyncClient = getEc2AsyncClient(getRegion(autoScalingGroup.getRegion()));
         return removeAutoScalingGroup(autoScalingGroup)
             .thenAccept(response->{
-                logger.info("Removing launch configuration "+launchConfigurationName);
-                autoScalingAsyncClient.deleteLaunchConfiguration(b->b.launchConfigurationName(launchConfigurationName));
+                if (launchTemplateId != null) {
+                    logger.info("Removing launch template "+launchTemplateName+" with ID "+launchTemplateId);
+                    ec2AsyncClient.deleteLaunchTemplate(b->b.launchTemplateId(launchTemplateId));
+                }
             });
     }
     
@@ -2144,7 +2213,7 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
     String createAutoScalingGroupFromExisting(AwsAutoScalingGroup autoScalingParent,
             String shardName, TargetGroup<ShardingKey> targetGroup, int minSize, Optional<Tags> tags) {
         final AutoScalingClient autoScalingClient = getAutoScalingClient(getRegion(autoScalingParent.getRegion()));
-        final String launchConfigurationName = autoScalingParent.getAutoScalingGroup().launchConfigurationName();
+        final String launchTemplateId = autoScalingParent.getLaunchTemplate().launchTemplateId();
         final String autoScalingGroupName = getAutoScalingGroupName(shardName);
         final List<String> availabilityZones = autoScalingParent.getAutoScalingGroup().availabilityZones();
         final int instanceWarmupTimeInSeconds = autoScalingParent.getAutoScalingGroup().defaultInstanceWarmup() != null ? autoScalingParent.getAutoScalingGroup().defaultInstanceWarmup() : 180 ;
@@ -2159,7 +2228,7 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
                 .autoScalingGroupName(autoScalingGroupName)
                 .availabilityZones(availabilityZones)
                 .targetGroupARNs(targetGroup.getTargetGroupArn())
-                .launchConfigurationName(launchConfigurationName);
+                .launchTemplate(ltb->ltb.launchTemplateId(launchTemplateId).version(LandscapeConstants.DEFAULT_LAUNCH_TEMPLATE_VERSION_NAME));
             final List<software.amazon.awssdk.services.autoscaling.model.Tag> awsTags = new ArrayList<>();
             final List<software.amazon.awssdk.services.autoscaling.model.TagDescription> parentTags = autoScalingParent.getAutoScalingGroup().tags();
             for (final software.amazon.awssdk.services.autoscaling.model.TagDescription parentTag : parentTags) {

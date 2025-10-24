@@ -1,11 +1,11 @@
 package com.sap.sse.landscape.aws;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -23,9 +23,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
@@ -49,7 +49,6 @@ import com.sap.sse.landscape.SecurityGroup;
 import com.sap.sse.landscape.application.ApplicationProcess;
 import com.sap.sse.landscape.aws.impl.AwsRegion;
 import com.sap.sse.landscape.aws.orchestration.CreateDNSBasedLoadBalancerMapping;
-import com.sap.sse.landscape.impl.ReleaseRepositoryImpl;
 import com.sap.sse.landscape.mongodb.MongoEndpoint;
 import com.sap.sse.landscape.mongodb.impl.DatabaseImpl;
 import com.sap.sse.landscape.rabbitmq.RabbitMQEndpoint;
@@ -88,7 +87,7 @@ import software.amazon.awssdk.services.sts.model.Credentials;
  * @author Axel Uhl (D043530)
  *
  */
-@Ignore("Needs AWS key ID, key secret and session token in system properties")
+@Disabled("Needs AWS key ID, key secret and session token in system properties")
 public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, SailingAnalyticsMetrics, ProcessT>> {
     private static final Logger logger = Logger.getLogger(ConnectivityTest.class.getName());
     private static final Optional<Duration> optionalTimeout = Optional.of(Duration.ONE_MINUTE.times(10));
@@ -99,7 +98,7 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
     private static final String AXELS_KEY_NAME = "Axel_ed25519";
     private static final String pathPrefixForShardingKey = "/sse/landscape/test";
     
-    @BeforeClass
+    @BeforeAll
     public static void setUp() {
         if (System.getProperty(AwsLandscape.SESSION_TOKEN_SYSTEM_PROPERTY_NAME) != null) {
             landscape = AwsLandscape.obtain(
@@ -121,6 +120,11 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
         region = new AwsRegion(Region.EU_WEST_2, landscape);
         AXELS_KEY_PASS = new String(Base64.getDecoder().decode(System.getProperty("axelskeypassphrase")));
         keyPass = "lkayrelakuesyrlasp8caorewyc".getBytes();
+    }
+    
+    @Test
+    public void testReverseDNSLookup() {
+        assertEquals("mongo0.internal.sapsailing.com", landscape.findHostnamesForIP("172.31.13.233"));
     }
     
     @Test
@@ -232,7 +236,9 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
                         host.getInstanceId(), host.getAvailabilityZone(), host.getPrivateAddress(), host.getLaunchTimePoint(),
                         landscape, new SailingAnalyticsProcessFactory(()->landscape));
         @SuppressWarnings("unchecked")
-        final ProcessT process = (ProcessT) new SailingAnalyticsProcessImpl<String>(8888, sailingAnalyticsHost, ApplicationProcessHost.DEFAULT_SERVERS_PATH+"/"+serverName, 2010, landscape);
+        final ProcessT process = (ProcessT) new SailingAnalyticsProcessImpl<String>(8888, sailingAnalyticsHost, ApplicationProcessHost.DEFAULT_SERVERS_PATH+"/"+serverName,
+                /* expedition UDP port */2010,
+                /* igtimiRiotPort */ 6000, landscape);
         return process;
     }
     
@@ -284,7 +290,7 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
             final String envSh = process.getEnvSh(optionalTimeout, Optional.empty(), keyPass);
             assertFalse(envSh.isEmpty());
             assertTrue(envSh.contains("SERVER_NAME="));
-            final Release release = process.getRelease(new ReleaseRepositoryImpl("http://releases.sapsailing.com", "build"), optionalTimeout, Optional.empty(), keyPass);
+            final Release release = process.getRelease(SailingReleaseRepository.INSTANCE, optionalTimeout, Optional.empty(), keyPass);
             assertNotNull(release);
             assertEquals(14888, process.getTelnetPortToOSGiConsole(optionalTimeout, Optional.empty(), keyPass));
             final AwsLandscape<String> castLandscape = (AwsLandscape<String>) landscape;
@@ -508,7 +514,7 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
                             .conditions(r -> r.field("host-header").hostHeaderConfig(hhc -> hhc.values(hostnameCondition)))
                             .actions(a -> a.type(ActionTypeEnum.FIXED_RESPONSE).fixedResponseConfig(frc -> frc.statusCode("200").messageBody("Hello world"))).build());
             assertEquals(1, Util.size(rulesCreated));
-            assertTrue(hostnameCondition, rulesCreated.iterator().next().conditions().iterator().next().hostHeaderConfig().values().contains(hostnameCondition));
+            assertTrue(rulesCreated.iterator().next().conditions().iterator().next().hostHeaderConfig().values().contains(hostnameCondition), hostnameCondition);
         } finally {
             alb.delete();
         }

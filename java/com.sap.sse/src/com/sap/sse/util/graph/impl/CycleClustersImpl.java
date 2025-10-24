@@ -32,7 +32,7 @@ public class CycleClustersImpl<T> implements CycleClusters<T> {
 
     @Override
     public boolean isEdgeInCycleCluster(DirectedEdge<T> edge) {
-        return clusters.stream().anyMatch(c->c.contains(edge.getFrom() )&& c.contains(edge.getTo()));
+        return clusters.stream().anyMatch(c->c.contains(edge.getFrom()) && c.contains(edge.getTo()));
     }
 
     @Override

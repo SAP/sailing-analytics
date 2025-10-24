@@ -1,8 +1,9 @@
 package com.sap.sailing.domain.orc;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -13,14 +14,11 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ErrorCollector;
-import org.junit.rules.TestRule;
-import org.junit.rules.Timeout;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
 import com.sap.sailing.domain.abstractlog.orc.impl.RaceLogORCLegDataEventImpl;
@@ -62,6 +60,7 @@ import com.sap.sse.common.impl.SecondsDurationImpl;
  * @author Axel Uhl (d043530)
  *
  */
+@Timeout(value = 100, unit = TimeUnit.MINUTES)
 public class ORCPerformanceCurveRankingTest extends OnlineTracTracBasedTest {
     final static MillisecondsTimePoint TIME_14_30_00 = new MillisecondsTimePoint(1555849800000l);
     final static MillisecondsTimePoint TIME_14_30_12 = new MillisecondsTimePoint(1555849812000l);
@@ -72,30 +71,6 @@ public class ORCPerformanceCurveRankingTest extends OnlineTracTracBasedTest {
     private RegattaLog regattaLog;
     private LogEventAuthorImpl author;
 
-    @Rule
-    public TestRule getTimeoutRule() {
-        return Timeout.millis(100 * 60 * 1000);
-    }
-    
-    @Rule
-    public ErrorCollector collector = new ErrorCollector();
-    
-    public void assertEquals(double a, double b, double accuracy) {
-        try {
-            Assert.assertEquals(a, b, accuracy);
-        } catch (AssertionError e) {
-            collector.addError(e);
-        }
-    }
-
-    public void assertEquals(String message, double a, double b, double accuracy) {
-        try {
-            Assert.assertEquals(message, a, b, accuracy);
-        } catch (AssertionError e) {
-            collector.addError(e);
-        }
-    }
-
     public ORCPerformanceCurveRankingTest() throws MalformedURLException, URISyntaxException {
     }
     
@@ -104,7 +79,7 @@ public class ORCPerformanceCurveRankingTest extends OnlineTracTracBasedTest {
         return "D-Marin ORC World Championship";
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         URI storedUri = new URI("file:///"+new File("resources/orc/worlds2019/348f93c0-6798-0137-b07e-60a44ce903c3.mtb").getCanonicalPath().replace('\\', '/'));
@@ -135,7 +110,7 @@ public class ORCPerformanceCurveRankingTest extends OnlineTracTracBasedTest {
                     certificate = certificates.getCertificateByBoatName(boat.getName() == null ? boat.getSailID() : boat.getName());
                 }
             }
-            assertNotNull("Couldn't find a certificate for boat "+boat, certificate);
+            assertNotNull(certificate, "Couldn't find a certificate for boat "+boat);
             final RegattaLogEvent certificateAssignment = new RegattaLogORCCertificateAssignmentEventImpl(MillisecondsTimePoint.now(), MillisecondsTimePoint.now(),
                     author, UUID.randomUUID(), certificate, boat);
             regattaLog.add(certificateAssignment);
@@ -217,8 +192,8 @@ public class ORCPerformanceCurveRankingTest extends OnlineTracTracBasedTest {
     private void assertCorrectedTimeAtEnd(Duration scratchBoatDuration, Duration winnerCorrectedTime, String boatName, int hours, int minutes, int seconds) {
         final Duration expectedCorrectedTime = winnerCorrectedTime.plus(new SecondsDurationImpl(3600*hours+60*minutes+seconds));
         final Duration correctedTimeForNamedBoat = rankingMetric.getCorrectedTime(getCompetitor(boatName), MillisecondsTimePoint.now());
-        assertEquals("Expected corrected time "+expectedCorrectedTime+" but got "+correctedTimeForNamedBoat+" for "+boatName,
-                expectedCorrectedTime.asSeconds(), correctedTimeForNamedBoat.asSeconds(), 0.7);
+        assertEquals(expectedCorrectedTime.asSeconds(), correctedTimeForNamedBoat.asSeconds(), 0.7,
+                "Expected corrected time "+expectedCorrectedTime+" but got "+correctedTimeForNamedBoat+" for "+boatName);
     }
     
     private Competitor getCompetitor(String boatName) {

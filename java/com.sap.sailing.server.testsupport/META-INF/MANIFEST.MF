@@ -43,5 +43,6 @@ Require-Bundle: com.sap.sailing.server,
  com.sap.sse.mail
 Automatic-Module-Name: com.sap.sailing.server.testsupport
 Import-Package: com.sap.sse.security.userstore.mongodb,
+ org.apache.commons.math;version="2.1.0",
  org.osgi.framework;version="1.8.0",
  org.osgi.util.tracker;version="1.5.1"

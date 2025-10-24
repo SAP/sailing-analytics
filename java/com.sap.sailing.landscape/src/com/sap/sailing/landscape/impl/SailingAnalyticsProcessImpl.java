@@ -24,8 +24,8 @@ import com.jcraft.jsch.JSchException;
 import com.sap.sailing.landscape.SailingAnalyticsHost;
 import com.sap.sailing.landscape.SailingAnalyticsMetrics;
 import com.sap.sailing.landscape.SailingAnalyticsProcess;
-import com.sap.sailing.landscape.SailingAnalyticsProcessConfigurationVariable;
 import com.sap.sailing.landscape.SailingReleaseRepository;
+import com.sap.sailing.landscape.procedures.SailingProcessConfigurationVariables;
 import com.sap.sailing.landscape.procedures.StartSailingAnalyticsHost;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
@@ -53,19 +53,22 @@ implements SailingAnalyticsProcess<ShardingKey> {
     private static final String STATUS_RELEASE_PROPERTY_NAME = "release";
     private static final String MONGODB_CONFIGURATION_PROPERTY_NAME = "mongoDbConfiguration";
     private Integer expeditionUdpPort;
+    private Integer igtimiRiotPort;
     private Release release;
     private TimePoint startTimePoint;
     
-    public SailingAnalyticsProcessImpl(int port, SailingAnalyticsHost<ShardingKey> host, String serverDirectory, Integer expeditionUdpPort, AwsLandscape<ShardingKey> landscape) {
+    public SailingAnalyticsProcessImpl(int port, SailingAnalyticsHost<ShardingKey> host, String serverDirectory, Integer expeditionUdpPort, Integer igtimiRiotPort, AwsLandscape<ShardingKey> landscape) {
         super(port, host, serverDirectory, landscape);
         this.expeditionUdpPort = expeditionUdpPort;
+        this.igtimiRiotPort = igtimiRiotPort;
     }
 
     public SailingAnalyticsProcessImpl(int port,
             SailingAnalyticsHost<ShardingKey> host,
-            String serverDirectory, Integer telnetPort, String serverName, Integer expeditionUdpPort, AwsLandscape<ShardingKey> landscape) {
+            String serverDirectory, Integer telnetPort, String serverName, Integer expeditionUdpPort, Integer igtimiRiotPort, AwsLandscape<ShardingKey> landscape) {
         super(port, host, serverDirectory, telnetPort, serverName, landscape);
         this.expeditionUdpPort = expeditionUdpPort;
+        this.igtimiRiotPort = igtimiRiotPort;
     }
 
     @Override
@@ -221,11 +224,46 @@ implements SailingAnalyticsProcess<ShardingKey> {
     public int getExpeditionUdpPort(Optional<Duration> optionalTimeout, Optional<String> optionalKeyName, byte[] privateKeyEncryptionPassphrase)
             throws Exception {
         if (expeditionUdpPort == null) {
-            expeditionUdpPort = Integer.parseInt(getEnvShValueFor(SailingAnalyticsProcessConfigurationVariable.EXPEDITION_PORT.name(),
+            expeditionUdpPort = Integer.parseInt(getEnvShValueFor(SailingProcessConfigurationVariables.EXPEDITION_PORT.name(),
                 optionalTimeout, optionalKeyName, privateKeyEncryptionPassphrase));
         }
         return expeditionUdpPort;
     }
+    
+    @Override
+    public Integer getIgtimiRiotPort(Optional<Duration> optionalTimeout, Optional<String> optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception {
+        if (igtimiRiotPort == null) {
+            final String igtimiRiotPortEnvVar = getEnvShValueFor(SailingProcessConfigurationVariables.IGTIMI_RIOT_PORT.name(),
+                    optionalTimeout, optionalKeyName, privateKeyEncryptionPassphrase);
+            igtimiRiotPort = Util.hasLength(igtimiRiotPortEnvVar) ? Integer.parseInt(igtimiRiotPortEnvVar) : null;
+        }
+        return igtimiRiotPort;
+    }
+
+    @Override
+    public int[] getAllTCPPorts(Optional<Duration> optionalTimeout, Optional<String> optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception {
+        final Integer igtimiRiotPort = getIgtimiRiotPort(optionalTimeout, optionalKeyName, privateKeyEncryptionPassphrase);
+        final int[] result;
+        if (igtimiRiotPort == null) {
+            result = super.getAllTCPPorts(optionalTimeout, optionalKeyName, privateKeyEncryptionPassphrase);
+        } else {
+            final int[] superTCPPorts = super.getAllTCPPorts(optionalTimeout, optionalKeyName, privateKeyEncryptionPassphrase);
+            result = new int[superTCPPorts.length + 1];
+            System.arraycopy(superTCPPorts, 0, result, 0, superTCPPorts.length);
+            result[result.length-1] = igtimiRiotPort;
+        }
+        return result;
+    }
+
+    @Override
+    public int[] getAllUDPPorts(Optional<Duration> optionalTimeout, Optional<String> optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception {
+        final int[] superUDPPorts = super.getAllUDPPorts(optionalTimeout, optionalKeyName, privateKeyEncryptionPassphrase);
+        final int[] result = new int[superUDPPorts.length + 1];
+        System.arraycopy(superUDPPorts, 0, result, 0, superUDPPorts.length);
+        result[result.length-1] = getExpeditionUdpPort(optionalTimeout, optionalKeyName, privateKeyEncryptionPassphrase);
+        return result;
+    }
+
 
     @Override
     public void stopAndTerminateIfLast(Optional<Duration> optionalTimeout, Optional<String> optionalKeyName,

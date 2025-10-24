@@ -154,3 +154,9 @@
 	background: #e5e5e5;
 	opacity : 0.8;
 }
+
+.cellTableWrapText {
+    white-space: normal !important;
+    word-wrap: break-word; /* For older browsers */
+    overflow-wrap: break-word; /* Standard */
+}

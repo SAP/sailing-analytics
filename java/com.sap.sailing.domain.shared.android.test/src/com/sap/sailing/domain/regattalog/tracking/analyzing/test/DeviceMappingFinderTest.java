@@ -1,14 +1,15 @@
 package com.sap.sailing.domain.regattalog.tracking.analyzing.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.regatta.RegattaLogEvent;
@@ -19,17 +20,15 @@ import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.impl.CompetitorImpl;
 import com.sap.sailing.domain.common.DeviceIdentifier;
 import com.sap.sailing.domain.common.abstractlog.NotRevokableException;
-import com.sap.sailing.domain.racelog.tracking.test.mock.SmartphoneImeiIdentifier;
 import com.sap.sailing.domain.racelogtracking.DeviceMappingWithRegattaLogEvent;
+import com.sap.sailing.domain.racelogtracking.impl.SmartphoneImeiIdentifierImpl;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
-
-import org.junit.Assert;
 
 public class DeviceMappingFinderTest extends AbstractRegattaLogTrackingTest {
     private final Competitor competitor = new CompetitorImpl("comp", "Comp", "KYC", null, null, null, null, /* timeOnTimeFactor */ null, /* timeOnDistanceAllowancePerNauticalMile */ null, null);
     private final Competitor competitor2 = new CompetitorImpl("comp2", "Comp2", "KYC", null, null, null, null, /* timeOnTimeFactor */ null, /* timeOnDistanceAllowancePerNauticalMile */ null, null);
-    private final DeviceIdentifier device = new SmartphoneImeiIdentifier("imei");
+    private final DeviceIdentifier device = new SmartphoneImeiIdentifierImpl("imei");
     
     private int time = 0;
     
@@ -285,11 +284,11 @@ public class DeviceMappingFinderTest extends AbstractRegattaLogTrackingTest {
         addMapping(author, device, 10L, 40L, competitor2);
         addMapping(author, device, 20L, 30L, competitor2);
         addMapping(author, device, 50L, 90L, competitor);
-        Assert.assertEquals(2, getMappings().size());
+        Assertions.assertEquals(2, getMappings().size());
         
         //non-overlap with new device
-        addMapping(author, new SmartphoneImeiIdentifier("imei2"), 110L, 150L, competitor);
-        Assert.assertEquals(3, getMappings().size());
+        addMapping(author, new SmartphoneImeiIdentifierImpl("imei2"), 110L, 150L, competitor);
+        Assertions.assertEquals(3, getMappings().size());
     }
     
     @Test

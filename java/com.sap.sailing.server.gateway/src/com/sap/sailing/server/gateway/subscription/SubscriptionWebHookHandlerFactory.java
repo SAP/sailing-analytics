@@ -29,7 +29,7 @@ public class SubscriptionWebHookHandlerFactory {
     }
 
     /**
-     * Return webhook hanlder for request path, return null in case handler could not be found for the request
+     * Return webhook handler for request path, return null in case handler could not be found for the request
      */
     public SubscriptionWebHookHandler getHandlerForPath(String path, SubscriptionWebHookServlet context) {
         final Class<? extends SubscriptionWebHookHandler> handlerCls = handlers.get(path);
@@ -53,7 +53,7 @@ public class SubscriptionWebHookHandlerFactory {
     }
 
     private void registerHandler(Class<? extends SubscriptionWebHookHandler> handlerCls) {
-        SubscriptionWebHookHandler inst = createHandlerInstance(handlerCls);
+        final SubscriptionWebHookHandler inst = createHandlerInstance(handlerCls);
         if (inst != null) {
             handlers.put(inst.getHandlerPath(), handlerCls);
         }

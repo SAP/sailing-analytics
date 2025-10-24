@@ -44,7 +44,7 @@ public class ExpeditionWindMeasureStatusGetServlet extends SailingServerHttpServ
         if (!isExpeditionListenerRegistered) {
             isExpeditionListenerRegistered = registerExpeditionListener();
         }
-        writePostRefreshingHeadAndBodyWithRefreshForm(req, resp, "Expedition Wind Status");
+        writePostRefreshingHeadAndBodyWithRefreshForm(req, resp, "Expedition Wind Status", "/sailingserver/expeditionWindStatus");
     }
     
     @Override

@@ -26,9 +26,11 @@ public class EmbeddedMapAndWindChartSettings extends AbstractGenericSerializable
     private transient BooleanSetting windUp;
 
     public EmbeddedMapAndWindChartSettings() {
+        super();
     }
 
     public EmbeddedMapAndWindChartSettings(final boolean play) {
+        this();
         this.play.setValue(play);;
     }
 

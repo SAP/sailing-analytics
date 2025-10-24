@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Test
+Bundle-SymbolicName: com.sap.sse.aicore.test
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: SAP
+Fragment-Host: com.sap.sse.aicore
+Automatic-Module-Name: com.sap.sse.aicore.test
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: com.sap.sse.common
+Require-Bundle: org.hamcrest;bundle-version="2.2.0",
+ junit-jupiter-api;bundle-version="5.11.3",
+ junit-jupiter-engine;bundle-version="5.11.3",
+ junit-platform-commons;bundle-version="1.11.3",
+ junit-platform-engine;bundle-version="1.11.3",
+ org.opentest4j;bundle-version="1.3.0"

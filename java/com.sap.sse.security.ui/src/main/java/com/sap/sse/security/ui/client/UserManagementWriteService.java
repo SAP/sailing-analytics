@@ -1,10 +1,12 @@
 package com.sap.sse.security.ui.client;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import com.sap.sse.common.mail.MailException;
+import com.sap.sse.common.media.TakedownNoticeRequestContext;
 import com.sap.sse.security.shared.QualifiedObjectIdentifier;
 import com.sap.sse.security.shared.UnauthorizedException;
 import com.sap.sse.security.shared.UserGroupManagementException;
@@ -106,7 +108,13 @@ public interface UserManagementWriteService extends UserManagementService {
      */
     void unsetPreference(String username, String key)
             throws UserManagementException, UnauthorizedException, org.apache.shiro.authz.UnauthorizedException;
+    
+    void setCORSFilterConfigurationToWildcard();
 
+    void setCORSFilterConfigurationAllowedOrigins(ArrayList<String> allowedOrigins);
+
+    void fileTakedownNotice(TakedownNoticeRequestContext takedownNoticeRequestContext) throws MailException;
+    
     // ------------------------------------------------ OAuth Interface
     // --------------------------------------------------------------
     public String getAuthorizationUrl(CredentialDTO credential)

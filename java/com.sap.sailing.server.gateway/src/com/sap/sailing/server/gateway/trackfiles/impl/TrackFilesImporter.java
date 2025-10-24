@@ -28,6 +28,7 @@ import com.sap.sailing.server.gateway.trackfiles.impl.ImportResult.TrackImportDT
 import com.sap.sailing.server.interfaces.RacingEventService;
 import com.sap.sse.common.NoCorrespondingServiceRegisteredException;
 import com.sap.sse.common.TimeRange;
+import com.sap.sse.common.Timed;
 import com.sap.sse.common.TransformationException;
 import com.sap.sse.common.TypeBasedServiceFinderFactory;
 import com.sap.sse.common.Util.Pair;
@@ -85,6 +86,12 @@ public class TrackFilesImporter {
                                 storeFix(fix, device);
                                 deviceIds.add(device);
                             }
+
+                            @Override
+                            public void addFixes(Iterable<GPSFix> fixes, TrackFileImportDeviceIdentifier device) {
+                                storeFixes(fixes, device);
+                                deviceIds.add(device);
+                            }
                         }, true, fileName);
                         if (ok) {
                             succeeded.set(ok);
@@ -125,6 +132,14 @@ public class TrackFilesImporter {
     void storeFix(GPSFix fix, DeviceIdentifier deviceIdentifier) {
         try {
             service.getSensorFixStore().storeFix(deviceIdentifier, fix);
+        } catch (NoCorrespondingServiceRegisteredException e) {
+            logger.log(Level.WARNING, "Could not store fix for " + deviceIdentifier);
+        }
+    }
+
+    <FixT extends Timed> void storeFixes(Iterable<FixT> fixes, DeviceIdentifier deviceIdentifier) {
+        try {
+            service.getSensorFixStore().storeFixes(deviceIdentifier, fixes, /* returnManeuverUpdate */ false, /* returnLiveDelay */ false);
         } catch (NoCorrespondingServiceRegisteredException e) {
             logger.log(Level.WARNING, "Could not store fix for " + deviceIdentifier);
         }

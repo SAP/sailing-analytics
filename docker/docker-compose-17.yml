@@ -1,7 +1,7 @@
 version: "3.10"
 services:
   sailing-analytics:
-    image: "docker.sapsailing.com/sapsailing_on_sapmachine17:latest"
+    image: "ghcr.io/sap/sailing-analytics:latest-17"
     ports:
       - "8888:8888"
       - "6666:6666"
@@ -13,7 +13,7 @@ services:
       REPLICATION_CHANNEL: test
       REPLICATION_PORT: 5672
   mongo:
-    image: "mongo:4.4-rc"
+    image: "mongo:7"
   rabbitmq:
     image: "rabbitmq:3.13"
 

@@ -1,11 +1,8 @@
 package com.sap.sse.datamining.ui.client.presentation;
 
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DeckLayoutPanel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -49,17 +46,6 @@ public abstract class AbstractResultsPresenter<SettingsType extends Settings>
         controlsPanel.setSpacing(5);
         controlsPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
         mainPanel.addNorth(controlsPanel, 40);
-        Button exportButton = new Button("Export");
-        exportButton.setEnabled(false);
-        exportButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                // TODO Do the magic
-                // Push the current result to the server
-                // Call a servlet to download the previously pushed result as json file
-            }
-        });
-        // addControl(exportButton);
         presentationPanel = new DeckLayoutPanel();
         mainPanel.add(presentationPanel);
         errorLabel = new HTML();

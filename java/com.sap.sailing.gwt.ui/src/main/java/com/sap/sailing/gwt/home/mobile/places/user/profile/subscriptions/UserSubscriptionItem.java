@@ -1,6 +1,6 @@
 package com.sap.sailing.gwt.home.mobile.places.user.profile.subscriptions;
 
-import static com.sap.sailing.gwt.ui.common.client.DateAndTimeFormatterUtil.formatDateAndTime;
+import static com.sap.sse.gwt.client.DateAndTimeFormatterUtil.formatDateAndTime;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;

@@ -13,14 +13,20 @@
 
 <b>Description:</b>
 <p>Removes / invalidates any existing access token that so far was valid as a bearer token in a request's
-<tt>Authorization:</tt> HTTP header field.</p>
+<tt>Authorization:</tt> HTTP header field and produces a new one which is returned in the response.</p>
 <br/>
 <table>
 	<tr>
 		<td>Request Method:</td>
 		<td>GET/POST</td>
 	</tr>
-	<tr>
+    <tr>
+        <td>Output format:</td>
+        <td>JSON document of the following format<br>
+            <pre>{"username":"admin","access_token":"tnN1yVnXRuqEce3JqMpLUl7d+qeofez0tljKU1KzALw="}</pre>
+        </td>
+    </tr>
+    <tr>
 		<td>Mandatory parameters:</td>
 		<td>None</td>
 	</tr>

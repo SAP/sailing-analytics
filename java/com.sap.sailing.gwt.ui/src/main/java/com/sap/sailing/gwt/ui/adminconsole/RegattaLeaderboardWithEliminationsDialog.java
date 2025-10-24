@@ -94,7 +94,7 @@ public abstract class RegattaLeaderboardWithEliminationsDialog extends AbstractL
         displayNameTextBox.ensureDebugId("DisplayNameTextBox");
         displayNameTextBox.setVisibleLength(50);
         this.competitorEliminationPanelHolder = new FlowPanel();
-        regattaLeaderboardsListBox = createSortedRegattaLeaderboardsListBox(existingLeaderboards, null);
+        regattaLeaderboardsListBox = createSortedRegattaLeaderboardsListBox(existingLeaderboards, null, stringMessages, this);
         regattaLeaderboardsListBox.ensureDebugId("RegattaListBox");
         regattaLeaderboardsListBox.addChangeHandler(new ChangeHandler() {
             public void onChange(ChangeEvent event) {

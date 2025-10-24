@@ -192,7 +192,7 @@ public abstract class NonPerformanceCurveRankingMetric extends AbstractRankingMe
             final Competitor who = legWho.getCompetitor();
             final Competitor to = legTo.getCompetitor();
             if (who == to) {
-                if (isAssumedToHaveFinishedLeg(timePoint, legWho)) {
+                if (isAssumedToHaveFinishedLeg(timePoint, legWho) && legWho.getFinishTime() != null) {
                     result = timePoint.until(legWho.getFinishTime()); // negative time; reached end of leg some time ago
                 } else {
                     result = Duration.NULL; // still racing in the leg; reaches its own position in no time

@@ -1,12 +1,12 @@
 package com.sap.sailing.manage2sail.resultimport.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.manage2sail.EventResultDescriptor;
 import com.sap.sailing.manage2sail.Manage2SailEventResultsParser;

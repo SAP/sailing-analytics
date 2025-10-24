@@ -106,7 +106,7 @@ public class WindLineGuidesCanvasOverlay extends FullCanvasOverlay implements Ti
     @Override
     protected void draw() {
         super.draw();
-        if (mapProjection != null && windFieldDTO != null) {
+        if (getMapProjection() != null && windFieldDTO != null) {
             clear();
             drawWindField();
         }
@@ -145,8 +145,8 @@ public class WindLineGuidesCanvasOverlay extends FullCanvasOverlay implements Ti
             final SimulatorWindDTO w1 = windDTOIter.next();
             final LatLng pg0 = coordinateSystem.toLatLng(w0.position);
             final LatLng pg1 = coordinateSystem.toLatLng(w1.position);
-            final Point px0 = mapProjection.fromLatLngToDivPixel(pg0);
-            final Point px1 = mapProjection.fromLatLngToDivPixel(pg1);
+            final Point px0 = getMapProjection().fromLatLngToDivPixel(pg0);
+            final Point px1 = getMapProjection().fromLatLngToDivPixel(pg1);
             final double dx = px0.getX()-px1.getX();
             final double dy = px0.getY()-px1.getY();
             final double pxLength = Math.sqrt( dx*dx + dy*dy );
@@ -176,7 +176,7 @@ public class WindLineGuidesCanvasOverlay extends FullCanvasOverlay implements Ti
         context2d.setGlobalAlpha(0.2);
         final Position position = windDTO.position;
         final LatLng positionLatLng = coordinateSystem.toLatLng(position);
-        final Point canvasPositionInPx = mapProjection.fromLatLngToDivPixel(positionLatLng);
+        final Point canvasPositionInPx = getMapProjection().fromLatLngToDivPixel(positionLatLng);
         final double x = canvasPositionInPx.getX() - getWidgetPosLeft();
         final double y = canvasPositionInPx.getY() - getWidgetPosTop();
         windFieldPoints.put(new ToolTip(x, y), windDTO);

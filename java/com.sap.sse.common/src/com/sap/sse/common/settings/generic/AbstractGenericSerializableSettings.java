@@ -70,13 +70,14 @@ import com.sap.sse.common.settings.value.Value;
  */
 public abstract class AbstractGenericSerializableSettings extends AbstractSetting implements GenericSerializableSettings {
     private static final long serialVersionUID = -415371632804540785L;
-    private SettingsValue value;
-    private transient Map<String, Setting> childSettings;
+    protected SettingsValue value;
+    protected transient Map<String, Setting> childSettings;
 
     /**
      * Default constructor for direct instantiation of root settings objects.
      */
     public AbstractGenericSerializableSettings() {
+        super();
         value = new SettingsValue();
         addChildSettingsInternal();
     }
@@ -140,13 +141,11 @@ public abstract class AbstractGenericSerializableSettings extends AbstractSettin
      * 
      */
     protected abstract void addChildSettings();
-    
-    // TODO make protected
+
     public Value getValue(String settingName) {
         return value.getValue(settingName);
     }
-    
-    // TODO make protected
+
     public void setValue(String settingName, Value value) {
         this.value.setValue(settingName, value);
     }

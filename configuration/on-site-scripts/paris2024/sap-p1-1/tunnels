@@ -2,7 +2,7 @@
 killall autossh
 sleep 2
 # Tunnel to cloud MongoDB on port 10203 with reverse tunnels for MongoDB on localhost:10201 and through tunnel on localhost:10202 to P1 #2
-autossh -M 20500 -f -A -N \
+AUTOSSH_LOGLEVEL=7 AUTOSSH_POLL=5 autossh -M 20500 -f -A -N \
   -L 22443:sapsailing.com:443 \
   -L 22222:sapsailing.com:22 \
   -R 9443:localhost:9443 \
@@ -19,7 +19,7 @@ autossh -M 20500 -f -A -N \
   ec2-user@paris-ssh.sapsailing.com
 sleep 2
 # Tunnel to other laptop P1 #2, tunneling to MongoDB running on 10202, mapping to local port 10202
-autossh -M 20502 -f -A -N \
+AUTOSSH_LOGLEVEL=7 AUTOSSH_POLL=5 autossh -M 20502 -f -A -N \
   -L 15674:localhost:15672 \
   -L 10202:localhost:10202 \
   -R 10201:localhost:10201 \

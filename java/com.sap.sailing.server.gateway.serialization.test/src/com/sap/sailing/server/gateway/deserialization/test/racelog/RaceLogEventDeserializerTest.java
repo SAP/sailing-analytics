@@ -1,6 +1,6 @@
 package com.sap.sailing.server.gateway.deserialization.test.racelog;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
@@ -191,7 +191,7 @@ public class RaceLogEventDeserializerTest {
     
     @Test
     public void testSerializationAndDeserializationForRaceLogTagEvent() throws Exception {
-        RaceLogTagEventImpl originalEvent = new RaceLogTagEventImpl("tag", "comment", "a", "b", timePoint, timePoint2, author, UUID.randomUUID(), 3);
+        RaceLogTagEventImpl originalEvent = new RaceLogTagEventImpl("tag", "comment", "some hidden info", "a", "b", timePoint, timePoint2, author, UUID.randomUUID(), 3);
         RaceLogEventSerializer serializer = (RaceLogEventSerializer) RaceLogEventSerializer.create(CompetitorJsonSerializer.create());
         JSONObject object = serializer.serialize(originalEvent); 
         RaceLogEvent raceLogEvent = deserializer.deserialize(object);
@@ -208,6 +208,7 @@ public class RaceLogEventDeserializerTest {
         assertEquals(originalEvent.getCreatedAt(), newEvent.getCreatedAt());
         assertEquals(originalEvent.getTag(), newEvent.getTag());
         assertEquals(originalEvent.getComment(), newEvent.getComment());
+        assertEquals(originalEvent.getHiddenInfo(), newEvent.getHiddenInfo());
         assertEquals(originalEvent.getImageURL(), newEvent.getImageURL());
         assertEquals(originalEvent.getResizedImageURL(), newEvent.getResizedImageURL());
         assertEquals(originalEvent.getUsername(), newEvent.getUsername());

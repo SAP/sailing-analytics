@@ -26,9 +26,11 @@ public class AwsSessionCredentialsFromUserPreference extends AbstractGenericSeri
      * The default settings
      */
     public AwsSessionCredentialsFromUserPreference() {
+        super();
     }
 
     public AwsSessionCredentialsFromUserPreference(AwsSessionCredentialsWithExpiry awsSessionCredentialsWithExpiry) {
+        this();
         this.accessKeyId.setValue(awsSessionCredentialsWithExpiry.getAccessKeyId());
         this.secretAccessKey.setValue(awsSessionCredentialsWithExpiry.getSecretAccessKey());
         this.sessionToken.setValue(awsSessionCredentialsWithExpiry.getSessionToken());

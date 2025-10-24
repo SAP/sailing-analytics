@@ -1,10 +1,13 @@
-stored-uri:datafiles/event_20130424_IDMStarboo-Race_6.mtb
+stored-uri:datafiles/5ee63a52-b409-11e2-8561-10bf48d758ce.mtb
 StartReplay:1
 
-// Input from params_static:
-
-// Input from event_parameters:
-
+EnableResults:0
+ResultsLayout:[{"key":"Order","header":"#","description":"Position","printable":true,"align":"right","collapsible":false},{"key":"Name","header":"Name","description":"Competitor's name","printable":true,"align":"left","collapsible":false},{"key":"ShortName","header":"Short Name","description":"Competitor's short name","printable":true,"align":"left","collapsible":true},{"key":"LegTime","header":"Leg","description":"Leg time","printable":false,"align":"right","collapsible":true},{"key":"LegPosition","header":"#","description":"Leg position","printable":false,"align":"right","collapsible":true},{"key":"Time","header":"Total","description":"Total time","printable":true,"align":"right","collapsible":false},{"key":"After","header":"Total &Delta;","description":"Total &Delta;","printable":true,"align":"right","collapsible":false}]
+xrr_url_source:
+PerformanceTableLayout:[{"key":"Pos","header":"Pos","tooltip":"Position","options":null},{"key":"Name","header":"Name","tooltip":"Name","options":null},{"key":"Short","header":"Short","tooltip":"Short name","options":null},{"key":"Country","header":"Country","tooltip":"Country","options":null},{"key":"After","header":"After","tooltip":"After","options":null},{"key":"Leg pos","header":"Leg pos","tooltip":"Leg position","options":null},{"key":"Leg time","header":"Leg time","tooltip":"Leg time","options":null},{"key":"SOG","header":"SOG","tooltip":"SOG","options":null},{"key":"VMG","header":"VMG","tooltip":"VMG","options":null},{"key":"Top speed","header":"Top Speed","tooltip":"Top Speed","options":null},{"key":"Distance","header":"Distance","tooltip":"Distance","options":null}]
+DefaultPanel:
+smsProvider:0
+LabelNoBackground:0
 CompMarkerUUID:1
 PopUpRow1Type:Name
 PopUpRow1Name:
@@ -20,6 +23,13 @@ PopUpRow6Type:BoatAfter
 PopUpRow6Name:After
 CodanIsSponsor:0
 DefaultTailLength:60
+ResultColumn1Tooltip:
+ResultColumn2Tooltip:
+ResultColumn3Tooltip:
+ResultColumn4Tooltip:
+ResultColumn5Tooltip:
+StartTimeType:Race
+smsParams:0,tracanonym,4525720572,3,10,15
 APzoomChangeTime:2500
 disableAutoProduce:0
 autoProduce:1
@@ -31,7 +41,9 @@ APmarkSwitch:0.13
 APmarkZoomBehindMarks:0.10
 APmarkZoomInFrontOfMarks:0.20
 PopupMarkerUUID:2
+ws-uri:ws://tracms.traclive.dk:8888
 ManualUrl:http://www.tractrac.com/files/userguide_sailing.pdf
+enableDiplomas:0
 Marker1UUID:1
 Marker1Type:RGBMarkerFactory
 Marker1Directional:1
@@ -44,7 +56,7 @@ MaxMetersPerSecond:20
 PrecisionMeters:20
 ShortAvgTime:180
 LongAvgTime:900
-TimeZone:2
+TimeZone:0
 CompMarkerTimeout:60
 FramesPerSecond:8
 replayspeedup:5
@@ -70,7 +82,27 @@ DisableRotation:0
 ControlPointMarkerRadius:21
 disableselection:0
 disableleaderline:0
+delayIntervals:3,10,15
+MapUrl:http://tile.traclive.dk/osm
 DisableChangeRace:0
+MarkerSymbol:standardBoat
+MarkerMinPixelSize:36
+ShowFlagInLabel:0
+ShowRankInLabel:1
+TailOpacity:70
+TailWidth:1
+ResultColumn1DefaultOrder:1
+ResultColumn2DefaultOrder:0
+ResultColumn3DefaultOrder:0
+ResultColumn4DefaultOrder:0
+ResultColumn5DefaultOrder:0
+DatabaseVersion:01.00.20
+LaggingThreshold:5
+LowBatteryThreshold:5
+dimmingLevel:1
+BatteryLevelWarn:20
+BatteryLevelDanger:13
+dimmingSeconds:60
 ResultColumn1Name:#
 ResultColumn1Size:20
 ResultColumn1Type:RowNumber
@@ -91,8 +123,8 @@ ResultColumn6Type:BoatSpeed
 DisableLeaderboard:0
 DisableAnalysis:0
 TableFontSize:11
-//live-uri:tcp://germanmaster.traclive.dk:4400
-//stored-uri:tcp://germanmaster.traclive.dk:4401
+//live-uri:tcp://tracms.traclive.dk:4400
+//stored-uri:tcp://tracms.traclive.dk:4401
 compInitialsFontSize:11
 AutoRotate:0
 MassStart:0
@@ -102,14 +134,22 @@ ReCalcDirAndSpeed:0
 RaceHandicapSystem:NONE
 TeamCompetitionType:NONE
 LiveDelaySecs: 20
+LiveDelaySecsRace: 
+LiveDelaySecsEvent: 20
 
-//-------- AUTO GENERATED PARAMETERS START ----------------
+Maps:[]
 
 EventID:e1995602-acc8-11e2-89c0-10bf48d758ce
 EventName:IDM Starboot 2013
+EventAnalyticsName:IDM Starboot 2013
 EventDB:event_20130424_IDMStarboo
 EventStartTime:2013-04-24 10:00:00
 EventEndTime:2013-05-05 23:00:00
+EventType:a1b74ca0-fdd8-11dc-8811-005056c00008
+EventJSON:https://historical1.tractrac.com/events/event_20130424_IDMStarboo/jsonservice.php
+DBReplicaEnabled:0
+HighLoadEnabled:
+MultipleDataservers:0
 
 RaceID:5ee63a52-b409-11e2-8561-10bf48d758ce
 RaceName:Race 6
@@ -117,558 +157,609 @@ RaceStartTime:2013-05-04 14:00:00
 RaceEndTime:
 RaceTrackingStartTime:2013-05-04 13:48:11
 RaceTrackingEndTime:2013-05-04 14:58:38
-RaceDefaultRouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Initialized:1
+RaceDefaultRouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
 RaceHandicapSystem:NONE
 
 Class1UUID:dbe67500-b308-11e2-8561-10bf48d758ce
 Class1Name:Star
+Class1BoatClassId:
 
 Team1UUID:3a798f60-b3f1-11e2-8561-10bf48d758ce
 Team1Name:Team
-Team1Comp1UUID:87a8f43c-b3f2-11e2-8561-10bf48d758ce
-Team1Comp2UUID:8999a2dc-b3f2-11e2-8561-10bf48d758ce
-Team1Comp3UUID:84737a80-b3f2-11e2-8561-10bf48d758ce
-Team1Comp4UUID:84f68cf4-b3f2-11e2-8561-10bf48d758ce
-Team1Comp5UUID:8ba307da-b3f2-11e2-8561-10bf48d758ce
-Team1Comp6UUID:85dac766-b3f2-11e2-8561-10bf48d758ce
-Team1Comp7UUID:82ddec3c-b3f2-11e2-8561-10bf48d758ce
-Team1Comp8UUID:88920d16-b3f2-11e2-8561-10bf48d758ce
-Team1Comp9UUID:88e60efc-b3f2-11e2-8561-10bf48d758ce
-Team1Comp10UUID:86286462-b3f2-11e2-8561-10bf48d758ce
-Team1Comp11UUID:86c9c3fc-b3f2-11e2-8561-10bf48d758ce
-Team1Comp12UUID:8939a094-b3f2-11e2-8561-10bf48d758ce
-Team1Comp13UUID:83a1f6fe-b3f2-11e2-8561-10bf48d758ce
-Team1Comp14UUID:8cadf6d0-b3f2-11e2-8561-10bf48d758ce
+Team1Comp1UUID:82ddec3c-b3f2-11e2-8561-10bf48d758ce
+Team1Comp2UUID:83023b82-b3f2-11e2-8561-10bf48d758ce
+Team1Comp3UUID:83237d2e-b3f2-11e2-8561-10bf48d758ce
+Team1Comp4UUID:8339fee6-b3f2-11e2-8561-10bf48d758ce
+Team1Comp5UUID:83550484-b3f2-11e2-8561-10bf48d758ce
+Team1Comp6UUID:837c17cc-b3f2-11e2-8561-10bf48d758ce
+Team1Comp7UUID:83a1f6fe-b3f2-11e2-8561-10bf48d758ce
+Team1Comp8UUID:83cc72c6-b3f2-11e2-8561-10bf48d758ce
+Team1Comp9UUID:83fa5e70-b3f2-11e2-8561-10bf48d758ce
+Team1Comp10UUID:843187ec-b3f2-11e2-8561-10bf48d758ce
+Team1Comp11UUID:84737a80-b3f2-11e2-8561-10bf48d758ce
+Team1Comp12UUID:84b5e8d4-b3f2-11e2-8561-10bf48d758ce
+Team1Comp13UUID:84f68cf4-b3f2-11e2-8561-10bf48d758ce
+Team1Comp14UUID:853ca13a-b3f2-11e2-8561-10bf48d758ce
 Team1Comp15UUID:858f812a-b3f2-11e2-8561-10bf48d758ce
-Team1Comp16UUID:8c003dba-b3f2-11e2-8561-10bf48d758ce
-Team1Comp17UUID:867dd88e-b3f2-11e2-8561-10bf48d758ce
-Team1Comp18UUID:8cfb82c4-b3f2-11e2-8561-10bf48d758ce
-Team1Comp19UUID:83cc72c6-b3f2-11e2-8561-10bf48d758ce
-Team1Comp20UUID:883da6ea-b3f2-11e2-8561-10bf48d758ce
-Team1Comp21UUID:8339fee6-b3f2-11e2-8561-10bf48d758ce
-Team1Comp22UUID:843187ec-b3f2-11e2-8561-10bf48d758ce
-Team1Comp23UUID:8c57247c-b3f2-11e2-8561-10bf48d758ce
-Team1Comp24UUID:8a3c52b6-b3f2-11e2-8561-10bf48d758ce
-Team1Comp25UUID:875c9aec-b3f2-11e2-8561-10bf48d758ce
-Team1Comp26UUID:8b05a148-b3f2-11e2-8561-10bf48d758ce
-Team1Comp27UUID:83023b82-b3f2-11e2-8561-10bf48d758ce
-Team1Comp28UUID:87f4d898-b3f2-11e2-8561-10bf48d758ce
+Team1Comp16UUID:85dac766-b3f2-11e2-8561-10bf48d758ce
+Team1Comp17UUID:86286462-b3f2-11e2-8561-10bf48d758ce
+Team1Comp18UUID:867dd88e-b3f2-11e2-8561-10bf48d758ce
+Team1Comp19UUID:86c9c3fc-b3f2-11e2-8561-10bf48d758ce
+Team1Comp20UUID:871283e4-b3f2-11e2-8561-10bf48d758ce
+Team1Comp21UUID:875c9aec-b3f2-11e2-8561-10bf48d758ce
+Team1Comp22UUID:87a8f43c-b3f2-11e2-8561-10bf48d758ce
+Team1Comp23UUID:87f4d898-b3f2-11e2-8561-10bf48d758ce
+Team1Comp24UUID:883da6ea-b3f2-11e2-8561-10bf48d758ce
+Team1Comp25UUID:88920d16-b3f2-11e2-8561-10bf48d758ce
+Team1Comp26UUID:88e60efc-b3f2-11e2-8561-10bf48d758ce
+Team1Comp27UUID:8939a094-b3f2-11e2-8561-10bf48d758ce
+Team1Comp28UUID:8999a2dc-b3f2-11e2-8561-10bf48d758ce
 Team1Comp29UUID:89e9dd1a-b3f2-11e2-8561-10bf48d758ce
-Team1Comp30UUID:8aaca2a0-b3f2-11e2-8561-10bf48d758ce
-Team1Comp31UUID:83550484-b3f2-11e2-8561-10bf48d758ce
-Team1Comp32UUID:837c17cc-b3f2-11e2-8561-10bf48d758ce
-Team1Comp33UUID:83237d2e-b3f2-11e2-8561-10bf48d758ce
-Team1Comp34UUID:83fa5e70-b3f2-11e2-8561-10bf48d758ce
-Team1Comp35UUID:871283e4-b3f2-11e2-8561-10bf48d758ce
-Team1Comp36UUID:8b56f32c-b3f2-11e2-8561-10bf48d758ce
-Team1Comp37UUID:84b5e8d4-b3f2-11e2-8561-10bf48d758ce
-Team1Comp38UUID:853ca13a-b3f2-11e2-8561-10bf48d758ce
+Team1Comp30UUID:8a3c52b6-b3f2-11e2-8561-10bf48d758ce
+Team1Comp31UUID:8aaca2a0-b3f2-11e2-8561-10bf48d758ce
+Team1Comp32UUID:8b05a148-b3f2-11e2-8561-10bf48d758ce
+Team1Comp33UUID:8b56f32c-b3f2-11e2-8561-10bf48d758ce
+Team1Comp34UUID:8ba307da-b3f2-11e2-8561-10bf48d758ce
+Team1Comp35UUID:8c003dba-b3f2-11e2-8561-10bf48d758ce
+Team1Comp36UUID:8c57247c-b3f2-11e2-8561-10bf48d758ce
+Team1Comp37UUID:8cadf6d0-b3f2-11e2-8561-10bf48d758ce
+Team1Comp38UUID:8cfb82c4-b3f2-11e2-8561-10bf48d758ce
 Team1Comp39UUID:8d50d12a-b3f2-11e2-8561-10bf48d758ce
 
 Comp1UUID:82ddec3c-b3f2-11e2-8561-10bf48d758ce
 Comp1Name:Fallais, Dominik,Fallais, Simo
 Comp1NameShort:GER7
-Comp1Color:000080
 Comp1Nationality:GER
 Comp1Description:0
 Comp1Handicap:1.0000000000
 Comp1HandicapDistance:0.00000
 Comp1StartTime:2013-05-04 14:00:00
 Comp1ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp1RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp1RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp1Color:000080
 
 Comp2UUID:83023b82-b3f2-11e2-8561-10bf48d758ce
 Comp2Name:Nolte, Robin,Dieckmann, Hennin
 Comp2NameShort:GER433
-Comp2Color:000000
 Comp2Nationality:GER
 Comp2Description:0
 Comp2Handicap:1.0000000000
 Comp2HandicapDistance:0.00000
 Comp2StartTime:2013-05-04 14:00:00
 Comp2ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp2RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp2RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp2Color:000000
 
 Comp3UUID:83237d2e-b3f2-11e2-8561-10bf48d758ce
 Comp3Name:Seekamp, Jan,Müller Gösta
 Comp3NameShort:GER1122
-Comp3Color:00FF00
 Comp3Nationality:GER
 Comp3Description:0
 Comp3Handicap:1.0000000000
 Comp3HandicapDistance:0.00000
 Comp3StartTime:2013-05-04 14:00:00
 Comp3ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp3RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp3RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp3Color:00FF00
 
 Comp4UUID:8339fee6-b3f2-11e2-8561-10bf48d758ce
 Comp4Name:Luxa, Claus-Peter,Röttger, Rol
 Comp4NameShort:GER7013
-Comp4Color:800000
 Comp4Nationality:GER
 Comp4Description:0
 Comp4Handicap:1.0000000000
 Comp4HandicapDistance:0.00000
 Comp4StartTime:2013-05-04 14:00:00
 Comp4ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp4RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp4RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp4Color:800000
 
 Comp5UUID:83550484-b3f2-11e2-8561-10bf48d758ce
 Comp5Name:Schulte, Gert,Schulte, Gerrit
 Comp5NameShort:GER7417
-Comp5Color:FFFF00
 Comp5Nationality:GER
 Comp5Description:0
 Comp5Handicap:1.0000000000
 Comp5HandicapDistance:0.00000
 Comp5StartTime:2013-05-04 14:00:00
 Comp5ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp5RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp5RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp5Color:FFFF00
 
 Comp6UUID:837c17cc-b3f2-11e2-8561-10bf48d758ce
 Comp6Name:Seefelder, Jürgen,Seefelder, N
 Comp6NameShort:GER7616
-Comp6Color:00FFFF
 Comp6Nationality:GER
 Comp6Description:0
 Comp6Handicap:1.0000000000
 Comp6HandicapDistance:0.00000
 Comp6StartTime:2013-05-04 14:00:00
 Comp6ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp6RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp6RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp6Color:00FFFF
 
 Comp7UUID:83a1f6fe-b3f2-11e2-8561-10bf48d758ce
 Comp7Name:Hoffmann, Peter,Theis, Nina
 Comp7NameShort:GER7693
-Comp7Color:0000FF
 Comp7Nationality:GER
 Comp7Description:0
 Comp7Handicap:1.0000000000
 Comp7HandicapDistance:0.00000
 Comp7StartTime:2013-05-04 14:00:00
 Comp7ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp7RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp7RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp7Color:0000FF
 
 Comp8UUID:83cc72c6-b3f2-11e2-8561-10bf48d758ce
 Comp8Name:Kohler, Thomas,Roszinski, Dr. 
 Comp8NameShort:GER7727
-Comp8Color:800080
 Comp8Nationality:GER
 Comp8Description:0
 Comp8Handicap:1.0000000000
 Comp8HandicapDistance:0.00000
 Comp8StartTime:2013-05-04 14:00:00
 Comp8ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp8RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp8RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp8Color:800080
 
 Comp9UUID:83fa5e70-b3f2-11e2-8561-10bf48d758ce
 Comp9Name:Spehr, Helge,Spehr, Jesper
 Comp9NameShort:GER7747
-Comp9Color:008080
 Comp9Nationality:GER
 Comp9Description:0
 Comp9Handicap:1.0000000000
 Comp9HandicapDistance:0.00000
 Comp9StartTime:2013-05-04 14:00:00
 Comp9ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp9RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp9RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp9Color:008080
 
 Comp10UUID:843187ec-b3f2-11e2-8561-10bf48d758ce
 Comp10Name:Massler, Julian,Seeberger, Uli
 Comp10NameShort:GER7860
-Comp10Color:808000
 Comp10Nationality:GER
 Comp10Description:0
 Comp10Handicap:1.0000000000
 Comp10HandicapDistance:0.00000
 Comp10StartTime:2013-05-04 14:00:00
 Comp10ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp10RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp10RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp10Color:808000
 
 Comp11UUID:84737a80-b3f2-11e2-8561-10bf48d758ce
 Comp11Name:Behn, Philip,Kaerger, Andreas
 Comp11NameShort:GER7866
-Comp11Color:FF0000
 Comp11Nationality:GER
 Comp11Description:0
 Comp11Handicap:1.0000000000
 Comp11HandicapDistance:0.00000
 Comp11StartTime:2013-05-04 14:00:00
 Comp11ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp11RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp11RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp11Color:FF0000
 
 Comp12UUID:84b5e8d4-b3f2-11e2-8561-10bf48d758ce
 Comp12Name:Tusch, Frank,Winkelmann, Sven
 Comp12NameShort:GER7897
-Comp12Color:FFFFFF
 Comp12Nationality:GER
 Comp12Description:0
 Comp12Handicap:1.0000000000
 Comp12HandicapDistance:0.00000
 Comp12StartTime:2013-05-04 14:00:00
 Comp12ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp12RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp12RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp12Color:FFFFFF
 
 Comp13UUID:84f68cf4-b3f2-11e2-8561-10bf48d758ce
 Comp13Name:Bode, Klaus,Bode, Alexander
 Comp13NameShort:GER7898
-Comp13Color:FF00FF
 Comp13Nationality:GER
 Comp13Description:0
 Comp13Handicap:1.0000000000
 Comp13HandicapDistance:0.00000
 Comp13StartTime:2013-05-04 14:00:00
 Comp13ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp13RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp13RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp13Color:FF00FF
 
 Comp14UUID:853ca13a-b3f2-11e2-8561-10bf48d758ce
 Comp14Name:Vater, Ulrich,Nolte, Andreas
 Comp14NameShort:GER7971
-Comp14Color:008000
 Comp14Nationality:GER
 Comp14Description:0
 Comp14Handicap:1.0000000000
 Comp14HandicapDistance:0.00000
 Comp14StartTime:2013-05-04 14:00:00
 Comp14ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp14RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp14RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp14Color:008000
 
 Comp15UUID:858f812a-b3f2-11e2-8561-10bf48d758ce
 Comp15Name:Janson, Jürgen,Schulte, Axel
 Comp15NameShort:GER7981
-Comp15Color:000080
 Comp15Nationality:GER
 Comp15Description:0
 Comp15Handicap:1.0000000000
 Comp15HandicapDistance:0.00000
 Comp15StartTime:2013-05-04 14:00:00
 Comp15ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp15RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp15RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp15Color:000080
 
 Comp16UUID:85dac766-b3f2-11e2-8561-10bf48d758ce
 Comp16Name:Diercks, Jochen,Braasch, Herbe
 Comp16NameShort:GER8055
-Comp16Color:000000
 Comp16Nationality:GER
 Comp16Description:0
 Comp16Handicap:1.0000000000
 Comp16HandicapDistance:0.00000
 Comp16StartTime:2013-05-04 14:00:00
 Comp16ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp16RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp16RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp16Color:000000
 
 Comp17UUID:86286462-b3f2-11e2-8561-10bf48d758ce
 Comp17Name:Hagen, Alexander,Hasche, Marko
 Comp17NameShort:GER8093
-Comp17Color:00FF00
 Comp17Nationality:GER
 Comp17Description:0
 Comp17Handicap:1.0000000000
 Comp17HandicapDistance:0.00000
 Comp17StartTime:2013-05-04 14:00:00
 Comp17ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp17RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp17RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp17Color:00FF00
 
 Comp18UUID:867dd88e-b3f2-11e2-8561-10bf48d758ce
 Comp18Name:Kappes, Klaus,Rutz, Steffen
 Comp18NameShort:GER8122
-Comp18Color:800000
 Comp18Nationality:GER
 Comp18Description:0
 Comp18Handicap:1.0000000000
 Comp18HandicapDistance:0.00000
 Comp18StartTime:2013-05-04 14:00:00
 Comp18ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp18RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp18RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp18Color:800000
 
 Comp19UUID:86c9c3fc-b3f2-11e2-8561-10bf48d758ce
 Comp19Name:Hannemann, Uwe,Dahms, Anette
 Comp19NameShort:GER8124
-Comp19Color:FFFF00
 Comp19Nationality:GER
 Comp19Description:0
 Comp19Handicap:1.0000000000
 Comp19HandicapDistance:0.00000
 Comp19StartTime:2013-05-04 14:00:00
 Comp19ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp19RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp19RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp19Color:FFFF00
 
 Comp20UUID:871283e4-b3f2-11e2-8561-10bf48d758ce
 Comp20Name:Stoll, Bernd,Stoll, Barbara
 Comp20NameShort:GER8147
-Comp20Color:00FFFF
 Comp20Nationality:GER
 Comp20Description:0
 Comp20Handicap:1.0000000000
 Comp20HandicapDistance:0.00000
 Comp20StartTime:2013-05-04 14:00:00
 Comp20ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp20RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp20RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp20Color:00FFFF
 
 Comp21UUID:875c9aec-b3f2-11e2-8561-10bf48d758ce
 Comp21Name:Meyer, Klaus,Müller, Jörg
 Comp21NameShort:GER8179
-Comp21Color:0000FF
 Comp21Nationality:GER
 Comp21Description:0
 Comp21Handicap:1.0000000000
 Comp21HandicapDistance:0.00000
 Comp21StartTime:2013-05-04 14:00:00
 Comp21ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp21RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp21RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp21Color:0000FF
 
 Comp22UUID:87a8f43c-b3f2-11e2-8561-10bf48d758ce
 Comp22Name:Antrecht, Alexander,Schwill, F
 Comp22NameShort:GER8190
-Comp22Color:800080
 Comp22Nationality:GER
 Comp22Description:0
 Comp22Handicap:1.0000000000
 Comp22HandicapDistance:0.00000
 Comp22StartTime:2013-05-04 14:00:00
 Comp22ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp22RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp22RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp22Color:800080
 
 Comp23UUID:87f4d898-b3f2-11e2-8561-10bf48d758ce
 Comp23Name:Pieper, Josef,Vockel, Ralf
 Comp23NameShort:GER8233
-Comp23Color:008080
 Comp23Nationality:GER
 Comp23Description:0
 Comp23Handicap:1.0000000000
 Comp23HandicapDistance:0.00000
 Comp23StartTime:2013-05-04 14:00:00
 Comp23ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp23RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp23RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp23Color:008080
 
 Comp24UUID:883da6ea-b3f2-11e2-8561-10bf48d758ce
 Comp24Name:König, Kilian,Schäfer, Kai
 Comp24NameShort:GER8301
-Comp24Color:808000
 Comp24Nationality:GER
 Comp24Description:0
 Comp24Handicap:1.0000000000
 Comp24HandicapDistance:0.00000
 Comp24StartTime:2013-05-04 14:00:00
 Comp24ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp24RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp24RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp24Color:808000
 
 Comp25UUID:88920d16-b3f2-11e2-8561-10bf48d758ce
 Comp25Name:Glunde, Arnd,Beltz, Marcel
 Comp25NameShort:GER8321
-Comp25Color:FF0000
 Comp25Nationality:GER
 Comp25Description:0
 Comp25Handicap:1.0000000000
 Comp25HandicapDistance:0.00000
 Comp25StartTime:2013-05-04 14:00:00
 Comp25ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp25RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp25RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp25Color:FF0000
 
 Comp26UUID:88e60efc-b3f2-11e2-8561-10bf48d758ce
 Comp26Name:Griese, Achim,Marcour, Michael
 Comp26NameShort:GER8340
-Comp26Color:FFFFFF
 Comp26Nationality:GER
 Comp26Description:0
 Comp26Handicap:1.0000000000
 Comp26HandicapDistance:0.00000
 Comp26StartTime:2013-05-04 14:00:00
 Comp26ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp26RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp26RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp26Color:FFFFFF
 
 Comp27UUID:8939a094-b3f2-11e2-8561-10bf48d758ce
 Comp27Name:Hellmich, Joachim,Lacher, Stef
 Comp27NameShort:GER8412
-Comp27Color:FF00FF
 Comp27Nationality:GER
 Comp27Description:0
 Comp27Handicap:1.0000000000
 Comp27HandicapDistance:0.00000
 Comp27StartTime:2013-05-04 14:00:00
 Comp27ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp27RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp27RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp27Color:FF00FF
 
 Comp28UUID:8999a2dc-b3f2-11e2-8561-10bf48d758ce
 Comp28Name:Babendererde, Johannes,Voigt, 
 Comp28NameShort:GER8433
-Comp28Color:008000
 Comp28Nationality:GER
 Comp28Description:0
 Comp28Handicap:1.0000000000
 Comp28HandicapDistance:0.00000
 Comp28StartTime:2013-05-04 14:00:00
 Comp28ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp28RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp28RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp28Color:008000
 
 Comp29UUID:89e9dd1a-b3f2-11e2-8561-10bf48d758ce
 Comp29Name:Polgar, Johannes,Koy, Markus
 Comp29NameShort:GER8442
-Comp29Color:000080
 Comp29Nationality:GER
 Comp29Description:0
 Comp29Handicap:1.0000000000
 Comp29HandicapDistance:0.00000
 Comp29StartTime:2013-05-04 14:00:00
 Comp29ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp29RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp29RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp29Color:000080
 
 Comp30UUID:8a3c52b6-b3f2-11e2-8561-10bf48d758ce
 Comp30Name:Merkelbach, Hubert,Kleen, Frit
 Comp30NameShort:GER8450
-Comp30Color:000000
 Comp30Nationality:GER
 Comp30Description:0
 Comp30Handicap:1.0000000000
 Comp30HandicapDistance:0.00000
 Comp30StartTime:2013-05-04 14:00:00
 Comp30ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp30RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp30RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp30Color:000000
 
 Comp31UUID:8aaca2a0-b3f2-11e2-8561-10bf48d758ce
 Comp31Name:Schmidt, Reinhard,Hentschel, N
 Comp31NameShort:GER8478
-Comp31Color:00FF00
 Comp31Nationality:GER
 Comp31Description:0
 Comp31Handicap:1.0000000000
 Comp31HandicapDistance:0.00000
 Comp31StartTime:2013-05-04 14:00:00
 Comp31ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp31RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp31RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp31Color:00FF00
 
 Comp32UUID:8b05a148-b3f2-11e2-8561-10bf48d758ce
 Comp32Name:Müllejans, Christian,Morf, Kar
 Comp32NameShort:ITA8400
-Comp32Color:800000
 Comp32Nationality:ITA
 Comp32Description:0
 Comp32Handicap:1.0000000000
 Comp32HandicapDistance:0.00000
 Comp32StartTime:2013-05-04 14:00:00
 Comp32ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp32RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp32RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp32Color:800000
 
 Comp33UUID:8b56f32c-b3f2-11e2-8561-10bf48d758ce
 Comp33Name:Tennigkeit, Alexander,Schöller
 Comp33NameShort:SUI7948
-Comp33Color:FFFF00
 Comp33Nationality:SUI
 Comp33Description:0
 Comp33Handicap:1.0000000000
 Comp33HandicapDistance:0.00000
 Comp33StartTime:2013-05-04 14:00:00
 Comp33ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp33RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp33RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp33Color:FFFF00
 
 Comp34UUID:8ba307da-b3f2-11e2-8561-10bf48d758ce
 Comp34Name:Bondar, Pavlo,Malzev, Konstant
 Comp34NameShort:UKR8119
-Comp34Color:00FFFF
 Comp34Nationality:UKR
 Comp34Description:0
 Comp34Handicap:1.0000000000
 Comp34HandicapDistance:0.00000
 Comp34StartTime:2013-05-04 14:00:00
 Comp34ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp34RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp34RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp34Color:00FFFF
 
 Comp35UUID:8c003dba-b3f2-11e2-8561-10bf48d758ce
 Comp35Name:Jensen, Johnny
 Comp35NameShort:DEN8124
-Comp35Color:0000FF
 Comp35Nationality:DEN
 Comp35Description:0
 Comp35Handicap:1.0000000000
 Comp35HandicapDistance:0.00000
 Comp35StartTime:2013-05-04 14:00:00
 Comp35ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp35RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp35RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp35Color:0000FF
 
 Comp36UUID:8c57247c-b3f2-11e2-8561-10bf48d758ce
 Comp36Name:Mellis, Jörg,Flugel, Falko
 Comp36NameShort:GER816
-Comp36Color:800080
 Comp36Nationality:GER
 Comp36Description:0
 Comp36Handicap:1.0000000000
 Comp36HandicapDistance:0.00000
 Comp36StartTime:2013-05-04 14:00:00
 Comp36ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp36RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp36RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp36Color:800080
 
 Comp37UUID:8cadf6d0-b3f2-11e2-8561-10bf48d758ce
 Comp37Name:Hülsmann, Thorsten
 Comp37NameShort:GER7897
-Comp37Color:008080
 Comp37Nationality:GER
 Comp37Description:0
 Comp37Handicap:1.0000000000
 Comp37HandicapDistance:0.00000
 Comp37StartTime:2013-05-04 14:00:00
 Comp37ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp37RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp37RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp37Color:008080
 
 Comp38UUID:8cfb82c4-b3f2-11e2-8561-10bf48d758ce
 Comp38Name:Kleine, Frieder
 Comp38NameShort:GER8301
-Comp38Color:808000
 Comp38Nationality:GER
 Comp38Description:0
 Comp38Handicap:1.0000000000
 Comp38HandicapDistance:0.00000
 Comp38StartTime:2013-05-04 14:00:00
 Comp38ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp38RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp38RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp38Color:808000
 
 Comp39UUID:8d50d12a-b3f2-11e2-8561-10bf48d758ce
 Comp39Name:von Linde, Florian,Steffens, T
 Comp39NameShort:GER8419
-Comp39Color:FF0000
 Comp39Nationality:GER
 Comp39Description:0
 Comp39Handicap:1.0000000000
 Comp39HandicapDistance:0.00000
 Comp39StartTime:2013-05-04 14:00:00
 Comp39ClassUUID:dbe67500-b308-11e2-8561-10bf48d758ce
-Comp39RouteUUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
+Comp39RouteUUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Comp39Color:FF0000
 
-ControlPoint1UUID:166ab660-b3f3-11e2-8561-10bf48d758ce
-ControlPoint1Name:Start/Ziel
-ControlPoint1HasTwoPoints:1
-ControlPoint1ShortName:St
-ControlPoint1Mark1Lon:8.076375
-ControlPoint1Mark1Lat:51.481972
-ControlPoint1Mark2Lon:8.074255
-ControlPoint1Mark2Lat:51.480293
+PositionedItem1UUID:9655e5d0-854d-013d-8ef6-1c6b00518c70
+PositionedItem1Name:Start/Ziel - 1
+PositionedItem1CourseArea:
+PositionedItem1Static:0
+PositionedItem1Positions:
+PositionedItem1DataSheet:
 
-ControlPoint2UUID:2b5bde8c-b3f3-11e2-8561-10bf48d758ce
-ControlPoint2Name:Luvtonne
-ControlPoint2HasTwoPoints:0
-ControlPoint2ShortName:Lu
-ControlPoint2Mark1Lon:8.064938
-ControlPoint2Mark1Lat:51.485242
+PositionedItem2UUID:969df260-854d-013d-8ef7-1c6b00518c70
+PositionedItem2Name:Start/Ziel - 2
+PositionedItem2CourseArea:
+PositionedItem2Static:0
+PositionedItem2Positions:
+PositionedItem2DataSheet:
 
-ControlPoint3UUID:3f999718-b3f3-11e2-8561-10bf48d758ce
-ControlPoint3Name:Offset Luvtonne
-ControlPoint3HasTwoPoints:0
-ControlPoint3ShortName:Of
-ControlPoint3Mark1Lon:8.064113
-ControlPoint3Mark1Lat:51.484798
+PositionedItem3UUID:96f88b40-854d-013d-8efa-1c6b00518c70
+PositionedItem3Name:Luvtonne
+PositionedItem3CourseArea:
+PositionedItem3Static:0
+PositionedItem3Positions:
+PositionedItem3DataSheet:
 
-ControlPoint4UUID:b160887a-b3f3-11e2-8561-10bf48d758ce
-ControlPoint4Name:Leegate
-ControlPoint4HasTwoPoints:1
-ControlPoint4ShortName:Le
-ControlPoint4Mark1Lon:8.076637
-ControlPoint4Mark1Lat:51.480125
-ControlPoint4Mark2Lon:8.077277
-ControlPoint4Mark2Lat:51.480682
+PositionedItem4UUID:9735da40-854d-013d-8efb-1c6b00518c70
+PositionedItem4Name:Offset Luvtonne
+PositionedItem4CourseArea:
+PositionedItem4Static:0
+PositionedItem4Positions:
+PositionedItem4DataSheet:
 
+PositionedItem5UUID:97ad3c90-854d-013d-8efc-1c6b00518c70
+PositionedItem5Name:Leegate - 1
+PositionedItem5CourseArea:
+PositionedItem5Static:0
+PositionedItem5Positions:
+PositionedItem5DataSheet:
+
+PositionedItem6UUID:97e71600-854d-013d-8efd-1c6b00518c70
+PositionedItem6Name:Leegate - 2
+PositionedItem6CourseArea:
+PositionedItem6Static:0
+PositionedItem6Positions:
+PositionedItem6DataSheet:
+
+MapItem1UUID:166ab660-b3f3-11e2-8561-10bf48d758ce
+MapItem1Name:Start/Ziel
+MapItem1ShortName:St
+MapItem1PositionedItemIds:["9655e5d0-854d-013d-8ef6-1c6b00518c70", "969df260-854d-013d-8ef7-1c6b00518c70"]
+
+MapItem2UUID:2b5bde8c-b3f3-11e2-8561-10bf48d758ce
+MapItem2Name:Luvtonne
+MapItem2ShortName:Lu
+MapItem2PositionedItemIds:["96f88b40-854d-013d-8efa-1c6b00518c70"]
+
+MapItem3UUID:3f999718-b3f3-11e2-8561-10bf48d758ce
+MapItem3Name:Offset Luvtonne
+MapItem3ShortName:Of
+MapItem3PositionedItemIds:["9735da40-854d-013d-8efb-1c6b00518c70"]
+
+MapItem4UUID:96dfc630-854d-013d-8ef8-1c6b00518c70
+MapItem4Name:Start/Ziel - 1
+MapItem4ShortName:St
+MapItem4PositionedItemIds:["9655e5d0-854d-013d-8ef6-1c6b00518c70"]
+
+MapItem5UUID:96e09230-854d-013d-8ef9-1c6b00518c70
+MapItem5Name:Start/Ziel - 2
+MapItem5ShortName:St
+MapItem5PositionedItemIds:["969df260-854d-013d-8ef7-1c6b00518c70"]
+
+MapItem6UUID:98282b10-854d-013d-8efe-1c6b00518c70
+MapItem6Name:Leegate - 1
+MapItem6ShortName:Le
+MapItem6PositionedItemIds:["97ad3c90-854d-013d-8efc-1c6b00518c70"]
+
+MapItem7UUID:98299b00-854d-013d-8eff-1c6b00518c70
+MapItem7Name:Leegate - 2
+MapItem7ShortName:Le
+MapItem7PositionedItemIds:["97e71600-854d-013d-8efd-1c6b00518c70"]
+
+MapItem8UUID:b160887a-b3f3-11e2-8561-10bf48d758ce
+MapItem8Name:Leegate
+MapItem8ShortName:Le
+MapItem8PositionedItemIds:["97ad3c90-854d-013d-8efc-1c6b00518c70", "97e71600-854d-013d-8efd-1c6b00518c70"]
 
 SegmentFile:segments.php
-Route1UUID:e2f725ce-b3f3-11e2-8561-10bf48d758ce
-Route1Description:Windward-Leeward - 3 Laps
+Route1UUID:5eeb6c66-b409-11e2-8561-10bf48d758ce
+Route1Description:Race 6
 Route1Length:0
 Route1ControlPoint1UUID:166ab660-b3f3-11e2-8561-10bf48d758ce
 Route1ControlPoint2UUID:2b5bde8c-b3f3-11e2-8561-10bf48d758ce
@@ -682,4 +773,3 @@ Route1ControlPoint9UUID:3f999718-b3f3-11e2-8561-10bf48d758ce
 Route1ControlPoint10UUID:b160887a-b3f3-11e2-8561-10bf48d758ce
 Route1ControlPoint11UUID:166ab660-b3f3-11e2-8561-10bf48d758ce
 
-//-------- AUTO GENERATED PARAMETERS END ------------------

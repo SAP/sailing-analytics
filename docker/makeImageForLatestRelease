@@ -1,24 +1,33 @@
 #!/bin/bash
-release=$1
-if [ "${release}" = "" ]; then
-  SET_LATEST=1
-  release=$(wget -O - https://releases.sapsailing.com/ 2>/dev/null | grep 'build-[0-9]\{10\}' | tail -1 | sed -e 's/^.*\(build-[0-9]*\).*$/\1/')
-  echo Latest release is ${release}
-fi
+release_prefix="$1"
+GITHUB_REPOSITORY="$2"
+OWNER=${GITHUB_REPOSITORY%%/*}
+OWNER_LOWER=$(echo "$OWNER" | tr '[:upper:]' '[:lower:]')
+REPO=${GITHUB_REPOSITORY##*/}
+REPO_LOWER=$(echo "$REPO" | tr '[:upper:]' '[:lower:]')
+PACKAGE="$OWNER_LOWER/$REPO_LOWER"
 GITROOT="`dirname $0`/.."
 DOCKERDIR="${GITROOT}/docker"
 DOCKERFILE="$DOCKERDIR/Dockerfile"
-echo "Copying files from GITROOT $GITROOT into Docker workspace"
-cp "$GITROOT/java/target/env.sh" "$DOCKERDIR"
-cp "$GITROOT/java/target/start" "$DOCKERDIR"
-cp "$GITROOT/java/target/configuration/JavaSE-11.profile" "$DOCKERDIR"
-cd "$DOCKERDIR"
-docker build --build-arg RELEASE=${release} -t sapsailing:${release} .
-echo "Cleaning up..."
-rm start env.sh JavaSE-11.profile
-docker tag sapsailing:${release} docker.sapsailing.com/sapsailing:${release}
-docker push docker.sapsailing.com/sapsailing:${release}
-if [ "$SET_LATEST" = "1" ]; then
-  docker tag sapsailing:${release} docker.sapsailing.com/sapsailing:latest
-  docker push docker.sapsailing.com/sapsailing:latest
+if [ "${release_prefix}" = "" ]; then
+  SET_LATEST=1
+  release_prefix="main-"
 fi
+pushd "${DOCKERDIR}"
+RELEASE_TAR_GZ_FILENAME=$( ${GITROOT}/configuration/github-download-release-assets.sh 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 "${release_prefix}" "${GITHUB_REPOSITORY}" )
+if [ "${RELEASE_TAR_GZ_FILENAME}" = "" ]; then
+  echo "No release with prefix ${release_prefix} found" >&2
+else
+  release=$( echo ${RELEASE_TAR_GZ_FILENAME} | sed -e 's/\.tar\.gz//' )
+  echo Release is ${release}
+  echo "Copying files from GITROOT $GITROOT into Docker workspace"
+  cp "$GITROOT/java/target/env.sh" "$DOCKERDIR"
+  cp "$GITROOT/java/target/start" "$DOCKERDIR"
+  cp "$GITROOT/java/target/configuration/JavaSE-11.profile" "$DOCKERDIR"
+  cd "$DOCKERDIR"
+  docker buildx create --name=container --driver=docker-container --use --bootstrap
+  docker buildx build --builder=container --platform=linux/amd64,linux/arm64 --build-arg RELEASE=${release} -t ghcr.io/${PACKAGE}:${release} --push .
+  echo "Cleaning up..."
+  rm start env.sh JavaSE-11.profile ${RELEASE_TAR_GZ_FILENAME} release-notes.txt
+fi
+popd

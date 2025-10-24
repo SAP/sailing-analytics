@@ -1,5 +1,7 @@
 package com.sap.sailing.domain.persistence.impl;
 
+import com.mongodb.ReadConcern;
+import com.mongodb.WriteConcern;
 import com.sap.sailing.domain.base.DomainFactory;
 import com.sap.sailing.domain.persistence.DomainObjectFactory;
 import com.sap.sailing.domain.persistence.MongoObjectFactory;
@@ -32,6 +34,11 @@ public class PersistenceFactoryImpl implements PersistenceFactory {
     }
 
     @Override
+    public DomainObjectFactory getMajorityDomainObjectFactory(MongoDBService mongoDBService, DomainFactory baseDomainFactory) {
+        return new DomainObjectFactoryImpl(mongoDBService.getDB().withReadConcern(ReadConcern.MAJORITY).withWriteConcern(WriteConcern.MAJORITY), baseDomainFactory);
+    }
+    
+    @Override
     public DomainObjectFactory getDomainObjectFactory(MongoDBService mongoDBService, DomainFactory baseDomainFactory,
             TypeBasedServiceFinderFactory serviceFinderFactory) {
         return new DomainObjectFactoryImpl(mongoDBService.getDB(), baseDomainFactory, serviceFinderFactory);
@@ -50,6 +57,11 @@ public class PersistenceFactoryImpl implements PersistenceFactory {
     @Override
     public MongoObjectFactory getMongoObjectFactory(MongoDBService mongoDBService) {
         return new MongoObjectFactoryImpl(mongoDBService.getDB());
+    }
+
+    @Override
+    public MongoObjectFactory getMajorityMongoObjectFactory(MongoDBService mongoDBService) {
+        return new MongoObjectFactoryImpl(mongoDBService.getDB().withReadConcern(ReadConcern.MAJORITY).withWriteConcern(WriteConcern.MAJORITY));
     }
 
     @Override

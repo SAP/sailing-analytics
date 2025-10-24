@@ -2,7 +2,8 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:mp="urn:import:com.sap.sailing.gwt.home.mobile.partials"
-    xmlns:s="urn:import:com.sap.sailing.gwt.home.client.shared">
+    xmlns:s="urn:import:com.sap.sailing.gwt.home.client.shared"
+    xmlns:m="urn:import:com.sap.sse.gwt.client.media">
     <ui:with field="i18n"
         type="com.sap.sailing.gwt.ui.client.StringMessages" />
     <ui:with field="res"
@@ -14,9 +15,10 @@
     <ui:with field="local_res"
         type="com.sap.sailing.gwt.home.mobile.partials.imagegallery.ImageGalleryResources" />
     <g:HTMLPanel>
-        <div  style="position: relative;">
-            <div class="{local_res.css.imagegallery_column_item}"
-                ui:field="imageUi" style="position:relative"></div>
+        <div style="position: relative;">
+            <div class="{local_res.css.imagegallery_column_item} {res.mainCss.media_wrapper}" ui:field="imageUi" style="position:relative">
+                <m:MediaMenuIcon ui:field="mediaMenuIcon" fontSize="15px"/>
+            </div>
             <div ui:field="overlayUi" class="{res_home.sharedHomeCss.overlay}">
                 <g:Button addStyleNames="{media_res.css.button} {media_res.css.editButton}" ui:field="editButtonUi"></g:Button>
                 <g:Button addStyleNames="{media_res.css.button} {media_res.css.deleteButton}" ui:field="deleteButtonUi"></g:Button>

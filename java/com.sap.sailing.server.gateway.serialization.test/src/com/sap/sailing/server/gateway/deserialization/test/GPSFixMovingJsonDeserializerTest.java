@@ -1,11 +1,11 @@
 package com.sap.sailing.server.gateway.deserialization.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixMovingImpl;
@@ -17,7 +17,7 @@ public class GPSFixMovingJsonDeserializerTest {
     private GPSFixMovingJsonSerializer serializer;
     private GPSFixMovingJsonDeserializer deserializer;
 
-    @Before
+    @BeforeEach
     public void setup() {
         serializer = new GPSFixMovingJsonSerializer();
         deserializer = new GPSFixMovingJsonDeserializer();

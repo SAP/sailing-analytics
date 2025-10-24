@@ -9,7 +9,10 @@ import com.sap.sse.common.Util.Pair;
 
 /**
  * Comparator which compares a pair composed of a position and time point. The special feature of this comparator is
- * that it takes inaccuracy of double values when comparing longitude and latitude by introducing a tolerance threshold.
+ * that it takes inaccuracy of double values when comparing longitude and latitude by introducing a tolerance threshold.<p>
+ * 
+ * The comparators of this type implement a total ordering. The primary criterion is the time point; secondary is the latitude,
+ * considering the tolerance; the third ordering criterion is the longitude, again considering the tolerance.
  * 
  * @author Vladislav Chumak (D069712)
  *

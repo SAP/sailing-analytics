@@ -1,21 +1,23 @@
 package com.sap.sailing.domain.racelogtracking.test.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import com.mongodb.MongoException;
 import com.mongodb.ReadConcern;
 import com.mongodb.WriteConcern;
+import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoDatabase;
 import com.sap.sailing.domain.common.DeviceIdentifier;
 import com.sap.sailing.domain.common.sensordata.BravoSensorDataMetadata;
@@ -27,12 +29,16 @@ import com.sap.sailing.domain.persistence.racelog.tracking.impl.MongoSensorFixSt
 import com.sap.sailing.domain.racelog.tracking.FixReceivedListener;
 import com.sap.sailing.domain.racelog.tracking.SensorFixStore;
 import com.sap.sailing.domain.racelog.tracking.test.mock.MockSmartphoneImeiServiceFinderFactory;
-import com.sap.sailing.domain.racelog.tracking.test.mock.SmartphoneImeiIdentifier;
+import com.sap.sailing.domain.racelogtracking.impl.SmartphoneImeiIdentifierImpl;
+import com.sap.sse.common.Duration;
 import com.sap.sse.common.NoCorrespondingServiceRegisteredException;
 import com.sap.sse.common.Timed;
 import com.sap.sse.common.TransformationException;
+import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.common.impl.TimeRangeImpl;
+import com.sap.sse.mongodb.MongoDBService;
+import com.sap.sse.shared.util.Wait;
 
 public class SensorFixStoreTest {
     private static final long FIX_TIMESTAMP = 110;
@@ -40,12 +46,18 @@ public class SensorFixStoreTest {
     private static final double FIX_RIDE_HEIGHT = 1337.0;
     private static final double FIX_RIDE_HEIGHT2 = 1338.0;
     protected final MockSmartphoneImeiServiceFinderFactory serviceFinderFactory = new MockSmartphoneImeiServiceFinderFactory();
-    protected final DeviceIdentifier device = new SmartphoneImeiIdentifier("a");
-    protected final DeviceIdentifier device2 = new SmartphoneImeiIdentifier("b");
+    protected final DeviceIdentifier device = new SmartphoneImeiIdentifierImpl("a");
+    protected final DeviceIdentifier device2 = new SmartphoneImeiIdentifierImpl("b");
     protected SensorFixStore store;
+    private static ClientSession clientSession;
 
-    @Before
-    public void setUp() throws UnknownHostException, MongoException {
+    @BeforeAll
+    public static void setUpClass() {
+        clientSession = MongoDBService.INSTANCE.startCausallyConsistentSession();
+    }
+    
+    @BeforeEach
+    public void setUp() throws Exception {
         dropPersistedData();
         newStore();
     }
@@ -53,18 +65,31 @@ public class SensorFixStoreTest {
     private void newStore() {
         store = new MongoSensorFixStoreImpl(PersistenceFactory.INSTANCE.getDefaultMongoObjectFactory(),
                 PersistenceFactory.INSTANCE.getDefaultDomainObjectFactory(), serviceFinderFactory, ReadConcern.MAJORITY,
-                WriteConcern.MAJORITY, /* clientSession */ null, /* metadataCollectionClientSession */ null);
+                WriteConcern.MAJORITY, clientSession, clientSession);
     }
 
-    @After
-    public void after() {
+    @AfterEach
+    public void after() throws Exception {
+        store.getNumberOfFixes(device); // wait until all metadata updates have completed;
+        // this shall avoid that pending updates are written to the metadata collection after
+        // dropping it.
         dropPersistedData();
     }
 
-    private void dropPersistedData() {
-        MongoDatabase db = PersistenceFactory.INSTANCE.getDefaultMongoObjectFactory().getDatabase();
-        db.getCollection(CollectionNames.GPS_FIXES.name()).drop();
-        db.getCollection(CollectionNames.GPS_FIXES_METADATA.name()).drop();
+    private void dropPersistedData() throws Exception {
+        final MongoDatabase db = PersistenceFactory.INSTANCE.getDefaultMongoObjectFactory().getDatabase();
+        // keep trying to drop the collections until the drop is finally visible when listing the collections again;
+        // this seems particularly important in non-replica-set / standalone configurations of MongoDB...
+        Wait.wait(()->{
+            db.getCollection(CollectionNames.GPS_FIXES.name()).withWriteConcern(WriteConcern.MAJORITY).drop(clientSession);
+            db.getCollection(CollectionNames.GPS_FIXES_METADATA.name()).withWriteConcern(WriteConcern.MAJORITY).drop(clientSession);
+            return null;
+        },
+                v->!Util.contains(db.listCollectionNames(clientSession), CollectionNames.GPS_FIXES.name())
+                   && !Util.contains(db.listCollectionNames(clientSession), CollectionNames.GPS_FIXES_METADATA.name()),
+                /* retry on exception */ true,
+                Optional.of(Duration.ONE_MINUTE), Duration.ONE_SECOND,
+                Level.INFO, "Waiting for dropped collections to disappear");
     }
 
     @Test
@@ -87,7 +112,6 @@ public class SensorFixStoreTest {
     @Test
     public void testFixDataIsPreservedOnStore() throws Exception {
         DoubleVectorFix fix = addBravoFix(device, FIX_TIMESTAMP, FIX_RIDE_HEIGHT);
-
         verifySingleFix(fix, 100, 200, device, true);
     }
     
@@ -131,14 +155,14 @@ public class SensorFixStoreTest {
         // validate between 0 and 1 (inclusive)
         Double last = 0.0;
         for (Double progress : progressData) {
-            Assert.assertTrue(progress <= 1);
-            Assert.assertTrue(progress >= 0);
-            Assert.assertTrue(progress >= last);
+            Assertions.assertTrue(progress <= 1);
+            Assertions.assertTrue(progress >= 0);
+            Assertions.assertTrue(progress >= last);
             last = progress;
         }
         //validate that 0-100 updates do exist
-        Assert.assertFalse(progressData.isEmpty());
-        Assert.assertTrue(progressData.size() <= 100);
+        Assertions.assertFalse(progressData.isEmpty());
+        Assertions.assertTrue(progressData.size() <= 100);
     }
 
     @Test
@@ -187,7 +211,6 @@ public class SensorFixStoreTest {
         FixReceivedListener<DoubleVectorFix> listener = mockFixReceivedListener();
         store.addListener(listener, device);
         DoubleVectorFix doubleVectorFix = addBravoFix(device, FIX_TIMESTAMP, FIX_RIDE_HEIGHT);
-
         Mockito.verify(listener, Mockito.times(1)).fixReceived(device, doubleVectorFix, /* returnManeuverChanges */ false, /* returnLiveDelay */ false);
     }
 
@@ -198,7 +221,6 @@ public class SensorFixStoreTest {
         store.addListener(listener1, device);
         store.addListener(listener2, device);
         DoubleVectorFix doubleVectorFix = addBravoFix(device, FIX_TIMESTAMP, FIX_RIDE_HEIGHT);
-
         Mockito.verify(listener1, Mockito.times(1)).fixReceived(device, doubleVectorFix, /* returnManeuverChanges */ false, /* returnLiveDelay */ false);
         Mockito.verify(listener2, Mockito.times(1)).fixReceived(device, doubleVectorFix, /* returnManeuverChanges */ false, /* returnLiveDelay */ false);
     }
@@ -208,7 +230,6 @@ public class SensorFixStoreTest {
         FixReceivedListener<DoubleVectorFix> listener = mockFixReceivedListener();
         store.addListener(listener, device);
         addBravoFix(device2, FIX_TIMESTAMP, FIX_RIDE_HEIGHT);
-
         Mockito.verifyNoInteractions(listener);
     }
 
@@ -219,7 +240,6 @@ public class SensorFixStoreTest {
         store.addListener(listener1, device);
         store.addListener(listener2, device2);
         DoubleVectorFix doubleVectorFix = addBravoFix(device, FIX_TIMESTAMP, FIX_RIDE_HEIGHT);
-
         Mockito.verify(listener1, Mockito.times(1)).fixReceived(device, doubleVectorFix, /* returnManeuverChanges */ false, /* returnLiveDelay */ false);
         Mockito.verifyNoInteractions(listener2);
     }
@@ -230,7 +250,6 @@ public class SensorFixStoreTest {
         store.addListener(listener, device);
         DoubleVectorFix doubleVectorFix1 = addBravoFix(device, FIX_TIMESTAMP, FIX_RIDE_HEIGHT);
         DoubleVectorFix doubleVectorFix2 = addBravoFix(device, FIX_TIMESTAMP2, FIX_RIDE_HEIGHT2);
-
         Mockito.verify(listener, Mockito.times(1)).fixReceived(device, doubleVectorFix1, /* returnManeuverChanges */ false, /* returnLiveDelay */ false);
         Mockito.verify(listener, Mockito.times(1)).fixReceived(device, doubleVectorFix2, /* returnManeuverChanges */ false, /* returnLiveDelay */ false);
         Mockito.verifyNoMoreInteractions(listener);

@@ -32,7 +32,8 @@ public class WindTrackWithConfidenceForEachWindFixImpl extends WindTrackImpl {
     protected double getConfidenceOfInternalWindFixUnsynchronized(Wind windFix) {
         WindWithConfidence<Pair<Position, TimePoint>> windWithConfidence = windTrackWithConfidences
                 .get(new Pair<>(windFix.getPosition(), windFix.getTimePoint()));
-        return super.getConfidenceOfInternalWindFixUnsynchronized(windFix) * windWithConfidence.getConfidence();
+        return windWithConfidence == null ? 0.0 :
+            (super.getConfidenceOfInternalWindFixUnsynchronized(windFix) * windWithConfidence.getConfidence());
     }
 
     @Override

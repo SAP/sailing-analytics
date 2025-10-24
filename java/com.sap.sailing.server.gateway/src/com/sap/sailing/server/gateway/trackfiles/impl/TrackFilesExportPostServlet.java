@@ -69,15 +69,12 @@ public class TrackFilesExportPostServlet extends SailingServerHttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
         // TODO better error handling: check if whole file is generated, then start outputting to client
-
         String[] regattaRaces = req.getParameterValues(TrackFilesExportParameters.REGATTARACES);
         String formatString = req.getParameter(TrackFilesExportParameters.FORMAT);
         String[] dataString = req.getParameterValues(TrackFilesExportParameters.DATA);
         String beforeAfterString = req.getParameter(TrackFilesExportParameters.BEFORE_AFTER);
         String rawFixesString = req.getParameter(TrackFilesExportParameters.RAW_FIXES);
-
         if (!(isParamValid(resp, regattaRaces, TrackFilesExportParameters.REGATTARACES)
                 && isParamValid(resp, formatString, TrackFilesExportParameters.FORMAT) && isParamValid(resp,
                     dataString, TrackFilesExportParameters.DATA))) {
@@ -85,7 +82,6 @@ public class TrackFilesExportPostServlet extends SailingServerHttpServlet {
         }
         resp.setHeader("Content-Disposition", "attachment; filename=\"tracked-races.zip\"");
         resp.setContentType("application/zip");
-
         List<TrackedRace> trackedRaces = getTrackedRaces(regattaRaces);
         for (TrackedRace trackedRace : trackedRaces) {
             SecurityUtils.getSubject()
@@ -102,10 +98,9 @@ public class TrackFilesExportPostServlet extends SailingServerHttpServlet {
         try {
             TrackFileExporter.INSTANCE.writeAllData(data, format, trackedRaces, beforeAfter, rawFixes, out);
         } catch (Exception e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error trying to export data; see server logs for details.");
             log.log(Level.WARNING, e.getMessage());
         }
-
         out.flush();
         out.close();
     }

@@ -5,7 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.lang.reflect.Method;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.components.FilterCriterion;
 import com.sap.sse.datamining.test.util.FunctionTestsUtil;

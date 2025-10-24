@@ -3,10 +3,8 @@ package com.sap.sse.security;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,9 +15,9 @@ import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.osgi.framework.BundleContext;
-import org.osgi.util.tracker.ServiceTracker;
 
 import com.sap.sse.security.impl.Activator;
+import com.sap.sse.security.impl.PermissionConverter;
 import com.sap.sse.security.interfaces.AccessControlStore;
 import com.sap.sse.security.interfaces.UserStore;
 import com.sap.sse.security.shared.AccessControlListAnnotation;
@@ -30,6 +28,7 @@ import com.sap.sse.security.shared.UserManagementException;
 import com.sap.sse.security.shared.WildcardPermission;
 import com.sap.sse.security.shared.impl.Role;
 import com.sap.sse.security.shared.impl.User;
+import com.sap.sse.util.ServiceTrackerFactory;
 
 /**
  * This class implements a realm that combines Access Control Lists, Role Based Permission Modeling and
@@ -67,72 +66,12 @@ public abstract class AbstractCompositeAuthorizingRealm extends AuthorizingRealm
         setPermissionResolver(wildcardString->new org.apache.shiro.authz.permission.WildcardPermission(wildcardString, /* caseSensitive */ true));
         BundleContext context = Activator.getContext();
         if (context != null) {
-            userStore = createUserStoreFuture(context);
-            accessControlStore = createAccessControlStoreFuture(context);
+            userStore = ServiceTrackerFactory.createServiceFuture(context, UserStore.class);
+            accessControlStore = ServiceTrackerFactory.createServiceFuture(context, AccessControlStore.class);
         } else {
             userStore = null;
             accessControlStore = null;
         }
-    }
-
-    private Future<UserStore> createUserStoreFuture(BundleContext bundleContext) {
-        final ServiceTracker<UserStore, UserStore> tracker = new ServiceTracker<>(bundleContext, UserStore.class, /* customizer */ null);
-        tracker.open();
-        final FutureTask<UserStore> result = new FutureTask<>(new Callable<UserStore>() {
-            @Override
-            public UserStore call() throws InterruptedException {
-                try {
-                    logger.info("Waiting for UserStore service...");
-                    UserStore userStore = tracker.waitForService(0);
-                    logger.info("Obtained UserStore service "+userStore);
-                    return userStore;
-                } catch (InterruptedException e) {
-                    logger.log(Level.SEVERE, "Interrupted while waiting for UserStore service", e);
-                    throw e;
-                }
-            }
-        });
-        new Thread("ServiceTracker waiting for UserStore service") {
-            @Override
-            public void run() {
-                try {
-                    result.run();
-                } catch (Exception e) {
-                    logger.log(Level.SEVERE, "Exception while waiting for UserStore service", e);
-                }
-            }
-        }.start();
-        return result;
-    }
-    
-    private Future<AccessControlStore> createAccessControlStoreFuture(BundleContext bundleContext) {
-        final ServiceTracker<AccessControlStore, AccessControlStore> tracker = new ServiceTracker<>(bundleContext, AccessControlStore.class, /* customizer */ null);
-        tracker.open();
-        final FutureTask<AccessControlStore> result = new FutureTask<>(new Callable<AccessControlStore>() {
-            @Override
-            public AccessControlStore call() throws InterruptedException {
-                try {
-                    logger.info("Waiting for AccessControlListStore service...");
-                    AccessControlStore accessControlStore = tracker.waitForService(0);
-                    logger.info("Obtained AccessControlListStore service "+accessControlStore);
-                    return accessControlStore;
-                } catch (InterruptedException e) {
-                    logger.log(Level.SEVERE, "Interrupted while waiting for AccessControlListStore service", e);
-                    throw e;
-                }
-            }
-        });
-        new Thread("ServiceTracker waiting for AccessControlListStore service") {
-            @Override
-            public void run() {
-                try {
-                    result.run();
-                } catch (Exception e) {
-                    logger.log(Level.SEVERE, "Exception while waiting for AccessControlListStore service", e);
-                }
-            }
-        }.start();
-        return result;
     }
 
     protected UserStore getUserStore() {
@@ -169,7 +108,7 @@ public abstract class AbstractCompositeAuthorizingRealm extends AuthorizingRealm
     public boolean isPermitted(PrincipalCollection principals, Permission perm) {
         String username = (String) principals.getPrimaryPrincipal();
         final User user = getUserStore().getUserByName(username);
-        final WildcardPermission wildcardPermission = new WildcardPermission(perm.toString().replaceAll("\\[|\\]", ""));
+        final WildcardPermission wildcardPermission = new PermissionConverter().getWildcardPermission(perm);
         List<Set<String>> parts = wildcardPermission.getParts();
         final boolean result;
         if (parts.size() > 2 && !parts.get(2).isEmpty()) {

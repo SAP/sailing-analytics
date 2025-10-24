@@ -1,5 +1,7 @@
 package com.sap.sailing.gwt.ui.simulator.streamlets;
 
+import com.google.gwt.maps.client.base.Point;
+
 public class Vector {
     public double x;
     public double y;
@@ -10,6 +12,10 @@ public class Vector {
     public Vector(double x, double y) {
         this.x = x;
         this.y = y;
+    }
+    
+    public Vector(Point pixel) {
+        this(pixel.getX(), pixel.getY());
     }
 
     public double length() {

@@ -1,11 +1,12 @@
 package net.sf.marineapi.nmea.parser;
 
-import static org.junit.Assert.assertEquals;
 import net.sf.marineapi.nmea.sentence.TalkerId;
 import net.sf.marineapi.nmea.sentence.VLWSentence;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class VLWTest {
 
@@ -14,7 +15,7 @@ public class VLWTest {
 	VLWSentence vlw;
 	VLWSentence empty;
 	
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		vlw = new VLWParser(EXAMPLE);
 		empty = new VLWParser(TalkerId.VD);

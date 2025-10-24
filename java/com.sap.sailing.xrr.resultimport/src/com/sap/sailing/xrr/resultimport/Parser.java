@@ -3,6 +3,9 @@ package com.sap.sailing.xrr.resultimport;
 import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 import com.sap.sailing.domain.common.RegattaScoreCorrections;
 import com.sap.sailing.domain.common.ScoreCorrectionProvider;
@@ -14,7 +17,7 @@ import com.sap.sailing.xrr.schema.RegattaResults;
 import com.sap.sailing.xrr.schema.Team;
 
 public interface Parser {
-    RegattaResults parse() throws JAXBException;
+    RegattaResults parse() throws JAXBException, SAXException, ParserConfigurationException;
     
     String getBoatClassName(Division division); 
     

@@ -32,7 +32,7 @@ RESPONSE_STATUS_CODE=$(echo $STATUS | head -n 1 | cut -d ' ' -f 2)
 
 echo "AVAILABILITY_STATUS: $RESPONSE_STATUS_CODE" >&2
 echo "AVAILABILITY_DETAILS:" >&2
-echo "$STATUS" | grep "^\{" | jq .
+echo "$STATUS" | grep "^{" | jq .
 
 if [[ $RESPONSE_STATUS_CODE =~ 2.. ]]; then
     echo "Server $SERVER_NAME is available on $SERVER_PORT" >&2

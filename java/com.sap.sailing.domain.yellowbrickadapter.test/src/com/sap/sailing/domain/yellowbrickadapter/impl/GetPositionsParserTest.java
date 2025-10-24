@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.yellowbrickadapter.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,8 +10,8 @@ import java.text.SimpleDateFormat;
 import java.util.stream.StreamSupport;
 
 import org.json.simple.parser.ParseException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
@@ -19,7 +19,7 @@ import com.sap.sse.common.Util;
 public class GetPositionsParserTest {
     private GetPositionsParser parser;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         parser = new GetPositionsParser();
     }

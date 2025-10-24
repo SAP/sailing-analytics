@@ -48,7 +48,7 @@ public class CompetitorInfoOverlay extends CanvasOverlayV3 {
 
     @Override
     protected void draw() {
-        if (mapProjection != null && position != null) {
+        if (getMapProjection() != null && position != null) {
             LatLng latLngPosition = coordinateSystem.toLatLng(position);
             Context2d ctx = getCanvas().getContext2d();
             CssColor grayTransparentColor = CssColor.make("rgba(255,255,255,0.75)");
@@ -87,7 +87,7 @@ public class CompetitorInfoOverlay extends CanvasOverlayV3 {
             drawText(textLines, ctx);
             ctx.stroke();
             ctx.restore();
-            Point objectPositionInPx = mapProjection.fromLatLngToDivPixel(latLngPosition);
+            Point objectPositionInPx = getMapProjection().fromLatLngToDivPixel(latLngPosition);
             setCanvasPosition(objectPositionInPx.getX(), objectPositionInPx.getY() - canvasHeight);
         }
     }

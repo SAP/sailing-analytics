@@ -40,6 +40,7 @@ import com.sap.sse.security.interfaces.SocialSettingsKeys;
 import com.sap.sse.security.shared.SocialUserAccount;
 import com.sap.sse.security.shared.UserGroupManagementException;
 import com.sap.sse.security.shared.UserManagementException;
+import com.sap.sse.security.shared.impl.LockingAndBanningImpl;
 import com.sap.sse.security.shared.impl.User;
 import com.sap.sse.security.shared.impl.UserGroup;
 
@@ -188,7 +189,7 @@ public class OAuthRealm extends AbstractCompositeAuthorizingRealm {
             try {
                 UserGroup tenant = getUserStore().createUserGroup(UUID.randomUUID(), socialname + SecurityService.TENANT_SUFFIX);
                 getAccessControlStore().setOwnership(tenant.getIdentifier(), user, tenant, tenant.getName());
-                user = getUserStore().createUser(socialname, socialUser.getProperty(Social.EMAIL.name()), socialUser);
+                user = getUserStore().createUser(socialname, socialUser.getProperty(Social.EMAIL.name()), new LockingAndBanningImpl(), socialUser);
                 tenant.add(user);
                 getUserStore().updateUserGroup(tenant);
             } catch (UserManagementException | UserGroupManagementException e) {

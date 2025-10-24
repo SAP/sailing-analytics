@@ -97,4 +97,10 @@ public interface Peer<O extends Operation<S>, S> {
      * wait until consistency has been reached across clients and server.
      */
     void waitForNotRunning();
+
+    /**
+     * Shuts any executor service, e.g., the one used for merging incoming operations,
+     * down. This is an irreversible operation; this peer cannot be used anymore afterwards.
+     */
+    void shutdown();
 }

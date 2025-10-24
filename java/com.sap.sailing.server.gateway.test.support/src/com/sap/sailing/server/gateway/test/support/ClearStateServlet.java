@@ -56,7 +56,7 @@ public class ClearStateServlet extends HttpServlet {
                 }
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             } catch (Exception exception) {
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, exception.getMessage());
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error trying to clear state. See erver log for details.");
             }
             return;
         }

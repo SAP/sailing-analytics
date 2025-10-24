@@ -11,8 +11,8 @@ import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.regatta.RegattaLog;
 import com.sap.sailing.domain.abstractlog.regatta.tracking.analyzing.impl.RegattaLogDeviceMarkMappingFinder;
@@ -55,7 +55,7 @@ public class LeaderboardsResourcePingMarkTest extends AbstractJaxRsApiTest {
             "      \"course\" : 258.11,\n" + 
             "    }";
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         mark = racingEventService.getBaseDomainFactory().getOrCreateMark("id", "name", "n");

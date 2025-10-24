@@ -1,8 +1,8 @@
 package com.sap.sailing.mongodb.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.net.MalformedURLException;
@@ -11,8 +11,8 @@ import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoClient;
@@ -70,7 +70,7 @@ public class TestStoringAndRetrievingWindTracksTest extends AbstractTracTracLive
         return MongoClients.create(dbConfiguration.getMongoClientURI());
     }
     
-    @Before
+    @BeforeEach
     public void dropTestDB() throws UnknownHostException, MongoException {
         mongo = newMongo();
         assertNotNull(mongo);
@@ -137,6 +137,6 @@ public class TestStoringAndRetrievingWindTracksTest extends AbstractTracTracLive
         } finally {
             result.unlockAfterRead();
         }
-        assertTrue("Expected myBeaaringDeg to be >= 139.999999999 but was "+myBearingDeg, myBearingDeg >= 139.999999999);
+        assertTrue(myBearingDeg >= 139.999999999, "Expected myBeaaringDeg to be >= 139.999999999 but was "+myBearingDeg);
     }
 }

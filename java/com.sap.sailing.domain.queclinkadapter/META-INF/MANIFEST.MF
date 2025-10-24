@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Queclinkadapter
+Bundle-SymbolicName: com.sap.sailing.domain.queclinkadapter
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: SAP
+Automatic-Module-Name: com.sap.sailing.domain.queclinkadapter
+Bundle-Activator: com.sap.sailing.domain.queclinkadapter.impl.Activator
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: com.sap.sailing.domain.shared.android,
+ com.sap.sailing.domain,
+ com.sap.sailing.domain.common,
+ com.sap.sse.common,
+ com.sap.sailing.domain.racelogtrackingadapter,
+ com.sap.sailing.server.trackfiles,
+ com.sap.sailing.udpconnector
+Import-Package: org.osgi.framework;version="[1.10.0,2.0.0]"

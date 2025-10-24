@@ -12,9 +12,11 @@ public class SpectatorContextDefinition extends AbstractGenericSerializableSetti
     private transient StringSetting leaderboardGroupId;
     
     public SpectatorContextDefinition() {
+        super();
     }
     
     public SpectatorContextDefinition(String leaderboardGroupId) {
+        this();
         this.leaderboardGroupId.setValue(leaderboardGroupId);
     }
     

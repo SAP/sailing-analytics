@@ -7,8 +7,6 @@ public interface HighChartsRessource extends ClientBundle {
     /**
      * Package common controls css files as text resource so it can be injected when required. We need to move away from
      * this css file.
-     * 
-     * @return
      */
     @Source("css/CommonControls.css")
     TextResource commonControls();
@@ -16,12 +14,12 @@ public interface HighChartsRessource extends ClientBundle {
     @Source("highcharts/highcharts.js")
     TextResource highcharts();
     
-    @Source("highcharts/js/themes/grid.js")
+    @Source("highcharts/themes/grid.js")
     TextResource highchartsThemeGrid();
 
-    @Source("highcharts/js/modules/exporting.js")
+    @Source("highcharts/modules/exporting.js")
     TextResource highchartsModuleExport();
 
-    @Source("highcharts/js/highcharts-more.js")
+    @Source("highcharts/highcharts-more.js")
     TextResource highchartsMore();
 }

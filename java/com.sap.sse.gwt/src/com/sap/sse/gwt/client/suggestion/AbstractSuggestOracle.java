@@ -51,7 +51,7 @@ public abstract class AbstractSuggestOracle<T> extends SuggestOracle {
         if (normalizedQuery == null || normalizedQuery.isEmpty()) {
             requestDefaultSuggestions(request, callback);
         } else {
-            Iterable<String> queryTokens = Collections.singleton(normalizedQuery);
+            Iterable<String> queryTokens = Util.splitAlongWhitespaceRespectingDoubleQuotedPhrases(normalizedQuery);
             getSuggestions(request, callback, queryTokens);
         }
     }

@@ -41,6 +41,7 @@ import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprintRegistry
 import com.sap.sailing.domain.racelog.RaceLogAndTrackedRaceResolver;
 import com.sap.sailing.domain.racelog.RaceLogStore;
 import com.sap.sailing.domain.regattalog.RegattaLogStore;
+import com.sap.sailing.domain.shared.tracking.impl.TrackingConnectorInfoImpl;
 import com.sap.sailing.domain.swisstimingadapter.DomainFactory;
 import com.sap.sailing.domain.swisstimingadapter.SwissTimingAdapter;
 import com.sap.sailing.domain.swisstimingreplayadapter.CompetitorStatus;
@@ -60,7 +61,6 @@ import com.sap.sailing.domain.tracking.WindTrack;
 import com.sap.sailing.domain.tracking.impl.EmptyWindStore;
 import com.sap.sailing.domain.tracking.impl.MarkPassingImpl;
 import com.sap.sailing.domain.tracking.impl.TrackedRaceStatusImpl;
-import com.sap.sailing.domain.tracking.impl.TrackingConnectorInfoImpl;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;

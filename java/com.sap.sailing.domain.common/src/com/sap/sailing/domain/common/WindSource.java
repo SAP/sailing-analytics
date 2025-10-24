@@ -2,6 +2,7 @@ package com.sap.sailing.domain.common;
 
 import java.io.Serializable;
 
+import com.sap.sailing.domain.common.impl.WindSourceImpl;
 import com.sap.sailing.domain.common.impl.WindSourceWithAdditionalID;
 
 
@@ -45,4 +46,35 @@ public interface WindSource extends Serializable {
      * An optional ID. May be <code>null</code>. Can be used to distinguish different wind sources of the same type.
      */
     Object getId();
+    
+    /**
+     * "Serializes" the {@link #getType type} and the {@link #getId() ID} into a single string that can be used
+     * to produce a {@link WindSource} again using the {@link #fromTypeAndId(String)} factory method.
+     */
+    default String getTypeAndId() {
+        return getType().name() + (getId() == null ? "" : " ("+getId().toString()+")");
+    }
+    
+    /**
+     * Produces a {@link WindSource} from a string as returned by {@link #getTypeAndId()}.
+     * 
+     * @param typeAndId
+     *            if {@code null}, the result will be {@code null}.
+     */
+    static WindSource fromTypeAndId(String typeAndId) {
+        final WindSource result;
+        if (typeAndId == null) {
+            result = null;
+        } else {
+            final int space = typeAndId.indexOf(' ');
+            if (space == -1) {
+                result = new WindSourceImpl(WindSourceType.valueOf(typeAndId));
+            } else {
+                final WindSourceType type = WindSourceType.valueOf(typeAndId.substring(0, space));
+                final String id = typeAndId.substring(typeAndId.indexOf('(')+1, typeAndId.indexOf(')'));
+                result = new WindSourceWithAdditionalID(type, id);
+            }
+        }
+        return result;
+    }
 }

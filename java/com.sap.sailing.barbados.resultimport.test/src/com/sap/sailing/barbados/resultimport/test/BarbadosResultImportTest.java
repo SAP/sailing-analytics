@@ -1,10 +1,10 @@
 package com.sap.sailing.barbados.resultimport.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,8 +18,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.barbados.resultimport.impl.BarbadosResultSpreadsheet;
 import com.sap.sailing.barbados.resultimport.impl.ScoreCorrectionProviderImpl;
@@ -50,7 +50,7 @@ public class BarbadosResultImportTest {
         return new File(RESOURCES + filename);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws FileNotFoundException, IOException, Exception {
         spreadsheet = new BarbadosResultSpreadsheet(getInputStream(SAMPLE_INPUT_NAME_EMPTY_RESULTS));
         scp = new ScoreCorrectionProviderImpl(new ResultDocumentProvider() {

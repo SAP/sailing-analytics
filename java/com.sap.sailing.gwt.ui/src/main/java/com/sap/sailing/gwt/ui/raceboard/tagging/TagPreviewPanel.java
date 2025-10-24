@@ -6,6 +6,7 @@ import java.util.List;
 import com.google.gwt.user.cellview.client.CellList;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.sap.sailing.domain.common.RaceIdentifier;
 import com.sap.sailing.domain.common.dto.TagDTO;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.gwt.ui.raceboard.tagging.TaggingPanelResources.TagPanelStyle;
@@ -36,12 +37,12 @@ public class TagPreviewPanel extends FlowPanel {
      *            references input fields used to get current user input
      */
     protected TagPreviewPanel(TaggingComponent taggingComponent, TagInputPanel inputPanel, StringMessages stringMessages,
-            UserService userService) {
+            UserService userService, RaceIdentifier raceIdentifier) {
         this.taggingComponent = taggingComponent;
         this.userService = userService;
 
         setStyleName(style.tagPreviewPanel());
-        tagPreviewCellList = new CellList<TagDTO>(new TagCell(taggingComponent, stringMessages, userService, true),
+        tagPreviewCellList = new CellList<TagDTO>(new TagCell(taggingComponent, stringMessages, userService, true, raceIdentifier),
                 resources);
         listContainingPreviewTag = new ArrayList<TagDTO>();
         add(new Label(stringMessages.tagPreview()));
@@ -70,9 +71,9 @@ public class TagPreviewPanel extends FlowPanel {
      */
     protected void renderPreview(TagInputPanel inputPanel) {
         listContainingPreviewTag.removeAll(listContainingPreviewTag);
-        listContainingPreviewTag.add(new TagDTO(inputPanel.getTag(), inputPanel.getComment(), inputPanel.getImageURL(), "",
-                inputPanel.isVisibleForPublic(), userService.getCurrentUser().getName(),
-                new MillisecondsTimePoint(taggingComponent.getTimerTime()), MillisecondsTimePoint.now()));
+        listContainingPreviewTag.add(new TagDTO(inputPanel.getTag(), inputPanel.getComment(), inputPanel.getHiddenInfo(), inputPanel.getImageURL(),
+                "", inputPanel.isVisibleForPublic(),
+                userService.getCurrentUser().getName(), new MillisecondsTimePoint(taggingComponent.getTimerTime()), MillisecondsTimePoint.now()));
         tagPreviewCellList.setRowData(listContainingPreviewTag);
         setVisible(!inputPanel.getTag().isEmpty());
     }

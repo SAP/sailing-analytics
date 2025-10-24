@@ -1,12 +1,12 @@
 package com.sap.sse.security.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -19,8 +19,8 @@ import java.util.UUID;
 
 import org.apache.shiro.SecurityUtils;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoDatabase;
@@ -34,16 +34,17 @@ import com.sap.sse.security.impl.SecurityServiceImpl;
 import com.sap.sse.security.interfaces.AccessControlStore;
 import com.sap.sse.security.shared.AdminRole;
 import com.sap.sse.security.shared.HasPermissions;
-import com.sap.sse.security.shared.UserStoreManagementException;
 import com.sap.sse.security.shared.PermissionChecker;
 import com.sap.sse.security.shared.QualifiedObjectIdentifier;
 import com.sap.sse.security.shared.RoleDefinition;
 import com.sap.sse.security.shared.TypeRelativeObjectIdentifier;
 import com.sap.sse.security.shared.UserGroupManagementException;
 import com.sap.sse.security.shared.UserManagementException;
+import com.sap.sse.security.shared.UserStoreManagementException;
 import com.sap.sse.security.shared.WildcardPermission;
 import com.sap.sse.security.shared.WithQualifiedObjectIdentifier;
 import com.sap.sse.security.shared.impl.AccessControlList;
+import com.sap.sse.security.shared.impl.LockingAndBanningImpl;
 import com.sap.sse.security.shared.impl.Ownership;
 import com.sap.sse.security.shared.impl.QualifiedObjectIdentifierImpl;
 import com.sap.sse.security.shared.impl.Role;
@@ -63,7 +64,7 @@ public class LoginTest {
     private AccessControlStore accessControlStore;
     private SecurityService securityService;
 
-    @Before
+    @BeforeEach
     public void setUp() throws UnknownHostException, MongoException, UserGroupManagementException, UserManagementException {
         final MongoDBConfiguration dbConfiguration = MongoDBConfiguration.getDefaultTestConfiguration();
         final MongoDBService service = dbConfiguration.getService();
@@ -81,8 +82,8 @@ public class LoginTest {
         Activator.setTestStores(userStore, accessControlStore);
         // enables shiro to find classes from com.sap.sse.security
         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-        securityService = new SecurityServiceImpl(/* mailServiceTracker */ null, userStore, accessControlStore,
-                SecuredSecurityTypes::getAllInstances, SSESubscriptionPlan::getAllInstances);
+        securityService = new SecurityServiceImpl(/* mailServiceTracker */ null, /* corsFilterConfigurationTracker */ null, userStore,
+                accessControlStore, SecuredSecurityTypes::getAllInstances, SSESubscriptionPlan::getAllInstances);
         Activator.setSecurityService(securityService);
     }
 
@@ -91,7 +92,7 @@ public class LoginTest {
         final String username = "TheNewUser";
         final String specialUserGroupName1 = "TheSpecialUserGroup1";
         final String specialUserGroupName2 = "TheSpecialUserGroup2";
-        final User user = securityService.createSimpleUser(username, "u@a.b", "Humba", "The New User", /* company */ null, /* locale */ null, /* validationBaseURL */ null, /* owning group */ null);
+        final User user = securityService.createSimpleUser(username, "u@a.b", "Humba", "The New User", /* company */ null, /* locale */ null, /* validationBaseURL */ null, /* owning group */ null, /* clientIP */ null, /* enforce strong password */ false);
         final TypeRelativeObjectIdentifier myServerTypeRelativeObjectIdentifier = new TypeRelativeObjectIdentifier("myserver");
         final WildcardPermission createObjectPermissionOnMyserver = SecuredSecurityTypes.SERVER.getPermissionForTypeRelativeIdentifier(ServerActions.CREATE_OBJECT,
                 myServerTypeRelativeObjectIdentifier);
@@ -122,7 +123,7 @@ public class LoginTest {
         final String username = "TheNewUser";
         final String specialUserGroupName1 = "TheSpecialUserGroup1";
         final String specialUserGroupName2 = "TheSpecialUserGroup2";
-        final User user = securityService.createSimpleUser(username, "u@a.b", "Humba", "The New User", /* company */ null, /* locale */ null, /* validationBaseURL */ null, /* owning group */ null);
+        final User user = securityService.createSimpleUser(username, "u@a.b", "Humba", "The New User", /* company */ null, /* locale */ null, /* validationBaseURL */ null, /* owning group */ null, /* clientIP */ null, /* enforce strong password */ false);
         final UserGroup defaultUserGroup = securityService.getUserGroupByName(username+SecurityService.TENANT_SUFFIX);
         final UserGroup specialUserGroup1 = securityService.createUserGroup(UUID.randomUUID(), specialUserGroupName1);
         final UserGroup specialUserGroup2 = securityService.createUserGroup(UUID.randomUUID(), specialUserGroupName2);
@@ -140,7 +141,7 @@ public class LoginTest {
     public void testAclAnonUserGroup() throws UserManagementException, MailException, UserGroupManagementException {
         final String username = "TheNewUser";
         securityService.createSimpleUser(username, "u@a.b", "Humba", username, /* company */ null,
-                /* locale */ null, /* validationBaseURL */ null, /* owning group */ null);
+                /* locale */ null, /* validationBaseURL */ null, /* owning group */ null, /* clientIP */ null, /* enforce strong password */ false);
         final UserGroup defaultUserGroup = securityService.getUserGroupByName(username + SecurityService.TENANT_SUFFIX);
         Map<UserGroup, Set<String>> permissionMap = new HashMap<>();
         permissionMap.put(defaultUserGroup, new HashSet<>(Arrays.asList(new String[] { "!READ", "UPDATE" })));
@@ -179,7 +180,7 @@ public class LoginTest {
         final RoleDefinition adminRoleDefinition = securityService.getOrCreateRoleDefinitionFromPrototype(AdminRole.getInstance(), /* makeReadableForAll */ true);
         final UserGroup adminTenant = securityService.getUserGroupByName(admin.getName()+SecurityService.TENANT_SUFFIX);
         securityService.createSimpleUser(username, "u@a.b", password, username, /* company */ null,
-                /* locale */ null, /* validationBaseURL */ null, /* owning group */ null);
+                /* locale */ null, /* validationBaseURL */ null, /* owning group */ null, /* clientIP */ null, /* enforce strong password */ false);
         final UserGroup defaultUserGroup = securityService.getUserGroupByName(username + SecurityService.TENANT_SUFFIX);
         final QualifiedObjectIdentifier myId = my.getIdentifier();
         // grant admin role to user unqualified, implying READ on all objects including the "my" SERVER
@@ -221,7 +222,7 @@ public class LoginTest {
     
     @Test
     public void testGetUser() {
-        assertNotNull("Subject should not be null: ", SecurityUtils.getSubject());
+        assertNotNull(SecurityUtils.getSubject(), "Subject should not be null: ");
     }
     
     @Test
@@ -241,7 +242,7 @@ public class LoginTest {
 
     @Test
     public void rolesTest() throws UserStoreManagementException {
-        userStore.createUser("me", "me@sap.com");
+        userStore.createUser("me", "me@sap.com", new LockingAndBanningImpl());
         RoleDefinition testRoleDefinition = userStore.createRoleDefinition(UUID.randomUUID(), "testRole",
                 Collections.emptySet());
         final Role testRole = new Role(testRoleDefinition, true);
@@ -253,7 +254,7 @@ public class LoginTest {
     @Test
     public void roleWithQualifiersTest() throws UserStoreManagementException {
         UserGroupImpl userDefaultTenant = userStore.createUserGroup(UUID.randomUUID(), "me-tenant");
-        User meUser = userStore.createUser("me", "me@sap.com");
+        User meUser = userStore.createUser("me", "me@sap.com", new LockingAndBanningImpl());
         RoleDefinition testRoleDefinition = userStore.createRoleDefinition(UUID.randomUUID(), "testRole",
                 Collections.emptySet());
         final Role testRole = new Role(testRoleDefinition, userDefaultTenant, meUser, true);
@@ -267,7 +268,7 @@ public class LoginTest {
 
     @Test
     public void permissionsTest() throws UserStoreManagementException {
-        userStore.createUser("me", "me@sap.com");
+        userStore.createUser("me", "me@sap.com", new LockingAndBanningImpl());
         userStore.addPermissionForUser("me", new WildcardPermission("a:b:c"));
         UserStoreImpl store2 = createAndLoadUserStore();
         User allUser = userStore.getUserByName(SecurityService.ALL_USERNAME);

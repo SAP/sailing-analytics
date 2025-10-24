@@ -32,8 +32,12 @@ public class GpsQualitySatCount extends Fix {
     private final int satCount;
     
     public GpsQualitySatCount(TimePoint timePoint, Sensor sensor, Map<Integer, Object> valuesPerSubindex) {
+        this(timePoint, sensor, ((Number) valuesPerSubindex.get(1)).intValue());
+    }
+
+    public GpsQualitySatCount(TimePoint timePoint, Sensor sensor, int satCount) {
         super(sensor, timePoint);
-        satCount = ((Number) valuesPerSubindex.get(1)).intValue();
+        this.satCount = satCount;
     }
 
     public int getSatCount() {

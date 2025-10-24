@@ -1,11 +1,3 @@
-/*
-    InfoPlist.strings
-    SAPTracker
-  
-    Created by Raimund Wege on 04.11.16.
-    Copyright © 2016 com.sap.sailing. All rights reserved.
-*/
-
 "NSLocationAlwaysUsageDescription" = "In order to track your entire race your phone needs to continue tracking also when you switch off or lock the screen which helps save battery and avoids unintentionally stopping the tracking process.";
 "NSLocationWhenInUseUsageDescription" = "In order to track your entire race your phone needs to continue tracking also when you switch off or lock the screen which helps save battery and avoids unintentionally stopping the tracking process.";
 "NSLocationAlwaysAndWhenInUseUsageDescription" = "In order to track your entire race your phone needs to continue tracking also when you switch off or lock the screen which helps save battery and avoids unintentionally stopping the tracking process.";

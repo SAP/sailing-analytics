@@ -1,4 +1,3 @@
-/* InfoPlist.strings\n    SAPTracker\n  \n    Created by Raimund Wege on 04.11.16.\n    Copyright © 2016 com.sap.sailing. All rights reserved. */
 "NSLocationAlwaysUsageDescription" = "レース全体を追跡するには、画面のオフ時またはロック時にも電話で追跡が続行される必要があり、これは電池の節約や追跡プロセスの意図しない停止の回避に役立ちます。";
 
 "NSLocationWhenInUseUsageDescription" = "レース全体を追跡するには、画面のオフ時またはロック時にも電話で追跡が続行される必要があり、これは電池の節約や追跡プロセスの意図しない停止の回避に役立ちます。";

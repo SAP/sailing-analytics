@@ -11,21 +11,22 @@ import com.sap.sailing.domain.tracking.DynamicTrackedRace;
 import com.sap.sailing.domain.tracking.DynamicTrackedRegatta;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.domain.tractracadapter.DomainFactory;
-import com.tractrac.model.lib.api.data.IPosition;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Triple;
+import com.tractrac.model.lib.api.data.IPosition;
 import com.tractrac.model.lib.api.event.IEvent;
 import com.tractrac.model.lib.api.event.IRace;
-import com.tractrac.model.lib.api.route.IControl;
+import com.tractrac.model.lib.api.map.IMapItem;
+import com.tractrac.model.lib.api.map.IPositionedItem;
 import com.tractrac.subscription.lib.api.IEventSubscriber;
 import com.tractrac.subscription.lib.api.IRaceSubscriber;
-import com.tractrac.subscription.lib.api.control.IControlPointPositionListener;
+import com.tractrac.subscription.lib.api.map.IPositionedItemPositionListener;
 
 /**
- * The positions of the {@link IControl control points}s of a {@link Course} are received dynamically through a callback interface.
+ * The positions of the {@link IMapItem control points}s of a {@link Course} are received dynamically through a callback interface.
  * Therefore, when connected to an {@link Regatta}, and even after receiving the order of the marks for a race course,
  * these orders are not yet defined. An instance of this class can be used to create the listeners needed to receive
- * this information and set it on an {@link Regatta}'s {@link IControl control points}.
+ * this information and set it on an {@link Regatta}'s {@link IMapItem control points}.
  * <p>
  * 
  * As a {@link MarkPositionReceiver} requires a tracked race in order to update the mark positions received, and since a
@@ -36,12 +37,12 @@ import com.tractrac.subscription.lib.api.control.IControlPointPositionListener;
  * @author Axel Uhl (d043530)
  * 
  */
-public class MarkPositionReceiver extends AbstractReceiverWithQueue<IControl, IPosition, Integer> {
+public class MarkPositionReceiver extends AbstractReceiverWithQueue<IPositionedItem, IPosition, Void> {
     private static final Logger logger = Logger.getLogger(MarkPositionReceiver.class.getName());
     
     private int received;
     private final IRace tractracRace;
-    final IControlPointPositionListener listener;
+    final IPositionedItemPositionListener listener;
 
     /**
      * In order to establish single marks by their native names in case they are also
@@ -61,27 +62,27 @@ public class MarkPositionReceiver extends AbstractReceiverWithQueue<IControl, IP
         if (tractracEvent.getRaces().isEmpty()) {
             throw new IllegalArgumentException("Can't receive mark positions from event "+tractracEvent.getName()+" that has no race");
         }
-        listener = new IControlPointPositionListener() {
+        listener = new IPositionedItemPositionListener() {
             @Override
-            public void gotControlPointPosition(IControl controlPoint, IPosition position, int arg2) {
-                enqueue(new Triple<IControl, IPosition, Integer>(controlPoint, position, arg2));
+            public void gotPositionedItemPosition(IPositionedItem mark, IPosition position) {
+                enqueue(new Triple<IPositionedItem, IPosition, Void>(mark, position, null));
             }
         };
     }
     
     @Override
     public void subscribe() {
-        getRaceSubscriber().subscribeControlPositions(listener);
+        getRaceSubscriber().subscribePositionedItemPositions(listener);
         startThread();
     }
     
     @Override
     protected void unsubscribe() {
-        getRaceSubscriber().unsubscribeControlPositions(listener);
+        getRaceSubscriber().unsubscribePositionedItemPositions(listener);
     }
 
     @Override
-    protected void handleEvent(Util.Triple<IControl, IPosition, Integer> event) {
+    protected void handleEvent(Util.Triple<IPositionedItem, IPosition, Void> event) {
         /* bug 5919 (https://bugzilla.sapsailing.com/bugzilla/show_bug.cgi?id=5919)
          * 
          * TracTrac has re-keyed all mark IDs from old events.
@@ -107,7 +108,7 @@ public class MarkPositionReceiver extends AbstractReceiverWithQueue<IControl, IP
                 singleMarksEnsuredAlready = true;
                 ensureAllSingleMarksOfCourseAreaAreCreated(tractracRace);
             }
-            Mark mark = getDomainFactory().getMark(new ControlPointAdapter(event.getA()), event.getC());
+            Mark mark = getDomainFactory().getMark(event.getA());
             DynamicTrackedRace trackedRace = getTrackedRace(tractracRace);
             if (trackedRace != null) {
                 GPSFixMoving markPosition = getDomainFactory().createGPSFixMoving(event.getB());

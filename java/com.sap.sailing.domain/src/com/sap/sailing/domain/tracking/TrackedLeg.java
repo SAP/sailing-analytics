@@ -81,6 +81,19 @@ public interface TrackedLeg extends Serializable {
     Distance getSignedCrossTrackError(Position p, TimePoint timePoint);
 
     /**
+     * Returns the (unsigned) distance of <code>p</code> to this leg's wind axis attached to the leg's end
+     * waypoint at <code>timePoint</code>.
+     */
+    Distance getUnsignedCrossTrackErrorToWindAxis(Position p, TimePoint timePoint);
+
+    /**
+     * Returns the (unsigned) distance of <code>p</code> to this leg's wind axis attached to the leg's end
+     * waypoint at <code>timePoint</code>. Negative distances mean "left" of the
+     * wind axis, looking in the direction of the leg, positive distances mean "right."
+     */
+    Distance getSignedCrossTrackErrorToWindAxis(Position p, TimePoint timePoint);
+
+    /**
      * Must be called when the start and finish waypoint of this leg may have changed.
      */
     void waypointsMayHaveChanges();

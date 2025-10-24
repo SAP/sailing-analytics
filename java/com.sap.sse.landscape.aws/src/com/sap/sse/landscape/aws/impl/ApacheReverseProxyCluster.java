@@ -80,7 +80,7 @@ public class ApacheReverseProxyCluster<ShardingKey, MetricsT extends Application
                         .and(LandscapeConstants.REVERSE_PROXY_TAG_NAME, "")),
                 "");
         addHost(host);
-        Wait.wait(() -> host.getInstance().state().name().equals(InstanceStateName.RUNNING),
+        Wait.wait(() -> host.getInstance().state().name().equals(InstanceStateName.RUNNING), (result) -> result, true,
                 Optional.of(Duration.ofSeconds(60 * 7)), Duration.ofSeconds(30), Level.INFO,
                 "Is instance in the running state check");
         for (TargetGroup<ShardingKey> targetGroup : getLandscape().getTargetGroups(az.getRegion())) {

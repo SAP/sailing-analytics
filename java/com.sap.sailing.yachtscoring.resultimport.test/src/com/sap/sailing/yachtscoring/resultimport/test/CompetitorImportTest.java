@@ -1,8 +1,8 @@
 package com.sap.sailing.yachtscoring.resultimport.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -12,8 +12,10 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
 
 import com.sap.sailing.domain.common.CompetitorDescriptor;
 import com.sap.sailing.resultimport.ResultUrlRegistry;
@@ -24,7 +26,7 @@ import com.sap.sse.common.Util;
 
 public class CompetitorImportTest extends AbstractCharlstonRaceWeek2015Test {
     @Test
-    public void simpleCompetitorImportTest() throws FileNotFoundException, IOException, JAXBException, URISyntaxException {
+    public void simpleCompetitorImportTest() throws FileNotFoundException, IOException, JAXBException, URISyntaxException, SAXException, ParserConfigurationException {
         ResultUrlRegistry resultUrlRegistry = mock(ResultUrlRegistry.class);
         when(resultUrlRegistry.getReadableResultUrls(AbstractYachtScoringProvider.NAME)).thenReturn(Arrays.asList(getClass().getClassLoader().getResource(CHARLSTONRACEWEEK2015_TESTFILE_XRR)));
         final YachtScoringCompetitorProvider competitorProvider = new YachtScoringCompetitorProvider(ParserFactory.INSTANCE, resultUrlRegistry, getTestDocumentProvider());

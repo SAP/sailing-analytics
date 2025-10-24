@@ -1,11 +1,11 @@
 package com.sap.sse.security.jaxrs.api;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -20,8 +20,8 @@ import org.apache.shiro.subject.Subject;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.media.MediaTrack;
 import com.sap.sse.common.mail.MailException;
@@ -55,7 +55,7 @@ public class SecurityResourceTest {
     private UserStore store;
     private AccessControlStore accessControlStore;
 
-    @Before
+    @BeforeEach
     public void setUp() throws UserManagementException, MailException, UserGroupManagementException {
         PersistenceFactory.INSTANCE.getDefaultMongoObjectFactory().getDatabase().drop();
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
@@ -66,21 +66,21 @@ public class SecurityResourceTest {
             store.ensureServerGroupExists();
             accessControlStore = new AccessControlStoreImpl(store);
             Activator.setTestStores(store, accessControlStore);
-            service = new SecurityServiceImpl(/* mailServiceTracker */ null, store, accessControlStore,
-                    /* hasPermissionsProvider */SecuredSecurityTypes::getAllInstances,
-                    SSESubscriptionPlan::getAllInstances);
+            service = new SecurityServiceImpl(/* mailServiceTracker */ null, /* corsFilterConfigurationTracker */ null, store,
+                    accessControlStore,
+                    /* hasPermissionsProvider */SecuredSecurityTypes::getAllInstances, SSESubscriptionPlan::getAllInstances);
             service.initialize();
             Activator.setSecurityService(service);
             SecurityUtils.setSecurityManager(service.getSecurityManager());
             service.createSimpleUser(USERNAME, "a@b.c", PASSWORD, "The User", "SAP SE",
-                    /* validation URL */ Locale.ENGLISH, null, null);
+                    /* validation URL */ Locale.ENGLISH, null, null, /* clientIP */ null, /* enforce strong password */ false);
             authenticatedAdmin = SecurityUtils.getSubject();
             authenticatedAdmin.login(new UsernamePasswordToken(USERNAME, PASSWORD));
             Session session = authenticatedAdmin.getSession();
             assertNotNull(session);
             servlet = new SecurityResource() {
                 @Override
-                public SecurityService getService() {
+                public SecurityService getSecurityService() {
                     return service;
                 }
             };
@@ -90,6 +90,15 @@ public class SecurityResourceTest {
         } finally {
             Thread.currentThread().setContextClassLoader(oldContextClassLoader);
         }
+    }
+    
+    @Test
+    public void testNullClientIP() {
+        assertFalse(service.isClientIPLockedForBearerTokenAuthentication(null)); // ensure there is no exception being thrown
+        service.failedBearerTokenAuthentication(null);
+        assertTrue(service.isClientIPLockedForBearerTokenAuthentication(null));
+        service.successfulBearerTokenAuthentication(null);
+        assertFalse(service.isClientIPLockedForBearerTokenAuthentication(null));
     }
     
     @Test
@@ -269,7 +278,7 @@ public class SecurityResourceTest {
         assertNotNull(user);
         assertEquals(USERNAME, user.getName());
         final Subject subject = SecurityUtils.getSubject();
-        subject.login(new BearerAuthenticationToken(accessToken));
+        subject.login(new BearerAuthenticationToken(accessToken, /* clientIP */ null, /* userAgent */ null));
         assertTrue(subject.isAuthenticated());
         assertEquals(USERNAME, subject.getPrincipal());
         assertTrue(subject.isPermitted("can do"));

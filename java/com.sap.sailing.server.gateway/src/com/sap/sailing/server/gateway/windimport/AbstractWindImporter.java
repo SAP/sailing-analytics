@@ -138,7 +138,7 @@ public abstract class AbstractWindImporter {
     }
 
     public void importWindForUploadRequest(RacingEventService service, WindImportResult windImportResult, UploadRequest uploadRequest)
-            throws IOException, InterruptedException, FormatNotSupportedException {
+            throws Exception {
         WindSource windSource = getDefaultWindSource(uploadRequest);
         List<DynamicTrackedRace> trackedRaces = new ArrayList<DynamicTrackedRace>();
         if (uploadRequest.races.size() > 0) {
@@ -175,7 +175,7 @@ public abstract class AbstractWindImporter {
      */
     public void importWindToWindSourceAndTrackedRaces(RacingEventService service, WindImportResult windImportResult, WindSource defaultWindSource,
             List<DynamicTrackedRace> trackedRaces, final Map<InputStream, Pair<String, Charset>> streamsWithFilenamesAndCharsets)
-            throws IOException, InterruptedException, FormatNotSupportedException {
+            throws Exception {
         Map<WindSource, Iterable<Wind>> windFixes = importWind(defaultWindSource, streamsWithFilenamesAndCharsets);
         for (final Entry<WindSource, Iterable<Wind>> windForSource : windFixes.entrySet()) {
             if (!Util.isEmpty(windForSource.getValue())) {
@@ -208,7 +208,7 @@ public abstract class AbstractWindImporter {
      */
     protected abstract Map<WindSource, Iterable<Wind>> importWind(WindSource defaultWindSource,
             Map<InputStream, Pair<String, Charset>> streamsWithFilenamesAndCharsets)
-            throws IOException, InterruptedException, FormatNotSupportedException;
+            throws IOException, InterruptedException, FormatNotSupportedException, Exception;
 
     protected abstract WindSource getDefaultWindSource(UploadRequest uploadRequest);
 }

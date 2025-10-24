@@ -140,6 +140,7 @@ import com.sap.sse.security.ui.authentication.view.FlyoutAuthenticationView;
 import com.sap.sse.security.ui.client.UserService;
 import com.sap.sse.security.ui.client.WithSecurity;
 import com.sap.sse.security.ui.client.premium.PaywallResolver;
+import com.sap.sse.security.ui.client.premium.PaywallResolverImpl;
 
 /**
  * A view showing a list of components visualizing a race from the regattas announced by calls to {@link #fillRegattas(List)}.
@@ -308,7 +309,7 @@ public class RaceBoardPanel
         final CompetitorColorProvider colorProvider = new CompetitorColorProviderImpl(selectedRaceIdentifier, competitorsAndTheirBoats);
         competitorSelectionProvider = new RaceCompetitorSelectionModel(/* hasMultiSelection */ true, colorProvider, competitorsAndTheirBoats);
         raceMapResources.raceMapStyle().ensureInjected();
-        final PaywallResolver paywallResolverRace = new PaywallResolver(withSecurity.getUserService(), withSecurity.getSubscriptionServiceFactory());
+        final PaywallResolver paywallResolverRace = new PaywallResolverImpl(withSecurity.getUserService(), withSecurity.getSubscriptionServiceFactory());
         RaceMapLifecycle raceMapLifecycle = new RaceMapLifecycle(stringMessages, paywallResolverRace, raceDTO);
         RaceMapSettings defaultRaceMapSettings = settings.findSettingsByComponentId(raceMapLifecycle.getComponentId());
         RaceTimePanelLifecycle raceTimePanelLifecycle = lifecycle.getRaceTimePanelLifecycle();
@@ -356,8 +357,12 @@ public class RaceBoardPanel
                 public void onSuccess(RegattaDTO regattaDTO) {
                     Distance buoyZoneRadius = regattaDTO.getCalculatedBuoyZoneRadius();
                     RaceMapSettings existingMapSettings = raceMap.getSettings();
-                    if (!Util.equalsWithNull(buoyZoneRadius, existingMapSettings.getBuoyZoneRadius())) {
-                        final RaceMapSettings newRaceMapSettings = RaceMapSettings.createSettingsWithNewBuoyZoneRadius(existingMapSettings, buoyZoneRadius);
+                    if (existingMapSettings.isBuoyZoneRadiusDefaultValue()
+                            && !Util.equalsWithNull(buoyZoneRadius, existingMapSettings.getBuoyZoneRadius())) {
+                        final RaceMapSettings newRaceMapSettings = new RaceMapSettings.RaceMapSettingsBuilder(
+                                existingMapSettings, regattaDTO, paywallResolverRace)
+                                .withBuoyZoneRadius(buoyZoneRadius)
+                                .build();
                         raceMap.updateSettings(newRaceMapSettings);
                     }
                 }
@@ -402,7 +407,7 @@ public class RaceBoardPanel
             }
         }
         taggingComponent = new TaggingComponent(parent, componentContext, stringMessages, sailingService, withSecurity.getUserService(), timer,
-                raceTimesInfoProvider, sharedTagTimePoint, sharedTagTitle, leaderboardDTO, sailingServiceWrite);
+                raceTimesInfoProvider, sharedTagTimePoint, sharedTagTitle, leaderboardDTO, sailingServiceWrite, selectedRaceIdentifier);
         addChildComponent(taggingComponent);
         taggingComponent.setVisible(showTaggingComponent);
         // Determine if the screen is large enough to initially display the leaderboard panel on the left side of the
@@ -448,7 +453,7 @@ public class RaceBoardPanel
         addChildComponent(racetimePanel);
         final Long zoomStartMillis = parsedPerspectiveOwnSettings.getZoomStart();
         final Long zoomEndMillis = parsedPerspectiveOwnSettings.getZoomEnd();
-        if(isScreenLargeEnoughToInitiallyDisplayLeaderboard && zoomStartMillis != null && zoomEndMillis != null) {
+        if (isScreenLargeEnoughToInitiallyDisplayLeaderboard && zoomStartMillis != null && zoomEndMillis != null) {
             final Date zoomStart = new Date(zoomStartMillis);
             final Date zoomEnd = new Date(zoomEndMillis);
             Scheduler.get().scheduleDeferred(new Command() {
@@ -545,7 +550,7 @@ public class RaceBoardPanel
         mediaPlayerManagerComponent = new MediaPlayerManagerComponent(this, getComponentContext(), mediaPlayerLifecycle,
                 sailingServiceWrite, selectedRaceIdentifier, raceTimesInfoProvider, timer, mediaService,
                 mediaServiceWrite, userService, stringMessages, errorReporter, userAgent, this, mediaPlayerSettings,
-                raceDTO);
+                raceDTO, leaderboardGroupName, event);
         final LeaderboardWithSecurityFetcher asyncFetcher = new LeaderboardWithSecurityFetcher() {
             @Override
             public void getLeaderboardWithSecurity(Consumer<StrippedLeaderboardDTO> consumer) {
@@ -839,7 +844,7 @@ public class RaceBoardPanel
             final FlowPanel helpButtonAndRaceTimePanel = new FlowPanel();
             helpButtonAndRaceTimePanel.setStyleName("Help-And-RaceTime");
             final HelpButton helpButton = new HelpButton(HelpButtonResources.INSTANCE,
-                    stringMessages.videoGuide(), "https://support.sapsailing.com/hc/en-us/articles/7275243525148-Tracking-Race-Player-Overview");
+                    stringMessages.videoGuide(), "https://wiki.sapsailing.com/wiki/howto/tutorials/sailinganalytics/tracking-race-player.md");
             if (!DeviceDetector.isMobile()) {
                 helpButtonAndRaceTimePanel.add(helpButton);
             }

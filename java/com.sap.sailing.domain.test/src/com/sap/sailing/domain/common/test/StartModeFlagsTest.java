@@ -2,7 +2,7 @@ package com.sap.sailing.domain.common.test;
 
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.racelog.Flags;
 

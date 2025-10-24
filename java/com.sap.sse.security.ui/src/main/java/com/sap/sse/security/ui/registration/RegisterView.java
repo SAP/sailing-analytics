@@ -1,5 +1,7 @@
 package com.sap.sse.security.ui.registration;
 
+import static com.sap.sse.security.shared.UserManagementException.USER_ALREADY_EXISTS;
+
 import java.util.HashMap;
 
 import com.google.gwt.core.client.GWT;
@@ -17,6 +19,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+import com.sap.sse.common.Util;
 import com.sap.sse.gwt.client.Notification;
 import com.sap.sse.gwt.client.Notification.NotificationType;
 import com.sap.sse.gwt.client.controls.PasswordTextBoxWithWatermark;
@@ -91,27 +94,32 @@ public class RegisterView extends Composite {
                 /* fullName */ null, /* company */ null, LocaleInfo.getCurrentLocale().getLocaleName(),
                 EntryPointLinkFactory.createEmailValidationLink(new HashMap<String, String>()),
                 new AsyncCallback<UserDTO>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                if (caught instanceof UserManagementException) {
-                    String message = ((UserManagementException) caught).getMessage();
-                    if (UserManagementException.USER_ALREADY_EXISTS.equals(message)) {
-                        Notification.notify(stringMessages.userAlreadyExists(usernameTextBox.getText()), NotificationType.ERROR);
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        final String message = caught.getMessage();
+                                if (caught instanceof UserManagementException) {
+                                    if (Util.hasLength(message) && message.equals(USER_ALREADY_EXISTS)) {
+                                        Notification.notify(stringMessages.userAlreadyExists(usernameTextBox.getText()), NotificationType.ERROR);
+                                    } else if (Util.hasLength(message) && message.equals(UserManagementException.CLIENT_CURRENTLY_LOCKED_FOR_USER_CREATION)) {
+                                        Notification.notify(stringMessages.clientCurrentlyLockedForUserCreation(), NotificationType.ERROR);
+                                    } else {
+                                        Notification.notify(stringMessages.errorCreatingUser(usernameTextBox.getText(),
+                                                message == null ? "" : message), NotificationType.ERROR);
+                                    }
+                                } else {
+                                    Notification.notify(stringMessages.errorCreatingUser(usernameTextBox.getText(), message), NotificationType.ERROR);
+                                }
+                            }
+    
+                    @Override
+                    public void onSuccess(UserDTO result) {
+                        if (result != null) {
+                            Notification.notify(stringMessages.signedUpSuccessfully(result.getName()), NotificationType.SUCCESS);
+                            closeWindow();
+                        } else {
+                            Notification.notify(stringMessages.unknownErrorCreatingUser(usernameTextBox.getText()), NotificationType.ERROR);
+                        }
                     }
-                } else {
-                    Notification.notify(stringMessages.errorCreatingUser(usernameTextBox.getText(), caught.getMessage()), NotificationType.ERROR);
-                }
-            }
-
-            @Override
-            public void onSuccess(UserDTO result) {
-                if (result != null) {
-                    Notification.notify(stringMessages.signedUpSuccessfully(result.getName()), NotificationType.SUCCESS);
-                    closeWindow();
-                } else {
-                    Notification.notify(stringMessages.unknownErrorCreatingUser(usernameTextBox.getText()), NotificationType.ERROR);
-                }
-            }
         });
     }
     

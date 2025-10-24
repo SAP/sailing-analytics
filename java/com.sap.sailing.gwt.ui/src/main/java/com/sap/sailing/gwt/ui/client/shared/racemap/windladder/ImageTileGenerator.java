@@ -1,5 +1,7 @@
 package com.sap.sailing.gwt.ui.client.shared.racemap.windladder;
 
+import java.util.logging.Logger;
+
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.dom.client.CanvasElement;
@@ -11,10 +13,12 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.RootPanel;
 
 public class ImageTileGenerator implements WindLadderTileGenerator {
+    private static final Logger logger = Logger.getLogger(ImageTileGenerator.class.getName());
+
     protected final Canvas canvas;
     protected boolean isReady = false;
 
-    public ImageTileGenerator(ImageResource resource) {
+    public ImageTileGenerator(ImageResource resource, Runnable runWhenReady) {
         canvas = Canvas.createIfSupported();
         if (canvas != null) {
             Image image = new Image(resource);
@@ -27,6 +31,10 @@ public class ImageTileGenerator implements WindLadderTileGenerator {
                     ctx.drawImage(ImageElement.as(image.getElement()), 0, 0);
                     RootPanel.get().remove(image);
                     isReady = true;
+                    logger.info("Wind ladder image loaded successfully");
+                    if (runWhenReady != null) {
+                        runWhenReady.run();
+                    }
                 }
             });
             image.setVisible(false);

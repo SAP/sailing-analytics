@@ -3,6 +3,7 @@ package com.sap.sse.gwt.dispatch.shared.commands;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.impl.MillisecondsDurationImpl;
 import com.sap.sse.gwt.dispatch.shared.caching.HasClientCacheTotalTimeToLive;
+import com.sap.sse.gwt.shared.DTO;
 
 /**
  * Result implementation that holds a {@link DTO} with a defined time to live expiration.

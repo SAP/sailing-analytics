@@ -1,15 +1,15 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.PositionWithConfidence;
 import com.sap.sailing.domain.base.impl.PositionWithConfidenceImpl;
@@ -352,8 +352,8 @@ public class ConfidenceTest {
         assertEquals(.5, weigher.getConfidence(p, p2), 0.001); // somewhat more tolerant; using quick distance in weigher
         Position p3 = p.translateGreatCircle(new DegreeBearingImpl(123), new NauticalMileDistance(1000));
         final double threshold = 0.001;
-        assertTrue("Expected confidence in 1000nm distance to be less than "+threshold+" but was "+weigher.getConfidence(p, p3),
-                weigher.getConfidence(p, p3) < threshold);
+        assertTrue(weigher.getConfidence(p, p3) < threshold,
+                "Expected confidence in 1000nm distance to be less than "+threshold+" but was "+weigher.getConfidence(p, p3));
     }
     
     @Test

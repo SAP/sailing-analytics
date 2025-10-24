@@ -3,9 +3,12 @@ package com.sap.sailing.domain.abstractlog.impl;
 import com.sap.sailing.domain.abstractlog.AbstractLog;
 import com.sap.sailing.domain.abstractlog.AbstractLogEvent;
 import com.sap.sailing.domain.abstractlog.BaseLogAnalyzer;
+import com.sap.sailing.domain.abstractlog.race.RaceLog;
 
 /**
- * Finds the most recent event in the log which is an {@code instanceof} {@link #ofType}.
+ * Finds the most recent {@link RaceLog#getUnrevokedEventsDescending() valid unrevoked event} in the log which is an
+ * {@code instanceof} {@link #ofType}.
+ * 
  * @author Fredrik Teschke
  *
  */
@@ -22,13 +25,12 @@ VisitorT> extends BaseLogAnalyzer<LogT, EventT, VisitorT, EventT> {
 
     @Override
     protected EventT performAnalysis() {
-        Iterable<EventT> set = onlyUnrevoked ? getLog().getUnrevokedEventsDescending() : getAllEventsDescending();
-        for (EventT event : set) {
+        final Iterable<EventT> set = onlyUnrevoked ? getLog().getUnrevokedEventsDescending() : getAllEventsDescending();
+        for (final EventT event : set) {
             if (ofType.isAssignableFrom(event.getClass())) {
                 return event;
             }
         }
         return null;
     }
-
 }

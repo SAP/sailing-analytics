@@ -1,6 +1,6 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -15,8 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.Mark;
@@ -45,7 +45,7 @@ public class ManeuverAnalysisIDMChampionsFinalTest extends AbstractManeuverDetec
         super();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         URI storedUri = new URI("file:///"+new File("resources/event_20110929_Internatio-Champions_Cup_Final.mtb").getCanonicalPath().replace('\\', '/'));
@@ -68,10 +68,10 @@ public class ManeuverAnalysisIDMChampionsFinalTest extends AbstractManeuverDetec
         TimePoint epoch = new MillisecondsTimePoint(0l);
         TimePoint now = MillisecondsTimePoint.now();
         Map<String, Position> markPositions = new HashMap<String, Position>();
-        markPositions.put("G2 Start-Finish (1)", new DegreePosition(53.96744, 10.89441));
-        markPositions.put("G2 Start-Finish (2)", new DegreePosition(53.96798, 10.89401));
-        markPositions.put("G2 Mark4 (2)", new DegreePosition(53.96689, 10.89375));
-        markPositions.put("G2 Mark4 (1)", new DegreePosition(53.96718, 10.89339));
+        markPositions.put("G2 Start-Finish - 1", new DegreePosition(53.96744, 10.89441));
+        markPositions.put("G2 Start-Finish - 2", new DegreePosition(53.96798, 10.89401));
+        markPositions.put("G2 Mark4 - 2", new DegreePosition(53.96689, 10.89375));
+        markPositions.put("G2 Mark4 - 1", new DegreePosition(53.96718, 10.89339));
         markPositions.put("G2 Mark1", new DegreePosition(53.96506, 10.88896));
         for (Waypoint w : race.getRace().getCourse().getWaypoints()) {
             for (Mark mark : w.getMarks()) {

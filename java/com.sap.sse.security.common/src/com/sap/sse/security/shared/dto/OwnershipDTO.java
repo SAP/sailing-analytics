@@ -13,5 +13,4 @@ public class OwnershipDTO extends AbstractOwnership<StrippedUserGroupDTO, Stripp
     public OwnershipDTO(StrippedUserDTO userOwner, StrippedUserGroupDTO tenantOwner) {
         super(userOwner, tenantOwner);
     }
-
 }

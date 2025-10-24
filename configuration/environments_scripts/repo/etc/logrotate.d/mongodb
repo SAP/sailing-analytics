@@ -1,0 +1,11 @@
+compress
+delaycompress
+
+/var/log/mongodb/mongod.log
+{
+   rotate 5
+   weekly
+   postrotate
+       /usr/bin/killall -SIGUSR1 mongod
+   endscript
+}

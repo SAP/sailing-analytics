@@ -9,6 +9,7 @@ import com.sap.sailing.gwt.ui.leaderboard.SingleRaceLeaderboardPanel;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.gwt.client.player.Timer.PlayModes;
 import com.sap.sse.gwt.client.player.Timer.PlayStates;
+import com.sap.sse.security.ui.client.SecurityChildSettingsContext;
 import com.sap.sse.security.ui.settings.ComponentContextWithSettingsStorageAndAdditionalSettingsLayers.OnSettingsReloadedCallback;
 
 /**
@@ -52,8 +53,9 @@ public class FullAnalysisMode extends AbstractRaceBoardMode {
         raceDetailsToShow.add(DetailType.RACE_AVERAGE_SPEED_OVER_GROUND_IN_KNOTS);
         raceDetailsToShow.add(DetailType.RACE_DISTANCE_TRAVELED);
         raceDetailsToShow.add(DetailType.RACE_GAP_TO_LEADER_IN_SECONDS);
+        SecurityChildSettingsContext context = new SecurityChildSettingsContext(getLeaderboard(), leaderboardPanel.getPaywallResolver());
         final SingleRaceLeaderboardSettings additiveSettings = SingleRaceLeaderboardSettings
-                .createDefaultSettingsWithRaceDetailValues(raceDetailsToShow);
+                .createDefaultSettingsWithRaceDetailValues(raceDetailsToShow, context);
         ((RaceBoardComponentContext) leaderboardPanel.getComponentContext()).addModesPatching(leaderboardPanel, additiveSettings, new OnSettingsReloadedCallback<SingleRaceLeaderboardSettings>() {
             @Override
             public void onSettingsReloaded(SingleRaceLeaderboardSettings patchedSettings) {

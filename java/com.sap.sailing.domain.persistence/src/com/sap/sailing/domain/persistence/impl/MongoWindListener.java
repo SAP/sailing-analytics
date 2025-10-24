@@ -1,5 +1,8 @@
 package com.sap.sailing.domain.persistence.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bson.Document;
 
 import com.mongodb.WriteConcern;
@@ -29,8 +32,22 @@ public class MongoWindListener implements com.sap.sailing.domain.tracking.WindLi
 
     @Override
     public void windDataReceived(Wind wind) {
-        Document windTrackEntry = mongoObjectFactory.storeWindTrackEntry(trackedRace.getRace(), regattaName, windSource, wind);
+        final Document windTrackEntry = createWindFixDocument(wind);
         windTracksCollection.withWriteConcern(WriteConcern.UNACKNOWLEDGED).insertOne(windTrackEntry);
+    }
+
+    private Document createWindFixDocument(Wind wind) {
+        final Document windTrackEntry = mongoObjectFactory.storeWindTrackEntry(trackedRace.getRace(), regattaName, windSource, wind);
+        return windTrackEntry;
+    }
+
+    @Override
+    public void windDataReceived(Iterable<Wind> winds) {
+        final List<Document> windTrackEntries = new ArrayList<>();
+        for (final Wind wind : winds) {
+            windTrackEntries.add(createWindFixDocument(wind));
+        }
+        windTracksCollection.withWriteConcern(WriteConcern.UNACKNOWLEDGED).insertMany(windTrackEntries);
     }
 
     @Override

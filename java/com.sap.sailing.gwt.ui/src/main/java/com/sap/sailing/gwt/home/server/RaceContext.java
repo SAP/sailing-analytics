@@ -65,7 +65,7 @@ import com.sap.sse.common.TimeRange;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.common.media.MediaType;
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
+import com.sap.sse.gwt.shared.DTO;
 import com.sap.sse.security.ui.server.SecurityDTOUtil;
 
 /**
@@ -121,11 +121,27 @@ public class RaceContext {
     }
 
     public String getRegattaName() {
-        if (leaderboard instanceof RegattaLeaderboard) {
-            Regatta regatta = ((RegattaLeaderboard) leaderboard).getRegatta();
-            return regatta.getName();
+        final String result;
+        final Regatta regatta = getRegatta();
+        if (regatta != null) {
+            result = regatta.getName();
+        } else {
+            result = leaderboard.getName();
         }
-        return leaderboard.getName();
+        return result;
+    }
+    
+    /**
+     * Returns {@code null} if the {@link #leaderboard};s type does not conform to {@link RegattaLeaderboard}
+     */
+    public Regatta getRegatta() {
+        final Regatta result;
+        if (leaderboard instanceof RegattaLeaderboard) {
+            result = ((RegattaLeaderboard) leaderboard).getRegatta();
+        } else {
+            result = null;
+        }
+        return result;
     }
 
     private String getRegattaDisplayName() {
@@ -402,7 +418,7 @@ public class RaceContext {
         return 0;
     }
 
-    private TimePoint getLiveTimePoint() {
+    TimePoint getLiveTimePoint() {
         final TimePoint liveTimePoint;
         if (trackedRace != null) {
             liveTimePoint = MillisecondsTimePoint.now().minus(
@@ -569,7 +585,8 @@ public class RaceContext {
             }
         }
         ScoreCorrection scoreCorrection = leaderboard.getScoreCorrection();
-        if (trackedRace == null && scoreCorrection != null && scoreCorrection.hasCorrectionForNonTrackedFleet(raceColumn)) {
+        // bug6168: for split fleets we need to check the fleet too
+        if (trackedRace == null && scoreCorrection != null && scoreCorrection.hasCorrectionForNonTrackedFleet(raceColumn, fleet)) {
             return RaceViewState.FINISHED;
         }
         if (startTime != null) {

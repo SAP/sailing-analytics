@@ -25,7 +25,6 @@ import com.sap.sse.common.TypeBasedServiceFinderFactory;
  *
  */
 public abstract class RacingEventServiceImplMock extends RacingEventServiceImpl {
-
     private DataImportLockWithProgress lock;
 
     public RacingEventServiceImplMock() {

@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class EclipseNeonConstructorReferenceSerializationTest {
     

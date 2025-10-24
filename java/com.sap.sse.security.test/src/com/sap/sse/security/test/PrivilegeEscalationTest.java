@@ -1,15 +1,15 @@
 package com.sap.sse.security.test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.security.SecurityService;
 import com.sap.sse.security.impl.SecurityServiceImpl;
@@ -26,6 +26,7 @@ import com.sap.sse.security.shared.UserStoreManagementException;
 import com.sap.sse.security.shared.WildcardPermission;
 import com.sap.sse.security.shared.impl.AccessControlList;
 import com.sap.sse.security.shared.impl.HasPermissionsImpl;
+import com.sap.sse.security.shared.impl.LockingAndBanningImpl;
 import com.sap.sse.security.shared.impl.Ownership;
 import com.sap.sse.security.shared.impl.Role;
 import com.sap.sse.security.shared.impl.SecuredSecurityTypes;
@@ -58,21 +59,21 @@ public class PrivilegeEscalationTest {
     private SecurityService securityService;
     private RoleDefinition rd;
 
-    @Before
+    @BeforeEach
     public void setup() throws UserStoreManagementException {
         userStore = new UserStoreImpl(PersistenceFactory.INSTANCE.getDefaultDomainObjectFactory(),
                 PersistenceFactory.INSTANCE.getDefaultMongoObjectFactory(), TEST_DEFAULT_TENANT);
         userStore.ensureDefaultRolesExist();
         userStore.loadAndMigrateUsers();
-        user = userStore.createUser(USER_USERNAME, null);
-        user2 = userStore.createUser(USER2_USERNAME, null);
+        user = userStore.createUser(USER_USERNAME, null, new LockingAndBanningImpl());
+        user2 = userStore.createUser(USER2_USERNAME, null, new LockingAndBanningImpl());
         userGroup = userStore.createUserGroup(USER_GROUP_UUID, USER_USERNAME+"-tenant");
         userGroup.add(user);
         userGroup.add(user2);
         userStore.updateUserGroup(userGroup);
         accessControlStore = new AccessControlStoreImpl(userStore);
-        securityService = new SecurityServiceImpl(null, userStore, accessControlStore,
-                SecuredSecurityTypes::getAllInstances, SSESubscriptionPlan::getAllInstances);
+        securityService = new SecurityServiceImpl(null, /* corsFilterConfigurationTracker */ null, userStore,
+                accessControlStore, SecuredSecurityTypes::getAllInstances, SSESubscriptionPlan::getAllInstances);
         securityService.initialize();
         rd = new RoleDefinitionImpl(UUID.randomUUID(), "some_role",
                 Collections.singleton(type1.getPermission(DefaultActions.READ, DefaultActions.UPDATE)));
@@ -107,7 +108,7 @@ public class PrivilegeEscalationTest {
                 new Ownership(null, null), noopAclResolver));
     }
 
-    @After
+    @AfterEach
     public void cleanup() {
         userStore.clear();
         accessControlStore.clear();

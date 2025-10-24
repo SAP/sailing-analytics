@@ -20,8 +20,8 @@ public class SubscriptionWebHookServlet extends SailingServerHttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String path = getRequestHandlerPath(request);
-        SubscriptionWebHookHandler handler = SubscriptionWebHookHandlerFactory.getInstance().getHandlerForPath(path,
+        final String path = getRequestHandlerPath(request);
+        final SubscriptionWebHookHandler handler = SubscriptionWebHookHandlerFactory.getInstance().getHandlerForPath(path,
                 this);
         if (handler != null) {
             handler.handle(request, response);
@@ -31,8 +31,8 @@ public class SubscriptionWebHookServlet extends SailingServerHttpServlet {
     }
 
     private String getRequestHandlerPath(HttpServletRequest request) {
-        String pathInfo = request.getPathInfo();
-        String[] pathParts = pathInfo.split("/");
+        final String pathInfo = request.getPathInfo();
+        final String[] pathParts = pathInfo.split("/");
         return pathParts[pathParts.length - 1];
     }
 }

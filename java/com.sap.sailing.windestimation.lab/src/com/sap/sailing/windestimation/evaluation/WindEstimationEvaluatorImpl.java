@@ -100,7 +100,7 @@ public class WindEstimationEvaluatorImpl<T> implements WindEstimationEvaluator<T
                                 .mapToInt(competitorTrack -> competitorTrack.getElements().size())
                                 .sum() >= minManeuversPerRace);
         if (randomClipping) {
-            RaceWithRandomClippingPreprocessingPipelineImpl<ManeuverForEstimation, ManeuverForEstimation> clippingPipeline = new RaceWithRandomClippingPreprocessingPipelineImpl<>(
+            RaceWithRandomClippingPreprocessingPipelineImpl<ManeuverForEstimation, ManeuverForEstimation> clippingPipeline = new RaceWithRandomClippingPreprocessingPipelineImpl<ManeuverForEstimation, ManeuverForEstimation>(
                     new DummyRacePreprocessingPipelineImpl<>(), fixedNumberOfManeuvers == null ? 1 : fixedNumberOfManeuvers,
                     fixedNumberOfManeuvers == null ? Integer.MAX_VALUE : fixedNumberOfManeuvers, evaluationPerCompetitorTrack);
             preprocessingStream = preprocessingStream

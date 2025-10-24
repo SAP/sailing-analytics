@@ -19,10 +19,300 @@
         </div>
     </div>
     <div class="yield_content">
-        <div class="contentWrapper">
-            <div class="mainContent">
-                <h2 class="releaseHeadline">Release Notes - Administration Console</h2>
-                <div class="innerContent">
+      <div class="contentWrapper">
+        <div class="mainContent">
+          <h2 class="releaseHeadline">Release Notes - Administration Console</h2>
+          <div class="innerContent">
+          <h2 class="articleSubheadline">October 2025</h2>
+          <ul class="bulletList">
+                <li>When WindBots sent buffered data, e.g., from previous days, there was a possibility that
+                    under some circumstances this data may have interfered with live data, leading, e.g.,
+                    to "jumping" WindBot positions. This has now been fixed.<p>
+                <li>For the following system properties, alternative environment variables have been introduced:
+                    <ul>
+                        <li><tt>AWS_S3_TEST_S3ACCESSID</tt> for <tt>aws.s3.test.s3AccessId</tt></li>
+                        <li><tt>AWS_S3_TEST_S3ACCESSKEY</tt> for <tt>aws.s3.test.s3AccessKey</tt></li>
+                        <li><tt>GOOGLE_MAPS_AUTHENTICATION_PARAMS</tt> for <tt>google.maps.authenticationparams</tt></li>
+                        <li><tt>YOUTUBE_V3_API_KEY</tt> for <tt>youtube.api.key</tt></li>
+                        <li><tt>GEONAMES_ORG_USERNAMES</tt> for <tt>geonames.org.usernames</tt></li>
+                    </ul>   
+                    If the system property is set, it takes precedence over the environment variable.</li>
+          </ul>
+          <h2 class="articleSubheadline">September 2025</h2>
+          <ul class="bulletList">
+                <li>Added boat classes "Elan E4" and "Beneteau First 36" to the list of boat classes.<p>
+          </ul>
+          <h2 class="articleSubheadline">August 2025</h2>
+          <ul class="bulletList">
+                <li>Pairings, e.g., in league set-ups, can not be copied across regattas/leaderboards.
+                    This allows users to create a hidden regatta/leaderboard with flights to the entire
+                    season, create a pairing list for that and the copy sub-sequences from it to
+                    the regattas of the individual events. This can help improve the fairness of
+                    pairing lists across an entire season.</li>
+                <li>Upon popular demand, the series editing dialog now supports not only 50 but 100
+                    race columns / flights to be created in the drop-down list.</li>
+                <li>AI Agent credentials can now be reset from the Admin Console.</li>
+                <li>When using the Advanced / Landscape Management page of the Admin Console, and a new
+                    application load balancer (ALB) is created (e.g., in response to the number of ALB
+                    listener rules exceeding the limit for all existing ALBs in the region), the new ALB
+                    will automatically be registered with any AWS Web Application Firewall (WAF) access
+                    control list (Web ACL) that has a tag "web-acl-purpose" with value "geoblocking".<p>
+          </ul>
+          <h2 class="articleSubheadline">June 2025</h2>
+          <ul class="bulletList">
+                <li>Introduced a new Low Point scoring scheme for overall leaderboards which---instead of using the <em>ranks</em>
+                    from the contained leaderboards---uses the net points from those leaderboards. This way, the overall leaderboard's
+                    point sum equals the total points sum of the leaderboards (if no discards are configured for the overall leaderboard).
+                    Tie breaking is by rule A8.1, as usual. Use this if you want to give emphasis to each act according to the number
+                    of races/flights sailed in them.</li>
+                <li>ORC Performance Curve Scoring (PCS) was renamed to "ORC Polar Curve Scoring" with the acronym unchanged. We have adjusted
+                    our message texts in the UI accordingly. Furthermore, the "CIRCULAR_RANDOM" pre-set is now called "All Purpose,"
+                    and "LONG_DISTANCE" is now called "Ocean Race." Non-spinnaker allowances now typically come in separate certificates.</li>
+                <li>Upgraded embedded Jetty web server, closing CVE-2024-13009</li>
+                <li>Added boat classes "ORC Multihull" and "SRS" (also known as "LYS")</li>
+                <li>Added action to remotely trigger a calibration run on a WindBot device.</li>
+                <li>New scoring system for iQFOil medal series mode where two, not one, get promoted straight into the grand final.</li>
+          </ul>
+          <h2 class="articleSubheadline">May 2025</h2>
+          <ul class="bulletList">
+                <li>The Riot server listening for WindBot data now properly implements connection closing upon not having
+                    received device heartbeat messages for more than 30s.</li>
+                <li>Users can now file take-down requests for media assets displayed on the web site. This includes
+                    event stage/logo/teaser/gallery images and videos, as well as competitor images and competitor flags.
+                    For all these assets, a little semi-transparent three-dots button is displayed in the top-left
+                    corner of the image/video tile. When a logged-in user with a validated e-mail address clicks the
+                    button, a popup dialog allows for additional input and submitting of the take-down request, which
+                    will lead to an e-mail being sent to support@sapsailing.com.</li>
+                <li>Fixed parsing of X-Forwarded-For header, now reporting the correct client IP in case of multiple proxies along the way.</li>
+                <li>Improved logging in case operations received from replicas are being applied. The log entry now shows the name of the server
+                    where the operation originated from.</li>
+          </ul>
+          <h2 class="articleSubheadline">March 2025</h2>
+          <ul class="bulletList">
+                <li>We included a new AI Agent, based on <a href="https://help.sap.com/docs/sap-ai-core/sap-ai-core-service-guide/what-is-sap-ai-core">SAP AI Core</a>,
+                    that helps commenting races, live and replay. To configure the agent,
+                    the administration console has a new "AI Agent" tab. It shows whether credentials for the
+                    underlying AI Core service have been provided, allows users to provide these,
+                    shows which language model is currently selected for producing the comments
+                    and displays the list of events, allowing the user to select for which of those
+                    the AI Agent shall be activated to produce comments. The comments will be produced
+                    when certain events in those races are discovered, such as a start or a certain
+                    share of competitors having rounded a mark. This also means that races already
+                    loaded will not have their existing data commented on. But (re-)loading races
+                    as well as live races into selected events will add those comments, visible in
+                    the "Tags" side bar in the race viewer.<p>
+                    Two optional system properties can be used to control the AI Agent:
+                    <ul>
+                    <li><tt>sap.aicore.credentials</tt>: if provided, its value is expected to be a JSON document with AI Core
+                        credentials, as you would get from viewing your credentials of you AI Core instance in SAP BTP Cockpit;
+                        if not provided, credentials may still be provided through the Admin Console later.</li>
+                    <li><tt>sap.sailing.aiagent.modelname</tt>: if provided, selected a language model name to use; a model
+                        deployment by that name must be available in the AI Core account for which the credentials are valid.
+                        If not provided, or if no model deployment by that name can be found, a default model is used
+                        (currently gpt-4o-mini). Note that the model you choose this way needs to comply with the <tt>openai</tt>
+                        API for <tt>chat-completions</tt> in order to be used in this context.</li>
+                    </ul>
+                </li>
+                <li>The Administration Console now allows you to configure trusted origins / domains for using Cross-Origin Resource Sharing
+                    (CORS) and hence access, in particular, REST API resources from the server or replica set you are administering, as well as
+                    the possibility to embed pages from that server or replica set in some other page's &lt;iframe&gt; HTML element,
+                    controlled through the <tt>Content-Security-Policy</tt> header field and its <tt>frame-ancestors</tt> directive.
+                    Both, wildcard or explicit sets of origins in the form of <tt>https://www.example.org</tt> can be specified.
+                    CORS restrictions map to corresponding values of the <tt>Access-Control-Allow-Origin</tt> HTTP response header field.
+                    You can find these new options <a href="/gwt/AdminConsole.html#LocalServerPlace:">here in the Advanced / Local Server</a>
+                    panel of the Administration Console.<p>
+                    Note that the settings you make there are specific to the replica set / server name of the environment you're
+                    administering.<p>
+                    Also note that with the introduction of these configuration options, there are new, secure defaults. CORS
+                    requests are now by default allowed only from the same origin as the REST request goes to, and frame embedding
+                    is by default disabled. Should you have a scenario in which you have embedded Sailing Analytics pages in your
+                    web site using an &lt;iframe&gt; and would like to continue doing this, please get in touch
+                    (<a href="mailto:support@sapsailing.com">support@sapsailing.com</a>).<p>
+                    Note that this additional configuration data changes the format of the Security Service's initial load
+                    for replication incompatibly. A synchronized roll-out approach is required, upgrading primary/master
+                    nodes before upgrading their replica(s).</li>
+                <li>File uploads now not only require an authenticated user to have object creation permissions on the
+                    target server, but additionally the user's e-mail address now must have been validated successfully.</li>
+                <li>New passwords now need to have a higher minimum complexity than before.</li>
+                <li>There is a new system property <tt>geonames.org.usernames</tt> that can be used to provide one or more
+                    (comma-separated) user names for the <a href="https://geonames.org">geonames.org</a> service that we
+                    use to map coordinates to venue names and to determine time zones for races as used, e.g., in
+                    data mining.</li>
+          </ul>
+          <h2 class="articleSubheadline">February 2025</h2>
+          <ul class="bulletList">
+                <li>In the <a href="/gwt/AdminConsole.html#SmartphoneTrackingPlace:">admin console's</a>
+                    Smartphone Tracking panel, when importing data from files to create new device mappings
+                    there is now a "Vakaros" / "VAKAROS_EXTENDED" menu entry when using "Import fixes"
+                    or "Import additional sensor data," respectively. With these, files obtained from
+                    Vakaros devices can be imported with their time stamps, GPS information (lat/lon,
+                    COG, SOG) and, when available, from the "additional" sensor data heel, pitch,
+                    and the two special values load_GDF1 and load_GDF2, which we map to the
+                    forestay load and the kicker tension values, respectively.</li>
+                <li>When upgrading an application replica set through the Landscape Management panel,
+                    other target groups such as those from an NLB will be considered correctly for adding
+                    and removing temporary upgrade replicas and the primary/master node.</li>
+                <li>Added a result importer for the typical Sailwave HTML output, such as
+                    <a href="https://www.rhkyc.org.hk/storage/app/media/Sailing/result/HONG-KONG-RACE-WEEK/2025/ILCA4.htm">https://www.rhkyc.org.hk/storage/app/media/Sailing/result/HONG-KONG-RACE-WEEK/2025/ILCA4.htm</a>.
+                    You can add these types of URLs now in the <a href="/gwt/AdminConsole.html#ResultImportUrlsPlace:">Result import URLs</a> tab
+                    of the Connectors category in the administration console.</li>
+          </ul>
+          <h2 class="articleSubheadline">January 2025</h2>
+          <ul class="bulletList">
+                <li>When exporting wind from the Admin Console's Tracked Races / Tracked Races panel,
+                    the wind data is represented as "fixes" where COG and SOG correspond to TWD and TWS,
+                    as usual. Now, however, not only the <tt>COMBINED</tt> wind track is exported, but
+                    all detailed tracks of type <tt>EXPEDITION</tt>, <tt>WEB</tt>, <tt>WINDFINDER</tt>,
+                    and <tt>RACECOMMITTEE</tt>. The respective object names are constructed from the
+                    wind source types and IDs, e.g., <tt>"EXPEDITION (DC-FE-AAHJ)"</tt> and can be
+                    imported again in the Tracked Races / Wind panel now (see "Routeconverter"-based
+                    wind import).</li>
+                <li>Fixed wind import from ZIP files exported by the Sailing Analytics. So far, file extensions
+                    of the files wrapped in the ZIP file were checked to be ".txt" which therefore ignored the
+                    .gpx, .kml, etc. file types that we normally export ourselves.</li>
+          </ul>
+          <h2 class="articleSubheadline">December 2024</h2>
+          <ul class="bulletList">
+                <li>The Igtimi WindBot connector has been re-designed. This became necessary because
+                    Riedel Communications GmbH deprecated and then stopped their "Riot" back-end
+                    which so far allowed WindBot and YachtBot devices to register, send their data to and provide
+                    client applications access to live and historic WindBot data.<p>
+                    The new architecture features a built-in "Riot" server replacement in every
+                    Sailing Analytics server. It can be configured using the <tt>igtimi.riot.port</tt>
+                    system property, which is controlled through the <tt>IGTIMI_RIOT_PORT</tt>
+                    environment variable set for the <tt>start</tt> script. When left empty,
+                    the Riot server will listen on a random port unused so far. This port can
+                    be obtained using the <tt>/igtimi/api/v1/server</tt> REST GET method, found
+                    in the <tt>port</tt> attribute of the JSON document responded with.
+                    The built-in Riot server is replicated by default, and devices and data access
+                    windows are kept synchronized between primary and replicas. Dedicated instances
+                    may be set up with the only purpose of acting as a highly-available Riot server
+                    farm. Messages sent to one of the instances in the replica set will make it to
+                    all instances in the replica set and will eventually get stored persistently in
+                    the primary's database.
+                    <p>
+                    Devices can be configured to send to that port, directly to the server's IP
+                    address with the specific port, or, e.g., through a network load balancer
+                    such as the Amazon Web Services (AWS) NLB, allowing for multiple servers
+                    such as a primary/master and one or more replicas to be registered for
+                    high availability. With an AWS NLB it is important to configure the target group
+                    such that the client IP address is preserved, so the server knows where to send
+                    responses and commands to.
+                    <p>
+                    Instead of managing Igtimi "Accounts" there now is a system property <tt>igtimi.base.url</tt>
+                    that defines the base URL of the Riot service to which the Sailing Analytics server will
+                    connect for live and stored WindBot data. The new environment variable <tt>IGTIMI_BASE_URL</tt>
+                    is mapped to the <tt>igtimi.base.url</tt> property in the start scripts.
+                    The property defaults to <tt>https://wind.sapsailing.com</tt>.
+                    By default, authentication for the remote service is handled using the local user's bearer token
+                    of the user tracking or owning the race for which wind data is requested. The <tt>igtimi.bearer.token</tt>
+                    system property can be used as an override, e.g., in case the local Sailing Analytics server
+                    does not share the security service with the replica set running the Riot service. The corresponding
+                    environment variable is <tt>IGTIMI_BEARER_TOKEN</tt>. With this,
+                    the <tt>igtimi.client.id</tt> and <tt>igtimi.client.secret</tt> system properties, as well as
+                    their environment variable counterparts <tt>IGTIMI_CLIENT_ID</tt> and <tt>IGTIMI_CLIENT_SECRET</tt>,
+                    respectively, are no longer used.
+                    <p>
+                    The new version of the Igtimi Devices panel in the Admin Console (see
+                    <tt>/gwt/AdminConsole.html#IgtimiDevicesPlace:</tt>) now shows the devices
+                    and their sharing to clients through so-called "Data Access Windows." The
+                    device entities are created automatically when messages are received.
+                    Data Access Windows (DAWs), however, need to be created manually in order to share
+                    the content delivered by the devices with authenticated users. You can use
+                    the DAWs' ownership and access control list (ACL) settings and grant users
+                    explicit permissions to individual DAWs. Click on the "Change Ownership" action icon
+                    to see the key of a DAW in case you want to use it in an individual permission
+                    that you grant to a user.
+                    <p>
+                    There is a REST API that mimics the old Riot REST API to a certain degree.
+                    Sailing Analytics users and operators typically don't work with this API directly.
+                    Yet, the API is exposed under <tt>/igtimi/api/v1</tt> and has end points for
+                    managing devices and DAWs, retrieving data recorded from the devices,
+                    as well as for finding out the web socket server end
+                    point for connecting to live data and connecting to it,
+                    and the above-mentioned method for finding
+                    out the Riot server socket's listening port.
+                    <p>
+                    The protocol used for transmitting device data to REST API clients has changed in
+                    so far that the device message payloads are no longer sent as JSON objects; instead,
+                    the original Protocol Buffer (protobuf) binary messages are encoded using Base64
+                    and transmitted as an array of such Base64 strings.
+                    </li>
+          </ul>
+          <h2 class="articleSubheadline">November 2024</h2>
+          <ul class="bulletList">
+                <li>The system property for removing the SAP branding from the solution has changed its default. It used
+                    to default to <tt>false</tt>, meaning that by default the entire solution shows SAP's branding.
+                    Prior to publishing the repository under an open-source license we'd like to make clear that only
+                    SAP-reviewed versions such as from <a href="https://github.com/SAP/sailing-analytics">https://github.com/SAP/sailing-analytics</a>
+                    are supposed to show this branding. Any other fork must not, and the regular rules for the use of
+                    the SAP trademark apply. See also <a href="https://brand.sap.com">brand.sap.com</a>.
+                    Therefore, we change the default value of this property to <tt>true</tt>.</li>
+          </ul>
+          <h2 class="articleSubheadline">September 2024</h2>
+          <ul class="bulletList">
+            <li>When removing the denotation for smartphone tracking from a race, tracking of that race will
+                now be stopped and the tracked race will be removed. This ensures consistency when later
+                the denotation should be added again.</li>
+            <li>A file importer for the Queclink GL300 format (see, e.g.,
+                <a target="_" href="https://static.sapsailing.com/GL300%20@Track%20Air%20Interface%20Protocol_R13.03.pdf">here</a>)
+                has been added. This way, you can now create a "smartphone-tracked" race and import a file that contains
+                messages recorded from GL300 devices. Those messages look like this:
+                <pre>
+                  +BUFF:GTFRI,301201,860599002480051,,0,0,4,1,,,,-2.872803,52.161116,20240710154359,,,,,,1,,,,-2.872803,52.161116,20240710154404,,,,,,1,,,,-2.872803,52.161116,20240710154409,,,,,,1,,,,-2.872803,52.161116,20240710154414,,,,,,60,,21B0$
+                </pre>
+                The importer naturally supports out of order delivery. The position-related data doesn't have to be
+                ordered by increasing time stamps. This way, you can also activate buffering in your GL300 such that
+                when the tracker comes online again, live data transmission takes precedence over transmitting the
+                data buffered.</li>
+          </ul>
+          <h2 class="articleSubheadline">August 2024</h2>
+          <ul class="bulletList">
+            <li>When importing race results for race columns with column factors different from 1.0,
+                score difference highlighting now properly considers those column factors. This
+                should help in particular when importing medal race scores which by default are
+                doubled.</li>
+            <li>Inserting wind data into the database on the importing side of a "Master Data Import"
+                is now quicker, using mass insert instead of inserting the wind fixes one by one.</li>
+            <li>Added Zoom8 as new pre-defined boat class.</li>
+            <li>Switched from Launch Configurations to Launch Templates for AWS landscape automation.
+                When this release is deployed, you will only be able to fully manage application
+                replica sets based on Launch Templates. Those still based on Launch Configurations
+                then need to be migrated manually in the AWS EC2 Console before you can manage
+                those replica sets again with this release.</li>
+          </ul>
+          <h2 class="articleSubheadline">July 2024</h2>
+          <ul class="bulletList">
+            <li>A regatta's end date is now considered for deciding whether to display the regatta as still
+                "in progress." A regatta will be shown as "finished" now even if not all its races (as may occur
+                particlarly in split-fleet scenarios) have been completed, as soon as the regatta's end date
+                has passed.</li>
+            <li>Upgraded TracAPI to version 3.15.13, resolving issues with deadlocks based on HTTP ports
+                being blocked.</li>
+          </ul>
+          <h2 class="articleSubheadline">June 2024</h2>
+          <ul class="bulletList">
+            <li>Upgraded to TracAPI 3.15.8, supporting more TracTrac invalid result markers (IRMs),
+                in particular DCT, DNE, and RCT.</li>
+            <li>For raw data output of wind sensor and object positions, where permitted, use seven instead of
+                six decimal places in lat/lng output to increase resolution to approximately 1cm.</li>
+            <li>Fixed concurrency issue with subscription webhook callbacks which in rare cases led
+                expiring subscriptions or failing payments to not properly revoke user permissions.</li>
+            <li>When archiving a replica set, any remote reference pointing to it from the archive running
+                at <tt>www.sapsailing.com</tt> is being removed. Now, the same reference will also be removed
+                from the failover archive at <tt>archive-failover.sapsailing.com</tt> to reduce inconsistency
+                and a circular reference structure in case we need to switch to the failover.</li>
+            <li>Upgraded to TracAPI 3.15.9, filtering mark positions by course area on the server side now and
+                offering the client archived MTB files instead of live DB access where available.</li>
+            <li>Upgraded to TracAPI 3.15.10, fixing a bug introduced by TracAPI 3.15.9 regarding locally
+                overriding the so-called "stored data URI"</li>
+            <li>Added class "Wingfoil"</li>
+            <li>TracAPI 3.15.12 fixes the MTB file reader that was not releasing all the resources once
+                the reading process was over.</li>
+            <li>Added class "RS Vareo"</li>
+            <li>Fixed Czech translation for the headerLogo of the web interface: 'Sailing Analytics' is now
+                used instead of czech phrase.</li>
+          </ul>
           <h2 class="articleSubheadline">May 2024</h2>
           <ul class="bulletList">
             <li>Reading the wind estimation data from a server during start-up, using the
@@ -304,7 +594,7 @@
                 up you can create and remove so-called "shards" to which you can assign zero or more leaderboards
                 offered by that replica set. Each shard gets its own auto-scaling group and target group in addition to the regular
                 auto-scaling group / target group pair used for the public target group. By default a minimum of two instances
-                are required by each shard to ensure availability. They are created with the same launch configuration
+                are required by each shard to ensure availability. They are created with the same launch template
                 used by the replica set's regular public target group. When a shard's instances are healthy,
                 rules are managed in the replica set's load balancer to route traffic regarding the leaderboards
                 selected for the shard to the shard's target group. This reduces traffic on the default public
@@ -1140,8 +1430,8 @@
                             com_sap_sailing_Leaderboard_NumberOfCompetitors{name="5O5-Worlds 2010 (5O5)",} 147.0
                             com_sap_sailing_Leaderboard_NumberOfAllCompetitors{name="5O5-Worlds 2010 (5O5)",} 147.0
                             com_sap_sailing_Leaderboard_ComputationTimeAverageMedium_averageRangeInMillis{name="5O5-Worlds 2010 (5O5)",} 30000.0
-                                ...
-                                com_sap_sailing_RacingEventService_LeaderboardComputationStatisticsYoung_averageComputeDurationInMillis 13.0
+                            ...
+                            com_sap_sailing_RacingEventService_LeaderboardComputationStatisticsYoung_averageComputeDurationInMillis 13.0
                             com_sap_sailing_RacingEventService_LeaderboardComputationStatisticsMedium_averageComputeDurationInMillis 52.0
                             com_sap_sailing_RacingEventService_LeaderboardComputationStatisticsYoung_numberOfComputations 5.0
                             com_sap_sailing_RacingEventService_LeaderboardComputationStatisticsMedium_numberOfComputations 17.0

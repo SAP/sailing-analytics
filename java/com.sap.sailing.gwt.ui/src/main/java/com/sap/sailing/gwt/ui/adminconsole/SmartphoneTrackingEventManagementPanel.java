@@ -811,6 +811,7 @@ public class SmartphoneTrackingEventManagementPanel extends AbstractLeaderboardC
                     @Override
                     public void onSuccess(Void result) {
                         loadAndRefreshLeaderboard(t.getC().getName());
+                        trackedRacesListComposite.regattaRefresher.reloadAndCallFillAll();
                     }
 
                     @Override

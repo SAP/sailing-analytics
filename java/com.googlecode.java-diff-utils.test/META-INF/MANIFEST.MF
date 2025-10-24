@@ -8,5 +8,9 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Fragment-Host: com.googlecode.java-diff-utils
 Bundle-ClassPath: test/,
  .
-Import-Package: junit.framework;version="4.8.1"
+Require-Bundle: junit-jupiter-api;bundle-version="5.11.3",
+ junit-jupiter-engine;bundle-version="5.11.3",
+ junit-platform-commons;bundle-version="1.11.3",
+ junit-platform-engine;bundle-version="1.11.3",
+ org.opentest4j;bundle-version="1.3.0"
 Automatic-Module-Name: com.googlecode.java-diff-utils.test

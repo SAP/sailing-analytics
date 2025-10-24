@@ -29,14 +29,13 @@ public class EventsActivity extends AbstractActivity implements Presenter {
         panel.setWidget(clientFactory.createBusyView());
         Window.setTitle(StringMessages.INSTANCE.events());
         final EventsView view = new EventsViewImpl(this);
-
         clientFactory.getDispatch().execute(new GetEventListViewAction(),
                 new ActivityCallback<EventListViewDTO>(clientFactory, panel) {
             @Override
             public void onSuccess(EventListViewDTO eventListView) {
                 panel.setWidget(view.asWidget());
                 Window.setTitle(place.getTitle());
-                view.setEvents(eventListView);
+                view.setEvents(eventListView, clientFactory.getUserService());
             }
         });
     }

@@ -46,6 +46,7 @@ import com.sap.sse.gwt.client.shared.components.Component;
 import com.sap.sse.gwt.client.shared.components.SettingsDialog;
 import com.sap.sse.gwt.client.shared.components.SettingsDialogComponent;
 import com.sap.sse.gwt.client.shared.settings.ComponentContext;
+import com.sap.sse.security.ui.client.SecurityChildSettingsContext;
 import com.sap.sse.security.ui.client.WithSecurity;
 
 /**
@@ -159,7 +160,8 @@ public class SingleRaceLeaderboardPanel extends LeaderboardPanel<SingleRaceLeade
         final SingleRaceLeaderboardSettings leaderboardSettings = new SingleRaceLeaderboardSettings(selectedManeuverDetails,
                 selectedLegDetails, selectedRaceDetails, selectedOverallDetailColumns, timer.getRefreshInterval(),
                 isShowAddedScores(), isShowCompetitorShortName(),
-                isShowCompetitorFullName(), isShowCompetitorBoatInfo(), isShowCompetitorNationality, showRaceRankColumn);
+                isShowCompetitorFullName(), isShowCompetitorBoatInfo(), isShowCompetitorNationality, showRaceRankColumn,
+                new SecurityChildSettingsContext(leaderboard, paywallResolver));
         return leaderboardSettings;
     }
 

@@ -3,7 +3,7 @@ package com.sap.sailing.domain.test.markpassing;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 public class Kiel2011505MarkPassingTest extends AbstractMarkPassingTest {
 
@@ -13,15 +13,15 @@ public class Kiel2011505MarkPassingTest extends AbstractMarkPassingTest {
 
     // The Start-Times are set very wrong on these races
     
-    @Ignore
+    @Disabled
     public void testRace2() throws Exception {
         testRace("2");
     }
-    @Ignore
+    @Disabled
     public void testRace3() throws Exception {
         testRace("3");
     }
-    @Ignore
+    @Disabled
     public void testRace4() throws Exception {
         testRace("4");
     }

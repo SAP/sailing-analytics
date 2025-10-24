@@ -1,9 +1,9 @@
 package com.sap.sailing.domain.test.markpassinghash;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.json.simple.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
 import com.sap.sailing.domain.abstractlog.race.RaceLogFixedMarkPassingEvent;
@@ -61,7 +61,7 @@ public class MarkPassingRaceFingerprintJsonSerializationTest extends OnlineTracT
         return "Academy Tracking 2011";
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp("event_20110505_SailingTea", // Semifinale
                 /* raceId */ "01ea3604-02ef-11e1-9efc-406186cbf87c", /* liveUri */ null, /* storedUri */ null,
@@ -87,7 +87,7 @@ public class MarkPassingRaceFingerprintJsonSerializationTest extends OnlineTracT
         assertTrue(fingerprint1.matches(trackedRace1));
         JSONObject json1 = fingerprint1.toJson();
         MarkPassingRaceFingerprint output1 = factory.fromJson(json1);
-        assertTrue("Original and de-serialized copy are equal", output1.matches(trackedRace1));
+        assertTrue(output1.matches(trackedRace1), "Original and de-serialized copy are equal");
         assertEquals(fingerprint1, output1);
         assertEquals(fingerprint1.hashCode(), output1.hashCode());
     }
@@ -102,8 +102,8 @@ public class MarkPassingRaceFingerprintJsonSerializationTest extends OnlineTracT
         TimePoint epoch = new MillisecondsTimePoint(0l);
         TimePoint now = MillisecondsTimePoint.now();
         Map<String, Position> markPositions = new HashMap<String, Position>();
-        markPositions.put("CR Start (1)", new DegreePosition(53.562944999999985, 10.010104000000046));
-        markPositions.put("CR Start (2)", new DegreePosition(53.562944999999985, 10.010104000000046));
+        markPositions.put("CR Start - 1", new DegreePosition(53.562944999999985, 10.010104000000046));
+        markPositions.put("CR Start - 2", new DegreePosition(53.562944999999985, 10.010104000000046));
         markPositions.put("Leeward mark", new DegreePosition(53.562145000000015, 10.009252));
         markPositions.put("Luvtonne", new DegreePosition(53.560581899999995, 10.005657));
         for (Waypoint w : trackedRace2.getRace().getCourse().getWaypoints()) {
@@ -118,7 +118,7 @@ public class MarkPassingRaceFingerprintJsonSerializationTest extends OnlineTracT
         assertFalse(fingerprint2.matches(trackedRace1));
         JSONObject json1 = fingerprint1.toJson();
         JSONObject json2 = fingerprint2.toJson();
-        assertNotEquals("Json1 and Json2 are equal: " + json1 + " json2: " + json2, json1, json2);
+        assertNotEquals(json1, json2, "Json1 and Json2 are equal: " + json1 + " json2: " + json2);
     }
 
     @Test
@@ -136,7 +136,7 @@ public class MarkPassingRaceFingerprintJsonSerializationTest extends OnlineTracT
         assertFalse(fingerprint2.matches(trackedRace1));
         JSONObject json1 = fingerprint1.toJson();
         JSONObject json2 = fingerprint2.toJson();
-        assertNotEquals("Json1 and Json2 are equal: " + json1 + " json2: " + json2, json1, json2);
+        assertNotEquals(json1, json2, "Json1 and Json2 are equal: " + json1 + " json2: " + json2);
     }
 
     @Test
@@ -155,7 +155,7 @@ public class MarkPassingRaceFingerprintJsonSerializationTest extends OnlineTracT
         assertFalse(fingerprint2.matches(trackedRace1));
         JSONObject json1 = fingerprint1.toJson();
         JSONObject json2 = fingerprint2.toJson();
-        assertNotEquals("Json1 and Json2 are equal: " + json1 + " json2: " + json2, json1, json2);
+        assertNotEquals(json1, json2, "Json1 and Json2 are equal: " + json1 + " json2: " + json2);
     }
 
     @Test
@@ -170,7 +170,7 @@ public class MarkPassingRaceFingerprintJsonSerializationTest extends OnlineTracT
         assertFalse(fingerprint2.matches(trackedRace1));
         JSONObject json1 = fingerprint1.toJson();
         JSONObject json2 = fingerprint2.toJson();
-        assertNotEquals("Json1 and Json2 are equal: " + json1 + " json2: " + json2, json1, json2);
+        assertNotEquals(json1, json2, "Json1 and Json2 are equal: " + json1 + " json2: " + json2);
     }
 
     @Test
@@ -189,7 +189,7 @@ public class MarkPassingRaceFingerprintJsonSerializationTest extends OnlineTracT
         assertFalse(fingerprint2.matches(trackedRace1));
         JSONObject json1 = fingerprint1.toJson();
         JSONObject json2 = fingerprint2.toJson();
-        assertNotEquals("Json1 and Json2 are equal: " + json1 + " json2: " + json2, json1, json2);
+        assertNotEquals(json1, json2, "Json1 and Json2 are equal: " + json1 + " json2: " + json2);
     }
 
     @Test
@@ -204,7 +204,7 @@ public class MarkPassingRaceFingerprintJsonSerializationTest extends OnlineTracT
         assertFalse(fingerprint2.matches(trackedRace1));
         JSONObject json1 = fingerprint1.toJson();
         JSONObject json2 = fingerprint2.toJson();
-        assertNotEquals("Json1 and Json2 are equal: " + json1 + " json2: " + json2, json1, json2);
+        assertNotEquals(json1, json2, "Json1 and Json2 are equal: " + json1 + " json2: " + json2);
     }
 
     @Test
@@ -223,7 +223,7 @@ public class MarkPassingRaceFingerprintJsonSerializationTest extends OnlineTracT
         assertFalse(fingerprint2.matches(trackedRace1));
         JSONObject json1 = fingerprint1.toJson();
         JSONObject json2 = fingerprint2.toJson();
-        assertNotEquals("Json1 and Json2 are equal: " + json1 + " json2: " + json2, json1, json2);
+        assertNotEquals(json1, json2, "Json1 and Json2 are equal: " + json1 + " json2: " + json2);
     }
 
     @Test
@@ -252,6 +252,6 @@ public class MarkPassingRaceFingerprintJsonSerializationTest extends OnlineTracT
         assertFalse(fingerprint2.matches(trackedRace1));
         JSONObject json1 = fingerprint1.toJson();
         JSONObject json2 = fingerprint2.toJson();
-        assertNotEquals("Json1 and Json2 are equal: " + json1 + " json2: " + json2, json1, json2);
+        assertNotEquals(json1, json2, "Json1 and Json2 are equal: " + json1 + " json2: " + json2);
     }
 }

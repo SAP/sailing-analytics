@@ -1,6 +1,7 @@
 package com.sap.sailing.gwt.ui.client;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 import org.apache.shiro.authz.UnauthorizedException;
 
+import com.sap.sailing.aiagent.interfaces.AIAgent;
 import com.sap.sailing.domain.abstractlog.orc.RaceLogORCLegDataEvent;
 import com.sap.sailing.domain.abstractlog.race.RaceLog;
 import com.sap.sailing.domain.abstractlog.race.RaceLogTagEvent;
@@ -66,6 +68,8 @@ import com.sap.sailing.gwt.ui.shared.DeviceIdentifierDTO;
 import com.sap.sailing.gwt.ui.shared.DeviceMappingDTO;
 import com.sap.sailing.gwt.ui.shared.EventDTO;
 import com.sap.sailing.gwt.ui.shared.GPSFixDTO;
+import com.sap.sailing.gwt.ui.shared.IgtimiDataAccessWindowWithSecurityDTO;
+import com.sap.sailing.gwt.ui.shared.IgtimiDeviceWithSecurityDTO;
 import com.sap.sailing.gwt.ui.shared.LeaderboardGroupDTO;
 import com.sap.sailing.gwt.ui.shared.MarkDTO;
 import com.sap.sailing.gwt.ui.shared.MigrateGroupOwnerForHierarchyDTO;
@@ -239,13 +243,33 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
             throws NotFoundException, NotDenotableForRaceLogTrackingException;
 
     Map<RegattaAndRaceIdentifier, Integer> importWindFromIgtimi(List<RaceDTO> selectedRaces,
-            boolean correctByDeclination)
+            boolean correctByDeclination, String optionalBearerTokenOrNull)
             throws IllegalStateException, Exception;
 
-    void removeIgtimiAccount(String eMailOfAccountToRemove);
+    IgtimiDataAccessWindowWithSecurityDTO addIgtimiDataAccessWindow(String deviceSerialNumber, Date from, Date to);
 
-    boolean authorizeAccessToIgtimiUser(String eMailAddress, String password) throws Exception;
+    void removeIgtimiDataAccessWindow(long id);
+    
+    void updateIgtimiDevice(IgtimiDeviceWithSecurityDTO editedObject);
 
+    void removeIgtimiDevice(String serialNumber);
+    
+    boolean sendGPSOffCommandToIgtimiDevice(String serialNumber) throws IOException;
+
+    boolean sendGPSOnCommandToIgtimiDevice(String serialNumber) throws IOException;
+
+    boolean sendPowerOffCommandToIgtimiDevice(String serialNumber) throws IOException;
+
+    boolean sendRestartCommandToIgtimiDevice(String serialNumber) throws IOException;
+
+    boolean sendIMUCalibrationCommandSequenceToIgtimiDevice(String serialNumber) throws IOException, InterruptedException;
+    
+    boolean sendIgtimiCommand(String serialNumber, String command) throws IOException, InterruptedException;
+    
+    boolean enableIgtimiDeviceOverTheAirLog(String serialNumber, boolean enable) throws Exception;
+    
+    ArrayList<Pair<TimePoint, String>> getIgtimiDeviceLogs(String serialNumber, Duration duration) throws Exception;
+    
     void setTrackingTimes(RaceLogSetTrackingTimesDTO dto) throws NotFoundException;
 
     boolean removeDeviceConfiguration(UUID deviceConfigurationId);
@@ -305,8 +329,8 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
 
     EventDTO updateEvent(UUID eventId, String eventName, String eventDescription, Date startDate, Date endDate,
             VenueDTO venue, boolean isPublic, List<UUID> leaderboardGroupIds, String officialWebsiteURLString,
-            String baseURLAsString, Map<String, String> sailorsInfoWebsiteURLsByLocaleName, List<ImageDTO> images,
-            List<VideoDTO> videos, List<String> windFinderReviewedSpotCollectionIds)
+            String baseURLAsString, Map<String, String> sailorsInfoWebsiteURLsByLocaleName, List<? extends ImageDTO> images,
+            List<? extends VideoDTO> videos, List<String> windFinderReviewedSpotCollectionIds)
             throws UnauthorizedException, IOException;
 
     void updateLeaderboardGroup(UUID leaderboardGroupId, String oldName, String newName, String newDescription,
@@ -533,18 +557,24 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
      *            title of tag, must <b>NOT</b> be <code>null</code>
      * @param comment
      *            optional comment of tag
-     * @param imageURLs
-     *            optional image URLs of tag
+     * @param hiddenInfo
+     *            Data that will not be displayed to the end user; it may be visible, e.g., when viewing the technical
+     *            race log entries or user preference objects, so don't use this to store secrets. But it can be used,
+     *            e.g., to store information that identifies the tag in some unique way, for example, when the tag was
+     *            automatically produced by some rule or agent, and that rule or agent later needs to decide whether or
+     *            not there already is a tag produced by that rule/agent for the race to which the tag pertains.
      * @param visibleForPublic
      *            when set to <code>true</code> tag will be saved as public tag (visible for every user), when set to
      *            <code>false</code> tag will be saved as private tag (visible only for creator)
      * @param raceTimepoint
      *            timepoint in race where user created tag, must <b>NOT</b> be <code>null</code>
+     * @param imageURLs
+     *            optional image URLs of tag
      * @return <code>successful</code> {@link SuccessInfo} if tag was added successfully, otherwise
      *         <code>non-successful</code> {@link SuccessInfo}
      */
     SuccessInfo addTag(String leaderboardName, String raceColumnName, String fleetName, String tag, String comment,
-            String imageURL, String resizedImageURL, boolean visibleForPublic, TimePoint raceTimepoint)
+            String hiddenInfo, String imageURL, String resizedImageURL, boolean visibleForPublic, TimePoint raceTimepoint)
             throws UnauthorizedException;
 
     void allowBoatResetToDefaults(List<BoatDTO> boats) throws UnauthorizedException;
@@ -613,6 +643,7 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
      *            new tag title
      * @param comment
      *            new comment
+     * @param hiddenInfo TODO
      * @param imageURL
      *            new image url
      * @param visibleForPublic
@@ -621,7 +652,7 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
      *         <code>non-successful</code> {@link SuccessInfo}
      */
     SuccessInfo updateTag(String leaderboardName, String raceColumnName, String fleetName, TagDTO tagToUpdate,
-            String tag, String comment, String imageURL, String resizedImageURL, boolean visibleForPublic)
+            String tag, String comment, String hiddenInfo, String imageURL, String resizedImageURL, boolean visibleForPublic)
             throws UnauthorizedException;
 
     /**
@@ -662,13 +693,10 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
      * Revoke the {@link RaceLogDenoteForTrackingEvent}. This does not affect an existing {@code RaceLogRaceTracker} or
      * {@link TrackedRace} for this {@code RaceLog}.
      *
-     * @throws UnauthorizedException,
-     *             NotFoundException
-     *
      * @see RaceLogTrackingAdapter#removeDenotationForRaceLogTracking
      */
     void removeDenotationForRaceLogTracking(String leaderboardName, String raceColumnName, String fleetName)
-            throws UnauthorizedException, NotFoundException;
+            throws UnauthorizedException, NotFoundException, Exception;
 
     /**
      * Removes public {@link TagDTO tag} from {@link RaceLog} and private {@link TagDTO tag} from {@link UserStore}.
@@ -712,4 +740,27 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
     void deleteYellowBrickConfigurations(Collection<YellowBrickConfigurationWithSecurityDTO> singletonList);
 
     void updateYellowBrickConfiguration(YellowBrickConfigurationWithSecurityDTO editedObject);
+
+    void startAICommentingOnEvent(UUID eventId);
+
+    void stopAICommentingOnEvent(UUID eventId);
+
+    /**
+     * Event though this is a reading API method, we place it on {@link SailingServiceWrite} because it is available
+     * and makes sense only on the primary/master process of a replica set. There is no replication of the {@link AIAgent}
+     * itself; only its actions will be replicated. Therefore, AI agent configuration and introspection will work only
+     * on the primary/master.
+     */
+    List<EventDTO> getIdsOfEventsWithAICommenting();
+
+    String getAIAgentLanguageModelName();
+    
+    boolean hasAIAgentCredentials();
+    
+    void setAIAgentCredentials(String credentials) throws Exception;
+    
+    void resetAIAgentCredentials();
+
+    void copyPairingListFromOtherLeaderboard(String sourceLeaderboardName, String targetLeaderboardName, String fromRaceColumnName,
+            String toRaceColumnInclusiveName) throws UnauthorizedException, NotFoundException;
 }

@@ -13,8 +13,12 @@ public class GpsQualityHdop extends Fix {
     private final Distance hdop;
     
     public GpsQualityHdop(TimePoint timePoint, Sensor sensor, Map<Integer, Object> valuesPerSubindex) {
+        this(timePoint, sensor, new MeterDistance(((Number) valuesPerSubindex.get(1)).doubleValue()));
+    }
+
+    public GpsQualityHdop(TimePoint timePoint, Sensor sensor, Distance hdop) {
         super(sensor, timePoint);
-        hdop = new MeterDistance(((Number) valuesPerSubindex.get(1)).doubleValue());
+        this.hdop = hdop;
     }
 
     public Distance getHdop() {

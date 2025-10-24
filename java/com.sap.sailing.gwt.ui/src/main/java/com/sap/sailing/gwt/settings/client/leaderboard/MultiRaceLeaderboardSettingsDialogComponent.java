@@ -21,6 +21,7 @@ import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sse.common.Util;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog.Validator;
+import com.sap.sse.security.ui.client.SecurityChildSettingsContext;
 import com.sap.sse.security.ui.client.premium.PaywallResolver;
 
 public class MultiRaceLeaderboardSettingsDialogComponent
@@ -64,7 +65,8 @@ public class MultiRaceLeaderboardSettingsDialogComponent
                 activeRaceColumnSelectionStrategy,
                 /* showAddedScores */ showAddedScoresCheckBox.getValue().booleanValue(),
                 showCompetitorShortNameColumnCheckBox.getValue(), showCompetitorFullNameColumnCheckBox.getValue(),
-                showCompetitorBoatInfoColumnCheckBox.getValue(), isCompetitorNationalityColumnVisible.getValue());
+                showCompetitorBoatInfoColumnCheckBox.getValue(), isCompetitorNationalityColumnVisible.getValue(),
+                new SecurityChildSettingsContext(leaderboardDTO, paywallResolver));
         return newSettings;
     }
 

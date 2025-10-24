@@ -1,14 +1,14 @@
 package com.sap.sailing.domain.swisstimingadapter.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.swisstimingadapter.SwissTimingFactory;
 import com.sap.sailing.domain.swisstimingadapter.SwissTimingFormatException;

@@ -143,7 +143,11 @@ public class RabbitOutputStream extends OutputStream {
                     message = new byte[count];
                 }
                 System.arraycopy(streamBuffer, 0, message, 0, count);
-                this.channel.basicPublish(/* exchangeName */"", /* routingKey */queueName, /* properties */null, message);
+                this.channel.basicPublish(/* empty exchange name means the default exchange with direct routing;
+                                             all queues by default bind to this exchange, using the queue name
+                                             as the routing key.
+                                             See also https://www.rabbitmq.com/tutorials/amqp-concepts#exchange-default
+                                           */ "", /* routingKey */ queueName, /* properties */ null, message);
                 count = 0;
             } else {
                 this.closed = true;

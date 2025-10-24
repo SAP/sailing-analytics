@@ -1,6 +1,6 @@
 package com.sap.sse.filestorage.services.test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,8 +10,8 @@ import java.net.URISyntaxException;
 import org.apache.commons.io.IOUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.sap.sse.filestorage.FileStorageService;
@@ -21,7 +21,7 @@ import com.sap.sse.filestorage.testsupport.AmazonS3TestSupport;
 import com.sap.sse.security.testsupport.SecurityServiceMockFactory;
 
 public class AmazonS3Test {
-    @Before
+    @BeforeEach
     public void setup() throws InvalidPropertiesException, IOException {
         setUpSecurity();
         storageService = AmazonS3TestSupport.createService(SecurityServiceMockFactory.mockSecurityService());

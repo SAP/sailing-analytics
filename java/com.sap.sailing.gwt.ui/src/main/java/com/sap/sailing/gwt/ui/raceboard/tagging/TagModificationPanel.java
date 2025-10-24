@@ -4,6 +4,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
+import com.sap.sailing.domain.common.RaceIdentifier;
 import com.sap.sailing.domain.common.dto.TagDTO;
 import com.sap.sailing.gwt.ui.client.SailingServiceAsync;
 import com.sap.sailing.gwt.ui.client.StringMessages;
@@ -38,7 +39,7 @@ public class TagModificationPanel extends FlowPanel {
      *            required for creation of {@link TagButton tag-buttons}
      */
     protected TagModificationPanel(TaggingComponent taggingComponent, TagFooterPanel tagFooterPanel,
-            SailingServiceAsync sailingService, StringMessages stringMessages, UserService userService) {
+            SailingServiceAsync sailingService, StringMessages stringMessages, UserService userService, RaceIdentifier raceIdentifier) {
         this.taggingComponent = taggingComponent;
         this.stringMessages = stringMessages;
         setStyleName(style.tagModificationPanel());
@@ -47,12 +48,12 @@ public class TagModificationPanel extends FlowPanel {
             public void ok(TagDTO editedObject) {
                 if (taggingComponent.getCurrentState().equals(State.EDIT_TAG)) {
                     taggingComponent.updateTag(taggingComponent.getSelectedTag(), inputPanel.getTag(), inputPanel.getComment(),
-                            inputPanel.getImageURL(), inputPanel.isVisibleForPublic());
+                            inputPanel.getHiddenInfo(), inputPanel.getImageURL(), inputPanel.isVisibleForPublic());
                     resetState();
                 } else {
                     if (taggingComponent.isLoggedInAndRaceLogAvailable()) {
-                        taggingComponent.saveTag(inputPanel.getTag(), inputPanel.getComment(), inputPanel.getImageURL(),
-                                inputPanel.isVisibleForPublic());
+                        taggingComponent.saveTag(inputPanel.getTag(), inputPanel.getComment(), inputPanel.getHiddenInfo(),
+                                inputPanel.getImageURL(), inputPanel.isVisibleForPublic());
                         // TODO: Add callback to saveTag() to clear fields only if tag got really added
                         inputPanel.clearAllValues();
                     }
@@ -77,7 +78,7 @@ public class TagModificationPanel extends FlowPanel {
         editCustomTagButtons.addStyleName("gwt-Button");
         editCustomTagButtons.addClickHandler(event -> {
             if (taggingComponent.isLoggedInAndRaceLogAvailable()) {
-                new TagButtonDialog(taggingComponent, tagFooterPanel, sailingService, stringMessages, userService);
+                new TagButtonDialog(taggingComponent, tagFooterPanel, sailingService, stringMessages, userService, raceIdentifier);
             }
         });
         inputPanel.getOkButton().setText(stringMessages.tagAddTag());

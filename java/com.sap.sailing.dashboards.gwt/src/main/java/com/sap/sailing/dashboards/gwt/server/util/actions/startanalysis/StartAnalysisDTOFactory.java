@@ -22,7 +22,7 @@ import com.sap.sailing.domain.common.NoWindException;
 import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.racelog.RacingProcedureType;
-import com.sap.sailing.domain.tracking.LineDetails;
+import com.sap.sailing.domain.shared.tracking.LineDetails;
 import com.sap.sailing.domain.tracking.MarkPassing;
 import com.sap.sailing.domain.tracking.TrackedLeg;
 import com.sap.sailing.domain.tracking.TrackedRace;
@@ -141,9 +141,9 @@ public final class StartAnalysisDTOFactory extends AbstractStartAnalysisCreation
         final TimePoint timePoint = startOfRace == null ? MillisecondsTimePoint.now() : startOfRace;
         LineDetails startline = trackedRace.getStartLine(timePoint);
         StartLineAdvantageDTO startLineAdvantageDTO = new StartLineAdvantageDTO();
-        startLineAdvantageDTO.startLineAdvatageType = getStartlineAdvantageType(trackedRace, new MillisecondsTimePoint(
+        startLineAdvantageDTO.startLineAdvantageType = getStartlineAdvantageType(trackedRace, new MillisecondsTimePoint(
                 new Date()));
-        startLineAdvantageDTO.startLineAdvantage = startline.getAdvantage().getMeters();
+        startLineAdvantageDTO.startLineAdvantage = startline == null ? null : startline.getAdvantage().getMeters();
         startAnalysisWindLineInfoDTO.startLineAdvantage = startLineAdvantageDTO;
 	if (trackedRace.getStartTimeReceived() != null) {
 	    Position portMarkPosition = trackedRace.getOrCreateTrack(

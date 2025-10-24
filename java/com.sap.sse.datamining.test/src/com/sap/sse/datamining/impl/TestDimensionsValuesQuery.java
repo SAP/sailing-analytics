@@ -10,8 +10,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.ModifiableDataMiningServer;
 import com.sap.sse.datamining.Query;
@@ -60,7 +60,7 @@ public class TestDimensionsValuesQuery {
     private Function<String> dimensionCompetitorSailID;
     
     @SuppressWarnings("unchecked")
-    @Before
+    @BeforeEach
     public void initializeDataRetrieverChain() {
         dataRetrieverChainDefinition = new SimpleDataRetrieverChainDefinition<>((Class<Collection<Test_Regatta>>)(Class<?>) Collection.class, Test_HasLegOfCompetitorContext.class, "TestRetrieverChain");
         Class<Processor<Collection<Test_Regatta>, Test_Regatta>> regattaRetrieverClass = (Class<Processor<Collection<Test_Regatta>, Test_Regatta>>)(Class<?>) TestRegattaRetrievalProcessor.class;
@@ -165,7 +165,7 @@ public class TestDimensionsValuesQuery {
         return expectedResultData;
     }
 
-    @Before
+    @BeforeEach
     public void initializeDimensions() throws NoSuchMethodException, SecurityException {
         Method getNameMethod = Test_Named.class.getMethod("getName", new Class<?>[0]);
         Function<?> getName = FunctionTestsUtil.getFunctionFactory().createMethodWrappingFunction(getNameMethod);
@@ -202,7 +202,7 @@ public class TestDimensionsValuesQuery {
         dimensionCompetitorSailID = FunctionTestsUtil.getFunctionFactory().createCompoundFunction(Arrays.asList(getCompetitor, getBoat, getSailID));
     }
     
-    @Before
+    @BeforeEach
     public void initializeDataSource() {
         dataSource = ComponentTestsUtil.createExampleDataSource();
     }

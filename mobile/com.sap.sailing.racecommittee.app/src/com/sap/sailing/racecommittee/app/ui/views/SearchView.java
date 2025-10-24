@@ -103,11 +103,11 @@ public class SearchView extends FrameLayout {
                 mEditText.requestFocus();
                 InputMethodManager imm = (InputMethodManager) getContext()
                         .getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
+                imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_IMPLICIT_ONLY);
             } else {
                 InputMethodManager imm = (InputMethodManager) getContext()
                         .getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0);
+                imm.hideSoftInputFromWindow(getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
                 mSearchIcon.setImageDrawable(BitmapHelper.getAttrDrawable(getContext(), R.attr.search_24dp));
                 mEditText.setText(null);
                 mEditText.setVisibility(GONE);

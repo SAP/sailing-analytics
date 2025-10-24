@@ -42,7 +42,7 @@ public class CourseMarkOverlay extends CanvasOverlayV3 {
 
     private final MarkVectorGraphics markVectorGraphics;
 
-    private Map<Integer, Util.Pair<Double, Size>> markScaleAndSizePerZoomCache; 
+    private Map<Double, Util.Pair<Double, Size>> markScaleAndSizePerZoomCache; 
     
     private Double lastWidth;
     private Double lastHeight;
@@ -60,7 +60,7 @@ public class CourseMarkOverlay extends CanvasOverlayV3 {
         this.position = markDTO.position;
         this.buoyZoneRadius = new MeterDistance(0.0);
         this.showBuoyZone = false;
-        this.markScaleAndSizePerZoomCache = new HashMap<Integer, Util.Pair<Double,Size>>();
+        this.markScaleAndSizePerZoomCache = new HashMap<>();
         this.markVectorGraphicsFactory = new MarkVectorGraphicsFactory();
         this.markVectorGraphics = markVectorGraphicsFactory.getMarkVectorGraphics(markDTO);
         setCanvasSize(50, 50);
@@ -68,8 +68,8 @@ public class CourseMarkOverlay extends CanvasOverlayV3 {
     
     @Override
     protected void draw() {
-        if (mapProjection != null && mark != null && position != null) {
-            int zoom = map.getZoom();
+        if (getMapProjection() != null && mark != null && position != null) {
+            double zoom = map.getZoom();
             Util.Pair<Double, Size> markScaleAndSize = markScaleAndSizePerZoomCache.get(zoom);
             if (markScaleAndSize == null) {
                 markScaleAndSize = getMarkScaleAndSize(position);
@@ -82,7 +82,7 @@ public class CourseMarkOverlay extends CanvasOverlayV3 {
             double canvasHeight = markScaleAndSize.getB().getHeight();
             double buoyZoneRadiusInPixel = -1;
             if (showBuoyZone && isMarkWithBuoyZone(mark)) {
-                buoyZoneRadiusInPixel = calculateRadiusOfBoundingBoxInPixels(mapProjection, position,
+                buoyZoneRadiusInPixel = calculateRadiusOfBoundingBoxInPixels(getMapProjection(), position,
                         buoyZoneRadius);
                 if (buoyZoneRadiusInPixel > MIN_BUOYZONE_RADIUS_IN_PX) {
                     canvasWidth = (buoyZoneRadiusInPixel + 1) * 2;
@@ -117,7 +117,7 @@ public class CourseMarkOverlay extends CanvasOverlayV3 {
             if (rotation != null) {
                 updateDrawingAngleAndSetCanvasRotation(coordinateSystem.mapDegreeBearing(rotation.getDegrees()));
             }
-            Point buoyPositionInPx = mapProjection.fromLatLngToDivPixel(coordinateSystem.toLatLng(position));
+            Point buoyPositionInPx = getMapProjection().fromLatLngToDivPixel(coordinateSystem.toLatLng(position));
             if (showBuoyZone && isMarkWithBuoyZone(mark) && buoyZoneRadiusInPixel > MIN_BUOYZONE_RADIUS_IN_PX) {
                 setCanvasPosition(buoyPositionInPx.getX() - buoyZoneRadiusInPixel, buoyPositionInPx.getY() - buoyZoneRadiusInPixel);
             } else {
@@ -149,7 +149,7 @@ public class CourseMarkOverlay extends CanvasOverlayV3 {
         // the original buoy vector graphics is too small (2.1m x 1.5m) for higher zoom levels
         // therefore we scale the buoys with factor 2 by default
         double buoyScaleFactor = 2.0;
-        Size markSizeInPixel = calculateBoundingBox(mapProjection, markPosition,
+        Size markSizeInPixel = calculateBoundingBox(getMapProjection(), markPosition,
                 markVectorGraphics.getMarkWidth().scale(buoyScaleFactor), markVectorGraphics.getMarkHeight().scale(buoyScaleFactor));
         double markHeightInPixel = markSizeInPixel.getHeight();
         if (markHeightInPixel < minMarkHeight) {

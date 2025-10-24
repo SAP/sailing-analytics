@@ -7,7 +7,7 @@ import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.Nationality;
 import com.sap.sailing.domain.common.dto.CompetitorDTO;
 import com.sap.sse.common.CountryCode;
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
+import com.sap.sse.gwt.shared.DTO;
 import com.sap.sse.security.shared.dto.NamedDTO;
 
 public class SimpleCompetitorDTO extends NamedDTO implements DTO, Serializable, Comparable<SimpleCompetitorDTO> {

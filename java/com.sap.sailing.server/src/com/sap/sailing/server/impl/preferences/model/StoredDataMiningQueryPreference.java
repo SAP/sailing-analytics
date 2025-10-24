@@ -15,9 +15,11 @@ public class StoredDataMiningQueryPreference extends AbstractGenericSerializable
     private transient StringSetting serializedQuery;
 
     public StoredDataMiningQueryPreference() {
+        super();
     }
 
     public StoredDataMiningQueryPreference(String name, UUID uuid, String serializedQuery) {
+        this();
         this.name.setValue(name);
         this.id.setValue(uuid);
         this.serializedQuery.setValue(serializedQuery);

@@ -20,9 +20,11 @@ public final class RegattaRaceStatesSettings extends AbstractGenericSerializable
     private transient BooleanSetting showOnlyCurrentlyRunningRaces;
 
     public RegattaRaceStatesSettings() {
+        super();
     }
     
     public RegattaRaceStatesSettings(Iterable<CourseAreaDTO> defaultCourseAreas, Iterable<RaceGroupDTO> defaultRaceGroups) {
+        this();
         setDefaultCourseAreas(defaultCourseAreas);
         setDefaultRegattas(defaultRaceGroups);
     }

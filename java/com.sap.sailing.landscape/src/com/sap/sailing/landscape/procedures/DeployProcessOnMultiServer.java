@@ -137,13 +137,11 @@ implements Procedure<ShardingKey> {
                 getApplicationConfigurationBuilder().setServerDirectory(ApplicationProcessHost.DEFAULT_SERVERS_PATH+"/"+getApplicationConfigurationBuilder().getServerName());
             }
             if (!getApplicationConfigurationBuilder().isPortSet()) {
-                // TODO bug5763: this is where the port is selected; the selection shall consider available ports on all other instances eligible for a shared replica
                 getApplicationConfigurationBuilder().setPort(getNextAvailablePort(getHostToDeployTo(),
                         SailingAnalyticsApplicationConfiguration.Builder.DEFAULT_PORT,
                         SailingAnalyticsProcess::getPort));
             }
             if (!getApplicationConfigurationBuilder().isTelnetPortSet()) {
-                // TODO bug5763: this is where the port is selected; the selection shall consider available ports on all other instances eligible for a shared replica
                 getApplicationConfigurationBuilder().setTelnetPort(getNextAvailablePort(getHostToDeployTo(),
                         SailingAnalyticsApplicationConfiguration.Builder.DEFAULT_TELNET_PORT,
                         ap->{
@@ -155,7 +153,6 @@ implements Procedure<ShardingKey> {
                         }));
             }
             if (!getApplicationConfigurationBuilder().isExpeditionPortSet()) {
-                // TODO bug5763: this is where the port is selected; the selection shall consider available ports on all other instances eligible for a shared replica
                 getApplicationConfigurationBuilder().setExpeditionPort(getNextAvailablePort(getHostToDeployTo(),
                         SailingAnalyticsApplicationConfiguration.Builder.DEFAULT_EXPEDITION_PORT,
                         ap->{
@@ -165,6 +162,10 @@ implements Procedure<ShardingKey> {
                                 throw new RuntimeException(e);
                             }
                         }));
+            }
+            if (!getApplicationConfigurationBuilder().isIgtimiRiotPortSet() && getApplicationConfigurationBuilder().getServerName().equals(SharedLandscapeConstants.IGTIMI_DEFAULT_RIOT_REPLICA_SET_NAME)) {
+                // we deploy a process instance for the Igtimi Riot replica set; so we'll set the port to the default value:
+                getApplicationConfigurationBuilder().setIgtimiRiotPort(SharedLandscapeConstants.IGTIMI_DEFAULT_RIOT_PORT);
             }
             return new DeployProcessOnMultiServer<>(this);
         }
@@ -284,19 +285,14 @@ implements Procedure<ShardingKey> {
                     "sudo /usr/local/bin/cp_root_mail_properties "+applicationConfiguration.getServerName()+"; "+
                     "cd "+serverDirectory.replaceAll("\"", "\\\\\"")+"; "+
                     "echo '"+applicationConfiguration.getAsEnvironmentVariableAssignments().replaceAll("\"", "\\\\\"").replaceAll("\\$", "\\\\\\$")+
-                    "' | /home/sailing/code/java/target/refreshInstance.sh auto-install-from-stdin; ./start\";", // SAILING_USER ends here
+                    "' | /usr/local/bin/refreshInstance.sh auto-install-from-stdin; ./start\";", // SAILING_USER ends here
                     "stderr: ", Level.WARNING);
-            logger.info("stdout: "+stdout);
-        }
-        {
-            logger.info("Reloading/starting httpd on "+getHostToDeployTo()+" after application deployment");
-            final SshCommandChannel sshChannel = getHostToDeployTo().createRootSshChannel(optionalTimeout, optionalKeyName, privateKeyEncryptionPassphrase);
-            final String stdout = sshChannel.runCommandAndReturnStdoutAndLogStderr("if [ \"$( service httpd status )\" = \"httpd is stopped\" ]; then service httpd start; else service httpd reload; fi", "stderr: ", Level.WARNING);
             logger.info("stdout: "+stdout);
         }
         process = new SailingAnalyticsProcessImpl<>(applicationConfiguration.getPort(), getHostToDeployTo(),
                 serverDirectory, applicationConfiguration.getTelnetPort(),
-                applicationConfiguration.getServerName(), applicationConfiguration.getExpeditionPort(), getLandscape());
+                applicationConfiguration.getServerName(), applicationConfiguration.getExpeditionPort(),
+                applicationConfiguration.getIgtimiRiotPort(), getLandscape());
     }
     
     public SailingAnalyticsProcess<ShardingKey> getProcess() {

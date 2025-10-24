@@ -1,11 +1,11 @@
-ARG SAPJVM_VERSION=8.1.098
+ARG SAPJVM_VERSION=8.1.103
 FROM docker.sapsailing.com/sapjvm8:${SAPJVM_VERSION}
 LABEL maintainer=axel.uhl@sap.com
 # Download and extract the release
 WORKDIR /home/sailing
 RUN chmod 777 /home/sailing
-RUN curl -fsSL https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add -
-RUN echo "deb [arch=amd64,arm64] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" >/etc/apt/sources.list.d/mongodb-org-4.4.list
+RUN curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | apt-key add -
+RUN echo "deb [arch=amd64,arm64] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/7.0 multiverse" >/etc/apt/sources.list.d/mongodb-org-7.0.list
 RUN apt-get update \
  && apt-get install -y vim mongodb-org-shell
 COPY vimrc /root/.vimrc

@@ -1,8 +1,8 @@
 package com.sap.sailing.gwt.home.shared.partials.regattacompetition;
 
-import static com.sap.sailing.gwt.ui.common.client.DateAndTimeFormatterUtil.shortTimeFormatter;
-import static com.sap.sailing.gwt.ui.common.client.DateAndTimeFormatterUtil.weekdayMonthAbbrDayDateFormatter;
 import static com.sap.sse.common.impl.MillisecondsTimePoint.now;
+import static com.sap.sse.gwt.client.DateAndTimeFormatterUtil.shortTimeFormatter;
+import static com.sap.sse.gwt.client.DateAndTimeFormatterUtil.weekdayMonthAbbrDayDateFormatter;
 
 import java.util.Date;
 

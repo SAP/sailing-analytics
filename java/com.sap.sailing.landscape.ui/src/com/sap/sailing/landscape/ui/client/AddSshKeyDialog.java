@@ -1,7 +1,7 @@
 package com.sap.sailing.landscape.ui.client;
 
 import com.google.gwt.user.client.ui.FileUpload;
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextArea;
@@ -89,7 +89,7 @@ public class AddSshKeyDialog extends DataEntryDialog<Triple<String, String, Stri
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return keyPairNameBox;
     }
 

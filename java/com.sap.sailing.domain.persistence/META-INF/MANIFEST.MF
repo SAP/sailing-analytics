@@ -28,14 +28,16 @@ Export-Package: com.sap.sailing.domain.persistence,
    com.sap.sailing.server.gateway.test,
    com.sap.sailing.domain.racelogtrackingadapter.testsupport,
    com.sap.sailing.domain.racelogtrackingadapter.test,
-   com.sap.sailing.server",
+   com.sap.sailing.server,
+   com.sap.sailing.domain.queclinkadapter.test",
  com.sap.sailing.domain.persistence.media,
  com.sap.sailing.domain.persistence.racelog.tracking,
  com.sap.sailing.domain.persistence.racelog.tracking.impl;
   x-friends:="com.sap.sailing.domain.racelogtrackingadapter.testsupport,
    com.sap.sailing.mongodb.test,
    com.sap.sailing.domain.racelogtrackingadapter.test,
-   com.sap.sailing.server"
+   com.sap.sailing.server,
+   com.sap.sailing.domain.queclinkadapter.test"
 Bundle-ActivationPolicy: lazy
 Import-Package: org.json.simple,
  org.json.simple.parser,

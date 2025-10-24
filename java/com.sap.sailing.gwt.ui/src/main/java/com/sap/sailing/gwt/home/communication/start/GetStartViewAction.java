@@ -11,14 +11,14 @@ import com.google.gwt.core.shared.GwtIncompatible;
 import com.sap.sailing.domain.base.EventBase;
 import com.sap.sailing.gwt.home.communication.SailingAction;
 import com.sap.sailing.gwt.home.communication.SailingDispatchContext;
-import com.sap.sailing.gwt.home.communication.event.EventLinkDTO;
-import com.sap.sailing.gwt.home.communication.event.EventReferenceDTO;
-import com.sap.sailing.gwt.home.communication.media.SailingImageDTO;
-import com.sap.sailing.gwt.home.communication.media.SailingVideoDTO;
 import com.sap.sailing.gwt.server.EventHolder;
 import com.sap.sailing.gwt.server.EventStageCandidateCalculator;
 import com.sap.sailing.gwt.server.HomeServiceUtil;
 import com.sap.sailing.gwt.server.RecentEventsCalculator;
+import com.sap.sailing.gwt.ui.client.shared.SailingVideoDTO;
+import com.sap.sailing.gwt.ui.shared.EventLinkDTO;
+import com.sap.sailing.gwt.ui.shared.EventReferenceDTO;
+import com.sap.sailing.gwt.ui.shared.SailingImageDTO;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.media.MediaTagConstants;
@@ -78,11 +78,10 @@ public class GetStartViewAction implements SailingAction<StartViewDTO>, IsClient
         final List<SailingVideoDTO> videoCandidates = new ArrayList<>();
         for (EventHolder holder : recentEventsCalculator.getEventsNewestFirst()) {
             if (result.getRecentEvents().size() < MAX_RECENT_EVENTS) {
-                result.addRecentEvent(HomeServiceUtil.convertToEventListDTO(holder.event, holder.baseURL, holder.onRemoteServer, context.getRacingEventService()));
+                result.addRecentEvent(HomeServiceUtil.convertToEventListDTO(holder.event, holder.baseURL, holder.onRemoteServer));
             }
             EventBase event = holder.event;
-            EventLinkDTO eventLink = HomeServiceUtil.convertToEventLinkDTO(holder.event, holder.baseURL,
-                    holder.onRemoteServer, context.getRacingEventService());
+            EventLinkDTO eventLink = HomeServiceUtil.convertToEventLinkDTO(holder.event, holder.baseURL, holder.onRemoteServer);
             EventReferenceDTO eventRef = new EventReferenceDTO(holder.event);
             for (ImageDescriptor url : HomeServiceUtil.getSailingLovesPhotographyImages(event)) {
                 if (url.hasSize()) {

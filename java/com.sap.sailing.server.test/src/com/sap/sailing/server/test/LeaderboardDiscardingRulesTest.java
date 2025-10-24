@@ -1,13 +1,13 @@
 package com.sap.sailing.server.test;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Collections;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.BoatClass;
 import com.sap.sailing.domain.base.CompetitorWithBoat;
@@ -36,7 +36,7 @@ public class LeaderboardDiscardingRulesTest {
 
     private RacingEventService racingEventService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         racingEventService = new RacingEventServiceImpl();
     }

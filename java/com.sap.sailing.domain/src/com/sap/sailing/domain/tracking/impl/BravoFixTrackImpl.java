@@ -10,12 +10,13 @@ import com.sap.sailing.domain.common.scalablevalue.impl.ScalableDistance;
 import com.sap.sailing.domain.common.tracking.BravoExtendedFix;
 import com.sap.sailing.domain.common.tracking.BravoFix;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
-import com.sap.sailing.domain.tracking.AddResult;
+import com.sap.sailing.domain.shared.tracking.AddResult;
+import com.sap.sailing.domain.shared.tracking.Track;
+import com.sap.sailing.domain.shared.tracking.impl.TimeRangeCache;
 import com.sap.sailing.domain.tracking.BravoFixTrack;
 import com.sap.sailing.domain.tracking.DynamicBravoFixTrack;
 import com.sap.sailing.domain.tracking.GPSFixTrack;
 import com.sap.sailing.domain.tracking.GPSTrackListener;
-import com.sap.sailing.domain.tracking.Track;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
@@ -71,6 +72,7 @@ public class BravoFixTrackImpl<ItemType extends WithID & Serializable> extends S
     private transient TimeRangeCache<Pair<Double, Long>> expeditionRateOfTurnCache;
     private transient TimeRangeCache<Pair<Double, Long>> expeditionTimeToBurnToLineCache;
     private transient TimeRangeCache<Pair<Double, Long>> expeditionDistanceBelowLineInMetersCache;
+    private transient TimeRangeCache<Pair<Double, Long>> expeditionKickerTensionCache;
     
     /**
      * If a GPS track was provided at construction time, remember it non-transiently. It is needed when restoring
@@ -489,6 +491,17 @@ public class BravoFixTrackImpl<ItemType extends WithID & Serializable> extends S
                 ScalableDouble::new);
     }
     
+    @Override
+    public Double getExpeditionKickerTensionIfAvailable(TimePoint timePoint) {
+        return getValueFromExtendedFixSkippingNullValues(timePoint, BravoExtendedFix::getExpeditionKickerTension,
+                ScalableDouble::new);
+    }
+
+    @Override
+    public Double getAverageExpeditionKickerTensionIfAvailable(TimePoint start, TimePoint endTimePoint) {
+        return getAverageOfBravoExtenededFixValueWithCachingForDouble(start, endTimePoint, BravoExtendedFix::getExpeditionKickerTension, expeditionKickerTensionCache);
+    }
+
     @Override
     public Double getAverageExpeditionAWAIfAvailable(TimePoint start, TimePoint endTimePoint){
         return getAverageOfBravoExtenededFixValueWithCachingForDouble(start, endTimePoint, BravoExtendedFix::getExpeditionAWA, expeditionAWACache);

@@ -1,3 +1,4 @@
 #!/bin/bash
+# Requires a checked out copy of the git workspace at /home/sailing/code
 #sourceanalyzer -b com.sap.sailing.domain -scan
 sourceanalyzer -b com.sap.sailing.domain -Xmx6000m -scan "-f" "/home/sailing/code/java/com.sap.sailing_scan.fpr"

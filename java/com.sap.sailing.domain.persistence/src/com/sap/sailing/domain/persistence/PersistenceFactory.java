@@ -10,9 +10,11 @@ public interface PersistenceFactory {
     
     DomainObjectFactory getDefaultDomainObjectFactory();
     DomainObjectFactory getDomainObjectFactory(MongoDBService mongoDBService, DomainFactory baseDomainFactory);
+    DomainObjectFactory getMajorityDomainObjectFactory(MongoDBService mongoDBService, DomainFactory baseDomainFactory);
     DomainObjectFactory getDomainObjectFactory(MongoDBService mongoDBService, DomainFactory baseDomainFactory, TypeBasedServiceFinderFactory serviceFinderFactory);
     MongoObjectFactory getDefaultMongoObjectFactory();
     MongoObjectFactory getMongoObjectFactory(MongoDBService mongoDBService);
+    MongoObjectFactory getMajorityMongoObjectFactory(MongoDBService mongoDBService);
     MongoObjectFactory getDefaultMongoObjectFactory(TypeBasedServiceFinderFactory serviceFinderFactory);
     MongoObjectFactory getMongoObjectFactory(MongoDBService mongoDBService, TypeBasedServiceFinderFactory serviceFinderFactory);
 }

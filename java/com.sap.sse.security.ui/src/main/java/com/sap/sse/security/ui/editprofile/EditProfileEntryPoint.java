@@ -179,6 +179,8 @@ public class EditProfileEntryPoint implements EntryPoint {
                                 Notification.notify(stringMessages.passwordDoesNotMeetRequirements(), NotificationType.ERROR);
                             } else if (UserManagementException.INVALID_CREDENTIALS.equals(message)) {
                                 Notification.notify(stringMessages.invalidCredentials(), NotificationType.ERROR);
+                            } else if (UserManagementException.PASSWORD_AUTHENTICATION_CURRENTLY_LOCKED_FOR_USER.equals(message)) {
+                                Notification.notify(stringMessages.passwordAuthenticationCurrentlyLockedForUser(), NotificationType.ERROR);
                             } else {
                                 Notification.notify(stringMessages.errorChangingPassword(caught.getMessage()), NotificationType.ERROR);
                             }

@@ -1,13 +1,13 @@
 package com.sap.sailing.declination.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.text.ParseException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 import com.sap.sailing.declination.Declination;
@@ -24,7 +24,7 @@ public abstract class SimpleDeclinationTest<I extends DeclinationImporter> exten
         final MillisecondsTimePoint timePoint = new MillisecondsTimePoint(simpleDateFormat.parse("2019-12-10").getTime());
         Declination record = importer.importRecord(new DegreePosition(53, 3), timePoint);
         assertEquals(0.96886, record.getBearing().getDegrees(), 0.1);
-        assertEquals(0.19616, record.getAnnualChange().getDegrees(), 0.01);
+        assertEquals(0.18523, record.getAnnualChange().getDegrees(), 0.01);
         TimePoint oneYearLater = timePoint.plus(Duration.ONE_YEAR);
         Bearing bearing = record.getBearingCorrectedTo(oneYearLater);
         assertEquals(0.96886+record.getAnnualChange().getDegrees(), bearing.getDegrees(), 0.1);
@@ -35,7 +35,7 @@ public abstract class SimpleDeclinationTest<I extends DeclinationImporter> exten
         final MillisecondsTimePoint timePoint = new MillisecondsTimePoint(simpleDateFormat.parse("2019-12-11").getTime());
         Declination record = importer.importRecord(new DegreePosition(53, 3), timePoint);
         assertEquals(0.96886, record.getBearing().getDegrees(), 0.1);
-        assertEquals(0.19616, record.getAnnualChange().getDegrees(), 0.01);
+        assertEquals(0.18523, record.getAnnualChange().getDegrees(), 0.01);
         TimePoint oneYearEarlier = timePoint.minus(Duration.ONE_YEAR);
         Bearing bearing = record.getBearingCorrectedTo(oneYearEarlier);
         assertEquals(0.96886-record.getAnnualChange().getDegrees(), bearing.getDegrees(), 0.1);

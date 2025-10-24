@@ -1,7 +1,7 @@
 #!/bin/bash
 killall autossh
 # Tunnel to cloud MongoDB on port 10203; reverse tunnel to localhost:10202 for MongoDB
-autossh -M 21504 -f -A -N \
+AUTOSSH_LOGLEVEL=7 AUTOSSH_POLL=5 autossh -M 21504 -f -A -N \
   -L 443:localhost:9443 \
   -L 5673:localhost:5672 \
   -L 15673:localhost:15673 \

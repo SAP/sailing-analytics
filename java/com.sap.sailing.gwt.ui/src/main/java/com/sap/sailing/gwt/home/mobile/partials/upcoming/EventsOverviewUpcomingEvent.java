@@ -33,10 +33,8 @@ public class EventsOverviewUpcomingEvent extends Composite {
     public EventsOverviewUpcomingEvent(final EventListEventDTO event, final MobilePlacesNavigator navigator) {
         EventsOverviewUpcomingResources.INSTANCE.css().ensureInjected();
         initWidget(uiBinder.createAndBindUi(this));
-
         eventNavigation = navigator.getEventNavigation(event.getId().toString(), event.getBaseURL(), event.isOnRemoteServer());
         eventOverviewLink.setHref(eventNavigation.getTargetUrl());
-        
         eventName.setInnerText(event.getDisplayName());
         venueName.setInnerText(event.getVenue());
         eventStartDate.setInnerText(EventDatesFormatterUtil.formatDateRangeWithoutYear(event.getStartDate(), event.getEndDate()));

@@ -7,6 +7,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.sap.sailing.gwt.ui.client.media.VideoJSPlayer;
 import com.sap.sse.common.media.MimeType;
+import com.sap.sse.gwt.resources.CommonControlsCSS;
 
 public class VideoPopupWindow extends AbstractPopupWindow implements ContextMenuHandler {
 
@@ -15,25 +16,21 @@ public class VideoPopupWindow extends AbstractPopupWindow implements ContextMenu
 
     @Override
     protected void initializePlayer() {
-
         RootLayoutPanel mainPanel = RootLayoutPanel.get();
-
+        CommonControlsCSS.ensureInjected();
         String title = Window.Location.getParameter("title");
         Window.setTitle(title);
-
         String videoUrl = Window.Location.getParameter("url");
         String mimeType = Window.Location.getParameter("mimetype");
         isDebug = Window.Location.getParameter("gwt.codesvr") != null;
-
         if (videoUrl != null) {
-            videoJSDelegate = new VideoJSPlayer(true, false);
-            videoJSDelegate.setVideo(MimeType.valueOf(mimeType), videoUrl);
+            videoJSDelegate = new VideoJSPlayer(true, false, getUserService(), "takedownRequestForRaceVideo");
+            videoJSDelegate.setVideo(MimeType.valueOf(mimeType), videoUrl, Window.Location.getParameter("eventName"));
             mainPanel.add(videoJSDelegate);
             initPlay();
         } else {
             mainPanel.add(new Label("Parameter 'url' not assigned."));
         }
-
     }
 
     native void initPlay() /*-{
@@ -118,5 +115,4 @@ public class VideoPopupWindow extends AbstractPopupWindow implements ContextMenu
     protected void setVideoSize(int width, int height) {
         videoJSDelegate.setPixelSize(width, height);
     }
-
 }

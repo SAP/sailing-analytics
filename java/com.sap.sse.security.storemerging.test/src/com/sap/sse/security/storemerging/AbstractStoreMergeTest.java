@@ -4,20 +4,24 @@ import java.io.IOException;
 import java.util.UUID;
 
 import org.bson.Document;
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.ReadConcern;
 import com.mongodb.WriteConcern;
+import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.mongodb.MongoDBConfiguration;
+import com.sap.sse.mongodb.MongoDBService;
 import com.sap.sse.security.interfaces.AccessControlStore;
 import com.sap.sse.security.interfaces.UserStore;
 import com.sap.sse.security.shared.UserStoreManagementException;
 import com.sap.sse.security.storemerging.test.MongoDBFiller;
 import com.sap.sse.security.userstore.mongodb.impl.CollectionNames;
+import com.sap.sse.security.userstore.mongodb.impl.sessionwrapper.MongoDatabaseWrapperWithClientSession;
 
 /**
  * To create a new test suite based on a test frame, create source and target DB content. Start by running
@@ -71,29 +75,48 @@ public abstract class AbstractStoreMergeTest {
             .getMongoClientURI().getConnectionString()
             .replace(MongoDBConfiguration.getDefaultTestConfiguration().getMongoClientURI().getDatabase(),
                     UUID.randomUUID().toString());
+    private final static String importTargetMongoDbUri = MongoDBConfiguration.getDefaultTestConfiguration()
+            .getMongoClientURI().getConnectionString()
+            .replace(MongoDBConfiguration.getDefaultTestConfiguration().getMongoClientURI().getDatabase(),
+                    UUID.randomUUID().toString());
     protected final static String defaultCreationGroupNameForSource = "dummy-default-creation-group-for-source";
     protected final static String defaultCreationGroupNameForTarget = "dummy-default-creation-group-for-target";
-    protected MongoDBConfiguration cfgForSource;
+    protected static MongoDBConfiguration cfgForSource;
+    protected static MongoDBConfiguration cfgForTarget;
+    protected static ClientSession causallyConsistentSessionForSource;
+    private static ClientSession causallyConsistentSessionForTarget;
+    private static MongoDBService targetService;
+    protected static MongoDBService sourceService;
     private MongoDatabase targetDb;
-    protected MongoDBConfiguration cfgForTarget;
     protected SecurityStoreMerger merger;
     protected UserStore targetUserStore;
     protected AccessControlStore targetAccessControlStore;
 
-    protected void setUp(String sourceVariant, String targetVariant) throws IOException, UserStoreManagementException {
-        cfgForTarget = MongoDBConfiguration.getDefaultTestConfiguration();
-        targetDb = cfgForTarget.getService().getDB().withReadConcern(ReadConcern.MAJORITY).withWriteConcern(WriteConcern.MAJORITY);
-        fill(targetVariant, targetDb);
+    @BeforeAll
+    public static void setUpCausallyConsistentSession() {
+        cfgForTarget = new MongoDBConfiguration(new ConnectionString(importTargetMongoDbUri));
+        targetService = cfgForTarget.getService();
+        causallyConsistentSessionForTarget = targetService.startCausallyConsistentSession();
+        new MongoDatabaseWrapperWithClientSession(causallyConsistentSessionForTarget, targetService.getDB()).withReadConcern(ReadConcern.MAJORITY).withWriteConcern(WriteConcern.MAJORITY).drop();
         cfgForSource = new MongoDBConfiguration(new ConnectionString(importSourceMongoDbUri));
-        fill(sourceVariant, cfgForSource.getService().getDB().withReadConcern(ReadConcern.MAJORITY).withWriteConcern(WriteConcern.MAJORITY));
-        merger = new SecurityStoreMerger(cfgForTarget, defaultCreationGroupNameForTarget);
+        sourceService = cfgForSource.getService();
+        causallyConsistentSessionForSource = sourceService.startCausallyConsistentSession();
+        new MongoDatabaseWrapperWithClientSession(causallyConsistentSessionForSource, sourceService.getDB()).withReadConcern(ReadConcern.MAJORITY).withWriteConcern(WriteConcern.MAJORITY).drop();
+    }
+
+    protected void setUp(String sourceVariant, String targetVariant) throws IOException, UserStoreManagementException {
+        targetDb = new MongoDatabaseWrapperWithClientSession(causallyConsistentSessionForTarget, targetService.getDB().withReadConcern(ReadConcern.MAJORITY).withWriteConcern(WriteConcern.MAJORITY));
+        fill(targetVariant, targetDb);
+        fill(sourceVariant, new MongoDatabaseWrapperWithClientSession(causallyConsistentSessionForSource, sourceService.getDB().withReadConcern(ReadConcern.MAJORITY).withWriteConcern(WriteConcern.MAJORITY)));
+        merger = new SecurityStoreMerger(causallyConsistentSessionForTarget, cfgForTarget, targetService, defaultCreationGroupNameForTarget);
         targetUserStore = merger.getTargetUserStore();
         targetAccessControlStore = merger.getTargetAccessControlStore();
     }
     
-    @After
+    @AfterEach
     public void tearDown() {
-        cfgForSource.getService().getDB().withReadConcern(ReadConcern.MAJORITY).withWriteConcern(WriteConcern.MAJORITY).drop();
+        new MongoDatabaseWrapperWithClientSession(causallyConsistentSessionForSource, sourceService.getDB()).withReadConcern(ReadConcern.MAJORITY).withWriteConcern(WriteConcern.MAJORITY).drop();
+        new MongoDatabaseWrapperWithClientSession(causallyConsistentSessionForTarget, targetService.getDB()).withReadConcern(ReadConcern.MAJORITY).withWriteConcern(WriteConcern.MAJORITY).drop();
     }
 
     private void fill(final String variant, final MongoDatabase db) throws IOException {
@@ -121,7 +144,7 @@ public abstract class AbstractStoreMergeTest {
      * @return the source user store and the source access control store in their original, merge-unmodified version
      */
     protected Pair<UserStore, AccessControlStore> readSourceStores() throws UserStoreManagementException {
-        return merger.readStores(cfgForSource, defaultCreationGroupNameForSource);
+        return merger.readStores(causallyConsistentSessionForSource, cfgForSource, sourceService, defaultCreationGroupNameForSource);
     }
 
     /**

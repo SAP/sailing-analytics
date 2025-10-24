@@ -29,13 +29,13 @@ import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.markpassingcalculation.Candidate;
 import com.sap.sailing.domain.markpassingcalculation.CandidateChooser;
 import com.sap.sailing.domain.markpassingcalculation.MarkPassingCalculator;
+import com.sap.sailing.domain.shared.tracking.impl.TimedComparator;
 import com.sap.sailing.domain.tracking.DynamicTrackedRace;
 import com.sap.sailing.domain.tracking.GPSFixTrack;
 import com.sap.sailing.domain.tracking.MarkPassing;
 import com.sap.sailing.domain.tracking.TrackedLeg;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.domain.tracking.impl.MarkPassingImpl;
-import com.sap.sailing.domain.tracking.impl.TimedComparator;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.Speed;
@@ -491,22 +491,26 @@ public class CandidateChooserImpl implements CandidateChooser {
     public void setFixedPassing(Competitor c, Integer zeroBasedIndexOfWaypoint, TimePoint t) {
         final NamedReentrantReadWriteLock lock = perCompetitorLocks.get(c);
         if (lock != null) { // otherwise this is a phony competitor and we aren't interested in fixed mark passings for it
-            LockUtil.lockForWrite(lock);
-            try {
-                Candidate fixedCan = new CandidateForFixedMarkPassingImpl(zeroBasedIndexOfWaypoint + 1, t, 1, Util.get(race.getRace().getCourse().getWaypoints(), zeroBasedIndexOfWaypoint));
-                NavigableSet<Candidate> fixed = fixedPassings.get(c);
-                if (fixed != null) { // can only set the mark passing if the competitor is still part of this race
-                    if (!fixed.add(fixedCan)) {
-                        Candidate old = fixed.ceiling(fixedCan);
-                        fixed.remove(old);
-                        removeCandidates(c, Collections.singleton(old));
-                        fixed.add(fixedCan);
+            if (zeroBasedIndexOfWaypoint >= 0 && zeroBasedIndexOfWaypoint < race.getRace().getCourse().getNumberOfWaypoints()) {
+                LockUtil.lockForWrite(lock);
+                try {
+                    Candidate fixedCan = new CandidateForFixedMarkPassingImpl(zeroBasedIndexOfWaypoint + 1, t, 1, Util.get(race.getRace().getCourse().getWaypoints(), zeroBasedIndexOfWaypoint));
+                    NavigableSet<Candidate> fixed = fixedPassings.get(c);
+                    if (fixed != null) { // can only set the mark passing if the competitor is still part of this race
+                        if (!fixed.add(fixedCan)) {
+                            Candidate old = fixed.ceiling(fixedCan);
+                            fixed.remove(old);
+                            removeCandidates(c, Collections.singleton(old));
+                            fixed.add(fixedCan);
+                        }
+                        addCandidates(c, Collections.singleton(fixedCan));
+                        findShortestPath(c);
                     }
-                    addCandidates(c, Collections.singleton(fixedCan));
-                    findShortestPath(c);
+                } finally {
+                    LockUtil.unlockAfterWrite(lock);
                 }
-            } finally {
-                LockUtil.unlockAfterWrite(lock);
+            } else {
+                logger.warning("Competitor "+c+" has fixed mark passing for non-existing waypoint #"+(zeroBasedIndexOfWaypoint+1));
             }
         }
     }

@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import org.json.simple.parser.ParseException;
 
 import com.sap.sailing.domain.base.Event;
+import com.sap.sailing.domain.base.EventListener;
 import com.sap.sailing.domain.base.Venue;
 import com.sap.sailing.domain.common.Placemark;
 import com.sap.sailing.domain.common.Position;
@@ -23,8 +24,8 @@ import com.sap.sailing.domain.common.WindSourceType;
 import com.sap.sailing.domain.common.scalablevalue.impl.ScalablePosition;
 import com.sap.sailing.domain.leaderboard.Leaderboard;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroup;
+import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
 import com.sap.sailing.domain.tracking.TrackedRace;
-import com.sap.sailing.domain.tracking.TrackingConnectorInfo;
 import com.sap.sailing.geocoding.ReverseGeocoder;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
@@ -33,9 +34,11 @@ public class EventImpl extends EventBaseImpl implements Event {
     private static final long serialVersionUID = 855135446595485715L;
     private static final Logger logger = Logger.getLogger(EventImpl.class.getName());
 
-    private ConcurrentLinkedQueue<LeaderboardGroup> leaderboardGroups;
+    private final ConcurrentLinkedQueue<LeaderboardGroup> leaderboardGroups;
     
-    private ConcurrentMap<String, Boolean> windFinderReviewedSpotsCollectionIds;
+    private final ConcurrentMap<String, Boolean> windFinderReviewedSpotsCollectionIds;
+    
+    private transient ConcurrentMap<EventListener, Boolean> eventListeners;
     
     public EventImpl(String name, TimePoint startDate, TimePoint endDate, String venueName, boolean isPublic, UUID id) {
         this(name, startDate, endDate, new VenueImpl(venueName), isPublic, id);
@@ -48,15 +51,13 @@ public class EventImpl extends EventBaseImpl implements Event {
         super(name, startDate, endDate, venue, isPublic, id);
         this.leaderboardGroups = new ConcurrentLinkedQueue<>();
         this.windFinderReviewedSpotsCollectionIds = new ConcurrentHashMap<>();
+        this.eventListeners = new ConcurrentHashMap<>();
     }
 
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
         ois.defaultReadObject();
-        if (leaderboardGroups == null) {
-            leaderboardGroups = new ConcurrentLinkedQueue<>();
-        }
-        if (windFinderReviewedSpotsCollectionIds == null) {
-            windFinderReviewedSpotsCollectionIds = new ConcurrentHashMap<>();
+        if (eventListeners == null) {
+            eventListeners = new ConcurrentHashMap<>();
         }
     }
     
@@ -78,11 +79,24 @@ public class EventImpl extends EventBaseImpl implements Event {
     @Override
     public void addLeaderboardGroup(LeaderboardGroup leaderboardGroup) {
         leaderboardGroups.add(leaderboardGroup);
+        eventListeners.keySet().forEach(eventListener->eventListener.leaderboardGroupAdded(this, leaderboardGroup));
     }
 
     @Override
     public boolean removeLeaderboardGroup(LeaderboardGroup leaderboardGroup) {
-        return leaderboardGroups.remove(leaderboardGroup);
+        final boolean result = leaderboardGroups.remove(leaderboardGroup);
+        eventListeners.keySet().forEach(eventListener->eventListener.leaderboardGroupRemoved(this, leaderboardGroup));
+        return result;
+    }
+    
+    @Override
+    public void addEventListener(EventListener eventListener) {
+        eventListeners.put(eventListener, true);
+    }
+
+    @Override
+    public void removeEventListener(EventListener eventListener) {
+        eventListeners.remove(eventListener);
     }
 
     @Override

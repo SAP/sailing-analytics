@@ -1,10 +1,10 @@
 package com.sap.sse.shared.android.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Comparator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.shared.util.impl.ArrayListNavigableSet;
 

@@ -66,6 +66,7 @@ public class CreateApplicationReplicaSetDialog extends AbstractApplicationReplic
         private final String optionalDomainName;
         private final Integer optionalMemoryInMegabytesOrNull;
         private final Integer optionalMemoryTotalSizeFactorOrNull;
+        private final Integer optionalIgtimiRiotPort;
         private final boolean firstReplicaOnSharedInstance;
         
         public CreateApplicationReplicaSetInstructions(String name, boolean sharedMasterInstance, String dedicatedInstanceType,
@@ -73,7 +74,7 @@ public class CreateApplicationReplicaSetDialog extends AbstractApplicationReplic
                 boolean dynamicLoadBalancerMapping, String masterReplicationBearerToken,
                 String replicaReplicationBearerToken, String optionalDomainName,
                 Integer optionalMemoryInMegabytesOrNull, Integer optionalMemoryTotalSizeFactorOrNull,
-                boolean firstReplicaOnSharedInstance) {
+                Integer optionalIgtimiRiotPort, boolean firstReplicaOnSharedInstance) {
             super(releaseNameOrNullForLatestMaster, masterReplicationBearerToken, replicaReplicationBearerToken);
             this.name = name;
             this.sharedMasterInstance = sharedMasterInstance;
@@ -84,6 +85,7 @@ public class CreateApplicationReplicaSetDialog extends AbstractApplicationReplic
             this.optionalMemoryInMegabytesOrNull = optionalMemoryInMegabytesOrNull;
             this.optionalMemoryTotalSizeFactorOrNull = optionalMemoryTotalSizeFactorOrNull;
             this.firstReplicaOnSharedInstance = firstReplicaOnSharedInstance;
+            this.optionalIgtimiRiotPort = optionalIgtimiRiotPort;
         }
         public String getName() {
             return name;
@@ -108,6 +110,9 @@ public class CreateApplicationReplicaSetDialog extends AbstractApplicationReplic
         }
         public Integer getOptionalMemoryTotalSizeFactorOrNull() {
             return optionalMemoryTotalSizeFactorOrNull;
+        }
+        public Integer getOptionalIgtimiRiotPort() {
+            return optionalIgtimiRiotPort;
         }
         public boolean isFirstReplicaOnSharedInstance() {
             return firstReplicaOnSharedInstance;
@@ -178,6 +183,7 @@ public class CreateApplicationReplicaSetDialog extends AbstractApplicationReplic
     private final TextBox domainNameBox;
     private final IntegerBox memoryInMegabytesBox;
     private final IntegerBox memoryTotalSizeFactorBox;
+    private final IntegerBox igtimiRiotPortBox;
     private boolean memoryAsFactorToTotalMemoryAdjusted;
 
     public CreateApplicationReplicaSetDialog(LandscapeManagementWriteServiceAsync landscapeManagementService,
@@ -205,6 +211,8 @@ public class CreateApplicationReplicaSetDialog extends AbstractApplicationReplic
             memoryTotalSizeFactorBox.setValue(SharedLandscapeConstants.DEFAULT_NUMBER_OF_PROCESSES_IN_MEMORY);
         }
         memoryInMegabytesBox.addValueChangeHandler(e->memoryTotalSizeFactorBox.setEnabled(e.getValue() == null));
+        igtimiRiotPortBox = createIntegerBox(null, 10);
+        igtimiRiotPortBox.getElement().setAttribute("placeholder", stringMessages.examplePort(SharedLandscapeConstants.IGTIMI_DEFAULT_RIOT_PORT));
         startWithReplicaOnSharedInstanceBox = createCheckbox(stringMessages.firstReplicaOnSharedInstance());
         startWithReplicaOnSharedInstanceBox.addValueChangeHandler(e->updateInstanceTypesBasedOnSharedMasterInstanceBox());
         startWithReplicaOnSharedInstanceBox.setValue(useExistingSharedMasterInstance);
@@ -266,7 +274,7 @@ public class CreateApplicationReplicaSetDialog extends AbstractApplicationReplic
 
     @Override
     protected Widget getAdditionalWidget() {
-        final Grid result = new Grid(12, 2);
+        final Grid result = new Grid(13, 2);
         int row=0;
         result.setWidget(row, 0, new Label(stringMessages.name()));
         result.setWidget(row++, 1, nameBox);
@@ -296,6 +304,8 @@ public class CreateApplicationReplicaSetDialog extends AbstractApplicationReplic
         result.setWidget(row++, 1, memoryInMegabytesBox);
         result.setWidget(row, 0, new Label(stringMessages.memoryTotalSizeFactor()));
         result.setWidget(row++, 1, memoryTotalSizeFactorBox);
+        result.setWidget(row, 0, new Label(stringMessages.igtimiRiotPort()));
+        result.setWidget(row++, 1, igtimiRiotPortBox);
         return result;
     }
 
@@ -312,6 +322,6 @@ public class CreateApplicationReplicaSetDialog extends AbstractApplicationReplic
                 getReleaseNameBoxValue(), dynamicLoadBalancerCheckBox==null?false:dynamicLoadBalancerCheckBox.getValue(),
                 getMasterReplicationBearerTokenBox().getValue(), getReplicaReplicationBearerTokenBox().getValue(),
                 domainNameBox.getValue(), memoryInMegabytesBox.getValue(), memoryTotalSizeFactorBox.getValue(),
-                startWithReplicaOnSharedInstanceBox.getValue());
+                igtimiRiotPortBox.getValue(), startWithReplicaOnSharedInstanceBox.getValue());
     }
 }

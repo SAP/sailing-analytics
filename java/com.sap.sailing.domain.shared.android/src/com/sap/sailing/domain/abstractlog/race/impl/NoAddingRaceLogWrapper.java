@@ -16,7 +16,7 @@ import com.sap.sailing.domain.abstractlog.race.RaceLog;
 import com.sap.sailing.domain.abstractlog.race.RaceLogEvent;
 import com.sap.sailing.domain.abstractlog.race.RaceLogEventVisitor;
 import com.sap.sailing.domain.common.abstractlog.NotRevokableException;
-import com.sap.sailing.domain.tracking.impl.TimeRangeCache;
+import com.sap.sailing.domain.shared.tracking.impl.TimeRangeCache;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.scalablevalue.ScalableValue;
@@ -273,8 +273,8 @@ public class NoAddingRaceLogWrapper implements RaceLog {
 
     @Override
     public <T> T getValueSum(TimePoint from, TimePoint to, T nullElement,
-            com.sap.sailing.domain.tracking.Track.Adder<T> adder, TimeRangeCache<T> cache,
-            com.sap.sailing.domain.tracking.Track.TimeRangeValueCalculator<T> valueCalculator) {
+            com.sap.sailing.domain.shared.tracking.Track.Adder<T> adder, TimeRangeCache<T> cache,
+            com.sap.sailing.domain.shared.tracking.Track.TimeRangeValueCalculator<T> valueCalculator) {
         return innerRaceLog.getValueSum(from, to, nullElement, adder, cache, valueCalculator);
     }
 }

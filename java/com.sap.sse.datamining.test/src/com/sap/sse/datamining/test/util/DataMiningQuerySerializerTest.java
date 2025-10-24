@@ -1,7 +1,7 @@
 package com.sap.sse.datamining.test.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.datamining.SailingPredefinedQueries;
 import com.sap.sse.datamining.impl.DataMiningServerImpl;
@@ -25,6 +25,6 @@ public class DataMiningQuerySerializerTest {
                 /* executorService */ null, /* functionRegistry */ null, /* dataSourceProviderRegistry */ null,
                 /* dataRetrieverChainDefinitionRegistry */ null, /* aggregationProcessorDefinitionRegistry */ null,
                 /* queryDefinitionRegistry */ null).fromBase64String(base64);
-        Assert.assertEquals(dto, deserialized);
+        Assertions.assertEquals(dto, deserialized);
     }
 }

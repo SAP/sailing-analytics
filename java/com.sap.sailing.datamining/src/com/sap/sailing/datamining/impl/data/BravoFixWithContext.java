@@ -3,6 +3,7 @@ package com.sap.sailing.datamining.impl.data;
 import com.sap.sailing.datamining.data.HasBravoFixContext;
 import com.sap.sailing.datamining.data.HasTrackedLegOfCompetitorContext;
 import com.sap.sailing.domain.base.Competitor;
+import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.tracking.BravoFix;
@@ -18,9 +19,13 @@ import com.sap.sse.common.TimePoint;
  * Equality is based on the {@link #getBravoFix() Bravo fix} only.
  */
 public class BravoFixWithContext implements HasBravoFixContext {
+    private static final long serialVersionUID = 3452314555495774433L;
+
     private final HasTrackedLegOfCompetitorContext trackedLegOfCompetitorContext;
     
     private final BravoFix bravoFix;
+
+    private Wind wind;
 
     public BravoFixWithContext(HasTrackedLegOfCompetitorContext trackedLegOfCompetitorContext, BravoFix bravoFix) {
         this.trackedLegOfCompetitorContext = trackedLegOfCompetitorContext;
@@ -60,6 +65,21 @@ public class BravoFixWithContext implements HasBravoFixContext {
     }
 
     @Override
+    public Wind getWindInternal() {
+        return wind;
+    }
+
+    @Override
+    public void setWindInternal(Wind wind) {
+        this.wind = wind;
+    }
+
+    @Override
+    public Position getPosition() {
+        return getTrackedRace().getTrack(getCompetitor()).getEstimatedPosition(getTimePoint(), /* extrapolate */ true);
+    }
+
+    @Override
     public HasTrackedLegOfCompetitorContext getTrackedLegOfCompetitorContext() {
         return trackedLegOfCompetitorContext;
     }
@@ -69,11 +89,13 @@ public class BravoFixWithContext implements HasBravoFixContext {
         return bravoFix;
     }
     
-    private TimePoint getTimePoint() {
+    @Override
+    public TimePoint getTimePoint() {
         return getBravoFix().getTimePoint();
     }
     
-    private TrackedRace getTrackedRace() {
+    @Override
+    public TrackedRace getTrackedRace() {
         return getTrackedLegOfCompetitorContext().getTrackedRace();
     }
     

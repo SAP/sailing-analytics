@@ -362,10 +362,10 @@ public class LeaderboardGroupOverviewPanel extends FormPanel {
             public SafeHtml getValue(StrippedLeaderboardDTO leaderboard) {
                 LeaderboardGroupDTO selectedGroup = groupsSelectionModel.getSelectedObject();
                 String debugParam = Window.Location.getParameter("gwt.codesvr");
-                String link = URLEncoder.encode("/gwt/Leaderboard.html?name=" + leaderboard.getName()
+                String link = "/gwt/Leaderboard.html?name=" + URLEncoder.encodeQueryString(leaderboard.getName())
                         + (showRaceDetails ? "&showRaceDetails=true" : "") + "&root=overview" + "&leaderboardGroupId="
                         + selectedGroup.getId().toString()
-                        + (debugParam != null && !debugParam.isEmpty() ? "&gwt.codesvr=" + debugParam : ""));
+                        + (debugParam != null && !debugParam.isEmpty() ? "&gwt.codesvr=" + URLEncoder.encodeQueryString(debugParam) : "");
                 return ANCHORTEMPLATE.anchor(UriUtils.fromString(link), leaderboard.getName());
             }
         };
@@ -455,11 +455,11 @@ public class LeaderboardGroupOverviewPanel extends FormPanel {
                         StrippedLeaderboardDTO selectedLeaderboard = leaderboardsSelectionModel.getSelectedObject();
                         RegattaNameAndRaceName raceId = (RegattaNameAndRaceName) race.getRaceIdentifier(fleet);
                         String debugParam = Window.Location.getParameter("gwt.codesvr");
-                        String link = URLEncoder.encode(RaceBoardPanel.RACEBOARD_PATH+"?leaderboardName="
-                                + selectedLeaderboard.getName() + "&raceName=" + raceId.getRaceName() + "&regattaName="
-                                + raceId.getRegattaName() + "&leaderboardGroupId=" + selectedGroup.getId().toString()
+                        String link = RaceBoardPanel.RACEBOARD_PATH+"?leaderboardName="
+                                + URLEncoder.encodeQueryString(selectedLeaderboard.getName()) + "&raceName=" + URLEncoder.encodeQueryString(raceId.getRaceName()) + "&regattaName="
+                                + URLEncoder.encodeQueryString(raceId.getRegattaName()) + "&leaderboardGroupId=" + selectedGroup.getId().toString()
                                 + "&root=overview"
-                                + (debugParam != null && !debugParam.isEmpty() ? "&gwt.codesvr=" + debugParam : ""));
+                                + (debugParam != null && !debugParam.isEmpty() ? "&gwt.codesvr=" + URLEncoder.encodeQueryString(debugParam) : "");
                         name = ANCHORTEMPLATE.anchor(UriUtils.fromString(link), raceDisplayName);
                     } else {
                         name = new SafeHtmlBuilder().appendHtmlConstant(raceDisplayName).toSafeHtml();

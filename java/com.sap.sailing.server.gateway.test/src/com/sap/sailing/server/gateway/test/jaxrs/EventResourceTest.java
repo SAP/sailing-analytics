@@ -1,8 +1,8 @@
 package com.sap.sailing.server.gateway.test.jaxrs;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -20,8 +20,8 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.CompetitorRegistrationType;
 import com.sap.sailing.domain.common.NotFoundException;
@@ -37,7 +37,7 @@ public class EventResourceTest extends AbstractJaxRsApiTest {
     private String randomName; 
     private UriInfo uriInfo;
     
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         uriInfo = mock(UriInfo.class);

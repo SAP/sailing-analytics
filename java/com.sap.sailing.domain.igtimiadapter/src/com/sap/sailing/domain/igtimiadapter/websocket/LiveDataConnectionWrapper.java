@@ -44,7 +44,7 @@ public class LiveDataConnectionWrapper implements LiveDataConnection {
     /**
      * Makes the actual connection available to other classes in this package, particularly the test classes in the test fragment of the same package
      */
-    LiveDataConnection getActualConnection() {
+    public LiveDataConnection getActualConnection() {
         return actualConnection;
     }
 

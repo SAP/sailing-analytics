@@ -1,14 +1,13 @@
 package com.sap.see.pairinglist.test;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.pairinglist.impl.PairingListTemplateImpl;
-
-import org.junit.Assert;
 
 public class PairingListTemplateTest extends PairingListTemplateImpl {
 
@@ -28,10 +27,10 @@ public class PairingListTemplateTest extends PairingListTemplateImpl {
         for (int x = 0; x < associations.length; x++) {
             for (int y = 0; y < associations[0].length; y++) {
                 if ((x == y) && (associations[x][y] != -1)) {
-                    Assert.fail("The diagonal of association matrix has to be -1.");
+                    Assertions.fail("The diagonal of association matrix has to be -1.");
                 }
                 if (associations[x][y] > flights && (associations[x][y] < -1)) {
-                    Assert.fail("Calculation of assosciation matrix failed!");
+                    Assertions.fail("Calculation of assosciation matrix failed!");
                 }
             }
         }
@@ -56,7 +55,7 @@ public class PairingListTemplateTest extends PairingListTemplateImpl {
         double average = sum / tests + 1;
         System.out.println("Average Time: " + (average / 1000) + "s");
         if (average > 10000) {
-            Assert.fail("The calculation of Pairing Lists took longer than expected!");
+            Assertions.fail("The calculation of Pairing Lists took longer than expected!");
         }
     }
 
@@ -74,7 +73,7 @@ public class PairingListTemplateTest extends PairingListTemplateImpl {
         for (double quality : results) {
             sum += quality;
         }
-        Assert.assertEquals(0.574, sum / count, 0.01);
+        Assertions.assertEquals(0.574, sum / count, 0.01);
     }
 
     @Test
@@ -87,7 +86,7 @@ public class PairingListTemplateTest extends PairingListTemplateImpl {
         for (int[] key : associations) {
             for (int value : key) {
                 if (value > 0) {
-                    Assert.fail("Associations array should only have values 0 and -1!");
+                    Assertions.fail("Associations array should only have values 0 and -1!");
                 }
             }
         }
@@ -107,10 +106,10 @@ public class PairingListTemplateTest extends PairingListTemplateImpl {
                 { 17, 4, 5, 16, 8, 6 }, { 17, 4, 12, 15, 10, 7 }, { 3, 1, 11, 0, 8, 16 }, { 2, 9, 6, 5, 13, 14 },
                 { 0, 9, 17, 5, 3, 15 }, { 12, 7, 1, 13, 16, 6 }, { 10, 14, 2, 8, 11, 4 }, { 7, 14, 2, 17, 3, 16 },
                 { 15, 5, 10, 11, 1, 6 }, { 4, 12, 8, 9, 0, 13 } };
-        Assert.assertEquals(0.5998846486579744,
+        Assertions.assertEquals(0.5998846486579744,
                 calcStandardDev(incrementAssociations(givenPairingList, new int[18][18])), 0.0);
         int[][] testPairingList = { { 0, 1, 2, 3, 4 }, { 5, 6, 7, 8, 9 } };
-        Assert.assertEquals(0.4967673, (calcStandardDev(incrementAssociations(testPairingList, new int[10][10]))),
+        Assertions.assertEquals(0.4967673, (calcStandardDev(incrementAssociations(testPairingList, new int[10][10]))),
                 0.01);
     }
 
@@ -146,6 +145,6 @@ public class PairingListTemplateTest extends PairingListTemplateImpl {
                 { 17, 4, 5, 16, 8, 6 }, { 17, 4, 12, 15, 10, 7 }, { 3, 1, 11, 0, 8, 16 }, { 2, 9, 6, 5, 13, 14 },
                 { 0, 9, 17, 5, 3, 15 }, { 12, 7, 1, 13, 16, 6 }, { 10, 14, 2, 8, 11, 4 }, { 7, 14, 2, 17, 3, 16 },
                 { 15, 5, 10, 11, 1, 6 }, { 4, 12, 8, 9, 0, 13 } };
-    	Assert.assertEquals(56,this.getBoatChangesFromPairingList(givenPairingList, 15, 3, 18));
+    	Assertions.assertEquals(56,this.getBoatChangesFromPairingList(givenPairingList, 15, 3, 18));
     }
 }

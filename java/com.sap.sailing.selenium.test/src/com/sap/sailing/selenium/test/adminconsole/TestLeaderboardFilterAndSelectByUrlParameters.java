@@ -1,13 +1,13 @@
 package com.sap.sailing.selenium.test.adminconsole;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardConfigurationPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardConfigurationPanelPO.LeaderboardEntryPO;
@@ -24,14 +24,14 @@ public class TestLeaderboardFilterAndSelectByUrlParameters extends AbstractSelen
     private static final String PARAM_FILTER_AND_SELECT = "filterAndSelect";
     
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot());
         super.setUp();
         createTestLeaderboards();
     }
     
-    @Test
+    @SeleniumTestCase
     public void testUrlParameterFilter() {        
         List<String> availableLeaderboards = getLeaderboardsOfPageWithUrlParams(PARAM_FILTER, "505");
         assertEquals(4, availableLeaderboards.size()); 
@@ -45,7 +45,7 @@ public class TestLeaderboardFilterAndSelectByUrlParameters extends AbstractSelen
         assertEquals(4, availableLeaderboards.size());        
     }
     
-    @Test
+    @SeleniumTestCase
     public void testUrlParameterSelect() {  
         LeaderboardConfigurationPanelPO leaderboardConfigurationPanelPO = getLeaderboardConfigurationPanelPoOfPageWithUrlParams(PARAM_SELECT, "505");        
         List<String> availableLeaderboards = leaderboardConfigurationPanelPO.getAvailableLeaderboards();      
@@ -62,7 +62,7 @@ public class TestLeaderboardFilterAndSelectByUrlParameters extends AbstractSelen
         assertEquals("505 Pre-World 2017", selectedEntries.get(1).getName());
     }
     
-    @Test
+    @SeleniumTestCase
     public void testUrlParameterFilterAndSelect() {
         LeaderboardConfigurationPanelPO leaderboardConfigurationPanelPO = getLeaderboardConfigurationPanelPoOfPageWithUrlParams(PARAM_FILTER_AND_SELECT, "505");        
         List<String> availableLeaderboards = leaderboardConfigurationPanelPO.getAvailableLeaderboards();      
@@ -79,7 +79,7 @@ public class TestLeaderboardFilterAndSelectByUrlParameters extends AbstractSelen
         assertEquals("505 Pre-World 2017", selectedEntries.get(1).getName());      
     }
     
-    @Test
+    @SeleniumTestCase
     public void testUrlParameterSelectExact() { 
         LeaderboardConfigurationPanelPO leaderboardConfigurationPanelPO = getLeaderboardConfigurationPanelPoOfPageWithUrlParams(PARAM_SELECT_EXACT, "505");        
         List<String> availableLeaderboards = leaderboardConfigurationPanelPO.getAvailableLeaderboards();      
@@ -95,7 +95,7 @@ public class TestLeaderboardFilterAndSelectByUrlParameters extends AbstractSelen
         assertEquals("505 World 2017", selectedEntries.get(0).getName());
     }
     
-    @Test
+    @SeleniumTestCase
     public void testUrlParametersSelectExactAndSelect() {     
         LeaderboardConfigurationPanelPO leaderboardConfigurationPanelPO = getLeaderboardConfigurationPanelPoOfPageWithUrlParams(PARAM_SELECT_EXACT, 
                 "505 World 2017", PARAM_SELECT, "2017");        
@@ -115,7 +115,7 @@ public class TestLeaderboardFilterAndSelectByUrlParameters extends AbstractSelen
         assertEquals("505 Pre-World 2017", selectedEntries.get(1).getName());
     }
     
-    @Test
+    @SeleniumTestCase
     public void testUrlParametersSelectExactAndFilterAndSelect() {
         LeaderboardConfigurationPanelPO leaderboardConfigurationPanelPO = getLeaderboardConfigurationPanelPoOfPageWithUrlParams(PARAM_SELECT_EXACT, 
                 "505", PARAM_FILTER_AND_SELECT, "2017");        
@@ -134,7 +134,7 @@ public class TestLeaderboardFilterAndSelectByUrlParameters extends AbstractSelen
         assertEquals("505 Pre-World 2017", selectedEntries.get(1).getName());   
     }
     
-    @Test
+    @SeleniumTestCase
     public void testAllSelectionUrlParameters() {
         LeaderboardConfigurationPanelPO leaderboardConfigurationPanelPO = getLeaderboardConfigurationPanelPoOfPageWithUrlParams(PARAM_SELECT_EXACT, "505", 
                 PARAM_FILTER_AND_SELECT, "2017", PARAM_SELECT, "2015");        
@@ -162,7 +162,7 @@ public class TestLeaderboardFilterAndSelectByUrlParameters extends AbstractSelen
         assertEquals("505 Pre-World 2017", selectedEntries.get(1).getName());
     }
     
-    @Test
+    @SeleniumTestCase
     public void testAllSelectionAndFilterUrlParameters() {
         LeaderboardConfigurationPanelPO leaderboardConfigurationPanelPO = getLeaderboardConfigurationPanelPoOfPageWithUrlParams(PARAM_SELECT_EXACT, "505", 
                 PARAM_FILTER_AND_SELECT, "2017", PARAM_SELECT, "2015", PARAM_FILTER, "2017");
@@ -201,7 +201,7 @@ public class TestLeaderboardFilterAndSelectByUrlParameters extends AbstractSelen
         assertEquals(2, selectedEntries.size()); 
     }
     
-    @Test
+    @SeleniumTestCase
     public void testUrlParameterDecoding() {
         LeaderboardConfigurationPanelPO leaderboardConfigurationPanelPO = getLeaderboardConfigurationPanelPoOfPageWithUrlParams();                    
         leaderboardConfigurationPanelPO.createFlexibleLeaderboard("Sailing & 2011");
@@ -233,7 +233,7 @@ public class TestLeaderboardFilterAndSelectByUrlParameters extends AbstractSelen
         assertEquals("&", selectedEntries.get(0).getName());
     }
     
-    @Test
+    @SeleniumTestCase
     public void testResetFilterWhenSelectionUrlParametersOnly() {  
         List<String> availableLeaderboards = getLeaderboardsOfPageWithUrlParams(PARAM_FILTER, "2017");
         assertEquals(2, availableLeaderboards.size()); 
@@ -254,7 +254,7 @@ public class TestLeaderboardFilterAndSelectByUrlParameters extends AbstractSelen
         assertEquals(4, availableLeaderboards.size()); 
     }
     
-    @Test
+    @SeleniumTestCase
     public void testResetSelectWhenFilterUrlParametersOnly() {  
         LeaderboardConfigurationPanelPO leaderboardConfigurationPanelPO = getLeaderboardConfigurationPanelPoOfPageWithUrlParams(PARAM_FILTER_AND_SELECT, "2017");             
         List<String> availableLeaderboards = leaderboardConfigurationPanelPO.getAvailableLeaderboards();

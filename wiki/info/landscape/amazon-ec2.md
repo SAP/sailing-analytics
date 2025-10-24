@@ -4,22 +4,24 @@
 
 ## Quickstart
 
-Our default region in AWS EC2 is eu-west-1 (Ireland). Tests are currently run in the otherwise unused region eu-west-2 (London). Most regular operations can be handled through the AdminConsole's "Advanced / Landscape" tab. See, e.g., [https://security-service.sapsailing.com/gwt/AdminConsole.html#LandscapeManagementPlace:](https://security-service.sapsailing.com/gwt/AdminConsole.html#LandscapeManagementPlace:). Some operations occurring not so frequently still require more in-depth knowledge of steps, manual execution of commands on the command line and some basic Linux understanding. This also goes for [highest-scale set-ups requiring an AWS Global Accelerator with or without Geo-Blocking through AWS Web Application Firewall (WAF) with Web ACLs](https://wiki.sapsailing.com/wiki/info/landscape/tokyo2020/olympic-setup#setup-for-the-olympic-summer-games-2020-2021-tokyo_aws-setup_global-accelerator).
+Our default region in AWS EC2 is eu-west-1 (Ireland). Tests are currently run in the otherwise unused region eu-west-2 (London). Most regular operations can be handled through the AdminConsole's "Advanced / Landscape" tab. See, e.g., [https://security-service.sapsailing.com/gwt/AdminConsole.html#LandscapeManagementPlace:](https://security-service.sapsailing.com/gwt/AdminConsole.html#LandscapeManagementPlace:). Some operations occurring not so frequently still require more in-depth knowledge of steps, manual execution of commands on the command line and some basic Linux understanding. This also goes for highest-scale set-ups requiring an AWS Global Accelerator with or without Geo-Blocking through AWS Web Application Firewall (WAF) with Web ACLs as used for [Tokyo 2020](https://wiki.sapsailing.com/wiki/info/landscape/tokyo2020/olympic-setup#setup-for-the-olympic-summer-games-2020-2021-tokyo_aws-setup_global-accelerator) and [Paris 2024](https://wiki.sapsailing.com/wiki/info/landscape/paris2024/olympic-plan-for-paris-marseille-2024).
 
 ## Important Servers, Hostnames
 
 - Web Server / Central Reverse Proxy: reachable through SSH to sapsailing.com:22
-- Database Servers: dbserver.internal.sapsailing.com (archive server winddb on port 10201, all other slow/archived DBs on 10202, hidden replica of "live" replica set on 10203), mongo0.internal.sapsailing.com, mongo1.internal.sapsailing.com
+- Database Servers: dbserver.internal.sapsailing.com (archive server winddb on port 10201 and replica set "winddb", all other slow/archived DBs on 10202 for replica set "slow", hidden replica of "live" replica set on 10203), mongo0.internal.sapsailing.com (replica set "live"), mongo1.internal.sapsailing.com (replica set "live")
 - RabbitMQ Server: rabbit.internal.sapsailing.com
-- MySQL DB (mainly for Bugzilla): mysql.internal.sapsailing.com (currently co-deployed on the same old instance that also runs RabbitMQ, hence currently mysql.internal.sapsailing.com and rabbit.internal.sapsailing.com refer to the same instance)
-- Hudson Build Server: called "Build/Test/Dev", running a Hudson instance reachable at ``hudson.sapsailing.com`` and a test instance of the SAP Sailing Analytics available under ``dev.sapsailing.com``
-- Additional "Build Slaves" launched by the Hudson Build Server: Named ``Hudson Ubuntu Slave``, used to run individual build jobs
+- MariaDB (mainly for Bugzilla): mysql.internal.sapsailing.com
+- Hudson Build Server: called "Build/Dev", running a Hudson instance reachable at ``hudson.sapsailing.com`` and a test instance of the SAP Sailing Analytics available under ``dev.sapsailing.com``
+- A central sailing application replica set called "security_service" reachable at ``security-service.sapsailing.com`` which is the hub for security-related information such as the user and groups database with permissions and roles, entity ownerships, as well as access control lists
+- Self-service at ``my.sapsailing.com`` which currently is the default server name used by the Sail Insight app, as two dedicated hosts running the replica set
+- Three multi-server instances shared by several sailing application replica sets, spread across all three availability zones (AZs) of eu-west-1
 
 ## Landscape Overview
 
 In Route53 (the AWS DNS) we have registered the sapsailing.com domain and can manage records for any sub-domains. The "apex" record for sapsailing.com points to a Network Load Balancer (NLB), currently ``NLB-sapsailing-dot-com-f937a5b33246d221.elb.eu-west-1.amazonaws.com``, which does the following things:
 
-* accept SSH connects on port 22; these are forwarded to the internal IP of the web server through the target group ``SSH-to-sapsailing-dot-com-2``, currently with the internal IP target ``172.31.28.212``
+* accept SSH connects on port 22; these are forwarded to the internal IP of the central reverse proxy through the target group ``SSH-to-sapsailing-dot-com-2``; it is important that the target group is configured to preserve client IP addresses; otherwise, the ``fail2ban`` installation on the central reverse proxy would quickly block all SSH traffic, malicious and good, because they all would be identified as having one of the NLB's internal IP addresses as their source IP.
 * accept HTTP connections for ``sapsailing.com:80``, forwarding them to the target group ``HTTP-to-sapsailing-dot-com-2`` which is a TCP target group for port 80 with ip-based targets (instance-based was unfortunately not possible for the old ``m3`` instance type of our web server), again pointing to ``172.31.28.212``, the internal IP of our web server
 * accept HTTPS/TLS connections on port 443, using the ACM-managed certificate for ``*.sapsailing.com`` and ``sapsailing.com`` and also forwarding to the ``HTTP-to-sapsailing-dot-com-2`` target group
 * optionally, this NLB could be extended by UDP port mappings in case we see a use case for UDP-based data streams that need forwarding to specific applications, such as the Expedition data typically sent on ports 2010 and following
@@ -31,15 +33,15 @@ Further ALBs may exist in addition to the default ALB and the NLB for ``sapsaili
 ### Apache httpd, the central reverse proxy (Webserver) and disposable reverse proxies
 
 A key pillar of our architecture is the central reverse proxy, which handles traffic for the wiki, bugzilla, awstats, releases, p2, Git, jobs, static and is the target of the catch all rule in the Dynamic ALB.
-Any traffic to the Hudson build server subdomain *does not* go through the central webserver. Instead, it gets directed by route 53 to a `DDNSMapped` load balancer (which all route any port 80 traffic to 443), which has a rule pointing to a target group, that contains only the Hudson server.
+Any traffic to the Hudson build server subdomain *does not* go through the central webserver. Instead, it gets directed by route 53 to a `DNSMapped` load balancer (which all route any port 80 traffic to 443), which has a rule pointing to a target group, that contains only the Hudson server. The setup procedure can be found below.
 
-To improve availability and reliability, we have a disposable environment type and AMI. The instances from this AMI are only for serving requests to the archive but are lightweight and can be quickly started and shutdown, using the landscape management console.
+To improve availability and reliability, we have a "disposable reverse proxy" environment type and AMI (see ``configuration/environments_scripts/reverse_proxy``). The instances from this AMI are only for serving requests to the archive but are lightweight and can be quickly started and shutdown, using the landscape management console.
 
 The IPs for all reverse proxies will automatically be added to ALB target groups with the tag key `allReverseProxies`, including the `CentralWebServerHTTP-Dyn` target group (in the dynamic ALB in eu-west-1)
-and all the `DDNSMapped-x-HTTP` (in all the DDNSMapped servers). These are the target groups for the default rules and it ensures availability to the ARCHIVE especially.
-Disposables instances are tagged with `disposableProxy` to indicate it hosts no vital services. `ReverseProxy` also identifies any reverse proxies. The health check for the target groups would change to trigger a script which returns different error codes: healthy/200 if in the same AZ as the archive (or if the failover archive is in use), whilst unhealthy/503 if in different AZs. This will reduce cross-AZ, archive traffic costs, but maintain availability and load balancing.
+and all the `DDNSMapped-x-HTTP` (in all the DNSMapped ALBs). These are the target groups for the default rules and it ensures availability to the ARCHIVE especially.
+Disposables instances are tagged with `DisposableProxy` to indicate it hosts no vital services. `ReverseProxy` also identifies any reverse proxies. The health check for the target groups would change to trigger a script which returns different error codes: healthy/200 if in the same AZ as the archive (or if the failover archive is in use), whilst unhealthy/503 if in different AZs. This will reduce cross-AZ, archive traffic costs, but maintain availability and load balancing.
 
-For security groups of the central reverse proxy, we want Webserver, as well as Disposable Reverse Proxy. The disposables just have the latter.
+For security groups of the central reverse proxy, we want Webserver, as well as Reverse Proxy. The disposables just have the latter.
 
 There is hope to also deploy the httpd on already existing instances, which have free resources and a certain tag permitting this 
 co-deployment.
@@ -94,7 +96,7 @@ Use Status 172.31.19.129 internal-server-status
 Use Status 127.0.0.1 internal-server-status
 ```
 
-The second obviously requires maintenance as the internal IP changes, e.g., when instantiating a new Webserver copy by creating an image and restoring from the image. When upgrading / moving / copying the webserver you may try to be smart and copy the contents of ``/etc/ssh``, in particular the ``ssh_host_...`` files that contain the host keys. As you switch, users will then not have to upgrade their ``known_hosts`` file, and even internal accounts such as the Wiki account or the sailing accounts on other hosts that clone the git, or the build infrastructure won't be affected.
+The second obviously requires maintenance as the internal IP changes, e.g., when instantiating a new Webserver copy by creating an image and restoring from the image. This maintenance is managed by a service unit. When upgrading / moving / copying the webserver you may try to be smart and copy the contents of ``/etc/ssh``, in particular the ``ssh_host_...`` files that contain the host keys. As you switch, users will then not have to upgrade their ``known_hosts`` file, and even internal accounts such as the Wiki account or the sailing accounts on other hosts that clone the git, or the build infrastructure won't be affected.
 
 After (re-)booting the webserver, check that all services have come up before adding the instance to its respective target groups. For example, ensure that the Wiki "Gollum" service has been launched (see ``/home/wiki/serve.sh``). Furthermore, ensure that the Docker daemon is running and that it runs the Docker registry containers (``registry-ui-1`` and ``registry-registry-1``). See [here](https://wiki.sapsailing.com/wiki/info/landscape/docker-registry) for how this is set up.
 
@@ -102,7 +104,24 @@ The webserver must be tagged with key ``CentralReverseProxy`` where the value is
 
 The following diagram explains the disposable reverse proxies role a little better. 
 
-<img src="wiki/images/orchestration/disposable-reverse-proxy-architecture-from-bug1873.png" />
+<img src="/wiki/images/orchestration/disposable-reverse-proxy-architecture-from-bug1873.png" />
+
+## Setting up the Central Reverse Proxy
+
+A lot of the above procedure has since been combined into a series of setup scripts found under `configuration/environments_scripts/central_reverse_proxy`. The script requires that you have added an SSH key with maximum access to your SSH authentication agent. This can be done with 
+```
+eval `ssh-agent`
+ssh-add
+```
+
+You will also need the AWS CLI and must run `./awsmfalogon.sh` before running the first script below, to authenticate and gain a session token. Next, you should notify the community that internal services, such as Bugzilla will temporarily be down (make sure to notify them afterwards too, so they can continue their work). 
+
+Using the landscape tab of the admin console, ensure there is a disposable in the same AZ as the archive (this ensures we can still route traffic to the archive).
+
+Next, remove the central reverse proxy from all target groups tagged with `allReverseProxies`. Then when at the path described above, launch `./setup-central-reverse-proxy.sh` and follow the necessary instructions. You
+will need to unmount and detach volumes from the old instance and then reattach and mount on the new webserver.
+Then `setup-central-reverse-proxy-part-2.sh` runs to finish any setup that requires these mounts. Finally, `target-group-tag-route53-nfs-elasticIP-setup.sh`
+will run to configure the target groups, tags and route 53. You will need to then remove the old reverse proxy from the target groups tagged with `CentralReverseProxy`. 
 
 ### DNS and Application Load Balancers (ALBs)
 
@@ -119,6 +138,20 @@ In addition to a default re-direct for the "/" path, the following four ALB list
 - if the HTTP header ``X-SAPSSE-Forward-Request-To`` is ``replica`` then forward to the public target group
 - if the request method is ``GET`` then forward to the public target group
 - forward all other request for the hostname to the master target group
+
+### Web Application Firewall (WAF) and Web ACLs for Geoblocking
+
+In order to be able to block requests from certain regions or countries based on sanctions or other bans, as well as to see improved statistics about web requests hitting the site (such as the country from where requests originate, or a classification of bot vs. non-bot requests) across all our application load balancers (ALBs), we can use the AWS Web Application Firewall (WAF) and its Web Access Control Lists (Web ACLs). These Web ACLs are defined per AWS Region, so in case of a cross-region scenarios like the Olympic Summer Games, Web ACLs have to be defined in each region supported.
+
+As of today, we are required to block access from Russia, Belarus, North Korea, and Iran.
+
+Any geo-blocking Web ACL that shall automatically be associated with ALBs that are created through our landscape automation have to be tagged with tag key ``web-acl-purpose`` (see ``LandscapeConstants.WEB_ACL_PURPOSE_TAG``) with value ``geoblocking`` (see ``LandscapeConstants.WEB_ACL_GEOBLOCKING_PURPOSE``). Tagging a Web ACL, as of this writing, is not possible through the AWS Web Console but only through the command line interface (CLI) or API. A command-line way to tag a Web ACL accordingly would look like this (adjust your Web ACL's ARN...):
+```
+  aws wafv2 tag-resource \
+      --resource-arn arn:aws:wafv2:eu-west-1:017363970217:regional/webacl/GeoBlocking/1f1c421e-994c-4c67-ba15-75375448c5c5 \
+      --tags Key=web-acl-purpose,Value=geoblocking
+```
+Note that in order to run this command you have to have valid credentials for the AWS region you're targeting with the request. Also consider using the ``--region`` argument if you're trying to tag a Web ACL in a region other than your AWS CLI's default region. Check your ``~/.aws/config`` file. Also see ``configuration/environments_scripts/repo/usr/local/bin/awsmfalogon.sh`` for logging on to the AWS CLI.
 
 ### MongoDB Replica Sets
 
@@ -153,7 +186,7 @@ With the exception of legacy, test and archive instances, regular application re
 - five rules for the replica set are created in the load balancer's HTTPS listener, forwarding traffic as needed to the "master" and the "public" target groups
 - for a DNS-mapped set-up (not using the default "dynamic" load balancer) a Route53 DNS CNAME record pointing to the ALB is created for the replica set's host name
 - an auto-scaling group, named after the replica set with the suffix "-replicas" appended
-- a launch configuration used by the auto-scaling group, named after the replica set with the release name appended, separated by a dash (-), e.g., "abc-build-202202142355"
+- a launch template used by the auto-scaling group, named after the replica set with the release name appended, separated by a dash (-), e.g., "abc-build-202202142355"
 - a master process, registered in both, the "master" and the "public" target groups
 - a replica process, registered in the "public" target group
 There are different standard deployment choices for the master and the replica process that will be described in the following sections.
@@ -278,7 +311,7 @@ In all of the following sub-sections the text will assume that you have provided
 
 In several of the scenarios, both, AdminConsole and REST API, you will have the option to provide security bearer tokens that are used to authenticate requests to processes running the SAP Sailing Analytics. If you omit those, the credentials of the session used to authenticate your sailing user will be used. (Note, that for local test set-ups disconnected from the standard security realm used by all of the sapsailing.com-deployed processes, these credentials may not be accepted by the processes you're trying to control. In this case, please provide explicit bearer tokens instead.) We distinguish between the credentials required to replicate the information shared across the landscape, usually from ``security-service.sapsailing.com``, and those used by a replica in one of your application replica sets to authenticate for credentials to replicate the application replica set's master.
 
-There is now a single point of truth for the various ssh and AWS keys, and possibly others in the future. This can be found at /root/key_vault on the central reverse proxy. There you will find directories for different environments' key setups, named consistently with the environment types under `${GIT_HOME}/configuration/environments_scripts` (the directory names are the environment type). One can use the `setup_keys` function in `imageupgrade_functions.sh` to setup the keys. There is 1 parameter, the environment type.
+There is now a single point of truth for the various ssh and AWS keys, and possibly others in the future. This can be found at `/root/key_vault` on the central reverse proxy. There you will find directories for different environments' key setups, named consistently with the environment types under `${GIT_HOME}/configuration/environments_scripts` (the directory names are the environment type). One can use the `setup_keys` function in `imageupgrade_functions.sh` to setup the keys. There is 1 parameter, the environment type.
 
 The structure of the vault is important for the efficacy of the script and should appear as below. There is an explanation afterwards.
 ```
@@ -371,7 +404,7 @@ This way, as an event starts to "cool down" and load decreases, the more expensi
 
 ### Scaling Replica Instances Up/Down
 
-When an application replica set's replica processes are provided by the auto-scaling group, the corresponding launch configuration specifies the instance type used for the dedicated instances used to host the replica processes. If this instance type turns out to be inadequate for the situation, e.g., because the event hosted in the application replica set produces more CPU load than expected or produces more tracking data than assumed, the instance type can be changed for the launch configuration, with a rolling update being performed for all replica instances managed by the auto-scaling group.
+When an application replica set's replica processes are provided by the auto-scaling group, the corresponding launch template specifies the instance type used for the dedicated instances used to host the replica processes. If this instance type turns out to be inadequate for the situation, e.g., because the event hosted in the application replica set produces more CPU load than expected or produces more tracking data than assumed, the instance type can be changed for the launch template, with a rolling update being performed for all replica instances managed by the auto-scaling group.
 
 Click on the "Scale auto-scaling replicas up/down" action icon or the corresponding button in the button bar and select the new instance type.
 
@@ -387,7 +420,7 @@ Use the action icon entitled "Upgrade" or the corresponding multi-selection-enab
 
 ### Archiving Application Replica Set
 
-When the event or season or whatever you chose to assign an application replica set to has come to the end of its live workload with races and other updates no longer taking place, the application replica set is up for archiving. This will help save cost due to better resource utilization. The auto-scaling group, its launch configuration, its DNS record (unless the "dynamic" load balancing scenario in the default region eu-west-1 was used), its target groups and its load balancer listener rules can all be removed which frees up capacity for new or other live events. Furthermore, the processes can be stopped, freeing up memory and disk space on the instances they ran on, or even allowing for the termination of entire instances. Lastly, storage space in the ``live`` MongoDB replica set is more expensive than in the ``slow`` replica set that can be used for backup and archiving of DB content.
+When the event or season or whatever you chose to assign an application replica set to has come to the end of its live workload with races and other updates no longer taking place, the application replica set is up for archiving. This will help save cost due to better resource utilization. The auto-scaling group, its launch template, its DNS record (unless the "dynamic" load balancing scenario in the default region eu-west-1 was used), its target groups and its load balancer listener rules can all be removed which frees up capacity for new or other live events. Furthermore, the processes can be stopped, freeing up memory and disk space on the instances they ran on, or even allowing for the termination of entire instances. Lastly, storage space in the ``live`` MongoDB replica set is more expensive than in the ``slow`` replica set that can be used for backup and archiving of DB content.
 
 To archive an application replica set, decide whether you want to move the MongoDB content away from the current (usually ``live``) replica set to free up space there. To do so, select any MongoDB endpoint from the "MongoDB Endpoints" table that you'd like to move the application replica set's database content to. If you want to keep it in the ``live`` environment, de-select all MongoDB endpoints in the table.
 
@@ -397,11 +430,11 @@ When confirmed, the archiving procedure will start by identifying the ``ARCHIVE`
 
 After successful import and comparison, if you selected a MongoDB endpoint from the table then the MongoDB database used by the application replica set being archived will be copied to the MongoDB endpoint selected. After copying, the original and the copy will be compared by hashing their contents and comparing the hashes. Only if the two hashes are equal, the original database will be removed, freeing up the space in what usually would be the ``live`` MongoDB replica set.
 
-Finally, if you ticked the "Remove archive replica set after successful verification", the application replica set will be completely removed by stopping its master and replica processes, removing all its load balancer rules, removing its two target groups, removing the auto-scaling group and the corresponding launch configuration and, if a DNS-based load balancer was used, removing its DNS record.
+Finally, if you ticked the "Remove archive replica set after successful verification", the application replica set will be completely removed by stopping its master and replica processes, removing all its load balancer rules, removing its two target groups, removing the auto-scaling group and the corresponding launch template and, if a DNS-based load balancer was used, removing its DNS record.
 
 ### Removing Application Replica Set
 
-This action is really only useful for application replica sets that were created for development, testing or debugging purposes. While its MongoDB database is left untouched, all other resources pertinent to the application replica set will be removed, including its load balancing rules, target groups, auto-scaling group, launch configuration, application processes and potentially the instances they ran on in case the processes were the last on their instance, and the optional DNS record.
+This action is really only useful for application replica sets that were created for development, testing or debugging purposes. While its MongoDB database is left untouched, all other resources pertinent to the application replica set will be removed, including its load balancing rules, target groups, auto-scaling group, launch template, application processes and potentially the instances they ran on in case the processes were the last on their instance, and the optional DNS record.
 
 Note that due to the database remaining in place, re-surrecting an application replica set removed this way is usually easy. If you use the "Add" button or the "+" action icon in case you'd like a shared master instance set-up, the application replica set launched will use the same database if it is launched with exactly the same name (case-sensitive).
 
@@ -415,9 +448,9 @@ You can then start testing or using the new image. It is recommended to keep the
 
 #### Upgrading the Sailing Analytics Application AMI
 
-When upgrading the ``sailing-analytics-server`` AMI there is a good chance that the AMI you start with is used by one or more launch configurations that belong to auto-scaling groups and are used to launch new instances. Unfortunately, AWS doesn't keep you from removing old AMIs despite the fact that they are still referenced by one or more launch configurations that are in active use by their respective auto-scaling groups. So at some point you would want to upgrade those auto-scaling groups to use updated launch configurations which refer to the new AMI that results from the upgrade.
+When upgrading the ``sailing-analytics-server`` AMI there is a good chance that the AMI you start with is used by one or more launch templates that belong to auto-scaling groups and are used to launch new instances. Unfortunately, AWS doesn't keep you from removing old AMIs despite the fact that they are still referenced by one or more launch templates that are in active use by their respective auto-scaling groups. So at some point you would want to upgrade those auto-scaling groups to use updated launch templates which refer to the new AMI that results from the upgrade.
 
-After the AMI upgrade succeeds, you will see a pop-up dialog prompting you with a choice of whether you would like to update launch configurations for application replica sets that you selected in the table before upgrading the AMI, or in case you didn't pick any application replica sets suggesting all of them that currently use the AMI you just upgraded in their launch configuration. If you choose "OK" then all those auto-scaling groups will be updated so they point to new launch configurations copied from the previous ones, referencing the new AMI. The old launch configurations will be deleted. The names for the new launch configurations is constructed from the replica set name with the ID of the AMI appended to it. Note that running replicas are not affected by this.
+After the AMI upgrade succeeds, you will see a pop-up dialog prompting you with a choice of whether you would like to update launch templates for application replica sets that you selected in the table before upgrading the AMI, or in case you didn't pick any application replica sets suggesting all of them that currently use the AMI you just upgraded in their launch templates. If you choose "OK" then all those auto-scaling groups will be updated so they point to new launch templates copied from the previous ones, referencing the new AMI. The old launch templates will be deleted. The names for the new launch templates is constructed from the replica set name with the ID of the AMI appended to it. Note that running replicas are not affected by this.
 
 You can also manually trigger the upgrade of the AMI used by an auto-scaling group by using the "Update machine image for auto-scaling replicas" button or the action icon entitled correspondingly. It will use the lastest ``sailing-analytics-server``-tagged image available.
 
@@ -470,13 +503,11 @@ Any scripts common to multiple environment scripts, may be found in the "repo", 
 The build-crontab-and-cp-files uses this structure to help setup an environment 
 type. It builds the crontab file, by combining all the referenced crontab 
 one-liners, storing a copy in the user's home directory and installing it to the specified user. It also copies across the contents of "files" to the corresponding location, de-refencing any symbolic links.
-The script should ideally be triggered using a function in `imageupgrade_functions.sh`, titled `build_crontab_and_setup_files`, that takes an environment type (see other arguments below), and temporarily copies (via scp) the environments_scripts folder. It then calls the build-crontab-and-cp-files script.
+The script should ideally be triggered using a function in `imageupgrade_functions.sh`, titled `build_crontab_and_setup_files`, that takes an environment type (see other arguments below), and temporarily copies (via scp) the environments_scripts folder. It then calls the `build-crontab-and-cp-files` script.
 
 This script has a couple of arguments and options. The most important are the arguments.
 1. Environment type.
-2. User with a checked out Git copy.
-3. The relative path within $2 to the Git copy.
-Ideally, we would have only a single checked out Git copy across all instances: one on the wiki user of the central. However, some crontabs require references to specific users' files, so we have the strings PATH_OF_GIT_HOME_DIR_TO_REPLACE & PATH_OF_HOME_DIR_TO_REPLACE, in the crontabs, as placeholders for the paths the string itself describes, which the build-crontab-and-cp-files script replaces with the right path.
+Some crontabs require references to specific users' files, so we have the string PATH_OF_HOME_DIR_TO_REPLACE, in the crontabs, as placeholders for the paths the string itself describes, which the `build-crontab-and-cp-files` script replaces with the right path.
 Have a look at the script itself for more details on the options and arguments.
 
 ## Reverse proxy automation
@@ -502,13 +533,17 @@ disposables*. It is used to reduce costly cross-AZ traffic between our instances
 
 The general idea of this ALB target group healthcheck, is to make instances healthy only if in the same AZ as the archive (the correct AZ). However, availability takes priority over cost saving, so if there is no healthy instance in the "correct" AZ, the healthcheck returns healthy.
 
-All the target groups, tagged with allReverseProxies, have this healthcheck:
+All the target groups, tagged with ``allReverseProxies``, have this healthcheck:
 
 ```
 /cgi-bin/reverseProxyHealthcheck.sh?arn=TARGET_GROUP_ARN
 ```
 
-The healthcheck works by first checking internal-server-status. If genuinely unhealthy, then unhealthy is returned to the ELB (elastic load balancer) health checker. Otherwise, the instance uses cached CIDR masks (which correspond to AZ definitions) and nmap to check if in the same AZ as the archive.
+The script can be found under ``configuration/environments_scripts/repo/var/www/cgi-bin`` to where the environments for ``reverse_proxy`` (the disposables) and ``central_reverse_proxy`` link symbolically.
+
+The healthcheck works by first checking whether another instance of the healthcheck is already running. The PID of a running process is stored under ``/var/run/reverseProxyHealthcheck`` which is a folder created by a directive in ``/etc/tmpfiles.d/reverseProxyHealthcheck.conf`` upon boot. A healthcheck records its exit status and output in files under ``/var/run/reverseProxyHealthcheck`` which are removed after 10s by a background job again. If a health check is started while another is already running, the new one waits for the exit status of the already running one to be written to ``/var/run/reverseProxyHealthcheck``, then picks up that exit status and output to use it as exit status and output of the health check started concurrently. This way, we avoid congestion and clogging of reverse proxies by health checks which at times may be long-running, especially if the AWS CLI takes unusually long to discover the target groups and target health checks. Without the mechanics that shortcut these concurrent executions, we've see hundreds of concurrently executing health checks, even leading to out-of-memory situations at times.
+
+Then it checks the ``internal-server-status``. If genuinely unhealthy, then unhealthy is returned to the ELB (elastic load balancer) health checker. Otherwise, the instance uses cached CIDR masks (which correspond to AZ definitions) and nmap to check if in the same AZ as the archive.
 If in the same AZ, then "healthy" is returned to the ELB health checker. If not, then the target group ARN, passed as a parameter 
 to the healthcheck, is used to get the private IPs of the other instances in the target group, via a describe-target-health call to the AWS API. This is the most costly part of the check, so these values are cached.
 
@@ -559,12 +594,13 @@ write and quit, to install the cronjob.
 * * * * * /home/wiki/gitwiki/configuration/switchoverArchive.sh "/etc/httpd/conf.d/000-macros.conf" 2 9
 ```
 
-If you want to quickly run this script, consider installing it in /usr/local/bin, via `ln -s TARGET_PATH LINK_NAME`.
+If you want to quickly run this script, consider installing it in ``/usr/local/bin``, via `ln -s TARGET_PATH LINK_NAME`.
 
-You can use the build_crontab_and_setup_files (see below) to get these changes.
+You can use the `build_crontab_and_setup_files` (see below) to get these changes.
+
 ## Automated SSH Key Management
 
-AWS by default adds the public key of the key pair used when launching an EC2 instance to the default user's `.ssh/authorized_keys` file. For a typical Amazon Linux machine, the default user is the `root` user. For Ubuntu, it's the `ec2-user` or `ubuntu` user. The problem with this approach is that other users with landscape management permissions could not get at this instance with an SSH connection. In the past we worked around this problem by deploying those landscape-managing users' public SSH keys into the root user's `.ssh/authorized_keys` file already in the Amazon Machine Image (AMI) off which the instances were launched. The problem with this, however, is obviously that we have been slow to adjust for changes in the set of users permitted to manage the landscape.
+AWS by default adds the public key of the key pair used when launching an EC2 instance to the default user's `.ssh/authorized_keys` file. For a typical Amazon Linux machine, the default user is the `ec2-user` user. For Ubuntu, it's the `ubuntu` user, for Debian it's `admin`. The problem with this approach is that other users with landscape management permissions could not get at this instance with an SSH connection. In the past we worked around this problem by deploying those landscape-managing users' public SSH keys into the root user's `.ssh/authorized_keys` file already in the Amazon Machine Image (AMI) off which the instances were launched. The problem with this, however, is obviously that we have been slow to adjust for changes in the set of users permitted to manage the landscape.
 
 We decided early 2021 to change this so that things would be based on our own user and security sub-system (see [here](/wiki/info/security/security.md)). We introduced `LANDSCAPE` as a secured object type, with a special permission `MANAGE` and a special object identifier `AWS` such that the permission `LANDSCAPE:MANAGE:AWS` would permit users to manage all aspects of the AWS landscape, given they can present a valid AWS access key/secret. To keep the EC2 instances' SSH public key infrastructure in line, we made the instances poll the SSH public keys of those users with permissions, once per minute, updating the default user's `.ssh/authorized_keys` file accordingly.
 
@@ -572,18 +608,20 @@ The REST end point `/landscape/api/landscape/get_time_point_of_last_change_in_ss
 
 With this, the three REST API end points `/landscape/api/landscape/get_time_point_of_last_change_in_ssh_keys_of_aws_landscape_managers`, `/security/api/restsecurity/users_with_permission?permission=LANDSCAPE:MANAGE:AWS`, and `/landscape/api/landscape/get_ssh_keys_owned_by_user?username[]=...` allow clients to efficiently find out whether the set of users with AWS landscape management permission and/or their set of SSH key pairs may have changed, and if so, poll the actual changes which requires a bit more computational effort.
 
-Two new scripts and a crontab file are provided under the configuration/ folder:
-- `update_authorized_keys_for_landscape_managers_if_changed`
-- `update_authorized_keys_for_landscape_managers`
-- `crontab` (found within configuration for historical reasons, but we should be using those in configuration/crontabs)
+Two new scripts and a crontab snippet are provided under the configuration/ folder:
+- `environments_scripts/repo/usr/local/bin/update_authorized_keys_for_landscape_managers_if_changed`
+- `environments_scripts/repo/usr/local/bin/update_authorized_keys_for_landscape_managers`
+- `crontabs/crontab-update-authorized-keys@HOME_DIR`
+
+These files are intended to be used in specific ``environments_scripts/`` sub-folders to be deployed to a server for a given environment. The crontab snippet should be symbolically linked to, providing the home directory where to update the ``.ssh/authorized_keys`` in the symbolic link's name, such as ``crontab-update-authorized-keys@HOME_DIR=_root`` (where the '_' will get replaced by a '/' while compiling the ``crontab`` file from the snippets).
 
 The first makes a call to `/landscape/api/landscape/get_time_point_of_last_change_in_ssh_keys_of_aws_landscape_managers` (currently coded to `https://security-service.sapsailing.com` in the crontab file). If no previous time stamp for the last change exists under `/var/run/last_change_aws_landscape_managers_ssh_keys` or the time stamp received in the response is newer, the `update_authorized_keys_for_landscape_managers` script is invoked using the bearer token provided in `/root/ssh-key-reader.token` as argument, granting the script READ access to the user list and their SSH key pairs. That script first asks for `/security/api/restsecurity/users_with_permission?permission=LANDSCAPE:MANAGE:AWS` and then uses `/landscape/api/landscape/get_ssh_keys_owned_by_user?username[]=..`. to obtain the actual SSH public key information for the landscape managers. The original `/root/.ssh/authorized_keys` file is copied to `/root/.ssh/authorized_keys.org` once and then used to insert the single public SSH key inserted by AWS, then appending all public keys received for the landscape-managing users.
 
-The `crontab` file which is used during image-upgrade (see `configuration/imageupgrade.sh`) has a randomized sleeping period within a one minute duration after which it calls the `update_authorized_keys_for_landscape_managers_if_changed` script which transitively invokes `update_authorized_keys_for_landscape_managers` in case of changes possible.
+The `crontab-update-authorized-keys@HOME_DIR` snippet has a randomized sleeping period within a one minute duration after which it calls the `update_authorized_keys_for_landscape_managers_if_changed` script which transitively invokes `update_authorized_keys_for_landscape_managers` in case of changes possible.
 
 ## Legacy Documentation for Manual Operations
 
-Most of the things that follow should be obsolete by now because the [automated procedures](#amazon-ec2-for-sap-sailing-analytics_automated-procedures) should avoid the need for manual steps. Yet, should automatic procedures fail or should a deeper understanding of the things that have been automated become necessary, the following documentation may still be of value.
+Most of the things that follow should be obsolete by now because the [automated procedures](#automated-procedures) should avoid the need for manual steps. Yet, should automatic procedures fail or should a deeper understanding of the things that have been automated become necessary, the following documentation may still be of value.
 
 #### Starting an instance
 
@@ -796,7 +834,7 @@ This will automatically start replication from your master which is assumed to b
 * log on to replica's `/gwt/AdminConsole.html` page, go to "Advanced" / "Replication" and stop replication; to this manually for all replicas in this application server replica set
 * restart the master's application process (`./stop; sleep 5; ./start`)
 * while your master spins up, follow its `/gwt/status` page
-* while your master spins up, prepare a new Launch Configuration for the replicas that uses the new release; for this, find out which release your new master is running (e.g., `build-202012211912`), copy your existing Launch Configuration to one with a new name that reflects the new release, and edit the new Launch Configuration's "User Data" section, adjusting the `INSTALL_FROM_RELEASE` variable to the new release name. You find the "User Data" in the section "Additional configuration - optional" after expanding the "Advanced details" drop-down. Acknowledge your key at the bottom and save the new launch configuration.
+* while your master spins up, prepare a new Launch Configuration for the replicas that uses the new release; for this, find out which release your new master is running (e.g., `build-202012211912`), copy your existing Launch Configuration to one with a new name that reflects the new release, and edit the new Launch Configuration's "User Data" section, adjusting the `INSTALL_FROM_RELEASE` variable to the new release name. You find the "User Data" in the section "Additional configuration - optional" after expanding the "Advanced details" drop-down. Acknowledge your key at the bottom and save the new launch template.
 * as your new master's `/gwt/status` response tells you that the new master process is available again, add it to the master target group and the public target group again; in times of low load where you may afford going to zero replicas in your public target group, remove all replicas from the public target group; otherwise, before this step you would first need to spin up one or more replicas for your new release to replace all old replicas in the public target group in one transaction.
 * update the Auto-Scaling Group so it uses your new Launch Configuration
 * you may want to wait until your master's `/gwt/status` shows it has finished loading all races before starting new replicas on it; this way you can avoid huge numbers of replication operations that would be necessary to replicate the loading process fix by fix from the master to all replicas; it is a lot more efficient to transfer the result of loading all races in one sweep during the initial load process when a replica attaches after loading has completed

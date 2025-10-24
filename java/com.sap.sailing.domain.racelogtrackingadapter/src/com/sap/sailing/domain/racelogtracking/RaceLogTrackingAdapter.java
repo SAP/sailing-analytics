@@ -17,6 +17,7 @@ import com.sap.sailing.domain.base.RaceColumn;
 import com.sap.sailing.domain.base.Regatta;
 import com.sap.sailing.domain.base.SharedDomainFactory;
 import com.sap.sailing.domain.common.MailInvitationType;
+import com.sap.sailing.domain.common.NotFoundException;
 import com.sap.sailing.domain.common.racelog.tracking.NotDenotableForRaceLogTrackingException;
 import com.sap.sailing.domain.common.racelog.tracking.NotDenotedForRaceLogTrackingException;
 import com.sap.sailing.domain.common.racelog.tracking.RaceLogTrackingState;
@@ -123,4 +124,20 @@ public interface RaceLogTrackingAdapter {
             LeaderboardThatHasRegattaLike toLeaderboard, boolean copyMarkDeviceMappings, SharedDomainFactory<?> baseDomainFactory, RacingEventService service, int priority);
 
     void copyCompetitors(RaceColumn fromRaceColumn, Fleet fromFleet, Iterable<Pair<RaceColumn, Fleet>> toRaces);
+
+
+    /**
+     * 
+     * @param sourceLeaderboard
+     *            the leaderboard from which to copy the pairings, starting at {@code fromRaceColumnName}
+     * @param targetLeaderboard
+     *            the leaderboard to which to copy the pairings, starting at the first race column
+     * @param fromRaceColumnName
+     *            the name of the first race column in {@code sourceLeaderboard} from which to copy the pairings
+     * @param toRaceColumnInclusiveName
+     *            the name of the last race column in {@code sourceLeaderboard} from which to copy the pairings,
+     *            inclusive
+     */
+    void copyPairingListFromOtherLeaderboard(RegattaLeaderboard sourceLeaderboard, RegattaLeaderboard targetLeaderboard,
+            String fromRaceColumnName, String toRaceColumnInclusiveName) throws NotFoundException;
 }

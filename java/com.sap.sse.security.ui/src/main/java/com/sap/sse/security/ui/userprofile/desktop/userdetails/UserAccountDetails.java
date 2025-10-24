@@ -36,8 +36,6 @@ public class UserAccountDetails extends AbstractUserDetails {
     @Override
     public void setUser(UserDTO currentUser) {
         super.setUser(currentUser);
-        // TODO correct message
-//        editImageLinkUi.setTitle("TODO picture of: " + currentUser.getName());
         // TODO use image from user when field is available
         if (currentUser.isEmailValidated()) {
             validationStatus.setText(StringMessages.INSTANCE.emailValidated());

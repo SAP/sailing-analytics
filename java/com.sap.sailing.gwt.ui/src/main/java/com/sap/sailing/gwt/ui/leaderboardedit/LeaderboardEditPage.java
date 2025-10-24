@@ -35,6 +35,7 @@ import com.sap.sse.security.ui.authentication.generic.GenericAuthentication;
 import com.sap.sse.security.ui.authentication.generic.GenericAuthorizedContentDecorator;
 import com.sap.sse.security.ui.authentication.generic.sapheader.SAPHeaderWithAuthentication;
 import com.sap.sse.security.ui.client.premium.PaywallResolver;
+import com.sap.sse.security.ui.client.premium.PaywallResolverImpl;
 import com.sap.sse.security.ui.settings.ComponentContextWithSettingsStorage;
 import com.sap.sse.security.ui.settings.StoredSettingsLocation;
 
@@ -85,7 +86,7 @@ public class LeaderboardEditPage extends AbstractSailingWriteEntryPoint implemen
         @Override
         public void onSuccess(Iterable<DetailType> result) {
             SAPHeaderWithAuthentication header = initHeader();
-            PaywallResolver paywallResolver = new PaywallResolver(getUserService(), getSubscriptionServiceFactory());
+            PaywallResolver paywallResolver = new PaywallResolverImpl(getUserService(), getSubscriptionServiceFactory());
             GenericAuthentication genericSailingAuthentication = new FixedSailingAuthentication(getUserService(),
                     paywallResolver, header.getAuthenticationMenuView());
             AuthorizedContentDecorator authorizedContentDecorator = new GenericAuthorizedContentDecorator(
@@ -123,7 +124,7 @@ public class LeaderboardEditPage extends AbstractSailingWriteEntryPoint implemen
             }
             final StoredSettingsLocation storageDefinition = StoredSettingsLocationFactory
                     .createStoredSettingsLocatorForEditableLeaderboard(editableLeaderboardContextDefinition);
-            PaywallResolver paywallResolver = new PaywallResolver(getUserService(), getSubscriptionServiceFactory());
+            PaywallResolver paywallResolver = new PaywallResolverImpl(getUserService(), getSubscriptionServiceFactory());
             EditableLeaderboardLifecycle rootComponentLifeCycle = 
                     new EditableLeaderboardLifecycle(StringMessages.INSTANCE, leaderboardWithSecurity, 
                             getAvailableDetailTypesForLeaderboardResult, paywallResolver);

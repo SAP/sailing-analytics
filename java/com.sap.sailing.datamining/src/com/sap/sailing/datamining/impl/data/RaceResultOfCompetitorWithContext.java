@@ -294,6 +294,12 @@ public class RaceResultOfCompetitorWithContext implements HasRaceResultOfCompeti
     }
 
     @Override
+    public boolean isDiscarded() {
+        return getTrackedRaceContext().getLeaderboardContext().getLeaderboard().isDiscarded(competitor,
+                getTrackedRaceContext().getRaceColumn(), MillisecondsTimePoint.now());
+    }
+
+    @Override
     public Boolean isPodiumFinish() {
         Leaderboard leaderboard = getLeaderboard();
         final TimePoint now = MillisecondsTimePoint.now();

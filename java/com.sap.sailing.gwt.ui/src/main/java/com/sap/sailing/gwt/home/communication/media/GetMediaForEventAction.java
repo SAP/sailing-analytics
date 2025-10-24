@@ -6,9 +6,11 @@ import com.google.gwt.core.shared.GwtIncompatible;
 import com.sap.sailing.domain.base.Event;
 import com.sap.sailing.gwt.home.communication.SailingAction;
 import com.sap.sailing.gwt.home.communication.SailingDispatchContext;
-import com.sap.sailing.gwt.home.communication.event.EventLinkDTO;
-import com.sap.sailing.gwt.home.communication.event.EventReferenceDTO;
 import com.sap.sailing.gwt.server.HomeServiceUtil;
+import com.sap.sailing.gwt.ui.client.shared.SailingVideoDTO;
+import com.sap.sailing.gwt.ui.shared.EventLinkDTO;
+import com.sap.sailing.gwt.ui.shared.EventReferenceDTO;
+import com.sap.sailing.gwt.ui.shared.SailingImageDTO;
 import com.sap.sse.common.media.MediaTagConstants;
 import com.sap.sse.common.media.MimeType;
 import com.sap.sse.gwt.dispatch.shared.caching.IsClientCacheable;
@@ -44,8 +46,7 @@ public class GetMediaForEventAction implements SailingAction<MediaDTO>, IsClient
     @GwtIncompatible
     public MediaDTO execute(SailingDispatchContext ctx) throws DispatchException {
         Event event = ctx.getRacingEventService().getEvent(eventId);
-        EventLinkDTO eventLink = HomeServiceUtil.convertToEventLinkDTO(event, event.getBaseURL(), false,
-                ctx.getRacingEventService());
+        EventLinkDTO eventLink = HomeServiceUtil.convertToEventLinkDTO(event, event.getBaseURL(), /* on remote server */ false);
         EventReferenceDTO eventRef = new EventReferenceDTO(event);
 
         String eventName = event.getName();

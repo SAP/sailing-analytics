@@ -88,7 +88,7 @@ public class MapOptions extends JavaScriptObject {
   private static void setDefaults(MapOptions options) {
     options.setCenter(LatLng.newInstance(DEFAULT_LATLNG_LAT, DEFAULT_LATLNG_LNG));
     options.setMapTypeId(MapTypeId.ROADMAP);
-    options.setZoom(0);
+    options.setZoom(0.0);
     options.setDisableDefaultUi(false);
     options.setDisableDoubleClickZoom(false);
     options.setDraggable(true);
@@ -272,6 +272,24 @@ public class MapOptions extends JavaScriptObject {
    */
   public final native void setKeyboardShortcuts(boolean keyboardShortcuts) /*-{
     this.keyboardShortcuts = keyboardShortcuts;
+  }-*/;
+
+  /**
+   * Vector maps support fractional zoom, which lets you zoom using fractional values instead of integers. While both
+   * raster and vector maps support fractional zoom, fractional zoom is on by default for vector maps, and off by
+   * default for raster maps. Use the isFractionalZoomEnabled map option to turn fractional zoom on and off.
+   */
+  public final native boolean getIsFractionalZoomEnabled() /*-{
+    return isFractionalZoomEnabled;
+  }-*/;
+
+  /**
+   * Vector maps support fractional zoom, which lets you zoom using fractional values instead of integers. While both
+   * raster and vector maps support fractional zoom, fractional zoom is on by default for vector maps, and off by
+   * default for raster maps. Use the isFractionalZoomEnabled map option to turn fractional zoom on and off.
+   */
+  public final native void setIsFractionalZoomEnabled(boolean isFractionalZoomEnabled) /*-{
+    this.isFractionalZoomEnabled = isFractionalZoomEnabled;
   }-*/;
 
   /**
@@ -497,6 +515,34 @@ public class MapOptions extends JavaScriptObject {
   }-*/;
 
   /**
+   * The initial Map {@link MapTypeId}. Required.
+   * 
+   * @param mapTypeId {@link MapTypeId}
+   */
+  public final void setRenderingType(RenderingType renderingType) {
+    setRenderingTypeJs(renderingType.name());
+  }
+
+  /**
+   * Native Use. Use setMapTypeId(MapTypeId mapTypeId). The initial Map {@link MapTypeId}. Required.
+   */
+  private final native void setRenderingTypeJs(String renderingType) /*-{
+    this.renderingType = $wnd.google.maps.RenderingType[renderingType];
+  }-*/;
+
+  /**
+   * Get {@link RenderingType}
+   */
+  public final RenderingType getRenderingType() {
+    final String type = getRenderingTypeJs();
+    return RenderingType.valueOf(type);
+  }
+
+  private final native String getRenderingTypeJs() /*-{
+    return this.mapTypeId;
+  }-*/;
+  
+  /**
    * set The enabled/disabled state of the Rotate control.
    * 
    * @param rotateControl
@@ -681,7 +727,7 @@ public class MapOptions extends JavaScriptObject {
    * 
    * @param zoom
    */
-  public final native void setZoom(int zoom) /*-{
+  public final native void setZoom(double zoom) /*-{
     this.zoom = zoom;
   }-*/;
 
@@ -690,7 +736,7 @@ public class MapOptions extends JavaScriptObject {
    * 
    * @return int
    */
-  public final native int getZoom() /*-{
+  public final native double getZoom() /*-{
     return this.zoom;
   }-*/;
 

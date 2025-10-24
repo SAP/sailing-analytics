@@ -11,8 +11,12 @@ public class GpsQualityIndicator extends Fix {
     private final int quality;
     
     public GpsQualityIndicator(TimePoint timePoint, Sensor sensor, Map<Integer, Object> valuesPerSubindex) {
+        this(timePoint, sensor, ((Number) valuesPerSubindex.get(1)).intValue());
+    }
+
+    public GpsQualityIndicator(TimePoint timePoint, Sensor sensor, int quality) {
         super(sensor, timePoint);
-        quality = ((Number) valuesPerSubindex.get(1)).intValue();
+        this.quality = quality;
     }
 
     public int getQuality() {

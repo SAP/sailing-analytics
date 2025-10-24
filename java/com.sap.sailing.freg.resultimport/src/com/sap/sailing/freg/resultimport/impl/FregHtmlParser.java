@@ -23,8 +23,8 @@ public class FregHtmlParser {
     
     public List<String> getRowContents(InputStream is) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        Pattern tr = Pattern.compile("<(tr|TR)( [^>]*)?>");
-        Pattern slashTr = Pattern.compile("</(tr|TR)( [^>]*)?>");
+        Pattern tr = Pattern.compile("<(tr|TR)([^<>]*)>");
+        Pattern slashTr = Pattern.compile("</(tr|TR)([^<>]*)>");
         boolean inTr = false;
         StringBuilder trContents = new StringBuilder();
         List<String> tableRows = new ArrayList<String>(); // the contents of the <tr> tags found
@@ -66,8 +66,8 @@ public class FregHtmlParser {
     }
 
     public List<String> getTagContents(String s, String tag) {
-        Pattern tagPattern = Pattern.compile("<("+tag.toLowerCase()+"|"+tag.toUpperCase()+")( [^>]*)?>");
-        Pattern slashTag = Pattern.compile("</("+tag.toLowerCase()+"|"+tag.toUpperCase()+")( [^>]*)?>");
+        Pattern tagPattern = Pattern.compile("<("+tag.toLowerCase()+"|"+tag.toUpperCase()+")([^<>]*)>");
+        Pattern slashTag = Pattern.compile("</("+tag.toLowerCase()+"|"+tag.toUpperCase()+")([^<>]*)>");
         boolean inTag = false;
         List<String> result = new ArrayList<String>(); // the contents of the <td> tags found
         int start = 0;

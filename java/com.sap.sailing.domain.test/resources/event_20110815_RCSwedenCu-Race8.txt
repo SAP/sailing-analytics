@@ -1,10 +1,6 @@
 stored-uri:datafiles/1cdf8398-cafe-11e0-8c8e-406186cbf87c.mtb
 StartReplay:1
 
-// Input from params_static:
-
-// Input from event_parameters:
-
 EnableResults:0
 ResultsLayout:[{"key":"Order","header":"#","description":"Position","printable":true,"align":"right","collapsible":false},{"key":"Name","header":"Name","description":"Competitor's name","printable":true,"align":"left","collapsible":false},{"key":"ShortName","header":"Short Name","description":"Competitor's short name","printable":true,"align":"left","collapsible":true},{"key":"LegTime","header":"Leg","description":"Leg time","printable":false,"align":"right","collapsible":true},{"key":"LegPosition","header":"#","description":"Leg position","printable":false,"align":"right","collapsible":true},{"key":"Time","header":"Total","description":"Total time","printable":true,"align":"right","collapsible":false},{"key":"After","header":"Total &Delta;","description":"Total &Delta;","printable":true,"align":"right","collapsible":false}]
 CompetitorInitialsFontSizeTv:
@@ -22,7 +18,7 @@ PopUpRow6Name:After
 PopUpRow6Type:BoatAfter
 pageSize:10
 Marker4MinScaleTv:1
-PerformanceTableLayout:[{"key":"Pos","header":"Pos"},{"key":"Name","header":"Name"},{"key":"Short","header":"Short"},{"key":"Country","header":"Country"},{"key":"After","header":"After"},{"key":"Leg pos","header":"Leg pos"},{"key":"Leg time","header":"Leg time"},{"key":"SOG","header":"SOG"},{"key":"VMG","header":"VMG"},{"key":"Top speed","header":"Top Speed"},{"key":"Distance","header":"Distance"}]
+PerformanceTableLayout:[{"key":"Pos","header":"Pos","tooltip":"Position","options":null},{"key":"Name","header":"Name","tooltip":"Name","options":null},{"key":"Short","header":"Short","tooltip":"Short name","options":null},{"key":"Country","header":"Country","tooltip":"Country","options":null},{"key":"After","header":"After","tooltip":"After","options":null},{"key":"Leg pos","header":"Leg pos","tooltip":"Leg position","options":null},{"key":"Leg time","header":"Leg time","tooltip":"Leg time","options":null},{"key":"SOG","header":"SOG","tooltip":"SOG","options":null},{"key":"VMG","header":"VMG","tooltip":"VMG","options":null},{"key":"Top speed","header":"Top Speed","tooltip":"Top Speed","options":null},{"key":"Distance","header":"Distance","tooltip":"Distance","options":null}]
 DefaultPanel:
 LabelExtraDisplacement:5
 resultTableColorTv:000000
@@ -53,11 +49,12 @@ TableFontSizeTv:63
 CompMarkerUUID:1
 CodanIsSponsor:0
 DefaultTailLength:60
+LabelNoBackground:0
 LabelColor:FFFFFF
 Marker1MinScaleTv:1
 StartTimeType:Race
 smsParams:0,4525720572,4525720572,3,10,15
-ws-uri:ws://club.tractrac.com:8888
+ws-uri:ws://tracms.traclive.dk:8888
 APzoomChangeTime:2500
 disableAutoProduce:0
 autoProduce:1
@@ -115,12 +112,19 @@ ControlPointMarkerRadius:27
 disableselection:1
 disableleaderline:0
 cpLabelDisplacement:11
+delayIntervals:3,10,15
 ResultColumn1DefaultOrder:1
 ResultColumn2DefaultOrder:0
 ResultColumn3DefaultOrder:0
 ResultColumn4DefaultOrder:0
 ResultColumn5DefaultOrder:0
 DisableChangeRace:0
+MarkerSymbol:standardBoat
+MarkerMinPixelSize:36
+ShowFlagInLabel:0
+ShowRankInLabel:1
+TailOpacity:70
+TailWidth:1
 dimmingLevel:1
 LaggingThreshold:5
 LowBatteryThreshold:5
@@ -147,8 +151,8 @@ ResultColumn5Type:BoatSpeed
 DisableLeaderboard:0
 DisableAnalysis:0
 TableFontSize:12
-//live-uri:tcp://germanmaster.traclive.dk:4400
-//stored-uri:tcp://germanmaster.traclive.dk:4401
+//live-uri:tcp://tracms.traclive.dk:4400
+//stored-uri:tcp://tracms.traclive.dk:4401
 compInitialsFontSize:11
 AutoRotate:1
 MassStart:0
@@ -161,8 +165,10 @@ ResultTvColumn3Name:Name
 ResultTvColumn4OffsetIn:km
 CompetitorInitialsFontSizeTv:60
 LiveDelaySecs: 25
+LiveDelaySecsRace: 
+LiveDelaySecsEvent: 25
 
-//-------- AUTO GENERATED PARAMETERS START ----------------
+Maps:[]
 
 EventID:8449bd70-c381-11e0-8c8e-406186cbf87c
 EventName:RC44 Sweden Cup
@@ -171,6 +177,10 @@ EventDB:event_20110815_RCSwedenCu
 EventStartTime:2011-08-15 01:00:00
 EventEndTime:2011-08-21 22:00:00
 EventType:a1b74ca0-fdd8-11dc-8811-005056c00008
+EventJSON:https://historical1.tractrac.com/events/event_20110815_RCSwedenCu/jsonservice.php
+DBReplicaEnabled:0
+HighLoadEnabled:
+MultipleDataservers:0
 
 RaceID:1cdf8398-cafe-11e0-8c8e-406186cbf87c
 RaceName:Race8
@@ -349,117 +359,67 @@ Image33Image:pictures/e3794390-d319-11e0-8c8e-406186cbf87c/RC44-banner.png
 
 Class1UUID:0785425e-c427-11e0-8c8e-406186cbf87c
 Class1Name:RC44
+Class1BoatClassId:
 
-Team1UUID:d1480118-c4d5-11e0-8c8e-406186cbf87c
-Team1Name:-
+Team1UUID:079a3a74-c427-11e0-8c8e-406186cbf87c
+Team1Name:Christian Binder (AUT)
+Team1Comp1UUID:21a208c8-c4dd-11e0-8c8e-406186cbf87c
 
-Team2UUID:1324841c-c427-11e0-8c8e-406186cbf87c
-Team2Name:Cameron Appleton (NZL)
-Team2Comp1UUID:2d7227aa-c4dd-11e0-8c8e-406186cbf87c
+Team2UUID:0805697a-c427-11e0-8c8e-406186cbf87c
+Team2Name:Mathieu Richard (FRA)
+Team2Comp1UUID:2200cd68-c4dd-11e0-8c8e-406186cbf87c
 
-Team3UUID:24235f8a-c4d7-11e0-8c8e-406186cbf87c
-Team3Name:Chris Bake (CAN)
+Team3UUID:0884de26-c427-11e0-8c8e-406186cbf87c
+Team3Name:Morgan Larson (USA)
+Team3Comp1UUID:22983fa4-c4dd-11e0-8c8e-406186cbf87c
 
-Team4UUID:079a3a74-c427-11e0-8c8e-406186cbf87c
-Team4Name:Christian Binder (AUT)
-Team4Comp1UUID:21a208c8-c4dd-11e0-8c8e-406186cbf87c
+Team4UUID:0919630c-c427-11e0-8c8e-406186cbf87c
+Team4Name:Peter Evans (NZL)
+Team4Comp1UUID:23481d3e-c4dd-11e0-8c8e-406186cbf87c
 
-Team5UUID:ba7add24-c4d6-11e0-8c8e-406186cbf87c
-Team5Name:Daniel Calero (ESP)
+Team5UUID:09c23d24-c427-11e0-8c8e-406186cbf87c
+Team5Name:Jose Maria Ponce (ESP)
+Team5Comp1UUID:23f69d14-c4dd-11e0-8c8e-406186cbf87c
 
-Team6UUID:23c0dd10-c4d7-11e0-8c8e-406186cbf87c
-Team6Name:David Murphy (USA)
+Team6UUID:0a81ddd2-c427-11e0-8c8e-406186cbf87c
+Team6Name:Paul Cayard (USA)
+Team6Comp1UUID:24ab213a-c4dd-11e0-8c8e-406186cbf87c
 
-Team7UUID:11be3fc8-c427-11e0-8c8e-406186cbf87c
-Team7Name:Evgeniy Neugodnikov (RUS)
-Team7Comp1UUID:2c14e1e0-c4dd-11e0-8c8e-406186cbf87c
+Team7UUID:0b30b208-c427-11e0-8c8e-406186cbf87c
+Team7Name:Piotr Przybylski (POL)
+Team7Comp1UUID:258e4320-c4dd-11e0-8c8e-406186cbf87c
 
-Team8UUID:2452863e-c4d7-11e0-8c8e-406186cbf87c
-Team8Name:Hugues Lepic (FRA)
+Team8UUID:0c109828-c427-11e0-8c8e-406186cbf87c
+Team8Name:Mark Mendelblatt (USA)
+Team8Comp1UUID:268570aa-c4dd-11e0-8c8e-406186cbf87c
 
-Team9UUID:bb1d1b70-c4d6-11e0-8c8e-406186cbf87c
-Team9Name:Igor Lah (SLO)
+Team9UUID:0d0c0816-c427-11e0-8c8e-406186cbf87c
+Team9Name:Russell Coutts (NZL)
+Team9Comp1UUID:277e74fc-c4dd-11e0-8c8e-406186cbf87c
 
 Team10UUID:0e1d5610-c427-11e0-8c8e-406186cbf87c
 Team10Name:Iñaki Castañer (ESP)
 Team10Comp1UUID:2897f67e-c4dd-11e0-8c8e-406186cbf87c
 
-Team11UUID:245fdc26-c4d7-11e0-8c8e-406186cbf87c
-Team11Name:John Bassadone (GBR)
+Team11UUID:0f31d274-c427-11e0-8c8e-406186cbf87c
+Team11Name:Sergei Chevtsov (RUS)
+Team11Comp1UUID:29ab41ec-c4dd-11e0-8c8e-406186cbf87c
 
-Team12UUID:09c23d24-c427-11e0-8c8e-406186cbf87c
-Team12Name:Jose Maria Ponce (ESP)
-Team12Comp1UUID:23f69d14-c4dd-11e0-8c8e-406186cbf87c
+Team12UUID:106ea1ee-c427-11e0-8c8e-406186cbf87c
+Team12Name:Michele Ivaldi (ITA)
+Team12Comp1UUID:2aca1cf6-c4dd-11e0-8c8e-406186cbf87c
 
-Team13UUID:bbc93c7a-c4d6-11e0-8c8e-406186cbf87c
-Team13Name:Kirill Podolsky (RUS)
+Team13UUID:11be3fc8-c427-11e0-8c8e-406186cbf87c
+Team13Name:Evgeniy Neugodnikov (RUS)
+Team13Comp1UUID:2c14e1e0-c4dd-11e0-8c8e-406186cbf87c
 
-Team14UUID:246c46f0-c4d7-11e0-8c8e-406186cbf87c
-Team14Name:Krzysztof Krempec (POL)
+Team14UUID:1324841c-c427-11e0-8c8e-406186cbf87c
+Team14Name:Cameron Appleton (NZL)
+Team14Comp1UUID:2d7227aa-c4dd-11e0-8c8e-406186cbf87c
 
-Team15UUID:b9d8016c-c4d6-11e0-8c8e-406186cbf87c
-Team15Name:Larry Ellison (USA)
-
-Team16UUID:14574a36-c427-11e0-8c8e-406186cbf87c
-Team16Name:Magnus Woxen (SWE)
-
-Team17UUID:0c109828-c427-11e0-8c8e-406186cbf87c
-Team17Name:Mark Mendelblatt (USA)
-Team17Comp1UUID:268570aa-c4dd-11e0-8c8e-406186cbf87c
-
-Team18UUID:0805697a-c427-11e0-8c8e-406186cbf87c
-Team18Name:Mathieu Richard (FRA)
-Team18Comp1UUID:2200cd68-c4dd-11e0-8c8e-406186cbf87c
-
-Team19UUID:106ea1ee-c427-11e0-8c8e-406186cbf87c
-Team19Name:Michele Ivaldi (ITA)
-Team19Comp1UUID:2aca1cf6-c4dd-11e0-8c8e-406186cbf87c
-
-Team20UUID:0884de26-c427-11e0-8c8e-406186cbf87c
-Team20Name:Morgan Larson (USA)
-Team20Comp1UUID:22983fa4-c4dd-11e0-8c8e-406186cbf87c
-
-Team21UUID:d183291e-c4d5-11e0-8c8e-406186cbf87c
-Team21Name:Olle Jo Johansson (SWE)
-
-Team22UUID:0a81ddd2-c427-11e0-8c8e-406186cbf87c
-Team22Name:Paul Cayard (USA)
-Team22Comp1UUID:24ab213a-c4dd-11e0-8c8e-406186cbf87c
-
-Team23UUID:0919630c-c427-11e0-8c8e-406186cbf87c
-Team23Name:Peter Evans (NZL)
-Team23Comp1UUID:23481d3e-c4dd-11e0-8c8e-406186cbf87c
-
-Team24UUID:d0a15bec-c4d5-11e0-8c8e-406186cbf87c
-Team24Name:Pieter Heerema (NED)
-
-Team25UUID:0b30b208-c427-11e0-8c8e-406186cbf87c
-Team25Name:Piotr Przybylski (POL)
-Team25Comp1UUID:258e4320-c4dd-11e0-8c8e-406186cbf87c
-
-Team26UUID:cffb8f28-c4d5-11e0-8c8e-406186cbf87c
-Team26Name:Rene Mangold (AUT)
-
-Team27UUID:0d0c0816-c427-11e0-8c8e-406186cbf87c
-Team27Name:Russell Coutts (NZL)
-Team27Comp1UUID:277e74fc-c4dd-11e0-8c8e-406186cbf87c
-
-Team28UUID:0f31d274-c427-11e0-8c8e-406186cbf87c
-Team28Name:Sergei Chevtsov (RUS)
-Team28Comp1UUID:29ab41ec-c4dd-11e0-8c8e-406186cbf87c
-
-Team29UUID:159b2674-c427-11e0-8c8e-406186cbf87c
-Team29Name:Tomislav Basic (SLO)
-Team29Comp1UUID:30194a06-c4dd-11e0-8c8e-406186cbf87c
-
-Team30UUID:b96c6d08-c4d6-11e0-8c8e-406186cbf87c
-Team30Name:Torbjorn Tornqvist (SWE)
-
-Team31UUID:cf49c572-c4d5-11e0-8c8e-406186cbf87c
-Team31Name:Valentin Zavadnikov (RUS)
-
-Team32UUID:2351b66a-c4d7-11e0-8c8e-406186cbf87c
-Team32Name:Vladimir Prosikhin (RUS)
+Team15UUID:159b2674-c427-11e0-8c8e-406186cbf87c
+Team15Name:Tomislav Basic (SLO)
+Team15Comp1UUID:30194a06-c4dd-11e0-8c8e-406186cbf87c
 
 Comp1UUID:21a208c8-c4dd-11e0-8c8e-406186cbf87c
 Comp1Name:AEZ RC44 Sailing Team 
@@ -656,54 +616,116 @@ Comp15ClassUUID:0785425e-c427-11e0-8c8e-406186cbf87c
 Comp15RouteUUID:c6c23aaa-cafd-11e0-8c8e-406186cbf87c
 Comp15Color:008080
 
-ControlPoint1UUID:56043f82-c41f-11e0-8c8e-406186cbf87c
-ControlPoint1Name:Start
-ControlPoint1HasTwoPoints:1
-ControlPoint1ShortName:S
-ControlPoint1Mark1Lon:11.531390
-ControlPoint1Mark1Lat:57.882290
-ControlPoint1Mark1Static:0
-ControlPoint1Mark2Lon:11.538440
-ControlPoint1Mark2Lat:57.882065
-ControlPoint1Mark2Static:0
+PositionedItem1UUID:2eb0f990-84a5-013d-7b8d-1c6b00518c70
+PositionedItem1Name:Start - 1
+PositionedItem1CourseArea:
+PositionedItem1Static:0
+PositionedItem1Positions:
+PositionedItem1DataSheet:
 
-ControlPoint2UUID:644dac08-c420-11e0-8c8e-406186cbf87c
-ControlPoint2Name:Finish
-ControlPoint2HasTwoPoints:1
-ControlPoint2ShortName:F
-ControlPoint2Mark1Lon:11.583990
-ControlPoint2Mark1Lat:57.882710
-ControlPoint2Mark1Static:0
-ControlPoint2Mark2Lon:11.584467
-ControlPoint2Mark2Lat:57.881435
-ControlPoint2Mark2Static:0
+PositionedItem2UUID:2f87c5b0-84a5-013d-7b8e-1c6b00518c70
+PositionedItem2Name:Start - 2
+PositionedItem2CourseArea:
+PositionedItem2Static:0
+PositionedItem2Positions:
+PositionedItem2DataSheet:
 
-ControlPoint3UUID:d6c250aa-c41f-11e0-8c8e-406186cbf87c
-ControlPoint3Name:Mark1
-ControlPoint3HasTwoPoints:0
-ControlPoint3ShortName:1
-ControlPoint3Mark1Lon:11.530118
-ControlPoint3Mark1Lat:57.863705
-ControlPoint3Mark1Static:0
+PositionedItem3UUID:3025bb90-84a5-013d-7b91-1c6b00518c70
+PositionedItem3Name:Finish - 1
+PositionedItem3CourseArea:
+PositionedItem3Static:0
+PositionedItem3Positions:
+PositionedItem3DataSheet:
 
-ControlPoint4UUID:e844f01c-c41f-11e0-8c8e-406186cbf87c
-ControlPoint4Name:Mark1-sub
-ControlPoint4HasTwoPoints:0
-ControlPoint4ShortName:1
-ControlPoint4Mark1Lon:11.532695
-ControlPoint4Mark1Lat:57.863140
-ControlPoint4Mark1Static:0
+PositionedItem4UUID:30eccc60-84a5-013d-7b92-1c6b00518c70
+PositionedItem4Name:Finish - 2
+PositionedItem4CourseArea:
+PositionedItem4Static:0
+PositionedItem4Positions:
+PositionedItem4DataSheet:
 
-ControlPoint5UUID:f95e39ee-c41f-11e0-8c8e-406186cbf87c
-ControlPoint5Name:Gate
-ControlPoint5HasTwoPoints:1
-ControlPoint5ShortName:G
-ControlPoint5Mark1Lon:11.532482
-ControlPoint5Mark1Lat:57.881192
-ControlPoint5Mark1Static:0
-ControlPoint5Mark2Lon:11.534728
-ControlPoint5Mark2Lat:57.881000
-ControlPoint5Mark2Static:0
+PositionedItem5UUID:3297acd0-84a5-013d-7b95-1c6b00518c70
+PositionedItem5Name:Mark1
+PositionedItem5CourseArea:
+PositionedItem5Static:0
+PositionedItem5Positions:
+PositionedItem5DataSheet:
+
+PositionedItem6UUID:3350a280-84a5-013d-7b96-1c6b00518c70
+PositionedItem6Name:Mark1-sub
+PositionedItem6CourseArea:
+PositionedItem6Static:0
+PositionedItem6Positions:
+PositionedItem6DataSheet:
+
+PositionedItem7UUID:34aaa480-84a5-013d-7b97-1c6b00518c70
+PositionedItem7Name:Gate - 1
+PositionedItem7CourseArea:
+PositionedItem7Static:0
+PositionedItem7Positions:
+PositionedItem7DataSheet:
+
+PositionedItem8UUID:38183920-84a5-013d-7b98-1c6b00518c70
+PositionedItem8Name:Gate - 2
+PositionedItem8CourseArea:
+PositionedItem8Static:0
+PositionedItem8Positions:
+PositionedItem8DataSheet:
+
+MapItem1UUID:3011a860-84a5-013d-7b8f-1c6b00518c70
+MapItem1Name:Start - 1
+MapItem1ShortName:S
+MapItem1PositionedItemIds:["2eb0f990-84a5-013d-7b8d-1c6b00518c70"]
+
+MapItem2UUID:301c4410-84a5-013d-7b90-1c6b00518c70
+MapItem2Name:Start - 2
+MapItem2ShortName:S
+MapItem2PositionedItemIds:["2f87c5b0-84a5-013d-7b8e-1c6b00518c70"]
+
+MapItem3UUID:32694000-84a5-013d-7b93-1c6b00518c70
+MapItem3Name:Finish - 1
+MapItem3ShortName:F
+MapItem3PositionedItemIds:["3025bb90-84a5-013d-7b91-1c6b00518c70"]
+
+MapItem4UUID:32953a30-84a5-013d-7b94-1c6b00518c70
+MapItem4Name:Finish - 2
+MapItem4ShortName:F
+MapItem4PositionedItemIds:["30eccc60-84a5-013d-7b92-1c6b00518c70"]
+
+MapItem5UUID:39025c80-84a5-013d-7b99-1c6b00518c70
+MapItem5Name:Gate - 1
+MapItem5ShortName:G
+MapItem5PositionedItemIds:["34aaa480-84a5-013d-7b97-1c6b00518c70"]
+
+MapItem6UUID:3903ebc0-84a5-013d-7b9a-1c6b00518c70
+MapItem6Name:Gate - 2
+MapItem6ShortName:G
+MapItem6PositionedItemIds:["38183920-84a5-013d-7b98-1c6b00518c70"]
+
+MapItem7UUID:56043f82-c41f-11e0-8c8e-406186cbf87c
+MapItem7Name:Start
+MapItem7ShortName:S
+MapItem7PositionedItemIds:["2eb0f990-84a5-013d-7b8d-1c6b00518c70", "2f87c5b0-84a5-013d-7b8e-1c6b00518c70"]
+
+MapItem8UUID:644dac08-c420-11e0-8c8e-406186cbf87c
+MapItem8Name:Finish
+MapItem8ShortName:F
+MapItem8PositionedItemIds:["3025bb90-84a5-013d-7b91-1c6b00518c70", "30eccc60-84a5-013d-7b92-1c6b00518c70"]
+
+MapItem9UUID:d6c250aa-c41f-11e0-8c8e-406186cbf87c
+MapItem9Name:Mark1
+MapItem9ShortName:1
+MapItem9PositionedItemIds:["3297acd0-84a5-013d-7b95-1c6b00518c70"]
+
+MapItem10UUID:e844f01c-c41f-11e0-8c8e-406186cbf87c
+MapItem10Name:Mark1-sub
+MapItem10ShortName:1
+MapItem10PositionedItemIds:["3350a280-84a5-013d-7b96-1c6b00518c70"]
+
+MapItem11UUID:f95e39ee-c41f-11e0-8c8e-406186cbf87c
+MapItem11Name:Gate
+MapItem11ShortName:G
+MapItem11PositionedItemIds:["34aaa480-84a5-013d-7b97-1c6b00518c70", "38183920-84a5-013d-7b98-1c6b00518c70"]
 
 SegmentFile:segments.php
 Route1UUID:c6c23aaa-cafd-11e0-8c8e-406186cbf87c
@@ -716,6 +738,3 @@ Route1ControlPoint4UUID:d6c250aa-c41f-11e0-8c8e-406186cbf87c
 Route1ControlPoint5UUID:f95e39ee-c41f-11e0-8c8e-406186cbf87c
 Route1ControlPoint6UUID:644dac08-c420-11e0-8c8e-406186cbf87c
 
-//-------- AUTO GENERATED PARAMETERS END ------------------
-
-EventJSON:https://club.tractrac.com/events/event_20110815_RCSwedenCu/jsonservice.php

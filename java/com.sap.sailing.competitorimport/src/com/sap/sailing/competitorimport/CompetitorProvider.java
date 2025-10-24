@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 import com.sap.sailing.domain.common.CompetitorDescriptor;
 import com.sap.sse.common.Named;
@@ -33,7 +36,7 @@ public interface CompetitorProvider extends Named {
      *         competitor names. Should the value for a key be <code>null</code>, competitors for the event may still
      *         be available, only they may not be keyed per regatta in that case.
      */
-    Map<String, Set<String>> getHasCompetitorsForRegattasInEvent() throws IOException, URISyntaxException;
+    Map<String, Set<String>> getHasCompetitorsForRegattasInEvent() throws IOException, URISyntaxException, SAXException, ParserConfigurationException;
 
     /**
      * Obtains competitor records from the source of import
@@ -45,7 +48,7 @@ public interface CompetitorProvider extends Named {
      *            <code>eventName</code>, or a regatta name as provided in the value set for the key
      *            <code>eventName</code> as returned by {@link #getHasCompetitorsForRegattasInEvent()}.
      */
-    Iterable<CompetitorDescriptor> getCompetitorDescriptors(String eventName, String regattaName) throws JAXBException, IOException, URISyntaxException;
+    Iterable<CompetitorDescriptor> getCompetitorDescriptors(String eventName, String regattaName) throws JAXBException, IOException, URISyntaxException, SAXException, ParserConfigurationException;
 
     /**
      * A hint for users about this competitor provider; ideally mapped to the user's locale with i18n support.

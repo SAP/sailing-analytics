@@ -1,0 +1,5 @@
+This folder contains what is needed to satisfy our Azure Build Pipeline
+for our Android apps, in particular a dummy coverage test result where
+there are no real coverage tests run during the Android build, and a
+dummy Surefire test report where no surefire/JUnit tests are run during
+our Android builds.

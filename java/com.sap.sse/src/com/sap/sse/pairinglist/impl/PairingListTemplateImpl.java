@@ -820,12 +820,13 @@ public class PairingListTemplateImpl implements PairingListTemplate {
                     continue;
                 }
                 n += 1;
-                exp += associations[i][j] - k;
-                exp2 += Math.pow(associations[i][j] - k, 2);
+                final int base = associations[i][j] - k;
+                exp += base;
+                exp2 += base*base;
             }
         }
         // expression in Math.sqrt() is equal to variance / n
-        standardDev = Math.sqrt((exp2 - (Math.pow(exp, 2)) / n) / n);
+        standardDev = Math.sqrt((exp2 - (double) (exp*exp) / n) / n);
         return standardDev;
     }
 

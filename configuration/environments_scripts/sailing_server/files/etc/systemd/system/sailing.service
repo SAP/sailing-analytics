@@ -9,5 +9,5 @@ RequiredBy=multi-user.target
 [Service]
 Type=oneshot
 RemainAfterExit=true
-ExecStart=/etc/init.d/sailing start
-ExecStop=/etc/init.d/sailing stop
+ExecStart=/usr/local/bin/sailing start
+ExecStop=/usr/local/bin/sailing stop

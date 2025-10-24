@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -27,11 +28,13 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 
 import com.sap.sailing.domain.common.LeaderboardNameConstants;
+import com.sap.sailing.landscape.common.SharedLandscapeConstants;
 import com.sap.sailing.server.gateway.serialization.LeaderboardGroupConstants;
 import com.sap.sailing.shared.server.gateway.jaxrs.AbstractSailingServerResource;
 import com.sap.sse.common.Util;
@@ -67,6 +70,7 @@ public class CompareServersResource extends AbstractSailingServerResource {
             LeaderboardNameConstants.ISMETALEADERBOARD, LeaderboardNameConstants.ISREGATTALEADERBOARD,
             LeaderboardNameConstants.SCORINGCOMMENT, LeaderboardNameConstants.LASTSCORINGUPDATE,
             LeaderboardNameConstants.SCORINGSCHEME, LeaderboardNameConstants.REGATTANAME,
+            LeaderboardNameConstants.DISCARDS,
             LeaderboardNameConstants.SERIES, LeaderboardNameConstants.ISMEDALSERIES, LeaderboardNameConstants.FLEETS,
             LeaderboardNameConstants.COLOR, LeaderboardNameConstants.ORDERING, LeaderboardNameConstants.RACES,
             LeaderboardNameConstants.ISMEDALRACE, LeaderboardNameConstants.ISTRACKED,
@@ -80,6 +84,7 @@ public class CompareServersResource extends AbstractSailingServerResource {
      * "[]" for array expansion. Example: ".leaderboards[].series[].fleets[].races[].raceViewerUrls"
      */
     private static final String[] KEYSTOIGNORE = new String[] { "."+LeaderboardGroupConstants.TIMEPOINT,
+            "."+LeaderboardGroupConstants.TIMEPOINT_MILLIS,
             "."+LeaderboardGroupConstants.LEADERBOARDS+"[]."+LeaderboardNameConstants.SERIES+"[]."+LeaderboardNameConstants.FLEETS+"[]."+LeaderboardNameConstants.RACES+"[]."+LeaderboardNameConstants.RACEVIEWERURLS };
     private static final Set<String> KEYSETTOIGNORE = new HashSet<>(Arrays.asList(KEYSTOIGNORE));
 
@@ -150,12 +155,18 @@ public class CompareServersResource extends AbstractSailingServerResource {
             @FormParam(PASSWORD1_FORM_PARAM) String password1,
             @FormParam(PASSWORD2_FORM_PARAM) String password2,
             @FormParam(BEARER1_FORM_PARAM) String bearer1,
-            @FormParam(BEARER2_FORM_PARAM) String bearer2) {
+            @FormParam(BEARER2_FORM_PARAM) String bearer2) throws MalformedURLException {
         final Map<String, Set<Object>> result = new HashMap<>();
         Response response = null;
         final String effectiveServer1 = !Util.hasLength(server1) ? uriInfo.getBaseUri().getAuthority() : server1;
-        if (!validateParameters(server2, uuidset, user1, user2, password1, password2, bearer1, bearer2)) {
-            response = badRequest("Specify two server names and optionally a set of valid leaderboardgroup UUIDs.");
+        final URL url1 = RemoteServerUtil.createBaseUrl(effectiveServer1);
+        final URL url2 = RemoteServerUtil.createBaseUrl(server2);
+        if (!SharedLandscapeConstants.isTrustedDomain(url1.getHost())) {
+            response = badRequest("Untrusted domain for "+url1);
+        } else if (!SharedLandscapeConstants.isTrustedDomain(url2.getHost())) {
+            response = badRequest("Untrusted domain for "+url2);
+        } else if (!validateParameters(server2, uuidset, user1, user2, password1, password2, bearer1, bearer2)) {
+            response = badRequest("Specify two trusted server names and optionally a set of valid leaderboardgroup UUIDs.");
         } else {
             final String token1 = getSecurityService().getOrCreateTargetServerBearerToken(effectiveServer1, user1, password1, bearer1);
             final String token2 = getSecurityService().getOrCreateTargetServerBearerToken(server2, user2, password2, bearer2);
@@ -243,13 +254,13 @@ public class CompareServersResource extends AbstractSailingServerResource {
      */
     private Pair<Object, Object> fetchLeaderboardgroupDetailsAndRemoveDuplicates(String server1, String server2,
             String leaderboardgroupId, String bearer1, String bearer2) throws Exception {
-        Object lgdetail1 = getLeaderboardgroupDetailsById(leaderboardgroupId, RemoteServerUtil.createBaseUrl(server1), bearer1);
-        Object lgdetail2 = getLeaderboardgroupDetailsById(leaderboardgroupId, RemoteServerUtil.createBaseUrl(server2), bearer2);
-        Pair<Object, Object> result = removeUnnecessaryAndDuplicateFields(lgdetail1, lgdetail2);
+        final JSONObject lgdetail1 = getLeaderboardgroupDetailsById(leaderboardgroupId, RemoteServerUtil.createBaseUrl(server1), bearer1);
+        final JSONObject lgdetail2 = getLeaderboardgroupDetailsById(leaderboardgroupId, RemoteServerUtil.createBaseUrl(server2), bearer2);
+        final Pair<Object, Object> result = removeUnnecessaryAndDuplicateFields(lgdetail1, lgdetail2);
         return result;
     }
 
-    Pair<Object, Object> removeUnnecessaryAndDuplicateFields(Object lgdetail1, Object lgdetail2) {
+    Pair<Object, Object> removeUnnecessaryAndDuplicateFields(JSONAware lgdetail1, JSONAware lgdetail2) {
         removeUnnecessaryFields(lgdetail1);
         removeUnnecessaryFields(lgdetail2);
         Pair<Object, Object> result = removeDuplicateEntries(lgdetail1, lgdetail2);
@@ -274,10 +285,10 @@ public class CompareServersResource extends AbstractSailingServerResource {
     /**
      * Fetches the JSON for a given leaderboardgroup UUID.
      */
-    private Object getLeaderboardgroupDetailsById(String leaderboardgroupId, URL baseUrl, String bearer) throws Exception {
-        final URLConnection lgdetailc = HttpUrlConnectionHelper.redirectConnectionWithBearerToken(
+    private JSONObject getLeaderboardgroupDetailsById(String leaderboardgroupId, URL baseUrl, String bearer) throws Exception {
+        final URLConnection lgdetails = HttpUrlConnectionHelper.redirectConnectionWithBearerToken(
                 RemoteServerUtil.createRemoteServerUrl(baseUrl, createLgDetailPath(leaderboardgroupId), null), bearer);
-        Object result = JSONValue.parse(new InputStreamReader(lgdetailc.getInputStream(), "UTF-8"));
+        JSONObject result = (JSONObject) JSONValue.parse(new InputStreamReader(lgdetails.getInputStream(), "UTF-8"));
         return result;
     }
 
@@ -295,7 +306,7 @@ public class CompareServersResource extends AbstractSailingServerResource {
      * empty path string to start with, removing fields to be ignored or not to be compared in-place, modifying
      * the {@code json} object.
      */
-    private void removeUnnecessaryFields(Object json) {
+    private void removeUnnecessaryFields(JSONAware json) {
         removeUnnecessaryFields(json, "");
     }
     

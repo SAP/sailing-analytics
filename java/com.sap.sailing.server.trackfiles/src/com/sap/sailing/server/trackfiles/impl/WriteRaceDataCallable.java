@@ -44,17 +44,16 @@ class WriteRaceDataCallable implements Callable<Void> {
     }
 
     public Void call() throws Exception {
-        DataRetriever dataRetriever = getDataRetriever();
-        byte[] result = dataRetriever.getData(format, race, dataBeforeAfter, rawFixes);
-
-        String suffix = format.suffix;
+        final DataRetriever dataRetriever = getDataRetriever();
+        final byte[] result = dataRetriever.getData(format, race, dataBeforeAfter, rawFixes);
+        final String suffix;
         if (data == TrackFilesDataSource.METADATA) {
             suffix = "txt";
+        } else {
+            suffix = format.suffix;
         }
-
-        ZipEntry entry = new ZipEntry(race.getRaceIdentifier().getRegattaName() + "/"
+        final ZipEntry entry = new ZipEntry(race.getRaceIdentifier().getRegattaName() + "/"
                 + race.getRaceIdentifier().getRaceName() + " - " + data.toString() + "." + suffix);
-
         callback.write(entry, result);
         return null;
     }

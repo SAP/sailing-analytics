@@ -9,7 +9,7 @@ import com.google.gwt.core.shared.GwtIncompatible;
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.CompetitorAndBoatStore;
 import com.sap.sailing.gwt.home.communication.event.SimpleCompetitorWithIdDTO;
-import com.sap.sailing.server.impl.preferences.model.SailorProfilePreference;
+import com.sap.sailing.server.preferences.SailorProfilePreference;
 import com.sap.sse.common.Util;
 
 /**

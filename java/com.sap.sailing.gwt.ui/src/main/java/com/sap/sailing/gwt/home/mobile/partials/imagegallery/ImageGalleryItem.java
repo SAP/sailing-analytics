@@ -18,6 +18,8 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.sap.sailing.gwt.home.mobile.places.event.media.MediaViewResources;
 import com.sap.sse.gwt.client.media.ImageDTO;
+import com.sap.sse.gwt.client.media.MediaMenuIcon;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 
 public class ImageGalleryItem extends Composite implements HasClickHandlers {
 
@@ -34,11 +36,15 @@ public class ImageGalleryItem extends Composite implements HasClickHandlers {
     Button editButtonUi;
     @UiField
     Button deleteButtonUi;
-
-    public ImageGalleryItem(final ImageDTO image, final Consumer<ImageDTO> deleteImage) {
+    @UiField(provided=true)
+    MediaMenuIcon mediaMenuIcon;
+    
+    public ImageGalleryItem(final ImageDTO image, final Consumer<ImageDTO> deleteImage, TakedownNoticeService takedownNoticeService, String eventName) {
         MediaViewResources.INSTANCE.css().ensureInjected();
+        mediaMenuIcon = new MediaMenuIcon(takedownNoticeService, "takedownRequestForEventGalleryImage");
         initWidget(uiBinder.createAndBindUi(this));
         String backgroundUri = UriUtils.fromString(image.getSourceRef()).asString();
+        mediaMenuIcon.setData(eventName, backgroundUri);
         imageUi.getStyle().setBackgroundImage("url('" + backgroundUri + "')");
         overlayUi.getStyle().setVisibility(Visibility.HIDDEN);
         editButtonUi.addClickHandler(new ClickHandler() {

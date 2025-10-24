@@ -1,14 +1,14 @@
 package com.sap.sailing.server.trackfiles.test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.sensordata.ExpeditionExtendedSensorDataMetadata;
 import com.sap.sailing.domain.common.tracking.DoubleVectorFix;
@@ -27,7 +27,7 @@ public class ExpeditionDataImportTest {
         int getExpectedFixesCount();
     }
     
-    @Before
+    @BeforeEach
     public void setUp() {
         expeditionDataImporter = new ExpeditionExtendedDataImporterImpl();
     }
@@ -45,7 +45,7 @@ public class ExpeditionDataImportTest {
                     }
                 }
             }, "filename.csv", "source", /* downsample */ false);
-            Assert.assertEquals(importData.getExpectedFixesCount(), callbackCallCount);
+            Assertions.assertEquals(importData.getExpectedFixesCount(), callbackCallCount);
         }
     }
 

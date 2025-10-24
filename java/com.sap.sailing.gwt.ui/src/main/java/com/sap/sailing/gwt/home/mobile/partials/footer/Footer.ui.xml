@@ -15,10 +15,12 @@
                     <a ui:field="imprintAnchorLink"> 
                         <ui:text from='{i18n.footerLegal}' />
                     </a>
-                    |
                     <a href="https://www.sap.com/about/legal/privacy.html?campaigncode=CRM-XH21-OSP-Sailing"
                         title="{i18n.footerPrivacy}">
                         <ui:text from='{i18n.footerPrivacy}' />
+                    </a>
+                    <a ui:field="sapJobsAnchor" href="https://jobs.sapsailing.com" target="_blank">
+                        <ui:text from='{i18n.footerJobs}'/>
                     </a>
                     <br></br>
                     <a ui:field="supportAnchor" href="https://support.sapsailing.com"
@@ -26,8 +28,8 @@
                         <ui:text from='{i18n.footerSupport}' />
                     </a>
                     |
-                    <a ui:field="desktopUi" href="HomeDesktop.html" title="Desktop">
-                        Desktop
+                    <a ui:field="desktopUi" title="{i18n.desktop}" href="">
+                        <ui:text from='{i18n.desktop}' />
                     </a>
                     <br></br>
                     <g:Anchor title="{i18n.whatsNew}" ui:field="whatsNewLinkUi">

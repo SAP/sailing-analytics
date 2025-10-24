@@ -23,9 +23,9 @@ public class StopTrackingRace extends AbstractRaceOperation<Void> {
     
     @Override
     public Void internalApplyTo(RacingEventService toState) throws Exception {
-        Regatta regatta = toState.getRegatta(getRaceIdentifier());
+        final Regatta regatta = toState.getRegatta(getRaceIdentifier());
         if (regatta != null) {
-            RaceDefinition r = toState.getRace(getRaceIdentifier());
+            final RaceDefinition r = toState.getRace(getRaceIdentifier());
             if (r != null) {
                 toState.stopTracking(regatta, r);
             }

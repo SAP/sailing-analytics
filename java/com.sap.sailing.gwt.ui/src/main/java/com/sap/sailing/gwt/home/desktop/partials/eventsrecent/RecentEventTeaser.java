@@ -10,6 +10,7 @@ import com.sap.sailing.gwt.home.communication.event.LabelType;
 import com.sap.sailing.gwt.home.communication.eventlist.EventListEventSeriesDTO;
 import com.sap.sailing.gwt.home.desktop.partials.event.EventTeaser;
 import com.sap.sailing.gwt.home.shared.app.PlaceNavigation;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 
 public class RecentEventTeaser extends Composite {
 
@@ -20,9 +21,9 @@ public class RecentEventTeaser extends Composite {
     
     @UiField(provided = true) EventTeaser eventTeaser;
 
-    public RecentEventTeaser(final PlaceNavigation<?> placeNavigation, final EventMetadataDTO event, LabelType labelType) {
+    public RecentEventTeaser(final PlaceNavigation<?> placeNavigation, final EventMetadataDTO event, LabelType labelType, TakedownNoticeService takedownNoticeService) {
         EventsOverviewRecentResources.INSTANCE.css().ensureInjected();
-        eventTeaser = new EventTeaser(placeNavigation, event, labelType);
+        eventTeaser = new EventTeaser(placeNavigation, event, labelType, takedownNoticeService);
         initWidget(uiBinder.createAndBindUi(this));
     }
     

@@ -1,6 +1,7 @@
 package com.sap.sailing.gwt.home.shared.places.event;
 
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import com.google.gwt.activity.shared.Activity;
 import com.sap.sailing.gwt.home.communication.event.GetEventViewAction;
@@ -21,7 +22,8 @@ import com.sap.sse.gwt.client.mvp.AbstractActivityProxy;
 import com.sap.sse.gwt.client.mvp.ClientFactory;
 
 public abstract class AbstractEventActivityProxy<C extends ClientFactory & ClientFactoryWithDispatch> extends AbstractActivityProxy implements ProvidesNavigationPath {
-    
+    private static final Logger logger = Logger.getLogger(AbstractEventActivityProxy.class.getName());
+
     private final C clientFactory;
     private AbstractEventPlace place;
     private NavigationPathDisplay navigationPathDisplay;
@@ -55,7 +57,7 @@ public abstract class AbstractEventActivityProxy<C extends ClientFactory & Clien
     }
     
     /**
-     * This method is called after loading the event an verifying the {@link AbstractEventPlace}.
+     * This method is called after loading the event and verifying the {@link AbstractEventPlace}.
      * Subclasses can start an {@link Activity} based on the given {@link AbstractEventPlace}.
      * 
      * @param clientFactory the {@link ClientFactoryWithDispatch} needed in {@link Activity}
@@ -96,6 +98,7 @@ public abstract class AbstractEventActivityProxy<C extends ClientFactory & Clien
                 // Regatta ID unknown but unnecessary ...
                 place.getCtx().withRegattaId(null);
             } else if (event.isMultiRegatta() && !regattaKnown) {
+                logger.warning("Regatta ID "+place.getCtx().getRegattaId()+" is unknown; displaying event instead");
                 return new MultiregattaRegattasPlace(contextWithoutRegatta);
             }
         }

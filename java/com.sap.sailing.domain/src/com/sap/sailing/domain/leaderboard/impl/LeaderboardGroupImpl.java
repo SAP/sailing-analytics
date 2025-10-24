@@ -113,6 +113,11 @@ public class LeaderboardGroupImpl extends LeaderboardGroupBaseImpl implements Le
     }
 
     @Override
+    public String getOverallLeaderboardName() {
+        return hasOverallLeaderboard() ? getOverallLeaderboard().getName() : null;
+    }
+
+    @Override
     public void setOverallLeaderboard(Leaderboard overallLeaderboard) {
         this.overallLeaderboard = overallLeaderboard;
     }

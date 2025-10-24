@@ -40,6 +40,7 @@ public interface TaggingService {
      *            title of tag, must <b>NOT</b> be <code>null</code>
      * @param comment
      *            optional comment of tag
+     * @param hiddenInfo TODO
      * @param imageURL
      *            optional image URL of tag
      * @param resizedImageURL
@@ -63,7 +64,7 @@ public interface TaggingService {
      *             thrown if tag already exists
      */
     void addTag(String leaderboardName, String raceColumnName, String fleetName, String tag, String comment,
-            String imageURL, String resizedImageURL, boolean visibleForPublic, TimePoint raceTimepoint) throws AuthorizationException,
+            String hiddenInfo, String imageURL, String resizedImageURL, boolean visibleForPublic, TimePoint raceTimepoint) throws AuthorizationException,
             IllegalArgumentException, RaceLogNotFoundException, ServiceNotFoundException, TagAlreadyExistsException;
 
     /**
@@ -110,6 +111,7 @@ public interface TaggingService {
      *            new tag title
      * @param comment
      *            new comment
+     * @param hiddenInfo TODO
      * @param imageURL
      *            optional image URL of tag
      * @param resizedImageURL
@@ -131,7 +133,7 @@ public interface TaggingService {
      *             thrown if security service cannot be found
      */
     void updateTag(String leaderboardName, String raceColumnName, String fleetName, TagDTO tagToUpdate, String tag,
-            String comment, String imageURL, String resizedImageURL, boolean visibleForPublic)
+            String comment, String hiddenInfo, String imageURL, String resizedImageURL, boolean visibleForPublic)
             throws AuthorizationException, IllegalArgumentException, NotRevokableException, RaceLogNotFoundException,
             ServiceNotFoundException, TagAlreadyExistsException;
 

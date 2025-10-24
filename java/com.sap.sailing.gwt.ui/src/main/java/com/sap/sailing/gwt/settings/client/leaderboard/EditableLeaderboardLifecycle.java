@@ -6,6 +6,7 @@ import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sse.common.settings.generic.support.SettingsUtil;
 import com.sap.sse.gwt.client.formfactor.DeviceDetector;
 import com.sap.sse.gwt.client.shared.components.SettingsDialogComponent;
+import com.sap.sse.security.ui.client.SecurityChildSettingsContext;
 import com.sap.sse.security.ui.client.premium.PaywallResolver;
 
 public class EditableLeaderboardLifecycle extends AbstractMultiRaceLeaderboardPanelLifecycle<EditableLeaderboardSettings> {
@@ -28,7 +29,7 @@ public class EditableLeaderboardLifecycle extends AbstractMultiRaceLeaderboardPa
 
     @Override
     public EditableLeaderboardSettings createDefaultSettings() {
-        EditableLeaderboardSettings leaderboardSettings = new EditableLeaderboardSettings(DeviceDetector.isDesktop());
+        EditableLeaderboardSettings leaderboardSettings = new EditableLeaderboardSettings(DeviceDetector.isDesktop(), new SecurityChildSettingsContext(leaderboardDTO, paywallResolver));
         SettingsUtil.copyDefaultsFromValues(leaderboardSettings, leaderboardSettings);
         return leaderboardSettings;
     }

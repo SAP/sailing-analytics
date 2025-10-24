@@ -1,5 +1,5 @@
 package com.sap.sse.security.persistence.impl;
 
 public enum CollectionNames {
-    CACHES, SESSIONS;
+    CACHES, SESSIONS, CORS_FILTER_CONFIGURATIONS;
 }

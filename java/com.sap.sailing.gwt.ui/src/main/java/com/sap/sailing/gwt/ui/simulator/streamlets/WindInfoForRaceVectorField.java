@@ -164,7 +164,7 @@ public class WindInfoForRaceVectorField implements VectorField, AverageLatitudeP
     }
 
     @Override
-    public double getMotionScale(int zoomLevel) {
+    public double getMotionScale(double zoomLevel) {
         // This implementation is copied from SimulatorField, hoping it does something useful in combination with
         // the Swarm implementation.
         return 2.0 * knotsInDegreePerFrame * Math.pow(1.8, Math.min(15.0, 20.0 - zoomLevel)); 

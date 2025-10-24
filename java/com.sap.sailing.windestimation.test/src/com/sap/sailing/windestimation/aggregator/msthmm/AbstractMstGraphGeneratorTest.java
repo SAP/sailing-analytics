@@ -1,11 +1,11 @@
 package com.sap.sailing.windestimation.aggregator.msthmm;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.windestimation.aggregator.msthmm.AbstractMstGraphGenerator.NodeWithDistance;
 import com.sap.sailing.windestimation.aggregator.msthmm.AbstractMstGraphGenerator.NodeWithNeighbors;
@@ -22,7 +22,7 @@ public class AbstractMstGraphGeneratorTest {
 
     private int counter;
 
-    @Before
+    @BeforeEach
     public void beforeStart() {
         counter = 1;
     }

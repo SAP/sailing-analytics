@@ -2,7 +2,7 @@ package com.sap.sailing.gwt.ui.leaderboardedit;
 
 import java.util.Arrays;
 
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -96,7 +96,7 @@ public class EditScoreDialog extends DataEntryDialog<ScoreCorrectionUpdate> {
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return totalPointsBox;
     }
     

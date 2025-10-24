@@ -29,9 +29,18 @@
 	<listener>
 		<listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
 	</listener>
+    <!-- CORS filter -->
+    <filter>
+        <filter-name>CORSFilter</filter-name>
+        <filter-class>com.sap.sse.rest.CORSFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>CORSFilter</filter-name>
+        <url-pattern>*</url-pattern>
+    </filter-mapping>
 	<filter>
 		<filter-name>ShiroFilter</filter-name>
-		<filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+		<filter-class>com.sap.sse.security.shiro.ShiroFilterForAllButOptionsRequests</filter-class>
 	</filter>
 	<!-- Make sure any request you want accessible to Shiro is filtered. "/*" 
 	     catches all requests. Usually this filter mapping is defined first (before all 
@@ -61,10 +70,6 @@
         		<param-name>javax.ws.rs.Application</param-name>
         		<param-value>com.sap.sse.security.jaxrs.api.RestApiApplication</param-value>
    		</init-param>
-        <init-param>
-            <param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
-            <param-value>com.sap.sse.rest.AccessControlAndEncodingResponseFilter</param-value>
-        </init-param>
         <init-param>
                 <param-name>com.sun.jersey.config.feature.DisableWADL</param-name>
                 <param-value>true</param-value>

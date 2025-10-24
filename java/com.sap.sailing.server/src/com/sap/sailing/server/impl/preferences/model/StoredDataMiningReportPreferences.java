@@ -6,6 +6,10 @@ import com.sap.sse.common.settings.generic.SettingsList;
 /** Holds a list of {@link StoredDataMiningReportPreferences}. */
 public class StoredDataMiningReportPreferences extends AbstractGenericSerializableSettings {
 
+    public StoredDataMiningReportPreferences() {
+        super();
+    }
+
     private static final long serialVersionUID = -9158880266803106327L;
     public static final String PREF_NAME = SailingPreferences.STORED_DATAMINING_REPORT_PREFERENCES;
 

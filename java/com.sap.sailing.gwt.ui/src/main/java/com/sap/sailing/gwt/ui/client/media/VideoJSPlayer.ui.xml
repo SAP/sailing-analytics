@@ -1,5 +1,8 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:m="urn:import:com.sap.sse.gwt.client.media">
+    <ui:with field="res" type="com.sap.sailing.gwt.common.client.SharedResources" />
     <ui:style type="com.sap.sailing.gwt.ui.client.media.VideoJSPlayer.VideoJSStyle" ui:field="style">
         @external vjs-big-play-button;
         .vjs-big-play-button {
@@ -14,6 +17,7 @@
             transform: rotate(180deg) translateX(50%) translateZ(0) !important;
         }
     </ui:style>
-    <div ui:field="playerHolder" class="{style.player}">
-    </div>
+    <g:HTMLPanel ui:field="playerHolder" styleName="{style.player} {res.mainCss.media_wrapper}">
+      <m:MediaMenuIcon ui:field="videoPlayerMenuButton" fontSize="20px" zIndex="2"/>
+    </g:HTMLPanel>
 </ui:UiBinder>

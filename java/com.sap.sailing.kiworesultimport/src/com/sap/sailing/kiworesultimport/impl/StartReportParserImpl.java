@@ -11,11 +11,12 @@ import org.xml.sax.SAXException;
 
 import com.sap.sailing.kiworesultimport.StartReport;
 import com.sap.sailing.kiworesultimport.StartReportParser;
+import com.sap.sse.util.XmlUtil;
 
 public class StartReportParserImpl implements StartReportParser {
-
     private Document parseDocument(InputStream inputStream) throws SAXException, IOException, ParserConfigurationException {
-        return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream);
+        final DocumentBuilderFactory dbf = XmlUtil.getSecureDocumentBuilderFactory();
+        return dbf.newDocumentBuilder().parse(inputStream);
     }
 
     @Override
@@ -24,5 +25,4 @@ public class StartReportParserImpl implements StartReportParser {
         StartReport result = new StartReportImpl(doc.getElementsByTagName("star:startbericht").item(0), sourceName);
         return result;
     }
-
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
@@ -19,18 +20,23 @@ import com.sap.sailing.domain.abstractlog.race.RaceLog;
 import com.sap.sailing.domain.abstractlog.race.state.ReadonlyRaceState;
 import com.sap.sailing.domain.abstractlog.race.state.impl.ReadonlyRaceStateImpl;
 import com.sap.sailing.domain.base.Competitor;
+import com.sap.sailing.domain.base.Course;
 import com.sap.sailing.domain.base.CourseArea;
 import com.sap.sailing.domain.base.DomainFactory;
 import com.sap.sailing.domain.base.Fleet;
+import com.sap.sailing.domain.base.Leg;
 import com.sap.sailing.domain.base.RaceColumn;
 import com.sap.sailing.domain.base.RaceDefinition;
 import com.sap.sailing.domain.base.Regatta;
+import com.sap.sailing.domain.common.LegType;
 import com.sap.sailing.domain.common.NauticalSide;
+import com.sap.sailing.domain.common.NoWindException;
 import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.WindSource;
 import com.sap.sailing.domain.common.WindSourceType;
-import com.sap.sailing.domain.tracking.LineDetails;
-import com.sap.sailing.domain.tracking.Track;
+import com.sap.sailing.domain.shared.tracking.LineDetails;
+import com.sap.sailing.domain.shared.tracking.Track;
+import com.sap.sailing.domain.tracking.TrackedLeg;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.geocoding.ReverseGeocoder;
 import com.sap.sse.common.Bearing;
@@ -473,4 +479,29 @@ public class TrackedRaceWithContext implements HasTrackedRaceContext {
         }
         return cachedDayAsISO;
     }
+
+    @Override
+    public LegType getTypeOfFirstLeg() throws NoWindException {
+        final LegType result;
+        final TimePoint startOfRace = getTrackedRace().getStartOfRace();
+        if (startOfRace == null) {
+            result = null;
+        } else {
+            final Course course = getTrackedRace().getRace().getCourse();
+            final List<Leg> legs = course.getLegs();
+            if (legs.isEmpty()) {
+                result = null;
+            } else {
+                final TrackedLeg firstTrackedLeg = getTrackedRace().getTrackedLeg(legs.get(0));
+                if (firstTrackedLeg == null) {
+                    result = null;
+                } else {
+                    result = firstTrackedLeg.getLegType(startOfRace);
+                }
+            }
+        }
+        return result;
+    }
+    
+    
 }

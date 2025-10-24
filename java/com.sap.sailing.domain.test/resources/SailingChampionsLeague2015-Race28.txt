@@ -1,18 +1,27 @@
 stored-uri:datafiles/0ce4e090-3f82-0133-c0b5-60a44ce903c3.mtb
 StartReplay:1
 
-// Input from params_static:
-
-// Input from event_parameters:
-
 EnableLadderLines:0
 LadderLineDistance:100
+ResultColumn1DefaultOrder:1
+ResultColumn2DefaultOrder:0
+ResultColumn3DefaultOrder:0
+ResultColumn4DefaultOrder:0
+ResultColumn5DefaultOrder:0
 DefaultPanel:
 ReCalcDirAndSpeed:1
-ws-uri:ws://event.tractrac.com:8888
+LabelNoBackground:0
+ws-uri:ws://tracms.traclive.dk:8888
 CompMarkerUUID:2dee0384-2c45-11e4-a9f6-14dae9614d7b
 CodanIsSponsor:0
 DefaultTailLength:60
+dimmingLevel:1
+dimmingSeconds:60
+ResultColumn1Tooltip:
+ResultColumn2Tooltip:
+ResultColumn3Tooltip:
+ResultColumn4Tooltip:
+ResultColumn5Tooltip:
 DisableMarkTicker:0
 smsParams:0,tracanonym,4525720572,3,10,15
 APzoomChangeTime:2500
@@ -26,6 +35,7 @@ APmarkSwitch:0.13
 APmarkZoomBehindMarks:0.10
 APmarkZoomInFrontOfMarks:0.20
 PopupMarkerUUID:84199024-2c45-11e4-a9f6-14dae9614d7b
+enableDiplomas:0
 ManualUrl:http://www.tractrac.com/files/userguide_sailing.pdf
 xrr_url_source:
 Marker1UUID:2dee0384-2c45-11e4-a9f6-14dae9614d7b
@@ -70,16 +80,23 @@ disableselection:0
 disableleaderline:0
 StartTimeType:Race
 ResultColumn5SpeedIn:Knots
+delayIntervals:3,10,15
 smsProvider:0
 DisableChangeRace:0
 DisableLatestRoundings:0
+MarkerSymbol:standardBoat
+MarkerMinPixelSize:36
+ShowFlagInLabel:0
+ShowRankInLabel:1
+TailOpacity:70
+TailWidth:1
 LaggingThreshold:5
 LowBatteryThreshold:5
 BatteryLevelWarn:20
 BatteryLevelDanger:13
-//live-uri:tcp://event.tractrac.com:4400
-//stored-uri:tcp://event.tractrac.com:4401
-PerformanceTableLayout:[{"key":"Pos","header":"Pos"},{"key":"Name","header":"Name"},{"key":"Short","header":"Short"},{"key":"Country","header":"Country"},{"key":"After","header":"After"},{"key":"Leg pos","header":"Leg pos"},{"key":"Leg time","header":"Leg time"},{"key":"SOG","header":"SOG"},{"key":"VMG","header":"VMG"},{"key":"Top speed","header":"Top Speed"},{"key":"Distance","header":"Distance"}]
+//live-uri:tcp://tracms.traclive.dk:4400
+//stored-uri:tcp://tracms.traclive.dk:4401
+PerformanceTableLayout:[{"key":"Pos","header":"Pos","tooltip":"Position","options":null},{"key":"Name","header":"Name","tooltip":"Name","options":null},{"key":"Short","header":"Short","tooltip":"Short name","options":null},{"key":"Country","header":"Country","tooltip":"Country","options":null},{"key":"After","header":"After","tooltip":"After","options":null},{"key":"Leg pos","header":"Leg pos","tooltip":"Leg position","options":null},{"key":"Leg time","header":"Leg time","tooltip":"Leg time","options":null},{"key":"SOG","header":"SOG","tooltip":"SOG","options":null},{"key":"VMG","header":"VMG","tooltip":"VMG","options":null},{"key":"Top speed","header":"Top Speed","tooltip":"Top Speed","options":null},{"key":"Distance","header":"Distance","tooltip":"Distance","options":null}]
 ResultsLayout:[{"key":"Order","header":"#","description":"Position","printable":true,"align":"right","collapsible":false},{"key":"Name","header":"Name","description":"Competitor's name","printable":true,"align":"left","collapsible":false},{"key":"ShortName","header":"Short Name","description":"Competitor's short name","printable":true,"align":"left","collapsible":true},{"key":"LegTime","header":"Leg","description":"Leg time","printable":false,"align":"right","collapsible":true},{"key":"LegPosition","header":"#","description":"Leg position","printable":false,"align":"right","collapsible":true},{"key":"Time","header":"Total","description":"Total time","printable":true,"align":"right","collapsible":false},{"key":"After","header":"Total &Delta;","description":"Total &Delta;","printable":true,"align":"right","collapsible":false}]
 DatabaseVersion:01.00.20
 PopUpRow1Name:
@@ -119,8 +136,10 @@ SegmentFile:segments.php
 RaceHandicapSystem:NONE
 TeamCompetitionType:NONE
 LiveDelaySecs: 8
+LiveDelaySecsRace: 8
+LiveDelaySecsEvent: 8
 
-//-------- AUTO GENERATED PARAMETERS START ----------------
+Maps:[]
 
 EventID:c41caa60-287e-0133-61c2-60a44ce903c3
 EventName:Sailing Champions League 2015
@@ -129,6 +148,11 @@ EventDB:event_20150918_SailingCha
 EventStartTime:2015-09-16 23:00:00
 EventEndTime:2015-09-20 21:00:00
 EventType:a1b74ca0-fdd8-11dc-8811-005056c00008
+EventJSON:https://historical1.tractrac.com/events/event_20150918_SailingCha/jsonservice.php
+DBReplicaEnabled:0
+HighLoadEnabled:
+MultipleDataservers:0
+WebURL:https://www.tractrac.com/event-page/event_20150918_SailingCha/612
 
 RaceID:0ce4e090-3f82-0133-c0b5-60a44ce903c3
 RaceName:Race 28
@@ -142,106 +166,35 @@ RaceHandicapSystem:NONE
 
 Class1UUID:cd64dac0-287e-0133-61c9-60a44ce903c3
 Class1Name:J/70
+Class1BoatClassId:
 
-Team1UUID:7e7a8bf0-3f6c-0133-b821-60a44ce903c3
-Team1Name:AS
+Team1UUID:611995d0-3f83-0133-c19f-60a44ce903c3
+Team1Name:KSSS
+Team1Comp1UUID:611b1130-3f83-0133-c1a0-60a44ce903c3
 
-Team2UUID:7e6df910-3f6c-0133-b81f-60a44ce903c3
-Team2Name:BYC
-Team2Comp1UUID:7e709bb0-3f6c-0133-b820-60a44ce903c3
+Team2UUID:7ddbd070-3f6c-0133-b801-60a44ce903c3
+Team2Name:RMYC
+Team2Comp1UUID:7dde8ae0-3f6c-0133-b802-60a44ce903c3
 
-Team3UUID:7efe7b10-3f6c-0133-b833-60a44ce903c3
-Team3Name:CCRL
-Team3Comp1UUID:7eff6460-3f6c-0133-b834-60a44ce903c3
+Team3UUID:7e6df910-3f6c-0133-b81f-60a44ce903c3
+Team3Name:BYC
+Team3Comp1UUID:7e709bb0-3f6c-0133-b820-60a44ce903c3
 
-Team4UUID:7e431a50-3f6c-0133-b819-60a44ce903c3
-Team4Name:DTYC
+Team4UUID:7eedb300-3f6c-0133-b82f-60a44ce903c3
+Team4Name:SRR
+Team4Comp1UUID:7eee96c0-3f6c-0133-b830-60a44ce903c3
 
-Team5UUID:7f119000-3f6c-0133-b835-60a44ce903c3
-Team5Name:ESK
+Team5UUID:7efe7b10-3f6c-0133-b833-60a44ce903c3
+Team5Name:CCRL
+Team5Comp1UUID:7eff6460-3f6c-0133-b834-60a44ce903c3
 
-Team6UUID:7ea52830-3f6c-0133-b827-60a44ce903c3
-Team6Name:GKSS
+Team6UUID:7f35b7a0-3f6c-0133-b83b-60a44ce903c3
+Team6Name:SVBG
+Team6Comp1UUID:7f36a440-3f6c-0133-b83c-60a44ce903c3
 
-Team7UUID:7e6312a0-3f6c-0133-b81d-60a44ce903c3
-Team7Name:HS
-
-Team8UUID:7edafa50-3f6c-0133-b82d-60a44ce903c3
-Team8Name:JKWP
-
-Team9UUID:7e0f0de0-3f6c-0133-b80d-60a44ce903c3
-Team9Name:KDY
-
-Team10UUID:7ed27f80-3f6c-0133-b82b-60a44ce903c3
-Team10Name:KNS
-
-Team11UUID:611995d0-3f83-0133-c19f-60a44ce903c3
-Team11Name:KSSS
-Team11Comp1UUID:611b1130-3f83-0133-c1a0-60a44ce903c3
-
-Team12UUID:7f47ead0-3f6c-0133-b83f-60a44ce903c3
-Team12Name:NRV
-
-Team13UUID:7e039e20-3f6c-0133-b809-60a44ce903c3
-Team13Name:PIRYC
-
-Team14UUID:7f644330-3f6c-0133-b843-60a44ce903c3
-Team14Name:RCO
-Team14Comp1UUID:7f708860-3f6c-0133-b844-60a44ce903c3
-
-Team15UUID:7ddbd070-3f6c-0133-b801-60a44ce903c3
-Team15Name:RMYC
-Team15Comp1UUID:7dde8ae0-3f6c-0133-b802-60a44ce903c3
-
-Team16UUID:7f5a9060-3f6c-0133-b841-60a44ce903c3
-Team16Name:RTYC
-
-Team17UUID:7e363520-3f6c-0133-b815-60a44ce903c3
-Team17Name:SCTWVA
-
-Team18UUID:7e9ae350-3f6c-0133-b825-60a44ce903c3
-Team18Name:SKS
-
-Team19UUID:60fb71a0-3f83-0133-c199-60a44ce903c3
-Team19Name:SNG
-
-Team20UUID:7eedb300-3f6c-0133-b82f-60a44ce903c3
-Team20Name:SRR
-Team20Comp1UUID:7eee96c0-3f6c-0133-b830-60a44ce903c3
-
-Team21UUID:7f19dd30-3f6c-0133-b837-60a44ce903c3
-Team21Name:SSF
-
-Team22UUID:7f35b7a0-3f6c-0133-b83b-60a44ce903c3
-Team22Name:SVBG
-Team22Comp1UUID:7f36a440-3f6c-0133-b83c-60a44ce903c3
-
-Team23UUID:7ef620e0-3f6c-0133-b831-60a44ce903c3
-Team23Name:SVI
-
-Team24UUID:cd669040-287e-0133-61ca-60a44ce903c3
-Team24Name:team
-
-Team25UUID:7e8fdd90-3f6c-0133-b823-60a44ce903c3
-Team25Name:VSaW
-
-Team26UUID:7e584b10-3f6c-0133-b81b-60a44ce903c3
-Team26Name:WSVA
-
-Team27UUID:7eb9b9f0-3f6c-0133-b829-60a44ce903c3
-Team27Name:YCB
-
-Team28UUID:7e2abec0-3f6c-0133-b811-60a44ce903c3
-Team28Name:YCCS
-
-Team29UUID:7da1d9f0-3f6c-0133-b7f9-60a44ce903c3
-Team29Name:YCN
-
-Team30UUID:7dec2d00-3f6c-0133-b805-60a44ce903c3
-Team30Name:YCS
-
-Team31UUID:7dcffcb0-3f6c-0133-b7fd-60a44ce903c3
-Team31Name:ÅSS
+Team7UUID:7f644330-3f6c-0133-b843-60a44ce903c3
+Team7Name:RCO
+Team7Comp1UUID:7f708860-3f6c-0133-b844-60a44ce903c3
 
 Comp1UUID:7dde8ae0-3f6c-0133-b802-60a44ce903c3
 Comp1Name:Royal Malta Yacht Club
@@ -252,6 +205,7 @@ Comp1Handicap:1.0000000000
 Comp1HandicapDistance:0.00000
 Comp1StartTime:2015-09-19 16:12:30
 Comp1ClassUUID:cd64dac0-287e-0133-61c9-60a44ce903c3
+Comp1StatusUpdatedAt:2015-09-16 23:00:00.000
 Comp1RouteUUID:0ce498b0-3f82-0133-c0b4-60a44ce903c3
 Comp1RaceObjectDataSheet:boatName=Boat 8###BREAKLINE###boatId=8###BREAKLINE###boatColor=#71c5e8
 Comp1Color:71c5e8
@@ -265,6 +219,7 @@ Comp2Handicap:1.0000000000
 Comp2HandicapDistance:0.00000
 Comp2StartTime:2015-09-19 16:12:30
 Comp2ClassUUID:cd64dac0-287e-0133-61c9-60a44ce903c3
+Comp2StatusUpdatedAt:2015-09-16 23:00:00.000
 Comp2RouteUUID:0ce498b0-3f82-0133-c0b4-60a44ce903c3
 Comp2RaceObjectDataSheet:boatName=Boat 4###BREAKLINE###boatId=4###BREAKLINE###boatColor=#78d64b
 Comp2Color:78d64b
@@ -278,6 +233,7 @@ Comp3Handicap:1.0000000000
 Comp3HandicapDistance:0.00000
 Comp3StartTime:2015-09-19 16:12:30
 Comp3ClassUUID:cd64dac0-287e-0133-61c9-60a44ce903c3
+Comp3StatusUpdatedAt:2015-09-16 23:00:00.000
 Comp3RouteUUID:0ce498b0-3f82-0133-c0b4-60a44ce903c3
 Comp3RaceObjectDataSheet:boatName=Boat 7###BREAKLINE###boatId=7###BREAKLINE###boatColor=#717c7d
 Comp3Color:717c7d
@@ -291,6 +247,7 @@ Comp4Handicap:1.0000000000
 Comp4HandicapDistance:0.00000
 Comp4StartTime:2015-09-19 16:12:30
 Comp4ClassUUID:cd64dac0-287e-0133-61c9-60a44ce903c3
+Comp4StatusUpdatedAt:2015-09-16 23:00:00.000
 Comp4RouteUUID:0ce498b0-3f82-0133-c0b4-60a44ce903c3
 Comp4RaceObjectDataSheet:boatName=Boat 3###BREAKLINE###boatId=3###BREAKLINE###boatColor=#ece81a
 Comp4Color:ece81a
@@ -304,6 +261,7 @@ Comp5Handicap:1.0000000000
 Comp5HandicapDistance:0.00000
 Comp5StartTime:2015-09-19 16:12:30
 Comp5ClassUUID:cd64dac0-287e-0133-61c9-60a44ce903c3
+Comp5StatusUpdatedAt:2015-09-16 23:00:00.000
 Comp5RouteUUID:0ce498b0-3f82-0133-c0b4-60a44ce903c3
 Comp5RaceObjectDataSheet:boatName=Boat 1###BREAKLINE###boatId=1###BREAKLINE###boatColor=#004c97
 Comp5Color:004c97
@@ -317,6 +275,7 @@ Comp6Handicap:1.0000000000
 Comp6HandicapDistance:0.00000
 Comp6StartTime:2015-09-19 16:12:30
 Comp6ClassUUID:cd64dac0-287e-0133-61c9-60a44ce903c3
+Comp6StatusUpdatedAt:2015-09-16 23:00:00.000
 Comp6RouteUUID:0ce498b0-3f82-0133-c0b4-60a44ce903c3
 Comp6RaceObjectDataSheet:boatName=Boat 2###BREAKLINE###boatId=2###BREAKLINE###boatColor=#cb333b
 Comp6Color:cb333b
@@ -330,47 +289,92 @@ Comp7Handicap:1.0000000000
 Comp7HandicapDistance:0.00000
 Comp7StartTime:2015-09-19 16:12:30
 Comp7ClassUUID:cd64dac0-287e-0133-61c9-60a44ce903c3
+Comp7StatusUpdatedAt:2015-09-16 23:00:00.000
 Comp7RouteUUID:0ce498b0-3f82-0133-c0b4-60a44ce903c3
 Comp7RaceObjectDataSheet:boatName=Boat 5###BREAKLINE###boatId=5###BREAKLINE###boatColor=#e93cac
 Comp7Color:e93cac
 
-ControlPoint1UUID:250c0590-40cd-0133-c869-60a44ce903c3
-ControlPoint1Name:Top Replace
-ControlPoint1HasTwoPoints:0
-ControlPoint1ShortName:TR
-ControlPoint1Mark1Lon:9.552047
-ControlPoint1Mark1Lat:41.131207
-ControlPoint1Mark1Static:0
+PositionedItem1UUID:44280650-85b8-013d-d46b-1c6b00518c70
+PositionedItem1Name:Top Replace
+PositionedItem1CourseArea:
+PositionedItem1Static:0
+PositionedItem1Positions:
+PositionedItem1DataSheet:
 
-ControlPoint2UUID:6d457800-3ea1-0133-5923-60a44ce903c3
-ControlPoint2Name:Start-Finish
-ControlPoint2HasTwoPoints:1
-ControlPoint2ShortName:SF
-ControlPoint2Mark1Lon:9.557379
-ControlPoint2Mark1Lat:41.129528
-ControlPoint2Mark1Static:0
-ControlPoint2Mark2Lon:9.556334
-ControlPoint2Mark2Lat:41.128544
-ControlPoint2Mark2Static:0
+PositionedItem2UUID:44b8a9a0-85b8-013d-d46c-1c6b00518c70
+PositionedItem2Name:Start-Finish - 1
+PositionedItem2CourseArea:
+PositionedItem2Static:0
+PositionedItem2Positions:
+PositionedItem2DataSheet:
 
-ControlPoint3UUID:985f3620-3ea1-0133-5949-60a44ce903c3
-ControlPoint3Name:Top
-ControlPoint3HasTwoPoints:0
-ControlPoint3ShortName:T
-ControlPoint3Mark1Lon:9.551472
-ControlPoint3Mark1Lat:41.131355
-ControlPoint3Mark1Static:0
+PositionedItem3UUID:45c5d870-85b8-013d-d46d-1c6b00518c70
+PositionedItem3Name:Start-Finish - 2
+PositionedItem3CourseArea:
+PositionedItem3Static:0
+PositionedItem3Positions:
+PositionedItem3DataSheet:
 
-ControlPoint4UUID:c8f77240-3ea1-0133-594c-60a44ce903c3
-ControlPoint4Name:Bottom gate
-ControlPoint4HasTwoPoints:1
-ControlPoint4ShortName:B
-ControlPoint4Mark1Lon:9.555827
-ControlPoint4Mark1Lat:41.129478
-ControlPoint4Mark1Static:0
-ControlPoint4Mark2Lon:9.555692
-ControlPoint4Mark2Lat:41.129150
-ControlPoint4Mark2Static:0
+PositionedItem4UUID:4984e041-85b8-013d-d470-1c6b00518c70
+PositionedItem4Name:Top
+PositionedItem4CourseArea:
+PositionedItem4Static:0
+PositionedItem4Positions:
+PositionedItem4DataSheet:
+
+PositionedItem5UUID:4a9b1bb0-85b8-013d-d471-1c6b00518c70
+PositionedItem5Name:Bottom gate - 1
+PositionedItem5CourseArea:
+PositionedItem5Static:0
+PositionedItem5Positions:
+PositionedItem5DataSheet:
+
+PositionedItem6UUID:4b1ab460-85b8-013d-d472-1c6b00518c70
+PositionedItem6Name:Bottom gate - 2
+PositionedItem6CourseArea:
+PositionedItem6Static:0
+PositionedItem6Positions:
+PositionedItem6DataSheet:
+
+MapItem1UUID:250c0590-40cd-0133-c869-60a44ce903c3
+MapItem1Name:Top Replace
+MapItem1ShortName:TR
+MapItem1PositionedItemIds:["44280650-85b8-013d-d46b-1c6b00518c70"]
+
+MapItem2UUID:497744c0-85b8-013d-d46e-1c6b00518c70
+MapItem2Name:Start-Finish - 1
+MapItem2ShortName:SF
+MapItem2PositionedItemIds:["44b8a9a0-85b8-013d-d46c-1c6b00518c70"]
+
+MapItem3UUID:4981f870-85b8-013d-d46f-1c6b00518c70
+MapItem3Name:Start-Finish - 2
+MapItem3ShortName:SF
+MapItem3PositionedItemIds:["45c5d870-85b8-013d-d46d-1c6b00518c70"]
+
+MapItem4UUID:4be1e730-85b8-013d-d473-1c6b00518c70
+MapItem4Name:Bottom gate - 1
+MapItem4ShortName:B
+MapItem4PositionedItemIds:["4a9b1bb0-85b8-013d-d471-1c6b00518c70"]
+
+MapItem5UUID:4bfd4010-85b8-013d-d474-1c6b00518c70
+MapItem5Name:Bottom gate - 2
+MapItem5ShortName:B
+MapItem5PositionedItemIds:["4b1ab460-85b8-013d-d472-1c6b00518c70"]
+
+MapItem6UUID:6d457800-3ea1-0133-5923-60a44ce903c3
+MapItem6Name:Start-Finish
+MapItem6ShortName:SF
+MapItem6PositionedItemIds:["44b8a9a0-85b8-013d-d46c-1c6b00518c70", "45c5d870-85b8-013d-d46d-1c6b00518c70"]
+
+MapItem7UUID:985f3620-3ea1-0133-5949-60a44ce903c3
+MapItem7Name:Top
+MapItem7ShortName:T
+MapItem7PositionedItemIds:["4984e041-85b8-013d-d470-1c6b00518c70"]
+
+MapItem8UUID:c8f77240-3ea1-0133-594c-60a44ce903c3
+MapItem8Name:Bottom gate
+MapItem8ShortName:B
+MapItem8PositionedItemIds:["4a9b1bb0-85b8-013d-d471-1c6b00518c70", "4b1ab460-85b8-013d-d472-1c6b00518c70"]
 
 SegmentFile:segments.php
 Route1UUID:0ce498b0-3f82-0133-c0b4-60a44ce903c3
@@ -382,4 +386,3 @@ Route1ControlPoint3UUID:c8f77240-3ea1-0133-594c-60a44ce903c3
 Route1ControlPoint4UUID:985f3620-3ea1-0133-5949-60a44ce903c3
 Route1ControlPoint5UUID:6d457800-3ea1-0133-5923-60a44ce903c3
 
-//-------- AUTO GENERATED PARAMETERS END ------------------

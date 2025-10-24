@@ -10,6 +10,7 @@ import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.sap.sailing.domain.common.DetailType;
 import com.sap.sailing.domain.common.RaceIdentifier;
@@ -33,12 +34,15 @@ import com.sap.sailing.gwt.ui.leaderboard.LeaderboardEntryPoint;
 import com.sap.sailing.gwt.ui.leaderboard.SingleRaceLeaderboardPanel;
 import com.sap.sailing.gwt.ui.leaderboard.SixtyInchLeaderboardStyle;
 import com.sap.sailing.gwt.ui.raceboard.QuickFlagDataFromLeaderboardDTOProvider;
+import com.sap.sailing.gwt.ui.shared.StrippedLeaderboardDTO;
 import com.sap.sailing.gwt.ui.shared.WindDTO;
 import com.sap.sailing.gwt.ui.shared.WindTrackInfoDTO;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.async.AsyncActionsExecutor;
 import com.sap.sse.gwt.client.player.Timer.PlayModes;
 import com.sap.sse.gwt.client.player.Timer.PlayStates;
+import com.sap.sse.security.ui.client.SecurityChildSettingsContext;
+import com.sap.sse.security.ui.client.premium.PaywallResolverImpl;
 
 public class LiveRaceWithRacemapAndLeaderBoardPresenterImpl
         extends AutoPlayPresenterConfigured<LiveRaceWithRacemapAndLeaderBoardPlace>
@@ -156,50 +160,71 @@ public class LiveRaceWithRacemapAndLeaderBoardPresenterImpl
             view.showErrorNoLive(this, panel, new IllegalStateException("No race is live"));
             return;
         }
-        final SingleRaceLeaderboardSettings leaderboardSettings = getLeaderboardSettings(false);
-        timer = new com.sap.sse.gwt.client.player.Timer(
-                // perform the first request as "live" but don't by default auto-play
-                PlayModes.Live, PlayStates.Playing,
-                /* delayBetweenAutoAdvancesInMilliseconds */ LeaderboardEntryPoint.DEFAULT_REFRESH_INTERVAL_MILLIS);
-        
-        leaderboardPanel = new SingleRaceLeaderboardPanel(null, null, sailingService, new AsyncActionsExecutor(),
-                leaderboardSettings, false, liveRace, getPlace().getRaceMapSelectionProvider(), timer, null,
-                getSlideCtx().getContextDefinition().getLeaderboardName(), errorReporter, StringMessages.INSTANCE,
-                false, null, false, null, false, true, false, false, false, new SixtyInchLeaderboardStyle(true),
-                FlagImageResolverImpl.get(), Arrays.asList(DetailType.values()), getClientFactory());
-
-        leaderboardPanel.addLeaderboardUpdateListener(new LeaderboardUpdateListener() {
-
+        final LiveRaceWithRacemapAndLeaderBoardPresenterImpl that = this;
+        sailingService.getLeaderboard(getSlideCtx().getContextDefinition().getLeaderboardName(), new AsyncCallback<StrippedLeaderboardDTO>() {
+            
             @Override
-            public void updatedLeaderboard(LeaderboardDTO leaderboard) {
-                // if this is a changing boat race, enable the boat column
-                if (leaderboardPanel.getLeaderboard() != null) {
-                    LeaderboardDTO leaderboardDTO = leaderboardPanel.getLeaderboard();
-                    boolean boatsRequired = leaderboardDTO.canBoatsOfCompetitorsChangePerRace;
-                    if (leaderboardPanel.getSettings().isShowCompetitorBoatInfoColumn() != boatsRequired) {
-                        leaderboardPanel.updateSettings(getLeaderboardSettings(boatsRequired));
+            public void onSuccess(StrippedLeaderboardDTO strippedLeaderboardDto) {
+                SecurityChildSettingsContext context = new SecurityChildSettingsContext(strippedLeaderboardDto, 
+                        new PaywallResolverImpl(getClientFactory().getUserService(), 
+                                getClientFactory().getSubscriptionServiceFactory()));
+                final SingleRaceLeaderboardSettings leaderboardSettings = getLeaderboardSettings(false, context);
+                timer = new com.sap.sse.gwt.client.player.Timer(
+                        // perform the first request as "live" but don't by default auto-play
+                        PlayModes.Live, PlayStates.Playing,
+                        /* delayBetweenAutoAdvancesInMilliseconds */ LeaderboardEntryPoint.DEFAULT_REFRESH_INTERVAL_MILLIS);
+                
+                leaderboardPanel = new SingleRaceLeaderboardPanel(null, null, sailingService, new AsyncActionsExecutor(),
+                        leaderboardSettings, false, liveRace, getPlace().getRaceMapSelectionProvider(), timer, null,
+                        getSlideCtx().getContextDefinition().getLeaderboardName(), errorReporter, StringMessages.INSTANCE,
+                        false, null, false, null, false, true, false, false, false, new SixtyInchLeaderboardStyle(true),
+                        FlagImageResolverImpl.get(), Arrays.asList(DetailType.values()), getClientFactory());
+
+                leaderboardPanel.addLeaderboardUpdateListener(new LeaderboardUpdateListener() {
+
+                    @Override
+                    public void updatedLeaderboard(LeaderboardDTO leaderboard) {
+                        // if this is a changing boat race, enable the boat column
+                        if (leaderboardPanel.getLeaderboard() != null) {
+                            LeaderboardDTO leaderboardDTO = leaderboardPanel.getLeaderboard();
+                            boolean boatsRequired = leaderboardDTO.canBoatsOfCompetitorsChangePerRace;
+                            if (leaderboardPanel.getSettings().isShowCompetitorBoatInfoColumn() != boatsRequired) {
+                                SecurityChildSettingsContext context = new SecurityChildSettingsContext(leaderboard, 
+                                        new PaywallResolverImpl(getClientFactory().getUserService(), 
+                                                getClientFactory().getSubscriptionServiceFactory()));
+                                leaderboardPanel.updateSettings(getLeaderboardSettings(boatsRequired, context));
+                            }
+                        }
                     }
-                }
-            }
 
+                    @Override
+                    public void currentRaceSelected(RaceIdentifier raceIdentifier, RaceColumnDTO raceColumn) {
+                    }
+                });
+
+                getPlace().getRaceMap().setQuickRanksDTOProvider(new QuickFlagDataFromLeaderboardDTOProvider(
+                        new RaceCompetitorSet(getPlace().getRaceMapSelectionProvider()), liveRace));
+                view.startingWith(that, panel, getPlace().getRaceMap(), leaderboardPanel);
+                selectionTimer.schedule(SWITCH_COMPETITOR_DELAY + AnimationPanel.ANIMATION_DURATION + AnimationPanel.DELAY);
+            }
+            
             @Override
-            public void currentRaceSelected(RaceIdentifier raceIdentifier, RaceColumnDTO raceColumn) {
+            public void onFailure(Throwable caught) {
+                getEventBus().fireEvent(
+                        new LiveRaceWithRacemapAndLeaderBoardFailureEvent(caught, 
+                                "Error loading Leaderboard with name " + getSlideCtx().getContextDefinition().getLeaderboardName()));
             }
         });
-
-        getPlace().getRaceMap().setQuickRanksDTOProvider(new QuickFlagDataFromLeaderboardDTOProvider(
-                new RaceCompetitorSet(getPlace().getRaceMapSelectionProvider()), liveRace));
-        view.startingWith(this, panel, getPlace().getRaceMap(), leaderboardPanel);
-        selectionTimer.schedule(SWITCH_COMPETITOR_DELAY + AnimationPanel.ANIMATION_DURATION + AnimationPanel.DELAY);
+        
     }
 
-    private SingleRaceLeaderboardSettings getLeaderboardSettings(boolean showBoatColumn) {
+    private SingleRaceLeaderboardSettings getLeaderboardSettings(boolean showBoatColumn, SecurityChildSettingsContext context) {
         final SingleRaceLeaderboardSettings leaderboardSettings = new SingleRaceLeaderboardSettings(
                 /* maneuverDetailsToShow */ null, /* legDetailsToShow */ null, /* raceDetailsToShow */ null,
                 /* overallDetailsToShow */ null, /* delayBetweenAutoAdvancesInMilliseconds */ null,
                 /* showAddedScores */ false, /* showCompetitorShortNameColumn */ true,
                 /* showCompetitorFullNameColumn */ false, showBoatColumn,
-                /* showCompetitorBoatInfoColumn */ false, /* showRaceRankColumn */ true);
+                /* showCompetitorBoatInfoColumn */ false, /* showRaceRankColumn */ true, context);
         return leaderboardSettings;
     }
 

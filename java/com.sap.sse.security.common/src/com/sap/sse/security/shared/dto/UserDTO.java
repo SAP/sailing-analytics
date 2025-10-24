@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.sap.sse.common.Named;
+import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.security.shared.TypeRelativeObjectIdentifier;
 import com.sap.sse.security.shared.WildcardPermission;
@@ -26,6 +27,7 @@ public class UserDTO extends
     private List<AccountDTO> accounts;
     private boolean emailValidated;
     private List<StrippedUserGroupDTO> groups;
+    private TimePoint lockedUntil;
     private SecurityInformationDTO securityInformation = new SecurityInformationDTO();
     private StrippedUserGroupDTO defaultTenantForCurrentServer;
 
@@ -42,7 +44,7 @@ public class UserDTO extends
     public UserDTO(String name, String email, String fullName, String company, String locale, boolean emailValidated,
             List<AccountDTO> accounts, Iterable<RoleWithSecurityDTO> roles, StrippedUserGroupDTO defaultTenant,
             Iterable<WildcardPermissionWithSecurityDTO> permissions,
-            Iterable<StrippedUserGroupDTO> groups) {
+            Iterable<StrippedUserGroupDTO> groups, TimePoint lockedUntil) {
         super(name, permissions);
         this.defaultTenantForCurrentServer = defaultTenant;
         this.email = email;
@@ -55,6 +57,7 @@ public class UserDTO extends
         Util.addAll(groups, this.groups);
         this.roles = new HashSet<>();
         Util.addAll(roles, this.getRolesInternal());
+        this.lockedUntil = lockedUntil;
     }
     
     @Override
@@ -161,5 +164,9 @@ public class UserDTO extends
      */
     public void clearNonPublicFields() {
         this.email = null;
+    }
+    
+    public TimePoint getLockedUntil() {
+        return lockedUntil;
     }
 }

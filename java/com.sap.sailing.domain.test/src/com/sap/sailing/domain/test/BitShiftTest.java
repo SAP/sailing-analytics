@@ -1,8 +1,8 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * See the use of bit shift operations in <code>IncrementalLeaderboardDTO</code>

@@ -2,74 +2,74 @@ package com.sap.sailing.selenium.api.test;
 
 import static com.sap.sailing.domain.common.CompetitorRegistrationType.CLOSED;
 import static com.sap.sailing.selenium.api.core.ApiContext.createAdminApiContext;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.sap.sailing.selenium.api.core.ApiContext;
 import com.sap.sailing.selenium.api.event.EventApi;
 import com.sap.sailing.selenium.api.event.EventApi.Event;
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.test.AbstractSeleniumTest;
 
 public class EventApiTest extends AbstractSeleniumTest {
 
     private final EventApi eventApi = new EventApi();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot(),  /* headless */ true);
     }
 
-    @Test
+    @SeleniumTestCase
     public void createAndGetEventTest() {
         final ApiContext ctx = createAdminApiContext(getContextRoot(), ApiContext.SERVER_CONTEXT);
 
         final String eventName = "<ppp> loggingsession";
 
         final Event createdEvent = eventApi.createEvent(ctx, eventName, "75QMNATIONALEKREUZER", CLOSED, "default");
-        assertNotNull("create: event.eventid is missing", createdEvent.getId());
-        assertNotNull("create: event.eventstartdate is missing", createdEvent.getStartDate());
-        assertNotNull("create: event.eventenddate is missing", createdEvent.getEndDate());
-        assertEquals("create: event.eventname is different", eventName, createdEvent.getName());
-        assertEquals("create: event.reagattaname is different", eventName, createdEvent.get("regatta"));
-        assertEquals("create: event.leaderboard is different", eventName, createdEvent.get("leaderboard"));
+        assertNotNull(createdEvent.getId(), "create: event.eventid is missing");
+        assertNotNull(createdEvent.getStartDate(), "create: event.eventstartdate is missing");
+        assertNotNull(createdEvent.getEndDate(), "create: event.eventenddate is missing");
+        assertEquals(eventName, createdEvent.getName(), "create: event.eventname is different");
+        assertEquals(eventName, createdEvent.get("regatta"), "create: event.reagattaname is different");
+        assertEquals(eventName, createdEvent.get("leaderboard"), "create: event.leaderboard is different");
 
         final Event foundEvent = eventApi.getEvent(ctx, (String) createdEvent.getId());
-        assertNotNull("read: event.id is missing", foundEvent.getId());
-        assertEquals("read: event.name is different", eventName, foundEvent.getName());
-        assertEquals("read: event.description is different", eventName, foundEvent.get("description"));
-        assertEquals("read: event.officialWebsiteURL is different", null,
-                (String) foundEvent.get("officialWebsiteURL"));
-        assertEquals("read: event.baseUrl is different", removeTrailingSlash(getContextRoot()), removeTrailingSlash(foundEvent.get("baseURL")));
-        assertNotNull("read: event.startDate is missing", foundEvent.getStartDate());
-        assertNotNull("read: event.endDate is missing", foundEvent.getEndDate());
-        assertEquals("read: event.images should be empty", 0, ((JSONArray) foundEvent.get("images")).size());
-        assertEquals("read: event.videos should be empty", 0, ((JSONArray) foundEvent.get("videos")).size());
-        assertEquals("read: event.sailorsInfoWebsiteURLs", 0,
-                ((JSONArray) foundEvent.get("sailorsInfoWebsiteURLs")).size());
+        assertNotNull(foundEvent.getId(), "read: event.id is missing");
+        assertEquals(eventName, foundEvent.getName(), "read: event.name is different");
+        assertEquals(eventName, foundEvent.get("description"), "read: event.description is different");
+        assertEquals(null, (String) foundEvent.get("officialWebsiteURL"),
+                "read: event.officialWebsiteURL is different");
+        assertEquals(removeTrailingSlash(getContextRoot()), removeTrailingSlash(foundEvent.get("baseURL")), "read: event.baseUrl is different");
+        assertNotNull(foundEvent.getStartDate(), "read: event.startDate is missing");
+        assertNotNull(foundEvent.getEndDate(), "read: event.endDate is missing");
+        assertEquals(0, ((JSONArray) foundEvent.get("images")).size(), "read: event.images should be empty");
+        assertEquals(0, ((JSONArray) foundEvent.get("videos")).size(), "read: event.videos should be empty");
+        assertEquals(0, ((JSONArray) foundEvent.get("sailorsInfoWebsiteURLs")).size(),
+                "read: event.sailorsInfoWebsiteURLs");
 
         JSONObject foundEventVenue = (JSONObject) foundEvent.get("venue");
-        assertEquals("read: event.venue.name is different", "default", foundEventVenue.get("name"));
+        assertEquals("default", foundEventVenue.get("name"), "read: event.venue.name is different");
 
         JSONArray foundEventVenueCourseAreas = (JSONArray) foundEventVenue.get("courseAreas");
         JSONObject foundEventVenueCourseAreasFirst = (JSONObject) foundEventVenueCourseAreas.get(0);
-        assertEquals("read: event.venue.courseAreas[0].name is different", "Default",
-                foundEventVenueCourseAreasFirst.get("name"));
-        assertNotNull("read: event.venue.courseAreas[0].id is null", foundEventVenueCourseAreasFirst.get("id"));
+        assertEquals("Default", foundEventVenueCourseAreasFirst.get("name"),
+                "read: event.venue.courseAreas[0].name is different");
+        assertNotNull(foundEventVenueCourseAreasFirst.get("id"), "read: event.venue.courseAreas[0].id is null");
 
         JSONArray foundEventLeaderBoardGroups = (JSONArray) foundEvent.get("leaderboardGroups");
         JSONObject foundEventLeaderBoardGroupsFirst = (JSONObject) foundEventLeaderBoardGroups.get(0);
-        assertNotNull("read: event.leaderboardGroups[0].id is null", foundEventLeaderBoardGroupsFirst.get("id"));
-        assertEquals("read: event.leaderboardGroups[0].name is different", eventName,
-                foundEventLeaderBoardGroupsFirst.get("name"));
-        assertEquals("read: event.leaderboardGroups[0].description is different", eventName,
-                foundEventLeaderBoardGroupsFirst.get("description"));
-        assertEquals("read: event.leaderboardGroups[0].hasOverallLeaderboard is different", false,
-                foundEventLeaderBoardGroupsFirst.get("hasOverallLeaderboard"));
+        assertNotNull(foundEventLeaderBoardGroupsFirst.get("id"), "read: event.leaderboardGroups[0].id is null");
+        assertEquals(eventName, foundEventLeaderBoardGroupsFirst.get("name"),
+                "read: event.leaderboardGroups[0].name is different");
+        assertEquals(eventName, foundEventLeaderBoardGroupsFirst.get("description"),
+                "read: event.leaderboardGroups[0].description is different");
+        assertEquals(false, foundEventLeaderBoardGroupsFirst.get("hasOverallLeaderboard"),
+                "read: event.leaderboardGroups[0].hasOverallLeaderboard is different");
     }
     
     private String removeTrailingSlash(String url) {

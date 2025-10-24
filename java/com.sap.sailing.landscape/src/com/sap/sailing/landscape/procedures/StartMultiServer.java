@@ -126,6 +126,8 @@ implements StartFromSailingAnalyticsImage {
     @Override
     public void run() throws Exception {
         super.run(); // this will trigger the "sailing" init.d script running in the background
-        Wait.wait(() -> getHost().getInstance().state().name().equals(InstanceStateName.RUNNING), optionalTimeout, Duration.ONE_SECOND.times(10)); 
+        Wait.wait(() -> getHost().getInstance().state().name().equals(InstanceStateName.RUNNING), result->result,
+                /* retry on exception */ true, optionalTimeout, Duration.ONE_SECOND.times(10),
+                /* no logging */ null, /* no log message */ null); 
     }
 }

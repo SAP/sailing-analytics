@@ -8,6 +8,7 @@ import com.sap.sailing.datamining.data.HasTrackedRaceContext;
 import com.sap.sailing.datamining.data.HasWindTrackContext;
 import com.sap.sailing.datamining.impl.data.WindTrackWithContext;
 import com.sap.sailing.domain.common.WindSource;
+import com.sap.sailing.domain.common.WindSourceType;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.domain.tracking.WindTrack;
 import com.sap.sse.datamining.components.Processor;
@@ -38,7 +39,9 @@ public class WindTrackRetrievalProcessor extends AbstractRetrievalProcessor<HasT
                 if (isAborted()) {
                     break;
                 }
-                if (!trackedRace.getWindSourcesToExclude().contains(windSource)) {
+                // see bug 6084: only use "real" wind source types, not those estimated
+                if ((windSource.getType() == WindSourceType.RACECOMMITTEE || windSource.getType().canBeStored())
+                        && !trackedRace.getWindSourcesToExclude().contains(windSource)) {
                     final WindTrack windTrack = trackedRace.getOrCreateWindTrack(windSource);
                     windTracksWithContext.add(new WindTrackWithContext(element, windTrack, windSource));
                 }

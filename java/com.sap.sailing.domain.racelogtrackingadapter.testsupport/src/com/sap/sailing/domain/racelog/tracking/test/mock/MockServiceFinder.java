@@ -3,6 +3,8 @@ package com.sap.sailing.domain.racelog.tracking.test.mock;
 import java.util.Collections;
 import java.util.Set;
 
+import com.sap.sailing.domain.racelogtracking.impl.SmartphoneImeiIdentifierImpl;
+
 public class MockServiceFinder<T> extends AbstractTypeBasedServiceFinder<T> {
     private final T handler;
     private T fallback;
@@ -13,7 +15,7 @@ public class MockServiceFinder<T> extends AbstractTypeBasedServiceFinder<T> {
 
     @Override
     public T findService(String deviceType) {
-        if (deviceType.equals(SmartphoneImeiIdentifier.TYPE)) return handler;
+        if (deviceType.equals(SmartphoneImeiIdentifierImpl.TYPE)) return handler;
         return fallback;
     }
 

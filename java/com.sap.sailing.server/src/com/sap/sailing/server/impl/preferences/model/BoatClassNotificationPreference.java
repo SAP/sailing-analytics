@@ -13,6 +13,7 @@ public class BoatClassNotificationPreference extends AbstractGenericSerializable
     private transient BooleanSetting notifyAboutResults;
 
     public BoatClassNotificationPreference(DomainFactory domainFactory) {
+        super();
         boatClass = new BoatClassSetting("boatClass", this, domainFactory);
         notifyAboutUpcomingRaces = new BooleanSetting("notifyAboutUpcomingRaces", this, false);
         notifyAboutResults = new BooleanSetting("notifyAboutResults", this, false);

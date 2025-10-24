@@ -6,7 +6,7 @@ public class SensorImpl implements Sensor {
     private final String deviceSerialNumber;
     private final long subDeviceId;
     
-    protected SensorImpl(String deviceSerialNumber, long subDeviceId) {
+    public SensorImpl(String deviceSerialNumber, long subDeviceId) {
         super();
         this.deviceSerialNumber = deviceSerialNumber;
         this.subDeviceId = subDeviceId;

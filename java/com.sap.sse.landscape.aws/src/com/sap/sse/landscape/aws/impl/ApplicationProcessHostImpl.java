@@ -136,6 +136,13 @@ implements ApplicationProcessHost<ShardingKey, MetricsT, ProcessT> {
                 .append("\\\""+SERVER_NAME_JSON_PROPERTY+"\\\":\\\"${SERVER_NAME}\\\", ");
         // query the additional environment properties as specified by getAdditionalEnvironmentPropertiesAndWhetherStringTyped()
         for (final Entry<String, Boolean> additionalEntryAndWhetherStringTyped : getAdditionalEnvironmentPropertiesAndWhetherStringTyped().entrySet()) {
+            if (!additionalEntryAndWhetherStringTyped.getValue()) {
+                // for numeric values, add them to the result object only if they are actually defined;
+                // because empty values don't parse correctly as JSON
+                commandLine.append("\"; if [ -n \"${");
+                commandLine.append(additionalEntryAndWhetherStringTyped.getKey());
+                commandLine.append("}\" ]; then echo \"");
+            }
             commandLine.append("\\\""+additionalEntryAndWhetherStringTyped.getKey().toLowerCase()+"\\\":");
             if (additionalEntryAndWhetherStringTyped.getValue()) {
                 commandLine.append("\\\"");
@@ -147,6 +154,11 @@ implements ApplicationProcessHost<ShardingKey, MetricsT, ProcessT> {
                 commandLine.append("\\\"");
             }
             commandLine.append(", ");
+            if (!additionalEntryAndWhetherStringTyped.getValue()) {
+                // for numeric values, add them to the result object only if they are actually defined;
+                // because empty values don't parse correctly as JSON
+                commandLine.append("\"; fi; echo \"");
+            }
         }
         commandLine.append("},\"' \\; ; echo \"{}]\"");
         final String stdout = sshChannel.runCommandAndReturnStdoutAndLogStderr(

@@ -270,8 +270,10 @@ implements Procedure<ShardingKey>, StartFromSailingAnalyticsImage {
                         launchTimePoint, landscape, (host, port, serverDirectory, telnetPort, serverName, additionalProperties)->{
                             try {
                                 final Number expeditionUdpPort = (Number) additionalProperties.get(SailingProcessConfigurationVariables.EXPEDITION_PORT.name());
+                                final Number igtimiRiotPort = (Number) additionalProperties.get(SailingProcessConfigurationVariables.IGTIMI_RIOT_PORT.name());
                                 return new SailingAnalyticsProcessImpl<ShardingKey>(port, host, serverDirectory, telnetPort, serverName,
-                                        expeditionUdpPort == null ? null : expeditionUdpPort.intValue(), landscape);
+                                        expeditionUdpPort == null ? null : expeditionUdpPort.intValue(),
+                                        igtimiRiotPort == null ? null : igtimiRiotPort.intValue(), landscape);
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
@@ -348,9 +350,13 @@ implements Procedure<ShardingKey>, StartFromSailingAnalyticsImage {
             super.run(); // launches the machine in upgrade mode and shuts it down again, preparing for AMI creation
             final Instance[] instance = new Instance[1];
             if (waitForShutdown) {
-                Wait.wait(()->(instance[0] = getLandscape().getInstance(getHost().getInstanceId(), getHost().getRegion())) != null
-                               && instance[0].state().name() == InstanceStateName.STOPPED,
-                    optionalTimeout, /* sleepBetweenAttempts */ Duration.ONE_SECOND.times(5), Level.INFO, "Waiting for shutdown of instance "+getHost().getInstanceId());
+                Wait.wait(
+                        () -> (instance[0] = getLandscape().getInstance(getHost().getInstanceId(),
+                                getHost().getRegion())) != null
+                                && instance[0].state().name() == InstanceStateName.STOPPED,
+                        result -> result, /* retryOnException */ true, optionalTimeout,
+                        /* sleepBetweenAttempts */ Duration.ONE_SECOND.times(5), Level.INFO,
+                        "Waiting for shutdown of instance " + getHost().getInstanceId());
             }
             upgradedAmi = getLandscape().createImage(getHost(), upgradedImageName, Optional.of(Tags.with(Landscape.IMAGE_TYPE_TAG_NAME, imageType)));
             Wait.wait(()->(upgradedAmi=getLandscape().getImage(upgradedAmi.getRegion(), upgradedAmi.getId())).getState() == ImageState.AVAILABLE,

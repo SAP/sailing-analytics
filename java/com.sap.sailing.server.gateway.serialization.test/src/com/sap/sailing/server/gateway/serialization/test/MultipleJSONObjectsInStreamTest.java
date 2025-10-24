@@ -1,7 +1,7 @@
 package com.sap.sailing.server.gateway.serialization.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -12,7 +12,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Demonstrates and validates how to write more than one JSON object into a single stream as a JSONArray

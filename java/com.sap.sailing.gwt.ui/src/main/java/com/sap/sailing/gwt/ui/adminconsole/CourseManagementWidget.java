@@ -74,7 +74,7 @@ public abstract class CourseManagementWidget implements IsWidget {
     private SecuredDTO securedDtoForWaypointsPermissionCheck;
     
     /**
-     * ORC performance curve leg info for the leg ending at the key waypoint
+     * ORC polar curve leg info for the leg ending at the key waypoint
      */
     private final Map<WaypointDTO, ORCPerformanceCurveLeg> orcPerformanceCurveLegInfo;
     

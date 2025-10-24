@@ -84,16 +84,15 @@ public class GetEventOverviewNewsAction implements SailingAction<ResultWithTTL<L
     @GwtIncompatible
     private List<NewsEntryDTO> getNews(SailingDispatchContext dispatchContext, Event event) {
         List<EventNewsItem> newsItems = dispatchContext.getEventNewsService().getNews(event);
-
-        if(this.limit > 0 && newsItems.size() > limit) {
+        if (this.limit > 0 && newsItems.size() > limit) {
             newsItems = newsItems.subList(0, limit);
         }
-        List<NewsEntryDTO> news = new ArrayList<>(newsItems.size());
-        for(EventNewsItem newsItem: newsItems) {
-            if(newsItem instanceof InfoEventNewsItem) {
+        final List<NewsEntryDTO> news = new ArrayList<>(newsItems.size());
+        for (EventNewsItem newsItem : newsItems) {
+            if (newsItem instanceof InfoEventNewsItem) {
                 news.add(new InfoNewsEntryDTO((InfoEventNewsItem) newsItem, dispatchContext.getClientLocale()));
             }
-            if(newsItem instanceof LeaderboardUpdateNewsItem) {
+            if (newsItem instanceof LeaderboardUpdateNewsItem) {
                 news.add(new LeaderboardNewsEntryDTO((LeaderboardUpdateNewsItem) newsItem));
             }
         }

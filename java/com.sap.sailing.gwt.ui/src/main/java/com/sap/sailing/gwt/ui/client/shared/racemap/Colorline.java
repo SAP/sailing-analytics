@@ -5,11 +5,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.gwt.ajaxloader.client.Properties;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.base.LatLng;
 import com.google.gwt.maps.client.events.click.ClickMapHandler;
 import com.google.gwt.maps.client.events.mousedown.MouseDownMapHandler;
 import com.google.gwt.maps.client.events.mouseout.MouseOutMapHandler;
+import com.google.gwt.maps.client.events.mouseover.MouseOverMapEvent;
 import com.google.gwt.maps.client.events.mouseover.MouseOverMapHandler;
 import com.google.gwt.maps.client.events.mouseup.MouseUpMapHandler;
 import com.google.gwt.maps.client.mvc.MVCArray;
@@ -24,7 +26,7 @@ import com.google.gwt.maps.client.overlays.Polyline;
  * is decided by a {@link ColorlineColorProvider} embedded in the {@link ColorlineOptions} used for this
  * color line.
  * 
- * @author Tim Hessenm�ller (D062243)
+ * @author Tim Hessenmüller (D062243)
  */
 public class Colorline {
     private ColorlineOptions options;
@@ -32,7 +34,7 @@ public class Colorline {
     /**
      * Container for {@link Polyline}s which together build up the {@code Colorline}.
      */
-    private List<Polyline> polylines;
+    private final List<Polyline> polylines;
     
     private MapWidget map;
     
@@ -41,11 +43,60 @@ public class Colorline {
      */
     private Set<Colorline> pathChangeListeners;
     
-    private Set<ClickMapHandler> clickMapHandlers;
-    private Set<MouseOverMapHandler> mouseOverMapHandlers;
-    private Set<MouseDownMapHandler> mouseDownMapHandlers;
-    private Set<MouseUpMapHandler> mouseUpMapHandlers;
-    private Set<MouseOutMapHandler> mouseOutMapHandlers;
+    private final Set<ClickMapHandler> clickMapHandlers;
+    private final Set<MouseOverMapHandler> mouseOverMapHandlers;
+    private final Set<MouseOverLineHandler> mouseOverLineHandlers;
+    private final Set<MouseDownMapHandler> mouseDownMapHandlers;
+    private final Set<MouseUpMapHandler> mouseUpMapHandlers;
+    private final Set<MouseOutMapHandler> mouseOutMapHandlers;
+    
+    public static class MouseOverLineEvent extends MouseOverMapEvent {
+        private final int fixIndexInTail;
+        private final Polyline line;
+
+        public MouseOverLineEvent(Properties properties, Polyline line, int fixIndexInTail) {
+            super(properties);
+            this.line = line;
+            this.fixIndexInTail = fixIndexInTail;
+        }
+
+        /**
+         * @return {@code null} if this event was produced by hovering over a {@link Colorline} that was not in
+         *         {@link ColorlineMode#POLYCHROMATIC} mode; otherwise the index of the fix representing the start of
+         *         the line segment hovered over in the tail from {@link FixesAndTails}.
+         */
+        public int getFixIndexInTail() {
+            return fixIndexInTail;
+        }
+
+        /**
+         * @return {@code null} if this event was produced by hovering over a {@link Colorline} that was not in
+         *         {@link ColorlineMode#POLYCHROMATIC} mode; otherwise the line segment hovered over
+         */
+        public Polyline getLine() {
+            return line;
+        }
+    }
+    
+    /**
+     * Allows clients of the {@link Colorline} class to register more specific mouse hover handlers which,
+     * in case of a {@link ColorlineMode#POLYCHROMATIC} setting, additionally receives the {@link Polyline}
+     * segment actually hovered over, as well as the segment's start index in the {@link FixesAndTails}
+     * construct. This way, the client can infer, e.g., the value visualized by the polychromatic line
+     * at that point.<p>
+     * 
+     * Handlers implementing this interface are also compatible with the {@link MouseOverMapHandler}
+     * interface. If used as such, the line and index information will always be undefined, just as if
+     * a handler of this type is registered on a {@link Colorline} that is <em>not</em> using the 
+     * polychromatic setting.
+     * 
+     * @author Axel Uhl (d043530)
+     *
+     */
+    @FunctionalInterface
+    public static interface MouseOverLineHandler {
+        void onEvent(MouseOverLineEvent event);
+    }
     
     public Colorline(ColorlineColorProvider colorProvider) {
         this(new ColorlineOptions(colorProvider));
@@ -57,6 +108,7 @@ public class Colorline {
         pathChangeListeners = new HashSet<>();
         clickMapHandlers = new HashSet<>();
         mouseOverMapHandlers = new HashSet<>();
+        mouseOverLineHandlers = new HashSet<>();
         mouseDownMapHandlers = new HashSet<>();
         mouseUpMapHandlers = new HashSet<>();
         mouseOutMapHandlers = new HashSet<>();
@@ -350,6 +402,9 @@ public class Colorline {
         for (MouseOverMapHandler h : mouseOverMapHandlers) {
             line.addMouseOverHandler(h);
         }
+        for (MouseOverLineHandler h : mouseOverLineHandlers) {
+            line.addMouseOverHandler(createMouseOverMapHandlerFromMouseOverLineHandler(h, line));
+        }
         for (MouseDownMapHandler h : mouseDownMapHandlers) {
             line.addMouseDownHandler(h);
         }
@@ -385,6 +440,23 @@ public class Colorline {
         }
     }
     
+    public void addMouseOverLineHandler(MouseOverLineHandler handler) {
+        mouseOverLineHandlers.add(handler);
+        // Add to already existing Polylines
+        for (Polyline line : polylines) {
+            line.addMouseOverHandler(createMouseOverMapHandlerFromMouseOverLineHandler(handler, line));
+        }
+    }
+
+    private MouseOverMapHandler createMouseOverMapHandlerFromMouseOverLineHandler(MouseOverLineHandler handler, Polyline line) {
+        return e->handler.onEvent(new MouseOverLineEvent(e.getProperties(), line,
+                options.getColorMode() == ColorlineMode.POLYCHROMATIC ? getFixIndexInTail(line) : -1));
+    }
+    
+    private int getFixIndexInTail(Polyline line) {
+        return polylines.indexOf(line); // TODO bug6090: accelerate by maintaining this mapping in a HashMap?
+    }
+
     public void addMouseDownHandler(MouseDownMapHandler handler) {
         mouseDownMapHandlers.add(handler);
         // Add to already existing Polylines

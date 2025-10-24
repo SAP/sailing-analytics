@@ -339,7 +339,7 @@ public class LoginActivity extends BaseActivity implements EventSelectedListener
         Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
         int smallIcon = R.drawable.ic_boat_white_24dp;
         CharSequence title = getText(R.string.app_name);
-        NotificationHelper.prepareNotificationWith(title, largeIcon, smallIcon);
+        NotificationHelper.prepareNotificationWith(largeIcon, smallIcon);
 
         onNewIntent(getIntent());
     }

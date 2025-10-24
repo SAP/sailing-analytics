@@ -1,0 +1,8 @@
+#!/bin/bash
+REPLICA_SET_NAME=$(ec2-metadata | grep REPLICA_SET_NAME | sed -e 's/^user-data: //' | sed -e 's/^REPLICA_SET_NAME=//')
+echo Replica set name: $REPLICA_SET_NAME
+if [ \! -z "$REPLICA_SET_NAME" ]; then
+  echo "Not empty. Patching /etc/mongod.conf..."
+  sed -i -e "s/replSetName: .*$/replSetName: $REPLICA_SET_NAME/" /etc/mongod.conf
+  echo "Done"
+fi

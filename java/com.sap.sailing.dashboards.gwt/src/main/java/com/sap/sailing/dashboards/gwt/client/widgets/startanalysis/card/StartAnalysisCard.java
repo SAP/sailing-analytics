@@ -17,6 +17,7 @@ import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
@@ -45,8 +46,10 @@ import com.sap.sailing.gwt.ui.client.shared.racemap.RaceMapZoomSettings.ZoomType
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.async.AsyncActionsExecutor;
 import com.sap.sse.gwt.client.player.Timer.PlayModes;
+import com.sap.sse.security.shared.dto.SecuredDTO;
 import com.sap.sse.security.ui.client.UserService;
 import com.sap.sse.security.ui.client.premium.PaywallResolver;
+import com.sap.sse.security.ui.client.premium.PaywallResolverImpl;
 import com.sap.sse.security.ui.client.subscription.SubscriptionServiceFactory;
 
 public class StartAnalysisCard extends Composite implements HasWidgets, StartAnalysisPageChangeListener {
@@ -115,21 +118,25 @@ public class StartAnalysisCard extends Composite implements HasWidgets, StartAna
 
     private void fillWindAndStartLineData(StartAnalysisDTO startAnalysisDTO) {
         if (startAnalysisDTO.startAnalysisWindLineInfoDTO != null) {
-            setLineAdvantageDivWidth(startAnalysisDTO.startAnalysisWindLineInfoDTO.startLineAdvantage.startLineAdvatageType);
+            setLineAdvantageDivWidth(startAnalysisDTO.startAnalysisWindLineInfoDTO.startLineAdvantage.startLineAdvantageType);
             final String startLineAdvantageType;
-            if (startAnalysisDTO.startAnalysisWindLineInfoDTO.startLineAdvantage.startLineAdvatageType
+            if (startAnalysisDTO.startAnalysisWindLineInfoDTO.startLineAdvantage.startLineAdvantageType
                     .equals(StartlineAdvantageType.GEOMETRIC)) {
                 startLineAdvantageType = stringMessages.dashboardStartlineAdvantageByGeometryHeader();
             } else {
                 startLineAdvantageType = stringMessages.dashboardStartlineAdvantagesByWindHeader();
             }
-            startanalysis_card_line_advantage
-                    .setInnerHTML(SafeHtmlUtils.fromString(startLineAdvantageType
-                            + ": "
-                            + NumberFormat
-                                    .getFormat("#0.0")
-                                    .format(startAnalysisDTO.startAnalysisWindLineInfoDTO.startLineAdvantage.startLineAdvantage)
-                            + " m").asString());
+            if (startAnalysisDTO.startAnalysisWindLineInfoDTO.startLineAdvantage.startLineAdvantage == null) {
+                startanalysis_card_line_advantage.setInnerHTML("");
+            } else {
+                startanalysis_card_line_advantage
+                        .setInnerHTML(SafeHtmlUtils.fromString(startLineAdvantageType
+                                + ": "
+                                + NumberFormat
+                                        .getFormat("#0.0")
+                                        .format(startAnalysisDTO.startAnalysisWindLineInfoDTO.startLineAdvantage.startLineAdvantage)
+                                + " m").asString());
+            }
             String formattedTimeSinceStart;
             if (startAnalysisDTO.racingProcedureType.equals(RacingProcedureType.GateStart)) {
                 formattedTimeSinceStart = getRaceTimeStringFromMilliseconds(startAnalysisDTO.tailLenghtInMilliseconds);
@@ -148,8 +155,8 @@ public class StartAnalysisCard extends Composite implements HasWidgets, StartAna
     }
 
     private void setLineAdvantageDivWidth(StartlineAdvantageType startlineAdvantageType) {
-        if (startAnalysisDTO.startAnalysisWindLineInfoDTO.startLineAdvantage.startLineAdvatageType
-                .equals(StartlineAdvantageType.GEOMETRIC)) {
+        if (startAnalysisDTO.startAnalysisWindLineInfoDTO.startLineAdvantage.startLineAdvantageType
+                == StartlineAdvantageType.GEOMETRIC) {
             startanalysis_card_line_advantage.getStyle().setWidth(GEOMETRIC_LINE_ADVANTAGE_DIV_WIDTH_IN_PT, Unit.PT);
         } else {
             startanalysis_card_line_advantage.getStyle().setWidth(WIND_LINE_ADVANTAGE_DIV_WIDTH_IN_PT, Unit.PT);
@@ -167,47 +174,59 @@ public class StartAnalysisCard extends Composite implements HasWidgets, StartAna
             timer.setTime(startAnalysisDTO.timeOfStartInMilliSeconds);
             zoomTypes.add(ZoomTypes.BUOYS);
         }
-        final RaceMapZoomSettings raceMapZoomSettings = new RaceMapZoomSettings(zoomTypes, false);
-        final AsyncActionsExecutor asyncActionsExecutor = new AsyncActionsExecutor();
-        final RaceMapSettings defaultRaceMapSettings = RaceMapSettings.readSettingsFromURL(
-                /* defaultForShowMapControls */ true, /* defaultForShowCourseGeometry */ false,
-                /* defaultForMapOrientationWindUp */ false, /* defaultForViewShowStreamlets */ false,
-                /* defaultForViewShowStreamletColors */ false, /* defaultForViewShowSimulation */ false,
-                /* defaultForTailLengthInMilliseconds */ null);
-        final RaceMapSettings raceMapSettings = new RaceMapSettings(raceMapZoomSettings, getHelpLineSettings(),
-                defaultRaceMapSettings.getTransparentHoverlines(), defaultRaceMapSettings.getHoverlineStrokeWeight(), 
-                startAnalysisDTO.tailLenghtInMilliseconds, defaultRaceMapSettings.isWindUp(),
-                defaultRaceMapSettings.getBuoyZoneRadius(), defaultRaceMapSettings.isShowOnlySelectedCompetitors(),
-                defaultRaceMapSettings.isShowSelectedCompetitorsInfo(), defaultRaceMapSettings.isShowWindStreamletColors(),
-                defaultRaceMapSettings.isShowWindStreamletOverlay(), defaultRaceMapSettings.isShowSimulationOverlay(),
-                defaultRaceMapSettings.isShowMapControls(), defaultRaceMapSettings.getManeuverTypesToShow(),
-                defaultRaceMapSettings.isShowDouglasPeuckerPoints(), defaultRaceMapSettings.isShowEstimatedDuration(),
-                defaultRaceMapSettings.getStartCountDownFontSizeScaling(), defaultRaceMapSettings.isShowManeuverLossVisualization(),
-                defaultRaceMapSettings.isShowSatelliteLayer(), defaultRaceMapSettings.isShowWindLadder());
-        final RaceTimesInfoProvider raceTimesInfoProvider = new RaceTimesInfoProvider(sailingServiceAsync,
-                asyncActionsExecutor, errorReporter,
-                Collections.singletonList(startAnalysisDTO.regattaAndRaceIdentifier), 5000l /* requestInterval */);
-        final PaywallResolver paywallResolver = new PaywallResolver(userService, subscriptionServiceFactory);
-        // TODO: set RaceDTO to RaceMapLifecycle to enable premium functions
-        raceMap = new RaceMap(null, null, new RaceMapLifecycle(StringMessages.INSTANCE, paywallResolver, null), raceMapSettings,
-                sailingServiceAsync, asyncActionsExecutor, errorReporter, timer, competitorSelectionModel,
-                new RaceCompetitorSet(competitorSelectionModel), StringMessages.INSTANCE,
-                startAnalysisDTO.regattaAndRaceIdentifier, raceMapResources, /* showHeaderPanel */ true,
-                new DefaultQuickFlagDataProvider(), paywallResolver, /* isSimulationEnabled */false);
-        raceTimesInfoProvider.addRaceTimesInfoProviderListener(raceMap);
-        raceMap.setSize("100%", "100%");
-        card_map_container.getElement().getStyle().setHeight(getHeightForRaceMapInPixels(), Unit.PX);
-        card_map_container.add(raceMap);
-        /**
-         * Executes onResize() after the reflow of the DOM. Otherwise it has no effect.
-         * Needs to resize the map because google maps are not shown loaded fully when they are hidden.
-         * */
-        Scheduler.get().scheduleDeferred(new ScheduledCommand() {
-            @Override
-            public void execute() {
-                raceMap.onResize();
-            }
-        });
+        userService.createEssentialSecuredDTOByIdAndType(
+                /* permission Type */startAnalysisDTO.regattaAndRaceIdentifier.getPermissionType(),
+                /* name */ startAnalysisDTO.regattaAndRaceIdentifier.getName(),
+                /* TypeRelativeObjectIdentifier */ startAnalysisDTO.regattaAndRaceIdentifier
+                        .getTypeRelativeObjectIdentifier(),
+                new AsyncCallback<SecuredDTO>() {
+                    @Override
+                    public void onSuccess(SecuredDTO raceDTO) {
+                        final PaywallResolver paywallResolver = new PaywallResolverImpl(userService,
+                                subscriptionServiceFactory);
+                        final RaceMapZoomSettings raceMapZoomSettings = new RaceMapZoomSettings(zoomTypes, false);
+                        final AsyncActionsExecutor asyncActionsExecutor = new AsyncActionsExecutor();
+                        final RaceMapSettings defaultRaceMapSettings = RaceMapSettings.readSettingsFromURL(
+                                /* defaultForShowMapControls */ true, /* defaultForShowCourseGeometry */ false,
+                                /* defaultForMapOrientationWindUp */ false, /* defaultForViewShowStreamlets */ false,
+                                /* defaultForViewShowStreamletColors */ false, /* defaultForViewShowSimulation */ false,
+                                /* defaultForTailLengthInMilliseconds */ null, paywallResolver, raceDTO);
+                        final RaceMapSettings raceMapSettings = new RaceMapSettings.RaceMapSettingsBuilder(
+                                defaultRaceMapSettings, raceDTO, paywallResolver)
+                                        .withTailLengthInMilliseconds(startAnalysisDTO.tailLenghtInMilliseconds)
+                                        .withHelpLinesSettings(getHelpLineSettings())
+                                        .withZoomSettings(raceMapZoomSettings).build();
+                        final RaceTimesInfoProvider raceTimesInfoProvider = new RaceTimesInfoProvider(
+                                sailingServiceAsync, asyncActionsExecutor, errorReporter,
+                                Collections.singletonList(startAnalysisDTO.regattaAndRaceIdentifier),
+                                5000l /* requestInterval */);
+                        raceMap = new RaceMap(null, null,
+                                new RaceMapLifecycle(StringMessages.INSTANCE, paywallResolver, raceDTO),
+                                raceMapSettings, sailingServiceAsync, asyncActionsExecutor, errorReporter, timer,
+                                competitorSelectionModel, new RaceCompetitorSet(competitorSelectionModel),
+                                StringMessages.INSTANCE, startAnalysisDTO.regattaAndRaceIdentifier, raceMapResources,
+                                /* showHeaderPanel */ true, new DefaultQuickFlagDataProvider(), paywallResolver,
+                                /* isSimulationEnabled */false);
+                        raceTimesInfoProvider.addRaceTimesInfoProviderListener(raceMap);
+                        raceMap.setSize("100%", "100%");
+                        card_map_container.getElement().getStyle().setHeight(getHeightForRaceMapInPixels(), Unit.PX);
+                        card_map_container.add(raceMap);
+                        /**
+                         * Executes onResize() after the reflow of the DOM. Otherwise it has no effect. Needs to resize
+                         * the map because google maps are not shown loaded fully when they are hidden.
+                         */
+                        Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+                            @Override
+                            public void execute() {
+                                raceMap.onResize();
+                            }
+                        });
+                    };
+
+                    public void onFailure(Throwable caught) {
+                        GWT.log("Cannot create essential raceDTO", caught);
+                    };
+                });
     }
     
     private double getHeightForRaceMapInPixels(){

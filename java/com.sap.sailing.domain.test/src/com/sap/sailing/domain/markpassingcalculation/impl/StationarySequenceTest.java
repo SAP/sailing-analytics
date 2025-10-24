@@ -1,8 +1,8 @@
 package com.sap.sailing.domain.markpassingcalculation.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
 import java.util.NavigableSet;
@@ -10,8 +10,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.Waypoint;
@@ -39,7 +39,7 @@ public class StationarySequenceTest extends AbstractCandidateFilterTestSupport {
     private DynamicGPSFixTrack<Competitor, GPSFixMoving> track;
     private final static int FIXES_BETWEEN_CANDIDATES = 3;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         super.setUp();
         final TimePoint now = MillisecondsTimePoint.now();

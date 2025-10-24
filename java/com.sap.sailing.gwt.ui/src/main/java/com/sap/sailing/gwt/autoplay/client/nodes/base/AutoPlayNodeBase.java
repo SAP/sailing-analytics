@@ -37,11 +37,6 @@ public abstract class AutoPlayNodeBase implements AutoPlayNode {
         }
     }
 
-    public abstract void onStart();
-
-    public void onStop() {
-    };
-
     public boolean isStopped() {
         return isStopped;
     }

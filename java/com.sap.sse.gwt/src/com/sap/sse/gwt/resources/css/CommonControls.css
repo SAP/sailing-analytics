@@ -711,6 +711,7 @@ body ::-webkit-scrollbar-track {
 }
 
 .gwt-DialogBox {
+	z-index: 20;
 	line-height: 1.4;
 	background-color: #cecece;
 	border: 1px solid #3e3e3e;

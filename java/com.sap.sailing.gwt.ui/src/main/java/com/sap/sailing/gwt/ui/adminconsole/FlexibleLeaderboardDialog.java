@@ -130,7 +130,7 @@ public abstract class FlexibleLeaderboardDialog extends AbstractLeaderboardDialo
     }
     
     private void fillCourseAreaListBox(EventDTO selectedEvent) {
-        for (CourseAreaDTO courseArea : selectedEvent.venue.getCourseAreas()) {
+        for (CourseAreaDTO courseArea : selectedEvent.getVenue().getCourseAreas()) {
             courseAreaSelection.addCourseArea(courseArea);
         }
         courseAreaSelection.setEnabled(true);

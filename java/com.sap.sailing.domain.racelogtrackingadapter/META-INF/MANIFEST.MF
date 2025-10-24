@@ -23,10 +23,12 @@ Require-Bundle: com.sap.sailing.domain,
  org.mongodb.driver-core;bundle-version="4.3.1",
  org.mongodb.driver-sync;bundle-version="4.3.1",
  com.sap.sailing.shared.persistence;bundle-version="1.0.0",
- com.sap.sse.shared.android
+ com.sap.sse.shared.android,
+ com.sap.sse.operationaltransformation
 Import-Package: com.google.zxing;version="3.1.0",
  com.mongodb,
  com.sap.sse.concurrent,
+ com.sap.sse.operationaltransformation,
  com.sap.sse.shared.media,
  javax.mail;version="1.4.0",
  javax.mail.internet;version="1.4.0",
@@ -37,7 +39,13 @@ Import-Package: com.google.zxing;version="3.1.0",
  org.osgi.framework;version="1.6.0",
  org.osgi.util.tracker;version="1.5.1"
 Export-Package: com.sap.sailing.domain.racelogtracking,
- com.sap.sailing.domain.racelogtracking.impl;x-friends:="com.sap.sailing.domain.racelogtrackingadapter.testsupport,com.sap.sailing.gwt.ui.test,com.sap.sailing.mongodb.test",
+ com.sap.sailing.domain.racelogtracking.impl;
+  x-friends:="com.sap.sailing.domain.racelogtrackingadapter.testsupport,
+   com.sap.sailing.domain.shared.android.test,
+   com.sap.sailing.gwt.ui.test,
+   com.sap.sailing.mongodb.test,
+   com.sap.sailing.server.gateway.test,
+   com.sap.sailing.server.test",
  com.sap.sailing.domain.racelogtracking.impl.fixtracker;x-friends:="com.sap.sailing.domain.test"
 Bundle-Activator: com.sap.sailing.domain.racelogtracking.impl.Activator
 Automatic-Module-Name: com.sap.sailing.domain.racelogtrackingadapter

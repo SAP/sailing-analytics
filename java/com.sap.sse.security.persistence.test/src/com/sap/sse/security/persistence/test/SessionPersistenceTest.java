@@ -1,7 +1,7 @@
 package com.sap.sse.security.persistence.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Date;
 import java.util.Map;
@@ -12,25 +12,9 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.sap.sse.mongodb.MongoDBService;
-import com.sap.sse.security.persistence.DomainObjectFactory;
-import com.sap.sse.security.persistence.MongoObjectFactory;
-import com.sap.sse.security.persistence.PersistenceFactory;
-
-public class SessionPersistenceTest {
-    private DomainObjectFactory dof;
-    private MongoObjectFactory mof;
-    
-    @Before
-    public void setUp() {
-        MongoDBService.INSTANCE.getDB().drop();
-        dof = PersistenceFactory.INSTANCE.getDefaultDomainObjectFactory();
-        mof = PersistenceFactory.INSTANCE.getDefaultMongoObjectFactory();
-    }
-    
+public class SessionPersistenceTest extends AbstractSecurityPersistenceTest {
     @Test
     public void testLoadAndStoreAndRemoveSimpleSession() {
         final String cacheName = "shiroSessionCache";

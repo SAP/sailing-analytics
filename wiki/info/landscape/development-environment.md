@@ -2,33 +2,41 @@
 
 [[_TOC_]]
 
-## Git and Our Branches
-Our main Git repository lives at ssh://<user>@sapsailing.com/home/trac/git. For those working in the SAP corporate network and therefore unable to access the external sapsailing.com server using SSH, the repository contents are replicated on an hourly basis into ssh://dxxxxxx@git.wdf.sap.corp:29418/SAPSail/sapsailingcapture.git where dxxxxxx obviously is to be replaced by your D- or I- or C-user. You need to have an account at https://git.wdf.sap.corp:8080/ to be able to access this Git repository.
+Here, we describe the process for doing simple standard development for the Sailing Analytics project, with a focus on how we handle Git w.r.t. branches, Bugzilla, Hudson-CI, and Github Actions. Other development scenarios you'll find described in more depth [[here|wiki/info/landscape/typical-development-scenarios]].
 
-Small, obvious and non-disruptive developments are usually carried out immediately on our master branch. This branch is configured such that Maven can be used to run the tests inside the SAP corporate network. The master branch is never deployed onto the sapsailing.com server and hence has no corresponding /home/trac/servers/ subdirectory.
+## Git, Bugzilla, and Our Branches
+Our main Git repository lives at github.com/SAP/sailing-analytics. Its ``main`` branch is mirrored to ssh://trac@sapsailing.com/home/trac/git periodically.
 
-If a change looks reasonably good on the master branch and related JUnit tests or manual UI tests have succeeded locally, it is permissible to merge the master branch into the dev branch and run a central build on sapsailing.com. The dev branch is configured to run the Maven tests with direct Internet access. It can therefore also be used to run the tests locally if connected to the public Internet.
+Small, minor, obvious and non-disruptive developments are usually carried out immediately on our ``main`` branch.
 
-Ideally, the build should be run including the test cases. If the tests succeed , the branch can be installed and the corresponding server instance can be restarted. The branch can then also be promoted to the next level (dev-->test-->prod1/prod2). Note, that currently re-starting a server instance may require re-loading the races that were previously loaded, particularly for the prod1 and prod2 instances, because several externally-announced URLs point to them.
+Everything else should follow the pattern
+- create Bugzilla issue (e.g., issue #12345)
+- create branch for Bugzilla issue ``bug12345``, typically branching from latest ``main`` tip
+- create Hudson job for branch using ``configuration/createHudsonJobForBug.sh 12345``
+- make your changes on your branch and commit and push regularly
+- pushing triggers the [release workflow](https://github.com/SAP/sailing-analytics/actions/workflows/release.yml) which runs a build with tests
+- when the workflow has finished, it triggers your Hudson job which collects the [build and test results](https://hudson.sapsailing.com/job/bug12345)
+- be verbose and document your changes, progress, hold-ups and problems on your Bugzilla issue
+- when build is "green," suggest your branch for review; so far we do this informally by assigning the Bugzilla issue to the reviewer and in a comment asking for review; in the future, we may want to use Github Pull Requests for this
+- after your branch has been merged into ``main``, disable your Hudson build job for your branch
+- the ``main`` branch will then build a new release that you can roll out into the production landscape
+- in case of changes to i18n-related message properties files, merge ``main`` into ``translation`` which triggers the translation process; the completed translations will arrive as pushes to the ``translations`` branch, triggering another ``release`` workflow, and---if successful---an automated merge into ``main`` with the corresponding build/release process happens, based on the [translation Hudson job](https://hudson.sapsailing.com/job/translation/configure)'s special logic
+- a successful ``main`` build (still on Java 8) will lead to an automatic merge into one or more branches for newer Java releases (such as ``docker-24``) with the corresponding build/release process
 
-We typically promote the changes to the next branch by also merging the current master branch into the next-"higher" branch. This should lead to equivalent results compared to merging the "previous" branch (e.g., dev) into the "next" branch (e.g., test). The branches differ largely in the configurations used for the servers, particularly the port assignments for the Jetty web server, the UDP ports used for listening for Expedition wind messages, and the queue names used for the replication based on RabbitMQ (see also Scale-Out through Replication).
+Be eager to equip your features and functions with tests. There should be enough examples to learn from. For UI testing, use Selenium (see the ``java/com.sap.sailing.selenium.test`` project).
+
+### Exceptionally Building Without Running Tests, More/Fewer CPUs, and With Release
+Ideally, the build should be run including the test cases. However, for exceptional cases you can trigger a build using the ``release`` workflow in Github Actions manually and can choose to ignore tests, change the number of CPUs to use for the build, and run the build with an OSGi target platform built according to the specifications of the branch you're building from.
+
+Furthermore, if you push your branch, say ``bug12345`` to ``releases/bug12345`` then the Github Actions build triggered by the push will also build and publish a release (currently published on [https://releases.sapsailing.com](https://releases.sapsailing.com)) named after your branch. You can use such as release, e.g., to deploy it to a staging server such as [https://dev.sapsailing.com](https://dev.sapsailing.com).
 
 ## Eclipse Setup, Required Plug-Ins
-We use Eclipse as our development environment. Using a different IDE would make it hard to re-use the project configurations (.project and .classpath files which are specific to Eclipse) as well as the GWT plug-in which assists in locally compiling and refactoring the GWT code, in particular the RPC code.
-
-The recommended and tested Eclipse version is currently Indigo (3.7). Colleagues have reported that they succeeded with a Juno (3.8/4.x) set-up as well.
-
-To get started, install Eclipse with at least PDE, Git, GWT (use http://dl.google.com/eclipse/plugin/3.7 as update site) and JSP editing support enabled. Eclipse Maven support is not recommended as in many cases it has caused trouble with the local Eclipse build.
-
-## Target Platform
-After the Eclipse installation and importing all projects under java/ from Git, it is required to set the target platform in Eclipse (Window --> Preferences --> Plugin Development --> Target Platform). The project com.sap.sailing.targetplatform contains "Race Analysis Target (IDE)" as target platform definition. It uses a number of p2 update sites and defines the OSGi bundles that constitute the target platform for the application. If this is not set in Eclipse, the local build environment assumes that the developer wants to implement Eclipse plug-ins and offers the entire set of Eclipse plug-ins and only those as the target platform which doesn't make any sense for our application.
-
-Major parts of our target platform are hosted on sapsailing.com as a p2 repository which makes it possible to have only one central target platform configuration used by everyone. The target platform can be re-built, e.g., after adding another bundle to it, using the script in com.sap.sailing.targetplatform/scripts. 
-
-It then needs to be installed again (by using a tool like scp for instance) to the /home/trac/p2-repositories directory from where it is exposed as http://p2.sapsailing.com/p2/sailing/ by the Apache web server. After such a change, all developers need to reload the target platform into their Eclipse environment.
+The Eclipse setup is explained in our [[Onboarding|wiki/howto/onboarding]] description.
 
 ## Maven Build and Tests
-We use Maven to build our software and run our JUnit tests. The global setting.xml file to install in everyone's ~/.m2 directory is checked into the top-level Git folder. The checked-in copy assumes the developer is using Maven inside the SAP corporate network. If not, uncomment the <proxy> tag in the settings.xml file. See also section Git and Our Branches for details on which branch is configured to work in which network setup.
+We recommend using a local Maven-based build only if you try to understand or reproduce issues with the Github Actions build. In most other cases you should be fine using Eclipse with its local build/run/debug cycle.
+
+If you still feel you want to run a local Maven build, make sure again (see also [[Onboarding|wiki/howto/onboarding]]) to get your ``maven-settings.xml`` and ``toolchains.xml`` files in ``~/.m2`` in good shape first.
 
 We have a top-level Maven pom.xml configuration file in the root folder of our Git workspace. It delegates to the pom.xml file in the java/ folder where all the bundle projects are defined. We rely on the Tycho Maven plug-in to build our OSGi bundles, also known as the "manifest-first approach." The key idea is to mainly develop using Eclipse means, including its OSGi manifest editing capabilities, and keep the Maven infrastructure as simple as possible, deriving component dependencies from the OSGi manifests. See the various pom.xml files in the projects to see the project-specific settings. By and large, a pom.xml file for a bundle needs to have the bundle name and version defined (we currently have most bundles at version 1.0.0.qualifier in the manifest or 1.0.0.SNAPSHOT in Maven), and whether the bundle is a test or non-test bundle, expressed as the packaging type which here can be one of eclipse-plugin or ecplise-test-plugin.
 
@@ -52,18 +60,9 @@ When building on sapsailing.com you should stick with the buildAndUpdateProduct.
 
 All these build lines also creates a log file with all error messages, just in case the screen buffer is not sufficient to hold all scrolling error messages.
 
-## Automated Builds using Hudson
+When you're done with your local Maven build, finally run "mvn clean" to clean up the artifacts produced by the Maven build. Without this, remnants and outputs from the Maven build may collide with the local Eclipse build, such as JAR files that ended up in projects' ``bin/`` folders.
 
-The project uses a Hudson build server installation that can be reached at [hudson.sapsailing.com](http://hudson.sapsailing.com). Please ask a project administrator for an account. This Hudson server builds all new commits pushed to the master branch, performs the JUnit tests and publishes the JUnit test results. New jobs for other branches can easily be created by copying from the SAPSailingAnalytics-master job and updating the git branch to be checked out for build. This way, you can create your own job for your own branch. Don't forget to set yourself as the e-mail recipient for failing builds.
-
-As a special feature, release builds can automatically be performed and published to [releases.sapsailing.com](http:///releases.sapsailing.com) by pushing the tag named "release" to the version that you want to release. This can be done using the following series of git commands:
-
-    git tag -f release
-    git push origin release:release
-
-You can follow the build triggered by this [here](http://hudson.sapsailing.com/job/SAPSailingAnalytics-release/).
-
-### Plotting test results with the Measurement Plugin
+## Plotting test results with the Measurement Plugin
 
 By default the duration of each test is published and can be viewed in comparison with older builds. It is possible to publish other values using the Measurement Plugin, which reads them out of a `MeasurementXMLFile`. 
 
@@ -72,19 +71,3 @@ MeasurementXMLFile performanceReport = new MeasurementXMLFile("TEST-" + getClass
 MeasurementCase performanceReportCase = performanceReport.addCase(getClass().getSimpleName());
 performanceReportCase.addMeasurement(new Measurement("MeasurementName", measurementValue));
 ```
-
-## Product, Features and Target Platform
-The result of the build process is a p2 repository with a product consisting of a number of features. The product configuration is provided by the file raceanalysis.product in the com.sap.sailing.feature.p2build project. In its dependencies it defines the features of which it is built, which currently are com.sap.sailing.feature and com.sap.sailing.feature.runtime, each described in an equal-named bundle. The feature specified by com.sap.sailing.feature lists the bundles we develop ourselves as part of the project. The com.sap.sailing.feature.runtime feature lists those 3rd-party bundles from the target platform which are required by the product.
-
-The [target platform](#development-environment_target-platform) is defined in the various flavors for local and central environments in com.sap.sailing.targetplatform/definitions/*.target. It mainly uses Eclipse p2 repositories and our own p2 repository at http://p2.sapsailing.com/p2/sailing/ where we store those bundles required by our runtime which cannot be found as OSGi bundles in any other public p2 repository of which we are aware.
-
-This p2 repository at sapsailing.com can be re-built and correspondingly extended by the process explained [here](wiki/typical-development-scenarios#Adding-a-Bundle-to-the-Target-Platform).
-
-## External Libraries
-
-### Highcharts and jQuery
-We use the Highcharts library to present graphs to the user. These graphs are used on the RaceBoardPanel and (at the time of writing still under development) the PolarSheetsPanel. In the past, there were difficulties concerning the versions of the three interacting libraries:
-
-*	The GWT Highcharts Wrapper – The source code can be found in our project and it’s slightly modified to match our scenario
-*	The actual Highcharts Library
-*	The jQuery Library

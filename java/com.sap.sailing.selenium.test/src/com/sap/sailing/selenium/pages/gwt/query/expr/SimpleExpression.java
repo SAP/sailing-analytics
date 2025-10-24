@@ -4,13 +4,9 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import com.sap.sailing.selenium.pages.gwt.query.Expression;
-
 import com.sap.sailing.selenium.pages.gwt.query.operation.BooleanOperation;
-
 import com.sap.sailing.selenium.pages.gwt.query.operation.bool.Eq;
-
 import com.sap.sailing.selenium.pages.gwt.query.operation.collection.In;
-
 import com.sap.sailing.selenium.pages.gwt.query.operation.object.IsNotNull;
 import com.sap.sailing.selenium.pages.gwt.query.operation.object.IsNull;
 

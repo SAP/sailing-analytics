@@ -1,0 +1,3 @@
+hudson             ALL = (root) NOPASSWD: /usr/local/bin/launchhudsonslave
+hudson             ALL = (root) NOPASSWD: /usr/local/bin/launchhudsonslave-java11
+hudson             ALL = (root) NOPASSWD: /usr/local/bin/getLatestImageOfType.sh

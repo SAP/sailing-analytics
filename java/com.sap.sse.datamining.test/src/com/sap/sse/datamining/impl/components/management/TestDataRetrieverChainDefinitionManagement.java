@@ -2,8 +2,8 @@ package com.sap.sse.datamining.impl.components.management;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,8 +11,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.ModifiableDataMiningServer;
 import com.sap.sse.datamining.components.DataRetrieverChainDefinition;
@@ -43,7 +43,7 @@ public class TestDataRetrieverChainDefinitionManagement {
     private ModifiableDataMiningServer server;
 
     @SuppressWarnings("unchecked")
-    @Before
+    @BeforeEach
     public void initializeRetrieverChainsAndRegistry() {
         regattaRetrieverChainDefinition = new SingleDataRetrieverChainDefinition<>((Class<Collection<Test_Regatta>>)(Class<?>) Collection.class, Test_Regatta.class, "TestRaceRetrieverChain");
         regattaRetrieverChainDefinition.startWith(TestRegattaRetrievalProcessor.class, Test_Regatta.class, "regatta");

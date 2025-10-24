@@ -41,6 +41,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.MaxIterationsExceededException;
+
 import com.sap.sailing.domain.abstractlog.race.RaceLog;
 import com.sap.sailing.domain.abstractlog.race.RaceLogDependentStartTimeEvent;
 import com.sap.sailing.domain.abstractlog.race.RaceLogEndOfTrackingEvent;
@@ -86,6 +89,7 @@ import com.sap.sailing.domain.common.NauticalSide;
 import com.sap.sailing.domain.common.NoWindException;
 import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.RaceTimesCalculationUtil;
+import com.sap.sailing.domain.common.RankingMetrics;
 import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
 import com.sap.sailing.domain.common.RegattaNameAndRaceName;
 import com.sap.sailing.domain.common.SpeedWithBearing;
@@ -131,18 +135,23 @@ import com.sap.sailing.domain.maneuverdetection.ShortTimeAfterLastHitCache;
 import com.sap.sailing.domain.maneuverdetection.impl.IncrementalManeuverDetectorImpl;
 import com.sap.sailing.domain.markpassingcalculation.MarkPassingCalculator;
 import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprintRegistry;
+import com.sap.sailing.domain.orc.ORCPerformanceCurveRankingMetric;
 import com.sap.sailing.domain.polars.PolarDataService;
 import com.sap.sailing.domain.racelog.RaceLogAndTrackedRaceResolver;
 import com.sap.sailing.domain.ranking.OneDesignRankingMetric;
 import com.sap.sailing.domain.ranking.RankingMetric;
 import com.sap.sailing.domain.ranking.RankingMetric.RankingInfo;
+import com.sap.sailing.domain.shared.tracking.AddResult;
+import com.sap.sailing.domain.shared.tracking.LineDetails;
+import com.sap.sailing.domain.shared.tracking.Track;
+import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
+import com.sap.sailing.domain.shared.tracking.impl.LineDetailsImpl;
+import com.sap.sailing.domain.shared.tracking.impl.TimedComparator;
 import com.sap.sailing.domain.ranking.RankingMetricConstructor;
-import com.sap.sailing.domain.tracking.AddResult;
 import com.sap.sailing.domain.tracking.BravoFixTrack;
 import com.sap.sailing.domain.tracking.DynamicSensorFixTrack;
 import com.sap.sailing.domain.tracking.GPSFixTrack;
 import com.sap.sailing.domain.tracking.GPSTrackListener;
-import com.sap.sailing.domain.tracking.LineDetails;
 import com.sap.sailing.domain.tracking.Maneuver;
 import com.sap.sailing.domain.tracking.MarkPassing;
 import com.sap.sailing.domain.tracking.MarkPositionAtTimePointCache;
@@ -150,7 +159,6 @@ import com.sap.sailing.domain.tracking.RaceChangeListener;
 import com.sap.sailing.domain.tracking.RaceExecutionOrderProvider;
 import com.sap.sailing.domain.tracking.RaceListener;
 import com.sap.sailing.domain.tracking.SensorFixTrack;
-import com.sap.sailing.domain.tracking.Track;
 import com.sap.sailing.domain.tracking.TrackFactory;
 import com.sap.sailing.domain.tracking.TrackedLeg;
 import com.sap.sailing.domain.tracking.TrackedLegOfCompetitor;
@@ -158,7 +166,6 @@ import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.domain.tracking.TrackedRaceStatus;
 import com.sap.sailing.domain.tracking.TrackedRaceWithWindEssentials;
 import com.sap.sailing.domain.tracking.TrackedRegatta;
-import com.sap.sailing.domain.tracking.TrackingConnectorInfo;
 import com.sap.sailing.domain.tracking.WindLegTypeAndLegBearingAndORCPerformanceCurveCache;
 import com.sap.sailing.domain.tracking.WindPositionMode;
 import com.sap.sailing.domain.tracking.WindStore;
@@ -192,6 +199,14 @@ import difflib.DiffUtils;
 import difflib.Patch;
 import difflib.PatchFailedException;
 
+/**
+ * Note to subclasses: you have to override {@link #readResolve()} and invoke
+ * {@code super.readResolve()} in the override to ensure that this class's
+ * implementation gets called.<p>
+ * 
+ * @author Axel Uhl (d043530)
+ *
+ */
 public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials implements CourseListener {
 
     private static final long serialVersionUID = -4825546964220003507L;
@@ -430,7 +445,7 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
      * Tells how ranks are to be assigned to the competitors at any time during the race. For one-design boat classes
      * this will usually happen by projecting the competitors to the wind direction for upwind and downwind legs or to
      * the leg's rhumb line for reaching legs, then comparing positions. For handicap races using a time-on-time,
-     * time-on-distance, combination thereof or a more complicated scheme such as ORC Performance Curve, the ranking
+     * time-on-distance, combination thereof or a more complicated scheme such as ORC Polar Curve, the ranking
      * process needs to take into account the competitor-specific correction factors defined in the measurement
      * certificate.<p>
      * 
@@ -753,7 +768,7 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
      * When de-serializing, a possibly remote {@link #windStore} is ignored because it is transient. Instead, an
      * {@link EmptyWindStore} is used for the de-serialized instance.
      */
-    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException, PatchFailedException {
+    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
         ois.defaultReadObject();
         distancesFromStarboardSideOfStartLineProjectedOntoLineCache = new ConcurrentHashMap<>();
         distancesFromStarboardSideOfStartLineProjectedOntoLineCacheLastAccessTimes = new ConcurrentHashMap<>();
@@ -773,15 +788,24 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
         competitorRankings = createCompetitorRankingsCache();
         competitorRankingsLocks = createCompetitorRankingsLockMap();
         directionFromStartToNextMarkCache = new ConcurrentHashMap<>();
-        crossTrackErrorCache = new CrossTrackErrorCache(this);
-        crossTrackErrorCache.invalidate();
         maneuverDetectorPerCompetitorCache = createManeuverDetectorCache();
         maneuverCache = createManeuverCache();
+        logger.info("Deserialized race " + getRace().getName());
+    }
+    
+    @Override
+    public void initializeAfterDeserialization() {
+        crossTrackErrorCache = new CrossTrackErrorCache(this); // this invokes this.addListener(crossTrackErrorCache)
+        // which is handled by the subclass which may not yet be
+        // fully initialized; see also bug 6039
         // considering the unlikely possibility that the course and this tracked race's internal structures
         // may be inconsistent, e.g., due to non-atomic serialization of course and tracked race; see bug 2223
-        adjustStructureToCourse();
-        triggerManeuverCacheRecalculationForAllCompetitors();
-        logger.info("Deserialized race " + getRace().getName());
+        try {
+            adjustStructureToCourse();
+        } catch (PatchFailedException e) {
+            throw new RuntimeException(e);
+        } // a bit unclean: this also tries to work on the DynamicTrackedRaceImpl which isn't fully initialized yet; see also bug6039
+        triggerManeuverCacheRecalculationForAllCompetitors();  // a bit unclean: this also tries to work on the DynamicTrackedRaceImpl which isn't fully initialized yet; see also bug6039
     }
 
     /**
@@ -4371,5 +4395,42 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
     @Override
     public TrackingConnectorInfo getTrackingConnectorInfo() {
         return trackingConnectorInfo;
+    }
+    
+    @Override
+    public Double getPercentTargetBoatSpeed(Competitor competitor, TimePoint timePoint,
+            WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache)
+            throws NotEnoughDataHasBeenAddedException, MaxIterationsExceededException, FunctionEvaluationException {
+        Double result;
+        if (getRankingMetric().getType() == RankingMetrics.ONE_DESIGN) {
+            final PolarDataService polarDataService = getPolarDataService();
+            if (polarDataService != null) {
+                final GPSFixTrack<Competitor, GPSFixMoving> competitorTrack = getTrack(competitor);
+                final Wind wind = getWind(competitorTrack.getEstimatedPosition(timePoint, /* extrapolate */ true), timePoint);
+                final Bearing twa = getTWA(competitor, timePoint, cache);
+                if (twa != null) {
+                    try {
+                        final SpeedWithConfidence<Void> targetSpeed = polarDataService.getSpeed(getBoatOfCompetitor(competitor).getBoatClass(), wind, twa);
+                        final Speed sog = competitorTrack.getEstimatedSpeed(timePoint);
+                        result = targetSpeed != null && targetSpeed.getObject() != null && sog != null ? 100.0 * sog.getKnots() / targetSpeed.getObject().getKnots() : null;
+                    } catch (NotEnoughDataHasBeenAddedException e) {
+                        result = null;
+                    }
+                } else {
+                    result = null;
+                }
+            } else {
+                result = null;
+            }
+        } else if (getRankingMetric() instanceof ORCPerformanceCurveRankingMetric) {
+            final ORCPerformanceCurveRankingMetric orcRankingMetric = (ORCPerformanceCurveRankingMetric) getRankingMetric();
+            final GPSFixTrack<Competitor, GPSFixMoving> competitorTrack = getTrack(competitor);
+            final Wind wind = getWind(competitorTrack.getEstimatedPosition(timePoint, /* extrapolate */ true), timePoint);
+            final Speed impliedWind = orcRankingMetric.getImpliedWind(competitor, timePoint, cache);
+            result = impliedWind == null || wind == null ? null : impliedWind.divide(wind)*100.0;
+        } else {
+            result = null;
+        }
+        return result;
     }
 }

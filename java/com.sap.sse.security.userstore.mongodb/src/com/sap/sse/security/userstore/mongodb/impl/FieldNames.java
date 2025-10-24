@@ -57,7 +57,9 @@ public class FieldNames {
         VALIDATION_SECRET,
         DEFAULT_TENANT_SERVER,
         DEFAULT_TENANT_GROUP,
-        SUBSCRIPTIONS;
+        SUBSCRIPTIONS,
+        LOCKED_UNTIL_MILLIS,
+        NEXT_LOCKING_DURATION_MILLIS;
     }
     
     public static enum Settings {

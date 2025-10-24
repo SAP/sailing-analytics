@@ -1,12 +1,11 @@
 package com.sap.sailing.selenium.test.adminconsole;
 
-import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.*;
+import static org.hamcrest.core.Is.is;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.tractrac.TracTracEventManagementPanelPO;
 import com.sap.sailing.selenium.test.AbstractSeleniumTest;
@@ -22,7 +21,7 @@ public class TestRaceFilterForTracTracEvents extends AbstractSeleniumTest {
             "http://event2.tractrac.com/events/event_20120803_BMWCup/jsonservice.php"; //$NON-NLS-1$
     
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot());
         super.setUp();
@@ -31,7 +30,7 @@ public class TestRaceFilterForTracTracEvents extends AbstractSeleniumTest {
     /**
      * <p>Test with no filter at all, which means we expect all TracTrac races are displayed for a given event.</p>
      */
-    @Test
+    @SeleniumTestCase
     public void testNoFilter() {
         AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
         TracTracEventManagementPanelPO tracTracEvents = adminConsole.goToTracTracEvents();
@@ -42,7 +41,7 @@ public class TestRaceFilterForTracTracEvents extends AbstractSeleniumTest {
     /**
      * <p>Test with partial filter, which should show multiple races but not all.</p>
      */
-    @Test
+    @SeleniumTestCase
     public void testPartialFilter() {
         AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
         TracTracEventManagementPanelPO tracTracEvents = adminConsole.goToTracTracEvents();
@@ -54,7 +53,7 @@ public class TestRaceFilterForTracTracEvents extends AbstractSeleniumTest {
     /**
      * <p>Test with exact filter which should match only 1 races.</p>
      */
-    @Test
+    @SeleniumTestCase
     public void testExactFilter() {
         AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
         TracTracEventManagementPanelPO tracTracEvents = adminConsole.goToTracTracEvents();
@@ -66,7 +65,7 @@ public class TestRaceFilterForTracTracEvents extends AbstractSeleniumTest {
     /**
      * <p>Test with filter which does not match anything.</p>
      */
-    @Test
+    @SeleniumTestCase
     public void testNoneMatchingFilter() {
         AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
         TracTracEventManagementPanelPO tracTracEvents = adminConsole.goToTracTracEvents();

@@ -129,11 +129,9 @@ public class ImageCarousel<TYPE extends ImageDTO> extends Widget {
      * @param uniqueId
      */
     native void setupSlider(ImageCarousel<?> sliderReference) /*-{
-
 	var slider = $wnd
 		.$('.'
 			+ (sliderReference.@com.sap.sse.gwt.client.controls.carousel.ImageCarousel::uniqueId));
-
 	slider
 		.on(
 			'click',
@@ -141,14 +139,12 @@ public class ImageCarousel<TYPE extends ImageDTO> extends Widget {
 			$entry(function(event) {
 			    sliderReference.@com.sap.sse.gwt.client.controls.carousel.ImageCarousel::onClick(Lcom/google/gwt/dom/client/EventTarget;)(event.target);
 			}));
-
 	slider
 		.on(
 			'afterChange',
 			$entry(function(event, index) {
 			    sliderReference.@com.sap.sse.gwt.client.controls.carousel.ImageCarousel::currentSlideIndex = index.currentSlide;
 			}));
-
 	slider.slick(
 			{
 			    dots : (sliderReference.@com.sap.sse.gwt.client.controls.carousel.ImageCarousel::showDots),
@@ -162,7 +158,6 @@ public class ImageCarousel<TYPE extends ImageDTO> extends Widget {
 			    nextArrow : "<div class='slick-next'/>",
 			    responsive : true,
 			    slidesToShow : 2
-
 			});
 	$wnd
 		.$(
@@ -306,8 +301,6 @@ public class ImageCarousel<TYPE extends ImageDTO> extends Widget {
     }
 
     public interface FullscreenViewer<TYPE> {
-        
-        public void show(TYPE selectedImage, Collection<TYPE> imageList);
+        void show(TYPE selectedImage, Collection<TYPE> imageList);
     }
-    
 }

@@ -39,13 +39,12 @@ public class SeriesEventsTabView extends Composite implements SeriesTabView<Seri
     @Override
     public void start(SeriesEventsPlace myPlace, AcceptsOneWidget contentArea) {
         initWidget(ourUiBinder.createAndBindUi(this));
-
         for (EventMetadataDTO eventOfSeries : currentPresenter.getSeriesDTO().getEventsDescending()) {
             if(eventOfSeries.getState() == EventState.PLANNED) {
                 continue;
             }
             final PlaceNavigation<EventDefaultPlace> eventNavigation = currentPresenter.getEventNavigation(eventOfSeries.getId());
-            RecentEventTeaser eventTeaser = new RecentEventTeaser(eventNavigation, eventOfSeries, eventOfSeries.getState().getStateMarker());
+            RecentEventTeaser eventTeaser = new RecentEventTeaser(eventNavigation, eventOfSeries, eventOfSeries.getState().getStateMarker(), currentPresenter.getUserService());
             eventsContainer.add(eventTeaser);
         }
         contentArea.setWidget(this);

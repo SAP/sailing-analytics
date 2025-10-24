@@ -1,7 +1,7 @@
 package com.sap.sailing.sailti.resultimport;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -9,7 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.TimePoint;
 

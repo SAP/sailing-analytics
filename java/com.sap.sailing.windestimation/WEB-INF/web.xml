@@ -24,7 +24,7 @@
 	</listener>
 	<filter>
 		<filter-name>ShiroFilter</filter-name>
-		<filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+		<filter-class>com.sap.sse.security.shiro.ShiroFilterForAllButOptionsRequests</filter-class>
 	</filter>
 	<!-- Make sure any request you want accessible to Shiro is filtered. "/*" 
 		catches all requests. Usually this filter mapping is defined first (before 
@@ -54,10 +54,10 @@
 			<param-name>com.sun.jersey.config.property.packages</param-name>
 			<param-value>com.sap.sailing.windestimation.jaxrs</param-value>
 		</init-param>
-                <init-param>
-                        <param-name>com.sun.jersey.config.feature.DisableWADL</param-name>
-                        <param-value>true</param-value>
-                </init-param>
+        <init-param>
+            <param-name>com.sun.jersey.config.feature.DisableWADL</param-name>
+            <param-value>true</param-value>
+        </init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>

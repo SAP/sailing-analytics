@@ -1,13 +1,13 @@
 package com.sap.sse.security.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Set;
 
 import org.apache.shiro.authz.Permission;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.Util;
 import com.sap.sse.security.UsernamePasswordRealm;
@@ -50,6 +50,12 @@ public class PermissionConverterTest {
     public void testGetWildcardPermission() {
         com.sap.sse.security.shared.WildcardPermission wp = new PermissionConverter().getWildcardPermission(new org.apache.shiro.authz.permission.WildcardPermission("LEADERBOARD:EDIT:KW2017 Laser Int.", /* case sensitive */ true));
         assertEquals("LEADERBOARD:EDIT:KW2017 Laser Int.", wp.toString());
+    }
+
+    @Test
+    public void testGetWildcardPermissionWithMultipleObjectsInThirdPart() {
+        com.sap.sse.security.shared.WildcardPermission wp = new PermissionConverter().getWildcardPermission(new org.apache.shiro.authz.permission.WildcardPermission("LEADERBOARD:EDIT:KW2017 Laser Int.,KW2024 [ILCA7]", /* case sensitive */ true));
+        assertEquals("LEADERBOARD:EDIT:KW2017 Laser Int.,KW2024 [ILCA7]", wp.toString());
     }
     
     @Test

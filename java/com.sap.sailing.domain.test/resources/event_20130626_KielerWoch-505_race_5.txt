@@ -1,13 +1,23 @@
-stored-uri:datafiles/event_20130626_KielerWoch-505_race_5.mtb
+stored-uri:datafiles/12ae2356-df4d-11e2-a399-60a44ce903c3.mtb
 StartReplay:1
 
-// Input from params_static:
-
-// Input from event_parameters:
-
+DefaultPanel:
+ws-uri:ws://tracms.traclive.dk:8888
 CompMarkerUUID:1
+dimmingLevel:1
+MapUrl:http://tile.traclive.dk/osm
 CodanIsSponsor:0
 DefaultTailLength:60
+dimmingSeconds:60
+ResultColumn1Tooltip:
+ResultColumn2Tooltip:
+ResultColumn3Tooltip:
+ResultColumn4Tooltip:
+ResultColumn5Tooltip:
+EnableResults:0
+ResultsLayout:[{"key":"Order","header":"#","description":"Position","printable":true,"align":"right","collapsible":false},{"key":"Name","header":"Name","description":"Competitor's name","printable":true,"align":"left","collapsible":false},{"key":"ShortName","header":"Short Name","description":"Competitor's short name","printable":true,"align":"left","collapsible":true},{"key":"LegTime","header":"Leg","description":"Leg time","printable":false,"align":"right","collapsible":true},{"key":"LegPosition","header":"#","description":"Leg position","printable":false,"align":"right","collapsible":true},{"key":"Time","header":"Total","description":"Total time","printable":true,"align":"right","collapsible":false},{"key":"After","header":"Total &Delta;","description":"Total &Delta;","printable":true,"align":"right","collapsible":false}]
+PerformanceTableLayout:[{"key":"Pos","header":"Pos","tooltip":"Position","options":null},{"key":"Name","header":"Name","tooltip":"Name","options":null},{"key":"Short","header":"Short","tooltip":"Short name","options":null},{"key":"Country","header":"Country","tooltip":"Country","options":null},{"key":"After","header":"After","tooltip":"After","options":null},{"key":"Leg pos","header":"Leg pos","tooltip":"Leg position","options":null},{"key":"Leg time","header":"Leg time","tooltip":"Leg time","options":null},{"key":"SOG","header":"SOG","tooltip":"SOG","options":null},{"key":"VMG","header":"VMG","tooltip":"VMG","options":null},{"key":"Top speed","header":"Top Speed","tooltip":"Top Speed","options":null},{"key":"Distance","header":"Distance","tooltip":"Distance","options":null}]
+smsParams:0,4525720572,4525720572,3,10,15
 APzoomChangeTime:2500
 disableAutoProduce:0
 autoProduce:0
@@ -18,6 +28,7 @@ APwholeLegBehindMarks:0.15
 APmarkSwitch:0.13
 APmarkZoomBehindMarks:0.10
 APmarkZoomInFrontOfMarks:0.20
+enableDiplomas:0
 PopupMarkerUUID:2
 ManualUrl:http://www.tractrac.com/files/userguide_sailing.pdf
 Marker1UUID:1
@@ -32,7 +43,7 @@ MaxMetersPerSecond:20
 PrecisionMeters:20
 ShortAvgTime:180
 LongAvgTime:900
-TimeZone:2.0
+TimeZone:1
 CompMarkerTimeout:60
 FramesPerSecond:8
 replayspeedup:5
@@ -58,7 +69,20 @@ DisableRotation:0
 ControlPointMarkerRadius:13
 disableselection:0
 disableleaderline:0
+delayIntervals:3,10,15
 DisableChangeRace:0
+smsProvider:0
+MarkerSymbol:standardBoat
+MarkerMinPixelSize:36
+ShowFlagInLabel:0
+ShowRankInLabel:1
+TailOpacity:70
+TailWidth:1
+LaggingThreshold:5
+LowBatteryThreshold:5
+BatteryLevelWarn:20
+BatteryLevelDanger:13
+DatabaseVersion:01.00.20
 PopUpRow1Name:
 PopUpRow1Type:Name
 PopUpRow2Name:Knots
@@ -69,6 +93,8 @@ PopUpRow4Name:Sail
 PopUpRow4Type:Ini
 PopUpRow5Name:After
 PopUpRow5Type:BoatAfter
+LabelNoBackground:0
+StartTimeType:Race
 ResultColumn1Name:#
 ResultColumn1Size:20
 ResultColumn1Type:RowNumber
@@ -89,8 +115,8 @@ ResultColumn6Type:BoatSpeed
 DisableLeaderboard:0
 DisableAnalysis:0
 TableFontSize:11
-//live-uri:tcp://secondary.traclive.dk:4400
-//stored-uri:tcp://secondary.traclive.dk:4401
+//live-uri:tcp://tracms.traclive.dk:4400
+//stored-uri:tcp://tracms.traclive.dk:4401
 compInitialsFontSize:11
 AutoRotate:0
 MassStart:0
@@ -99,15 +125,29 @@ StartType:Mass
 ReCalcDirAndSpeed:0
 RaceHandicapSystem:NONE
 TeamCompetitionType:NONE
-LiveDelaySecs: 10
+ResultColumn1DefaultOrder:1
+ResultColumn2DefaultOrder:0
+ResultColumn3DefaultOrder:0
+ResultColumn4DefaultOrder:0
+ResultColumn5DefaultOrder:0
+LiveDelaySecs: 150
+LiveDelaySecsRace: 150
+LiveDelaySecsEvent: 150
 
-//-------- AUTO GENERATED PARAMETERS START ----------------
+Maps:[]
 
 EventID:78501c00-c077-0130-151e-60a44ce903c3
 EventName:Kieler Woche 2013 - International
+EventAnalyticsName:Kieler Woche 2013 - International
 EventDB:event_20130626_KielerWoch
 EventStartTime:2013-06-26 17:00:00
 EventEndTime:2013-06-30 21:00:00
+EventType:a1b74ca0-fdd8-11dc-8811-005056c00008
+EventJSON:https://historical1.tractrac.com/events/event_20130626_KielerWoch/jsonservice.php
+DBReplicaEnabled:0
+HighLoadEnabled:
+MultipleDataservers:0
+WebURL:https://www.tractrac.com/event-page/event_20130626_KielerWoch/309
 
 RaceID:12ae2356-df4d-11e2-a399-60a44ce903c3
 RaceName:505 race 5
@@ -115,1598 +155,216 @@ RaceStartTime:2013-06-28 10:40:00
 RaceEndTime:
 RaceTrackingStartTime:2013-06-28 10:34:00
 RaceTrackingEndTime:2013-06-28 11:43:32
+Initialized:1
 RaceDefaultRouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
 RaceHandicapSystem:NONE
+RaceStatus:UNOFFICIAL
+RaceStatusTime:2020-12-21 12:57:14
+RaceStatusUpdatedAt:2013-06-28 10:34:00
 
 Class1UUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
 Class1Name:505
-
-Team1UUID:5c34eba0-c0c6-0130-18c0-60a44ce903c3
-Team1Name: Andre østergård
-
-Team2UUID:5bdfd800-c0c6-0130-18ad-60a44ce903c3
-Team2Name:Adrien-Paul FARIEN
-
-Team3UUID:5be32f00-c0c6-0130-18ae-60a44ce903c3
-Team3Name:Albin Palsson
-
-Team4UUID:99d14600-c199-0130-41db-60a44ce903c3
-Team4Name:ALBRECHTSEN Hans H
-
-Team5UUID:5699ebc0-c262-0130-538e-60a44ce903c3
-Team5Name:Aleksandras Bezenar
-
-Team6UUID:5be57c70-c0c6-0130-18af-60a44ce903c3
-Team6Name:Alex BAUMANN
-
-Team7UUID:5668f1f0-c262-0130-537f-60a44ce903c3
-Team7Name:Alexander Ebert
-
-Team8UUID:54340da0-c262-0130-531a-60a44ce903c3
-Team8Name:Alexander Hagen
-
-Team9UUID:566aec60-c262-0130-5380-60a44ce903c3
-Team9Name:Alexandre BOITE
-
-Team10UUID:5be7cb40-c0c6-0130-18b0-60a44ce903c3
-Team10Name:Alica Stuhlemmer
-
-Team11UUID:f61fd180-c302-0130-8516-60a44ce903c3
-Team11Name:Alizée GADEL
-
-Team12UUID:f5ec7a20-c302-0130-8509-60a44ce903c3
-Team12Name:Amélie Riou
-
-Team13UUID:597c6d70-c0c6-0130-1841-60a44ce903c3
-Team13Name:Anders THULIN
-
-Team14UUID:59855640-c0c6-0130-1842-60a44ce903c3
-Team14Name:Andre SIEKMANN
-
-Team15UUID:99bfc200-c199-0130-41d8-60a44ce903c3
-Team15Name:Andreas CHRISTIANSEN
-
-Team16UUID:99b98400-c199-0130-41d5-60a44ce903c3
-Team16Name:Andreas FÖH
-
-Team17UUID:5a8384c0-c0c6-0130-1867-60a44ce903c3
-Team17Name:Andy Dinsdale
-
-Team18UUID:f60dec80-c302-0130-850d-60a44ce903c3
-Team18Name:Ania Weinzieher
-
-Team19UUID:55be5280-c262-0130-5366-60a44ce903c3
-Team19Name:Ann K Sørensen
-
-Team20UUID:f6605a90-c302-0130-8522-60a44ce903c3
-Team20Name:Anna BRZOZOWSKA
-
-Team21UUID:5518d210-c262-0130-5336-60a44ce903c3
-Team21Name:Anna Livbjerg
-
-Team22UUID:55482d20-c262-0130-5347-60a44ce903c3
-Team22Name:Anna Munch
-
-Team23UUID:f64c52c0-c302-0130-851e-60a44ce903c3
-Team23Name:Anna POHLAK
-
-Team24UUID:5bea0c50-c0c6-0130-18b1-60a44ce903c3
-Team24Name:Anne HÜBNER
-
-Team25UUID:5bec3e70-c0c6-0130-18b2-60a44ce903c3
-Team25Name:Anne Sofie BIRCH
-
-Team26UUID:f6464f50-c302-0130-851b-60a44ce903c3
-Team26Name:Anne-Mari LUIK
-
-Team27UUID:f5e66e90-c302-0130-8506-60a44ce903c3
-Team27Name:Anne-Marie Rindom
-
-Team28UUID:f62ff530-c302-0130-8517-60a44ce903c3
-Team28Name:Annika MATTHIESEN
-
-Team29UUID:566ce2e0-c262-0130-5381-60a44ce903c3
-Team29Name:Ansgar HENZE
-
-Team30UUID:598e0610-c0c6-0130-1843-60a44ce903c3
-Team30Name:Arne HOLWEG
-
-Team31UUID:56d73600-c262-0130-539b-60a44ce903c3
-Team31Name:Aryaman Dutta
-
-Team32UUID:f6018db0-c302-0130-850b-60a44ce903c3
-Team32Name:Ashley Stoddart
-
-Team33UUID:544a2bf0-c262-0130-5321-60a44ce903c3
-Team33Name:Audi I
-
-Team34UUID:544c8df0-c262-0130-5322-60a44ce903c3
-Team34Name:Audi II
-
-Team35UUID:542b7210-c262-0130-5317-60a44ce903c3
-Team35Name:Audi III
-
-Team36UUID:54443930-c262-0130-531e-60a44ce903c3
-Team36Name:Audi IV
-
-Team37UUID:544edb30-c262-0130-5323-60a44ce903c3
-Team37Name:Audi V
-
-Team38UUID:54510150-c262-0130-5324-60a44ce903c3
-Team38Name:Audi VI
-
-Team39UUID:5ad101d0-c0c6-0130-187b-60a44ce903c3
-Team39Name:BARTELDT Dirk
-Team39Comp1UUID:a5527090-03f8-4509-9a88-104c576e27b8
-
-Team40UUID:559351a0-c262-0130-5355-60a44ce903c3
-Team40Name:Bartosz PTAK
-
-Team41UUID:59908010-c0c6-0130-1844-60a44ce903c3
-Team41Name:BEHEM Andreas
-
-Team42UUID:5bf9d100-c0c6-0130-18b3-60a44ce903c3
-Team42Name:Benjamin WALSH
-
-Team43UUID:5d9b57a0-c0c6-0130-1906-60a44ce903c3
-Team43Name:Bennet Steffens
-
-Team44UUID:5bfd2e00-c0c6-0130-18b4-60a44ce903c3
-Team44Name:Bente CLASEN
-
-Team45UUID:5487e520-c262-0130-532c-60a44ce903c3
-Team45Name:Berezhnoy ANDREY
-
-Team46UUID:99b17b20-c199-0130-41d0-60a44ce903c3
-Team46Name:Bernd Ehler
-
-Team47UUID:5ae123b0-c0c6-0130-187c-60a44ce903c3
-Team47Name:BERTRAND LOYAL
-Team47Comp1UUID:05f95843-fde7-4812-942b-9653746e966c
-
-Team48UUID:5c015320-c0c6-0130-18b5-60a44ce903c3
-Team48Name:Bjarne STEINBRECHER
-
-Team49UUID:569772b0-c262-0130-538c-60a44ce903c3
-Team49Name:Bjarne WILHELM
-
-Team50UUID:5a8ba760-c0c6-0130-1868-60a44ce903c3
-Team50Name:Björn Quakernack
-
-Team51UUID:5458b470-c262-0130-5328-60a44ce903c3
-Team51Name:Bodenmiller Florian 
-
-Team52UUID:558b6e80-c262-0130-5352-60a44ce903c3
-Team52Name:Calle OLSSON
-
-Team53UUID:5a8d6220-c0c6-0130-1869-60a44ce903c3
-Team53Name:Camilla EDEN
-
-Team54UUID:5db61750-c0c6-0130-190b-60a44ce903c3
-Team54Name:Cano Nestor
-
-Team55UUID:9aa3dd70-c199-0130-41e8-60a44ce903c3
-Team55Name:CARISSAN Tom
-
-Team56UUID:5c058a70-c0c6-0130-18b6-60a44ce903c3
-Team56Name:Carl Emil BAAD NIELSEN
-
-Team57UUID:55163640-c262-0130-5335-60a44ce903c3
-Team57Name:Carl FERM
-
-Team58UUID:99b6be80-c199-0130-41d3-60a44ce903c3
-Team58Name:Carl-Otto Hedegaard
-
-Team59UUID:f75155a0-c302-0130-8554-60a44ce903c3
-Team59Name:Carla GERLACH
-
-Team60UUID:f6700a10-c302-0130-8524-60a44ce903c3
-Team60Name:Caroline BRISTULF NORÉN
-
-Team61UUID:58c1ffd0-c0c6-0130-181f-60a44ce903c3
-Team61Name:Caroline RUDORFF
-
-Team62UUID:5c122b70-c0c6-0130-18b7-60a44ce903c3
-Team62Name:Casper
-
-Team63UUID:5ae402a0-c0c6-0130-187d-60a44ce903c3
-Team63Name:Catherine HOURIET
-Team63Comp1UUID:221c4ebb-7d19-46c7-9f60-442425bcd8fa
-
-Team64UUID:55f712f0-c262-0130-5371-60a44ce903c3
-Team64Name:Cecilie Kjaer
-
-Team65UUID:5ae6d770-c0c6-0130-187e-60a44ce903c3
-Team65Name:Cédric BART
-Team65Comp1UUID:eeafa04f-0e34-41e3-ae36-6b894aa199ad
-
-Team66UUID:55ea31e0-c262-0130-536c-60a44ce903c3
-Team66Name:Charlotte BRAUN-DULLAEUS
-
-Team67UUID:5c147b10-c0c6-0130-18b8-60a44ce903c3
-Team67Name:Charlotte MÜLLER
-
-Team68UUID:f61019a0-c302-0130-850e-60a44ce903c3
-Team68Name:Chiara Steinmüller
-
-Team69UUID:f7321690-c302-0130-853d-60a44ce903c3
-Team69Name:Christian DEMLEITNER
-
-Team70UUID:f6f8a090-c302-0130-852d-60a44ce903c3
-Team70Name:Christian GULDBERG ROST
-
-Team71UUID:5ae9a030-c0c6-0130-187f-60a44ce903c3
-Team71Name:Christian HENGE
-Team71Comp1UUID:925d4e2b-422c-4c20-b772-229af8f88282
-
-Team72UUID:5b174f50-c0c6-0130-1892-60a44ce903c3
-Team72Name:Christian Kellner
-Team72Comp1UUID:2c350832-9ae5-4298-8911-e71c0de9058e
-
-Team73UUID:5392e950-c262-0130-5310-60a44ce903c3
-Team73Name:Christian KRÖHNKE
-
-Team74UUID:5493fe70-c262-0130-532e-60a44ce903c3
-Team74Name:Christian MÜLLEJANS
-
-Team75UUID:59995230-c0c6-0130-1845-60a44ce903c3
-Team75Name:Christian Schütz
-
-Team76UUID:542fc1d0-c262-0130-5318-60a44ce903c3
-Team76Name:Christian SOYKA
-
-Team77UUID:f744ac30-c302-0130-8551-60a44ce903c3
-Team77Name:Christian WERNER
-
-Team78UUID:5c16bd90-c0c6-0130-18b9-60a44ce903c3
-Team78Name:Christian WOLTER
-
-Team79UUID:5aec6440-c0c6-0130-1880-60a44ce903c3
-Team79Name:Christina BURGER
-Team79Comp1UUID:186e6aac-69bd-4565-b279-14ef18f89934
-
-Team80UUID:59a6aa40-c0c6-0130-1846-60a44ce903c3
-Team80Name:Christoph BOCK
-
-Team81UUID:99a5d160-c199-0130-41c9-60a44ce903c3
-Team81Name:Christoph NIELSEN
-
-Team82UUID:567695f0-c262-0130-5386-60a44ce903c3
-Team82Name:Chusitt Punjamala
-
-Team83UUID:5aeed980-c0c6-0130-1881-60a44ce903c3
-Team83Name:Claas Lehmann
-Team83Comp1UUID:7ca8b5c7-a693-4183-8d3f-fcdd19d2a631
-
-Team84UUID:5c18faf0-c0c6-0130-18ba-60a44ce903c3
-Team84Name:Clara KRAMER
-
-Team85UUID:536fcf90-c262-0130-5305-60a44ce903c3
-Team85Name:CLAUSSEN Helmut
-
-Team86UUID:f739af30-c302-0130-8545-60a44ce903c3
-Team86Name:CLAUSSEN Nikolas
-
-Team87UUID:f61679b0-c302-0130-8511-60a44ce903c3
-Team87Name:Constanze STOLZ
-
-Team88UUID:5c1b2a20-c0c6-0130-18bb-60a44ce903c3
-Team88Name:Cosmas GRELON
-
-Team89UUID:5af05160-c0c6-0130-1882-60a44ce903c3
-Team89Name:Daniel CZENINGA
-Team89Comp1UUID:144fb0d9-626a-446c-9b76-b9259cf7869b
-
-Team90UUID:5c1d5220-c0c6-0130-18bc-60a44ce903c3
-Team90Name:Daniel FELSER
-
-Team91UUID:543228f0-c262-0130-5319-60a44ce903c3
-Team91Name:Daniel Kohl
-
-Team92UUID:5c20d670-c0c6-0130-18bd-60a44ce903c3
-Team92Name:Daniel LISUNKIN
-
-Team93UUID:59a93ff0-c0c6-0130-1847-60a44ce903c3
-Team93Name:Daniel MULLEY
-
-Team94UUID:5af1b8a0-c0c6-0130-1883-60a44ce903c3
-Team94Name:Davina SCHLESIGER
-Team94Comp1UUID:d5088764-cd65-4582-8d7e-d3da2ee3ff4c
-
-Team95UUID:f71711b0-c302-0130-8537-60a44ce903c3
-Team95Name:Dawid KANIA
-
-Team96UUID:548665d0-c262-0130-532b-60a44ce903c3
-Team96Name:Denis KHASHINA
-
-Team97UUID:f723dee0-c302-0130-853b-60a44ce903c3
-Team97Name:Dennis FONSECA KARLSSON
-
-Team98UUID:5aab2950-c0c6-0130-1878-60a44ce903c3
-Team98Name:Detlef MOHR
-
-Team99UUID:59b3f540-c0c6-0130-1848-60a44ce903c3
-Team99Name:Dieter MAURER
-
-Team100UUID:99ec2780-c199-0130-41e4-60a44ce903c3
-Team100Name:Dirk ROHRBECK
-
-Team101UUID:5c2e6810-c0c6-0130-18be-60a44ce903c3
-Team101Name:Domenic MANN
-
-Team102UUID:566ed6c0-c262-0130-5382-60a44ce903c3
-Team102Name:Domenique FREUND
-
-Team103UUID:5dba38d0-c0c6-0130-190c-60a44ce903c3
-Team103Name:Don Whitcraft
-
-Team104UUID:5af33700-c0c6-0130-1884-60a44ce903c3
-Team104Name:Dr. Wolfgang Hunger
-Team104Comp1UUID:6d85f972-656d-4838-9876-d0d7e50cd3c1
-
-Team105UUID:5c3155d0-c0c6-0130-18bf-60a44ce903c3
-Team105Name:DUBOIS Andrea
-
-Team106UUID:55d4c420-c262-0130-5367-60a44ce903c3
-Team106Name:DÜLLMANN Jan
-
-Team107UUID:5af4d290-c0c6-0130-1885-60a44ce903c3
-Team107Name:Earle ALEXANDER
-Team107Comp1UUID:b7dcaa2f-ec9f-4210-b873-88de0e4302cd
-
-Team108UUID:58c47240-c0c6-0130-1820-60a44ce903c3
-Team108Name:Edwin NEUE
-
-Team109UUID:5dbe2cb0-c0c6-0130-190d-60a44ce903c3
-Team109Name:Eetu Kotiranta
-
-Team110UUID:f67403c0-c302-0130-8526-60a44ce903c3
-Team110Name:Ekaterina CHASHCHINA
-
-Team111UUID:5af684f0-c0c6-0130-1886-60a44ce903c3
-Team111Name:Elisabeth NEIDHART
-Team111Comp1UUID:829e869a-b8cd-48c4-aa5c-ce3734962b4f
-
-Team112UUID:f6756c00-c302-0130-8527-60a44ce903c3
-Team112Name:elizabeth KOHL
-
-Team113UUID:55413580-c262-0130-5343-60a44ce903c3
-Team113Name:Emil Munch
-
-Team114UUID:f60c6ac0-c302-0130-850c-60a44ce903c3
-Team114Name:Emma Plasschaert
-
-Team115UUID:5b68d350-c0c6-0130-18a9-60a44ce903c3
-Team115Name:Enrico Ciferri
-Team115Comp1UUID:70e4bf8b-7ad1-4c99-aada-729c23198c2a
-
-Team116UUID:565f00d0-c262-0130-537a-60a44ce903c3
-Team116Name:Eric Toralf MALACH
-
-Team117UUID:53837860-c262-0130-5308-60a44ce903c3
-Team117Name:Erich OFFERMANNS
-
-Team118UUID:58c69e30-c0c6-0130-1821-60a44ce903c3
-Team118Name:Ernst GRETEN
-
-Team119UUID:552b10d0-c262-0130-533a-60a44ce903c3
-Team119Name:Fabian Kirchhoff
-
-Team120UUID:59b7e780-c0c6-0130-1849-60a44ce903c3
-Team120Name:Fabian WUNDERLE
-
-Team121UUID:58c8bb30-c0c6-0130-1822-60a44ce903c3
-Team121Name:Felix ALBERT
-
-Team122UUID:f745a010-c302-0130-8552-60a44ce903c3
-Team122Name:Felix GUGGENHEIM
-
-Team123UUID:99c15f70-c199-0130-41d9-60a44ce903c3
-Team123Name:Felix GÄDE
-
-Team124UUID:5595fd60-c262-0130-5356-60a44ce903c3
-Team124Name:Felix Lentz
-
-Team125UUID:5c3892a0-c0c6-0130-18c1-60a44ce903c3
-Team125Name:Felix PAGENKÄMPER
-
-Team126UUID:5a8f4e20-c0c6-0130-186a-60a44ce903c3
-Team126Name:FERRARI Marcos
-
-Team127UUID:5c3d2c20-c0c6-0130-18c2-60a44ce903c3
-Team127Name:Finja PRIESE
-
-Team128UUID:538d27f0-c262-0130-530d-60a44ce903c3
-Team128Name:FINK Hans-W.
-
-Team129UUID:59bbbf60-c0c6-0130-184a-60a44ce903c3
-Team129Name:Finn Heeg
-
-Team130UUID:5c409830-c0c6-0130-18c3-60a44ce903c3
-Team130Name:Finn Jansen
-
-Team131UUID:58caf6a0-c0c6-0130-1823-60a44ce903c3
-Team131Name:FISCHER Gordon
-
-Team132UUID:55e0e630-c262-0130-5369-60a44ce903c3
-Team132Name:Florian JAKOBTORWEIHEN
-
-Team133UUID:59c40ed0-c0c6-0130-184b-60a44ce903c3
-Team133Name:Florian SPALTEHOLZ
-
-Team134UUID:567c66c0-c262-0130-5389-60a44ce903c3
-Team134Name:Florian Stindt
-
-Team135UUID:f6320ed0-c302-0130-8518-60a44ce903c3
-Team135Name:Fomicheva ALINA
-
-Team136UUID:59ce65b0-c0c6-0130-184c-60a44ce903c3
-Team136Name:Frank HORNBERGER
-
-Team137UUID:5a51b160-c0c6-0130-1864-60a44ce903c3
-Team137Name:Frank Weigelt
-
-Team138UUID:f5dcf810-c302-0130-8502-60a44ce903c3
-Team138Name:Franziska Goltz
-
-Team139UUID:55bbbde0-c262-0130-5365-60a44ce903c3
-Team139Name:Frederik Frerck
-
-Team140UUID:5c43f3b0-c0c6-0130-18c4-60a44ce903c3
-Team140Name:Frederik JUST MELSON
-
-Team141UUID:553da230-c262-0130-5341-60a44ce903c3
-Team141Name:Frederik RASK
-
-Team142UUID:f73d54d0-c302-0130-8549-60a44ce903c3
-Team142Name:Frederik SPLIETH
-
-Team143UUID:5c47f480-c0c6-0130-18c5-60a44ce903c3
-Team143Name:Frithjof MIKOLEIT
-
-Team144UUID:99eae4d0-c199-0130-41e3-60a44ce903c3
-Team144Name:Fritz LÜBBE
-
-Team145UUID:5c4a8990-c0c6-0130-18c6-60a44ce903c3
-Team145Name:Fritz Waßner
-
-Team146UUID:59d49b50-c0c6-0130-184d-60a44ce903c3
-Team146Name:GEHRMANN Reiner
-
-Team147UUID:58cd1ff0-c0c6-0130-1824-60a44ce903c3
-Team147Name:GENTHE Hans
-
-Team148UUID:5c4e7740-c0c6-0130-18c7-60a44ce903c3
-Team148Name:Gesa BORNEMANN
-
-Team149UUID:541a1ae0-c262-0130-5316-60a44ce903c3
-Team149Name:Gordon Nickel
-
-Team150UUID:5a912d50-c0c6-0130-186b-60a44ce903c3
-Team150Name:HANCOCK Chris
-
-Team151UUID:56611610-c262-0130-537b-60a44ce903c3
-Team151Name:Hannah Anderssohn
-
-Team152UUID:58cf54a0-c0c6-0130-1825-60a44ce903c3
-Team152Name:Hans Albert KÖNIG
-
-Team153UUID:5af82c30-c0c6-0130-1887-60a44ce903c3
-Team153Name:Hans GENEFKE
-Team153Comp1UUID:2a6a3f66-12bb-4e34-8cfc-ee9d64f99a80
-
-Team154UUID:55b999d0-c262-0130-5364-60a44ce903c3
-Team154Name:Hans Halberg
-
-Team155UUID:59d906b0-c0c6-0130-184e-60a44ce903c3
-Team155Name:Hans Ulrik GRUNERT
-
-Team156UUID:99d3c5e0-c199-0130-41dd-60a44ce903c3
-Team156Name:Hans-Joachim BERLIN
-
-Team157UUID:58d19000-c0c6-0130-1826-60a44ce903c3
-Team157Name:Harold WIJGERS
-
-Team158UUID:5a92fc40-c0c6-0130-186c-60a44ce903c3
-Team158Name:Hartmut SOMMER
-
-Team159UUID:58d3c730-c0c6-0130-1827-60a44ce903c3
-Team159Name:Hartmut Wesemüller
-
-Team160UUID:556fdfc0-c262-0130-5350-60a44ce903c3
-Team160Name:Havard Aker
-
-Team161UUID:f5ff7a20-c302-0130-850a-60a44ce903c3
-Team161Name:Heidi Tenkanen
-
-Team162UUID:99d28320-c199-0130-41dc-60a44ce903c3
-Team162Name:Heiner Fahnenstich
-
-Team163UUID:59db7c50-c0c6-0130-184f-60a44ce903c3
-Team163Name:Helge SACH
-
-Team164UUID:5495bc20-c262-0130-532f-60a44ce903c3
-Team164Name:Helge SPEHR
-
-Team165UUID:59dde8c0-c0c6-0130-1850-60a44ce903c3
-Team165Name:HENGSTMANN Stefan
-
-Team166UUID:5c50d080-c0c6-0130-18c8-60a44ce903c3
-Team166Name:Henri Kirchhoff
-
-Team167UUID:5560b0b0-c262-0130-534d-60a44ce903c3
-Team167Name:Henrik BEY
-
-Team168UUID:5c5f82e0-c0c6-0130-18c9-60a44ce903c3
-Team168Name:Henrik Huchel
-
-Team169UUID:99b32070-c199-0130-41d1-60a44ce903c3
-Team169Name:Henrik KOLD
-
-Team170UUID:f7422c90-c302-0130-854e-60a44ce903c3
-Team170Name:Henry SPERLING
-
-Team171UUID:5c635a30-c0c6-0130-18ca-60a44ce903c3
-Team171Name:Hinnerk SIEMSEN
-
-Team172UUID:5a94dab0-c0c6-0130-186d-60a44ce903c3
-Team172Name:Horst MIERA
-
-Team173UUID:99db44c0-c199-0130-41df-60a44ce903c3
-Team173Name:HOSIE Peter
-
-Team174UUID:58d5eb40-c0c6-0130-1828-60a44ce903c3
-Team174Name:HRUBY Jiri
-
-Team175UUID:544615d0-c262-0130-531f-60a44ce903c3
-Team175Name:Hyde Sails
-
-Team176UUID:5c67f1d0-c0c6-0130-18cb-60a44ce903c3
-Team176Name:Ida Svensson
-
-Team177UUID:5598a410-c262-0130-5357-60a44ce903c3
-Team177Name:Igor DERWICH
-
-Team178UUID:f88667b0-c302-0130-8556-60a44ce903c3
-Team178Name:Ingo DELIUS
-
-Team179UUID:5af9d7c0-c0c6-0130-1888-60a44ce903c3
-Team179Name:Iris FELDMANN
-Team179Comp1UUID:1427cd99-3c21-484a-8b9d-c95f87d96426
-
-Team180UUID:5513a630-c262-0130-5334-60a44ce903c3
-Team180Name:Jacob CHOLEWA
-
-Team181UUID:5c6bce80-c0c6-0130-18cc-60a44ce903c3
-Team181Name:Jacob Clasen
-
-Team182UUID:558e22c0-c262-0130-5353-60a44ce903c3
-Team182Name:Jacob Jungersen Hansen
-
-Team183UUID:552dc600-c262-0130-533b-60a44ce903c3
-Team183Name:Jakob FAARVANG
-
-Team184UUID:f738ca00-c302-0130-8544-60a44ce903c3
-Team184Name:Jakob PEITZNER
-
-Team185UUID:5a98a4e0-c0c6-0130-186e-60a44ce903c3
-Team185Name:Jakob SCHWERMER
-
-Team186UUID:5d14c880-c0c6-0130-18ed-60a44ce903c3
-Team186Name:James Olsson
-
-Team187UUID:59f4f0f0-c0c6-0130-1851-60a44ce903c3
-Team187Name:Jan Hedmann Jensen
-
-Team188UUID:555deb30-c262-0130-534b-60a44ce903c3
-Team188Name:Jan RIXGENS
-
-Team189UUID:5b6ff940-c0c6-0130-18aa-60a44ce903c3
-Team189Name:Jan SAUGMANN
-Team189Comp1UUID:0c77b2a8-3b67-46cb-b248-bb065cc2a8c1
-
-Team190UUID:5afb8460-c0c6-0130-1889-60a44ce903c3
-Team190Name:Jan SELL
-Team190Comp1UUID:5d5e9d4e-d766-491d-9e94-27cf64b32499
-
-Team191UUID:5535b1d0-c262-0130-533e-60a44ce903c3
-Team191Name:Janika Puls
-
-Team192UUID:5698b160-c262-0130-538d-60a44ce903c3
-Team192Name:Jasper Janik PAULSEN
-
-Team193UUID:5c6fc1c0-c0c6-0130-18cd-60a44ce903c3
-Team193Name:Jasper STEFFENS
-
-Team194UUID:5afd9cc0-c0c6-0130-188a-60a44ce903c3
-Team194Name:Jens FINDEL
-Team194Comp1UUID:35d5becc-f6cd-4f00-8cd5-2835f9824899
-
-Team195UUID:5a9a88c0-c0c6-0130-186f-60a44ce903c3
-Team195Name:Jens GORITZ
-
-Team196UUID:5afffd00-c0c6-0130-188b-60a44ce903c3
-Team196Name:Jens Olbrysch
-Team196Comp1UUID:98bd3dd3-745c-4ebb-a0ed-fce15701c612
-
-Team197UUID:5a9c66d0-c0c6-0130-1870-60a44ce903c3
-Team197Name:Jens REIMERS
-
-Team198UUID:59f90d90-c0c6-0130-1852-60a44ce903c3
-Team198Name:Jens Uwe TONNE
-
-Team199UUID:55466b20-c262-0130-5346-60a44ce903c3
-Team199Name:Jeppe Clausen
-
-Team200UUID:f81a6ab0-c302-0130-8555-60a44ce903c3
-Team200Name:Jesper Ralph VOGELIUS
-
-Team201UUID:55ffe390-c262-0130-5375-60a44ce903c3
-Team201Name:Jesper Ralph VOGELIUS
-
-Team202UUID:5c738d10-c0c6-0130-18ce-60a44ce903c3
-Team202Name:Jessica NIEDLICH
-
-Team203UUID:56013c50-c262-0130-5376-60a44ce903c3
-Team203Name:Jiri ZACEK
-
-Team204UUID:59fcb4d0-c0c6-0130-1853-60a44ce903c3
-Team204Name:Joachim OSTERTAG
-
-Team205UUID:5c782f10-c0c6-0130-18cf-60a44ce903c3
-Team205Name:Joakim SALSKOV-IVERSEN
-
-Team206UUID:55e27ae0-c262-0130-536a-60a44ce903c3
-Team206Name:Joanna MALYSZKA
-
-Team207UUID:58d83980-c0c6-0130-1829-60a44ce903c3
-Team207Name:Jochen SPAAN
-
-Team208UUID:5544f7d0-c262-0130-5345-60a44ce903c3
-Team208Name:Johan LANNER
-
-Team209UUID:5db1df20-c0c6-0130-190a-60a44ce903c3
-Team209Name:Johannes Andree
-
-Team210UUID:99d9f2f0-c199-0130-41de-60a44ce903c3
-Team210Name:johannes SCHULTZE
-
-Team211UUID:f73c62f0-c302-0130-8548-60a44ce903c3
-Team211Name:John ANTHON
-
-Team212UUID:f5e23d40-c302-0130-8504-60a44ce903c3
-Team212Name:Josefin Olsson
-
-Team213UUID:5c7b84d0-c0c6-0130-18d0-60a44ce903c3
-Team213Name:Jost Lindemann
-
-Team214UUID:55f9a8e0-c262-0130-5372-60a44ce903c3
-Team214Name:Judith NICKEL
-
-Team215UUID:99ac0ab0-c199-0130-41cc-60a44ce903c3
-Team215Name:juergen BREITENBACH
-
-Team216UUID:5b1077a0-c0c6-0130-188e-60a44ce903c3
-Team216Name:Juergen Waldheim
-Team216Comp1UUID:6b91a848-af9b-46db-b014-eb7af861a459
-
-Team217UUID:5dc09940-c0c6-0130-190e-60a44ce903c3
-Team217Name:Juho KOTIRANTA
-
-Team218UUID:56b71550-c262-0130-5398-60a44ce903c3
-Team218Name:Jule LEMCKE
-
-Team219UUID:f6145a30-c302-0130-8510-60a44ce903c3
-Team219Name:Julia CARLSSON
-
-Team220UUID:58da8fe0-c0c6-0130-182a-60a44ce903c3
-Team220Name:Julian DIERKER
-
-Team221UUID:56af7a00-c262-0130-5394-60a44ce903c3
-Team221Name:Julius Varzaitis
-
-Team222UUID:5b122cc0-c0c6-0130-188f-60a44ce903c3
-Team222Name:Jürgen ANTON
-Team222Comp1UUID:bbe8e578-74f9-4dbf-8247-fd0fb14ee132
-
-Team223UUID:5b13de00-c0c6-0130-1890-60a44ce903c3
-Team223Name:Jürgen FEUERHAKE
-Team223Comp1UUID:39be6a7a-efa2-45ab-8195-f0509c8bc784
-
-Team224UUID:549743e0-c262-0130-5330-60a44ce903c3
-Team224Name:Jürgen KALTHOFF
-
-Team225UUID:5a093e10-c0c6-0130-1854-60a44ce903c3
-Team225Name:Jörg GOSCHE
-
-Team226UUID:5b0e8c20-c0c6-0130-188d-60a44ce903c3
-Team226Name:Jörn WILLE
-Team226Comp1UUID:cf7af72c-4d50-475b-a218-c10ba524dfa9
-
-Team227UUID:5b029440-c0c6-0130-188c-60a44ce903c3
-Team227Name:Jørgen BOJSEN-MØLLER
-Team227Comp1UUID:f3f0f3cf-b537-4141-9b21-18c88631cc19
-
-Team228UUID:f7331230-c302-0130-853e-60a44ce903c3
-Team228Name:Kai Erik Thies
-
-Team229UUID:58dcd520-c0c6-0130-182b-60a44ce903c3
-Team229Name:Kai SCHÄFERS
-
-Team230UUID:5a0de570-c0c6-0130-1855-60a44ce903c3
-Team230Name:Kai SEEMANN
-
-Team231UUID:f6f6b970-c302-0130-852c-60a44ce903c3
-Team231Name:Karolis JANULIONIS
-
-Team232UUID:5b158580-c0c6-0130-1891-60a44ce903c3
-Team232Name:Karsten STÜMPEL
-Team232Comp1UUID:e1c10205-631c-41e8-a145-836b5b7b11bc
-
-Team233UUID:54895ec0-c262-0130-532d-60a44ce903c3
-Team233Name:KATAI Peter
-
-Team234UUID:f6796b30-c302-0130-8529-60a44ce903c3
-Team234Name:Katharina DITTMER
-
-Team235UUID:5c7ecc50-c0c6-0130-18d1-60a44ce903c3
-Team235Name:Katharina LEUKEL
-
-Team236UUID:554f32c0-c262-0130-534a-60a44ce903c3
-Team236Name:Katrine Bendix KROGH
-
-Team237UUID:5dd83400-c0c6-0130-190f-60a44ce903c3
-Team237Name:Kelapanda GANAPATHY
-
-Team238UUID:58e83b30-c0c6-0130-182c-60a44ce903c3
-Team238Name:KIEL Heinrich
-
-Team239UUID:55fee490-c262-0130-5374-60a44ce903c3
-Team239Name:KIEL Niklas
-
-Team240UUID:5900e860-c0c6-0130-182d-60a44ce903c3
-Team240Name:Kilian KÖNIG
-
-Team241UUID:5c8141d0-c0c6-0130-18d2-60a44ce903c3
-Team241Name:Kim BRANDT
-
-Team242UUID:56d87600-c262-0130-539c-60a44ce903c3
-Team242Name:Kim Christjan SATOR
-
-Team243UUID:99ed6a20-c199-0130-41e5-60a44ce903c3
-Team243Name:Kim Koch FOGDE
-
-Team244UUID:55b70e30-c262-0130-5363-60a44ce903c3
-Team244Name:Kim Lara HEDFELD
-
-Team245UUID:5390b150-c262-0130-530f-60a44ce903c3
-Team245Name:Kinner Silke
-
-Team246UUID:99ee9b30-c199-0130-41e6-60a44ce903c3
-Team246Name:klaus GUELZOW
-
-Team247UUID:99cfed20-c199-0130-41da-60a44ce903c3
-Team247Name:KLUCK Adalbert
-
-Team248UUID:5a9e3df0-c0c6-0130-1871-60a44ce903c3
-Team248Name:Knud JANSEN
-
-Team249UUID:5b191580-c0c6-0130-1893-60a44ce903c3
-Team249Name:Knut HASTENPFLUG
-Team249Comp1UUID:4ebfdbcb-7444-4100-b9a6-5acf084da065
-
-Team250UUID:538bed70-c262-0130-530c-60a44ce903c3
-Team250Name:Knut VIEHWEGER
-
-Team251UUID:5d9d9550-c0c6-0130-1907-60a44ce903c3
-Team251Name:Konrad LIPSKI
-
-Team252UUID:f7431770-c302-0130-854f-60a44ce903c3
-Team252Name:Kornelijus Pupkus
-
-Team253UUID:553fdee0-c262-0130-5342-60a44ce903c3
-Team253Name:Kristine MAURITZEN
-
-Team254UUID:55ad2970-c262-0130-535f-60a44ce903c3
-Team254Name:Kristoffer Rosmo
-
-Team255UUID:55eceff0-c262-0130-536d-60a44ce903c3
-Team255Name:Krzysztof MATYSIK
-
-Team256UUID:5674a3b0-c262-0130-5385-60a44ce903c3
-Team256Name:L.Schewe
-
-Team257UUID:550e5240-c262-0130-5332-60a44ce903c3
-Team257Name:Lars Johan Brodtkorb
-
-Team258UUID:5c902fb0-c0c6-0130-18d3-60a44ce903c3
-Team258Name:Lasse LEIERS
-
-Team259UUID:5c94ce40-c0c6-0130-18d4-60a44ce903c3
-Team259Name:Lasse PRAGER
-
-Team260UUID:5c977db0-c0c6-0130-18d5-60a44ce903c3
-Team260Name:Laura BLOCK
-
-Team261UUID:569bac00-c262-0130-538f-60a44ce903c3
-Team261Name:Laura Bo VOSS
-
-Team262UUID:f6720700-c302-0130-8525-60a44ce903c3
-Team262Name:LAURA KRAGH FREDERIKSEN
-
-Team263UUID:55fc4f30-c262-0130-5373-60a44ce903c3
-Team263Name:Laura RIEMENSCHNEIDER
-
-Team264UUID:5c9a69f0-c0c6-0130-18d6-60a44ce903c3
-Team264Name:Laurien
-
-Team265UUID:f7050c00-c302-0130-8533-60a44ce903c3
-Team265Name:LAURITSEN Georg
-
-Team266UUID:5aa017d0-c0c6-0130-1872-60a44ce903c3
-Team266Name:Lauritz Bockelmann
-
-Team267UUID:f6fed6f0-c302-0130-8530-60a44ce903c3
-Team267Name:Leah-Noel Gonseth
-
-Team268UUID:5caced40-c0c6-0130-18d7-60a44ce903c3
-Team268Name:LEBLANC Clement
-
-Team269UUID:5b1b07c0-c0c6-0130-1894-60a44ce903c3
-Team269Name:Lennart TASCHE
-Team269Comp1UUID:69fc5a02-8ea8-4ec9-af0b-99182b975e68
-
-Team270UUID:f7091b30-c302-0130-8535-60a44ce903c3
-Team270Name:Leon PASSLACK
-
-Team271UUID:f737ded0-c302-0130-8543-60a44ce903c3
-Team271Name:Leonhard HANISCH
-
-Team272UUID:5cb03aa0-c0c6-0130-18d8-60a44ce903c3
-Team272Name:Liam SEAGREEN
-
-Team273UUID:55afa990-c262-0130-5360-60a44ce903c3
-Team273Name:Lina RIXGENS
-
-Team274UUID:5cb2a020-c0c6-0130-18d9-60a44ce903c3
-Team274Name:Lisa - Marie Geisler
-
-Team275UUID:55f4d9d0-c262-0130-5370-60a44ce903c3
-Team275Name:Lisa Meyer
-
-Team276UUID:5cb4f410-c0c6-0130-18da-60a44ce903c3
-Team276Name:Lisa SCHÄLKE
-
-Team277UUID:54373700-c262-0130-531c-60a44ce903c3
-Team277Name:Lorenz BENJAMIN
-
-Team278UUID:55a81690-c262-0130-535d-60a44ce903c3
-Team278Name:Louise Törnsten
-
-Team279UUID:5cb88360-c0c6-0130-18db-60a44ce903c3
-Team279Name:Lucas RUAL
-
-Team280UUID:55ef9bc0-c262-0130-536e-60a44ce903c3
-Team280Name:Luisa Krüger
-
-Team281UUID:f73b7be0-c302-0130-8547-60a44ce903c3
-Team281Name:Luise WANSER
-
-Team282UUID:5cbad5f0-c0c6-0130-18dc-60a44ce903c3
-Team282Name:Lukas CEJNAR
-
-Team283UUID:f73513e0-c302-0130-8540-60a44ce903c3
-Team283Name:Lukas EISELE
-
-Team284UUID:55b4b010-c262-0130-5362-60a44ce903c3
-Team284Name:Lukas ÖSTERMANN
-
-Team285UUID:554b2680-c262-0130-5349-60a44ce903c3
-Team285Name:Lukasz Wloch
-
-Team286UUID:f6443f10-c302-0130-851a-60a44ce903c3
-Team286Name:Madison KENNEDY
-
-Team287UUID:99bad4a0-c199-0130-41d6-60a44ce903c3
-Team287Name:MAHRT Friedrich
-
-Team288UUID:f73f62a0-c302-0130-854b-60a44ce903c3
-Team288Name:Maike Heuwinkel
-
-Team289UUID:5cbd86c0-c0c6-0130-18dd-60a44ce903c3
-Team289Name:Maj BENDIX NIELSEN
-
-Team290UUID:f71d43f0-c302-0130-853a-60a44ce903c3
-Team290Name:Mantvydas CERNIAUSKAS
-
-Team291UUID:5447f6e0-c262-0130-5320-60a44ce903c3
-Team291Name:Marc LENTZ
-
-Team292UUID:54532230-c262-0130-5325-60a44ce903c3
-Team292Name:Marc SCHWARZBÜRGER
-
-Team293UUID:55b22bb0-c262-0130-5361-60a44ce903c3
-Team293Name:Marc WERNER
-
-Team294UUID:5b76c290-c0c6-0130-18ab-60a44ce903c3
-Team294Name:MARCOS Vivian
-Team294Comp1UUID:3817d6de-a6de-457a-bcb4-19add769003a
-
-Team295UUID:55a58df0-c262-0130-535c-60a44ce903c3
-Team295Name:Mareike BEY
-
-Team296UUID:55282750-c262-0130-5339-60a44ce903c3
-Team296Name:Marek Kaczmarek
-
-Team297UUID:5cc9ff80-c0c6-0130-18de-60a44ce903c3
-Team297Name:Marie Dominique SCHMIDT
-
-Team298UUID:557c2420-c262-0130-5351-60a44ce903c3
-Team298Name:Marisa ROCH
-
-Team299UUID:5a1909d0-c0c6-0130-1857-60a44ce903c3
-Team299Name:Marius LOEKEN
-
-Team300UUID:5cccd2f0-c0c6-0130-18df-60a44ce903c3
-Team300Name:Mark Oliver FISCHER
-
-Team301UUID:f64a9880-c302-0130-851d-60a44ce903c3
-Team301Name:Marketa AUDYOVA
-
-Team302UUID:54553910-c262-0130-5326-60a44ce903c3
-Team302Name:Markus PENTENRIEDER
-
-Team303UUID:f714e430-c302-0130-8536-60a44ce903c3
-Team303Name:Marozas Mantas
-
-Team304UUID:53993190-c262-0130-5313-60a44ce903c3
-Team304Name:Marschall Stephan
-
-Team305UUID:5ccf5760-c0c6-0130-18e0-60a44ce903c3
-Team305Name:Martí LLENA
-
-Team306UUID:5a23fa60-c0c6-0130-1858-60a44ce903c3
-Team306Name:Martin FRIEDRICHSEN
-
-Team307UUID:55306e80-c262-0130-533c-60a44ce903c3
-Team307Name:Martin Kotte
-
-Team308UUID:5ddbc410-c0c6-0130-1910-60a44ce903c3
-Team308Name:Martyna MIK
-
-Team309UUID:55110cf0-c262-0130-5333-60a44ce903c3
-Team309Name:Mathias LIVBJERG
-
-Team310UUID:5cd1e740-c0c6-0130-18e1-60a44ce903c3
-Team310Name:MATHISEN Tomas
-
-Team311UUID:f685cd00-c302-0130-852a-60a44ce903c3
-Team311Name:Matilda AKKOLA
-
-Team312UUID:f7341e70-c302-0130-853f-60a44ce903c3
-Team312Name:Mats BAUER
-
-Team313UUID:f74149e0-c302-0130-854d-60a44ce903c3
-Team313Name:Matthias Brühl
-
-Team314UUID:55a2e7e0-c262-0130-535b-60a44ce903c3
-Team314Name:Matthias Leitl
-
-Team315UUID:f746f100-c302-0130-8553-60a44ce903c3
-Team315Name:Matti STEIN
-
-Team316UUID:5dadb8a0-c0c6-0130-1909-60a44ce903c3
-Team316Name:Mattis FRANKEN
-
-Team317UUID:56b33470-c262-0130-5396-60a44ce903c3
-Team317Name:Max PHILIPP
-
-Team318UUID:5cd46c90-c0c6-0130-18e2-60a44ce903c3
-Team318Name:Max Rose
-
-Team319UUID:5cd74950-c0c6-0130-18e3-60a44ce903c3
-Team319Name:Max Stingele
-
-Team320UUID:590caa80-c0c6-0130-1830-60a44ce903c3
-Team320Name:Meike FRIEDHOFF
-
-Team321UUID:5b1d12d0-c0c6-0130-1895-60a44ce903c3
-Team321Name:Meike SCHOMÄKER
-Team321Comp1UUID:dfa53566-7ca8-4a77-bb2c-8250c0ec4638
-
-Team322UUID:f68c0f90-c302-0130-852b-60a44ce903c3
-Team322Name:Melli
-
-Team323UUID:5cdb6550-c0c6-0130-18e4-60a44ce903c3
-Team323Name:Merle DIEDRICHSEN
-
-Team324UUID:5aa1ef60-c0c6-0130-1873-60a44ce903c3
-Team324Name:Merle SIEBRECHT
-
-Team325UUID:5a2b7a00-c0c6-0130-1859-60a44ce903c3
-Team325Name:Meyer zu Schwabedissen, OTTO
-
-Team326UUID:5cdda3d0-c0c6-0130-18e5-60a44ce903c3
-Team326Name:Michael Fechner
-
-Team327UUID:53972290-c262-0130-5312-60a44ce903c3
-Team327Name:Michael RÖHRIG
-
-Team328UUID:f73a97a0-c302-0130-8546-60a44ce903c3
-Team328Name:Michael STEFFENHAGEN
-
-Team329UUID:559db800-c262-0130-5359-60a44ce903c3
-Team329Name:Michel SELTZ
-
-Team330UUID:5603d510-c262-0130-5377-60a44ce903c3
-Team330Name:Mie ELBEK
-
-Team331UUID:5b1f21e0-c0c6-0130-1896-60a44ce903c3
-Team331Name:Mikkel CHRISTIANSEN
-Team331Comp1UUID:05436d5d-f6fa-4bb5-b25f-9f2dbc47cb98
-
-Team332UUID:f61c34e0-c302-0130-8514-60a44ce903c3
-Team332Name:Milda EIDUKEVICIUTE
-
-Team333UUID:f702fbc0-c302-0130-8532-60a44ce903c3
-Team333Name:Milda Eidukeviciute
-
-Team334UUID:5ce0a5e0-c0c6-0130-18e6-60a44ce903c3
-Team334Name:Mimi EL-KHAZINDAR
-
-Team335UUID:5ce38fe0-c0c6-0130-18e7-60a44ce903c3
-Team335Name:MINDREN Clementine
-
-Team336UUID:55497ea0-c262-0130-5348-60a44ce903c3
-Team336Name:Miquel SALAZAR CASALS
-
-Team337UUID:5b21e300-c0c6-0130-1897-60a44ce903c3
-Team337Name:Moritz Bohnenberger
-Team337Comp1UUID:55a0a6fc-8ee9-47cb-b95b-27d461805b04
-
-Team338UUID:5b2493a0-c0c6-0130-1898-60a44ce903c3
-Team338Name:Morten BOGACKI
-Team338Comp1UUID:87c99dd4-0d70-46e2-9f81-f1cb934d019e
-
-Team339UUID:537c4d10-c262-0130-5306-60a44ce903c3
-Team339Name:Morten Nielsen
-
-Team340UUID:590af6f0-c0c6-0130-182f-60a44ce903c3
-Team340Name:MÄTZING Jörn
-
-Team341UUID:55649830-c262-0130-534f-60a44ce903c3
-Team341Name:Nadine Möller
-
-Team342UUID:569d8e60-c262-0130-5390-60a44ce903c3
-Team342Name:Nele PEGLOW
-
-Team343UUID:55f24f10-c262-0130-536f-60a44ce903c3
-Team343Name:Nele SÖKER
-
-Team344UUID:f7360230-c302-0130-8541-60a44ce903c3
-Team344Name:Nick Heuwinkel
-
-Team345UUID:55385320-c262-0130-533f-60a44ce903c3
-Team345Name:Nicki KRAUS
-
-Team346UUID:56ac86a0-c262-0130-5392-60a44ce903c3
-Team346Name:Nico NAUJOCK
-
-Team347UUID:567e67d0-c262-0130-538a-60a44ce903c3
-Team347Name:Nico STEENBUCK
-
-Team348UUID:5b274300-c0c6-0130-1899-60a44ce903c3
-Team348Name:Nicola BIRKNER
-Team348Comp1UUID:7f363c4c-58c3-4847-9a14-0733ade6f6fb
-
-Team349UUID:5590d240-c262-0130-5354-60a44ce903c3
-Team349Name:Nicola MONTI
-
-Team350UUID:567883c0-c262-0130-5387-60a44ce903c3
-Team350Name:Nicolas THIERSE
-
-Team351UUID:55aaa880-c262-0130-535e-60a44ce903c3
-Team351Name:Nicolaus SCHMIDT
-
-Team352UUID:53877590-c262-0130-530a-60a44ce903c3
-Team352Name:Niels Søndergaard
-
-Team353UUID:5cf24fe0-c0c6-0130-18e8-60a44ce903c3
-Team353Name:Niklas DENKER
-
-Team354UUID:5cf510d0-c0c6-0130-18e9-60a44ce903c3
-Team354Name:Nil MAS
-
-Team355UUID:5cf7a7b0-c0c6-0130-18ea-60a44ce903c3
-Team355Name:Nina Stamer
-
-Team356UUID:f73e4bb0-c302-0130-854a-60a44ce903c3
-Team356Name:Nora WEGER
-
-Team357UUID:5b28a6d0-c0c6-0130-189a-60a44ce903c3
-Team357Name:Norbert DASENBROOK
-Team357Comp1UUID:1fd6a0f2-5278-408a-80de-30fb4836acec
-
-Team358UUID:99e84470-c199-0130-41e1-60a44ce903c3
-Team358Name:Norbert Weber
-
-Team359UUID:5d0ec370-c0c6-0130-18eb-60a44ce903c3
-Team359Name:Odile VAN AANHOLT
-
-Team360UUID:591143b0-c0c6-0130-1831-60a44ce903c3
-Team360Name:Olaf BALLERSTEIN
-
-Team361UUID:544244d0-c262-0130-531d-60a44ce903c3
-Team361Name:Olaf Halle
-
-Team362UUID:99aee360-c199-0130-41ce-60a44ce903c3
-Team362Name:Olav Jansen
-
-Team363UUID:56b918c0-c262-0130-5399-60a44ce903c3
-Team363Name:Ole Fischer
-
-Team364UUID:5d115570-c0c6-0130-18ec-60a44ce903c3
-Team364Name:Ole Kuck
-
-Team365UUID:5912f5f0-c0c6-0130-1832-60a44ce903c3
-Team365Name:Oliver Gutsch
-
-Team366UUID:f5eaa5d0-c302-0130-8508-60a44ce903c3
-Team366Name:Oren Jacob
-
-Team367UUID:5d22e960-c0c6-0130-18ee-60a44ce903c3
-Team367Name:Ove HAGGE ELLHÖFT
-
-Team368UUID:5d255fe0-c0c6-0130-18ef-60a44ce903c3
-Team368Name:Owen BOWERMAN
-
-Team369UUID:f5dabf20-c302-0130-8501-60a44ce903c3
-Team369Name:Paige Railey
-
-Team370UUID:55a05170-c262-0130-535a-60a44ce903c3
-Team370Name:Pascal HATTICH
-
-Team371UUID:5d280140-c0c6-0130-18f0-60a44ce903c3
-Team371Name:Patrick MOTZ
-
-Team372UUID:551d0f50-c262-0130-5338-60a44ce903c3
-Team372Name:PAU SCHILT CATAFAL
-
-Team373UUID:5d2a30a0-c0c6-0130-18f1-60a44ce903c3
-Team373Name:Paul KOHLHOFF
-
-Team374UUID:5d2cae60-c0c6-0130-18f2-60a44ce903c3
-Team374Name:Paul Kramer
-
-Team375UUID:5d3a0630-c0c6-0130-18f3-60a44ce903c3
-Team375Name:Paul MEYER
-
-Team376UUID:f736f4f0-c302-0130-8542-60a44ce903c3
-Team376Name:Paul Seifert
-
-Team377UUID:f61ab970-c302-0130-8513-60a44ce903c3
-Team377Name:Paulina CZUBACHOWSKA
-
-Team378UUID:f61e5450-c302-0130-8515-60a44ce903c3
-Team378Name:Pauline LIEBIG
-
-Team379UUID:55d5c4b0-c262-0130-5368-60a44ce903c3
-Team379Name:Pavlina SMAKALOVA
-
-Team380UUID:99a92200-c199-0130-41ca-60a44ce903c3
-Team380Name:Per Buch
-
-Team381UUID:f6123720-c302-0130-850f-60a44ce903c3
-Team381Name:Pernelle MICHON
-
-Team382UUID:5d43c680-c0c6-0130-18f4-60a44ce903c3
-Team382Name:Peter Lin JANEZIC
-
-Team383UUID:538e9c40-c262-0130-530e-60a44ce903c3
-Team383Name:Peter NÜRNBERGER
-
-Team384UUID:5394ff10-c262-0130-5311-60a44ce903c3
-Team384Name:Peter Späth
-
-Team385UUID:5a3a0c40-c0c6-0130-185a-60a44ce903c3
-Team385Name:Peter TISCHER
-
-Team386UUID:591ccfa0-c0c6-0130-1833-60a44ce903c3
-Team386Name:Philipp BUHL
-
-Team387UUID:559b3100-c262-0130-5358-60a44ce903c3
-Team387Name:Philipp Glusa
-
-Team388UUID:553307e0-c262-0130-533d-60a44ce903c3
-Team388Name:Philipp Rosenberg
-
-Team389UUID:5672add0-c262-0130-5384-60a44ce903c3
-Team389Name:Philipp STEENBUCK
-
-Team390UUID:5b2a3750-c0c6-0130-189b-60a44ce903c3
-Team390Name:Philippe BOITE
-Team390Comp1UUID:e9aa0099-b9ea-471f-83b7-692b1e99fae7
-
-Team391UUID:f70711a0-c302-0130-8534-60a44ce903c3
-Team391Name:Pia KUHLMANN
-
-Team392UUID:f65d58d0-c302-0130-8520-60a44ce903c3
-Team392Name:Pia KUHLMANN
-
-Team393UUID:5936a730-c0c6-0130-1834-60a44ce903c3
-Team393Name:PRENZLER Kurt
-
-Team394UUID:593beb80-c0c6-0130-1835-60a44ce903c3
-Team394Name:PRENZLER Kurt
-
-Team395UUID:54567100-c262-0130-5327-60a44ce903c3
-Team395Name:Pro Nautik
-
-Team396UUID:5d466120-c0c6-0130-18f5-60a44ce903c3
-Team396Name:Ragna AGERUP
-
-Team397UUID:99b55060-c199-0130-41d2-60a44ce903c3
-Team397Name:Rainer Hasselmann
-
-Team398UUID:593ecd70-c0c6-0130-1836-60a44ce903c3
-Team398Name:RALF BEHRENS
-
-Team399UUID:539b4990-c262-0130-5314-60a44ce903c3
-Team399Name:Ralf CLAUSEN
-
-Team400UUID:5940e920-c0c6-0130-1837-60a44ce903c3
-Team400Name:Ralph JAMBOR
-
-Team401UUID:5b2d05f0-c0c6-0130-189c-60a44ce903c3
-Team401Name:Ralph KÄMMERLE
-Team401Comp1UUID:cb99a143-37c8-4107-a111-ae8e6ed4ebe0
-
-Team402UUID:5943d990-c0c6-0130-1838-60a44ce903c3
-Team402Name:Reinhold BAUER
-
-Team403UUID:5a3c8f80-c0c6-0130-185b-60a44ce903c3
-Team403Name:René DR. SCHWALL
-
-Team404UUID:5aacee50-c0c6-0130-1879-60a44ce903c3
-Team404Name:René Ufferhardt
-
-Team405UUID:56b13f70-c262-0130-5395-60a44ce903c3
-Team405Name:Riley CAMERON 
-
-Team406UUID:5daac340-c0c6-0130-1908-60a44ce903c3
-Team406Name:Robert Liias
-
-Team407UUID:5a3f03a0-c0c6-0130-185c-60a44ce903c3
-Team407Name:Robert SCHÜTZ
-
-Team408UUID:5666feb0-c262-0130-537e-60a44ce903c3
-Team408Name:Rokas Rudgalvis
-
-Team409UUID:594530c0-c0c6-0130-1839-60a44ce903c3
-Team409Name:Rolf Albert
-
-Team410UUID:99bc2160-c199-0130-41d7-60a44ce903c3
-Team410Name:Rolf UPPSTRÖM
-
-Team411UUID:5d491cf0-c0c6-0130-18f6-60a44ce903c3
-Team411Name:RUAL LUCAS
-
-Team412UUID:56adc970-c262-0130-5393-60a44ce903c3
-Team412Name:Samuel LAMBERT
-
-Team413UUID:f6340fa0-c302-0130-8519-60a44ce903c3
-Team413Name:Sandy FAUTHOUX
-
-Team414UUID:f5e88380-c302-0130-8507-60a44ce903c3
-Team414Name:Sarah Gunni
-
-Team415UUID:5a416690-c0c6-0130-185d-60a44ce903c3
-Team415Name:SCHMEINK Harry
-
-Team416UUID:55e4d9b0-c262-0130-536b-60a44ce903c3
-Team416Name:SCHRADER Vincent
-
-Team417UUID:5953b330-c0c6-0130-183b-60a44ce903c3
-Team417Name:SCHREIBER Bernd
-
-Team418UUID:5d4b6690-c0c6-0130-18f7-60a44ce903c3
-Team418Name:SCHWENK Christina
-
-Team419UUID:594edf40-c0c6-0130-183a-60a44ce903c3
-Team419Name:Schäfer Ulrich
-
-Team420UUID:55432210-c262-0130-5344-60a44ce903c3
-Team420Name:SEBASTIAN NOVAK
-
-Team421UUID:5902a910-c0c6-0130-182e-60a44ce903c3
-Team421Name:Shmuel Markhoff
-
-Team422UUID:f6485f60-c302-0130-851c-60a44ce903c3
-Team422Name:shnitko svetlana
-
-Team423UUID:99b02fa0-c199-0130-41cf-60a44ce903c3
-Team423Name:Siegfried Busse
-
-Team424UUID:f65ecd90-c302-0130-8521-60a44ce903c3
-Team424Name:Silvia ZENNARO
-
-Team425UUID:f6fcbe70-c302-0130-852f-60a44ce903c3
-Team425Name:simon LUNDMARK
-
-Team426UUID:f743caa0-c302-0130-8550-60a44ce903c3
-Team426Name:Simon MÜLLER
-
-Team427UUID:f6776200-c302-0130-8528-60a44ce903c3
-Team427Name:Sofie OKHOLM
-
-Team428UUID:f65c0240-c302-0130-851f-60a44ce903c3
-Team428Name:sofie SLOTSGAARD
-
-Team429UUID:5384c960-c262-0130-5309-60a44ce903c3
-Team429Name:Sonja KRABBE
-
-Team430UUID:5d4e0920-c0c6-0130-18f8-60a44ce903c3
-Team430Name:Sonja VORDERWÜLBECE
-
-Team431UUID:5b2fc500-c0c6-0130-189d-60a44ce903c3
-Team431Name:Sophie HEYER
-Team431Comp1UUID:c0733758-57e0-41e9-8d06-c0d25ac7c7e2
-
-Team432UUID:f66df4b0-c302-0130-8523-60a44ce903c3
-Team432Name:Sophie-Marie ERTELT
-
-Team433UUID:5b3284d0-c0c6-0130-189e-60a44ce903c3
-Team433Name:Stefan BÖHM
-Team433Comp1UUID:a4067949-e49e-416a-bf87-5f66803cf4d2
-
-Team434UUID:5b6601c0-c0c6-0130-18a8-60a44ce903c3
-Team434Name:Stefan GIESLER
-Team434Comp1UUID:9f92f17f-f792-4352-90da-b71c7aa4c992
-
-Team435UUID:5b354640-c0c6-0130-189f-60a44ce903c3
-Team435Name:Stefan KOECHLIN
-Team435Comp1UUID:b61cb4f3-638e-4372-b33d-91773fe3eb17
-
-Team436UUID:5a43cc30-c0c6-0130-185e-60a44ce903c3
-Team436Name:Stefan VOGEL
-
-Team437UUID:99e99780-c199-0130-41e2-60a44ce903c3
-Team437Name:Stefan VOGT
-
-Team438UUID:5aa3d420-c0c6-0130-1874-60a44ce903c3
-Team438Name:Stefan WIESE-DOHSE
-
-Team439UUID:535d9f50-c262-0130-5304-60a44ce903c3
-Team439Name:steffen STEGGER
-
-Team440UUID:5b37da40-c0c6-0130-18a0-60a44ce903c3
-Team440Name:Steve KWEE
-Team440Comp1UUID:3584dd17-c4ff-4087-b6f2-e0b0bad1df88
-
-Team441UUID:99e6e820-c199-0130-41e0-60a44ce903c3
-Team441Name:STICK Carsten
-
-Team442UUID:553aec10-c262-0130-5340-60a44ce903c3
-Team442Name:Stine PAEPER
-
-Team443UUID:99efcfa0-c199-0130-41e7-60a44ce903c3
-Team443Name:STÜBECKE Pall
-
-Team444UUID:555f7400-c262-0130-534c-60a44ce903c3
-Team444Name:Susanne SAILER
-
-Team445UUID:5a462ad0-c0c6-0130-185f-60a44ce903c3
-Team445Name:Sven JÜRGENSEN
-
-Team446UUID:5a4876b0-c0c6-0130-1860-60a44ce903c3
-Team446Name:Sven LINDSTÄDT
-
-Team447UUID:f6189d20-c302-0130-8512-60a44ce903c3
-Team447Name:Svenja WEGER
-
-Team448UUID:f700ed60-c302-0130-8531-60a44ce903c3
-Team448Name:Svetlana Shnitko
-
-Team449UUID:99aa96c0-c199-0130-41cb-60a44ce903c3
-Team449Name:Sönke DURST
-
-Team450UUID:5a149a40-c0c6-0130-1856-60a44ce903c3
-Team450Name:Sönke Kühl
-
-Team451UUID:551a7660-c262-0130-5337-60a44ce903c3
-Team451Name:Søren JOHNSEN
-
-Team452UUID:5957dd10-c0c6-0130-183c-60a44ce903c3
-Team452Name:Tanja HEIJINK
-
-Team453UUID:f5e03a60-c302-0130-8503-60a44ce903c3
-Team453Name:Tatiana Drozdovskaya
-
-Team454UUID:828fb560-c077-0130-1524-60a44ce903c3
-Team454Name:team
-
-Team455UUID:56057400-c262-0130-5378-60a44ce903c3
-Team455Name:Tereza KOVACOVA
-
-Team456UUID:5d50a480-c0c6-0130-18f9-60a44ce903c3
-Team456Name:THIBAUD Mathilda
-
-Team457UUID:5b440bb0-c0c6-0130-18a1-60a44ce903c3
-Team457Name:Thomas GOSCH
-Team457Comp1UUID:833d762e-eaee-4593-8454-af50c360b957
-
-Team458UUID:5a4acbf0-c0c6-0130-1861-60a44ce903c3
-Team458Name:Thomas HAUPT
-
-Team459UUID:537e9360-c262-0130-5307-60a44ce903c3
-Team459Name:Thomas Kausen
-
-Team460UUID:5a4d15e0-c0c6-0130-1862-60a44ce903c3
-Team460Name:Thomas NEUDAHL
-
-Team461UUID:5b530ce0-c0c6-0130-18a2-60a44ce903c3
-Team461Name:Thomas PYPE
-Team461Comp1UUID:7262ea87-5b9f-4df6-950d-8333ba056891
-
-Team462UUID:53899e10-c262-0130-530b-60a44ce903c3
-Team462Name:Thomas SANDER
-
-Team463UUID:59593ec0-c0c6-0130-183d-60a44ce903c3
-Team463Name:Thorsten WENTEN
-
-Team464UUID:5b54be00-c0c6-0130-18a3-60a44ce903c3
-Team464Name:Thure GNADEBERG
-Team464Comp1UUID:9fe5b694-334f-4b8d-8d24-54b4c66ae27c
-
-Team465UUID:56cb9790-c262-0130-539a-60a44ce903c3
-Team465Name:Til NEUMANN
-
-Team466UUID:5b5659a0-c0c6-0130-18a4-60a44ce903c3
-Team466Name:Tim BÖGER
-Team466Comp1UUID:831a8fc3-f4f5-43d2-bb3c-17f5a06ebe86
-
-Team467UUID:5a540fc0-c0c6-0130-1865-60a44ce903c3
-Team467Name:Tim SANDBERG
-
-Team468UUID:56a7dfb0-c262-0130-5391-60a44ce903c3
-Team468Name:Timo Preuß
-
-Team469UUID:f7195a30-c302-0130-8538-60a44ce903c3
-Team469Name:Timo SOMMER
-
-Team470UUID:5435dac0-c262-0130-531b-60a44ce903c3
-Team470Name:toliso.net
-
-Team471UUID:5b57f120-c0c6-0130-18a5-60a44ce903c3
-Team471Name:Tom HASTENPFLUG
-Team471Comp1UUID:65926c42-fb11-49a5-8b04-416d57b0918e
-
-Team472UUID:5484c9e0-c262-0130-532a-60a44ce903c3
-Team472Name:Tom LÖFSTEDT
-
-Team473UUID:5aa5b530-c0c6-0130-1875-60a44ce903c3
-Team473Name:Tom SCHREYACK
-
-Team474UUID:5670cf20-c262-0130-5383-60a44ce903c3
-Team474Name:Torben HARMS
-
-Team475UUID:f5d5d280-c302-0130-8500-60a44ce903c3
-Team475Name:Tuula Tenkanen
-
-Team476UUID:5d553f20-c0c6-0130-18fa-60a44ce903c3
-Team476Name:Ubbo RÖSING
-
-Team477UUID:99b81cb0-c199-0130-41d4-60a44ce903c3
-Team477Name:Udo HOMPESCH
-
-Team478UUID:99ad8290-c199-0130-41cd-60a44ce903c3
-Team478Name:Ulf KIPCKE
-
-Team479UUID:5b599d70-c0c6-0130-18a6-60a44ce903c3
-Team479Name:Ulf PLEßMANN
-Team479Comp1UUID:5320e464-ebbe-4d52-9fc7-4091f3f24071
-
-Team480UUID:5a4f6330-c0c6-0130-1863-60a44ce903c3
-Team480Name:Ulla BECKER
-
-Team481UUID:5d59a810-c0c6-0130-18fb-60a44ce903c3
-Team481Name:Vaar OSBORG
-
-Team482UUID:5d717210-c0c6-0130-18fc-60a44ce903c3
-Team482Name:Valentin JELL
-
-Team483UUID:5d73a580-c0c6-0130-18fd-60a44ce903c3
-Team483Name:Valentina NIGG
-
-Team484UUID:5687b3a0-c262-0130-538b-60a44ce903c3
-Team484Name:Valerie MALACH
-
-Team485UUID:5d819dc0-c0c6-0130-18fe-60a44ce903c3
-Team485Name:VANDORMAEL Daan
-
-Team486UUID:595b84b0-c0c6-0130-183e-60a44ce903c3
-Team486Name:Vanessa BUßMANN
-
-Team487UUID:55629c80-c262-0130-534e-60a44ce903c3
-Team487Name:Vanessa MANTHEY
-
-Team488UUID:5ddf9a60-c0c6-0130-1911-60a44ce903c3
-Team488Name:Varsha GAUTHAM
-
-Team489UUID:f730a020-c302-0130-853c-60a44ce903c3
-Team489Name:Varzaitis Paulius
-
-Team490UUID:f71b0170-c302-0130-8539-60a44ce903c3
-Team490Name:Vejas PAJARSKAS
-
-Team491UUID:5d86bf10-c0c6-0130-18ff-60a44ce903c3
-Team491Name:Vikki Payne
-
-Team492UUID:f5e45350-c302-0130-8505-60a44ce903c3
-Team492Name:Viktorija Andrulyte
-
-Team493UUID:f6fab1a0-c302-0130-852e-60a44ce903c3
-Team493Name:Viktorija Andrulyte
-
-Team494UUID:5ded0020-c0c6-0130-1912-60a44ce903c3
-Team494Name:Vincent OTTEN
-
-Team495UUID:56651400-c262-0130-537d-60a44ce903c3
-Team495Name:VIR MENON
-
-Team496UUID:567a77c0-c262-0130-5388-60a44ce903c3
-Team496Name:WADEK Michal
-
-Team497UUID:5aa78cc0-c0c6-0130-1876-60a44ce903c3
-Team497Name:WICHARDT Kerstin
-
-Team498UUID:5d8b2380-c0c6-0130-1900-60a44ce903c3
-Team498Name:William Norvold BJOERN
-
-Team499UUID:56631010-c262-0130-537c-60a44ce903c3
-Team499Name:WILLIAMS Gerald
-
-Team500UUID:5aa95320-c0c6-0130-1877-60a44ce903c3
-Team500Name:Willy TRAUTMANN
-
-Team501UUID:56b521e0-c262-0130-5397-60a44ce903c3
-Team501Name:Wojciech Kaminski
-
-Team502UUID:5dfa2380-c0c6-0130-1913-60a44ce903c3
-Team502Name:Wojciech STOLARCZYK
-
-Team503UUID:595da8a0-c0c6-0130-183f-60a44ce903c3
-Team503Name:Wolf-Dieter JAHN
-
-Team504UUID:5b5c5850-c0c6-0130-18a7-60a44ce903c3
-Team504Name:Xavier BROISE
-Team504Comp1UUID:f0375889-8bde-4fbc-b5ee-5c7f164a1769
-
-Team505UUID:5d8ecea0-c0c6-0130-1901-60a44ce903c3
-Team505Name:Yann D'ARGENLIEU
-
-Team506UUID:f7405b30-c302-0130-854c-60a44ce903c3
-Team506Name:Yannick Lorenzen
-
-Team507UUID:5d914b20-c0c6-0130-1902-60a44ce903c3
-Team507Name:York-Ferdinand KOSEGARTEN
-
-Team508UUID:5d93f5d0-c0c6-0130-1903-60a44ce903c3
-Team508Name:Zack DOWNING
-
-Team509UUID:5d964650-c0c6-0130-1904-60a44ce903c3
-Team509Name:Zoé
-
-Team510UUID:5d98c400-c0c6-0130-1905-60a44ce903c3
-Team510Name:Zoe KLINKE
-
-Team511UUID:5dfe8fa0-c0c6-0130-1914-60a44ce903c3
-Team511Name:Zuzanna Rybicka
+Class1BoatClassId:
+
+Team1UUID:5ad101d0-c0c6-0130-187b-60a44ce903c3
+Team1Name:BARTELDT Dirk
+Team1Comp1UUID:a5527090-03f8-4509-9a88-104c576e27b8
+
+Team2UUID:5ae123b0-c0c6-0130-187c-60a44ce903c3
+Team2Name:BERTRAND LOYAL
+Team2Comp1UUID:05f95843-fde7-4812-942b-9653746e966c
+
+Team3UUID:5ae402a0-c0c6-0130-187d-60a44ce903c3
+Team3Name:Catherine HOURIET
+Team3Comp1UUID:221c4ebb-7d19-46c7-9f60-442425bcd8fa
+
+Team4UUID:5ae6d770-c0c6-0130-187e-60a44ce903c3
+Team4Name:Cédric BART
+Team4Comp1UUID:eeafa04f-0e34-41e3-ae36-6b894aa199ad
+
+Team5UUID:5ae9a030-c0c6-0130-187f-60a44ce903c3
+Team5Name:Christian HENGE
+Team5Comp1UUID:925d4e2b-422c-4c20-b772-229af8f88282
+
+Team6UUID:5aec6440-c0c6-0130-1880-60a44ce903c3
+Team6Name:Christina BURGER
+Team6Comp1UUID:186e6aac-69bd-4565-b279-14ef18f89934
+
+Team7UUID:5aeed980-c0c6-0130-1881-60a44ce903c3
+Team7Name:Claas Lehmann
+Team7Comp1UUID:7ca8b5c7-a693-4183-8d3f-fcdd19d2a631
+
+Team8UUID:5af05160-c0c6-0130-1882-60a44ce903c3
+Team8Name:Daniel CZENINGA
+Team8Comp1UUID:144fb0d9-626a-446c-9b76-b9259cf7869b
+
+Team9UUID:5af1b8a0-c0c6-0130-1883-60a44ce903c3
+Team9Name:Davina SCHLESIGER
+Team9Comp1UUID:d5088764-cd65-4582-8d7e-d3da2ee3ff4c
+
+Team10UUID:5af33700-c0c6-0130-1884-60a44ce903c3
+Team10Name:Dr. Wolfgang Hunger
+Team10Comp1UUID:6d85f972-656d-4838-9876-d0d7e50cd3c1
+
+Team11UUID:5af4d290-c0c6-0130-1885-60a44ce903c3
+Team11Name:Earle ALEXANDER
+Team11Comp1UUID:b7dcaa2f-ec9f-4210-b873-88de0e4302cd
+
+Team12UUID:5af684f0-c0c6-0130-1886-60a44ce903c3
+Team12Name:Elisabeth NEIDHART
+Team12Comp1UUID:829e869a-b8cd-48c4-aa5c-ce3734962b4f
+
+Team13UUID:5af82c30-c0c6-0130-1887-60a44ce903c3
+Team13Name:Hans GENEFKE
+Team13Comp1UUID:2a6a3f66-12bb-4e34-8cfc-ee9d64f99a80
+
+Team14UUID:5af9d7c0-c0c6-0130-1888-60a44ce903c3
+Team14Name:Iris FELDMANN
+Team14Comp1UUID:1427cd99-3c21-484a-8b9d-c95f87d96426
+
+Team15UUID:5afb8460-c0c6-0130-1889-60a44ce903c3
+Team15Name:Jan SELL
+Team15Comp1UUID:5d5e9d4e-d766-491d-9e94-27cf64b32499
+
+Team16UUID:5afd9cc0-c0c6-0130-188a-60a44ce903c3
+Team16Name:Jens FINDEL
+Team16Comp1UUID:35d5becc-f6cd-4f00-8cd5-2835f9824899
+
+Team17UUID:5afffd00-c0c6-0130-188b-60a44ce903c3
+Team17Name:Jens Olbrysch
+Team17Comp1UUID:98bd3dd3-745c-4ebb-a0ed-fce15701c612
+
+Team18UUID:5b029440-c0c6-0130-188c-60a44ce903c3
+Team18Name:Jørgen BOJSEN-MØLLER
+Team18Comp1UUID:f3f0f3cf-b537-4141-9b21-18c88631cc19
+
+Team19UUID:5b0e8c20-c0c6-0130-188d-60a44ce903c3
+Team19Name:Jörn WILLE
+Team19Comp1UUID:cf7af72c-4d50-475b-a218-c10ba524dfa9
+
+Team20UUID:5b1077a0-c0c6-0130-188e-60a44ce903c3
+Team20Name:Juergen Waldheim
+Team20Comp1UUID:6b91a848-af9b-46db-b014-eb7af861a459
+
+Team21UUID:5b122cc0-c0c6-0130-188f-60a44ce903c3
+Team21Name:Jürgen ANTON
+Team21Comp1UUID:bbe8e578-74f9-4dbf-8247-fd0fb14ee132
+
+Team22UUID:5b13de00-c0c6-0130-1890-60a44ce903c3
+Team22Name:Jürgen FEUERHAKE
+Team22Comp1UUID:39be6a7a-efa2-45ab-8195-f0509c8bc784
+
+Team23UUID:5b158580-c0c6-0130-1891-60a44ce903c3
+Team23Name:Karsten STÜMPEL
+Team23Comp1UUID:e1c10205-631c-41e8-a145-836b5b7b11bc
+
+Team24UUID:5b174f50-c0c6-0130-1892-60a44ce903c3
+Team24Name:Christian Kellner
+Team24Comp1UUID:2c350832-9ae5-4298-8911-e71c0de9058e
+
+Team25UUID:5b191580-c0c6-0130-1893-60a44ce903c3
+Team25Name:Knut HASTENPFLUG
+Team25Comp1UUID:4ebfdbcb-7444-4100-b9a6-5acf084da065
+
+Team26UUID:5b1b07c0-c0c6-0130-1894-60a44ce903c3
+Team26Name:Lennart TASCHE
+Team26Comp1UUID:69fc5a02-8ea8-4ec9-af0b-99182b975e68
+
+Team27UUID:5b1d12d0-c0c6-0130-1895-60a44ce903c3
+Team27Name:Meike SCHOMÄKER
+Team27Comp1UUID:dfa53566-7ca8-4a77-bb2c-8250c0ec4638
+
+Team28UUID:5b1f21e0-c0c6-0130-1896-60a44ce903c3
+Team28Name:Mikkel CHRISTIANSEN
+Team28Comp1UUID:05436d5d-f6fa-4bb5-b25f-9f2dbc47cb98
+
+Team29UUID:5b21e300-c0c6-0130-1897-60a44ce903c3
+Team29Name:Moritz Bohnenberger
+Team29Comp1UUID:55a0a6fc-8ee9-47cb-b95b-27d461805b04
+
+Team30UUID:5b2493a0-c0c6-0130-1898-60a44ce903c3
+Team30Name:Morten BOGACKI
+Team30Comp1UUID:87c99dd4-0d70-46e2-9f81-f1cb934d019e
+
+Team31UUID:5b274300-c0c6-0130-1899-60a44ce903c3
+Team31Name:Nicola BIRKNER
+Team31Comp1UUID:7f363c4c-58c3-4847-9a14-0733ade6f6fb
+
+Team32UUID:5b28a6d0-c0c6-0130-189a-60a44ce903c3
+Team32Name:Norbert DASENBROOK
+Team32Comp1UUID:1fd6a0f2-5278-408a-80de-30fb4836acec
+
+Team33UUID:5b2a3750-c0c6-0130-189b-60a44ce903c3
+Team33Name:Philippe BOITE
+Team33Comp1UUID:e9aa0099-b9ea-471f-83b7-692b1e99fae7
+
+Team34UUID:5b2d05f0-c0c6-0130-189c-60a44ce903c3
+Team34Name:Ralph KÄMMERLE
+Team34Comp1UUID:cb99a143-37c8-4107-a111-ae8e6ed4ebe0
+
+Team35UUID:5b2fc500-c0c6-0130-189d-60a44ce903c3
+Team35Name:Sophie HEYER
+Team35Comp1UUID:c0733758-57e0-41e9-8d06-c0d25ac7c7e2
+
+Team36UUID:5b3284d0-c0c6-0130-189e-60a44ce903c3
+Team36Name:Stefan BÖHM
+Team36Comp1UUID:a4067949-e49e-416a-bf87-5f66803cf4d2
+
+Team37UUID:5b354640-c0c6-0130-189f-60a44ce903c3
+Team37Name:Stefan KOECHLIN
+Team37Comp1UUID:b61cb4f3-638e-4372-b33d-91773fe3eb17
+
+Team38UUID:5b37da40-c0c6-0130-18a0-60a44ce903c3
+Team38Name:Steve KWEE
+Team38Comp1UUID:3584dd17-c4ff-4087-b6f2-e0b0bad1df88
+
+Team39UUID:5b440bb0-c0c6-0130-18a1-60a44ce903c3
+Team39Name:Thomas GOSCH
+Team39Comp1UUID:833d762e-eaee-4593-8454-af50c360b957
+
+Team40UUID:5b530ce0-c0c6-0130-18a2-60a44ce903c3
+Team40Name:Thomas PYPE
+Team40Comp1UUID:7262ea87-5b9f-4df6-950d-8333ba056891
+
+Team41UUID:5b54be00-c0c6-0130-18a3-60a44ce903c3
+Team41Name:Thure GNADEBERG
+Team41Comp1UUID:9fe5b694-334f-4b8d-8d24-54b4c66ae27c
+
+Team42UUID:5b5659a0-c0c6-0130-18a4-60a44ce903c3
+Team42Name:Tim BÖGER
+Team42Comp1UUID:831a8fc3-f4f5-43d2-bb3c-17f5a06ebe86
+
+Team43UUID:5b57f120-c0c6-0130-18a5-60a44ce903c3
+Team43Name:Tom HASTENPFLUG
+Team43Comp1UUID:65926c42-fb11-49a5-8b04-416d57b0918e
+
+Team44UUID:5b599d70-c0c6-0130-18a6-60a44ce903c3
+Team44Name:Ulf PLEßMANN
+Team44Comp1UUID:5320e464-ebbe-4d52-9fc7-4091f3f24071
+
+Team45UUID:5b5c5850-c0c6-0130-18a7-60a44ce903c3
+Team45Name:Xavier BROISE
+Team45Comp1UUID:f0375889-8bde-4fbc-b5ee-5c7f164a1769
+
+Team46UUID:5b6601c0-c0c6-0130-18a8-60a44ce903c3
+Team46Name:Stefan GIESLER
+Team46Comp1UUID:9f92f17f-f792-4352-90da-b71c7aa4c992
+
+Team47UUID:5b68d350-c0c6-0130-18a9-60a44ce903c3
+Team47Name:Enrico Ciferri
+Team47Comp1UUID:70e4bf8b-7ad1-4c99-aada-729c23198c2a
+
+Team48UUID:5b6ff940-c0c6-0130-18aa-60a44ce903c3
+Team48Name:Jan SAUGMANN
+Team48Comp1UUID:0c77b2a8-3b67-46cb-b248-bb065cc2a8c1
+
+Team49UUID:5b76c290-c0c6-0130-18ab-60a44ce903c3
+Team49Name:MARCOS Vivian
+Team49Comp1UUID:3817d6de-a6de-457a-bcb4-19add769003a
 
 Comp1UUID:a5527090-03f8-4509-9a88-104c576e27b8
 Comp1Name:BARTELDT Dirk
 Comp1NameShort:GER 8392
-Comp1Color:800000
 Comp1Nationality:GER
 Comp1Description:505
 Comp1Handicap:1.0000000000
@@ -1714,12 +372,13 @@ Comp1HandicapDistance:0.00000
 Comp1DataSheet:Gender: Men / BoatID: 'a5527090-03f8-4509-9a88-104c576e27b8'
 Comp1StartTime:2013-06-28 10:40:00
 Comp1ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp1StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp1RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp1Color:800000
 
 Comp2UUID:05f95843-fde7-4812-942b-9653746e966c
 Comp2Name:BERTRAND LOYAL
 Comp2NameShort:FRA 9076
-Comp2Color:00FF00
 Comp2Nationality:FRA
 Comp2Description:505
 Comp2Handicap:1.0000000000
@@ -1727,12 +386,13 @@ Comp2HandicapDistance:0.00000
 Comp2DataSheet:Gender: Men / BoatID: '05f95843-fde7-4812-942b-9653746e966c'
 Comp2StartTime:2013-06-28 10:40:00
 Comp2ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp2StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp2RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp2Color:00FF00
 
 Comp3UUID:221c4ebb-7d19-46c7-9f60-442425bcd8fa
 Comp3Name:Catherine HOURIET
 Comp3NameShort:SUI 9060
-Comp3Color:008000
 Comp3Nationality:SUI
 Comp3Description:505
 Comp3Handicap:1.0000000000
@@ -1740,12 +400,13 @@ Comp3HandicapDistance:0.00000
 Comp3DataSheet:Gender: Women / BoatID: '221c4ebb-7d19-46c7-9f60-442425bcd8fa'
 Comp3StartTime:2013-06-28 10:40:00
 Comp3ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp3StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp3RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp3Color:008000
 
 Comp4UUID:eeafa04f-0e34-41e3-ae36-6b894aa199ad
 Comp4Name:Cédric BART
 Comp4NameShort:SUI 9096
-Comp4Color:FF00FF
 Comp4Nationality:SUI
 Comp4Description:505
 Comp4Handicap:1.0000000000
@@ -1753,12 +414,13 @@ Comp4HandicapDistance:0.00000
 Comp4DataSheet:Gender: Men / BoatID: 'eeafa04f-0e34-41e3-ae36-6b894aa199ad'
 Comp4StartTime:2013-06-28 10:40:00
 Comp4ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp4StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp4RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp4Color:FF00FF
 
 Comp5UUID:925d4e2b-422c-4c20-b772-229af8f88282
 Comp5Name:Christian HENGE
 Comp5NameShort:GER 8932
-Comp5Color:0000FF
 Comp5Nationality:GER
 Comp5Description:505
 Comp5Handicap:1.0000000000
@@ -1766,12 +428,13 @@ Comp5HandicapDistance:0.00000
 Comp5DataSheet:Gender: Men / BoatID: '925d4e2b-422c-4c20-b772-229af8f88282'
 Comp5StartTime:2013-06-28 10:40:00
 Comp5ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp5StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp5RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp5Color:0000FF
 
 Comp6UUID:186e6aac-69bd-4565-b279-14ef18f89934
 Comp6Name:Christina Burger
 Comp6NameShort:GER 8317
-Comp6Color:000000
 Comp6Nationality:GER
 Comp6Description:505
 Comp6Handicap:1.0000000000
@@ -1779,12 +442,13 @@ Comp6HandicapDistance:0.00000
 Comp6DataSheet:Gender: Women / BoatID: '186e6aac-69bd-4565-b279-14ef18f89934'
 Comp6StartTime:2013-06-28 10:40:00
 Comp6ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp6StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp6RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp6Color:000000
 
 Comp7UUID:7ca8b5c7-a693-4183-8d3f-fcdd19d2a631
 Comp7Name:Claas Lehmann
 Comp7NameShort:GER 8992
-Comp7Color:00FFFF
 Comp7Nationality:GER
 Comp7Description:505
 Comp7Handicap:1.0000000000
@@ -1792,12 +456,13 @@ Comp7HandicapDistance:0.00000
 Comp7DataSheet:Gender: Men / BoatID: '7ca8b5c7-a693-4183-8d3f-fcdd19d2a631'
 Comp7StartTime:2013-06-28 10:40:00
 Comp7ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp7StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp7RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp7Color:00FFFF
 
 Comp8UUID:144fb0d9-626a-446c-9b76-b9259cf7869b
 Comp8Name:Daniel Czeninga
 Comp8NameShort:GER 8721
-Comp8Color:FFFF00
 Comp8Nationality:GER
 Comp8Description:505
 Comp8Handicap:1.0000000000
@@ -1805,12 +470,13 @@ Comp8HandicapDistance:0.00000
 Comp8DataSheet:Gender: Men / BoatID: '144fb0d9-626a-446c-9b76-b9259cf7869b'
 Comp8StartTime:2013-06-28 10:40:00
 Comp8ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp8StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp8RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp8Color:FFFF00
 
 Comp9UUID:d5088764-cd65-4582-8d7e-d3da2ee3ff4c
 Comp9Name:Davina SCHLESIGER
 Comp9NameShort:GER 8437
-Comp9Color:FFFFFF
 Comp9Nationality:GER
 Comp9Description:505
 Comp9Handicap:1.0000000000
@@ -1818,12 +484,13 @@ Comp9HandicapDistance:0.00000
 Comp9DataSheet:Gender: Women / BoatID: 'd5088764-cd65-4582-8d7e-d3da2ee3ff4c'
 Comp9StartTime:2013-06-28 10:40:00
 Comp9ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp9StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp9RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp9Color:FFFFFF
 
 Comp10UUID:6d85f972-656d-4838-9876-d0d7e50cd3c1
 Comp10Name:Dr. Wolfgang Hunger
 Comp10NameShort:GER 9071
-Comp10Color:008080
 Comp10Nationality:GER
 Comp10Description:505
 Comp10Handicap:1.0000000000
@@ -1831,12 +498,13 @@ Comp10HandicapDistance:0.00000
 Comp10DataSheet:Gender: Men / BoatID: '6d85f972-656d-4838-9876-d0d7e50cd3c1'
 Comp10StartTime:2013-06-28 10:40:00
 Comp10ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp10StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp10RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp10Color:008080
 
 Comp11UUID:b7dcaa2f-ec9f-4210-b873-88de0e4302cd
 Comp11Name:Earle ALEXANDER
 Comp11NameShort:AUS 9028
-Comp11Color:FF0000
 Comp11Nationality:AUS
 Comp11Description:505
 Comp11Handicap:1.0000000000
@@ -1844,12 +512,13 @@ Comp11HandicapDistance:0.00000
 Comp11DataSheet:Gender: Men / BoatID: 'b7dcaa2f-ec9f-4210-b873-88de0e4302cd'
 Comp11StartTime:2013-06-28 10:40:00
 Comp11ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp11StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp11RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp11Color:FF0000
 
 Comp12UUID:829e869a-b8cd-48c4-aa5c-ce3734962b4f
 Comp12Name:Elisabeth neidhart
 Comp12NameShort:FRA 9086
-Comp12Color:800080
 Comp12Nationality:FRA
 Comp12Description:505
 Comp12Handicap:1.0000000000
@@ -1857,12 +526,13 @@ Comp12HandicapDistance:0.00000
 Comp12DataSheet:Gender: Women / BoatID: '829e869a-b8cd-48c4-aa5c-ce3734962b4f'
 Comp12StartTime:2013-06-28 10:40:00
 Comp12ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp12StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp12RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp12Color:800080
 
 Comp13UUID:2a6a3f66-12bb-4e34-8cfc-ee9d64f99a80
 Comp13Name:Hans GENEFKE
 Comp13NameShort:DEN 9109
-Comp13Color:808000
 Comp13Nationality:DEN
 Comp13Description:505
 Comp13Handicap:1.0000000000
@@ -1870,12 +540,13 @@ Comp13HandicapDistance:0.00000
 Comp13DataSheet:Gender: Men / BoatID: '2a6a3f66-12bb-4e34-8cfc-ee9d64f99a80'
 Comp13StartTime:2013-06-28 10:40:00
 Comp13ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp13StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp13RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp13Color:808000
 
 Comp14UUID:1427cd99-3c21-484a-8b9d-c95f87d96426
 Comp14Name:Iris Feldmann
 Comp14NameShort:GER 8730
-Comp14Color:000080
 Comp14Nationality:GER
 Comp14Description:505
 Comp14Handicap:1.0000000000
@@ -1883,12 +554,13 @@ Comp14HandicapDistance:0.00000
 Comp14DataSheet:Gender: Women / BoatID: '1427cd99-3c21-484a-8b9d-c95f87d96426'
 Comp14StartTime:2013-06-28 10:40:00
 Comp14ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp14StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp14RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp14Color:000080
 
 Comp15UUID:5d5e9d4e-d766-491d-9e94-27cf64b32499
 Comp15Name:Jan Sell
 Comp15NameShort:GER 8775
-Comp15Color:800000
 Comp15Nationality:GER
 Comp15Description:505
 Comp15Handicap:1.0000000000
@@ -1896,12 +568,13 @@ Comp15HandicapDistance:0.00000
 Comp15DataSheet:Gender: Men / BoatID: '5d5e9d4e-d766-491d-9e94-27cf64b32499'
 Comp15StartTime:2013-06-28 10:40:00
 Comp15ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp15StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp15RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp15Color:800000
 
 Comp16UUID:35d5becc-f6cd-4f00-8cd5-2835f9824899
 Comp16Name:Jens FINDEL
 Comp16NameShort:GER 8875
-Comp16Color:00FF00
 Comp16Nationality:GER
 Comp16Description:505
 Comp16Handicap:1.0000000000
@@ -1909,12 +582,13 @@ Comp16HandicapDistance:0.00000
 Comp16DataSheet:Gender: Men / BoatID: '35d5becc-f6cd-4f00-8cd5-2835f9824899'
 Comp16StartTime:2013-06-28 10:40:00
 Comp16ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp16StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp16RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp16Color:00FF00
 
 Comp17UUID:98bd3dd3-745c-4ebb-a0ed-fce15701c612
 Comp17Name:Jens Olbrysch
 Comp17NameShort:GER 8988
-Comp17Color:008000
 Comp17Nationality:GER
 Comp17Description:505
 Comp17Handicap:1.0000000000
@@ -1922,12 +596,13 @@ Comp17HandicapDistance:0.00000
 Comp17DataSheet:Gender: Men / BoatID: '98bd3dd3-745c-4ebb-a0ed-fce15701c612'
 Comp17StartTime:2013-06-28 10:40:00
 Comp17ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp17StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp17RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp17Color:008000
 
 Comp18UUID:f3f0f3cf-b537-4141-9b21-18c88631cc19
 Comp18Name:Jørgen Bojsen-Møller
 Comp18NameShort:DEN 9062
-Comp18Color:FF00FF
 Comp18Nationality:DEN
 Comp18Description:505
 Comp18Handicap:1.0000000000
@@ -1935,12 +610,13 @@ Comp18HandicapDistance:0.00000
 Comp18DataSheet:Gender: Men / BoatID: 'f3f0f3cf-b537-4141-9b21-18c88631cc19'
 Comp18StartTime:2013-06-28 10:40:00
 Comp18ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp18StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp18RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp18Color:FF00FF
 
 Comp19UUID:cf7af72c-4d50-475b-a218-c10ba524dfa9
 Comp19Name:Jörn Wille
 Comp19NameShort:GER 8609
-Comp19Color:0000FF
 Comp19Nationality:GER
 Comp19Description:505
 Comp19Handicap:1.0000000000
@@ -1948,12 +624,13 @@ Comp19HandicapDistance:0.00000
 Comp19DataSheet:Gender: Men / BoatID: 'cf7af72c-4d50-475b-a218-c10ba524dfa9'
 Comp19StartTime:2013-06-28 10:40:00
 Comp19ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp19StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp19RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp19Color:0000FF
 
 Comp20UUID:6b91a848-af9b-46db-b014-eb7af861a459
 Comp20Name:Juergen Waldheim
 Comp20NameShort:GER 9029
-Comp20Color:000000
 Comp20Nationality:GER
 Comp20Description:505
 Comp20Handicap:1.0000000000
@@ -1961,12 +638,13 @@ Comp20HandicapDistance:0.00000
 Comp20DataSheet:Gender: Men / BoatID: '6b91a848-af9b-46db-b014-eb7af861a459'
 Comp20StartTime:2013-06-28 10:40:00
 Comp20ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp20StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp20RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp20Color:000000
 
 Comp21UUID:bbe8e578-74f9-4dbf-8247-fd0fb14ee132
 Comp21Name:Jürgen ANTON
 Comp21NameShort:GER 8741
-Comp21Color:00FFFF
 Comp21Nationality:GER
 Comp21Description:505
 Comp21Handicap:1.0000000000
@@ -1974,12 +652,13 @@ Comp21HandicapDistance:0.00000
 Comp21DataSheet:Gender: Men / BoatID: 'bbe8e578-74f9-4dbf-8247-fd0fb14ee132'
 Comp21StartTime:2013-06-28 10:40:00
 Comp21ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp21StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp21RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp21Color:00FFFF
 
 Comp22UUID:39be6a7a-efa2-45ab-8195-f0509c8bc784
 Comp22Name:Jürgen FEUERHAKE
 Comp22NameShort:GER 8052
-Comp22Color:FFFF00
 Comp22Nationality:GER
 Comp22Description:505
 Comp22Handicap:1.0000000000
@@ -1987,12 +666,13 @@ Comp22HandicapDistance:0.00000
 Comp22DataSheet:Gender: Men / BoatID: '39be6a7a-efa2-45ab-8195-f0509c8bc784'
 Comp22StartTime:2013-06-28 10:40:00
 Comp22ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp22StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp22RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp22Color:FFFF00
 
 Comp23UUID:e1c10205-631c-41e8-a145-836b5b7b11bc
 Comp23Name:Karsten STÜMPEL
 Comp23NameShort:GER 8999
-Comp23Color:FFFFFF
 Comp23Nationality:GER
 Comp23Description:505
 Comp23Handicap:1.0000000000
@@ -2000,12 +680,13 @@ Comp23HandicapDistance:0.00000
 Comp23DataSheet:Gender: Men / BoatID: 'e1c10205-631c-41e8-a145-836b5b7b11bc'
 Comp23StartTime:2013-06-28 10:40:00
 Comp23ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp23StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp23RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp23Color:FFFFFF
 
 Comp24UUID:2c350832-9ae5-4298-8911-e71c0de9058e
 Comp24Name:Christian Kellner
 Comp24NameShort:GER 9090
-Comp24Color:008080
 Comp24Nationality:GER
 Comp24Description:505
 Comp24Handicap:1.0000000000
@@ -2013,12 +694,13 @@ Comp24HandicapDistance:0.00000
 Comp24DataSheet:Gender: Men / BoatID: '2c350832-9ae5-4298-8911-e71c0de9058e'
 Comp24StartTime:2013-06-28 10:40:00
 Comp24ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp24StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp24RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp24Color:008080
 
 Comp25UUID:4ebfdbcb-7444-4100-b9a6-5acf084da065
 Comp25Name:Knut HASTENPFLUG
 Comp25NameShort:SWE 9092
-Comp25Color:FF0000
 Comp25Nationality:SWE
 Comp25Description:505
 Comp25Handicap:1.0000000000
@@ -2026,12 +708,13 @@ Comp25HandicapDistance:0.00000
 Comp25DataSheet:Gender: Men / BoatID: '4ebfdbcb-7444-4100-b9a6-5acf084da065'
 Comp25StartTime:2013-06-28 10:40:00
 Comp25ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp25StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp25RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp25Color:FF0000
 
 Comp26UUID:69fc5a02-8ea8-4ec9-af0b-99182b975e68
 Comp26Name:Lennart TASCHE
 Comp26NameShort:GER 8720
-Comp26Color:800080
 Comp26Nationality:GER
 Comp26Description:505
 Comp26Handicap:1.0000000000
@@ -2039,12 +722,13 @@ Comp26HandicapDistance:0.00000
 Comp26DataSheet:Gender: Men / BoatID: '69fc5a02-8ea8-4ec9-af0b-99182b975e68'
 Comp26StartTime:2013-06-28 10:40:00
 Comp26ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp26StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp26RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp26Color:800080
 
 Comp27UUID:dfa53566-7ca8-4a77-bb2c-8250c0ec4638
 Comp27Name:Meike SCHOMÄKER
 Comp27NameShort:GER 9102
-Comp27Color:808000
 Comp27Nationality:GER
 Comp27Description:505
 Comp27Handicap:1.0000000000
@@ -2052,12 +736,13 @@ Comp27HandicapDistance:0.00000
 Comp27DataSheet:Gender: Women / BoatID: 'dfa53566-7ca8-4a77-bb2c-8250c0ec4638'
 Comp27StartTime:2013-06-28 10:40:00
 Comp27ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp27StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp27RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp27Color:808000
 
 Comp28UUID:05436d5d-f6fa-4bb5-b25f-9f2dbc47cb98
 Comp28Name:Mikkel CHRISTIANSEN
 Comp28NameShort:DEN 8440
-Comp28Color:000080
 Comp28Nationality:DEN
 Comp28Description:505
 Comp28Handicap:1.0000000000
@@ -2065,12 +750,13 @@ Comp28HandicapDistance:0.00000
 Comp28DataSheet:Gender: Men / BoatID: '05436d5d-f6fa-4bb5-b25f-9f2dbc47cb98'
 Comp28StartTime:2013-06-28 10:40:00
 Comp28ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp28StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp28RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp28Color:000080
 
 Comp29UUID:55a0a6fc-8ee9-47cb-b95b-27d461805b04
 Comp29Name:Moritz Bohnenberger
 Comp29NameShort:GER 9059
-Comp29Color:800000
 Comp29Nationality:GER
 Comp29Description:505
 Comp29Handicap:1.0000000000
@@ -2078,12 +764,13 @@ Comp29HandicapDistance:0.00000
 Comp29DataSheet:Gender: Men / BoatID: '55a0a6fc-8ee9-47cb-b95b-27d461805b04'
 Comp29StartTime:2013-06-28 10:40:00
 Comp29ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp29StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp29RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp29Color:800000
 
 Comp30UUID:87c99dd4-0d70-46e2-9f81-f1cb934d019e
 Comp30Name:Morten BOGACKI
 Comp30NameShort:GER 9112
-Comp30Color:00FF00
 Comp30Nationality:GER
 Comp30Description:505
 Comp30Handicap:1.0000000000
@@ -2091,12 +778,13 @@ Comp30HandicapDistance:0.00000
 Comp30DataSheet:Gender: Men / BoatID: '87c99dd4-0d70-46e2-9f81-f1cb934d019e'
 Comp30StartTime:2013-06-28 10:40:00
 Comp30ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp30StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp30RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp30Color:00FF00
 
 Comp31UUID:7f363c4c-58c3-4847-9a14-0733ade6f6fb
 Comp31Name:Nicola BIRKNER
 Comp31NameShort:GER 9043
-Comp31Color:008000
 Comp31Nationality:GER
 Comp31Description:505
 Comp31Handicap:1.0000000000
@@ -2104,12 +792,13 @@ Comp31HandicapDistance:0.00000
 Comp31DataSheet:Gender: Women / BoatID: '7f363c4c-58c3-4847-9a14-0733ade6f6fb'
 Comp31StartTime:2013-06-28 10:40:00
 Comp31ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp31StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp31RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp31Color:008000
 
 Comp32UUID:1fd6a0f2-5278-408a-80de-30fb4836acec
 Comp32Name:Norbert DASENBROOK
 Comp32NameShort:GER 9040
-Comp32Color:FF00FF
 Comp32Nationality:GER
 Comp32Description:505
 Comp32Handicap:1.0000000000
@@ -2117,12 +806,13 @@ Comp32HandicapDistance:0.00000
 Comp32DataSheet:Gender: Men / BoatID: '1fd6a0f2-5278-408a-80de-30fb4836acec'
 Comp32StartTime:2013-06-28 10:40:00
 Comp32ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp32StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp32RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp32Color:FF00FF
 
 Comp33UUID:e9aa0099-b9ea-471f-83b7-692b1e99fae7
 Comp33Name:Philippe BOITE
 Comp33NameShort:FRA 9075
-Comp33Color:0000FF
 Comp33Nationality:FRA
 Comp33Description:505
 Comp33Handicap:1.0000000000
@@ -2130,12 +820,13 @@ Comp33HandicapDistance:0.00000
 Comp33DataSheet:Gender: Men / BoatID: 'e9aa0099-b9ea-471f-83b7-692b1e99fae7'
 Comp33StartTime:2013-06-28 10:40:00
 Comp33ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp33StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp33RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp33Color:0000FF
 
 Comp34UUID:cb99a143-37c8-4107-a111-ae8e6ed4ebe0
 Comp34Name:Ralph KÄMMERLE
 Comp34NameShort:GER 9023
-Comp34Color:000000
 Comp34Nationality:GER
 Comp34Description:505
 Comp34Handicap:1.0000000000
@@ -2143,12 +834,13 @@ Comp34HandicapDistance:0.00000
 Comp34DataSheet:Gender: Men / BoatID: 'cb99a143-37c8-4107-a111-ae8e6ed4ebe0'
 Comp34StartTime:2013-06-28 10:40:00
 Comp34ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp34StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp34RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp34Color:000000
 
 Comp35UUID:c0733758-57e0-41e9-8d06-c0d25ac7c7e2
 Comp35Name:Sophie HEYER
 Comp35NameShort:GER 9113
-Comp35Color:00FFFF
 Comp35Nationality:GER
 Comp35Description:505
 Comp35Handicap:1.0000000000
@@ -2156,12 +848,13 @@ Comp35HandicapDistance:0.00000
 Comp35DataSheet:Gender: Women / BoatID: 'c0733758-57e0-41e9-8d06-c0d25ac7c7e2'
 Comp35StartTime:2013-06-28 10:40:00
 Comp35ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp35StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp35RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp35Color:00FFFF
 
 Comp36UUID:a4067949-e49e-416a-bf87-5f66803cf4d2
 Comp36Name:Stefan BÖHM
 Comp36NameShort:GER 9035
-Comp36Color:FFFF00
 Comp36Nationality:GER
 Comp36Description:505
 Comp36Handicap:1.0000000000
@@ -2169,12 +862,13 @@ Comp36HandicapDistance:0.00000
 Comp36DataSheet:Gender: Men / BoatID: 'a4067949-e49e-416a-bf87-5f66803cf4d2'
 Comp36StartTime:2013-06-28 10:40:00
 Comp36ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp36StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp36RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp36Color:FFFF00
 
 Comp37UUID:b61cb4f3-638e-4372-b33d-91773fe3eb17
 Comp37Name:Stefan KOECHLIN
 Comp37NameShort:GER 9070
-Comp37Color:FFFFFF
 Comp37Nationality:GER
 Comp37Description:505
 Comp37Handicap:1.0000000000
@@ -2182,12 +876,13 @@ Comp37HandicapDistance:0.00000
 Comp37DataSheet:Gender: Men / BoatID: 'b61cb4f3-638e-4372-b33d-91773fe3eb17'
 Comp37StartTime:2013-06-28 10:40:00
 Comp37ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp37StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp37RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp37Color:FFFFFF
 
 Comp38UUID:3584dd17-c4ff-4087-b6f2-e0b0bad1df88
 Comp38Name:Steve Kwee
 Comp38NameShort:GER 8903
-Comp38Color:008080
 Comp38Nationality:GER
 Comp38Description:505
 Comp38Handicap:1.0000000000
@@ -2195,12 +890,13 @@ Comp38HandicapDistance:0.00000
 Comp38DataSheet:Gender: Men / BoatID: '3584dd17-c4ff-4087-b6f2-e0b0bad1df88'
 Comp38StartTime:2013-06-28 10:40:00
 Comp38ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp38StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp38RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp38Color:008080
 
 Comp39UUID:833d762e-eaee-4593-8454-af50c360b957
 Comp39Name:Thomas GOSCH
 Comp39NameShort:GER 8929
-Comp39Color:FF0000
 Comp39Nationality:GER
 Comp39Description:505
 Comp39Handicap:1.0000000000
@@ -2208,12 +904,13 @@ Comp39HandicapDistance:0.00000
 Comp39DataSheet:Gender: Men / BoatID: '833d762e-eaee-4593-8454-af50c360b957'
 Comp39StartTime:2013-06-28 10:40:00
 Comp39ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp39StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp39RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp39Color:FF0000
 
 Comp40UUID:7262ea87-5b9f-4df6-950d-8333ba056891
 Comp40Name:Thomas PYPE
 Comp40NameShort:FRA 8969
-Comp40Color:800080
 Comp40Nationality:FRA
 Comp40Description:505
 Comp40Handicap:1.0000000000
@@ -2221,12 +918,13 @@ Comp40HandicapDistance:0.00000
 Comp40DataSheet:Gender: Men / BoatID: '7262ea87-5b9f-4df6-950d-8333ba056891'
 Comp40StartTime:2013-06-28 10:40:00
 Comp40ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp40StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp40RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp40Color:800080
 
 Comp41UUID:9fe5b694-334f-4b8d-8d24-54b4c66ae27c
 Comp41Name:Thure Gnadeberg
 Comp41NameShort:GER 8519
-Comp41Color:808000
 Comp41Nationality:GER
 Comp41Description:505
 Comp41Handicap:1.0000000000
@@ -2234,12 +932,13 @@ Comp41HandicapDistance:0.00000
 Comp41DataSheet:Gender: Men / BoatID: '9fe5b694-334f-4b8d-8d24-54b4c66ae27c'
 Comp41StartTime:2013-06-28 10:40:00
 Comp41ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp41StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp41RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp41Color:808000
 
 Comp42UUID:831a8fc3-f4f5-43d2-bb3c-17f5a06ebe86
 Comp42Name:Tim Böger
 Comp42NameShort:GER 9110
-Comp42Color:000080
 Comp42Nationality:GER
 Comp42Description:505
 Comp42Handicap:1.0000000000
@@ -2247,12 +946,13 @@ Comp42HandicapDistance:0.00000
 Comp42DataSheet:Gender: Men / BoatID: '831a8fc3-f4f5-43d2-bb3c-17f5a06ebe86'
 Comp42StartTime:2013-06-28 10:40:00
 Comp42ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp42StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp42RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp42Color:000080
 
 Comp43UUID:65926c42-fb11-49a5-8b04-416d57b0918e
 Comp43Name:Tom HASTENPFLUG
 Comp43NameShort:SWE 8912
-Comp43Color:800000
 Comp43Nationality:SWE
 Comp43Description:505
 Comp43Handicap:1.0000000000
@@ -2260,12 +960,13 @@ Comp43HandicapDistance:0.00000
 Comp43DataSheet:Gender: Men / BoatID: '65926c42-fb11-49a5-8b04-416d57b0918e'
 Comp43StartTime:2013-06-28 10:40:00
 Comp43ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp43StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp43RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp43Color:800000
 
 Comp44UUID:5320e464-ebbe-4d52-9fc7-4091f3f24071
 Comp44Name:Ulf PLEßMANN
 Comp44NameShort:GER 8927
-Comp44Color:00FF00
 Comp44Nationality:GER
 Comp44Description:505
 Comp44Handicap:1.0000000000
@@ -2273,12 +974,13 @@ Comp44HandicapDistance:0.00000
 Comp44DataSheet:Gender: Men / BoatID: '5320e464-ebbe-4d52-9fc7-4091f3f24071'
 Comp44StartTime:2013-06-28 10:40:00
 Comp44ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp44StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp44RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp44Color:00FF00
 
 Comp45UUID:f0375889-8bde-4fbc-b5ee-5c7f164a1769
 Comp45Name:Xavier BROISE
 Comp45NameShort:FRA 9099
-Comp45Color:008000
 Comp45Nationality:FRA
 Comp45Description:505
 Comp45Handicap:1.0000000000
@@ -2286,12 +988,13 @@ Comp45HandicapDistance:0.00000
 Comp45DataSheet:Gender: Men / BoatID: 'f0375889-8bde-4fbc-b5ee-5c7f164a1769'
 Comp45StartTime:2013-06-28 10:40:00
 Comp45ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp45StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp45RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp45Color:008000
 
 Comp46UUID:9f92f17f-f792-4352-90da-b71c7aa4c992
 Comp46Name:Stefan GIESLER
 Comp46NameShort:GER 9835
-Comp46Color:FF00FF
 Comp46Nationality:GER
 Comp46Description:505
 Comp46Handicap:1.0000000000
@@ -2299,12 +1002,13 @@ Comp46HandicapDistance:0.00000
 Comp46DataSheet:Gender: Men / BoatID: '9f92f17f-f792-4352-90da-b71c7aa4c992'
 Comp46StartTime:2013-06-28 10:40:00
 Comp46ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp46StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp46RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp46Color:FF00FF
 
 Comp47UUID:70e4bf8b-7ad1-4c99-aada-729c23198c2a
 Comp47Name:Enrico Ciferri
 Comp47NameShort:ITA 8916
-Comp47Color:0000FF
 Comp47Nationality:ITA
 Comp47Description:505
 Comp47Handicap:1.0000000000
@@ -2312,12 +1016,13 @@ Comp47HandicapDistance:0.00000
 Comp47DataSheet:Gender: Men / BoatID: '70e4bf8b-7ad1-4c99-aada-729c23198c2a'
 Comp47StartTime:2013-06-28 10:40:00
 Comp47ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp47StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp47RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp47Color:0000FF
 
 Comp48UUID:0c77b2a8-3b67-46cb-b248-bb065cc2a8c1
 Comp48Name:Jan SAUGMANN
 Comp48NameShort:DEN 8964
-Comp48Color:000000
 Comp48Nationality:DEN
 Comp48Description:505
 Comp48Handicap:1.0000000000
@@ -2325,12 +1030,13 @@ Comp48HandicapDistance:0.00000
 Comp48DataSheet:Gender: Men / BoatID: '0c77b2a8-3b67-46cb-b248-bb065cc2a8c1'
 Comp48StartTime:2013-06-28 10:40:00
 Comp48ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp48StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp48RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp48Color:000000
 
 Comp49UUID:3817d6de-a6de-457a-bcb4-19add769003a
 Comp49Name:Marcos Vivian
 Comp49NameShort:AUS 9105
-Comp49Color:00FFFF
 Comp49Nationality:AUS
 Comp49Description:505
 Comp49Handicap:1.0000000000
@@ -2338,253 +1044,619 @@ Comp49HandicapDistance:0.00000
 Comp49DataSheet:Gender: Men / BoatID: '3817d6de-a6de-457a-bcb4-19add769003a'
 Comp49StartTime:2013-06-28 10:40:00
 Comp49ClassUUID:5aadeb10-c0c6-0130-187a-60a44ce903c3
+Comp49StatusUpdatedAt:2013-06-26 17:00:00.000
 Comp49RouteUUID:12b23f54-df4d-11e2-a399-60a44ce903c3
+Comp49Color:00FFFF
 
-ControlPoint1UUID:06926420-c0a8-0130-181a-60a44ce903c3
-ControlPoint1Name:(TR-A) 3
-ControlPoint1HasTwoPoints:1
-ControlPoint1ShortName:3
-ControlPoint1Mark1Lon:10.198947
-ControlPoint1Mark1Lat:54.440815
-ControlPoint1Mark2Lon:10.198300
-ControlPoint1Mark2Lat:54.440708
+PositionedItem1UUID:709cda00-8551-013d-9299-1c6b00518c70
+PositionedItem1Name:(TR-A) 3 - 1
+PositionedItem1CourseArea:
+PositionedItem1Static:0
+PositionedItem1Positions:
+PositionedItem1DataSheet:
 
-ControlPoint2UUID:09ad5e90-c07d-0130-179f-60a44ce903c3
-ControlPoint2Name:(WL-A) Replace
-ControlPoint2HasTwoPoints:0
-ControlPoint2ShortName:
-ControlPoint2Mark1Lon:10.267368
-ControlPoint2Mark1Lat:54.432430
+PositionedItem2UUID:71f9c8d0-8551-013d-929a-1c6b00518c70
+PositionedItem2Name:(TR-A) 3 - 2
+PositionedItem2CourseArea:
+PositionedItem2Static:0
+PositionedItem2Positions:
+PositionedItem2DataSheet:
 
-ControlPoint3UUID:16285160-c07b-0130-1784-60a44ce903c3
-ControlPoint3Name:(WL-A) Finish
-ControlPoint3HasTwoPoints:1
-ControlPoint3ShortName:F
-ControlPoint3Mark1Lon:10.262947
-ControlPoint3Mark1Lat:54.445190
-ControlPoint3Mark2Lon:10.267827
-ControlPoint3Mark2Lat:54.446385
+PositionedItem3UUID:728ddbe0-8551-013d-929d-1c6b00518c70
+PositionedItem3Name:(WL-A) Replace
+PositionedItem3CourseArea:
+PositionedItem3Static:0
+PositionedItem3Positions:
+PositionedItem3DataSheet:
 
-ControlPoint4UUID:199c6d40-c07c-0130-1797-60a44ce903c3
-ControlPoint4Name:(WL-B) Start
-ControlPoint4HasTwoPoints:1
-ControlPoint4ShortName:S
-ControlPoint4Mark1Lon:10.211550
-ControlPoint4Mark1Lat:54.454582
-ControlPoint4Mark2Lon:10.211912
-ControlPoint4Mark2Lat:54.454678
+PositionedItem4UUID:73858690-8551-013d-929e-1c6b00518c70
+PositionedItem4Name:(WL-A) Finish - 1
+PositionedItem4CourseArea:
+PositionedItem4Static:0
+PositionedItem4Positions:
+PositionedItem4DataSheet:
 
-ControlPoint5UUID:2c739890-c07d-0130-17a2-60a44ce903c3
-ControlPoint5Name:(WL-B) Replace
-ControlPoint5HasTwoPoints:0
-ControlPoint5ShortName:
-ControlPoint5Mark1Lon:10.212858
-ControlPoint5Mark1Lat:54.439953
+PositionedItem5UUID:741228b0-8551-013d-929f-1c6b00518c70
+PositionedItem5Name:(WL-A) Finish - 2
+PositionedItem5CourseArea:
+PositionedItem5Static:0
+PositionedItem5Positions:
+PositionedItem5DataSheet:
 
-ControlPoint6UUID:343d9eaa-dfd6-11e2-a399-60a44ce903c3
-ControlPoint6Name:2 (Flying Dutchman race 2)
-ControlPoint6HasTwoPoints:0
-ControlPoint6ShortName:2
-ControlPoint6Mark1Lon:10.229024
-ControlPoint6Mark1Lat:54.492867
+PositionedItem6UUID:74d5de60-8551-013d-92a2-1c6b00518c70
+PositionedItem6Name:(WL-B) Start - 1
+PositionedItem6CourseArea:
+PositionedItem6Static:0
+PositionedItem6Positions:
+PositionedItem6DataSheet:
 
-ControlPoint7UUID:380fa8b0-c167-0130-2c13-60a44ce903c3
-ControlPoint7Name:Flying Dutchman start 3
-ControlPoint7HasTwoPoints:1
-ControlPoint7ShortName:S
-ControlPoint7Mark1Lon:10.233063
-ControlPoint7Mark1Lat:54.507661
-ControlPoint7Mark2Lon:10.237601
-ControlPoint7Mark2Lat:54.506197
+PositionedItem7UUID:75562440-8551-013d-92a3-1c6b00518c70
+PositionedItem7Name:(WL-B) Start - 2
+PositionedItem7CourseArea:
+PositionedItem7Static:0
+PositionedItem7Positions:
+PositionedItem7DataSheet:
 
-ControlPoint8UUID:3c7df210-c0a7-0130-1806-60a44ce903c3
-ControlPoint8Name:(TR-A) Start
-ControlPoint8HasTwoPoints:1
-ControlPoint8ShortName:S
-ControlPoint8Mark1Lon:10.197892
-ControlPoint8Mark1Lat:54.446273
-ControlPoint8Mark2Lon:10.197285
-ControlPoint8Mark2Lat:54.441715
+PositionedItem8UUID:761bba51-8551-013d-92a6-1c6b00518c70
+PositionedItem8Name:(WL-B) Replace
+PositionedItem8CourseArea:
+PositionedItem8Static:0
+PositionedItem8Positions:
+PositionedItem8DataSheet:
 
-ControlPoint9UUID:43332aee-df34-11e2-a399-60a44ce903c3
-ControlPoint9Name:(WL-A) 2 - Hobie 2
-ControlPoint9HasTwoPoints:0
-ControlPoint9ShortName:2
-ControlPoint9Mark1Lon:10.179366
-ControlPoint9Mark1Lat:54.479960
+PositionedItem9UUID:76c0c860-8551-013d-92a7-1c6b00518c70
+PositionedItem9Name:2 (Flying Dutchman race 2)
+PositionedItem9CourseArea:
+PositionedItem9Static:0
+PositionedItem9Positions:
+PositionedItem9DataSheet:
 
-ControlPoint10UUID:444d593e-df4a-11e2-a399-60a44ce903c3
-ControlPoint10Name:(WL-B) Reserve
-ControlPoint10HasTwoPoints:0
-ControlPoint10ShortName:R
-ControlPoint10Mark1Lon:10.211527
-ControlPoint10Mark1Lat:54.454560
+PositionedItem10UUID:76d1fcf0-8551-013d-92a8-1c6b00518c70
+PositionedItem10Name:Flying Dutchman start 3 - 1
+PositionedItem10CourseArea:
+PositionedItem10Static:0
+PositionedItem10Positions:
+PositionedItem10DataSheet:
 
-ControlPoint11UUID:4a301d00-c07c-0130-179b-60a44ce903c3
-ControlPoint11Name:(WL-B) Finish
-ControlPoint11HasTwoPoints:1
-ControlPoint11ShortName:F
-ControlPoint11Mark1Lon:10.211725
-ControlPoint11Mark1Lat:54.454658
-ControlPoint11Mark2Lon:10.211490
-ControlPoint11Mark2Lat:54.454468
+PositionedItem11UUID:76dc40d0-8551-013d-92a9-1c6b00518c70
+PositionedItem11Name:Flying Dutchman start 3 - 2
+PositionedItem11CourseArea:
+PositionedItem11Static:0
+PositionedItem11Positions:
+PositionedItem11DataSheet:
 
-ControlPoint12UUID:4a3d9190-c234-0130-5301-60a44ce903c3
-ControlPoint12Name:(TR-A) 5
-ControlPoint12HasTwoPoints:0
-ControlPoint12ShortName:5
-ControlPoint12Mark1Lon:10.169750
-ControlPoint12Mark1Lat:54.428818
+PositionedItem12UUID:7707b8c0-8551-013d-92ac-1c6b00518c70
+PositionedItem12Name:(TR-A) Start - 1
+PositionedItem12CourseArea:
+PositionedItem12Static:0
+PositionedItem12Positions:
+PositionedItem12DataSheet:
 
-ControlPoint13UUID:5599d41e-dfd7-11e2-a399-60a44ce903c3
-ControlPoint13Name:2 (Flying Dutchman race 3)	
-ControlPoint13HasTwoPoints:0
-ControlPoint13ShortName:2
-ControlPoint13Mark1Lon:10.228986
-ControlPoint13Mark1Lat:54.492614
+PositionedItem13UUID:77a641c0-8551-013d-92ad-1c6b00518c70
+PositionedItem13Name:(TR-A) Start - 2
+PositionedItem13CourseArea:
+PositionedItem13Static:0
+PositionedItem13Positions:
+PositionedItem13DataSheet:
 
-ControlPoint14UUID:5d68ea10-df49-11e2-a399-60a44ce903c3
-ControlPoint14Name:(TR-A) 4
-ControlPoint14HasTwoPoints:1
-ControlPoint14ShortName:4
-ControlPoint14Mark1Lon:10.197877
-ControlPoint14Mark1Lat:54.446140
-ControlPoint14Mark2Lon:10.197418
-ControlPoint14Mark2Lat:54.445903
+PositionedItem14UUID:783be140-8551-013d-92b0-1c6b00518c70
+PositionedItem14Name:(WL-A) 2 - Hobie 2
+PositionedItem14CourseArea:
+PositionedItem14Static:0
+PositionedItem14Positions:
+PositionedItem14DataSheet:
 
-ControlPoint15UUID:63eb78e0-c07b-0130-1788-60a44ce903c3
-ControlPoint15Name:(WL-A) 1
-ControlPoint15HasTwoPoints:0
-ControlPoint15ShortName:1
-ControlPoint15Mark1Lon:10.266692
-ControlPoint15Mark1Lat:54.433190
+PositionedItem15UUID:785c6910-8551-013d-92b1-1c6b00518c70
+PositionedItem15Name:(WL-B) Reserve
+PositionedItem15CourseArea:
+PositionedItem15Static:0
+PositionedItem15Positions:
+PositionedItem15DataSheet:
 
-ControlPoint16UUID:69e49e50-c0a7-0130-180a-60a44ce903c3
-ControlPoint16Name:(TR-A) Finish
-ControlPoint16HasTwoPoints:1
-ControlPoint16ShortName:F
-ControlPoint16Mark1Lon:10.200102
-ControlPoint16Mark1Lat:54.431163
-ControlPoint16Mark2Lon:10.201033
-ControlPoint16Mark2Lat:54.431275
+PositionedItem16UUID:78d2cff0-8551-013d-92b2-1c6b00518c70
+PositionedItem16Name:(WL-B) Finish - 1
+PositionedItem16CourseArea:
+PositionedItem16Static:0
+PositionedItem16Positions:
+PositionedItem16DataSheet:
 
-ControlPoint17UUID:6fc38a68-df2f-11e2-a399-60a44ce903c3
-ControlPoint17Name:(TR-A) Repl
-ControlPoint17HasTwoPoints:0
-ControlPoint17ShortName:R
-ControlPoint17Mark1Lon:10.208225
-ControlPoint17Mark1Lat:54.437813
+PositionedItem17UUID:7959f270-8551-013d-92b3-1c6b00518c70
+PositionedItem17Name:(WL-B) Finish - 2
+PositionedItem17CourseArea:
+PositionedItem17Static:0
+PositionedItem17Positions:
+PositionedItem17DataSheet:
 
-ControlPoint18UUID:80ff09a0-c163-0130-2c0a-60a44ce903c3
-ControlPoint18Name:Start 505 Race 2
-ControlPoint18HasTwoPoints:1
-ControlPoint18ShortName:S
-ControlPoint18Mark1Lon:10.243763
-ControlPoint18Mark1Lat:54.509269
-ControlPoint18Mark2Lon:10.230245
-ControlPoint18Mark2Lat:54.509814
+PositionedItem18UUID:79e89430-8551-013d-92b6-1c6b00518c70
+PositionedItem18Name:(TR-A) 5
+PositionedItem18CourseArea:
+PositionedItem18Static:0
+PositionedItem18Positions:
+PositionedItem18DataSheet:
 
-ControlPoint19UUID:88ff3c50-c0a7-0130-180e-60a44ce903c3
-ControlPoint19Name:(TR-A) 1
-ControlPoint19HasTwoPoints:0
-ControlPoint19ShortName:1
-ControlPoint19Mark1Lon:10.200073
-ControlPoint19Mark1Lat:54.431938
+PositionedItem19UUID:7a3f2550-8551-013d-92b7-1c6b00518c70
+PositionedItem19Name:2 (Flying Dutchman race 3)	
+PositionedItem19CourseArea:
+PositionedItem19Static:0
+PositionedItem19Positions:
+PositionedItem19DataSheet:
 
-ControlPoint20UUID:985bcfb0-c0a7-0130-1811-60a44ce903c3
-ControlPoint20Name:(TR-A) 2
-ControlPoint20HasTwoPoints:0
-ControlPoint20ShortName:2
-ControlPoint20Mark1Lon:10.206877
-ControlPoint20Mark1Lat:54.437447
+PositionedItem20UUID:7a52ea10-8551-013d-92b8-1c6b00518c70
+PositionedItem20Name:(TR-A) 4 - 1
+PositionedItem20CourseArea:
+PositionedItem20Static:0
+PositionedItem20Positions:
+PositionedItem20DataSheet:
 
-ControlPoint21UUID:98604406-df30-11e2-a399-60a44ce903c3
-ControlPoint21Name:(WL-A) 2
-ControlPoint21HasTwoPoints:0
-ControlPoint21ShortName:2
-ControlPoint21Mark1Lon:10.169618
-ControlPoint21Mark1Lat:54.428822
+PositionedItem21UUID:7acbb4f0-8551-013d-92b9-1c6b00518c70
+PositionedItem21Name:(TR-A) 4 - 2
+PositionedItem21CourseArea:
+PositionedItem21Static:0
+PositionedItem21Positions:
+PositionedItem21DataSheet:
 
-ControlPoint22UUID:9a317d70-c07b-0130-178b-60a44ce903c3
-ControlPoint22Name:(WL-A) 3
-ControlPoint22HasTwoPoints:1
-ControlPoint22ShortName:3
-ControlPoint22Mark1Lon:10.264257
-ControlPoint22Mark1Lat:54.444298
-ControlPoint22Mark2Lon:10.265030
-ControlPoint22Mark2Lat:54.444503
+PositionedItem22UUID:7b230000-8551-013d-92bc-1c6b00518c70
+PositionedItem22Name:(WL-A) 1
+PositionedItem22CourseArea:
+PositionedItem22Static:0
+PositionedItem22Positions:
+PositionedItem22DataSheet:
 
-ControlPoint23UUID:aaf39f30-c169-0130-34c5-60a44ce903c3
-ControlPoint23Name:Start 505 Race 3
-ControlPoint23HasTwoPoints:1
-ControlPoint23ShortName:S
-ControlPoint23Mark1Lon:10.241137
-ControlPoint23Mark1Lat:54.509448
-ControlPoint23Mark2Lon:10.232198
-ControlPoint23Mark2Lat:54.510877
+PositionedItem23UUID:7bbc64f0-8551-013d-92bd-1c6b00518c70
+PositionedItem23Name:(TR-A) Finish - 1
+PositionedItem23CourseArea:
+PositionedItem23Static:0
+PositionedItem23Positions:
+PositionedItem23DataSheet:
 
-ControlPoint24UUID:ae18c6b4-df4a-11e2-a399-60a44ce903c3
-ControlPoint24Name:(WL-A) Reserve
-ControlPoint24HasTwoPoints:0
-ControlPoint24ShortName:R
-ControlPoint24Mark1Lon:10.262853
-ControlPoint24Mark1Lat:54.445237
+PositionedItem24UUID:7cad00a0-8551-013d-92be-1c6b00518c70
+PositionedItem24Name:(TR-A) Finish - 2
+PositionedItem24CourseArea:
+PositionedItem24Static:0
+PositionedItem24Positions:
+PositionedItem24DataSheet:
 
-ControlPoint25UUID:af861380-c15f-0130-2ab5-60a44ce903c3
-ControlPoint25Name:Start 505 Race 1
-ControlPoint25HasTwoPoints:1
-ControlPoint25ShortName:S
-ControlPoint25Mark1Lon:10.246097
-ControlPoint25Mark1Lat:54.505329
-ControlPoint25Mark2Lon:10.234754
-ControlPoint25Mark2Lat:54.506448
+PositionedItem25UUID:7d61e500-8551-013d-92c1-1c6b00518c70
+PositionedItem25Name:(TR-A) Repl
+PositionedItem25CourseArea:
+PositionedItem25Static:0
+PositionedItem25Positions:
+PositionedItem25DataSheet:
 
-ControlPoint26UUID:b7f37350-c07b-0130-178f-60a44ce903c3
-ControlPoint26Name:(WL-B) 1
-ControlPoint26HasTwoPoints:0
-ControlPoint26ShortName:1
-ControlPoint26Mark1Lon:10.215342
-ControlPoint26Mark1Lat:54.442055
+PositionedItem26UUID:7dee1210-8551-013d-92c2-1c6b00518c70
+PositionedItem26Name:Start 505 Race 2 - 1
+PositionedItem26CourseArea:
+PositionedItem26Static:0
+PositionedItem26Positions:
+PositionedItem26DataSheet:
 
-ControlPoint27UUID:d616cd10-c07b-0130-1792-60a44ce903c3
-ControlPoint27Name:(WL-B) 3
-ControlPoint27HasTwoPoints:1
-ControlPoint27ShortName:3
-ControlPoint27Mark1Lon:10.214177
-ControlPoint27Mark1Lat:54.453377
-ControlPoint27Mark2Lon:10.213470
-ControlPoint27Mark2Lat:54.453288
+PositionedItem27UUID:7def92c0-8551-013d-92c3-1c6b00518c70
+PositionedItem27Name:Start 505 Race 2 - 2
+PositionedItem27CourseArea:
+PositionedItem27Static:0
+PositionedItem27Positions:
+PositionedItem27DataSheet:
 
-ControlPoint28UUID:dfc4ec7c-dfd3-11e2-a399-60a44ce903c3
-ControlPoint28Name:2 (Flying Dutchman race 1)
-ControlPoint28HasTwoPoints:0
-ControlPoint28ShortName:2
-ControlPoint28Mark1Lon:10.229200
-ControlPoint28Mark1Lat:54.492666
+PositionedItem28UUID:7e534310-8551-013d-92c6-1c6b00518c70
+PositionedItem28Name:(TR-A) 1
+PositionedItem28CourseArea:
+PositionedItem28Static:0
+PositionedItem28Positions:
+PositionedItem28DataSheet:
 
-ControlPoint29UUID:e1d38970-c07a-0130-177f-60a44ce903c3
-ControlPoint29Name:(WL-A) Start
-ControlPoint29HasTwoPoints:1
-ControlPoint29ShortName:S
-ControlPoint29Mark1Lon:10.262902
-ControlPoint29Mark1Lat:54.445228
-ControlPoint29Mark2Lon:10.268008
-ControlPoint29Mark2Lat:54.445812
+PositionedItem29UUID:7ec363d0-8551-013d-92c7-1c6b00518c70
+PositionedItem29Name:(TR-A) 2
+PositionedItem29CourseArea:
+PositionedItem29Static:0
+PositionedItem29Positions:
+PositionedItem29DataSheet:
 
-ControlPoint30UUID:e40849a2-df4a-11e2-a399-60a44ce903c3
-ControlPoint30Name:(TR-A) Reserve
-ControlPoint30HasTwoPoints:0
-ControlPoint30ShortName:Re
-ControlPoint30Mark1Lon:10.197317
-ControlPoint30Mark1Lat:54.441727
+PositionedItem30UUID:7f6c6af0-8551-013d-92c8-1c6b00518c70
+PositionedItem30Name:(WL-A) 2
+PositionedItem30CourseArea:
+PositionedItem30Static:0
+PositionedItem30Positions:
+PositionedItem30DataSheet:
 
-ControlPoint31UUID:fed3138a-df35-11e2-a399-60a44ce903c3
-ControlPoint31Name:(WL-A) 2 - Hobie 3
-ControlPoint31HasTwoPoints:0
-ControlPoint31ShortName:2
-ControlPoint31Mark1Lon:10.184693
-ControlPoint31Mark1Lat:54.479945
+PositionedItem31UUID:7fbff4e0-8551-013d-92c9-1c6b00518c70
+PositionedItem31Name:(WL-A) 3 - 1
+PositionedItem31CourseArea:
+PositionedItem31Static:0
+PositionedItem31Positions:
+PositionedItem31DataSheet:
 
+PositionedItem32UUID:80428d20-8551-013d-92ca-1c6b00518c70
+PositionedItem32Name:(WL-A) 3 - 2
+PositionedItem32CourseArea:
+PositionedItem32Static:0
+PositionedItem32Positions:
+PositionedItem32DataSheet:
+
+PositionedItem33UUID:80fb8490-8551-013d-92cd-1c6b00518c70
+PositionedItem33Name:Start 505 Race 3 - 1
+PositionedItem33CourseArea:
+PositionedItem33Static:0
+PositionedItem33Positions:
+PositionedItem33DataSheet:
+
+PositionedItem34UUID:80ff0ac0-8551-013d-92ce-1c6b00518c70
+PositionedItem34Name:Start 505 Race 3 - 2
+PositionedItem34CourseArea:
+PositionedItem34Static:0
+PositionedItem34Positions:
+PositionedItem34DataSheet:
+
+PositionedItem35UUID:812ded90-8551-013d-92d1-1c6b00518c70
+PositionedItem35Name:(WL-A) Reserve
+PositionedItem35CourseArea:
+PositionedItem35Static:0
+PositionedItem35Positions:
+PositionedItem35DataSheet:
+
+PositionedItem36UUID:81d231b0-8551-013d-92d2-1c6b00518c70
+PositionedItem36Name:Start 505 Race 1 - 1
+PositionedItem36CourseArea:
+PositionedItem36Static:0
+PositionedItem36Positions:
+PositionedItem36DataSheet:
+
+PositionedItem37UUID:81d32780-8551-013d-92d3-1c6b00518c70
+PositionedItem37Name:Start 505 Race 1 - 2
+PositionedItem37CourseArea:
+PositionedItem37Static:0
+PositionedItem37Positions:
+PositionedItem37DataSheet:
+
+PositionedItem38UUID:82067f00-8551-013d-92d6-1c6b00518c70
+PositionedItem38Name:(WL-B) 1
+PositionedItem38CourseArea:
+PositionedItem38Static:0
+PositionedItem38Positions:
+PositionedItem38DataSheet:
+
+PositionedItem39UUID:82a3a580-8551-013d-92d7-1c6b00518c70
+PositionedItem39Name:(WL-B) 3 - 1
+PositionedItem39CourseArea:
+PositionedItem39Static:0
+PositionedItem39Positions:
+PositionedItem39DataSheet:
+
+PositionedItem40UUID:834ed540-8551-013d-92d8-1c6b00518c70
+PositionedItem40Name:(WL-B) 3 - 2
+PositionedItem40CourseArea:
+PositionedItem40Static:0
+PositionedItem40Positions:
+PositionedItem40DataSheet:
+
+PositionedItem41UUID:844f5220-8551-013d-92db-1c6b00518c70
+PositionedItem41Name:2 (Flying Dutchman race 1)
+PositionedItem41CourseArea:
+PositionedItem41Static:0
+PositionedItem41Positions:
+PositionedItem41DataSheet:
+
+PositionedItem42UUID:8465aea0-8551-013d-92dc-1c6b00518c70
+PositionedItem42Name:(WL-A) Start - 1
+PositionedItem42CourseArea:
+PositionedItem42Static:0
+PositionedItem42Positions:
+PositionedItem42DataSheet:
+
+PositionedItem43UUID:8559da10-8551-013d-92dd-1c6b00518c70
+PositionedItem43Name:(WL-A) Start - 2
+PositionedItem43CourseArea:
+PositionedItem43Static:0
+PositionedItem43Positions:
+PositionedItem43DataSheet:
+
+PositionedItem44UUID:86256860-8551-013d-92e0-1c6b00518c70
+PositionedItem44Name:(TR-A) Reserve
+PositionedItem44CourseArea:
+PositionedItem44Static:0
+PositionedItem44Positions:
+PositionedItem44DataSheet:
+
+PositionedItem45UUID:86b37f70-8551-013d-92e1-1c6b00518c70
+PositionedItem45Name:(WL-A) 2 - Hobie 3
+PositionedItem45CourseArea:
+PositionedItem45Static:0
+PositionedItem45Positions:
+PositionedItem45DataSheet:
+
+MapItem1UUID:06926420-c0a8-0130-181a-60a44ce903c3
+MapItem1Name:(TR-A) 3
+MapItem1ShortName:3
+MapItem1PositionedItemIds:["709cda00-8551-013d-9299-1c6b00518c70", "71f9c8d0-8551-013d-929a-1c6b00518c70"]
+
+MapItem2UUID:09ad5e90-c07d-0130-179f-60a44ce903c3
+MapItem2Name:(WL-A) Replace
+MapItem2ShortName:
+MapItem2PositionedItemIds:["728ddbe0-8551-013d-929d-1c6b00518c70"]
+
+MapItem3UUID:16285160-c07b-0130-1784-60a44ce903c3
+MapItem3Name:(WL-A) Finish
+MapItem3ShortName:F
+MapItem3PositionedItemIds:["73858690-8551-013d-929e-1c6b00518c70", "741228b0-8551-013d-929f-1c6b00518c70"]
+
+MapItem4UUID:199c6d40-c07c-0130-1797-60a44ce903c3
+MapItem4Name:(WL-B) Start
+MapItem4ShortName:S
+MapItem4PositionedItemIds:["74d5de60-8551-013d-92a2-1c6b00518c70", "75562440-8551-013d-92a3-1c6b00518c70"]
+
+MapItem5UUID:2c739890-c07d-0130-17a2-60a44ce903c3
+MapItem5Name:(WL-B) Replace
+MapItem5ShortName:
+MapItem5PositionedItemIds:["761bba51-8551-013d-92a6-1c6b00518c70"]
+
+MapItem6UUID:343d9eaa-dfd6-11e2-a399-60a44ce903c3
+MapItem6Name:2 (Flying Dutchman race 2)
+MapItem6ShortName:2
+MapItem6PositionedItemIds:["76c0c860-8551-013d-92a7-1c6b00518c70"]
+
+MapItem7UUID:380fa8b0-c167-0130-2c13-60a44ce903c3
+MapItem7Name:Flying Dutchman start 3
+MapItem7ShortName:S
+MapItem7PositionedItemIds:["76d1fcf0-8551-013d-92a8-1c6b00518c70", "76dc40d0-8551-013d-92a9-1c6b00518c70"]
+
+MapItem8UUID:3c7df210-c0a7-0130-1806-60a44ce903c3
+MapItem8Name:(TR-A) Start
+MapItem8ShortName:S
+MapItem8PositionedItemIds:["7707b8c0-8551-013d-92ac-1c6b00518c70", "77a641c0-8551-013d-92ad-1c6b00518c70"]
+
+MapItem9UUID:43332aee-df34-11e2-a399-60a44ce903c3
+MapItem9Name:(WL-A) 2 - Hobie 2
+MapItem9ShortName:2
+MapItem9PositionedItemIds:["783be140-8551-013d-92b0-1c6b00518c70"]
+
+MapItem10UUID:444d593e-df4a-11e2-a399-60a44ce903c3
+MapItem10Name:(WL-B) Reserve
+MapItem10ShortName:R
+MapItem10PositionedItemIds:["785c6910-8551-013d-92b1-1c6b00518c70"]
+
+MapItem11UUID:4a301d00-c07c-0130-179b-60a44ce903c3
+MapItem11Name:(WL-B) Finish
+MapItem11ShortName:F
+MapItem11PositionedItemIds:["78d2cff0-8551-013d-92b2-1c6b00518c70", "7959f270-8551-013d-92b3-1c6b00518c70"]
+
+MapItem12UUID:4a3d9190-c234-0130-5301-60a44ce903c3
+MapItem12Name:(TR-A) 5
+MapItem12ShortName:5
+MapItem12PositionedItemIds:["79e89430-8551-013d-92b6-1c6b00518c70"]
+
+MapItem13UUID:5599d41e-dfd7-11e2-a399-60a44ce903c3
+MapItem13Name:2 (Flying Dutchman race 3)	
+MapItem13ShortName:2
+MapItem13PositionedItemIds:["7a3f2550-8551-013d-92b7-1c6b00518c70"]
+
+MapItem14UUID:5d68ea10-df49-11e2-a399-60a44ce903c3
+MapItem14Name:(TR-A) 4
+MapItem14ShortName:4
+MapItem14PositionedItemIds:["7a52ea10-8551-013d-92b8-1c6b00518c70", "7acbb4f0-8551-013d-92b9-1c6b00518c70"]
+
+MapItem15UUID:63eb78e0-c07b-0130-1788-60a44ce903c3
+MapItem15Name:(WL-A) 1
+MapItem15ShortName:1
+MapItem15PositionedItemIds:["7b230000-8551-013d-92bc-1c6b00518c70"]
+
+MapItem16UUID:69e49e50-c0a7-0130-180a-60a44ce903c3
+MapItem16Name:(TR-A) Finish
+MapItem16ShortName:F
+MapItem16PositionedItemIds:["7bbc64f0-8551-013d-92bd-1c6b00518c70", "7cad00a0-8551-013d-92be-1c6b00518c70"]
+
+MapItem17UUID:6fc38a68-df2f-11e2-a399-60a44ce903c3
+MapItem17Name:(TR-A) Repl
+MapItem17ShortName:R
+MapItem17PositionedItemIds:["7d61e500-8551-013d-92c1-1c6b00518c70"]
+
+MapItem18UUID:7287d510-8551-013d-929b-1c6b00518c70
+MapItem18Name:(TR-A) 3 - 1
+MapItem18ShortName:3
+MapItem18PositionedItemIds:["709cda00-8551-013d-9299-1c6b00518c70"]
+
+MapItem19UUID:728b6b10-8551-013d-929c-1c6b00518c70
+MapItem19Name:(TR-A) 3 - 2
+MapItem19ShortName:3
+MapItem19PositionedItemIds:["71f9c8d0-8551-013d-929a-1c6b00518c70"]
+
+MapItem20UUID:74d31110-8551-013d-92a0-1c6b00518c70
+MapItem20Name:(WL-A) Finish - 1
+MapItem20ShortName:F
+MapItem20PositionedItemIds:["73858690-8551-013d-929e-1c6b00518c70"]
+
+MapItem21UUID:74d526a0-8551-013d-92a1-1c6b00518c70
+MapItem21Name:(WL-A) Finish - 2
+MapItem21ShortName:F
+MapItem21PositionedItemIds:["741228b0-8551-013d-929f-1c6b00518c70"]
+
+MapItem22UUID:75e81650-8551-013d-92a4-1c6b00518c70
+MapItem22Name:(WL-B) Start - 1
+MapItem22ShortName:S
+MapItem22PositionedItemIds:["74d5de60-8551-013d-92a2-1c6b00518c70"]
+
+MapItem23UUID:761052a0-8551-013d-92a5-1c6b00518c70
+MapItem23Name:(WL-B) Start - 2
+MapItem23ShortName:S
+MapItem23PositionedItemIds:["75562440-8551-013d-92a3-1c6b00518c70"]
+
+MapItem24UUID:76f88760-8551-013d-92aa-1c6b00518c70
+MapItem24Name:Flying Dutchman start 3 - 1
+MapItem24ShortName:S
+MapItem24PositionedItemIds:["76d1fcf0-8551-013d-92a8-1c6b00518c70"]
+
+MapItem25UUID:76ff0b60-8551-013d-92ab-1c6b00518c70
+MapItem25Name:Flying Dutchman start 3 - 2
+MapItem25ShortName:S
+MapItem25PositionedItemIds:["76dc40d0-8551-013d-92a9-1c6b00518c70"]
+
+MapItem26UUID:7831cd50-8551-013d-92ae-1c6b00518c70
+MapItem26Name:(TR-A) Start - 1
+MapItem26ShortName:S
+MapItem26PositionedItemIds:["7707b8c0-8551-013d-92ac-1c6b00518c70"]
+
+MapItem27UUID:78378b90-8551-013d-92af-1c6b00518c70
+MapItem27Name:(TR-A) Start - 2
+MapItem27ShortName:S
+MapItem27PositionedItemIds:["77a641c0-8551-013d-92ad-1c6b00518c70"]
+
+MapItem28UUID:79e01370-8551-013d-92b4-1c6b00518c70
+MapItem28Name:(WL-B) Finish - 1
+MapItem28ShortName:F
+MapItem28PositionedItemIds:["78d2cff0-8551-013d-92b2-1c6b00518c70"]
+
+MapItem29UUID:79e21b60-8551-013d-92b5-1c6b00518c70
+MapItem29Name:(WL-B) Finish - 2
+MapItem29ShortName:F
+MapItem29PositionedItemIds:["7959f270-8551-013d-92b3-1c6b00518c70"]
+
+MapItem30UUID:7b1b2110-8551-013d-92ba-1c6b00518c70
+MapItem30Name:(TR-A) 4 - 1
+MapItem30ShortName:4
+MapItem30PositionedItemIds:["7a52ea10-8551-013d-92b8-1c6b00518c70"]
+
+MapItem31UUID:7b1bd960-8551-013d-92bb-1c6b00518c70
+MapItem31Name:(TR-A) 4 - 2
+MapItem31ShortName:4
+MapItem31PositionedItemIds:["7acbb4f0-8551-013d-92b9-1c6b00518c70"]
+
+MapItem32UUID:7d3a2ca0-8551-013d-92bf-1c6b00518c70
+MapItem32Name:(TR-A) Finish - 1
+MapItem32ShortName:F
+MapItem32PositionedItemIds:["7bbc64f0-8551-013d-92bd-1c6b00518c70"]
+
+MapItem33UUID:7d3d2b30-8551-013d-92c0-1c6b00518c70
+MapItem33Name:(TR-A) Finish - 2
+MapItem33ShortName:F
+MapItem33PositionedItemIds:["7cad00a0-8551-013d-92be-1c6b00518c70"]
+
+MapItem34UUID:7e2d3780-8551-013d-92c4-1c6b00518c70
+MapItem34Name:Start 505 Race 2 - 1
+MapItem34ShortName:S
+MapItem34PositionedItemIds:["7dee1210-8551-013d-92c2-1c6b00518c70"]
+
+MapItem35UUID:7e43dca0-8551-013d-92c5-1c6b00518c70
+MapItem35Name:Start 505 Race 2 - 2
+MapItem35ShortName:S
+MapItem35PositionedItemIds:["7def92c0-8551-013d-92c3-1c6b00518c70"]
+
+MapItem36UUID:80f0eb30-8551-013d-92cb-1c6b00518c70
+MapItem36Name:(WL-A) 3 - 1
+MapItem36ShortName:3
+MapItem36PositionedItemIds:["7fbff4e0-8551-013d-92c9-1c6b00518c70"]
+
+MapItem37UUID:80f6cd90-8551-013d-92cc-1c6b00518c70
+MapItem37Name:(WL-A) 3 - 2
+MapItem37ShortName:3
+MapItem37PositionedItemIds:["80428d20-8551-013d-92ca-1c6b00518c70"]
+
+MapItem38UUID:80ff09a0-c163-0130-2c0a-60a44ce903c3
+MapItem38Name:Start 505 Race 2
+MapItem38ShortName:S
+MapItem38PositionedItemIds:["7dee1210-8551-013d-92c2-1c6b00518c70", "7def92c0-8551-013d-92c3-1c6b00518c70"]
+
+MapItem39UUID:8115a990-8551-013d-92cf-1c6b00518c70
+MapItem39Name:Start 505 Race 3 - 1
+MapItem39ShortName:S
+MapItem39PositionedItemIds:["80fb8490-8551-013d-92cd-1c6b00518c70"]
+
+MapItem40UUID:812abfd0-8551-013d-92d0-1c6b00518c70
+MapItem40Name:Start 505 Race 3 - 2
+MapItem40ShortName:S
+MapItem40PositionedItemIds:["80ff0ac0-8551-013d-92ce-1c6b00518c70"]
+
+MapItem41UUID:81f402b0-8551-013d-92d4-1c6b00518c70
+MapItem41Name:Start 505 Race 1 - 1
+MapItem41ShortName:S
+MapItem41PositionedItemIds:["81d231b0-8551-013d-92d2-1c6b00518c70"]
+
+MapItem42UUID:81f4a890-8551-013d-92d5-1c6b00518c70
+MapItem42Name:Start 505 Race 1 - 2
+MapItem42ShortName:S
+MapItem42PositionedItemIds:["81d32780-8551-013d-92d3-1c6b00518c70"]
+
+MapItem43UUID:843f59c0-8551-013d-92d9-1c6b00518c70
+MapItem43Name:(WL-B) 3 - 1
+MapItem43ShortName:3
+MapItem43PositionedItemIds:["82a3a580-8551-013d-92d7-1c6b00518c70"]
+
+MapItem44UUID:84487c00-8551-013d-92da-1c6b00518c70
+MapItem44Name:(WL-B) 3 - 2
+MapItem44ShortName:3
+MapItem44PositionedItemIds:["834ed540-8551-013d-92d8-1c6b00518c70"]
+
+MapItem45UUID:860edf10-8551-013d-92de-1c6b00518c70
+MapItem45Name:(WL-A) Start - 1
+MapItem45ShortName:S
+MapItem45PositionedItemIds:["8465aea0-8551-013d-92dc-1c6b00518c70"]
+
+MapItem46UUID:861d1910-8551-013d-92df-1c6b00518c70
+MapItem46Name:(WL-A) Start - 2
+MapItem46ShortName:S
+MapItem46PositionedItemIds:["8559da10-8551-013d-92dd-1c6b00518c70"]
+
+MapItem47UUID:88ff3c50-c0a7-0130-180e-60a44ce903c3
+MapItem47Name:(TR-A) 1
+MapItem47ShortName:1
+MapItem47PositionedItemIds:["7e534310-8551-013d-92c6-1c6b00518c70"]
+
+MapItem48UUID:985bcfb0-c0a7-0130-1811-60a44ce903c3
+MapItem48Name:(TR-A) 2
+MapItem48ShortName:2
+MapItem48PositionedItemIds:["7ec363d0-8551-013d-92c7-1c6b00518c70"]
+
+MapItem49UUID:98604406-df30-11e2-a399-60a44ce903c3
+MapItem49Name:(WL-A) 2
+MapItem49ShortName:2
+MapItem49PositionedItemIds:["7f6c6af0-8551-013d-92c8-1c6b00518c70"]
+
+MapItem50UUID:9a317d70-c07b-0130-178b-60a44ce903c3
+MapItem50Name:(WL-A) 3
+MapItem50ShortName:3
+MapItem50PositionedItemIds:["7fbff4e0-8551-013d-92c9-1c6b00518c70", "80428d20-8551-013d-92ca-1c6b00518c70"]
+
+MapItem51UUID:aaf39f30-c169-0130-34c5-60a44ce903c3
+MapItem51Name:Start 505 Race 3
+MapItem51ShortName:S
+MapItem51PositionedItemIds:["80fb8490-8551-013d-92cd-1c6b00518c70", "80ff0ac0-8551-013d-92ce-1c6b00518c70"]
+
+MapItem52UUID:ae18c6b4-df4a-11e2-a399-60a44ce903c3
+MapItem52Name:(WL-A) Reserve
+MapItem52ShortName:R
+MapItem52PositionedItemIds:["812ded90-8551-013d-92d1-1c6b00518c70"]
+
+MapItem53UUID:af861380-c15f-0130-2ab5-60a44ce903c3
+MapItem53Name:Start 505 Race 1
+MapItem53ShortName:S
+MapItem53PositionedItemIds:["81d231b0-8551-013d-92d2-1c6b00518c70", "81d32780-8551-013d-92d3-1c6b00518c70"]
+
+MapItem54UUID:b7f37350-c07b-0130-178f-60a44ce903c3
+MapItem54Name:(WL-B) 1
+MapItem54ShortName:1
+MapItem54PositionedItemIds:["82067f00-8551-013d-92d6-1c6b00518c70"]
+
+MapItem55UUID:d616cd10-c07b-0130-1792-60a44ce903c3
+MapItem55Name:(WL-B) 3
+MapItem55ShortName:3
+MapItem55PositionedItemIds:["82a3a580-8551-013d-92d7-1c6b00518c70", "834ed540-8551-013d-92d8-1c6b00518c70"]
+
+MapItem56UUID:dfc4ec7c-dfd3-11e2-a399-60a44ce903c3
+MapItem56Name:2 (Flying Dutchman race 1)
+MapItem56ShortName:2
+MapItem56PositionedItemIds:["844f5220-8551-013d-92db-1c6b00518c70"]
+
+MapItem57UUID:e1d38970-c07a-0130-177f-60a44ce903c3
+MapItem57Name:(WL-A) Start
+MapItem57ShortName:S
+MapItem57PositionedItemIds:["8465aea0-8551-013d-92dc-1c6b00518c70", "8559da10-8551-013d-92dd-1c6b00518c70"]
+
+MapItem58UUID:e40849a2-df4a-11e2-a399-60a44ce903c3
+MapItem58Name:(TR-A) Reserve
+MapItem58ShortName:Re
+MapItem58PositionedItemIds:["86256860-8551-013d-92e0-1c6b00518c70"]
+
+MapItem59UUID:fed3138a-df35-11e2-a399-60a44ce903c3
+MapItem59Name:(WL-A) 2 - Hobie 3
+MapItem59ShortName:2
+MapItem59PositionedItemIds:["86b37f70-8551-013d-92e1-1c6b00518c70"]
 
 SegmentFile:segments.php
 Route1UUID:12b23f54-df4d-11e2-a399-60a44ce903c3
@@ -2599,4 +1671,3 @@ Route1ControlPoint6UUID:88ff3c50-c0a7-0130-180e-60a44ce903c3
 Route1ControlPoint7UUID:06926420-c0a8-0130-181a-60a44ce903c3
 Route1ControlPoint8UUID:69e49e50-c0a7-0130-180a-60a44ce903c3
 
-//-------- AUTO GENERATED PARAMETERS END ------------------

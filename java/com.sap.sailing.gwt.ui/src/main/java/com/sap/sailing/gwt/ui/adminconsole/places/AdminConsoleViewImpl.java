@@ -11,6 +11,8 @@ import com.sap.sailing.domain.common.security.SecuredDomainType;
 import com.sap.sailing.domain.common.security.SecuredDomainType.TrackedRaceActions;
 import com.sap.sailing.gwt.common.authentication.FixedSailingAuthentication;
 import com.sap.sailing.gwt.common.authentication.SAPSailingHeaderWithAuthentication;
+import com.sap.sailing.gwt.ui.adminconsole.AIAgentConfigurationPanel;
+import com.sap.sailing.gwt.ui.adminconsole.AIAgentConfigurationPanelSupplier;
 import com.sap.sailing.gwt.ui.adminconsole.BoatPanel;
 import com.sap.sailing.gwt.ui.adminconsole.BoatPanelSupplier;
 import com.sap.sailing.gwt.ui.adminconsole.CompetitorPanel;
@@ -23,8 +25,8 @@ import com.sap.sailing.gwt.ui.adminconsole.EventManagementPanelSupplier;
 import com.sap.sailing.gwt.ui.adminconsole.ExpeditionDeviceConfigurationsPanel;
 import com.sap.sailing.gwt.ui.adminconsole.ExpeditionDeviceConfigurationsPanelSupplier;
 import com.sap.sailing.gwt.ui.adminconsole.FileStoragePanelSupplier;
-import com.sap.sailing.gwt.ui.adminconsole.IgtimiAccountsPanel;
-import com.sap.sailing.gwt.ui.adminconsole.IgtimiAccountsPanelSupplier;
+import com.sap.sailing.gwt.ui.adminconsole.IgtimiDevicesPanel;
+import com.sap.sailing.gwt.ui.adminconsole.IgtimiDevicesPanelSupplier;
 import com.sap.sailing.gwt.ui.adminconsole.LeaderboardConfigPanel;
 import com.sap.sailing.gwt.ui.adminconsole.LeaderboardConfigPanelSupplier;
 import com.sap.sailing.gwt.ui.adminconsole.LeaderboardGroupConfigPanel;
@@ -77,8 +79,9 @@ import com.sap.sailing.gwt.ui.adminconsole.places.advanced.ReplicationPlace;
 import com.sap.sailing.gwt.ui.adminconsole.places.advanced.RolesPlace;
 import com.sap.sailing.gwt.ui.adminconsole.places.advanced.UserGroupManagementPlace;
 import com.sap.sailing.gwt.ui.adminconsole.places.advanced.UserManagementPlace;
+import com.sap.sailing.gwt.ui.adminconsole.places.aiagent.AIAgentConfigurationPlace;
 import com.sap.sailing.gwt.ui.adminconsole.places.connectors.ExpeditionDeviceConfigurationsPlace;
-import com.sap.sailing.gwt.ui.adminconsole.places.connectors.IgtimiAccountsPlace;
+import com.sap.sailing.gwt.ui.adminconsole.places.connectors.IgtimiDevicesPlace;
 import com.sap.sailing.gwt.ui.adminconsole.places.connectors.Manage2SailRegattaStructureImportPlace;
 import com.sap.sailing.gwt.ui.adminconsole.places.connectors.ResultImportUrlsPlace;
 import com.sap.sailing.gwt.ui.adminconsole.places.connectors.SmartphoneTrackingPlace;
@@ -117,6 +120,7 @@ import com.sap.sse.gwt.client.ServerInfoDTO;
 import com.sap.sse.gwt.client.controls.filestorage.FileStoragePanel;
 import com.sap.sse.gwt.client.panels.HorizontalTabLayoutPanel;
 import com.sap.sse.landscape.common.shared.SecuredLandscapeTypes;
+import com.sap.sse.security.shared.HasPermissions.Action;
 import com.sap.sse.security.shared.HasPermissions.DefaultActions;
 import com.sap.sse.security.shared.TypeRelativeObjectIdentifier;
 import com.sap.sse.security.shared.impl.SecuredSecurityTypes;
@@ -128,6 +132,7 @@ import com.sap.sse.security.ui.client.UserService;
 import com.sap.sse.security.ui.client.component.RoleDefinitionsPanel;
 import com.sap.sse.security.ui.client.component.UserGroupManagementPanel;
 import com.sap.sse.security.ui.client.premium.PaywallResolver;
+import com.sap.sse.security.ui.client.premium.PaywallResolverImpl;
 import com.sap.sse.security.ui.client.usermanagement.UserManagementPanel;
 
 public class AdminConsoleViewImpl extends Composite implements AdminConsoleView {
@@ -143,6 +148,7 @@ public class AdminConsoleViewImpl extends Composite implements AdminConsoleView 
     private static final String LEADERBOARDS = "LeaderboardPanel";
     private static final String RACES = "RacesPanel";
     private static final String RACE_COMMITEE = "RaceCommiteeAppPanel";
+    private static final String AI_AGENT = "AIAgentPanel";
 
     @UiField
     HeaderPanel headerPanel;
@@ -170,7 +176,7 @@ public class AdminConsoleViewImpl extends Composite implements AdminConsoleView 
         this.userService = presenter.getUserService();
         this.errorReporter = presenter.getErrorReporter();
         this.placeController = presenter.getPlaceController();
-        this.paywallResolver = new PaywallResolver(this.userService, presenter.getSubscriptionServiceFactory());
+        this.paywallResolver = new PaywallResolverImpl(this.userService, presenter.getSubscriptionServiceFactory());
     }
 
     @Override
@@ -362,17 +368,17 @@ public class AdminConsoleViewImpl extends Composite implements AdminConsoleView 
                 }, stringMessages.smartphoneTracking(), new SmartphoneTrackingPlace((String) null /* no place token */),
                 SecuredDomainType.LEADERBOARD.getPermission(DefaultActions.UPDATE, DefaultActions.DELETE));
         /* Igtimi Accounts */
-        final IgtimiAccountsPanelSupplier accountsPanelSupplier = new IgtimiAccountsPanelSupplier(stringMessages, presenter);
+        final IgtimiDevicesPanelSupplier accountsPanelSupplier = new IgtimiDevicesPanelSupplier(stringMessages, presenter);
         adminConsolePanel.addToTabPanel(connectorsTabPanel,
-                new DefaultRefreshableAdminConsolePanel<IgtimiAccountsPanel>(accountsPanelSupplier) {
+                new DefaultRefreshableAdminConsolePanel<IgtimiDevicesPanel>(accountsPanelSupplier) {
                     @Override
                     public void refreshAfterBecomingVisible() {
                         if (getWidget() != null) {
-                            getWidget().refresh();
+                            getWidget().refreshDevices();
                         }
                     }
-                }, stringMessages.igtimiAccounts(), new IgtimiAccountsPlace((String) null /* no place token */),
-                SecuredDomainType.IGTIMI_ACCOUNT.getPermission(DefaultActions.values()));
+                }, stringMessages.igtimiDevices(), new IgtimiDevicesPlace((String) null /* no place token */),
+                SecuredDomainType.IGTIMI_DEVICE.getPermission(DefaultActions.values()));
         /* Expedition Device Configurations */
         final ExpeditionDeviceConfigurationsPanelSupplier expeditionDeviceConfigurationsPanelSupplier =
                 new ExpeditionDeviceConfigurationsPanelSupplier(stringMessages, presenter);
@@ -549,6 +555,14 @@ public class AdminConsoleViewImpl extends Composite implements AdminConsoleView 
                     }
                 }, stringMessages.markRoles(), new MarkRolesPlace((String) null /* no place token */),
                 SecuredDomainType.MARK_ROLE.getPermission(DefaultActions.MUTATION_ACTIONS));
+        /* AI Agent */
+        final HorizontalTabLayoutPanel aiAgentTabPanel = adminConsolePanel.addVerticalTab(stringMessages.aiAgent(), AI_AGENT);
+        /* Device Configuration User */
+        final AIAgentConfigurationPanelSupplier aiAgentConfigurationUserPanelSupplier = new AIAgentConfigurationPanelSupplier(stringMessages, presenter);
+        adminConsolePanel.addToTabPanel(aiAgentTabPanel,
+                new DefaultRefreshableAdminConsolePanel<AIAgentConfigurationPanel>(aiAgentConfigurationUserPanelSupplier),
+                stringMessages.aiAgentConfiguration(), new AIAgentConfigurationPlace((String) null /* no place token */),
+                SecuredSecurityTypes.SERVER.getPermissionsForTypeRelativeIdentifier(new Action[] { SecuredSecurityTypes.ServerActions.CONFIGURE_AI_AGENT }, serverInfo.getTypeRelativeObjectIdentifier()));
         adminConsolePanel.initUI(defaultPlace);
         return adminConsolePanel;
     }
@@ -557,5 +571,4 @@ public class AdminConsoleViewImpl extends Composite implements AdminConsoleView 
     public void setRedirectToPlace(AbstractAdminConsolePlace redirectoPlace) {
         this.defaultPlace = redirectoPlace;
     }
-
 }

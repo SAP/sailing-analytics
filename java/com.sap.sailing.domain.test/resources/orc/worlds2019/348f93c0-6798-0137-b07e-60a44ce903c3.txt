@@ -1,15 +1,14 @@
 stored-uri:datafiles/348f93c0-6798-0137-b07e-60a44ce903c3.mtb
 StartReplay:1
 
-//live-uri:tcp://event.tractrac.com:44002
-//stored-uri:tcp://event.tractrac.com:44012
-dataservers:{"stored":["tcp:\/\/event.tractrac.com:44011","tcp:\/\/event.tractrac.com:44012","tcp:\/\/event.tractrac.com:44013","tcp:\/\/event.tractrac.com:44014"],"live":["tcp:\/\/event.tractrac.com:44001","tcp:\/\/event.tractrac.com:44002","tcp:\/\/event.tractrac.com:44003","tcp:\/\/event.tractrac.com:44004"],"ws":["ws:\/\/event.tractrac.com:8891","ws:\/\/event.tractrac.com:8892","ws:\/\/event.tractrac.com:8893","ws:\/\/event.tractrac.com:8894"]}
+//live-uri:tcp://historical1.tractrac.com:4400
+//stored-uri:tcp://historical1.tractrac.com:4401
 ResultColumn4Defaultorder:0
 EnableLadderLines:
 LadderLineDistance:100
 DefaultPanel:
-ws-uri:ws://event.tractrac.com:8888
-PerformanceTableLayout:[{"key":"Pos","header":"Pos","tooltip":"Position"},{"key":"Name","header":"Name","tooltip":"Name"},{"key":"Short","header":"Short","tooltip":"Short name"},{"key":"Country","header":"Country","tooltip":"Country"},{"key":"After","header":"After","tooltip":"After"},{"key":"Leg pos","header":"Leg pos","tooltip":"Leg position"},{"key":"Leg time","header":"Leg time","tooltip":"Leg time"},{"key":"SOG","header":"SOG","tooltip":"SOG"},{"key":"VMG","header":"VMG","tooltip":"VMG"},{"key":"Top speed","header":"Top Speed","tooltip":"Top Speed"},{"key":"Distance","header":"Distance","tooltip":"Distance"}]
+ws-uri:ws://tracms.traclive.dk:8888
+PerformanceTableLayout:[{"key":"Pos","header":"Pos","tooltip":"Position","options":null},{"key":"Name","header":"Name","tooltip":"Name","options":null},{"key":"Short","header":"Short","tooltip":"Short name","options":null},{"key":"Country","header":"Country","tooltip":"Country","options":null},{"key":"After","header":"After","tooltip":"After","options":null},{"key":"Leg pos","header":"Leg pos","tooltip":"Leg position","options":null},{"key":"Leg time","header":"Leg time","tooltip":"Leg time","options":null},{"key":"SOG","header":"SOG","tooltip":"SOG","options":null},{"key":"VMG","header":"VMG","tooltip":"VMG","options":null},{"key":"Top speed","header":"Top Speed","tooltip":"Top Speed","options":null},{"key":"Distance","header":"Distance","tooltip":"Distance","options":null}]
 ResultsLayout:[{"key":"Order","header":"#","description":"Position","printable":true,"align":"right","collapsible":false},{"key":"Name","header":"Name","description":"Competitor's name","printable":true,"align":"left","collapsible":false},{"key":"ShortName","header":"Short Name","description":"Competitor's short name","printable":true,"align":"left","collapsible":true},{"key":"LegTime","header":"Leg","description":"Leg time","printable":false,"align":"right","collapsible":true},{"key":"LegPosition","header":"#","description":"Leg position","printable":false,"align":"right","collapsible":true},{"key":"Time","header":"Total","description":"Total time","printable":true,"align":"right","collapsible":false},{"key":"After","header":"Total \u0026Delta;","description":"Total \u0026Delta;","printable":true,"align":"right","collapsible":false}]
 ReCalcDirAndSpeed:
 smsProvider:0
@@ -24,7 +23,7 @@ Marker4MinPixelSize:5
 Marker4Radius:5
 ExcludeRankInfo:
 CompetitorPopUp:1
-TailWidth:4
+TailWidth:1
 DisableMarkTicker:
 LeaderboardMaxSize:
 ShowLeadersNumber:1
@@ -87,6 +86,7 @@ APmarkSwitch:0.13
 APmarkZoomBehindMarks:0.10
 APmarkZoomInFrontOfMarks:0.20
 PopupMarkerUUID:84199024-2c45-11e4-a9f6-14dae9614d7b
+LabelNoBackground:0
 ResultColumn1Visible:1
 ResultColumn1DefaultOrder:1
 ResultColumn1Tooltip:
@@ -137,7 +137,7 @@ MaxMetersPerSecond:20
 PrecisionMeters:20
 ShortAvgTime:180
 LongAvgTime:900
-TimeZone:2
+TimeZone:1
 CompMarkerTimeout:0
 FramesPerSecond:15
 replayspeedup:5
@@ -169,6 +169,12 @@ StartTimeType:Race
 delayIntervals:3,12,15
 DisableChangeRace:
 DisableLatestRoundings:0
+MarkerSymbol:standardBoat
+MarkerMinPixelSize:36
+ShowFlagInLabel:0
+ShowRankInLabel:1
+TailOpacity:70
+TailWidth:1
 cis:2
 DatabaseVersion:01.00.20
 PopUpRow1Name:
@@ -198,6 +204,7 @@ LiveDelaySecs: 70
 LiveDelaySecsRace: 
 LiveDelaySecsEvent: 70
 
+Maps:[]
 
 EventID:1a9551c0-3913-0137-6637-60a44ce903c3
 EventName:D-Marin ORC World Championship
@@ -206,8 +213,11 @@ EventDB:event_20190529_DMarinORCW
 EventStartTime:2019-06-01 22:00:00
 EventEndTime:2019-06-08 21:00:00
 EventType:a1b74ca0-fdd8-11dc-8811-005056c00008
+EventJSON:https://historical1.tractrac.com/events/event_20190529_DMarinORCW/jsonservice.php
 DBReplicaEnabled:0
 HighLoadEnabled:1
+MultipleDataservers:0
+WebURL:https://www.tractrac.com/event-page/event_20190529_DMarinORCW/1685
 
 RaceID:348f93c0-6798-0137-b07e-60a44ce903c3
 RaceName:ORC A - Long Offshore
@@ -219,6 +229,8 @@ Initialized:1
 RaceDefaultRouteUUID:26b64e80-6798-0137-b07d-60a44ce903c3
 RaceHandicapSystem:NONE
 RaceStatus:OFFICIAL
+RaceStatusTime:
+RaceStatusUpdatedAt:
 RaceCourseArea:Standard
 
 Image1UUID:552f27f0-679a-0137-b182-60a44ce903c3
@@ -303,6 +315,7 @@ Image16Image:http://traclive.dk/events/event_20100806_SailforGol/images/EST.gif
 
 Class1UUID:9edb88e0-6798-0137-b083-60a44ce903c3
 Class1Name:ORC A
+Class1BoatClassId:
 
 Team1UUID:375885e0-6930-0137-d269-60a44ce903c3
 Team1Name:ITA 18170
@@ -538,110 +551,178 @@ Comp13StatusTime:2019-06-04 01:56:53
 Comp13RouteUUID:26b64e80-6798-0137-b07d-60a44ce903c3
 Comp13Color:4E342E
 
-ControlPoint1UUID:1a9f7f10-679c-0137-b1e2-60a44ce903c3
-ControlPoint1Name:NAV Plic Cavlin
-ControlPoint1HasTwoPoints:1
-ControlPoint1ShortName:CA
-ControlPoint1CourseArea:Standard
-ControlPoint1Mark1Lon:15.557637
-ControlPoint1Mark1Lat:43.740807
-ControlPoint1Mark1Static:1
-ControlPoint1Mark2Lon:15.551389
-ControlPoint1Mark2Lat:43.744422
-ControlPoint1Mark2Static:1
+PositionedItem1UUID:afb840a0-8845-013d-67a6-1c6b00518c70
+PositionedItem1Name:NAV Plic Cavlin - 1
+PositionedItem1CourseArea:Standard
+PositionedItem1Static:1
+PositionedItem1Positions:[{"m": null, "x": 15.557637, "y": 43.740807, "z": 0.0}]
+PositionedItem1DataSheet:
 
-ControlPoint2UUID:3c114a50-679d-0137-b1ea-60a44ce903c3
-ControlPoint2Name:NAV Hrid Kukuljari
-ControlPoint2HasTwoPoints:1
-ControlPoint2ShortName:KU
-ControlPoint2CourseArea:Standard
-ControlPoint2Mark1Lon:15.634081
-ControlPoint2Mark1Lat:43.759927
-ControlPoint2Mark1Static:1
-ControlPoint2Mark2Lon:15.639372
-ControlPoint2Mark2Lat:43.769666
-ControlPoint2Mark2Static:1
+PositionedItem2UUID:afc6af31-8845-013d-67a7-1c6b00518c70
+PositionedItem2Name:NAV Plic Cavlin - 2
+PositionedItem2CourseArea:Standard
+PositionedItem2Static:1
+PositionedItem2Positions:[{"m": null, "x": 15.551389, "y": 43.744422, "z": 0.0}]
+PositionedItem2DataSheet:
 
-ControlPoint3UUID:3d4551b0-679e-0137-b1ee-60a44ce903c3
-ControlPoint3Name:NAV Zlarin
-ControlPoint3HasTwoPoints:1
-ControlPoint3ShortName:ZL
-ControlPoint3CourseArea:Standard
-ControlPoint3Mark1Lon:15.825733
-ControlPoint3Mark1Lat:43.701662
-ControlPoint3Mark1Static:1
-ControlPoint3Mark2Lon:15.823952
-ControlPoint3Mark2Lat:43.704134
-ControlPoint3Mark2Static:1
+PositionedItem3UUID:b1fffda0-8845-013d-67af-1c6b00518c70
+PositionedItem3Name:NAV Hrid Kukuljari - 1
+PositionedItem3CourseArea:Standard
+PositionedItem3Static:1
+PositionedItem3Positions:[{"m": null, "x": 15.634081, "y": 43.759927, "z": 0.0}]
+PositionedItem3DataSheet:
 
-ControlPoint4UUID:5627dd80-6797-0137-b047-60a44ce903c3
-ControlPoint4Name:B Start
-ControlPoint4HasTwoPoints:1
-ControlPoint4ShortName:ST
-ControlPoint4CourseArea:Standard
-ControlPoint4Mark1Lon:15.800671
-ControlPoint4Mark1Lat:43.697517
-ControlPoint4Mark1Static:0
-ControlPoint4Mark2Lon:15.791654
-ControlPoint4Mark2Lat:43.700879
-ControlPoint4Mark2Static:0
+PositionedItem4UUID:b222bc20-8845-013d-67b0-1c6b00518c70
+PositionedItem4Name:NAV Hrid Kukuljari - 2
+PositionedItem4CourseArea:Standard
+PositionedItem4Static:1
+PositionedItem4Positions:[{"m": null, "x": 15.639372, "y": 43.769666, "z": 0.0}]
+PositionedItem4DataSheet:
 
-ControlPoint5UUID:6d6decd0-680d-0137-b735-60a44ce903c3
-ControlPoint5Name:NAV 1
-ControlPoint5HasTwoPoints:0
-ControlPoint5ShortName:1
-ControlPoint5CourseArea:Standard
-ControlPoint5Mark1Lon:15.803531
-ControlPoint5Mark1Lat:43.710774
-ControlPoint5Mark1Static:1
+PositionedItem5UUID:b26a5b10-8845-013d-67b4-1c6b00518c70
+PositionedItem5Name:NAV Zlarin - 1
+PositionedItem5CourseArea:Standard
+PositionedItem5Static:1
+PositionedItem5Positions:[{"m": null, "x": 15.825733, "y": 43.701662, "z": 0.0}]
+PositionedItem5DataSheet:
 
-ControlPoint6UUID:7983c470-679c-0137-b1e4-60a44ce903c3
-ControlPoint6Name:NAV Drvenik
-ControlPoint6HasTwoPoints:1
-ControlPoint6ShortName:DR
-ControlPoint6CourseArea:Standard
-ControlPoint6Mark1Lon:16.093619
-ControlPoint6Mark1Lat:43.446604
-ControlPoint6Mark1Static:1
-ControlPoint6Mark2Lon:16.117488
-ControlPoint6Mark2Lat:43.441833
-ControlPoint6Mark2Static:1
+PositionedItem6UUID:b270cc40-8845-013d-67b6-1c6b00518c70
+PositionedItem6Name:NAV Zlarin - 2
+PositionedItem6CourseArea:Standard
+PositionedItem6Static:1
+PositionedItem6Positions:[{"m": null, "x": 15.823952, "y": 43.704134, "z": 0.0}]
+PositionedItem6DataSheet:
 
-ControlPoint7UUID:8ad183a0-679d-0137-b1ec-60a44ce903c3
-ControlPoint7Name:NAV Visovac
-ControlPoint7HasTwoPoints:1
-ControlPoint7ShortName:VI
-ControlPoint7CourseArea:Standard
-ControlPoint7Mark1Lon:15.538827
-ControlPoint7Mark1Lat:43.828838
-ControlPoint7Mark1Static:1
-ControlPoint7Mark2Lon:15.532065
-ControlPoint7Mark2Lat:43.837239
-ControlPoint7Mark2Static:1
+PositionedItem7UUID:b2e4edd0-8845-013d-67bd-1c6b00518c70
+PositionedItem7Name:B Start - 1
+PositionedItem7CourseArea:Standard
+PositionedItem7Static:0
+PositionedItem7Positions:
+PositionedItem7DataSheet:
 
-ControlPoint8UUID:af30f100-679c-0137-b1e6-60a44ce903c3
-ControlPoint8Name:NAV Blitvenica
-ControlPoint8HasTwoPoints:1
-ControlPoint8ShortName:BL
-ControlPoint8CourseArea:Standard
-ControlPoint8Mark1Lon:15.574488
-ControlPoint8Mark1Lat:43.625232
-ControlPoint8Mark1Static:1
-ControlPoint8Mark2Lon:15.560893
-ControlPoint8Mark2Lat:43.615441
-ControlPoint8Mark2Static:1
+PositionedItem8UUID:b39fb2d0-8845-013d-67be-1c6b00518c70
+PositionedItem8Name:B Start - 2
+PositionedItem8CourseArea:Standard
+PositionedItem8Static:0
+PositionedItem8Positions:
+PositionedItem8DataSheet:
 
-ControlPoint9UUID:d613d3c0-679c-0137-b1e8-60a44ce903c3
-ControlPoint9Name:NAV Mulo
-ControlPoint9HasTwoPoints:1
-ControlPoint9ShortName:MU
-ControlPoint9CourseArea:Standard
-ControlPoint9Mark1Lon:15.918919
-ControlPoint9Mark1Lat:43.514243
-ControlPoint9Mark1Static:1
-ControlPoint9Mark2Lon:15.939155
-ControlPoint9Mark2Lat:43.514022
-ControlPoint9Mark2Static:1
+PositionedItem9UUID:b4fbb0e0-8845-013d-67c4-1c6b00518c70
+PositionedItem9Name:NAV 1
+PositionedItem9CourseArea:Standard
+PositionedItem9Static:1
+PositionedItem9Positions:[{"m": null, "x": 15.803531, "y": 43.710774, "z": 0.0}]
+PositionedItem9DataSheet:
+
+PositionedItem10UUID:b69c90e0-8845-013d-67c6-1c6b00518c70
+PositionedItem10Name:NAV Drvenik - 1
+PositionedItem10CourseArea:Standard
+PositionedItem10Static:1
+PositionedItem10Positions:[{"m": null, "x": 16.093619, "y": 43.446604, "z": 0.0}]
+PositionedItem10DataSheet:
+
+PositionedItem11UUID:b6ad0910-8845-013d-67c7-1c6b00518c70
+PositionedItem11Name:NAV Drvenik - 2
+PositionedItem11CourseArea:Standard
+PositionedItem11Static:1
+PositionedItem11Positions:[{"m": null, "x": 16.117488, "y": 43.441833, "z": 0.0}]
+PositionedItem11DataSheet:
+
+PositionedItem12UUID:b740ad30-8845-013d-67cc-1c6b00518c70
+PositionedItem12Name:NAV Visovac - 1
+PositionedItem12CourseArea:Standard
+PositionedItem12Static:1
+PositionedItem12Positions:[{"m": null, "x": 15.538827, "y": 43.828838, "z": 0.0}]
+PositionedItem12DataSheet:
+
+PositionedItem13UUID:b76a5280-8845-013d-67cd-1c6b00518c70
+PositionedItem13Name:NAV Visovac - 2
+PositionedItem13CourseArea:Standard
+PositionedItem13Static:1
+PositionedItem13Positions:[{"m": null, "x": 15.532065, "y": 43.837239, "z": 0.0}]
+PositionedItem13DataSheet:
+
+PositionedItem14UUID:bbc79340-8845-013d-67d8-1c6b00518c70
+PositionedItem14Name:NAV Blitvenica - 1
+PositionedItem14CourseArea:Standard
+PositionedItem14Static:1
+PositionedItem14Positions:[{"m": null, "x": 15.574488, "y": 43.625232, "z": 0.0}]
+PositionedItem14DataSheet:
+
+PositionedItem15UUID:bc075b30-8845-013d-67d9-1c6b00518c70
+PositionedItem15Name:NAV Blitvenica - 2
+PositionedItem15CourseArea:Standard
+PositionedItem15Static:1
+PositionedItem15Positions:[{"m": null, "x": 15.560893, "y": 43.615441, "z": 0.0}]
+PositionedItem15DataSheet:
+
+PositionedItem16UUID:c0da3d50-8845-013d-67e6-1c6b00518c70
+PositionedItem16Name:NAV Mulo - 1
+PositionedItem16CourseArea:Standard
+PositionedItem16Static:1
+PositionedItem16Positions:[{"m": null, "x": 15.918919, "y": 43.514243, "z": 0.0}]
+PositionedItem16DataSheet:
+
+PositionedItem17UUID:c10b09d0-8845-013d-67e7-1c6b00518c70
+PositionedItem17Name:NAV Mulo - 2
+PositionedItem17CourseArea:Standard
+PositionedItem17Static:1
+PositionedItem17Positions:[{"m": null, "x": 15.939155, "y": 43.514022, "z": 0.0}]
+PositionedItem17DataSheet:
+
+MapItem1UUID:5627dd80-6797-0137-b047-60a44ce903c3
+MapItem1Name:B Start
+MapItem1ShortName:ST
+MapItem1PositionedItemIds:["b2e4edd0-8845-013d-67bd-1c6b00518c70", "b39fb2d0-8845-013d-67be-1c6b00518c70"]
+MapItem1CourseArea:Standard
+
+MapItem2UUID:6d6decd0-680d-0137-b735-60a44ce903c3
+MapItem2Name:NAV 1
+MapItem2ShortName:1
+MapItem2PositionedItemIds:["b4fbb0e0-8845-013d-67c4-1c6b00518c70"]
+MapItem2CourseArea:Standard
+
+MapItem3UUID:1a9f7f10-679c-0137-b1e2-60a44ce903c3
+MapItem3Name:NAV Plic Cavlin
+MapItem3ShortName:CA
+MapItem3PositionedItemIds:["afb840a0-8845-013d-67a6-1c6b00518c70", "afc6af31-8845-013d-67a7-1c6b00518c70"]
+MapItem3CourseArea:Standard
+
+MapItem4UUID:7983c470-679c-0137-b1e4-60a44ce903c3
+MapItem4Name:NAV Drvenik
+MapItem4ShortName:DR
+MapItem4PositionedItemIds:["b69c90e0-8845-013d-67c6-1c6b00518c70", "b6ad0910-8845-013d-67c7-1c6b00518c70"]
+MapItem4CourseArea:Standard
+
+MapItem5UUID:af30f100-679c-0137-b1e6-60a44ce903c3
+MapItem5Name:NAV Blitvenica
+MapItem5ShortName:BL
+MapItem5PositionedItemIds:["bbc79340-8845-013d-67d8-1c6b00518c70", "bc075b30-8845-013d-67d9-1c6b00518c70"]
+MapItem5CourseArea:Standard
+
+MapItem6UUID:d613d3c0-679c-0137-b1e8-60a44ce903c3
+MapItem6Name:NAV Mulo
+MapItem6ShortName:MU
+MapItem6PositionedItemIds:["c0da3d50-8845-013d-67e6-1c6b00518c70", "c10b09d0-8845-013d-67e7-1c6b00518c70"]
+MapItem6CourseArea:Standard
+
+MapItem7UUID:3c114a50-679d-0137-b1ea-60a44ce903c3
+MapItem7Name:NAV Hrid Kukuljari
+MapItem7ShortName:KU
+MapItem7PositionedItemIds:["b1fffda0-8845-013d-67af-1c6b00518c70", "b222bc20-8845-013d-67b0-1c6b00518c70"]
+MapItem7CourseArea:Standard
+
+MapItem8UUID:8ad183a0-679d-0137-b1ec-60a44ce903c3
+MapItem8Name:NAV Visovac
+MapItem8ShortName:VI
+MapItem8PositionedItemIds:["b740ad30-8845-013d-67cc-1c6b00518c70", "b76a5280-8845-013d-67cd-1c6b00518c70"]
+MapItem8CourseArea:Standard
+
+MapItem9UUID:3d4551b0-679e-0137-b1ee-60a44ce903c3
+MapItem9Name:NAV Zlarin
+MapItem9ShortName:ZL
+MapItem9PositionedItemIds:["b26a5b10-8845-013d-67b4-1c6b00518c70", "b270cc40-8845-013d-67b6-1c6b00518c70"]
+MapItem9CourseArea:Standard
 
 SegmentFile:segments.php
 Route1UUID:26b64e80-6798-0137-b07d-60a44ce903c3

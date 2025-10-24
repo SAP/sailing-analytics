@@ -13,8 +13,12 @@ public class GpsAltitude extends Fix {
     private final Distance altitude;
     
     public GpsAltitude(TimePoint timePoint, Sensor sensor, Map<Integer, Object> valuesPerSubindex) {
+        this(timePoint, sensor, new MeterDistance(((Number) valuesPerSubindex.get(1)).doubleValue()));
+    }
+
+    public GpsAltitude(TimePoint timePoint, Sensor sensor, Distance altitude) {
         super(sensor, timePoint);
-        altitude = new MeterDistance(((Number) valuesPerSubindex.get(1)).doubleValue());
+        this.altitude = altitude;
     }
 
     public Distance getAltitude() {

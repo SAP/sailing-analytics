@@ -1,13 +1,13 @@
 package com.sap.sailing.mongodb.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.Serializable;
 
 import org.bson.Document;
 import org.json.simple.parser.ParseException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.mongodb.BasicDBList;
 import com.sap.sailing.domain.abstractlog.race.RaceLogCourseDesignChangedEvent;

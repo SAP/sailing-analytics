@@ -88,53 +88,32 @@ public class DirectedGraphImpl<T> implements DirectedGraph<T> {
         }
     }
     
-    private class TraverseNonTreeEdge implements DFSStep<T> {
+    private class TraverseEdge implements DFSStep<T> {
         private final T toNode;
-
-        public TraverseNonTreeEdge(T toNode) {
+        
+        public TraverseEdge(T toNode) {
             this.toNode = toNode;
         }
-
+        
         @Override
         public int applyAndReturnNextDFSNumber(LinkedList<T> oReps, LinkedList<T> oNodes, Map<T, T> representatives,
                 Map<T, Integer> depthFirstSearchPosition, Set<T> remainingRoots, LinkedList<DFSStep<T>> worklist,
                 int nodeCounter, Set<T> oNodesForFastContains) {
-            if (oNodesForFastContains.contains(toNode)) {
-                while (depthFirstSearchPosition.get(toNode) < depthFirstSearchPosition.get(oReps.getLast())) {
-                    oReps.removeLast();
+            if (depthFirstSearchPosition.containsKey(toNode)) {
+                if (oNodesForFastContains.contains(toNode)) {
+                    while (depthFirstSearchPosition.get(toNode) < depthFirstSearchPosition.get(oReps.getLast())) {
+                        oReps.removeLast();
+                    }
                 }
+            } else {
+                oReps.add(toNode);
+                oNodes.add(toNode);
+                oNodesForFastContains.add(toNode);
+                remainingRoots.remove(toNode);
+                depthFirstSearchPosition.put(toNode, nodeCounter++);
+                worklist.add(new DFS(toNode));
             }
             return nodeCounter;
-        }
-        
-        @Override
-        public String toString() {
-            return "traverseNonTreeEdge("+toNode+")";
-        }
-    }
-    
-    private class TraverseTreeEdge implements DFSStep<T> {
-        private final T toNode;
-
-        public TraverseTreeEdge(T toNode) {
-            this.toNode = toNode;
-        }
-
-        @Override
-        public int applyAndReturnNextDFSNumber(LinkedList<T> oReps, LinkedList<T> oNodes, Map<T, T> representatives,
-                Map<T, Integer> depthFirstSearchPosition, Set<T> remainingRoots, LinkedList<DFSStep<T>> worklist, int nodeCounter, Set<T> oNodesForFastContains) {
-            oReps.add(toNode);
-            oNodes.add(toNode);
-            oNodesForFastContains.add(toNode);
-            remainingRoots.remove(toNode);
-            depthFirstSearchPosition.put(toNode, nodeCounter++);
-            worklist.add(new DFS(toNode));
-            return nodeCounter;
-        }
-        
-        @Override
-        public String toString() {
-            return "traverseTreeEdge("+toNode+")";
         }
     }
     
@@ -176,11 +155,7 @@ public class DirectedGraphImpl<T> implements DirectedGraph<T> {
                 Map<T, Integer> depthFirstSearchPosition, Set<T> remainingRoots, LinkedList<DFSStep<T>> worklist, int nodeCounter, Set<T> oNodesForFastContains) {
             worklist.add(new Backtrack(to));
             for (final T successor : immediateSuccessors.get(to)) {
-                if (depthFirstSearchPosition.containsKey(successor)) {
-                    worklist.add(new TraverseNonTreeEdge(successor));
-                } else {
-                    worklist.add(new TraverseTreeEdge(successor));
-                }
+                worklist.add(new TraverseEdge(successor));
             }
             return nodeCounter;
         }

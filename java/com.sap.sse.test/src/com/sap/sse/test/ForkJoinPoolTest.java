@@ -1,12 +1,12 @@
 package com.sap.sse.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the concept of a {@link ForkJoinPool} by producing a deep hierarchy of {@link RecursiveTask}s

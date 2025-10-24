@@ -1,0 +1,7 @@
+This folder contains an Azure pipeline definition that is used for building our
+Android companion apps, in particular the Sailing Race Manager app and the
+Buoy Pinger app. See also the mobile/ folder for their source code. The
+gradle build that is used at the core of this build pipeline is controlled
+by the ``build.gradle``and ``gradle.properties`` file in the root folder.
+A local Android app build can be achieved by running the ``gradlew``
+wrapper script from the root folder.

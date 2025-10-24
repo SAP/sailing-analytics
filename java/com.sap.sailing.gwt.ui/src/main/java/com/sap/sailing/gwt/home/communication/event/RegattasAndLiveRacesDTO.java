@@ -6,7 +6,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import com.sap.sailing.gwt.home.communication.eventview.RegattaMetadataDTO;
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
+import com.sap.sse.gwt.shared.DTO;
 
 public class RegattasAndLiveRacesDTO implements DTO {
     

@@ -7,7 +7,6 @@ import java.util.concurrent.ExecutorService;
 import com.sap.sailing.datamining.data.HasBravoFixContext;
 import com.sap.sailing.datamining.data.HasTrackedLegOfCompetitorContext;
 import com.sap.sailing.datamining.impl.data.BravoFixWithContext;
-import com.sap.sailing.datamining.impl.data.TrackedLegOfCompetitorWithSpecificTimePointWithContext;
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.common.tracking.BravoFix;
 import com.sap.sailing.domain.tracking.BravoFixTrack;
@@ -37,9 +36,7 @@ public class BravoFixRetrievalProcessor extends AbstractRetrievalProcessor<HasTr
                         if (isAborted()) {
                             break;
                         }
-                        BravoFixWithContext gpsFixWithContext = new BravoFixWithContext(
-                                new TrackedLegOfCompetitorWithSpecificTimePointWithContext(
-                                        element.getTrackedLegContext(), element.getTrackedLegOfCompetitor(), bravoFix.getTimePoint()), bravoFix);
+                        BravoFixWithContext gpsFixWithContext = new BravoFixWithContext(element, bravoFix);
                         bravoFixesWithContext.add(gpsFixWithContext);
                     }
                 } finally {

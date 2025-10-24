@@ -311,68 +311,81 @@ public class RaceAndCompetitorStatusWithRaceLogReconciler {
      */
     private MaxPointsReason getMaxPointsReason(RaceCompetitorStatusType raceCompetitorStatusType) {
         MaxPointsReason result;
-        switch (raceCompetitorStatusType) {
-        // TODO we expect NSC and perhaps also TLE to show up; support the mapping to MaxPointsReason.NSC / TLE, respectively when they appear
-        case ABANDONED:
-            result = MaxPointsReason.NONE; // TODO bug 5154: find out what ABANDONED means and if/how we can translate it to a MaxPointsReason
-            break;
-        case BFD:
-            result = MaxPointsReason.BFD;
-            break;
-        case DISQUALIFIED:
-            result = MaxPointsReason.DSQ;
-            break;
-        case DNC:
-            result = MaxPointsReason.DNC;
-            break;
-        case DNF:
-            result = MaxPointsReason.DNF;
-            break;
-        case DONT_RACE:
-            result = MaxPointsReason.DNS; // TODO bug 5154: find out what DONT_RACE means and if/how we can translate it to a MaxPointsReason; is it DNS?
-            break;
-        case FIN:
-            result = MaxPointsReason.NONE; // TODO bug 5154: find out what FIN means and if/how we can translate it to a MaxPointsReason; does it mean the competitor finished properly?
-            break;
-        case FINISH_CONFIRMED:
-            result = MaxPointsReason.NONE; // TODO bug 5154: find out what FINISH_CONFIRMED means and if/how we can translate it to a MaxPointsReason; does it mean the competitor finished properly?
-            break;
-        case MIS:
-            result = MaxPointsReason.NONE; // TODO bug 5154: find out what MIS means and if/how we can translate it to a MaxPointsReason; does it mean the competitor is "missing?"
-            break;
-        case NO_COLLECT:
-            result = MaxPointsReason.NONE; // TODO bug 5154: find out what NO_COLLECT means and if/how we can translate it to a MaxPointsReason
-            break;
-        case NO_DATA:
+        if (raceCompetitorStatusType == null) {
             result = MaxPointsReason.NONE;
-            break;
-        case OCS:
-            result = MaxPointsReason.OCS;
-            break;
-        case RACING:
-            result = MaxPointsReason.NONE;
-            break;
-        case RETIRED:
-            result = MaxPointsReason.RET;
-            break;
-        case UFD:
-            result = MaxPointsReason.UFD;
-            break;
-        case NSC:
-            result = MaxPointsReason.NSC;
-            break;
-        case TLE:
-            result = MaxPointsReason.TLE;
-            break;
-        case SCP:
-            result = MaxPointsReason.SCP;
-            break;
-        case STP:
-            result = MaxPointsReason.STP;
-            break;
-        default:
-            result = MaxPointsReason.NONE;
-            break;
+        } else {
+            switch (raceCompetitorStatusType) {
+            // TODO we expect NSC and perhaps also TLE to show up; support the mapping to MaxPointsReason.NSC / TLE, respectively when they appear
+            case ABANDONED:
+                result = MaxPointsReason.NONE; // TODO bug 5154: find out what ABANDONED means and if/how we can translate it to a MaxPointsReason
+                break;
+            case BFD:
+                result = MaxPointsReason.BFD;
+                break;
+            case DISQUALIFIED:
+                result = MaxPointsReason.DSQ;
+                break;
+            case DNC:
+                result = MaxPointsReason.DNC;
+                break;
+            case DNF:
+                result = MaxPointsReason.DNF;
+                break;
+            case DONT_RACE:
+                result = MaxPointsReason.DNS; // TODO bug 5154: find out what DONT_RACE means and if/how we can translate it to a MaxPointsReason; is it DNS?
+                break;
+            case FIN:
+                result = MaxPointsReason.NONE; // TODO bug 5154: find out what FIN means and if/how we can translate it to a MaxPointsReason; does it mean the competitor finished properly?
+                break;
+            case FINISH_CONFIRMED:
+                result = MaxPointsReason.NONE; // TODO bug 5154: find out what FINISH_CONFIRMED means and if/how we can translate it to a MaxPointsReason; does it mean the competitor finished properly?
+                break;
+            case MIS:
+                result = MaxPointsReason.NONE; // TODO bug 5154: find out what MIS means and if/how we can translate it to a MaxPointsReason; does it mean the competitor is "missing?"
+                break;
+            case NO_COLLECT:
+                result = MaxPointsReason.NONE; // TODO bug 5154: find out what NO_COLLECT means and if/how we can translate it to a MaxPointsReason
+                break;
+            case NO_DATA:
+                result = MaxPointsReason.NONE;
+                break;
+            case OCS:
+                result = MaxPointsReason.OCS;
+                break;
+            case RACING:
+                result = MaxPointsReason.NONE;
+                break;
+            case RETIRED:
+                result = MaxPointsReason.RET;
+                break;
+            case UFD:
+                result = MaxPointsReason.UFD;
+                break;
+            case NSC:
+                result = MaxPointsReason.NSC;
+                break;
+            case TLE:
+                result = MaxPointsReason.TLE;
+                break;
+            case SCP:
+                result = MaxPointsReason.SCP;
+                break;
+            case STP:
+                result = MaxPointsReason.STP;
+                break;
+            case DCT:
+                result = MaxPointsReason.DCT;
+                break;
+            case DNE:
+                result = MaxPointsReason.DNE;
+                break;
+            case RCT:
+                result = MaxPointsReason.RCT;
+                break;
+            default:
+                result = MaxPointsReason.NONE;
+                break;
+            }
         }
         return result;
     }

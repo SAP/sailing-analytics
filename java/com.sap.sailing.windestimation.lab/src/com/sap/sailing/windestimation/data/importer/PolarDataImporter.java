@@ -27,9 +27,9 @@ public class PolarDataImporter {
     public PolarDataImporter() {
     }
 
-    public InputStream retrievePolarDataRegressionAsBytes() throws IOException, ParseException {
+    public InputStream retrievePolarDataRegressionAsBytes(String bearerToken) throws IOException, ParseException {
         LoggingUtil.logInfo("Loading polar regression data from remote server " + polarDataSourceUrl);
-        final InputStream inputStream = getContentFromResponse();
+        final InputStream inputStream = getContentFromResponse(bearerToken);
         LoggingUtil.logInfo("Loading polar regression data succeeded");
         return inputStream;
     }
@@ -44,20 +44,21 @@ public class PolarDataImporter {
         return polarDataSourceUrl + (polarDataSourceUrl.endsWith("/") ? "" : "/") + RESOURCE;
     }
 
-    protected InputStream getContentFromResponse() throws IOException, ParseException {
+    protected InputStream getContentFromResponse(String bearerToken) throws IOException, ParseException {
         HttpClient client = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategyForAllRedirectResponseCodes()).build();
         HttpGet getProcessor = new HttpGet(getAPIString());
+        getProcessor.setHeader("Authorization", "Bearer "+bearerToken);
         HttpResponse processorResponse = client.execute(getProcessor);
         return processorResponse.getEntity().getContent();
     }
 
     public static void main(String[] args) throws Exception {
         PolarDataImporter polarDataImporter = new PolarDataImporter();
-        polarDataImporter.importPolarData();
+        polarDataImporter.importPolarData(args[0]);
     }
 
-    public void importPolarData() throws IOException, ParseException {
-        InputStream inputStream = retrievePolarDataRegressionAsBytes();
+    public void importPolarData(String bearerToken) throws IOException, ParseException {
+        InputStream inputStream = retrievePolarDataRegressionAsBytes(bearerToken);
         persistPolarDataRegressionAsBytes(new File(polarDataFilePath), inputStream);
     }
 

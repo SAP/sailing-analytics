@@ -1,5 +1,6 @@
 package com.sap.sse.landscape.aws;
 
+import software.amazon.awssdk.services.autoscaling.model.LaunchTemplateSpecification;
 import software.amazon.awssdk.services.ec2.model.InstanceType;
 
 public interface LandscapeConstants {
@@ -65,6 +66,24 @@ public interface LandscapeConstants {
      * A tag key indicating that a subnet is not to be used for deploying instances, by autoscaling groups or by load balancers.
      */
     String NO_INSTANCE_DEPLOYMENT = "noInstanceDeployment";
+    
+    /**
+     * The version "number" to use for a launch template in an auto-scaling group to identify the
+     * "default" version. See, e.g., {@link LaunchTemplateSpecification#version()}.
+     */
+    String DEFAULT_LAUNCH_TEMPLATE_VERSION_NAME = "$Default";
+    
+    /**
+     * When we use AWS Web Application Firewall (WAF) to protect a web application, we tag the web ACLs using this as a
+     * tag key. The tag value then identifies the purpose, e.g., using the value of {@link #WEB_ACL_GEOBLOCKING_PURPOSE}.
+     */
+    String WEB_ACL_PURPOSE_TAG = "web-acl-purpose";
+    
+    /**
+     * A possible tag value for the {@link #WEB_ACL_PURPOSE_TAG} tag key, on a WAF (Web Application Firewall) web ACL
+     * indicating that the web ACL is used for geoblocking.
+     */
+    String WEB_ACL_GEOBLOCKING_PURPOSE = "geoblocking";
 
     InstanceType[] INSTANCE_TYPES_BANNED_FROM_INSTANCE_BASED_NLB_TARGET_GROUPS = new InstanceType[] { InstanceType.CC1_4_XLARGE, InstanceType.C1_MEDIUM, InstanceType.C1_XLARGE,
             InstanceType.CC2_8_XLARGE, InstanceType.CG1_4_XLARGE, InstanceType.CR1_8_XLARGE, InstanceType.G2_2_XLARGE,

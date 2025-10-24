@@ -59,9 +59,11 @@ public class RaceBoardPerspectiveOwnSettings extends AbstractGenericSerializable
 
 
     public RaceBoardPerspectiveOwnSettings() {
+        super();
     }
 
     public RaceBoardPerspectiveOwnSettings(Duration initialDurationAfterRaceStartInReplay) {
+        this();
         this.initialDurationAfterRaceStartInReplay.setValue(initialDurationAfterRaceStartInReplay);
     }
     
@@ -79,7 +81,7 @@ public class RaceBoardPerspectiveOwnSettings extends AbstractGenericSerializable
         this.showCompetitorsChart = new BooleanSetting("showCompetitorsChart", this, false);
         this.activeCompetitorsFilterSetName = new StringSetting("activeCompetitorsFilterSetName", this, null);
         this.canReplayDuringLiveRaces = new BooleanSetting("canReplayDuringLiveRaces", this, false);
-        this.initialDurationAfterRaceStartInReplay = new DurationSetting(PARAM_TIME_AFTER_RACE_START_AS_HOURS_COLON_MILLIS_COLON_SECONDS, this, null);
+        this.initialDurationAfterRaceStartInReplay = new DurationSetting(PARAM_TIME_AFTER_RACE_START_AS_HOURS_COLON_MILLIS_COLON_SECONDS, this);
         this.selectedCompetitor = new StringSetting(PARAM_SELECTED_COMPETITOR, this, null);
         this.selectedCompetitors = new StringSetSetting(PARAM_SELECTED_COMPETITORS, this, null);
         this.showTags = new BooleanSetting(PARAM_VIEW_SHOW_TAGS, this, false);
@@ -94,6 +96,7 @@ public class RaceBoardPerspectiveOwnSettings extends AbstractGenericSerializable
             Boolean showWindChart, Boolean showCompetitorsChart, Boolean canReplayDuringLiveRaces,
             Duration initialDurationAfterRaceStartInReplay, String selectedCompetitor, Iterable<String> selectedCompetitors, 
             Boolean showTags, Boolean showManeuverTable, String jumpToTag, Long zoomStart, Long zoomEnd, Boolean autoExpandPreSelectedRace) {
+        super();
         this.showTags.setValue(showTags);
         this.showManeuverTable.setValue(showManeuverTable);
         this.activeCompetitorsFilterSetName.setValue(activeCompetitorsFilterSetName);

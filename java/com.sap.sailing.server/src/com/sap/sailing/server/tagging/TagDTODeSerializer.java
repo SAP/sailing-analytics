@@ -18,6 +18,7 @@ public class TagDTODeSerializer {
 
     public static final String FIELD_TAG = "tag";
     public static final String FIELD_COMMENT = "comment";
+    public static final String FIELD_HIDDEN_INFO = "hiddenInfo";
     public static final String FIELD_ORIGINAL_IMAGE_URL = "image";
     public static final String FIELD_RESIZED_IMAGE_URL = "resized_image";
     public static final String FIELD_USERNAME = "username";
@@ -42,6 +43,9 @@ public class TagDTODeSerializer {
         result.put(FIELD_TAG, tag.getTag());
         if (tag.getComment() != null) {
             result.put(FIELD_COMMENT, tag.getComment());
+        }
+        if (tag.getHiddenInfo() != null) {
+            result.put(FIELD_HIDDEN_INFO, tag.getHiddenInfo());
         }
         if (tag.getImageURL() != null) {
             result.put(FIELD_ORIGINAL_IMAGE_URL, tag.getImageURL());
@@ -85,6 +89,7 @@ public class TagDTODeSerializer {
         try {
             String tag = (String) jsonObject.get(FIELD_TAG);
             String comment = jsonObject.get(FIELD_COMMENT) == null ? "" : (String) jsonObject.get(FIELD_COMMENT);
+            String hiddenInfo = jsonObject.get(FIELD_HIDDEN_INFO) == null ? "" : (String) jsonObject.get(FIELD_HIDDEN_INFO);
             String imageURL = jsonObject.get(FIELD_ORIGINAL_IMAGE_URL) == null ? ""
                     : (String) jsonObject.get(FIELD_ORIGINAL_IMAGE_URL);
             String resizedImageURL = jsonObject.get(FIELD_RESIZED_IMAGE_URL) == null ? ""
@@ -95,7 +100,7 @@ public class TagDTODeSerializer {
             TimePoint createdAt = deserializeTimePoint((Long) (jsonObject.get(FIELD_CREATED_AT)));
             TimePoint revokedAt = jsonObject.get(FIELD_REVOKED_AT) == null ? null
                     : deserializeTimePoint((Long) jsonObject.get(FIELD_REVOKED_AT));
-            return new TagDTO(tag, comment, imageURL, resizedImageURL, visibleForPublic, username, raceTimePoint, createdAt, revokedAt);
+            return new TagDTO(tag, comment, hiddenInfo, imageURL, resizedImageURL, visibleForPublic, username, raceTimePoint, createdAt, revokedAt);
         } catch (Exception e) {
             return null;
         }

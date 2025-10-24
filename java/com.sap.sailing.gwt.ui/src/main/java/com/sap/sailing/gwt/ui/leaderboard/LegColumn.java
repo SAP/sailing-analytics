@@ -430,6 +430,10 @@ public class LegColumn extends ExpandableSortableColumn<String> {
                 new FormattedDoubleLeaderboardRowDTODetailTypeColumn(DetailType.EXPEDITION_LEG_MAST_BUTT,
                         new DoubleDetailTypeExtractor(LegEntryDTO::getExpeditionMastButt), detailHeaderStyle,
                         detailColumnStyle, leaderboardPanel));
+        result.put(DetailType.EXPEDITION_RACE_KICKER_TENSION,
+                new FormattedDoubleLeaderboardRowDTODetailTypeColumn(DetailType.EXPEDITION_RACE_KICKER_TENSION,
+                        new DoubleDetailTypeExtractor(LegEntryDTO::getExpeditionKickerTension), detailHeaderStyle,
+                        detailColumnStyle, leaderboardPanel));
         return result;
     }
 

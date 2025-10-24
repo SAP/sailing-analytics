@@ -1,14 +1,14 @@
 package com.sap.sailing.domain.common.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Compare Java 8 stream and function performance to direct method call performance
@@ -21,7 +21,7 @@ public class Java8FunctionsPerformanceTest {
     private List<Integer> intList;
     private final static int SIZE = 10000000;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         intList = new ArrayList<Integer>(SIZE);
         for (int i=0; i<SIZE; i++) {

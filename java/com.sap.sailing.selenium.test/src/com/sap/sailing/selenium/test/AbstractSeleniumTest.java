@@ -1,44 +1,31 @@
 package com.sap.sailing.selenium.test;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.html5.WebStorage;
-import org.openqa.selenium.remote.Augmenter;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.sap.sailing.selenium.core.Managed;
-import com.sap.sailing.selenium.core.SeleniumRunner;
 import com.sap.sailing.selenium.core.TestEnvironment;
+import com.sap.sailing.selenium.core.UseSeleniumExtensions;
 import com.sap.sailing.selenium.core.WindowManager;
 import com.sap.sailing.selenium.pages.PageObject;
 import com.sap.sse.common.Duration;
@@ -52,18 +39,10 @@ import com.sap.sse.common.impl.MillisecondsTimePoint;
  * @author
  *   D049941
  */
-@RunWith(SeleniumRunner.class)
+@UseSeleniumExtensions
+@TestInstance(Lifecycle.PER_METHOD)
 public abstract class AbstractSeleniumTest {
     private static final Logger logger = Logger.getLogger(AbstractSeleniumTest.class.getName());
-    
-    /**
-     * <p>File extension for screenshots captured with a Selenium web driver.</p>
-     */
-    private static final String SCREENSHOT_FILE_EXTENSION = ".png"; //$NON-NLS-1$
-    
-    private static final String NOT_SUPPORTED_IMAGE = "/com/sap/sailing/selenium/resources/not-supported.png"; //$NON-NLS-1$
-    
-    private static final String ATTACHMENT_FORMAT = "[[ATTACHMENT|%s]]"; //$NON-NLS-1$
     
     private static final String CLEAR_STATE_URL = "sailingserver/test-support/clearState"; //$NON-NLS-1$
     
@@ -207,7 +186,7 @@ public abstract class AbstractSeleniumTest {
      * This is important because {@link #clearState(String)} will also clear all session state that has been constructed
      * by {@link #setUpAuthenticatedSession()}.
      */
-    @Before
+    @BeforeEach
     public void setUp() {
         setUpAuthenticatedSession(getWebDriver());
     }
@@ -249,34 +228,19 @@ public abstract class AbstractSeleniumTest {
         }
     }
     
-    private class ScreenShotRule extends TestWatcher {
-        @Override
-        protected void failed(Throwable error, Description description) {
-            captureScreenshots();
-        }
-
-        @Override
-        protected void finished(Description description) {
-            try {
-                environment.getWindowManager().closeAllWindows();
-            } finally {
-                super.finished(description);
-            }
-        }
-    }
-    
-    /**
-     * <p>Rule for capturing of a screenshot if a test fails.</p>
-     */
-    @Rule
-    public final ScreenShotRule takeScreenshotAndCloseWindows = new ScreenShotRule();
-
     /**
      * <p>The test environment used for the execution of the the tests.</p>
      */
-    @Managed
     protected TestEnvironment environment;
     
+    public void setEnvironment(TestEnvironment environment) {
+        this.environment = environment;
+    }
+
+    public TestEnvironment getEnvironment() {
+        return environment;
+    }
+
     /**
      * <p>Returns the context root (base URL) against the tests are executed. The context root identifies a web
      *   application and usually consists of a protocol definition, the host and a path.</p>
@@ -308,50 +272,5 @@ public abstract class AbstractSeleniumTest {
     protected WindowManager getWindowManager() {
         return this.environment.getWindowManager();
     }
-        
-    /**
-     * <p>Captures a screen shot and saves the picture as an PNG file under the given file name. The complete path to
-     *   the stored picture consists of the screenshot folder, as defined in the test environment, and the given
-     *   filename with "png" as file extension.</p>
-     * 
-     * <p>If the used web driver does not support the capturing of screenshots an alternative picture is used instead
-     *   of the screenshot.</p>
-     * 
-     * @param filename
-     *   The file name under which the screenshot should be saved.
-     * @throws IOException
-     *   if an I/O error occurs.
-     */
-    protected void captureScreenshots() {
-        File screenshotFolder = this.environment.getScreenshotFolder();
-        if (screenshotFolder != null) {
-            this.environment.getWindowManager().forEachOpenedWindow(window -> {
-                final String filename = UUID.randomUUID().toString();
-                
-                WebDriver driver = window.getWebDriver();
-                if (RemoteWebDriver.class.equals(driver.getClass())) {
-                    driver = new Augmenter().augment(driver);
-                }
-                InputStream source = getScreenshotNotSupportedImage();
-                if (driver instanceof TakesScreenshot) {
-                    source = new ByteArrayInputStream(((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES));
-                }
-                try {
-                    File destinationDir = new File(screenshotFolder, getClass().getName());
-                    destinationDir.mkdirs();
-                    File destination = new File(destinationDir, filename + SCREENSHOT_FILE_EXTENSION); //$NON-NLS-1$
-                    Path path = destination.toPath();
-                    Files.copy(source, path, StandardCopyOption.REPLACE_EXISTING);
-                    // ATTENTION: Do not remove this line because it is needed for the JUnit Attachment Plugin!
-                    System.out.println(String.format(ATTACHMENT_FORMAT, destination.getCanonicalFile().toURI()));
-                } catch (IOException exception) {
-                    throw new RuntimeException(exception);
-                }
-            });
-        }
-    }
-    
-    private InputStream getScreenshotNotSupportedImage() {
-        return AbstractSeleniumTest.class.getResourceAsStream(NOT_SUPPORTED_IMAGE);
-    }
+
 }

@@ -23,7 +23,7 @@ public class Message extends Widget {
     }
 
     public void setMessage(String message) {
-        if(message == null || message.isEmpty()) {
+        if (message == null || message.isEmpty()) {
             getElement().getStyle().setDisplay(Display.NONE);
         } else {
             text.setInnerText(message);

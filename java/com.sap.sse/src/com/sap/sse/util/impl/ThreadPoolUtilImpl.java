@@ -114,7 +114,7 @@ public class ThreadPoolUtilImpl implements ThreadPoolUtil {
     private Optional<Subject> getSubjectOrNull() {
         Optional<Subject> mySubject;
         try {
-            mySubject = Optional.of(SecurityUtils.getSubject());
+            mySubject = Optional.ofNullable(SecurityUtils.getSubject());
         } catch (IllegalStateException | UnavailableSecurityManagerException e) {
             mySubject = Optional.empty();
         }

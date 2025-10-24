@@ -1,8 +1,8 @@
 package com.sap.sailing.domain.base.racegroup.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Fleet;
 import com.sap.sailing.domain.base.impl.BoatClassImpl;
@@ -38,7 +38,7 @@ public class CurrentRaceFilterImplTest {
     private RaceGroup iQFOil;
     private Map<RaceGroupSeriesFleetRaceColumn, SimpleFilterableRace> races;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         races = new HashMap<>();
         // five regattas ("RaceGroup"s):

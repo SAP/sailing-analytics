@@ -137,6 +137,7 @@ public interface BravoFixTrack<ItemType extends WithID & Serializable> extends S
     Double getExpeditionJibCarPortIfAvailable(TimePoint at);
     Double getExpeditionJibCarStbdIfAvailable(TimePoint at);
     Double getExpeditionMastButtIfAvailable(TimePoint at);
+    Double getExpeditionKickerTensionIfAvailable(TimePoint at);
     Double getAverageExpeditionAWAIfAvailable(TimePoint start, TimePoint endTimePoint);
     Double getAverageExpeditionAWSIfAvailable(TimePoint start, TimePoint endTimePoint);
     Double getAverageExpeditionTWAIfAvailable(TimePoint start, TimePoint endTimePoint);
@@ -176,4 +177,5 @@ public interface BravoFixTrack<ItemType extends WithID & Serializable> extends S
     Double getAverageExpeditionJibCarPortIfAvailable(TimePoint start, TimePoint endTimePoint);
     Double getAverageExpeditionJibCarStbdIfAvailable(TimePoint start, TimePoint endTimePoint);
     Double getAverageExpeditionMastButtIfAvailable(TimePoint start, TimePoint endTimePoint);
+    Double getAverageExpeditionKickerTensionIfAvailable(TimePoint start, TimePoint endTimePoint);
 }

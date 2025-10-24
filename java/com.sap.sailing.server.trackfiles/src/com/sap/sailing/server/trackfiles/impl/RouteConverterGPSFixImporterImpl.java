@@ -219,7 +219,7 @@ public class RouteConverterGPSFixImporterImpl extends BaseRouteConverterGPSFixIm
     @Override
     public Iterable<String> getSupportedFileExtensions() {
         //TODO the list is not yet complete
-        return Arrays.asList("gpx", "kml", "kmz");
+        return Arrays.asList("gpx", "kml", "kmz", "txt");
     }
 
     @Override

@@ -30,7 +30,7 @@ import software.amazon.awssdk.services.elasticloadbalancingv2.model.TargetHealth
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.TargetHealthStateEnum;
 
 /**
- * This class is for creating shards out of the {@code shardingKeys}. This class creats a target group, and an
+ * This class is for creating shards out of the {@code shardingKeys}. This class creates a target group, and an
  * autoscaling group and inserts rules into the {@code replicaSet}'s load balancer. If the load balancer does not have
  * enough rules left in it'S HTTPS-listener, the whole replica set gets moved to another load balancer.
  * 
@@ -147,11 +147,11 @@ public class CreateShard<ShardingKey, MetricsT extends ApplicationProcessMetrics
                         final Map<AwsInstance<ShardingKey>, TargetHealth> healths = getLandscape()
                                 .getTargetHealthDescriptions(targetGroup);
                         if (healths.isEmpty() || healths.size() < minAutoscalingSize) {
-                            ret = false; // if there is no Aws in target
+                            ret = false; // if there are not enough instances in the target group yet
                         } else {
                             for (Map.Entry<AwsInstance<ShardingKey>, TargetHealth> instance : healths.entrySet()) {
                                 if (instance.getValue().state() != TargetHealthStateEnum.HEALTHY) {
-                                    ret = false; // if this instance is unhealthy
+                                    ret = false; // if an instance is unhealthy
                                     break;
                                 }
                             }

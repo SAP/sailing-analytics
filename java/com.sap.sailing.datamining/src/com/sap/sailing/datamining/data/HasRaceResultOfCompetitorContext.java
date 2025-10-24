@@ -1,32 +1,28 @@
 package com.sap.sailing.datamining.data;
 
 import com.sap.sailing.domain.base.Boat;
-import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.common.MaxPointsReason;
 import com.sap.sse.datamining.annotations.Connector;
 import com.sap.sse.datamining.annotations.Dimension;
 import com.sap.sse.datamining.annotations.Statistic;
 import com.sap.sse.datamining.shared.impl.dto.ClusterDTO;
 
-public interface HasRaceResultOfCompetitorContext {
-    
+public interface HasRaceResultOfCompetitorContext extends HasSomethingOfCompetitorContextWithTrackedRaceContext {
     @Connector(scanForStatistics=false)
-    public HasLeaderboardContext getLeaderboardContext();
+    HasLeaderboardContext getLeaderboardContext();
 
+    @Override
     @Connector(scanForStatistics=false)
-    public HasTrackedRaceContext getTrackedRaceContext();
+    HasTrackedRaceContext getTrackedRaceContext();
 
-    @Connector(messageKey="Competitor", ordinal=2)
-    public Competitor getCompetitor();
-    
     @Connector(messageKey="Boat")
-    public Boat getBoat();
+    Boat getBoat();
 
     @Dimension(messageKey="Regatta", ordinal=4)
     String getRegattaName();
     
     @Dimension(messageKey="RelativeScoreInPercent", ordinal=6)
-    public ClusterDTO getPercentageClusterForRelativeScore();
+    ClusterDTO getPercentageClusterForRelativeScore();
 
     @Dimension(messageKey="WindSpeedInBeaufort", ordinal=7)
     int getAverageWindSpeedInRoundedBeaufort();
@@ -35,17 +31,20 @@ public interface HasRaceResultOfCompetitorContext {
      * 0 means the competitor won the race, 1 means the competitor ranked last
      */
     @Statistic(messageKey="RelativeScore", ordinal=1, resultDecimals=2)
-    public Double getRelativeRank();
+    Double getRelativeRank();
     
     @Statistic(messageKey="AbsoluteRank", ordinal=2, resultDecimals=2)
-    public Double getAbsoluteRank();
+    Double getAbsoluteRank();
     
     @Dimension(messageKey="IRM")
-    public MaxPointsReason getMaxPointsReason();
+    MaxPointsReason getMaxPointsReason();
+    
+    @Dimension(messageKey="Discarded")
+    boolean isDiscarded();
     
     @Statistic(messageKey="NumberOfPodiumFinish", ordinal=3)
-    public Boolean isPodiumFinish();
+    Boolean isPodiumFinish();
     
     @Statistic(messageKey="NumberOfWins", ordinal=4)
-    public Boolean isWin();
+    Boolean isWin();
 }

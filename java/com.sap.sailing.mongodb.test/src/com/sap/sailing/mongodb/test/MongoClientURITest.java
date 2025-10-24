@@ -1,9 +1,9 @@
 package com.sap.sailing.mongodb.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.mongodb.ReadPreference;
 import com.sap.sse.mongodb.MongoDBConfiguration;

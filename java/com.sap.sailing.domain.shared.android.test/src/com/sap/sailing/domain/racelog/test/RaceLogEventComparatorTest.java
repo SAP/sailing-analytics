@@ -1,12 +1,12 @@
 package com.sap.sailing.domain.racelog.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.race.RaceLogEvent;
@@ -22,7 +22,7 @@ public class RaceLogEventComparatorTest {
     
     private RaceLogEventComparator comparator;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         eventOne = mock(RaceLogEvent.class);
         eventTwo = mock(RaceLogEvent.class);

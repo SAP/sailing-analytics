@@ -12,3 +12,4 @@ Export-Package: com.sap.sse.security.shared,
  com.sap.sse.security.shared.subscription.chargebee
 Require-Bundle: com.sap.sse.common
 Automatic-Module-Name: com.sap.sse.security.common
+Bundle-ActivationPolicy: lazy

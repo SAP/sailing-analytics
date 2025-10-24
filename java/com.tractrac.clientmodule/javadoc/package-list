@@ -2,6 +2,7 @@ com.tractrac.model.lib.api
 com.tractrac.model.lib.api.attachment
 com.tractrac.model.lib.api.data
 com.tractrac.model.lib.api.event
+com.tractrac.model.lib.api.map
 com.tractrac.model.lib.api.metadata
 com.tractrac.model.lib.api.route
 com.tractrac.model.lib.api.sensor
@@ -10,5 +11,6 @@ com.tractrac.subscription.lib.api
 com.tractrac.subscription.lib.api.competitor
 com.tractrac.subscription.lib.api.control
 com.tractrac.subscription.lib.api.event
+com.tractrac.subscription.lib.api.map
 com.tractrac.subscription.lib.api.race
 com.tractrac.subscription.lib.api.route

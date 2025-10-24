@@ -1,6 +1,1 @@
-#!/bin/bash
-eval $( ec2-metadata -d | sed -e 's/^user-data: //' )
-if [ \! -z "REPLICA_SET_PRIMARY" ]; then
-  IP=$(ec2-metadata -o | sed -e 's/^local-ipv4: //')
-  echo "rs.remove(\"${IP}:27017\")" | mongo "mongodb://${IP}:27017/?replicaSet=${REPLICA_SET_NAME}&retryWrites=true"
-fi
+../../../../../repo/usr/local/bin/remove-as-replica

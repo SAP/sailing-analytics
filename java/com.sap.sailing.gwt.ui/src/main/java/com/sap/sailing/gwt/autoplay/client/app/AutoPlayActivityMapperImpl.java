@@ -66,11 +66,11 @@ public class AutoPlayActivityMapperImpl implements ActivityMapper {
         }
         if (place instanceof PreRaceLeaderboardWithCompetitorPlace) {
             return new PreLiveRaceLeaderboardWithImagePresenterImpl((PreRaceLeaderboardWithCompetitorPlace) place,
-                    clientFactory, new PreLiveRaceLeaderboardWithImageViewImpl(new CompetitorImageProvider()));
+                    clientFactory, new PreLiveRaceLeaderboardWithImageViewImpl(new CompetitorImageProvider(), clientFactory.getUserService()));
         }
         if (place instanceof PreRaceLeaderboardWithFlagPlace) {
             return new PreLiveRaceLeaderboardWithImagePresenterImpl((PreRaceLeaderboardWithFlagPlace) place,
-                    clientFactory, new PreLiveRaceLeaderboardWithImageViewImpl(new FlagImageProvider()));
+                    clientFactory, new PreLiveRaceLeaderboardWithImageViewImpl(new FlagImageProvider(), clientFactory.getUserService()));
         }
         if (place instanceof IdleUpNextPlace) {
             return new IdleUpNextPresenterImpl((IdleUpNextPlace) place, clientFactory, new IdleNextUpViewImpl());
@@ -99,11 +99,11 @@ public class AutoPlayActivityMapperImpl implements ActivityMapper {
         }
         if (place instanceof RaceEndWithCompetitorsBoatsPlace) {
             return new RaceEndWithBoatsPresenterImpl((RaceEndWithCompetitorsBoatsPlace) place, clientFactory,
-                    new RaceEndWithBoatsViewImpl(new CompetitorImageProvider()));
+                    new RaceEndWithBoatsViewImpl(new CompetitorImageProvider(), clientFactory.getUserService()));
         }
         if (place instanceof RaceEndWithCompetitorFlagsPlace) {
             return new RaceEndWithBoatsPresenterImpl((RaceEndWithCompetitorFlagsPlace) place, clientFactory,
-                    new RaceEndWithBoatsViewImpl(new FlagImageProvider()));
+                    new RaceEndWithBoatsViewImpl(new FlagImageProvider(), clientFactory.getUserService()));
         }
         if (place instanceof IdleSixtyInchLeaderboardPlace) {
             return new IdleSixtyInchLeaderboardPresenterImpl((IdleSixtyInchLeaderboardPlace) place, clientFactory,

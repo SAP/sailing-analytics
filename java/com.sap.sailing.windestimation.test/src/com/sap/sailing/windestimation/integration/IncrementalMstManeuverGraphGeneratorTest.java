@@ -1,6 +1,6 @@
 package com.sap.sailing.windestimation.integration;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -15,8 +15,8 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.common.Position;
@@ -59,7 +59,7 @@ public class IncrementalMstManeuverGraphGeneratorTest extends OnlineTracTracBase
                 IncrementalMstHmmWindEstimationForTrackedRaceTest.modelFilesNames);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         URI storedUri = new URI("file:///"
@@ -81,8 +81,8 @@ public class IncrementalMstManeuverGraphGeneratorTest extends OnlineTracTracBase
                 gaussianBasedTwdTransitionDistributionCache, true);
         ManeuverClassifiersCache maneuverClassifiersCache = new ManeuverClassifiersCache(modelStore, true,
                 Long.MAX_VALUE, new ManeuverFeatures(false, false, false));
-        assertTrue("Wind estimation models are empty",
-                gaussianBasedTwdTransitionDistributionCache.isReady() && maneuverClassifiersCache.isReady());
+        assertTrue(gaussianBasedTwdTransitionDistributionCache.isReady() && maneuverClassifiersCache.isReady(),
+                "Wind estimation models are empty");
         DynamicTrackedRaceImpl trackedRace = getTrackedRace();
         IncrementalMstManeuverGraphGenerator generator = new IncrementalMstManeuverGraphGenerator(
                 new CompleteManeuverCurveToManeuverForEstimationConverter(trackedRace, null),
@@ -133,10 +133,10 @@ public class IncrementalMstManeuverGraphGeneratorTest extends OnlineTracTracBase
                 .forEach(pair -> cleanManeuversFromGraph.add(pair));
 
         for (Pair<Position, TimePoint> pair : cleanManeuversFromGraph) {
-            assertTrue("Target set does not contain maneuver at " + pair, cleanManeuvers.contains(pair));
+            assertTrue(cleanManeuvers.contains(pair), "Target set does not contain maneuver at " + pair);
         }
         for (Pair<Position, TimePoint> pair : cleanManeuvers) {
-            assertTrue("Set from graph  does not contain maneuver at " + pair, cleanManeuversFromGraph.contains(pair));
+            assertTrue(cleanManeuversFromGraph.contains(pair), "Set from graph  does not contain maneuver at " + pair);
         }
     }
 

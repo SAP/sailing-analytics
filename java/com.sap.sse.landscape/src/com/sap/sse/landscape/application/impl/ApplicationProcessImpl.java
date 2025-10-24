@@ -163,6 +163,15 @@ implements ApplicationProcess<ShardingKey, MetricsT, ProcessT> {
         return telnetPortToOSGiConsole;
     }
     
+    @Override
+    public int[] getAllTCPPorts(Optional<Duration> optionalTimeout, Optional<String> optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception {
+        final int[] superTCPPorts = super.getAllTCPPorts(optionalTimeout, optionalKeyName, privateKeyEncryptionPassphrase);
+        final int[] result = new int[superTCPPorts.length + 1];
+        System.arraycopy(superTCPPorts, 0, result, 0, superTCPPorts.length);
+        result[result.length-1] = getTelnetPortToOSGiConsole(optionalTimeout, optionalKeyName, privateKeyEncryptionPassphrase);
+        return result;
+    }
+
     /**
      * Obtains the last definition of the process configuration variable specified, or {@code null} if that variable isn't set
      * by evaluating the {@code env.sh} file on the {@link #getHost() host} or the connection to the host timed out.

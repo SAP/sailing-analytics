@@ -3,3 +3,5 @@ Deploy the imageupgrade script to /usr/local/bin,
 furthermore the ../imageupgrade_functions.sh has to go to /usr/local/bin, best as symbolic link to files in git.
 
 See the script in wiki/howto/development/ci.md that shows how to set up such an instance from scratch.
+
+With us moving our builds to Github, maintaining Hudson build slaves is DEPRECATED.

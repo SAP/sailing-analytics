@@ -14,6 +14,7 @@ import com.sap.sailing.domain.igtimiadapter.datatypes.GpsQualityIndicator;
 import com.sap.sailing.domain.igtimiadapter.datatypes.GpsQualitySatCount;
 import com.sap.sailing.domain.igtimiadapter.datatypes.HDG;
 import com.sap.sailing.domain.igtimiadapter.datatypes.HDGM;
+import com.sap.sailing.domain.igtimiadapter.datatypes.Log;
 import com.sap.sailing.domain.igtimiadapter.datatypes.SOG;
 import com.sap.sailing.domain.igtimiadapter.datatypes.STW;
 
@@ -82,4 +83,7 @@ public class IgtimiFixReceiverAdapter implements IgtimiFixReceiver {
     public void received(STW fix) {
     }
 
+    @Override
+    public void received(Log fix) {
+    }
 }

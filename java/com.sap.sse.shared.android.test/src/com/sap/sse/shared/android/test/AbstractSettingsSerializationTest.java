@@ -1,11 +1,12 @@
 package com.sap.sse.shared.android.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.filter.TextOperator;
 import com.sap.sse.common.filter.TextOperator.Operators;
@@ -28,6 +29,7 @@ public abstract class AbstractSettingsSerializationTest<SOT> {
         private transient SimpleTestSettings nested;
 
         public TestOuterSettings() {
+            super();
         }
         
         @Override
@@ -41,6 +43,7 @@ public abstract class AbstractSettingsSerializationTest<SOT> {
         private transient SettingsList<SimpleTestSettings> l;
 
         public TestListSettings() {
+            super();
         }
         
         @Override
@@ -55,9 +58,11 @@ public abstract class AbstractSettingsSerializationTest<SOT> {
         private transient DecimalSetting num;
 
         public SimpleTestSettings() {
+            super();
         }
 
         public SimpleTestSettings(String string, BigDecimal num) {
+            super();
             this.string.setValue(string);
             this.num.setValue(num);
         }
@@ -82,6 +87,7 @@ public abstract class AbstractSettingsSerializationTest<SOT> {
         private transient DecimalListSetting l;
 
         public TestSettings() {
+            super();
         }
         
         @Override
@@ -142,6 +148,7 @@ public abstract class AbstractSettingsSerializationTest<SOT> {
         private transient EnumListSetting<TextOperator.Operators> l;
         
         public TestEnumListSettings() {
+            super();
         }
 
         @Override
@@ -157,6 +164,10 @@ public abstract class AbstractSettingsSerializationTest<SOT> {
     }
 
     private static class DuplicateFieldSettings extends AbstractGenericSerializableSettings {
+        public DuplicateFieldSettings() {
+            super();
+        }
+
         private static final long serialVersionUID = 4058775568295038177L;
         @SuppressWarnings("unused")
         private transient StringSetting humba;
@@ -171,6 +182,10 @@ public abstract class AbstractSettingsSerializationTest<SOT> {
     }
     
     private static class DisallowedKeySettings extends AbstractGenericSerializableSettings {
+        public DisallowedKeySettings() {
+            super();
+        }
+
         private static final long serialVersionUID = -2265305217290147424L;
         @SuppressWarnings("unused")
         private transient StringSetting disallowedKey;
@@ -257,17 +272,21 @@ public abstract class AbstractSettingsSerializationTest<SOT> {
      * Verifies that it is not possible to have two equally named child settings that would cause conflicts on
      * serialization.
      */
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testDuplicateSetting() {
-        new DuplicateFieldSettings();
+        assertThrows(RuntimeException.class, () -> {
+            new DuplicateFieldSettings();
+        });
     }
     
     /**
      * Verifies that it is not possible to have setting names with ".".
      */
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testDisallowedSettingNameSetting() {
-        new DisallowedKeySettings();
+        assertThrows(RuntimeException.class, () -> {
+            new DisallowedKeySettings();
+        });
     }
 
     /**

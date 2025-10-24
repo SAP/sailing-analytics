@@ -1,11 +1,11 @@
 package com.sap.sailing.mongodb.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.net.UnknownHostException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.mongodb.MongoException;
 import com.sap.sailing.domain.base.DomainFactory;

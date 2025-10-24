@@ -125,7 +125,7 @@ public class WindLineCanvasOverlay extends FullCanvasOverlay implements TimeList
     @Override
     protected void draw() {
         super.draw();
-        if (mapProjection != null && windLinesDTO != null) {
+        if (getMapProjection() != null && windLinesDTO != null) {
             clear();
             drawWindLine();
         }
@@ -150,10 +150,8 @@ public class WindLineCanvasOverlay extends FullCanvasOverlay implements TimeList
         if (numPoints < 1) {
             return;
         }
-
         final String title = "Wind line at " + numPoints + " points.";
         getCanvas().setTitle(title);
-
         final Iterator<Position> positionDTOIter = positionList.iterator();
         Position prevPosition = null;
         while (positionDTOIter.hasNext()) {
@@ -202,11 +200,11 @@ public class WindLineCanvasOverlay extends FullCanvasOverlay implements TimeList
     private void drawLine(final Position p1, final Position p2) {
         final double weight = 1.0;
         LatLng positionLatLng = coordinateSystem.toLatLng(p1);
-        Point canvasPositionInPx = mapProjection.fromLatLngToDivPixel(positionLatLng);
+        Point canvasPositionInPx = getMapProjection().fromLatLngToDivPixel(positionLatLng);
         final double x1 = canvasPositionInPx.getX() - this.getWidgetPosLeft();
         final double y1 = canvasPositionInPx.getY() - this.getWidgetPosTop();
         positionLatLng = coordinateSystem.toLatLng(p2);
-        canvasPositionInPx = mapProjection.fromLatLngToDivPixel(positionLatLng);
+        canvasPositionInPx = getMapProjection().fromLatLngToDivPixel(positionLatLng);
         final double x2 = canvasPositionInPx.getX() - this.getWidgetPosLeft();
         final double y2 = canvasPositionInPx.getY() - this.getWidgetPosTop();
         drawLine(x1, y1, x2, y2, weight, lineColor);
@@ -228,7 +226,7 @@ public class WindLineCanvasOverlay extends FullCanvasOverlay implements TimeList
 
     private Point getPointInDivPixel(final Position p) {
         LatLng pLatLng = LatLng.newInstance(p.getLatDeg(), p.getLngDeg());
-        Point canvasPositionInPx = mapProjection.fromLatLngToDivPixel(pLatLng);
+        Point canvasPositionInPx = getMapProjection().fromLatLngToDivPixel(pLatLng);
         return Point.newInstance(canvasPositionInPx.getX(), canvasPositionInPx.getY());
     }
     

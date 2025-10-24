@@ -12,7 +12,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -143,7 +143,7 @@ public class UserEditDialog extends DataEntryDialog<UserDTO> {
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return email;
     }
 
@@ -157,7 +157,7 @@ public class UserEditDialog extends DataEntryDialog<UserDTO> {
         final UserDTO user = new UserDTO(userToEdit.getName(), email.getText(), fullName.getText(), company.getText(),
                 userToEdit.getLocale(), userToEdit.isEmailValidated(), userToEdit.getAccounts(),
                 userToEdit.getRoles(), userToEdit.getDefaultTenant(), permissions,
-                userToEdit.getUserGroups());
+                userToEdit.getUserGroups(), userToEdit.getLockedUntil());
         return user;
     }
 

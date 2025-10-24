@@ -9,11 +9,16 @@ import com.sap.sse.security.shared.HasPermissions.Action;
 import com.sap.sse.security.shared.dto.SecuredDTO;
 import com.sap.sse.security.ui.client.premium.PaywallResolver;
 import com.sap.sse.security.ui.client.premium.PremiumCheckBox;
+import com.sap.sse.security.ui.client.premium.settings.AbstractSecuredValueSetting;
 
 public class SailingPremiumCheckBox extends PremiumCheckBox {
 
-    public SailingPremiumCheckBox(final String label, final Action action, final PaywallResolver paywallResolver, SecuredDTO contextDTO) {
-        super(label, action, paywallResolver, contextDTO);
+    public SailingPremiumCheckBox(final String label, final Action action, final PaywallResolver paywallResolver, final SecuredDTO contextDTO, final boolean defaultValue) {
+        super(label, action, paywallResolver, contextDTO, defaultValue);
+    }
+    
+    public SailingPremiumCheckBox(final String label, final AbstractSecuredValueSetting<Boolean> setting) {
+        super(label, setting);
     }
 
     @Override

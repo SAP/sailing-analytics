@@ -1,16 +1,16 @@
 package com.sap.sailing.server.replication.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.FileNotFoundException;
 import java.net.UnknownHostException;
 import java.util.logging.Logger;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.BoatClass;
 import com.sap.sailing.domain.base.Competitor;
@@ -55,7 +55,7 @@ public class DelayedLeaderboardCorrectionsReplicationTest extends AbstractServer
     private ReplicationService replicaReplicator;
     private ReplicationMasterDescriptor masterDescriptor;
     
-    @Before
+    @BeforeEach
     public void setUp() throws FileNotFoundException, UnknownHostException {
         final MongoDBService mongoDBService = MongoDBService.INSTANCE;
         mongoDBService.getDB().drop();
@@ -146,7 +146,7 @@ public class DelayedLeaderboardCorrectionsReplicationTest extends AbstractServer
             unexpectedCompetitors.append(System.identityHashCode(unexpectedCompetitor));
             unexpectedCompetitors.append(", ");
         }
-        assertTrue(unexpectedCompetitors.toString(), Util.isEmpty(newMasterScoreCorrections.getCompetitorsThatHaveCorrectionsIn(newMasterQ2))); // no score corrections applied yet
+        assertTrue(Util.isEmpty(newMasterScoreCorrections.getCompetitorsThatHaveCorrectionsIn(newMasterQ2)), unexpectedCompetitors.toString()); // no score corrections applied yet
         // now connect the tracked race again to the leaderboard column in the re-loaded environment
         master.apply(new ConnectTrackedRaceToLeaderboardColumn(masterLeaderboard.getName(), Q2, /* default fleet */
                 masterLeaderboard.getFleet(null).getName(), q2YellowTrackedRace.getRaceIdentifier()));

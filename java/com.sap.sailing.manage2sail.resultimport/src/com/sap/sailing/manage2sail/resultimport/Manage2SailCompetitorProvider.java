@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 import com.sap.sailing.competitorimport.CompetitorProvider;
 import com.sap.sailing.domain.common.CompetitorDescriptor;
@@ -32,7 +35,7 @@ public class Manage2SailCompetitorProvider extends AbstractManage2SailProvider i
     }
     
     @Override
-    public Map<String, Set<String>> getHasCompetitorsForRegattasInEvent() throws IOException, URISyntaxException {
+    public Map<String, Set<String>> getHasCompetitorsForRegattasInEvent() throws IOException, URISyntaxException, SAXException, ParserConfigurationException {
         return competitorResolver.getHasCompetitorsForRegattasInEvent();
     }
 
@@ -42,7 +45,7 @@ public class Manage2SailCompetitorProvider extends AbstractManage2SailProvider i
     }
 
     @Override
-    public Iterable<CompetitorDescriptor> getCompetitorDescriptors(String eventName, String regattaName) throws JAXBException, IOException, URISyntaxException {
+    public Iterable<CompetitorDescriptor> getCompetitorDescriptors(String eventName, String regattaName) throws JAXBException, IOException, URISyntaxException, SAXException, ParserConfigurationException {
         return competitorResolver.getCompetitorDescriptors(eventName, regattaName);
     }
 

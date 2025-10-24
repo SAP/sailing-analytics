@@ -3,7 +3,6 @@ package com.sap.sailing.domain.tractracadapter.impl;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,26 +23,24 @@ import com.sap.sailing.domain.common.PassingInstruction;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroupResolver;
 import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprintRegistry;
 import com.sap.sailing.domain.racelog.RaceLogAndTrackedRaceResolver;
+import com.sap.sailing.domain.shared.tracking.impl.TrackingConnectorInfoImpl;
 import com.sap.sailing.domain.tracking.DynamicRaceDefinitionSet;
 import com.sap.sailing.domain.tracking.DynamicTrackedRace;
 import com.sap.sailing.domain.tracking.DynamicTrackedRegatta;
 import com.sap.sailing.domain.tracking.RaceTrackingHandler;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.domain.tracking.WindStore;
-import com.sap.sailing.domain.tracking.impl.TrackingConnectorInfoImpl;
 import com.sap.sailing.domain.tractracadapter.DomainFactory;
 import com.sap.sailing.domain.tractracadapter.TracTracAdapter;
-import com.sap.sailing.domain.tractracadapter.TracTracControlPoint;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.Util.Triple;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.tractrac.model.lib.api.event.IEvent;
 import com.tractrac.model.lib.api.event.IRace;
-import com.tractrac.model.lib.api.route.IControl;
+import com.tractrac.model.lib.api.map.IMapItem;
 import com.tractrac.model.lib.api.route.IControlRoute;
 import com.tractrac.model.lib.api.route.IPathRoute;
-import com.tractrac.model.lib.api.route.IRoute;
 import com.tractrac.subscription.lib.api.IEventSubscriber;
 import com.tractrac.subscription.lib.api.IRaceSubscriber;
 import com.tractrac.subscription.lib.api.control.IControlRouteChangeListener;
@@ -135,35 +132,21 @@ public class RaceCourseReceiver extends AbstractReceiverWithQueue<IControlRoute,
     protected void handleEvent(Triple<IControlRoute, Long, Void> event) {
         System.out.print("R");
         ensureAllSingleMarksOfCourseAreaAreCreated(tractracRace); // this way, single marks will be known by their original name, even if used as virtual marks in gates/lines
-        final IRoute route = event.getA();
+        final IControlRoute route = event.getA();
         final String routeMetadataString = route.getMetadata() != null ? route.getMetadata().getText() : null;
-        final LinkedHashMap<IControl, TracTracControlPoint> ttControlPointsForAllOriginalEventControlPoints = new LinkedHashMap<>();
-        for (IControl cp : getTracTracEvent().getControls()) {
-            ttControlPointsForAllOriginalEventControlPoints.put(cp, new ControlPointAdapter(cp));
-        }
-        final List<TracTracControlPoint> routeControlPoints = new ArrayList<>();
-        for (IControl cp : event.getA().getControls()) {
-            routeControlPoints.add(ttControlPointsForAllOriginalEventControlPoints.get(cp));
-        }
-        Map<Integer, PassingInstruction> courseWaypointPassingInstructions = getDomainFactory().getMetadataParser().parsePassingInstructionData(routeMetadataString, routeControlPoints);
-        final List<Pair<TracTracControlPoint, PassingInstruction>> ttControlPoints = new ArrayList<>();
+        final List<IMapItem> routeControlPoints = route.getControls();
+        Map<Integer, PassingInstruction> courseWaypointPassingInstructions = getDomainFactory().getMetadataParser().parsePassingInstructionData(routeMetadataString, routeControlPoints.size());
+        final List<Pair<IMapItem, PassingInstruction>> ttControlPoints = new ArrayList<>();
         int i = 0;
-        for (IControl cp : event.getA().getControls()) {
-            PassingInstruction passingInstructions = courseWaypointPassingInstructions.containsKey(i) ? courseWaypointPassingInstructions.get(i) : PassingInstruction.None;
-            if (!ttControlPointsForAllOriginalEventControlPoints.containsKey(cp)) {
-                logger.warning("The TracTrac event "+getTracTracEvent()+" with ID "+
-                        getTracTracEvent().getId()+" does not contain the IControl with ID "+
-                        cp.getId()+" which is used by race "+tractracRace.getId()+
-                        ". Adding control point adapter based on race data.");
-                ttControlPointsForAllOriginalEventControlPoints.put(cp, new ControlPointAdapter(cp));
-            }
-            ttControlPoints.add(new Pair<TracTracControlPoint, PassingInstruction>(ttControlPointsForAllOriginalEventControlPoints.get(cp), passingInstructions));
+        for (IMapItem cp : routeControlPoints) {
+            final PassingInstruction passingInstructions = courseWaypointPassingInstructions.containsKey(i) ? courseWaypointPassingInstructions.get(i) : PassingInstruction.None;
+            ttControlPoints.add(new Pair<>(cp, passingInstructions));
             i++;
         }
         Course course = getDomainFactory().createCourse(route.getName(), ttControlPoints);
         List<Sideline> sidelines = getDomainFactory().createSidelines(
                 tractracRace.getMetadata() != null ? tractracRace.getMetadata().getText() : null,
-                ttControlPointsForAllOriginalEventControlPoints.values());
+                        tractracRace.getEvent().getMapItems());
         RaceDefinition existingRaceDefinitionForRace = getDomainFactory().getExistingRaceDefinitionForRace(tractracRace.getId());
         DynamicTrackedRace trackedRace = null;
         // When the tracked race is created, we noted that for REPLAY races the TracAPI transmission of race times is not reliable.
@@ -210,10 +193,8 @@ public class RaceCourseReceiver extends AbstractReceiverWithQueue<IControlRoute,
      * method return those, helping clients asking for "available" marks.
      */
     private void addAllMarksFromCourseArea(DynamicTrackedRace trackedRace) {
-        for (final IControl tractracControlPoint : getDomainFactory().getControlsForCourseArea(getTracTracEvent(),
-                tractracRace.getCourseArea())) {
-            final TracTracControlPoint ttcp = new ControlPointAdapter(tractracControlPoint);
-            final ControlPoint cp = getDomainFactory().getOrCreateControlPoint(ttcp);
+        for (final IMapItem tractracControlPoint : getDomainFactory().getControlsForCourseArea(getTracTracEvent(), tractracRace.getCourseArea())) {
+            final ControlPoint cp = getDomainFactory().getOrCreateControlPoint(tractracControlPoint);
             for (final Mark mark : cp.getMarks()) {
                 trackedRace.getOrCreateTrack(mark);
             }

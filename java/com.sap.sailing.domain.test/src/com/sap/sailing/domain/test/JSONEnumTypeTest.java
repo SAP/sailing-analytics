@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -12,7 +12,7 @@ import java.io.Writer;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class JSONEnumTypeTest {
     private enum TestEnum{ VALUE1, VALUE2 };

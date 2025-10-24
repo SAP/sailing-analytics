@@ -3,6 +3,7 @@
 <module>
 
   <inherits name="com.sap.sse.security.ui.UserManagement" />
+  <inherits name="com.sap.sse.landscape.aws.common.SSELandscapeAWSCommon" />
 
   <!-- Specify the app entry point class.                         -->
   <entry-point class='com.sap.sse.security.ui.usermanagement.UserManagementEntryPoint'/>

@@ -1,5 +1,9 @@
 package com.sap.sse.util;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.osgi.framework.BundleContext;
@@ -25,6 +29,36 @@ public class ServiceTrackerFactory {
             result = new ServiceTracker<T, T>(context, clazz, customizer);
             result.open();
         }
+        return result;
+    }
+    
+    public static <T> Future<T> createServiceFuture(final BundleContext bundleContext, final Class<T> serviceClass) {
+        final ServiceTracker<T, T> tracker = new ServiceTracker<>(bundleContext, serviceClass, /* customizer */ null);
+        tracker.open();
+        final FutureTask<T> result = new FutureTask<>(new Callable<T>() {
+            @Override
+            public T call() throws InterruptedException {
+                try {
+                    logger.info("Waiting for "+serviceClass.getSimpleName()+" service...");
+                    T service = tracker.waitForService(0);
+                    logger.info("Obtained UserStore service "+service);
+                    return service;
+                } catch (InterruptedException e) {
+                    logger.log(Level.SEVERE, "Interrupted while waiting for "+serviceClass.getSimpleName()+" service", e);
+                    throw e;
+                }
+            }
+        });
+        new Thread("ServiceTracker waiting for "+serviceClass.getSimpleName()+" service") {
+            @Override
+            public void run() {
+                try {
+                    result.run();
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Exception while waiting for "+serviceClass.getSimpleName()+" service", e);
+                }
+            }
+        }.start();
         return result;
     }
 }

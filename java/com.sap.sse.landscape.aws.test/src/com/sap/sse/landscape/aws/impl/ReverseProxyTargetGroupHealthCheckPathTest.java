@@ -1,8 +1,8 @@
 package com.sap.sse.landscape.aws.impl;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.landscape.application.ApplicationProcess;
 import com.sap.sse.landscape.application.ApplicationProcessMetrics;

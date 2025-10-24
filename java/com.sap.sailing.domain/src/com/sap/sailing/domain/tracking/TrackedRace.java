@@ -13,6 +13,9 @@ import java.util.SortedSet;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
+import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.MaxIterationsExceededException;
+
 import com.sap.sailing.domain.abstractlog.orc.RaceLogORCImpliedWindSourceEvent;
 import com.sap.sailing.domain.abstractlog.race.RaceLog;
 import com.sap.sailing.domain.abstractlog.race.RaceLogRaceStatusEvent;
@@ -66,6 +69,8 @@ import com.sap.sailing.domain.racelog.RaceLogAndTrackedRaceResolver;
 import com.sap.sailing.domain.racelog.tracking.SensorFixStore;
 import com.sap.sailing.domain.ranking.RankingMetric;
 import com.sap.sailing.domain.ranking.RankingMetric.RankingInfo;
+import com.sap.sailing.domain.shared.tracking.LineDetails;
+import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
 import com.sap.sailing.domain.tracking.impl.NonCachingMarkPositionAtTimePointCache;
 import com.sap.sailing.domain.tracking.impl.TrackedRaceImpl;
 import com.sap.sailing.domain.windestimation.IncrementalWindEstimation;
@@ -92,7 +97,12 @@ import com.sap.sse.security.shared.WithQualifiedObjectIdentifier;
  * <p>
  *
  * The overall race standings can be requested in terms of a competitor's ranking. More detailed information about what
- * happens / happened within a leg is available from {@link TrackedLeg} and {@link TrackedLegOfCompetitor}.
+ * happens / happened within a leg is available from {@link TrackedLeg} and {@link TrackedLegOfCompetitor}.<p>
+ * 
+ * Note: if you de-serialize objects of this type, make sure to invoke {@link #initializeAfterDeserialization} after the
+ * entire object graph, including any cycles across {@link Regatta} objects, such as through the race's
+ * {@link #getTrackedRegatta()} and {@link TrackedRegatta#getRegatta()} links, has been fully read and its structure
+ * established. This will, e.g., ensure that XTE and maneuver cache calculations are triggered initially.
  *
  * @author Axel Uhl (d043530)
  *
@@ -105,6 +115,17 @@ public interface TrackedRace
     final long MAX_TIME_BETWEEN_START_AND_FIRST_MARK_PASSING_IN_MILLISECONDS = 30000;
 
     final long DEFAULT_LIVE_DELAY_IN_MILLISECONDS = 5000;
+    
+    /**
+     * Runs the things after de-serialization of the entire graph of the enclosing {@link Regatta} required to
+     * fully initialize this object, such as triggering an initial calculation of the {@link #crossTrackErrorCache},
+     * adjusting the leg structure to the race's current course, and triggering the maneuver cache calculations.
+     * <p>
+     * 
+     * Note that this method won't be called for an object that is instance of a subclass. Therefore, subclasses are
+     * advised to invoke this method in their own {@code readResolve()} implementation.
+     */
+    void initializeAfterDeserialization();
 
     RaceDefinition getRace();
 
@@ -114,7 +135,7 @@ public interface TrackedRace
      * Tells how ranks are to be assigned to the competitors at any time during the race. For one-design boat classes
      * this will usually happen by projecting the competitors to the wind direction for upwind and downwind legs or to
      * the leg's rhumb line for reaching legs, then comparing positions. For handicap races using a time-on-time,
-     * time-on-distance, combination thereof or a more complicated scheme such as ORC Performance Curve, the ranking
+     * time-on-distance, combination thereof or a more complicated scheme such as ORC Polar Curve, the ranking
      * process needs to take into account the competitor-specific correction factors defined in the measurement
      * certificate.
      */
@@ -1397,7 +1418,7 @@ public interface TrackedRace
     }
 
     /**
-     * A so-called "implied wind" speed is determined in ORC Performance Curve Scoring (PCS) by inverting the
+     * A so-called "implied wind" speed is determined in ORC Polar Curve Scoring (PCS) by inverting the
      * performance curve functions of the competitors that maps a wind speed to the time allowance for a course that the
      * competitor gets for that wind speed. This way, a virtual wind speed can be calculated based on the time the
      * competitor actually took to complete that course.
@@ -1466,4 +1487,15 @@ public interface TrackedRace
      * {@link SharedDomainFactory#getExistingCourseAreaById(Serializable)} method.
      */
     UUID getCourseAreaId();
+
+    /**
+     * Computes the {@code competitor}'s current boat speed's percentage of the target boat speed at time point
+     * {@code timePoint}. For one-design classes with a one-design ranking metric, the {@link PolarDataService} is used
+     * to tell the target boat speed. For an ORC Polar Curve Scoring ranking metric we can assume that
+     * boat-specific measurement {@link ORCCertificate}s exist from which we can obtain a target boat speed for the
+     * current conditions and point of sail.
+     */
+    Double getPercentTargetBoatSpeed(Competitor competitor, TimePoint timePoint,
+            WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache)
+            throws NotEnoughDataHasBeenAddedException, MaxIterationsExceededException, FunctionEvaluationException;
 }

@@ -40,6 +40,14 @@ public interface WindTrack extends DynamicTrack<Wind> {
      * A listener is notified whenever a new fix is added to this track
      */
     void addListener(WindListener listener);
+    
+    /**
+     * Adds multiple {@link Wind} fixes in one call. This allows listeners to be notified with the
+     * {@link WindListener#windDataReceived(Iterable)} callback method, taking action on all wind fixes actually added
+     * at once. Only those fixes really added (not those where an equal {@link Wind} object was already contained in
+     * this track} are passed to the {@link WindListener#windDataReceived(Iterable)} method.
+     */
+    void add(Iterable<Wind> fixesToAdd);
 
     void remove(Wind wind);
 

@@ -1,7 +1,7 @@
 package com.sap.sailing.server.replication.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Course;
 import com.sap.sailing.domain.base.RaceDefinition;
@@ -40,7 +40,7 @@ public class IdempotencyForWaypointOperationsTest {
     private RaceDefinition race;
     private Course course;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         service = mock(RacingEventService.class);
         race = mock(RaceDefinition.class);

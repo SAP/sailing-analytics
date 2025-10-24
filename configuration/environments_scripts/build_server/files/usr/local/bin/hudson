@@ -60,13 +60,14 @@ RETVAL=0
 case "$1" in
     start)
     echo -n "Starting Hudson "
+    # Note, the pidfile isn't written to below but it is checked to see if the  program is already running.
     daemon  --user "$HUDSON_USER" --pidfile "$HUDSON_PID_FILE" "$JAVA_CMD" "$PARAMS" &> /var/tmp/hudson.log &
     RETVAL=$?
     if [ $RETVAL = 0 ]; then
         success
         echo > "$HUDSON_PID_FILE"  # just in case we fail to find it
             MY_SESSION_ID=`/bin/ps h -o sess -p $$`
-            # get PID
+            # get PID. Note the ww means unlimited width.
             /bin/ps hww -u "$HUDSON_USER" -o sess,ppid,pid,cmd | \
             while read sess ppid pid cmd; do
         [ "$ppid" = 1 ] || continue

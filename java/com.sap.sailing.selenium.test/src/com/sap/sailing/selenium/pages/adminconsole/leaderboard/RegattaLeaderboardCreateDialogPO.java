@@ -6,7 +6,6 @@ import org.openqa.selenium.support.ui.Select;
 
 import com.sap.sailing.selenium.core.BySeleniumId;
 import com.sap.sailing.selenium.core.FindBy;
-
 import com.sap.sailing.selenium.pages.adminconsole.regatta.RegattaListCompositePO.RegattaDescriptor;
 import com.sap.sailing.selenium.pages.common.DataEntryDialogPO;
 

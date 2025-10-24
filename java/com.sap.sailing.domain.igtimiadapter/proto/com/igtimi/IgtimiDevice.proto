@@ -1,0 +1,74 @@
+/**
+ * File: Igtimi Device
+ * Project: IgtimiRIoT
+ *
+ * Version 0.9.0
+ *
+ * Author Stephen Markham
+ * Date 12/05/2021
+ * Copyright 2021, Igtimi Ltd.
+ * Description
+ *    Igtimi device information
+ *
+ *
+ * Note: Versions < 1.0 are liable to breaking changes (including structure)
+ *        and therefore implementations based of these should proceed with caution.
+ *        After 1.0 all changes *should* be backwards compatible.
+ */
+
+syntax = "proto3";
+
+package com.igtimi;
+
+import "google/protobuf/any.proto";
+
+option optimize_for = SPEED;
+
+// Top level message for streaming interface
+message DeviceManagement {
+  string id = 1 [json_name = "id"];
+  string serial_number = 2 [json_name = "serial"];
+
+  oneof msg {
+    DeviceManagementRequest request = 3 [json_name = "request"];
+    DeviceManagementResponse response = 4 [json_name = "response"];
+    //This updates the device information. Will NOT remove keys that are not present
+    DeviceInformation update_device_information = 5 [json_name = "updateDeviceInfo"];
+  }
+}
+
+message DeviceManagementRequest {
+  //Timeout runs from time riot sends command out (or tries to) to the time it is returned
+  //not setting, or setting to 0 will result in 5000ms (5s) being used BUT will return immediately if
+  //no suitable client (device or gateway) is located.
+  //Explicitly setting a timeout will wait the specified amount of time before returning if no device
+  //or gateway is found (in case one does happen to connect)
+  uint64 timeout_ms = 1 [json_name = "timeoutMs"];
+
+  oneof msg {
+    DeviceCommand command = 2 [json_name = "cmd"];
+  }
+}
+
+message DeviceManagementResponse {
+  uint64 timestamp = 1 [json_name = "t"];
+  bool success = 2 [json_name = "success"];
+  uint32 code = 3 [json_name = "code"];
+  string reason = 4 [json_name = "reason"];
+
+  oneof content {
+    string text = 5 [json_name = "text"];
+  }
+}
+
+message DeviceCommand {
+  oneof command {
+    string text = 1 [json_name = "text"];
+    google.protobuf.Any custom = 2 [json_name = "custom"];
+  }
+}
+
+message DeviceInformation {
+  string serial_number = 1 [json_name = "serial"];
+  map<string, string> info = 2 [json_name = "info"];
+}

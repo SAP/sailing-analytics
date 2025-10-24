@@ -180,7 +180,9 @@ implements ProcedureCreatingLoadBalancerMapping<ShardingKey> {
     /**
      * Produces conditions for a sharding load balancer rule based on the {@link #replicaSet}'s
      * {@link AwsApplicationReplicaSet#getHostname() hostname}, a header-field condition that requires the request to be
-     * tagged for a replica, plus a path-pattern condition with the sharding keys as patterns.
+     * tagged for a replica, plus a path-pattern condition with the sharding keys as patterns.<p>
+     * 
+     * TODO bug5887: if each leaderboard/regatta in a shard creates more than one pathPatternConfig, new number calculations are required, and multiple rules will be needed for each leaderboard/regatta
      * 
      * @param shardingKeys
      *            their number must not exceed {@link ApplicationLoadBalancer#MAX_CONDITIONS_PER_RULE} -
@@ -196,6 +198,7 @@ implements ProcedureCreatingLoadBalancerMapping<ShardingKey> {
         }
         final Collection<RuleCondition> ruleConditions = new ArrayList<>();
         final Collection<String> paths = Util.mapToArrayList(shardingKeys, shardingKey->getPathConditionForShardingKey(shardingKey, pathPrefixForShardingKey));
+        // TODO bug5887: there is a "secret" connection between the following few lines and the NUMBER_OF_STANDARD_CONDITIONS_FOR_SHARDING_RULE constant...
         ruleConditions.add(loadBalancer.createHostHeaderRuleCondition(replicaSet.getHostname()));
         ruleConditions.add(RuleCondition.builder().field("http-header")
                 .httpHeaderConfig(hhcb -> hhcb.httpHeaderName(HttpRequestHeaderConstants.HEADER_KEY_FORWARD_TO)
@@ -217,6 +220,7 @@ implements ProcedureCreatingLoadBalancerMapping<ShardingKey> {
             LoadBalancerRuleInserter.create(alb, ApplicationLoadBalancer.MAX_PRIORITY, ApplicationLoadBalancer.MAX_RULES_PER_LOADBALANCER).shiftRulesToMakeSpaceAt(ruleIdx, 1);
             final Set<ShardingKey> shardingKeysForNextRule = new HashSet<>();
             for (final Iterator<ShardingKey> i=shardingKeyForConsumption.iterator();
+                    // TODO bug5887: we will then need more than one condition per sharding key/leaderboard/regatta; see https://bugzilla.sapsailing.com/bugzilla/show_bug.cgi?id=5887#c1
                     shardingKeysForNextRule.size() < ApplicationLoadBalancer.MAX_CONDITIONS_PER_RULE-NUMBER_OF_STANDARD_CONDITIONS_FOR_SHARDING_RULE && i.hasNext(); ) {
                 shardingKeysForNextRule.add(i.next());
                 i.remove();
@@ -254,8 +258,7 @@ implements ProcedureCreatingLoadBalancerMapping<ShardingKey> {
             res = replicaSet.getLoadBalancer();
         } else {
             // Another loadbalancer
-            final Iterable<ApplicationLoadBalancer<ShardingKey>> loadBalancers = getLandscape()
-                    .getLoadBalancers(region);
+            final Iterable<ApplicationLoadBalancer<ShardingKey>> loadBalancers = getLandscape().getLoadBalancers(region);
             final Iterable<ApplicationLoadBalancer<ShardingKey>> loadBalancersFiltered = Util.filter(loadBalancers,
                     t -> {
                         try {
@@ -385,6 +388,7 @@ implements ProcedureCreatingLoadBalancerMapping<ShardingKey> {
     }
     
     protected int numberOfRequiredRules(int numberOfShardingKeys) {
+        // TODO bug5887: this is where we will need more than one condition per sharding key
         return (int) (numberOfShardingKeys / (ApplicationLoadBalancer.MAX_CONDITIONS_PER_RULE-NUMBER_OF_STANDARD_CONDITIONS_FOR_SHARDING_RULE))
                 + (int) Math.signum(/* one more because casting to int rounds down */ numberOfShardingKeys %
                         (ApplicationLoadBalancer.MAX_CONDITIONS_PER_RULE-NUMBER_OF_STANDARD_CONDITIONS_FOR_SHARDING_RULE));

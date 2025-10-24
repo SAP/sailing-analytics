@@ -1,15 +1,15 @@
 package com.sap.sailing.nmeaconnector.test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.nmeaconnector.NmeaFactory;
@@ -29,7 +29,7 @@ public class GeneralizedSentenceListenerTest {
     private SentenceReader sentenceReader;
     private SentenceReaderSupport readerSupport;
 
-    @Before
+    @BeforeEach
     public void setUp() throws FileNotFoundException {
         sentenceReader = new SentenceReader(new FileInputStream("resources/LogSS.txt"));
         readerSupport = new SentenceReaderSupport(sentenceReader);

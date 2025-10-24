@@ -16,6 +16,204 @@ It contains also some files:
  - Manifest.txt -> manifest used to create the test.jar file
 
 ********************************************
+        TracAPI 4.0.4
+********************************************
+This is the final version. It keeps the backward compatibility. This version has been compiled with
+Java 21 but the target compatibility continues being Java 8.
+
+  Release date: 01/10/2025
+
+ 1) Bugs
+
+ - The heartbeat monitoring the connection status can stop working (Reported by Jorge Piera, 01/10/2025)
+
+********************************************
+        TracAPI 4.0.3
+********************************************
+This is the final version.  It keeps the backward compatibility. The new parameter files will be encoded in UTF-8,
+and the first line will contain "utf8:true". If the file does not start with this line, TracAPI will assume the
+file is an older version and will read it using the ISO-8859 encoding.
+
+  Release date: 03/04/2025
+
+ 1) Feature
+
+ - Support for UTF-8 (Requested by Jorge Piera, 01/04/2025)
+
+********************************************
+        TracAPI 4.0.2
+********************************************
+This is a final version. It keeps the backward compatibility.
+
+  Release date: 10/03/2025
+
+ 1) Feature
+
+ - Some entry status codes use a three-character abbreviation. For example, use ABD instead of ABANDONED. The API has
+ not been updated yet, but internally, it is possible to use either the old abbreviation or the new one. This is the
+ first step toward using the new abbreviation for all entry statuses. (Reported by Jorge Piera, 10/03/2025)
+
+********************************************
+        TracAPI 4.0.1
+********************************************
+This is a final version. It keeps the backward compatibility.
+
+  Release date: 19/11/2024
+
+ 1) Bugs
+
+ - IPositionedItem.getMetadata() didn't get the content from the parameters file
+ (Reported by Axel Uhl, 19/11/2024)
+
+********************************************
+        TracAPI 4.0.0
+********************************************
+This is the final version. It changes the model of objects and is not compatible with versions 3.x.x.
+
+The IControl interface represents "controls" that are part of a route. Competitors pass through these "controls"
+during their race. However, in some sports, particularly in sailing, a control may consist of one or more "buoys."
+To accommodate this, the TracTrac API introduces the concept of IControlPoint, which represents all the points
+that make up a control.
+
+The current TracTrac model, however, does not differentiate between "control" and "control point." In TracTrac,
+everything is treated as a control, which can either be singular (if attached to a tracking device)
+or composite (if represented by multiple controls). This model has a significant limitation: a tracking device
+cannot be attached to two or more controls simultaneously.
+
+To work around this limitation, the concept of a Virtual Tracker was introduced. A Virtual Tracker is a virtual tracking
+device that retrieves positions from a real tracking device. However, this approach created a secondary issue:
+the positions of a physical device were duplicated multiple times, significantly increasing the volume of data
+transmitted between the server and clients.
+
+This new TracAPI has been designed with the primary goal of eliminating the concept of Virtual Trackers. A secondary
+objective has been to support additional race objects that are neither competitors nor controls, such as offset marks,
+boundaries, wind sensors, etc.
+
+The new API introduces two key interfaces:
+
+1) com.tractrac.model.lib.api.map.IPositionedItem: Represents items with an attached position, either from a tracker
+or a static location. These objects are not rendered in the viewer; they represent "a concept of an object with a
+position on the map."
+
+2) com.tractrac.model.lib.api.map.IMapItem: Represents tangible objects that can be drawn in the viewer. They consist
+of one or more IPositionedItems, which are used to render them on the map.
+
+Breaking Changes from Version 3.x.x
+
+- com.tractrac.model.lib.api.route.IControl has been replaced by com.tractrac.model.lib.api.map.IMapItem.
+- com.tractrac.model.lib.api.route.IControlPoint has been replaced by com.tractrac.model.lib.api.map.IPositionedItem.
+- com.tractrac.model.lib.api.route.IControlRoute.getControls() now returns an array of IMapItems.
+- com.tractrac.model.lib.api.data.IControlPassing.getControl() now returns an IMapItem.
+- com.tractrac.model.lib.api.event.IEvent.getControls() has been removed. Use IEvent.getMapItems() or
+ IEvent.getPositionedItems() instead.
+- com.tractrac.model.lib.api.event.IEvent.getControl(UUID controlId) has been removed. Use IEvent.getMapItem(UUID mapItemId)
+ instead.
+- com.tractrac.subscription.lib.api.IEventSubscriber.subscribeControls(IControlsListener) has been replaced by
+IEventSubscriber.subscribeMapItems(IMapItemsListener).
+- com.tractrac.subscription.lib.api.IEventSubscriber.unsubscribeControls(IControlsListener) has been replaced
+by IEventSubscriber.unsubscribeMapItems(IMapItemsListener).
+- com.tractrac.subscription.lib.api.IRaceSubscriber.subscribeControlPositions(IControlPointPositionListener) has been
+ replaced by IRaceSubscriber.subscribePositionedItemPositions(IPositionedItemPositionListener).
+- com.tractrac.subscription.lib.api.IRaceSubscriber.unsubscribeControlPositions(IControlPointPositionListener) has been
+ replaced by IRaceSubscriber.unsubscribePositionedItemPositions(IPositionedItemPositionListener).
+- com.tractrac.subscription.lib.api.control.IControlsListener has been replaced by
+com.tractrac.subscription.lib.api.map.IMapItemsListener. All methods have also been updated: updateControl → updateMapItem,
+addControl → addMapItem, deleteControl → deleteMapItem
+- com.tractrac.subscription.lib.api.control.IControlPointPositionListener has been replaced by
+ com.tractrac.subscription.lib.api.map.IPositionedItemPositionListener. The sole method in this interface
+ now returns the position of the IPositionedItem.
+
+Why IControl was renamed to IMapItem?
+
+The new API adopts a more generic model for objects. An IMapItem can now serve multiple purposes, such as being
+ part of a course or forming part of a line to define race boundaries. In this initial version, all IMapItems
+ are used as "controls." However, this will evolve in future iterations to support broader use cases.
+
+  Release date: 18/11/2024
+
+********************************************
+        TracAPI 3.15.13
+********************************************
+This is a final version. It keeps the backward compatibility.
+
+  Release date: 26/07/2024
+
+ 1) Bugs
+
+- When a new race is added to the event, TracAPI receives a message with some information about the race. However, this
+ message does not include the location of the parameters file. TracAPI attempts to infer the URI using HTTP (instead
+ of HTTPS). This can cause a deadlock in locations where HTTP is not allowed (e.g., the Olympic Games) because TracAPI is
+ trying to download an invalid parameters file. From now on, TracAPI will infer the URI using HTTPS. This is a
+ temporary solution. The final solution will be to include the URI of the parameters file in the original message.
+ (Reported by Axel Uhl, 25/07/2024)
+
+********************************************
+        TracAPI 3.15.12
+********************************************
+This is a final version. It keeps the backward compatibility.
+
+  Release date: 25/06/2024
+
+ 1) Bugs
+
+- The previous version 3.15.11 had an error in the build generation. (Reported by Jorge Piera, 25/06/2024)
+
+********************************************
+        TracAPI 3.15.11
+********************************************
+This is a final version. It keeps the backward compatibility.
+
+  Release date: 25/06/2024
+
+ 1) Bugs
+
+- The MTB reader is not releasing all the resources once the reading process is over (Reported by Axel Uhl,
+22/06/2024)
+
+********************************************
+        TracAPI 3.15.10
+********************************************
+This is a final version. It keeps the backward compatibility.
+
+  Release date: 20/06/2024
+
+ 1) Bugs
+
+- If the parameters file has an MTB and the user overwrites the stored-uri with another value, the library ignores the
+ user parameter and gives priority to the MTB file. And it doesn't matter if the provided stored-uri is a dataserver
+ port or an MTB: the library is always ignoring this parameter. This is a bug. Now, if the user uses an MTB file,
+ this file will always be used and the library will only force the usage of the MTB file if the user overwrites
+ the stored-uri using a dataserver port. (Reported by Axel Uhl, 20/06/2024)
+
+********************************************
+        TracAPI 3.15.9
+********************************************
+This is a final version. It keeps the backward compatibility.
+
+  Release date: 19/06/2024
+
+ 1) Features
+
+ - The dataserver is able to filter the control positions by course area. (Requested by Axel Ulh, 15/04/2024)
+ - If TracAPI tries to connect to a race and there is an MTB created, the library always returns the content
+ of the MTB file (Requested by Jorge Piera, 15/04/2024)
+
+********************************************
+        TracAPI 3.15.8
+********************************************
+This is a final version. It keeps the backward compatibility.
+
+  Release date: 06/06/2024
+
+ 1) Features
+
+ - Adding new values to the RaceCompetitorStatusType: RCT(Retired after causing a tangle),
+ DCT(Disqualified after causing a tangle) and DNE(Disqualification not excludable).
+ (Requested by Radek Masnika, 30/05/2024)
+ - Adding the method IPosition.getHACC to retrieve the horizontal accuracy (Requested by Chris Terkelsen,
+ 05/05/2024)
+
+********************************************
         TracAPI 3.15.7
 ********************************************
 This is a final version. It keeps the backward compatibility.

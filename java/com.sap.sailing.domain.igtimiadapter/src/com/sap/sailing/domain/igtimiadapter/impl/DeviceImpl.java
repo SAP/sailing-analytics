@@ -1,43 +1,28 @@
 package com.sap.sailing.domain.igtimiadapter.impl;
 
-import java.io.IOException;
-
-import org.apache.http.client.ClientProtocolException;
-import org.json.simple.parser.ParseException;
-
+import com.sap.sailing.domain.common.security.SecuredDomainType;
 import com.sap.sailing.domain.igtimiadapter.Device;
-import com.sap.sailing.domain.igtimiadapter.IgtimiConnection;
-import com.sap.sailing.domain.igtimiadapter.Permission;
-import com.sap.sailing.domain.igtimiadapter.User;
+import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.Util.Pair;
+import com.sap.sse.security.shared.HasPermissions;
+import com.sap.sse.security.shared.QualifiedObjectIdentifier;
+import com.sap.sse.security.shared.TypeRelativeObjectIdentifier;
 
 public class DeviceImpl extends HasIdImpl implements Device {
+    private static final long serialVersionUID = 7224992550721569935L;
     private final String serialNumber;
-    private final String name;
-    private String serviceTag;
-    private Long ownerId;
-    private Long deviceUserGroupId;
-    private Long adminDeviceUserGroupId;
-    private Iterable<Permission> permissions;
-    private Boolean blob;
-    private final IgtimiConnection conn;
+    private String name;
+    private TimePoint lastHeartbeat;
+    private String remoteAddress;
     
-    protected DeviceImpl(long id, String serialNumber, IgtimiConnection conn) {
-        this(id, serialNumber, /* name */ null, /* serviceTag */ null, /* ownerId */ null, /* deviceUserGroupId */ null,
-                /* adminDeviceUserGroupId */ null, /* permissions */ null, /* blob */ null, conn);
+    public DeviceImpl(long id, String serialNumber) {
+        this(id, serialNumber, /* name */ null);
     }
 
-    public DeviceImpl(Long id, String serialNumber, String name, String serviceTag, Long ownerId, Long deviceUserGroupId,
-            Long adminDeviceUserGroupId, Iterable<Permission> permissions, Boolean blob, IgtimiConnection conn) {
+    public DeviceImpl(long id, String serialNumber, String name) {
         super(id);
         this.serialNumber = serialNumber;
         this.name = name;
-        this.serviceTag = serialNumber;
-        this.ownerId = ownerId;
-        this.deviceUserGroupId = deviceUserGroupId;
-        this.adminDeviceUserGroupId = adminDeviceUserGroupId;
-        this.permissions = permissions;
-        this.blob = blob;
-        this.conn = conn;
     }
 
     @Override
@@ -46,43 +31,33 @@ public class DeviceImpl extends HasIdImpl implements Device {
     }
 
     @Override
-    public String getServiceTag() {
-        return serviceTag;
-    }
-
-    @Override
-    public Long getOwnerId() {
-        return ownerId;
-    }
-
-    @Override
-    public Long getDeviceUserGroupId() {
-        return deviceUserGroupId;
-    }
-    
-    @Override
-    public Long getAdminDeviceUserGroupId() {
-        return adminDeviceUserGroupId;
-    }
-    
-    @Override
-    public User getOwner() throws IllegalStateException, ClientProtocolException, IOException, ParseException {
-        return conn.getUser(getOwnerId());
-    }
-    
-    @Override
-    public Iterable<Permission> getPermissions() {
-        return permissions;
-    }
-
-    @Override
-    public Boolean getBlob() {
-        return blob;
-    }
-
-    @Override
     public String getName() {
         return name;
     }
+    
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
 
+    @Override
+    public Pair<TimePoint, String> getLastHeartbeat() {
+        return lastHeartbeat == null ? null : new Pair<>(lastHeartbeat, remoteAddress);
+    }
+
+    @Override
+    public void setLastHeartbeat(TimePoint timePointOfLastHeartbeat, String remoteAddress) {
+        this.lastHeartbeat = timePointOfLastHeartbeat;
+        this.remoteAddress = remoteAddress;
+    }
+
+    @Override
+    public QualifiedObjectIdentifier getIdentifier() {
+        return getPermissionType().getQualifiedObjectIdentifier(new TypeRelativeObjectIdentifier(getSerialNumber()));
+    }
+
+    @Override
+    public HasPermissions getPermissionType() {
+        return SecuredDomainType.IGTIMI_DEVICE;
+    }
 }

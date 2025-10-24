@@ -1,8 +1,8 @@
 package com.sap.sailing.manage2sail.resultimport.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 
 import java.io.File;
@@ -23,7 +23,7 @@ import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 import com.sap.sailing.domain.common.MaxPointsReason;
@@ -91,7 +91,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testSimpleParsingSomeManage2SailDocuments() throws JAXBException, IOException {
+    public void testSimpleParsingSomeManage2SailDocuments() throws JAXBException, IOException, SAXException, ParserConfigurationException {
         RegattaResults r1 = ParserFactory.INSTANCE.createParser(getInputStream(SAMPLE_INPUT_NAME_29er), YES_EVENT_NAME).parse();
         assertNotNull(r1);
 

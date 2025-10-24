@@ -5,17 +5,14 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
-
 import java.util.List;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.internal.WrapsElement;
-
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 import org.openqa.selenium.support.pagefactory.FieldDecorator;
-
 import org.openqa.selenium.support.pagefactory.internal.LocatingElementHandler;
 import org.openqa.selenium.support.pagefactory.internal.LocatingElementListHandler;
 

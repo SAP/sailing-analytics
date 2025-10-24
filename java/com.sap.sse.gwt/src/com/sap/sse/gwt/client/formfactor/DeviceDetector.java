@@ -34,21 +34,24 @@ public class DeviceDetector {
     
     private static DeviceCategory deviceCategory;
     public static DeviceCategory getDeviceCategory() {
-        if(deviceCategory == null) {
+        if (deviceCategory == null) {
             deviceCategory = calculateDeviceCategory();
         }
         return deviceCategory;
     }
     
     private static DeviceCategory calculateDeviceCategory() {
-        boolean isMobile = isMobileRegExp.test(Navigator.getUserAgent());
+        final DeviceCategory result;
+        final boolean isMobile = isMobileRegExp.test(Navigator.getUserAgent());
         LOG.info("Navigator user agent matched mobile regex: " + isMobile);
-        if(!isMobile) {
-            return DeviceCategory.DESKTOP;
+        if (!isMobile) {
+            result = DeviceCategory.DESKTOP;
+        } else {
+            boolean isTablet = tabletBlacklistRegExp.test(Navigator.getUserAgent());
+            LOG.info("Navigator user agent matched tablet regex: " + isTablet);
+            result = isTablet ? DeviceCategory.TABLET : DeviceCategory.MOBILE;
         }
-        boolean isTablet = tabletBlacklistRegExp.test(Navigator.getUserAgent());
-        LOG.info("Navigator user agent matched tablet regex: " + isTablet);
-        return isTablet ? DeviceCategory.TABLET : DeviceCategory.MOBILE;
+        return result;
     }
 
     /**

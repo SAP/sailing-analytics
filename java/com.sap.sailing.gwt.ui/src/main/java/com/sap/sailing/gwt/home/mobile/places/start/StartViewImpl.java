@@ -40,13 +40,12 @@ public class StartViewImpl extends Composite implements StartView {
         this.currentPresenter = presenter;
         stage = new Stage(presenter.getNavigator(), true);
         initWidget(uiBinder.createAndBindUi(this));
-        
         presenter.getNavigator().getEventsNavigation().configureAnchorElement(showAllEventsUi);
     }
     
     @Override
     public void setFeaturedEvents(List<? extends EventLinkAndMetadataDTO> list) {
-        stage.setFeaturedEvents(list);
+        stage.setFeaturedEvents(list, currentPresenter.getUserService());
     }
 
     @Override

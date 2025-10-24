@@ -13,7 +13,7 @@ sleep 2
 # However, the RabbitMQ forwards to emulate rabbit.internal.sapsailing.com (eu-west-1) and rabbit-eu-west-3.sapsailing.com
 # with the local RabbitMQ need to go through a localhost port forward. Furthermore, the security-service.sapsailing.com tunnel
 # is re-directed to sap-p1-1's NGINX, assuming it has a replacement running if Internet fails.
-autossh -M 21504 -f -A -N \
+AUTOSSH_LOGLEVEL=7 AUTOSSH_POLL=5 autossh -M 21504 -f -A -N \
   -L 5673:localhost:5672 \
   -L 15673:localhost:15672 \
   -L 5675:sap-p1-1:5672 \

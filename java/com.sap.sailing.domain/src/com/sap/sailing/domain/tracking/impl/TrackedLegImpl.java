@@ -393,16 +393,36 @@ public class TrackedLegImpl implements TrackedLeg {
 
     @Override
     public Distance getAbsoluteCrossTrackError(Position p, TimePoint timePoint) {
-        final Position approximatePosition = getTrackedRace().getApproximatePosition(getLeg().getFrom(), timePoint);
+        final Position approximateLegFromPosition = getTrackedRace().getApproximatePosition(getLeg().getFrom(), timePoint);
         final Bearing legBearing = getLegBearing(timePoint);
-        return approximatePosition==null || legBearing==null ? null : p.absoluteCrossTrackError(approximatePosition, legBearing);
+        return approximateLegFromPosition==null || legBearing==null ? null : p.absoluteCrossTrackError(approximateLegFromPosition, legBearing);
     }
 
     @Override
     public Distance getSignedCrossTrackError(Position p, TimePoint timePoint) {
-        final Position approximatePosition = getTrackedRace().getApproximatePosition(getLeg().getFrom(), timePoint);
+        final Position approximateLegFromPosition = getTrackedRace().getApproximatePosition(getLeg().getFrom(), timePoint);
         final Bearing legBearing = getLegBearing(timePoint);
-        return approximatePosition==null || legBearing==null ? null : p.crossTrackError(approximatePosition, legBearing);
+        return approximateLegFromPosition==null || legBearing==null ? null : p.crossTrackError(approximateLegFromPosition, legBearing);
+    }
+
+    @Override
+    public Distance getUnsignedCrossTrackErrorToWindAxis(Position p, TimePoint timePoint) {
+        final Position approximateLegToPosition = getTrackedRace().getApproximatePosition(getLeg().getTo(), timePoint);
+        final Bearing windAxis = getWind(p, timePoint, getTrackedRace().getWindSourcesToExclude()).getFrom(); // the "from" wind direction, not "to"
+        return approximateLegToPosition==null || windAxis==null ? null : p.absoluteCrossTrackError(approximateLegToPosition, windAxis);
+    }
+
+    @Override
+    public Distance getSignedCrossTrackErrorToWindAxis(Position p, TimePoint timePoint) {
+        final Position approximateLegToPosition = getTrackedRace().getApproximatePosition(getLeg().getTo(), timePoint);
+        final Wind wind = getWind(p, timePoint,
+                        getTrackedRace().getWindSourcesToExclude()); // the "from" wind direction, not "to"
+        try {
+            return approximateLegToPosition==null || wind==null ? null : p.crossTrackError(approximateLegToPosition,
+                    getTWA(timePoint).abs().compareTo(new DegreeBearingImpl(90)) < 0 ? wind.getFrom() : wind.getBearing());
+        } catch (NoWindException e) {
+            throw new RuntimeException("This shouldn't have happened; we failed computing the leg's TWA although we successfully computed a wind direction", e);
+        }
     }
 
     @Override

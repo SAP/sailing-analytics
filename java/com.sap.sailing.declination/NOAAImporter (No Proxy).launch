@@ -9,6 +9,6 @@
     </listAttribute>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.sap.sailing.declination.impl.DeclinationStore"/>
     <stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value="com.sap.sailing.declination"/>
-    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="2024 2024 1"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="2025 2025 1"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="com.sap.sailing.declination"/>
 </launchConfiguration>

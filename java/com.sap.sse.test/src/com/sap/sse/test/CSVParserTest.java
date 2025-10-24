@@ -1,7 +1,7 @@
 package com.sap.sse.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;

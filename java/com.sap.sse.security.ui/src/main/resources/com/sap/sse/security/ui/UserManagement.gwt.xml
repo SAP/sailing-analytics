@@ -3,6 +3,7 @@
 <module>
 
   <inherits name="com.sap.sse.security.ui.SecurityOauthCommon" />
+  <inherits name="com.sap.sse.landscape.aws.common.SSELandscapeAWSCommon" />
 
   <inherits name='com.google.gwt.debug.Debug'/>
   

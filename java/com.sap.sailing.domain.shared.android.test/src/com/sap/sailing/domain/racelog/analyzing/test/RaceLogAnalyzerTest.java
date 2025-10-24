@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
 import java.io.Serializable;
 import java.util.UUID;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
@@ -21,7 +21,7 @@ public abstract class RaceLogAnalyzerTest<AnalyzerType extends RaceLogAnalyzer<?
     protected AnalyzerType analyzer;
     protected RaceLog raceLog;
 
-    @Before
+    @BeforeEach
     public void setUpBase() {
         raceLog = new RaceLogImpl("RaceLogTest", "test-identifier");
         analyzer = createAnalyzer(raceLog);

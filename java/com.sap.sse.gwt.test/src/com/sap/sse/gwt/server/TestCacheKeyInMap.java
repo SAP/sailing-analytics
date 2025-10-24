@@ -1,13 +1,13 @@
 package com.sap.sse.gwt.server;
 
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.ref.ReferenceQueue;
 import java.util.HashMap;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.CacheableRPCResult;
 
@@ -23,7 +23,7 @@ public class TestCacheKeyInMap {
     private HashMap<CacheKey, String> map;
     private ReferenceQueue<CacheableRPCResult> queue;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         map = new HashMap<>();
         queue = new ReferenceQueue<>();

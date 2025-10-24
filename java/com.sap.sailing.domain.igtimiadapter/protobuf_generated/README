@@ -1,0 +1,22 @@
+The sources in here have been generated using the protobuf compiler for Java language bindings.
+The compiler has been archived at https://static.sapsailing.com/protoc-28.3-linux-x86_64.zip.
+The protobuf definition files have been taken from the Igtimi Github go-igtimi repository at
+git@github.com:igtimi/go-igtimi.git. There, in the proto/ folder the message type definition files
+(.proto file extension) can be found under com/igtimi/*.proto.
+
+Use the compiler like this:
+
+        protoc --java_out={your-git-root}/java/com.sap.sailing.domain.igtimiadapter/protobuf_generated/ com/igtimi/*.proto
+
+The resulting files show hundreds of warnings based on unused identifiers, unnecessary warning
+suppressions, and the like. We have adjusted the generated files manually to comply with our
+coding standards.
+
+The protobuf Java runtime library was taken from https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/4.28.3/
+which matches the compiler version (28.3). As usual, the sources JAR doesn't have a valid OSGi
+source bundle manifest, so this needed manual adjustment, too. The Orbit bundle
+com.google.protobuf in version 2.4.1 is useless as it's missing many classes required.
+So the Maven-provided JARs need to be added to our "target-base" feature group in our
+local base p2 repository definition which is part of our target platform.
+
+The original .proto files used for code generation have been copied to the proto/ folder in the root of this bundle.

@@ -1,16 +1,23 @@
 #!/bin/sh
+# Syncs the necessary branches of a repo at a specified location or, as default,
+# /home/wiki/gitwiki. The assumed checked-out branch is master and the tracking branch
+# is assumed to be origin master.
 ADMIN_EMAIL="axel.uhl@sap.com jan.hamann@sapsailing.com"
 if [ $# -eq 0 ]; then
     GIT_PATH="/home/wiki/gitwiki"
 else
-    GIT_PATH=$1
+    GIT_PATH="$1"
 fi
-cd $GIT_PATH
-git pull >/tmp/wiki-git.out 2>/tmp/wiki-git.err
+cd "$GIT_PATH"
+git push origin main:main >/tmp/wiki-git.out 2>/tmp/wiki-git.err
 if [ "$?" != "0" ]; then
-  cat /tmp/wiki-git.out /tmp/wiki-git.err | mail -s "Wiki git problem" $ADMIN_EMAIL
+  cat /tmp/wiki-git.out /tmp/wiki-git.err | mail -s "Wiki git problem: could not push main into sapsailing/main" $ADMIN_EMAIL
 fi
-git push >>/tmp/wiki-git.out 2>/tmp/wiki-git.err
+git pull github main >/tmp/wiki-git.out 2>/tmp/wiki-git.err
 if [ "$?" != "0" ]; then
-  cat /tmp/wiki-git.out /tmp/wiki-git.err | mail -s "Wiki git problem" $ADMIN_EMAIL
+  cat /tmp/wiki-git.out /tmp/wiki-git.err | mail -s "Wiki git problem: could not merge github/main into local main" $ADMIN_EMAIL
+fi
+git pull origin main >/tmp/wiki-git.out 2>/tmp/wiki-git.err
+if [ "$?" != "0" ]; then
+  cat /tmp/wiki-git.out /tmp/wiki-git.err | mail -s "Wiki git problem: could not pull origin/main" $ADMIN_EMAIL
 fi

@@ -3,10 +3,10 @@ package com.sap.sailing.domain.racelogtracking.test.impl;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.Timeout;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
@@ -18,23 +18,21 @@ import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.DomainFactory;
 import com.sap.sailing.domain.common.DeviceIdentifier;
 import com.sap.sailing.domain.common.tracking.impl.DoubleVectorFixImpl;
-import com.sap.sailing.domain.racelog.tracking.test.mock.SmartphoneImeiIdentifier;
+import com.sap.sailing.domain.racelogtracking.impl.SmartphoneImeiIdentifierImpl;
 import com.sap.sailing.domain.racelogtracking.impl.fixtracker.RegattaLogDeviceMappings;
 import com.sap.sailing.domain.racelogtracking.test.AbstractGPSFixStoreTest;
 import com.sap.sse.common.MultiTimeRange;
 import com.sap.sse.common.WithID;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
+@Timeout(value=3, unit=TimeUnit.SECONDS)
 public class DeviceMappingsAndSensorFixStoreLockingTest extends AbstractGPSFixStoreTest {
-    @Rule
-    public Timeout GPSFixStoreListenerTestTimeout = Timeout.millis(3 * 1000);
-    
     @Test
     public void deviceMappingsAndSensorFixStoreShouldNotCauseADeadlock() {
         final Competitor comp = DomainFactory.INSTANCE.getOrCreateCompetitor("comp", "comp", null, null, null,
                 null, null, /* timeOnTimeFactor */ null, /* timeOnDistanceAllowanceInSecondsPerNauticalMile */ null, null, /* storePersistently */ true);
         final AbstractLogEventAuthor author = new LogEventAuthorImpl("author", 0);
-        final DeviceIdentifier device = new SmartphoneImeiIdentifier("a");
+        final DeviceIdentifier device = new SmartphoneImeiIdentifierImpl("a");
         
         final CyclicBarrier barrier = new CyclicBarrier(2);
         final RegattaLog regattaLog = new RegattaLogImpl("regattalog");

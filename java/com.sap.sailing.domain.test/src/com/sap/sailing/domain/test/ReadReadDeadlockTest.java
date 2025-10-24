@@ -2,7 +2,7 @@ package com.sap.sailing.domain.test;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.concurrent.LockUtil;
 import com.sap.sse.concurrent.NamedReentrantReadWriteLock;

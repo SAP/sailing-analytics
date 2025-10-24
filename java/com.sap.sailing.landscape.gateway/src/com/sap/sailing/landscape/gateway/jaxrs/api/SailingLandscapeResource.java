@@ -26,6 +26,7 @@ import org.json.simple.JSONObject;
 
 import com.sap.sailing.domain.common.DataImportProgress;
 import com.sap.sailing.landscape.AwsSessionCredentialsWithExpiry;
+import com.sap.sailing.landscape.LandscapeService;
 import com.sap.sailing.landscape.SailingAnalyticsHost;
 import com.sap.sailing.landscape.SailingAnalyticsMetrics;
 import com.sap.sailing.landscape.SailingAnalyticsProcess;
@@ -98,6 +99,7 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
     private static final String REPLICA_PROCESSES_MOVED = "replicaProcessesMoved";
     private static final String REPLICA_SET_NAME = "replicaSetName";
     private static final String PORT = "port";
+    private static final String IGTIMI_RIOT_PORT = "igtimiRiotPort";
 
     @Context
     UriInfo uriInfo;
@@ -199,7 +201,8 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
             @FormParam(MEMORY_IN_MEGABYTES_FORM_PARAM) Integer optionalMemoryInMegabytesOrNull,
             @FormParam(MEMORY_TOTAL_SIZE_FACTOR_FORM_PARAM) Integer optionalMemoryTotalSizeFactorOrNull,
             @FormParam(MINIMUM_AUTO_SCALING_GROUP_SIZE_FORM_PARAM) Integer optionalMinimumAutoScalingGroupSize,
-            @FormParam(MAXIMUM_AUTO_SCALING_GROUP_SIZE_FORM_PARAM) Integer optionalMaximumAutoScalingGroupSize) {
+            @FormParam(MAXIMUM_AUTO_SCALING_GROUP_SIZE_FORM_PARAM) Integer optionalMaximumAutoScalingGroupSize,
+            @FormParam(IGTIMI_RIOT_PORT) Integer optionalIgtimiRiotPort) {
         checkLandscapeManageAwsPermission();
         Response response;
         try {
@@ -209,7 +212,8 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
                             dedicatedInstanceType, dynamicLoadBalancerMapping, release.getName(),
                             optionalKeyName, privateKeyEncryptionPassphrase == null ? null : privateKeyEncryptionPassphrase.getBytes(), masterReplicationBearerToken,
                             replicaReplicationBearerToken, domainName, optionalMemoryInMegabytesOrNull,
-                            optionalMemoryTotalSizeFactorOrNull, Optional.ofNullable(optionalMinimumAutoScalingGroupSize), Optional.ofNullable(optionalMaximumAutoScalingGroupSize));
+                            optionalMemoryTotalSizeFactorOrNull, optionalIgtimiRiotPort, Optional.ofNullable(optionalMinimumAutoScalingGroupSize),
+                            Optional.ofNullable(optionalMaximumAutoScalingGroupSize));
             final JSONObject result = new AwsApplicationReplicaSetJsonSerializer(release.getName()).serialize(replicaSet);
             response = Response.ok(streamingOutput(result)).build();
         } catch (Exception e) {
@@ -401,7 +405,8 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
             @FormParam(PRIVATE_KEY_ENCRYPTION_PASSPHRASE_FORM_PARAM) String privateKeyEncryptionPassphrase,
             @FormParam(REPLICA_REPLICATION_BEARER_TOKEN_FORM_PARAM) String replicaReplicationBearerToken,
             @FormParam(MEMORY_IN_MEGABYTES_FORM_PARAM) Integer optionalMemoryInMegabytesOrNull,
-            @FormParam(MEMORY_TOTAL_SIZE_FACTOR_FORM_PARAM) Integer optionalMemoryTotalSizeFactorOrNull) {
+            @FormParam(MEMORY_TOTAL_SIZE_FACTOR_FORM_PARAM) Integer optionalMemoryTotalSizeFactorOrNull,
+            @FormParam(IGTIMI_RIOT_PORT) Integer optionalIgtimiRiotPort) {
         checkLandscapeManageAwsPermission();
         Response response;
         final AwsRegion region = new AwsRegion(regionId, getLandscapeService().getLandscape());
@@ -413,14 +418,15 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
             if (replicaSet == null) {
                 response = badRequest("Application replica set with name "+replicaSetName+" not found in region "+regionId);
             } else {
-                final SailingAnalyticsHost<String> hostToDeployTo = getLandscapeService().getLandscape().getHostByInstanceId(region, hostId, new SailingAnalyticsHostSupplier<>());
-                if (replicaSet.isEligibleForDeployment(hostToDeployTo,
-                        optionalTimeoutInMilliseconds == null ? Optional.empty()
-                                : Optional.of(Duration.ofMillis(optionalTimeoutInMilliseconds)),
-                        Optional.ofNullable(optionalKeyName), passphraseForPrivateKeyDecryption)) {
+                final LandscapeService landscapeService = getLandscapeService();
+                final SailingAnalyticsHost<String> hostToDeployTo = landscapeService.getLandscape().getHostByInstanceId(region, hostId, new SailingAnalyticsHostSupplier<>());
+                if (landscapeService.isEligibleForDeployment(hostToDeployTo, replicaSet.getServerName(), replicaSet.getPort(),
+                        optionalIgtimiRiotPort,
+                        optionalTimeoutInMilliseconds == null ? Optional.empty() : Optional.of(Duration.ofMillis(optionalTimeoutInMilliseconds)),
+                        optionalKeyName, passphraseForPrivateKeyDecryption)) {
                     final SailingAnalyticsProcess<String> process = getLandscapeService().deployReplicaToExistingHost(replicaSet, hostToDeployTo, optionalKeyName,
                             passphraseForPrivateKeyDecryption, replicaReplicationBearerToken,
-                            optionalMemoryInMegabytesOrNull, optionalMemoryTotalSizeFactorOrNull);
+                            optionalMemoryInMegabytesOrNull, optionalMemoryTotalSizeFactorOrNull, optionalIgtimiRiotPort);
                     response = Response.ok().entity(streamingOutput(
                             new AwsApplicationProcessJsonSerializer<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>>()
                                     .serialize(process)))
@@ -627,7 +633,8 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
                 response = badRequest("Application replica set with name "+replicaSetName+" not found in region "+regionId);
             } else {
                 final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> result = getLandscapeService()
-                        .changeAutoScalingReplicasInstanceType(replicaSet, InstanceType.valueOf(instanceType));
+                        .changeAutoScalingReplicasInstanceType(replicaSet, InstanceType.valueOf(instanceType),
+                                Landscape.WAIT_FOR_PROCESS_TIMEOUT, Optional.ofNullable(optionalKeyName), passphraseForPrivateKeyDecryption);
                 response = Response.ok()
                         .entity(streamingOutput(new AwsApplicationReplicaSetJsonSerializer(result.getVersion(
                                 Landscape.WAIT_FOR_PROCESS_TIMEOUT, Optional.ofNullable(optionalKeyName), passphraseForPrivateKeyDecryption).getName()).serialize(result)))

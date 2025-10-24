@@ -53,13 +53,13 @@ public class EventContext implements ShareablePlaceContext {
 
     @Override
     public String getContextAsPathParameters() {
-        if(eventId != null) {
+        if (eventId != null) {
             String path = "/events/" + eventId;
-            if(regattaId != null) {
-                path += "/regattas/" +  URLEncoder.encode(regattaId);
+            if (regattaId != null) {
+                path += "/regattas/" + URLEncoder.encodeQueryString(regattaId);
             }
             return path;
-        }else {
+        } else {
             return null;
         }
     }

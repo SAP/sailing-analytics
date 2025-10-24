@@ -19,7 +19,8 @@ public interface MarkPassingRaceFingerprintFactory {
     MarkPassingRaceFingerprint createFingerprint(TrackedRace trackedRace);
 
     /**
-     * Creates a {@link MarkPassingRaceFingerprint} out of a given {@link JSONObject}.
+     * Creates a {@link MarkPassingRaceFingerprint} out of a given {@link JSONObject}, as produced by
+     * {@link MarkPassingRaceFingerprint#toJson()}.
      */
     MarkPassingRaceFingerprint fromJson(JSONObject json);
 }

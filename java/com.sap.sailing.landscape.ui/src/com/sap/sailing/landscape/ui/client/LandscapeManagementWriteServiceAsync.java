@@ -148,7 +148,7 @@ public interface LandscapeManagementWriteServiceAsync {
             String releaseNameOrNullForLatestMaster, String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
             String securityReplicationBearerToken, String replicaReplicationBearerToken, String optionalDomainName,
             Integer optionalMemoryInMegabytesOrNull, Integer optionalMemoryTotalSizeFactorOrNull,
-            Integer minimumAutoScalingGroupSizeOrNull, Integer maximumAutoScalingGroupSizeOrNull,
+            Integer minimumAutoScalingGroupSizeOrNull, Integer maximumAutoScalingGroupSizeOrNull, Integer optionalIgtimiRiotPort,
             AsyncCallback<SailingApplicationReplicaSetDTO<String>> callback);
 
     void serializationDummy(ProcessDTO mongoProcessDTO, AwsInstanceDTO awsInstanceDTO, AwsShardDTO shardDTO,
@@ -186,7 +186,7 @@ public interface LandscapeManagementWriteServiceAsync {
             String optionalKeyName, byte[] privateKeyEncryptionPassphrase, String masterReplicationBearerToken,
             String replicaReplicationBearerToken, String optionalDomainName,
             Integer optionalMinimumAutoScalingGroupSizeOrNull, Integer optionalMaximumAutoScalingGroupSizeOrNull,
-            Integer optionalMemoryInMegabytesOrNull, Integer optionalMemoryTotalSizeFactorOrNull,
+            Integer optionalMemoryInMegabytesOrNull, Integer optionalMemoryTotalSizeFactorOrNull, Integer optionalIgtimiRiotPort,
             AwsInstanceDTO optionalPreferredInstanceToDeployUnmanagedReplicaTo,
             AsyncCallback<SailingApplicationReplicaSetDTO<String>> callback);
 
@@ -204,7 +204,7 @@ public interface LandscapeManagementWriteServiceAsync {
             AsyncCallback<Boolean> callback);
 
     /**
-     * Updates the AMI to use in the launch configurations of those of the {@code replicaSets} that have an auto-scaling group.
+     * Updates the AMI to use in the launch template version of those of the {@code replicaSets} that have an auto-scaling group.
      * Any running replica will not be affected by this. Only new replicas will be launched based on the AMI specified.
      * 
      * @param replicaSets
@@ -213,7 +213,7 @@ public interface LandscapeManagementWriteServiceAsync {
      *            defaults to the latest image of type {@link SharedLandscapeConstants#IMAGE_TYPE_TAG_VALUE_SAILING}
      * @return those replica sets that were updated according to this request; those from {@code replicaSets} not part
      *         of this result have not had their AMI upgraded, probably because we didn't find an auto-scaling group and
-     *         hence no launch configuration to update
+     *         hence no launch template to update
      */
     void updateImageForReplicaSets(String regionId,
             ArrayList<SailingApplicationReplicaSetDTO<String>> applicationReplicaSetsToUpdate,
@@ -246,6 +246,7 @@ public interface LandscapeManagementWriteServiceAsync {
 
     void addShard(String shardName, ArrayList<LeaderboardNameDTO> selectedLeaderBoardNames,
             SailingApplicationReplicaSetDTO<String> replicaSet, String bearerToken, String region,
+            String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
             AsyncCallback<Void> callback);
 
     /**
@@ -255,6 +256,7 @@ public interface LandscapeManagementWriteServiceAsync {
      *            leaderboard names} of the shard.
      */
     void getShards(SailingApplicationReplicaSetDTO<String> replicaset, String region, String bearerToken,
+            String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
             AsyncCallback<Map<AwsShardDTO, Iterable<String>>> callback);
 
     /**
@@ -270,6 +272,7 @@ public interface LandscapeManagementWriteServiceAsync {
      * 
      */
     public void removeShard(AwsShardDTO shard, SailingApplicationReplicaSetDTO<String> replicaSet, String region,
+            String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
             AsyncCallback<Void> callback);
 
     /**
@@ -292,6 +295,7 @@ public interface LandscapeManagementWriteServiceAsync {
      */
     void appendShardingKeysToShard(Iterable<LeaderboardNameDTO> selectedLeaderBoards, String region, String shardName,
             SailingApplicationReplicaSetDTO<String> replicaSet, String bearerToken,
+            String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
             AsyncCallback<Void> callback);
 
     /**
@@ -310,6 +314,7 @@ public interface LandscapeManagementWriteServiceAsync {
      */
     void removeShardingKeysFromShard(Iterable<LeaderboardNameDTO> selectedLeaderBoards, String region, String shardName,
             SailingApplicationReplicaSetDTO<String> replicaSet, String bearerToken,
+            String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
             AsyncCallback<Void> callback);
 
     /**

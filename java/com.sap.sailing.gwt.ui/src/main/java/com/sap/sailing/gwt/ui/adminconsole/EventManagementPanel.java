@@ -68,10 +68,9 @@ public class EventManagementPanel extends SimplePanel
     }
     
     private final Displayer<EventDTO> eventsDisplayer = new Displayer<EventDTO>() {
-        
         @Override
         public void fill(Iterable<EventDTO> result) {
-            fillEvents(result);
+            eventListComposite.fillEvents(result);
         }
     };
     
@@ -79,12 +78,7 @@ public class EventManagementPanel extends SimplePanel
         return eventsDisplayer;
     }
 
-    public void fillEvents(Iterable<EventDTO> events) {
-        eventListComposite.fillEvents(events);
-    }
-    
     public Displayer<LeaderboardGroupDTO> leaderboardGroupsDisplayer = new Displayer<LeaderboardGroupDTO>() {
-        
         @Override
         public void fill(Iterable<LeaderboardGroupDTO> result) {
             fillLeaderboardGroups(result);

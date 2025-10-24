@@ -1,6 +1,6 @@
 package com.sap.sailing.server.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.CourseArea;
 import com.sap.sailing.domain.base.Event;

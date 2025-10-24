@@ -10,7 +10,7 @@ import com.sap.sse.util.graph.DirectedGraph;
  * operates on a {@link DirectedGraph directed graph} with nodes and directed edges. The graph may have more than one
  * root. It is possible for a root to not have any outbound edge. The graph may contain zero or more cycles. Shortcut
  * edges are ignored; in other words, if a node B is reachable by traversing two or more edges in their direction
- * starting a A, and there is an edge leading directly from A to B then this latter edge from A to B will be ignored. It
+ * starting at A, and there is an edge leading directly from A to B then this latter edge from A to B will be ignored. It
  * does not add any ordering information. The resulting {@link Comparator} complies with the specification by being able
  * to mutually compare all nodes in the graph, fulfilling the transitivity and symmetry criteria.
  * <p>

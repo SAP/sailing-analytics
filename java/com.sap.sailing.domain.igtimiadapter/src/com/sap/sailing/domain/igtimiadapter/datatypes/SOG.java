@@ -20,8 +20,12 @@ public class SOG extends Fix {
     private final Speed speedOverGround;
     
     public SOG(TimePoint timePoint, Sensor sensor, Map<Integer, Object> valuesPerSubindex) {
+        this(timePoint, sensor, new KilometersPerHourSpeedImpl(((Number) valuesPerSubindex.get(1)).doubleValue()));
+    }
+
+    public SOG(TimePoint timePoint, Sensor sensor, Speed speedOverGround) {
         super(sensor, timePoint);
-        speedOverGround = new KilometersPerHourSpeedImpl(((Number) valuesPerSubindex.get(1)).doubleValue());
+        this.speedOverGround = speedOverGround;
     }
 
     public Speed getSpeedOverGround() {

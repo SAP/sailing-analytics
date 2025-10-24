@@ -1,13 +1,13 @@
 package com.sap.sailing.server.replication.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.UUID;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
@@ -51,7 +51,7 @@ public class RaceLogReplicationTest extends AbstractLogReplicationTest<RaceLog, 
     private RaceLogEvent anotherRaceLogEvent;
     private AbstractLogEventAuthor author = new LogEventAuthorImpl("Test Author", 1);
     
-    @Before
+    @BeforeEach
     public void createEvents() throws Exception {
         raceLogEvent = new RaceLogRaceStatusEventImpl(new MillisecondsTimePoint(1), author, 42, RaceLogRaceStatus.UNKNOWN);
         anotherRaceLogEvent = new RaceLogRaceStatusEventImpl(new MillisecondsTimePoint(2), author, 42, RaceLogRaceStatus.UNKNOWN);
@@ -261,8 +261,8 @@ public class RaceLogReplicationTest extends AbstractLogReplicationTest<RaceLog, 
     protected void compareCourseBase(CourseBase masterCourse, CourseBase replicatedCourse) {
         assertEquals(masterCourse.getFirstWaypoint().getPassingInstructions(), PassingInstruction.None);
         assertEquals(replicatedCourse.getFirstWaypoint().getPassingInstructions(), PassingInstruction.None);
-        Assert.assertTrue(masterCourse.getFirstWaypoint().getControlPoint() instanceof ControlPointWithTwoMarks);
-        Assert.assertTrue(replicatedCourse.getFirstWaypoint().getControlPoint() instanceof ControlPointWithTwoMarks);
+        Assertions.assertTrue(masterCourse.getFirstWaypoint().getControlPoint() instanceof ControlPointWithTwoMarks);
+        Assertions.assertTrue(replicatedCourse.getFirstWaypoint().getControlPoint() instanceof ControlPointWithTwoMarks);
         
         ControlPointWithTwoMarks masterGate = (ControlPointWithTwoMarks) masterCourse.getFirstWaypoint().getControlPoint();
         ControlPointWithTwoMarks replicatedGate = (ControlPointWithTwoMarks) replicatedCourse.getFirstWaypoint().getControlPoint();
@@ -275,8 +275,8 @@ public class RaceLogReplicationTest extends AbstractLogReplicationTest<RaceLog, 
         
         assertEquals(masterCourse.getLastWaypoint().getPassingInstructions(), PassingInstruction.Port);
         assertEquals(replicatedCourse.getLastWaypoint().getPassingInstructions(), PassingInstruction.Port);
-        Assert.assertTrue(masterCourse.getLastWaypoint().getControlPoint() instanceof Mark);
-        Assert.assertTrue(replicatedCourse.getLastWaypoint().getControlPoint() instanceof Mark);
+        Assertions.assertTrue(masterCourse.getLastWaypoint().getControlPoint() instanceof Mark);
+        Assertions.assertTrue(replicatedCourse.getLastWaypoint().getControlPoint() instanceof Mark);
         
         Mark masterMark = (Mark) masterCourse.getLastWaypoint().getControlPoint();
         Mark replicatedMark = (Mark) replicatedCourse.getLastWaypoint().getControlPoint();

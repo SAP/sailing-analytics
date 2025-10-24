@@ -42,7 +42,7 @@ public class RestServletContainer extends ServletContainer {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        BundleContext context = (BundleContext) config.getServletContext().getAttribute(OSGI_RFC66_WEBBUNDLE_BUNDLECONTEXT_NAME);  
+        BundleContext context = getBundleContext(config);  
         securityServiceTracker = new ServiceTracker<SecurityService, SecurityService>(context, SecurityService.class.getName(), null);
         securityServiceTracker.open();
         config.getServletContext().setAttribute(SECURITY_SERVICE_TRACKER_NAME, securityServiceTracker);
@@ -50,6 +50,10 @@ public class RestServletContainer extends ServletContainer {
         TypeBasedServiceFinder<SecurityUrlPathProvider> securityUrlPathFinder = securityUrlPathFinderFactory.createServiceFinder(SecurityUrlPathProvider.class);
         securityUrlPathFinder.setFallbackService(new SecurityUrlPathProviderDefaultImpl());
         config.getServletContext().setAttribute(SECURITY_URL_PATH_PROVIDER_NAME, securityUrlPathFinder);
+    }
+
+    protected BundleContext getBundleContext(ServletConfig config) {
+        return (BundleContext) config.getServletContext().getAttribute(OSGI_RFC66_WEBBUNDLE_BUNDLECONTEXT_NAME);
     }
 
     @Override

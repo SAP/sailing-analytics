@@ -1,5 +1,7 @@
 package com.sap.sailing.selenium.api.event;
 
+import static com.sap.sailing.selenium.api.core.ApiRequest.Context.SAILING;
+
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -8,8 +10,6 @@ import org.json.simple.JSONObject;
 import com.sap.sailing.domain.common.CompetitorRegistrationType;
 import com.sap.sailing.selenium.api.core.ApiContext;
 import com.sap.sailing.selenium.api.core.ApiRequest;
-
-import static com.sap.sailing.selenium.api.core.ApiRequest.Context.SAILING;
 import com.sap.sailing.selenium.api.core.JsonWrapper;
 import com.sun.jersey.api.representation.Form;
 

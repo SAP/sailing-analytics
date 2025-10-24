@@ -16,6 +16,14 @@ public interface Process<LogT extends Log, MetricsT extends Metrics> {
      */
     int getPort();
     
+    default int[] getAllTCPPorts(Optional<Duration> optionalTimeout, Optional<String> optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception {
+        return new int[] { getPort() };
+    }
+    
+    default int[] getAllUDPPorts(Optional<Duration> optionalTimeout, Optional<String> optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception {
+        return new int[0];
+    }
+    
     /**
      * The host that this process is running on
      */
@@ -23,11 +31,11 @@ public interface Process<LogT extends Log, MetricsT extends Metrics> {
     
     default String getHostname() {
         // TODO consider caching this or requiring it upon object creation
-        return getHost().getPrivateAddress().getHostAddress();
+        return getHost().getHostname();
     }
     
     default String getHostname(Optional<Duration> timeoutEmptyMeaningForever) {
-        return getHost().getPrivateAddress(timeoutEmptyMeaningForever).getHostAddress();
+        return getHost().getHostname(timeoutEmptyMeaningForever);
     }
     
     /**

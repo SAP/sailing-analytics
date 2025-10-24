@@ -5,6 +5,7 @@ import java.util.Collections;
 import com.sap.sailing.domain.common.DetailType;
 import com.sap.sailing.domain.common.dto.AbstractLeaderboardDTO;
 import com.sap.sailing.gwt.ui.client.StringMessages;
+import com.sap.sse.security.ui.client.SecurityChildSettingsContext;
 import com.sap.sse.security.ui.client.premium.PaywallResolver;
 
 /**
@@ -26,7 +27,8 @@ public class MultipleMultiLeaderboardPanelLifecycle extends MultiRaceLeaderboard
 
     @Override
     public MultiRaceLeaderboardSettings extractDocumentSettings(MultiRaceLeaderboardSettings currentLeaderboardSettings) {
-        return currentLeaderboardSettings.withNamesOfRaceColumnsToShowDefaultsAndValues(Collections.emptyList());
+        SecurityChildSettingsContext context = new SecurityChildSettingsContext(leaderboardDTO, paywallResolver);
+        return currentLeaderboardSettings.withNamesOfRaceColumnsToShowDefaultsAndValues(Collections.emptyList(), context);
     }
 
     @Override

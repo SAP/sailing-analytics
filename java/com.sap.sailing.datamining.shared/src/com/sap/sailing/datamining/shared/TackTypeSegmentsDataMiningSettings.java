@@ -26,5 +26,4 @@ public class TackTypeSegmentsDataMiningSettings extends SerializableSettings {
                 /* minimumTackTypeSegmentDuration */ null,
                 /* minimumDurationBetweenAdjacentTackTypeSegments */ null);
     }
-
 }

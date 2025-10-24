@@ -2,15 +2,17 @@
 #
 # Assumes this (sap-p1-2) has been switched from failover to primary master;
 # We now need to map 5673 to the production RabbitMQ in the cloud
-# (rabbit-eu-west-3.sapsailing.com).
-# TracTrac is assumed to be running on "B" currently.
+# (rabbit-eu-west-3.sapsailing.com). Furthermore, the reverse port forward
+# for the cloud replicas to reach the on-site master must be established
+# to sap-p1-2:8888.
+# TracTrac is assumed to be running on "A" currently.
 #
 killall autossh
 # Tunnel to cloud MongoDB on port 10203; reverse tunnel to localhost:10202 for MongoDB
-autossh -M 21504 -f -A -N \
+AUTOSSH_LOGLEVEL=7 AUTOSSH_POLL=5 autossh -M 21504 -f -A -N \
   -L 22443:sapsailing.com:443 \
   -L 22222:sapsailing.com:22 \
-  -R 9443:localhost:9443 \
+  -R 9444:localhost:9443 \
   -R '*:8888:localhost:8888' \
   -L 443:security-service.sapsailing.com:443 \
   -R 10202:localhost:10202 \

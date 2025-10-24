@@ -224,7 +224,7 @@ public abstract class ProcessorQuery<ResultType, DataSourceType> implements Quer
     public void abort() {
         synchronized (monitorObject) {
             LOGGER.log(Level.INFO, "Aborting the query processing");
-            state = QueryState.ABORTED;
+            state = state == QueryState.RUNNING || state == QueryState.NOT_STARTED ? QueryState.ABORTED : state;
             monitorObject.notify();
         }
     }

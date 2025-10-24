@@ -1,6 +1,6 @@
 package com.sap.sailing.gwt.ui.adminconsole.swisstiming;
 
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -62,7 +62,7 @@ public class SwissTimingArchivedConnectionDialog
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return jsonURLTextBox;
     }
 

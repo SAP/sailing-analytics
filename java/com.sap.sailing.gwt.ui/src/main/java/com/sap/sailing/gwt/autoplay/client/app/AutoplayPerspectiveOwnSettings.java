@@ -13,11 +13,12 @@ public class AutoplayPerspectiveOwnSettings extends AbstractGenericSerializableS
     private IntegerSetting waitTimeAfterRaceEndInSeconds;
 
     public AutoplayPerspectiveOwnSettings() {
+        super();
     }
 
     public AutoplayPerspectiveOwnSettings(boolean fullscreen, boolean switchToLive,
             int timeToSwitchBeforeRaceStartInSeconds, int waitTimeAfterRaceEndInSeconds) {
-        super();
+        this();
         this.fullscreen.setValue(fullscreen);
         this.switchToLive.setValue(switchToLive);
         this.timeToSwitchBeforeRaceStartInSeconds.setValue(timeToSwitchBeforeRaceStartInSeconds);

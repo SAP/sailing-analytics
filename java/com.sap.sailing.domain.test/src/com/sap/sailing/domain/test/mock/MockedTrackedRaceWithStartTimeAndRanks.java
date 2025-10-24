@@ -53,9 +53,10 @@ import com.sap.sailing.domain.leaderboard.impl.RankAndRankComparable;
 import com.sap.sailing.domain.polars.PolarDataService;
 import com.sap.sailing.domain.ranking.RankingMetric;
 import com.sap.sailing.domain.ranking.RankingMetric.RankingInfo;
+import com.sap.sailing.domain.shared.tracking.LineDetails;
+import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
 import com.sap.sailing.domain.tracking.CourseDesignChangedListener;
 import com.sap.sailing.domain.tracking.GPSFixTrack;
-import com.sap.sailing.domain.tracking.LineDetails;
 import com.sap.sailing.domain.tracking.Maneuver;
 import com.sap.sailing.domain.tracking.MarkPassing;
 import com.sap.sailing.domain.tracking.MarkPositionAtTimePointCache;
@@ -69,7 +70,6 @@ import com.sap.sailing.domain.tracking.TrackedLegOfCompetitor;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.domain.tracking.TrackedRaceStatus;
 import com.sap.sailing.domain.tracking.TrackedRegatta;
-import com.sap.sailing.domain.tracking.TrackingConnectorInfo;
 import com.sap.sailing.domain.tracking.WindLegTypeAndLegBearingAndORCPerformanceCurveCache;
 import com.sap.sailing.domain.tracking.WindPositionMode;
 import com.sap.sailing.domain.tracking.WindStore;
@@ -130,6 +130,10 @@ public class MockedTrackedRaceWithStartTimeAndRanks implements TrackedRace {
         }
         this.race = new RaceDefinitionImpl("Mocked Race", new CourseImpl("Mock Course", Collections.emptyList()), boatClass,
                 competitorsAndBoats);
+    }
+
+    @Override
+    public void initializeAfterDeserialization() {
     }
 
     @Override
@@ -928,6 +932,12 @@ public class MockedTrackedRaceWithStartTimeAndRanks implements TrackedRace {
 
     @Override
     public UUID getCourseAreaId() {
+        return null;
+    }
+
+    @Override
+    public Double getPercentTargetBoatSpeed(Competitor competitor, TimePoint timePoint,
+            WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache) {
         return null;
     }
 }

@@ -13,6 +13,12 @@ public class AutoPlaySequenceNode extends BaseCompositeNode {
     private int currentPos = -1;
     private Command onLoopEnd;
 
+    public AutoPlaySequenceNode(String name, int sequenceTimePerNodeInSeconds, AutoPlayNode... nodes) {
+        super(name);
+        this.sequenceTimePerNodeInSeconds = sequenceTimePerNodeInSeconds;
+        this.nodes.addAll(Arrays.asList(nodes));
+    }
+    
     private Timer transitionTimer = new Timer() {
         @Override
         public void run() {
@@ -27,7 +33,7 @@ public class AutoPlaySequenceNode extends BaseCompositeNode {
                 onLoopEnd.execute();
             }
             //do nothing we stay at the end position
-        }else{
+        } else {
             transitionTo(nodes.get(currentPos));
         }
     }
@@ -41,12 +47,6 @@ public class AutoPlaySequenceNode extends BaseCompositeNode {
         }
     }
     
-    public AutoPlaySequenceNode(String name, int sequenceTimePerNodeInSeconds, AutoPlayNode... nodes) {
-        super(name);
-        this.sequenceTimePerNodeInSeconds = sequenceTimePerNodeInSeconds;
-        this.nodes.addAll(Arrays.asList(nodes));
-    }
-
     public void setOnSequenceEnd(Command onLoopEnd) {
         this.onLoopEnd = onLoopEnd;
     }

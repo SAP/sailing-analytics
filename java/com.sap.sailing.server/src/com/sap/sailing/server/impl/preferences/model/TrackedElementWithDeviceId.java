@@ -16,6 +16,7 @@ public class TrackedElementWithDeviceId extends AbstractGenericSerializableSetti
     private transient UUIDSetting trackedMarkId;
 
     public TrackedElementWithDeviceId() {
+        super();
     }
 
     /** copy constructor */

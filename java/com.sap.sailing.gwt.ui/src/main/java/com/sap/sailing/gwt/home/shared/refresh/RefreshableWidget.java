@@ -1,6 +1,6 @@
 package com.sap.sailing.gwt.home.shared.refresh;
 
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
+import com.sap.sse.gwt.shared.DTO;
 
 /**
  * To be implemented by widgets that are automatically managed by a {@link RefreshManager} that (re)loads the data

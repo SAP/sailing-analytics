@@ -58,6 +58,7 @@ public class LocaleInjectionFilter implements Filter {
                                     preferredLocale.toLanguageTag());
                             cookie.setMaxAge(-1);
                             cookie.setPath("/");
+                            cookie.setSecure(true);
                             resp.addCookie(cookie);
                         }
                     }

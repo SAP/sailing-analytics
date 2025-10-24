@@ -14,13 +14,13 @@
           <ui:text from="{i18n.followSapSports}" />
         </h3>
         <div class="{local_res.css.socialfooter_item} {local_res.css.socialfooter_itemleft} {res.mediaCss.small4} {res.mediaCss.columns}">
-          <a href="https://twitter.com/sap" target="_blank" class="{local_res.css.socialfooter_item_contentwrapper} {local_res.css.socialfooter_item_contentwrappertwitter}">
+          <a href="https://x.com/sap" target="_blank" class="{local_res.css.socialfooter_item_contentwrapper} {local_res.css.socialfooter_item_contentwrappertwitter}">
             <img src="{shr.twitter.getSafeUri}" class="{local_res.css.socialfooter_item_icon}"></img>
             <div class="{local_res.css.socialfooter_item_text}">
               <div class="{local_res.css.socialfooter_item_text_top}">
                 <ui:text from='{i18n.sapSportsOn}' />
               </div>
-              <div class="{local_res.css.socialfooter_item_text_bottom}">Twitter</div>
+              <div class="{local_res.css.socialfooter_item_text_bottom}">X</div>
             </div>
           </a>
         </div>

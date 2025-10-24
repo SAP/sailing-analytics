@@ -1,6 +1,6 @@
 package com.sap.sailing.polars.windestimation;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.ManeuverType;
 import com.sap.sailing.domain.common.Wind;

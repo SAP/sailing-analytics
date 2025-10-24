@@ -17,7 +17,7 @@
 	<inherits name="com.sap.sse.gwt.EmulatedJRE" />
 	<inherits name="com.sap.sse.gwt.SSESharedGWT" />
 	<inherits name="com.sap.sse.SSECommon" />
-
+    <inherits name="com.sap.sse.landscape.aws.common.SSELandscapeAWSCommon" />
 	<inherits name="com.sap.sse.security.ui.LoginPanel" />
 	<inherits name="com.sap.sse.security.ui.SecurityCommon" />
 	<inherits name="com.sap.sse.Security" />

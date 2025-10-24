@@ -21,6 +21,7 @@ APwholeLegBehindMarks:0.15
 APmarkSwitch:0.13
 APmarkZoomBehindMarks:0.10
 APmarkZoomInFrontOfMarks:0.20
+LabelNoBackground:0
 PopupMarkerUUID:84199024-2c45-11e4-a9f6-14dae9614d7b
 ManualUrl:http://www.tractrac.com/files/userguide_sailing.pdf
 Marker1UUID:2dee0384-2c45-11e4-a9f6-14dae9614d7b
@@ -68,6 +69,12 @@ ResultColumn5SpeedIn:Knots
 delayIntervals:3,12,15
 DisableChangeRace:
 DisableLatestRoundings:0
+MarkerSymbol:standardBoat
+MarkerMinPixelSize:36
+ShowFlagInLabel:0
+ShowRankInLabel:1
+TailOpacity:70
+TailWidth:1
 DatabaseVersion:01.00.20
 PopUpRow1Name:
 PopUpRow1Type:Name
@@ -80,10 +87,10 @@ PopUpRow4Type:Ini
 PopUpRow5Name:After
 PopUpRow5Type:BoatAfter
 smsProvider:0
-ws-uri:ws://event.tractrac.com:8888
-//live-uri:tcp://event.tractrac.com:4400
-//stored-uri:tcp://event.tractrac.com:4401
-PerformanceTableLayout:[{"key":"Pos","header":"Pos","tooltip":"Position"},{"key":"Name","header":"Name","tooltip":"Name"},{"key":"Short","header":"Short","tooltip":"Short name"},{"key":"Country","header":"Country","tooltip":"Country"},{"key":"After","header":"After","tooltip":"After"},{"key":"Leg pos","header":"Leg pos","tooltip":"Leg position"},{"key":"Leg time","header":"Leg time","tooltip":"Leg time"},{"key":"SOG","header":"SOG","tooltip":"SOG"},{"key":"VMG","header":"VMG","tooltip":"VMG"},{"key":"Top speed","header":"Top Speed","tooltip":"Top Speed"},{"key":"Distance","header":"Distance","tooltip":"Distance"}]
+ws-uri:ws://tracms.traclive.dk:8888
+//live-uri:tcp://tracms.traclive.dk:4400
+//stored-uri:tcp://tracms.traclive.dk:4401
+PerformanceTableLayout:[{"key":"Pos","header":"Pos","tooltip":"Position","options":null},{"key":"Name","header":"Name","tooltip":"Name","options":null},{"key":"Short","header":"Short","tooltip":"Short name","options":null},{"key":"Country","header":"Country","tooltip":"Country","options":null},{"key":"After","header":"After","tooltip":"After","options":null},{"key":"Leg pos","header":"Leg pos","tooltip":"Leg position","options":null},{"key":"Leg time","header":"Leg time","tooltip":"Leg time","options":null},{"key":"SOG","header":"SOG","tooltip":"SOG","options":null},{"key":"VMG","header":"VMG","tooltip":"VMG","options":null},{"key":"Top speed","header":"Top Speed","tooltip":"Top Speed","options":null},{"key":"Distance","header":"Distance","tooltip":"Distance","options":null}]
 ResultsLayout:[{"key":"Order","header":"#","description":"Position","printable":true,"align":"right","collapsible":false},{"key":"Name","header":"Name","description":"Competitor's name","printable":true,"align":"left","collapsible":false},{"key":"ShortName","header":"Short Name","description":"Competitor's short name","printable":true,"align":"left","collapsible":true},{"key":"LegTime","header":"Leg","description":"Leg time","printable":false,"align":"right","collapsible":true},{"key":"LegPosition","header":"#","description":"Leg position","printable":false,"align":"right","collapsible":true},{"key":"Time","header":"Total","description":"Total time","printable":true,"align":"right","collapsible":false},{"key":"After","header":"Total \u0026Delta;","description":"Total \u0026Delta;","printable":true,"align":"right","collapsible":false}]
 CompMarkerDeadTimeout:60
 ResultColumn1Visible:1
@@ -105,7 +112,7 @@ Marker4MinPixelSize:5
 Marker4Radius:5
 ExcludeRankInfo:
 CompetitorPopUp:1
-TailWidth:4
+TailWidth:1
 DisableMarkTicker:
 LeaderboardMaxSize:
 ShowLeadersNumber:1
@@ -190,6 +197,7 @@ LiveDelaySecs: 1
 LiveDelaySecsRace: 1
 LiveDelaySecsEvent: 3
 
+Maps:[]
 
 EventID:cc9f4f50-3f1b-0137-ee01-60a44ce903c3
 EventName:Sailing World Cup Genoa 2019
@@ -198,6 +206,11 @@ EventDB:event_20190412_SailingWor
 EventStartTime:2019-04-12 22:00:00
 EventEndTime:2019-04-21 21:00:00
 EventType:a1b74ca0-fdd8-11dc-8811-005056c00008
+EventJSON:https://historical1.tractrac.com/events/event_20190412_SailingWor/jsonservice.php
+DBReplicaEnabled:0
+HighLoadEnabled:
+MultipleDataservers:0
+WebURL:https://www.tractrac.com/event-page/event_20190412_SailingWor/1702
 
 RaceID:0fb18f50-45d7-0137-24dd-021d89ada30e
 RaceName:M Medal (Laser Int.)
@@ -209,11 +222,14 @@ Initialized:1
 RaceDefaultRouteUUID:0fb0cc50-45d7-0137-24dc-021d89ada30e
 RaceHandicapSystem:NONE
 RaceDataSheet:IFClassID=LSR###BREAKLINE###Gender=Men
-RaceStatus:FSHD
+RaceStatus:UNOFFICIAL
+RaceStatusTime:
+RaceStatusUpdatedAt:
 RaceCourseArea:Y - Medal
 
 Class1UUID:94d7e0d0-41e3-0137-28f2-021d89ada30e
 Class1Name:Laser Int.
+Class1BoatClassId:
 
 Team1UUID:95572070-41e3-0137-28f7-021d89ada30e
 Team1Name:Wannes Van Laer
@@ -286,13 +302,13 @@ Comp2RouteUUID:0fb0cc50-45d7-0137-24dc-021d89ada30e
 Comp2Color:00e60b
 
 Comp3UUID:481d9bb3-6c30-4abc-8b18-87168acf9bba
-Comp3Name:JoaquÃ­n Blanco
+Comp3Name:Joaquín Blanco
 Comp3NameShort:ESP 215311
 Comp3Nationality:ESP
 Comp3Description:Laser Int.
 Comp3Handicap:1.0000000000
 Comp3HandicapDistance:0.00000
-Comp3DataSheet:Gender: Men / BoatID: '481d9bb3-6c30-4abc-8b18-87168acf9bba' / SFamilyName: Blanco / SGivenName: JoaquÃ­n
+Comp3DataSheet:Gender: Men / BoatID: '481d9bb3-6c30-4abc-8b18-87168acf9bba' / SFamilyName: Blanco / SGivenName: Joaquín
 Comp3StartTime:2019-04-21 12:08:00
 Comp3ClassUUID:94d7e0d0-41e3-0137-28f2-021d89ada30e
 Comp3Status:FIN
@@ -405,62 +421,94 @@ Comp10StatusTime:2019-04-21 12:30:14
 Comp10RouteUUID:0fb0cc50-45d7-0137-24dc-021d89ada30e
 Comp10Color:D50000
 
-ControlPoint1UUID:42a7c9c0-40e8-0137-1519-021d89ada30e
-ControlPoint1Name:Y - Start
-ControlPoint1HasTwoPoints:1
-ControlPoint1ShortName:St
-ControlPoint1CourseArea:Y - Medal
-ControlPoint1DataSheet:P1.UUID=e54581c0-40e3-0137-13da-021d89ada30e###BREAKLINE###P2.UUID=e558ae60-40e3-0137-13dd-021d89ada30e###BREAKLINE###
-ControlPoint1Mark1Lon:8.927123
-ControlPoint1Mark1Lat:44.375005
-ControlPoint1Mark1Static:0
-ControlPoint1Mark2Lon:8.927080
-ControlPoint1Mark2Lat:44.373469
-ControlPoint1Mark2Static:0
+PositionedItem1UUID:7db4a920-8839-013d-5f74-1c6b00518c70
+PositionedItem1Name:Y - Start - 1
+PositionedItem1CourseArea:Y - Medal
+PositionedItem1Static:0
+PositionedItem1Positions:
+PositionedItem1DataSheet:UUID=e54581c0-40e3-0137-13da-021d89ada30e
 
-ControlPoint2UUID:e4f4a8c0-40e3-0137-13ce-021d89ada30e
-ControlPoint2Name:Y - 1
-ControlPoint2HasTwoPoints:0
-ControlPoint2ShortName:1
-ControlPoint2CourseArea:Y - Medal
-ControlPoint2Mark1Lon:8.919552
-ControlPoint2Mark1Lat:44.373997
-ControlPoint2Mark1Static:0
+PositionedItem2UUID:7f10f2a0-8839-013d-5f75-1c6b00518c70
+PositionedItem2Name:Y - Start - 2
+PositionedItem2CourseArea:Y - Medal
+PositionedItem2Static:0
+PositionedItem2Positions:
+PositionedItem2DataSheet:UUID=e558ae60-40e3-0137-13dd-021d89ada30e
 
-ControlPoint3UUID:5c784420-40e8-0137-1523-021d89ada30e
-ControlPoint3Name:Y - 4 gate
-ControlPoint3HasTwoPoints:1
-ControlPoint3ShortName:4
-ControlPoint3CourseArea:Y - Medal
-ControlPoint3DataSheet:P1.UUID=e51b6d90-40e3-0137-13d4-021d89ada30e###BREAKLINE###P2.UUID=e5323cb0-40e3-0137-13d7-021d89ada30e###BREAKLINE###
-ControlPoint3Mark1Lon:8.925547
-ControlPoint3Mark1Lat:44.374655
-ControlPoint3Mark1Static:0
-ControlPoint3Mark2Lon:8.925783
-ControlPoint3Mark2Lat:44.374229
-ControlPoint3Mark2Static:0
+PositionedItem3UUID:8743f590-8839-013d-5f7d-1c6b00518c70
+PositionedItem3Name:Y - Finish Medal - 1
+PositionedItem3CourseArea:Y - Medal
+PositionedItem3Static:0
+PositionedItem3Positions:
+PositionedItem3DataSheet:UUID=e56b5d80-40e3-0137-13e0-021d89ada30e
 
-ControlPoint4UUID:e51b6d90-40e3-0137-13d4-021d89ada30e
-ControlPoint4Name:Y - 4p
-ControlPoint4HasTwoPoints:0
-ControlPoint4ShortName:4p
-ControlPoint4CourseArea:Y - Medal
-ControlPoint4Mark1Lon:8.925545
-ControlPoint4Mark1Lat:44.374655
-ControlPoint4Mark1Static:0
+PositionedItem4UUID:883c72b0-8839-013d-5f7e-1c6b00518c70
+PositionedItem4Name:Y - Finish Medal - 2
+PositionedItem4CourseArea:Y - Medal
+PositionedItem4Static:0
+PositionedItem4Positions:
+PositionedItem4DataSheet:UUID=e57d8680-40e3-0137-13e3-021d89ada30e
 
-ControlPoint5UUID:59486970-45b6-0137-2315-021d89ada30e
-ControlPoint5Name:Y - Finish Medal
-ControlPoint5HasTwoPoints:1
-ControlPoint5ShortName:Fi
-ControlPoint5CourseArea:Y - Medal
-ControlPoint5DataSheet:P1.UUID=e56b5d80-40e3-0137-13e0-021d89ada30e###BREAKLINE###P2.UUID=e57d8680-40e3-0137-13e3-021d89ada30e###BREAKLINE###
-ControlPoint5Mark1Lon:8.926214
-ControlPoint5Mark1Lat:44.376322
-ControlPoint5Mark1Static:0
-ControlPoint5Mark2Lon:8.927178
-ControlPoint5Mark2Lat:44.375937
-ControlPoint5Mark2Static:0
+PositionedItem5UUID:89283ee0-8839-013d-5f82-1c6b00518c70
+PositionedItem5Name:Y - 4 gate - 1
+PositionedItem5CourseArea:Y - Medal
+PositionedItem5Static:0
+PositionedItem5Positions:
+PositionedItem5DataSheet:UUID=e51b6d90-40e3-0137-13d4-021d89ada30e
+
+PositionedItem6UUID:8c58d690-8839-013d-5f83-1c6b00518c70
+PositionedItem6Name:Y - 4 gate - 2
+PositionedItem6CourseArea:Y - Medal
+PositionedItem6Static:0
+PositionedItem6Positions:
+PositionedItem6DataSheet:UUID=e5323cb0-40e3-0137-13d7-021d89ada30e
+
+PositionedItem7UUID:b887b8d0-8839-013d-5fdb-1c6b00518c70
+PositionedItem7Name:Y - 1
+PositionedItem7CourseArea:Y - Medal
+PositionedItem7Static:0
+PositionedItem7Positions:
+PositionedItem7DataSheet:
+
+PositionedItem8UUID:bcc95ab0-8839-013d-5fdd-1c6b00518c70
+PositionedItem8Name:Y - 4p
+PositionedItem8CourseArea:Y - Medal
+PositionedItem8Static:0
+PositionedItem8Positions:
+PositionedItem8DataSheet:
+
+MapItem1UUID:42a7c9c0-40e8-0137-1519-021d89ada30e
+MapItem1Name:Y - Start
+MapItem1ShortName:St
+MapItem1PositionedItemIds:["7db4a920-8839-013d-5f74-1c6b00518c70", "7f10f2a0-8839-013d-5f75-1c6b00518c70"]
+MapItem1CourseArea:Y - Medal
+MapItem1DataSheet:P1.UUID=e54581c0-40e3-0137-13da-021d89ada30e###BREAKLINE###P2.UUID=e558ae60-40e3-0137-13dd-021d89ada30e###BREAKLINE###
+
+MapItem2UUID:e4f4a8c0-40e3-0137-13ce-021d89ada30e
+MapItem2Name:Y - 1
+MapItem2ShortName:1
+MapItem2PositionedItemIds:["b887b8d0-8839-013d-5fdb-1c6b00518c70"]
+MapItem2CourseArea:Y - Medal
+
+MapItem3UUID:5c784420-40e8-0137-1523-021d89ada30e
+MapItem3Name:Y - 4 gate
+MapItem3ShortName:4
+MapItem3PositionedItemIds:["89283ee0-8839-013d-5f82-1c6b00518c70", "8c58d690-8839-013d-5f83-1c6b00518c70"]
+MapItem3CourseArea:Y - Medal
+MapItem3DataSheet:P1.UUID=e51b6d90-40e3-0137-13d4-021d89ada30e###BREAKLINE###P2.UUID=e5323cb0-40e3-0137-13d7-021d89ada30e###BREAKLINE###
+
+MapItem4UUID:e51b6d90-40e3-0137-13d4-021d89ada30e
+MapItem4Name:Y - 4p
+MapItem4ShortName:4p
+MapItem4PositionedItemIds:["bcc95ab0-8839-013d-5fdd-1c6b00518c70"]
+MapItem4CourseArea:Y - Medal
+
+MapItem5UUID:59486970-45b6-0137-2315-021d89ada30e
+MapItem5Name:Y - Finish Medal
+MapItem5ShortName:Fi
+MapItem5PositionedItemIds:["8743f590-8839-013d-5f7d-1c6b00518c70", "883c72b0-8839-013d-5f7e-1c6b00518c70"]
+MapItem5CourseArea:Y - Medal
+MapItem5DataSheet:P1.UUID=e56b5d80-40e3-0137-13e0-021d89ada30e###BREAKLINE###P2.UUID=e57d8680-40e3-0137-13e3-021d89ada30e###BREAKLINE###
 
 SegmentFile:segments.php
 Route1UUID:0fb0cc50-45d7-0137-24dc-021d89ada30e

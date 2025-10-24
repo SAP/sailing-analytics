@@ -9,8 +9,7 @@ import com.google.gwt.maps.client.base.LatLng;
 import com.google.gwt.maps.client.base.Point;
 import com.google.gwt.maps.client.events.center.CenterChangeMapEvent;
 import com.google.gwt.maps.client.events.center.CenterChangeMapHandler;
-import com.google.gwt.maps.client.events.resize.ResizeMapEvent;
-import com.google.gwt.maps.client.events.resize.ResizeMapHandler;
+import com.google.gwt.maps.client.overlays.overlayhandlers.OverlayViewOnDrawHandler;
 import com.google.gwt.user.client.ui.RequiresResize;
 import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.gwt.ui.client.shared.racemap.CoordinateSystem;
@@ -19,7 +18,7 @@ import com.sap.sailing.gwt.ui.shared.racemap.CanvasOverlayV3;
 import com.sap.sailing.gwt.ui.simulator.streamlets.Vector;
 
 /**
- * This class extends @CanvasOverlayV3 to provide the functionality that the canvas always covers the
+ * This class extends {@link CanvasOverlayV3} to provide the functionality that the canvas always covers the
  * full viewable area of the map
  * 
  * @author Nidhi Sawhney(D054070)
@@ -44,6 +43,8 @@ public abstract class FullCanvasOverlay extends CanvasOverlayV3 implements Requi
     public String pointColor = "Red";
     public String textColor = "Black";
     
+    private boolean mapProjectionSet = false;
+    
     protected static Logger logger = Logger.getLogger(FullCanvasOverlay.class.getName());
     
     public FullCanvasOverlay(MapWidget map, int zIndex, CoordinateSystem coordinateSystem) {
@@ -57,6 +58,22 @@ public abstract class FullCanvasOverlay extends CanvasOverlayV3 implements Requi
         diffPx = new Vector(0, 0);
     }
     
+    @Override
+    protected OverlayViewOnDrawHandler getOnDrawHandler() {
+        return methods->{
+            if (!mapProjectionSet && methods.getProjection() != null) {
+                Scheduler.get().scheduleFixedDelay(()->{
+                    mapProjectionSet = true;
+                    setCanvasSettings();
+                    super.getOnDrawHandler().onDraw(methods);
+                    return false; // don't repeat
+                }, /* delay */ 1000);
+            } else {
+                super.getOnDrawHandler().onDraw(methods);
+            }
+        };
+    }
+
     /**
      *  Set the canvas to be the size of the map and set it to the top left corner of the map 
      */
@@ -67,17 +84,16 @@ public abstract class FullCanvasOverlay extends CanvasOverlayV3 implements Requi
         if (mapHeight == null) {
             mapHeight = getMap().getDiv().getClientHeight();
         }
-        int canvasWidth = mapWidth;
-        int canvasHeight = mapHeight;
-        canvas.setWidth(String.valueOf(canvasWidth));
-        canvas.setHeight(String.valueOf(canvasHeight));
-        canvas.setCoordinateSpaceWidth(canvasWidth);
-        canvas.setCoordinateSpaceHeight(canvasHeight);
-        Point sw = mapProjection.fromLatLngToDivPixel(getMap().getBounds().getSouthWest());
-        Point ne = mapProjection.fromLatLngToDivPixel(getMap().getBounds().getNorthEast());
-        setWidgetPosLeft(Math.min(sw.getX(), ne.getX()));
-        setWidgetPosTop(Math.min(sw.getY(), ne.getY()));
-        setCanvasPosition(getWidgetPosLeft(), getWidgetPosTop());
+        canvas.setWidth(String.valueOf(Math.max(1, mapWidth)));
+        canvas.setHeight(String.valueOf(Math.max(1, mapHeight)));
+        canvas.setCoordinateSpaceWidth(Math.max(1, mapWidth));
+        canvas.setCoordinateSpaceHeight(Math.max(1, mapHeight));
+        if (getMapProjection() != null) {
+            final Point upperLeftCorner = getMapProjection().fromLatLngToDivPixel(getMapProjection().fromContainerPixelToLatLng(Point.newInstance(0, 0)));
+            setWidgetPosLeft(Math.round(upperLeftCorner.getX()));
+            setWidgetPosTop(Math.round(upperLeftCorner.getY()));
+            setCanvasPosition(getWidgetPosLeft(), getWidgetPosTop());
+        }
     }
 
     @Override
@@ -85,22 +101,13 @@ public abstract class FullCanvasOverlay extends CanvasOverlayV3 implements Requi
         mapWidth = null;
         mapHeight = null;
     	// improve browser performance by deferred scheduling of redraws
-        Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
-            public void execute() {
-                draw();
-            }
-        });
+        Scheduler.get().scheduleDeferred(this::draw);
     }
 
     @Override
     public void addToMap() {
         if (map != null) {
-            map.addResizeHandler(new ResizeMapHandler() {
-                @Override
-                public void onEvent(ResizeMapEvent event) {
-                    onResize();
-                }
-            });
+            map.addResizeHandler(e->onResize());
         }
         super.addToMap();
     }
@@ -111,7 +118,7 @@ public abstract class FullCanvasOverlay extends CanvasOverlayV3 implements Requi
     
     @Override
     protected void draw() {
-        if (mapProjection != null) {
+        if (!mapProjectionSet && getMapProjection() != null) {
             // Reset the canvas, e.g. onMove() of map or onResize() of window
             setCanvasSettings();
         }
@@ -143,16 +150,13 @@ public abstract class FullCanvasOverlay extends CanvasOverlayV3 implements Requi
         Context2d context2d = canvas.getContext2d();
         drawPoint(x, y);
         if (getMap().getZoom() >= 11) {
-        	context2d.setFillStyle(textColor);
-        	context2d.fillText(text, x, y);
+            context2d.setFillStyle(textColor);
+            context2d.fillText(text, x, y);
         }
     }
     
     /**
      * Draw a circle centred at x,y with given radius
-     * @param x
-     * @param y
-     * @param radius
      */
     protected void drawCircle(double x, double y, double radius, String color) {
         Context2d context2d = canvas.getContext2d();
@@ -241,7 +245,7 @@ public abstract class FullCanvasOverlay extends CanvasOverlayV3 implements Requi
         logger.fine(msg);
         Position position = windDTO.position;
         LatLng positionLatLng = coordinateSystem.toLatLng(position);
-        Point canvasPositionInPx = mapProjection.fromLatLngToDivPixel(positionLatLng);
+        Point canvasPositionInPx = getMapProjection().fromLatLngToDivPixel(positionLatLng);
         double x = canvasPositionInPx.getX() - getWidgetPosLeft();
         double y = canvasPositionInPx.getY() - getWidgetPosTop();
         //windFieldPoints.put(new ToolTip(x, y), windDTO);

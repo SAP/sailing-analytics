@@ -1,4 +1,4 @@
-FROM sapmachine:17.0.10
+FROM sapmachine:17.0.13
 LABEL maintainer=axel.uhl@sap.com
 # Download and extract the release
 WORKDIR /home/sailing

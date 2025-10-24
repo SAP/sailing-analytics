@@ -5,18 +5,26 @@ Bundle-SymbolicName: com.sap.sse.replication.testsupport
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: SAP
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: org.junit;bundle-version="4.13.2",
+Require-Bundle: junit-jupiter-api;bundle-version="5.11.3",
+ junit-jupiter-engine;bundle-version="5.11.3",
+ junit-platform-commons;bundle-version="1.11.3",
+ junit-platform-engine;bundle-version="1.11.3",
+ org.opentest4j;bundle-version="1.3.0",
  com.sap.sse.replication,
  com.sap.sse.common,
  com.rabbitmq.client;bundle-version="2.8.4",
  lz4-java;bundle-version="1.3.0",
  com.sap.sse.replication.interfaces;bundle-version="1.0.0",
- org.apache.shiro.core
+ org.apache.shiro.core,
+ net.bytebuddy.byte-buddy;bundle-version="1.14.12",
+ net.bytebuddy.byte-buddy-agent;bundle-version="1.14.12",
+ org.objenesis;bundle-version="3.3.0",
+ org.hamcrest;bundle-version="2.2.0"
 Export-Package: com.sap.sse.replication.testsupport
 Automatic-Module-Name: com.sap.sse.replication.testsupport
-Import-Package: javax.servlet;version="3.1.0",
+Import-Package: com.sap.sse.security,
+ javax.servlet;version="3.1.0",
  javax.servlet.http;version="3.1.0",
- org.hamcrest;version="2.2.0",
  org.mockito;version="4.8.1",
  org.mockito.invocation;version="4.8.1",
  org.mockito.mock;version="4.8.1",

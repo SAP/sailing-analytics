@@ -21,6 +21,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -98,7 +99,7 @@ public class RemoteServerReferenceResource extends AbstractSailingServerResource
                 getSecurityService().checkCurrentUserServerPermission(ServerActions.CONFIGURE_REMOTE_INSTANCES);
                 final RemoteSailingServerReference existingReference = getService().getRemoteServerReferenceByName(remoteServerName);
                 if (existingReference == null) {
-                    response = Response.status(Status.NOT_FOUND).entity("No server reference by name "+remoteServerName+" found").build();
+                    response = Response.status(Status.NOT_FOUND).entity("No server reference by name "+StringEscapeUtils.escapeHtml(remoteServerName)+" found").build();
                 } else {
                     final RemoteSailingServerReference serverRef = getService()
                             .apply(new UpdateSailingServerReference(remoteServerName,
@@ -140,7 +141,7 @@ public class RemoteServerReferenceResource extends AbstractSailingServerResource
             } catch (UnauthorizedException e) {
                 response = returnUnauthorized(e);
             } catch (MalformedURLException e) {
-                response = badRequest(e.getMessage());
+                response = badRequest("Malformed URL. See server logs for details.");
                 logger.warning(e.getMessage() + " for URL: " + remoteServerUrlAsString);
             } catch (Throwable e) {
                 response = returnInternalServerError(e);
@@ -168,8 +169,8 @@ public class RemoteServerReferenceResource extends AbstractSailingServerResource
                 }
                 if (serverRef == null) {
                     response = Response.status(Status.NOT_FOUND)
-                            .entity("\"remoteServerName: \\\"" + remoteServerName +
-                                    "\\\", remoteServerUrl: \\\""+remoteServerUrlAsString+"\\\" doesn't exist on this server.\"")
+                            .entity("\"remoteServerName: \\\"" + StringEscapeUtils.escapeHtml(remoteServerName) +
+                                    "\\\", remoteServerUrl: \\\""+StringEscapeUtils.escapeHtml(remoteServerUrlAsString)+"\\\" doesn't exist on this server.\"")
                             .build();
                 } else {
                     getService().apply(new RemoveRemoteSailingServerReference(serverRef.getName()));

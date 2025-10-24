@@ -40,6 +40,8 @@ public class SailorProfilesCompetitorSelectionPresenter implements EditModeChang
 
     public void setCompetitorsAndUUID(Collection<SimpleCompetitorWithIdDTO> competitors, UUID uuid) {
         this.competitors = competitors;
+        this.competitorDataProvider.clearSelection();
+        competitors.forEach(c->this.competitorDataProvider.addSelection(c));
         this.uuid = uuid;
     }
 
@@ -66,18 +68,21 @@ public class SailorProfilesCompetitorSelectionPresenter implements EditModeChang
     @Override
     public void addSelection(SimpleCompetitorWithIdDTO item) {
         competitors.add(item);
+        competitorDataProvider.addSelection(item);
         sailorProfileDataProvider.updateCompetitors(uuid, competitors, this);
     }
 
     @Override
     public void removeSelection(SimpleCompetitorWithIdDTO item) {
         competitors.remove(item);
+        competitorDataProvider.removeSelection(item);
         sailorProfileDataProvider.updateCompetitors(uuid, competitors, this);
     }
 
     @Override
     public void clearSelection() {
         competitors.clear();
+        competitorDataProvider.clearSelection();
         sailorProfileDataProvider.updateCompetitors(uuid, competitors, this);
     }
 

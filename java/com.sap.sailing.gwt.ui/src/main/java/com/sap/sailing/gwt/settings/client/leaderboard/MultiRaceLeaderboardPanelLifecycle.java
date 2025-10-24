@@ -6,6 +6,7 @@ import com.sap.sailing.domain.common.DetailType;
 import com.sap.sailing.domain.common.dto.AbstractLeaderboardDTO;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sse.common.settings.generic.support.SettingsUtil;
+import com.sap.sse.security.ui.client.SecurityChildSettingsContext;
 import com.sap.sse.security.ui.client.premium.PaywallResolver;
 
 public class MultiRaceLeaderboardPanelLifecycle
@@ -24,7 +25,8 @@ public class MultiRaceLeaderboardPanelLifecycle
     @Override
     public MultiRaceLeaderboardSettings extractUserSettings(MultiRaceLeaderboardSettings currentLeaderboardSettings) {
         // All settings except namesOfRaceColumnsToShow are used for the user settings
-        return currentLeaderboardSettings.withNamesOfRaceColumnsToShowDefaultsAndValues(namesOfRaceColumns);
+        return currentLeaderboardSettings.withNamesOfRaceColumnsToShowDefaultsAndValues(namesOfRaceColumns,
+                new SecurityChildSettingsContext(leaderboardDTO, paywallResolver));
     }
 
     @Override
@@ -36,7 +38,8 @@ public class MultiRaceLeaderboardPanelLifecycle
 
     @Override
     public MultiRaceLeaderboardSettings createDefaultSettings() {
-        MultiRaceLeaderboardSettings leaderboardSettings = new MultiRaceLeaderboardSettings(namesOfRaceColumns);
+        MultiRaceLeaderboardSettings leaderboardSettings = new MultiRaceLeaderboardSettings(namesOfRaceColumns,
+                new SecurityChildSettingsContext(leaderboardDTO, paywallResolver));
         SettingsUtil.copyDefaultsFromValues(leaderboardSettings, leaderboardSettings);
         return leaderboardSettings;
     }

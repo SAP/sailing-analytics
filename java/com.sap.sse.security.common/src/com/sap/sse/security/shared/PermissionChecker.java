@@ -560,7 +560,7 @@ public class PermissionChecker {
             final Iterable<R> userRoles = user.getRoles();
             final HashSet<R> withAdditionalRoles = new HashSet<R>();
             userRoles.forEach(withAdditionalRoles::add);
-            if(additionalRoles != null) {
+            if (additionalRoles != null) {
                 additionalRoles.forEach(withAdditionalRoles::add);
             }
             for (R role : withAdditionalRoles) {

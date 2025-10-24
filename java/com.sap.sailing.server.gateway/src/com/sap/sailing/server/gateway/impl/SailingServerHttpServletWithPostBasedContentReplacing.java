@@ -23,16 +23,17 @@ import com.sap.sse.common.HttpRequestHeaderConstants;
 public abstract class SailingServerHttpServletWithPostBasedContentReplacing extends SailingServerHttpServlet {
     private static final long serialVersionUID = -2819428093387051473L;
 
-    protected void writePostRefreshingHeadAndBodyWithRefreshForm(HttpServletRequest req, HttpServletResponse resp, String title) throws IOException {
+    protected void writePostRefreshingHeadAndBodyWithRefreshForm(HttpServletRequest req, HttpServletResponse resp, String title, String postURI) throws IOException {
         resp.setContentType("text/html");
         PrintWriter out = resp.getWriter();
+        out.println("<!DOCTYPE html>");
         out.println("<html>");
         out.println("<head>");
         out.println("<title>"+title+"</title>");
         out.println("<script>\r\n" + 
                 "  function loadAndReplace() {\r\n" + 
                 "        var request = new XMLHttpRequest();\r\n" + 
-                "        request.open(\"POST\", \"" + req.getRequestURI() + "\" );\r\n" + 
+                "        request.open(\"POST\", \"" + postURI + "\" );\r\n" + 
                 "        request.setRequestHeader(\""+HttpRequestHeaderConstants.HEADER_FORWARD_TO_MASTER.getA()+"\",\""+HttpRequestHeaderConstants.HEADER_FORWARD_TO_MASTER.getB()+"\");\r\n" +
                 "        request.addEventListener(\"load\", function(event) {\r\n" + 
                 "                if (request.status >= 200 && request.status < 300) {\r\n" + 

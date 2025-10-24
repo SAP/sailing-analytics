@@ -1,6 +1,6 @@
 package com.sap.sailing.domain.regattalog.tracking.analyzing.test;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
@@ -21,7 +21,7 @@ public abstract class AbstractRegattaLogTrackingTest {
         super();
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         log = new RegattaLogImpl("log");
     }

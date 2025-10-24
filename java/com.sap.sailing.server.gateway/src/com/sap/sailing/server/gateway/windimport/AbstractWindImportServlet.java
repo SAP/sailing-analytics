@@ -22,11 +22,12 @@ import org.json.simple.parser.ParseException;
 import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
 import com.sap.sailing.domain.common.RegattaNameAndRaceName;
 import com.sap.sailing.domain.common.WindImportConstants;
-import com.sap.sailing.server.gateway.SailingServerHttpServlet;
+import com.sap.sailing.server.gateway.AbstractJsonHttpServlet;
 import com.sap.sailing.server.gateway.windimport.AbstractWindImporter.UploadRequest;
 import com.sap.sailing.server.gateway.windimport.AbstractWindImporter.WindImportResult;
+import com.sap.sse.common.fileupload.FileUploadUtil;
 
-public abstract class AbstractWindImportServlet extends SailingServerHttpServlet {
+public abstract class AbstractWindImportServlet extends AbstractJsonHttpServlet {
     private static final Logger logger = Logger.getLogger(AbstractWindImportServlet.class.getName());
     private static final long serialVersionUID = 1L;
     
@@ -43,7 +44,7 @@ public abstract class AbstractWindImportServlet extends SailingServerHttpServlet
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        WindImportResult windImportResult = new WindImportResult();
+        final WindImportResult windImportResult = new WindImportResult();
         try {
             UploadRequest uploadRequest = readRequest(request);
             for (RegattaAndRaceIdentifier trackedRace : uploadRequest.races) {
@@ -56,8 +57,7 @@ public abstract class AbstractWindImportServlet extends SailingServerHttpServlet
             logger.log(Level.SEVERE, "Error ocurred trying to import wind fixes", e);
             windImportResult.error = e.toString();
         }
-        response.setContentType("application/json;charset=UTF-8");
-        windImportResult.json().writeJSONString(response.getWriter());
+        response.getWriter().write(FileUploadUtil.getHtmlWithEmbeddedJsonContent(windImportResult.json().toJSONString()));
     }
 
     private UploadRequest readRequest(HttpServletRequest req) throws FileUploadException, ParseException {

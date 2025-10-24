@@ -1,11 +1,11 @@
 package com.sap.sailing.domain.racelog.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.race.impl.RaceLogImpl;
 import com.sap.sailing.domain.abstractlog.race.state.racingprocedure.ReadonlyRacingProcedure;
@@ -18,7 +18,7 @@ public class RacingProceduresWithStartModeFlagTest {
     private RacingProcedureFactoryImpl racingProcedureFactory;
     private RaceLogImpl raceLog;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.racingProcedureFactory = new RacingProcedureFactoryImpl(/* author */ null, new EmptyRegattaConfiguration());
         this.raceLog = new RaceLogImpl(UUID.randomUUID());
@@ -29,10 +29,10 @@ public class RacingProceduresWithStartModeFlagTest {
         for (final RacingProcedureType type : RacingProcedureType.values()) {
             if (type != RacingProcedureType.UNKNOWN) {
                 final ReadonlyRacingProcedure racingProcedure = racingProcedureFactory.createRacingProcedure(type, raceLog, /* raceLogResolver */ null);
-                assertEquals("Racing procedure type "+type.name()+" was "+((racingProcedure instanceof ConfigurableStartModeFlagRacingProcedure) ? "" : "not ")+
-                        "considered one with configurable start mode flag but should have",
-                        RacingProcedureType.RRS26.equals(type) || RacingProcedureType.RRS26_3MIN.equals(type) || RacingProcedureType.SWC.equals(type) || RacingProcedureType.SWC_4MIN.equals(type),
-                        racingProcedure instanceof ConfigurableStartModeFlagRacingProcedure);
+                assertEquals(RacingProcedureType.RRS26.equals(type) || RacingProcedureType.RRS26_3MIN.equals(type) || RacingProcedureType.SWC.equals(type) || RacingProcedureType.SWC_4MIN.equals(type),
+                        racingProcedure instanceof ConfigurableStartModeFlagRacingProcedure,
+                        "Racing procedure type "+type.name()+" was "+((racingProcedure instanceof ConfigurableStartModeFlagRacingProcedure) ? "" : "not ")+
+                                "considered one with configurable start mode flag but should have");
             }
         }
     }

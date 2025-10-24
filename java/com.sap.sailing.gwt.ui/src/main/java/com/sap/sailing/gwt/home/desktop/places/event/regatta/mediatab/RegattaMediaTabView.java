@@ -43,7 +43,7 @@ public class RegattaMediaTabView extends Composite implements RegattaTabView<Reg
             @Override
             public void onSuccess(MediaDTO media) {
                 contentArea.setWidget(RegattaMediaTabView.this);
-                mediaPage.setMedia(media);
+                mediaPage.setMedia(media, currentPresenter.getEventDTO());
             }
         });
     }

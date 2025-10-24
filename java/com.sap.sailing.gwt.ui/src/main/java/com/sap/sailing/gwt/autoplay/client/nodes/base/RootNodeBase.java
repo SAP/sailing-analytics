@@ -14,8 +14,8 @@ import com.sap.sailing.gwt.ui.shared.EventDTO;
 import com.sap.sse.common.Util.Pair;
 
 public abstract class RootNodeBase extends BaseCompositeNode {
-    protected static final long LIVE_SWITCH_DELAY = 1000;
-    private int UPDATE_STATE_TIMER = 5000;
+    private static final int LIVE_SWITCH_DELAY_MILLIS = 1000;
+    private static final int UPDATE_STATE_TIMER_MILLIS = 5000;
     private final AutoPlayClientFactory cf;
     private String leaderBoardName;
     private int errorCount = 0;;
@@ -56,14 +56,14 @@ public abstract class RootNodeBase extends BaseCompositeNode {
 
     private void doCheck() {
         // start next update, to ensure it is done no matter any error cases
-        checkTimer.schedule(UPDATE_STATE_TIMER);
+        checkTimer.schedule(UPDATE_STATE_TIMER_MILLIS);
         final UUID eventUUID = cf.getAutoPlayCtxSignalError().getContextDefinition().getEventId();
         cf.getSailingService().getEventById(eventUUID, true, new AsyncCallback<EventDTO>() {
             @Override
             public void onSuccess(final EventDTO event) {
                 if (firstTimeEventLoaded) {
                     AutoPlayHeaderEvent hE = new AutoPlayHeaderEvent(event.getName(), "");
-                    if(event.getLogoImage()!=null){
+                    if (event.getLogoImage()!=null) {
                         hE.setHeaderLogoUrl(event.getLogoImage().getSourceRef());
                     }
                     cf.getEventBus().fireEvent(hE);
@@ -75,7 +75,7 @@ public abstract class RootNodeBase extends BaseCompositeNode {
                 } else {
                     setCurrentState(false, null, RootNodeState.PRE_EVENT, currentState);
                     // faster update if event not yet started!
-                    checkTimer.schedule(1000);
+                    checkTimer.schedule(LIVE_SWITCH_DELAY_MILLIS);
                 }
             }
 
@@ -108,7 +108,7 @@ public abstract class RootNodeBase extends BaseCompositeNode {
                         } else {
                             final Long timeToRaceStartInMs = result.getA();
                             final RegattaAndRaceIdentifier loadedLiveRace = result.getB();
-                            boolean isPreLiveRace = timeToRaceStartInMs > LIVE_SWITCH_DELAY;
+                            boolean isPreLiveRace = timeToRaceStartInMs > LIVE_SWITCH_DELAY_MILLIS;
                             // exit
                             if (currentLiveRace != null && !loadedLiveRace.equals(currentLiveRace)) {
                                 log("Received different live race, hard switching to AFTER_LIVE race");

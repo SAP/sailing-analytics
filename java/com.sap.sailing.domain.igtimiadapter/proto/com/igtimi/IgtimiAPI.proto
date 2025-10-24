@@ -1,0 +1,403 @@
+/**
+ * File: IgtimiAPI
+ * Project: IgtimiRIoT
+ *
+ * Version 0.1.0
+ *
+ * Author Stephen Markham
+ * Date 01/07/2019
+ * Copyright 2019, Igtimi Ltd.
+ * Description
+ *    Protocol definition for Igtimi API data requests/responses.
+ *
+ *
+ * Note: Versions < 1.0 are liable to breaking changes (including structure)
+ *        and therefore implementations based of these should proceed with caution.
+ *        After 1.0 all changes *should* be backwards compatible.
+ */
+
+syntax = "proto3";
+
+package com.igtimi;
+
+import "com/igtimi/IgtimiData.proto";
+
+option optimize_for = SPEED;
+
+message APIData {
+  oneof data {
+    Request request = 1 [json_name = "request"];
+    Response response = 2 [json_name = "response"];
+  }
+}
+
+message Request {
+  string id = 1 [json_name = "id"];
+
+  oneof request {
+    //Old
+    ListSessions list_sessions = 2 [json_name = "listSessions"];
+
+    //New
+    SessionsRequest sessions = 3 [json_name = "sessions"];
+    DataRequest data = 4 [json_name = "data"];
+    DataAccessWindowsRequest data_access_windows = 5 [json_name = "dataAccessWindows"];
+    ResourcesRequest resources = 6 [json_name = "resources"];
+    GroupsRequest groups = 7 [json_name = "groups"];
+    DevicesRequest devices = 8 [json_name = "devices"];
+    AccountRequest account = 9 [json_name = "account"];
+    DeviceGroupsRequest device_groups = 10 [json_name = "deviceGroups"];
+  }
+}
+
+message SessionsRequest {
+  message ListSessions {
+    repeated uint32 ids = 1 [json_name = "ids"];
+
+    bool include_incomplete = 4 [json_name = "includeIncomplete"]; //defaults to false
+
+    uint64 end_time = 6 [json_name = "endTime"];
+
+    bool descendants = 8 [json_name = "descendants"]; //defaults to false
+  }
+
+  message CreateSession {}
+
+  oneof request {
+    ListSessions list_sessions = 1;
+    CreateSession create_session = 2;
+    //        GetSession get_session = 3;
+    //        DeleteSession delete_session = 4;
+  }
+}
+
+message DataRequest {
+  message GetData {
+    message DataSource {
+      oneof data_source {
+        string serial_number = 1 [json_name = "serial"];
+        uint32 session_id = 2 [json_name = "session"];
+      }
+      //Optional. E.g "1-100,104,200-1000" or "1,2,3"
+      // Not provided assumes all
+      string source_id_range = 3 [json_name = "sourceIdRange"];
+      string data_type_range = 4 [json_name = "dataTypeRange"];
+    }
+
+    uint64 start_time = 1 [json_name = "startTime"];
+    uint64 end_time = 2 [json_name = "endTime"];
+
+    // List of data sources (think devices/sessions)
+    repeated DataSource data_source = 3 [json_name = "dataSource"];
+  }
+
+  oneof request {
+    GetData get_data = 1;
+  }
+}
+
+message DataAccessWindowsRequest {
+  message ListDataAccessWindows {
+    enum DataAccessWindowType {
+      DAW_TYPE_READ = 0;
+      DAW_TYPE_MODIFY = 1;
+    }
+
+    DataAccessWindowType type = 1 [json_name = "type"];
+    uint64 start_time = 2 [json_name = "startTime"];
+    uint64 end_time = 3 [json_name = "endTime"];
+    repeated string serial_numbers = 4 [json_name = "serialNumbers"];
+  }
+
+  oneof request {
+    ListDataAccessWindows list_data_access_windows = 1 [json_name = "listDataAccessWindows"];
+  }
+}
+
+message ResourcesRequest {
+  message ListResources {
+    enum ResourcePermission {
+      ResourcePermission_READ = 0;
+      ResourcePermission_MODIFY = 1;
+    }
+
+    ResourcePermission permission = 1 [json_name = "permission"];
+    uint64 start_time = 2 [json_name = "startTime"];
+    uint64 end_time = 3 [json_name = "endTime"];
+    repeated string serial_numbers = 4 [json_name = "serialNumbers"];
+    repeated uint32 stream_ids = 5 [json_name = "streamIDs"];
+  }
+
+  oneof request {
+    ListResources list_resources = 1 [json_name = "listResources"];
+  }
+}
+
+message GroupsRequest {
+  //    message ListGroups {
+  //
+  //    }
+  //
+  //    message CreateGroup {
+  //
+  //    }
+  //
+  //    message DeleteGroup {
+  //
+  //    }
+  //
+  //    message ListGroupMembers {
+  //
+  //    }
+
+  message AddGroupMember {
+    uint32 group_id = 1 [json_name = "groupID"];
+
+    oneof add {
+      uint32 user_id_to_add = 2 [json_name = "userToAdd"];
+      uint32 group_id_to_add = 3 [json_name = "groupToAdd"];
+    }
+  }
+
+  message RemoveGroupMember {
+    uint32 group_id = 1 [json_name = "groupID"];
+
+    oneof add {
+      uint32 user_id_to_remove = 2 [json_name = "userToRemove"];
+      uint32 group_id_to_remove = 3 [json_name = "groupToRemove"];
+    }
+  }
+
+  oneof request {
+    //        ListGroups listGroups = 1;
+    //        CreateGroup createGroup = 2;
+    //        DeleteGroup deleteGroup = 3;
+    //        ListGroupMembers listGroupMembers = 4;
+    AddGroupMember addGroupMember = 5;
+    RemoveGroupMember removeGroupMember = 6;
+  }
+}
+
+message DevicesRequest {
+  message ListDevices {
+    repeated string serial_numbers = 1 [json_name = "serial_numbers"];
+
+    bool blob_content = 2 [json_name = "blobContent"];
+
+    bool device_info = 3 [json_name = "deviceInfo"];
+  }
+
+  message CreateDevice {
+    string prefix = 1 [json_name = "prefix"];
+
+    uint64 date = 2 [json_name = "date"];
+
+    string uid = 3 [json_name = "uid"];
+
+    string imei = 4 [json_name = "imei"];
+
+    bool register = 5 [json_name = "register"];
+
+    string token = 6 [json_name = "token"];
+
+    bool is_device_group_token = 7 [json_name = "isDeviceGroupToken"];
+  }
+
+  // FUTURE: RegisterDevice, UnRegisterDevice, UpdateDevice, SaveDeviceBlob, GetDeviceBlob, GetDeviceInformation
+
+  oneof request {
+    ListDevices list_devices = 1 [json_name = "listDevices"];
+
+    CreateDevice create_device = 2 [json_name = "createDevice"];
+  }
+}
+
+message AccountRequest {
+  message ShowAccount {}
+
+  oneof request {
+    ShowAccount show_account = 1 [json_name = "showAccount"];
+  }
+}
+
+message DeviceGroupsRequest {
+  message CreateGroup {
+    oneof token {
+      string application_access_token = 1 [json_name = "applicationAccessToken"];
+      string device_group_token = 2 [json_name = "deviceGroupToken"];
+    }
+
+    //Application prefix string.
+    string prefix = 3 [json_name = "prefix"];
+
+    //Enable the to ability create devices within this group.
+    bool create_devices = 4 [json_name = "createDevices"];
+
+    //Enable the ability to create sub groups within this group.
+    bool create_tokens = 5 [json_name = "createTokens"];
+
+    //optional - The token expiry timestamp. Milliseconds UNIX epoch time.
+    uint64 expiry = 6 [json_name = "expiry"];
+
+    //optional - Parent device group for the newly created device group
+    string recipient = 7 [json_name = "recipient"];
+
+    //optional - Owner ID for the newly created device group.
+    uint32 default_owner_id = 8 [json_name = "defaultOwnerID"];
+  }
+
+  oneof request {
+    //https://www.igtimi.com/developers#devicegroups_token
+    CreateGroup create_group = 1 [json_name = "createGroup"];
+  }
+}
+
+message Response {
+  //identifier of the request if set
+  string id = 1 [json_name = "id"];
+
+  uint64 timestamp = 2 [json_name = "t"];
+  bool success = 3 [json_name = "success"];
+  uint32 code = 4 [json_name = "code"];
+  string reason = 5 [json_name = "reason"];
+
+  uint32 message_number = 10 [json_name = "messageNumber"];
+  bool complete = 11 [json_name = "complete"];
+
+  oneof content {
+    Data data = 6 [json_name = "data"];
+    Sessions sessions = 7 [json_name = "sessions"];
+    DataAccessWindows data_access_windows = 8 [json_name = "dataAccessWindows"];
+    Resources resources = 9 [json_name = "resources"];
+    Devices devices = 12 [json_name = "devices"];
+    Account account = 13 [json_name = "account"];
+    DeviceGroup device_group = 14 [json_name = "deviceGroup"];
+  }
+}
+
+message ListSessions {
+  repeated uint32 ids = 1 [json_name = "ids"];
+
+  bool include_incomplete = 4 [json_name = "includeIncomplete"]; //defaults to false
+
+  uint64 end_time = 6 [json_name = "endTime"];
+
+  bool descendants = 8 [json_name = "descendants"]; //defaults to false
+}
+
+message Sessions {
+  repeated Session session = 1 [json_name = "session"];
+}
+
+message Session {
+  uint32 id = 1 [json_name = "id"];
+  string name = 2 [json_name = "name"];
+  uint64 start_time = 3 [json_name = "startTime"];
+  uint64 end_time = 4 [json_name = "endTime"];
+  uint32 owner_id = 5 [json_name = "ownerID"];
+  uint32 session_group_id = 6 [json_name = "sessionGroupID"];
+  uint32 admin_group_id = 7 [json_name = "adminGroupID"];
+  Permissions permissions = 8 [json_name = "permissions"];
+  bool blob = 9 [json_name = "blob"];
+  string ou = 10 [json_name = "ou"];
+  uint32 parent_id = 11 [json_name = "parent"];
+  map<string, string> properties = 12 [json_name = "properties"];
+}
+
+message Devices {
+  repeated Device device = 1 [json_name = "device"];
+}
+
+message Device {
+  uint32 id = 1 [json_name = "id"];
+  string name = 2 [json_name = "name"];
+  string serial_number = 3 [json_name = "serialNumber"];
+  string uid = 4 [json_name = "uID"];
+  string imei = 5 [json_name = "imei"];
+  string service_tag = 6 [json_name = "serviceTag"];
+  uint32 owner_id = 7 [json_name = "ownerID"];
+  uint32 device_user_group_id = 8 [json_name = "deviceUserGroupID"];
+  uint32 admin_device_user_group_id = 9 [json_name = "adminDeviceUserGroupID"];
+  Permissions permissions = 10 [json_name = "permissions"];
+  bool blob = 11 [json_name = "blob"];
+  string blob_content = 12 [json_name = "blobContent"];
+  string device_info = 13 [json_name = "deviceInfo"];
+}
+
+message Account {
+  uint32 id = 1 [json_name = "id"];
+  string first_name = 2 [json_name = "firstName"];
+  string surname = 3 [json_name = "surname"];
+  string email = 4 [json_name = "email"];
+}
+
+message Permissions {
+  bool read = 1 [json_name = "read"];
+  bool modify = 2 [json_name = "modify"];
+}
+
+message DataAccessWindows {
+  repeated DataAccessWindow data_access_window = 1 [json_name = "dataAccessWindow"];
+}
+
+message DataAccessWindow {
+  uint64 id = 1 [json_name = "id"];
+  uint64 start_time = 2 [json_name = "startTime"];
+  uint64 end_time = 3 [json_name = "endTime"];
+  string device_serial_number = 4 [json_name = "deviceSerialNumber"];
+  oneof recipient {
+    uint64 user_id = 5 [json_name = "userID"];
+    uint64 group_id = 6 [json_name = "groupID"];
+  }
+  Permissions permissions = 7 [json_name = "permissions"];
+}
+
+message Resources {
+  repeated Resource resource = 1 [json_name = "resource"];
+}
+
+message Resource {
+  enum ResourceType {
+    ResourceType_UNKNOWN = 0;
+    ResourceType_DEVICE = 1;
+    ResourceType_SESSION = 2;
+  }
+  message SourceIDList {
+    repeated uint32 source_ids = 1 [json_name = "sourceIDs"];
+  }
+  uint64 id = 1 [json_name = "id"];
+  uint64 start_time = 2 [json_name = "startTime"];
+  uint64 end_time = 3 [json_name = "endTime"];
+  ResourceType resourceType = 4 [json_name = "resourceType"];
+  oneof type_identifier {
+    string device_serial_number = 5 [json_name = "deviceSerialNumber"];
+    uint32 session_id = 6 [json_name = "sessionID"];
+  }
+  repeated uint32 data_types = 7 [json_name = "dataTypes"];
+  map<uint32, SourceIDList> source_id_map = 8 [json_name = "sourceIDMap"];
+  Permissions permissions = 9 [json_name = "permissions"];
+  bool blob = 10 [json_name = "blob"];
+}
+
+message Token {
+  oneof token {
+    string user_token = 1 [json_name = "userToken"];
+    string device_group_token = 2 [json_name = "deviceGroupToken"];
+  }
+}
+
+message DeviceGroupPermissions {
+  bool create_devices = 1 [json_name = "createDevices"];
+  bool create_tokens = 2 [json_name = "createTokens"];
+}
+
+message DeviceGroup {
+  uint32 id = 1 [json_name = "id"];
+  string token = 2 [json_name = "token"];
+  string prefix = 3 [json_name = "prefix"];
+  DeviceGroupPermissions permissions = 4 [json_name = "permissions"];
+  uint32 default_owner_id = 5 [json_name = "defaultOwnerID"];
+  uint32 default_admin_id = 6 [json_name = "defaultAdminID"];
+  uint32 default_user_id = 7 [json_name = "defaultUserID"];
+  uint64 expiry = 8 [json_name = "expiry"];
+}

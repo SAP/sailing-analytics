@@ -6,7 +6,7 @@ import com.sap.sse.datamining.annotations.Connector;
 import com.sap.sse.datamining.annotations.Dimension;
 import com.sap.sse.datamining.annotations.Statistic;
 
-public interface HasMarkPassingContext extends HasManeuver {
+public interface HasMarkPassingContext extends HasManeuver, HasWindOnTrackedLegOfCompetitor {
     @Connector(scanForStatistics=false)
     HasTrackedLegOfCompetitorContext getTrackedLegOfCompetitorContext();
     

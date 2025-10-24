@@ -114,7 +114,7 @@ public class SecurityServiceAclResolver implements AclResolver<AccessControlList
         final OwnershipAnnotation ownershipOfObject = accessControlStore.getOwnership(qoid);
         final User userOwnerSpecification = ownershipSpecification.getUserOwner();
         final UserGroup tenantOwnerSpecification = ownershipSpecification.getTenantOwner();
-        return (userOwnerSpecification == null || (ownershipOfObject != null && ownershipOfObject.getAnnotation().getUserOwner().equals(userOwnerSpecification)))
-            && (tenantOwnerSpecification == null || (ownershipOfObject != null && ownershipOfObject.getAnnotation().getTenantOwner().equals(tenantOwnerSpecification)));
+        return (userOwnerSpecification == null || (ownershipOfObject != null && Util.equalsWithNull(ownershipOfObject.getAnnotation().getUserOwner(), userOwnerSpecification)))
+            && (tenantOwnerSpecification == null || (ownershipOfObject != null && Util.equalsWithNull(ownershipOfObject.getAnnotation().getTenantOwner(), tenantOwnerSpecification)));
     }
 }

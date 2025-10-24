@@ -33,6 +33,7 @@ public class ManeuverWithContext implements HasManeuverContext {
     private final double directionChangeInDegreesForAnalysis;
     private final Maneuver previousManeuver;
     private final Maneuver nextManeuver;
+    private Wind wind;
 
     public ManeuverWithContext(HasTrackedLegOfCompetitorContext trackedLegOfCompetitor, Maneuver maneuver,
             boolean mainCurveAnalysis, Maneuver previousManeuver, Maneuver nextManeuver) {
@@ -70,6 +71,16 @@ public class ManeuverWithContext implements HasManeuverContext {
         } else if (!maneuver.equals(other.maneuver))
             return false;
         return true;
+    }
+
+    @Override
+    public Wind getWindInternal() {
+        return wind;
+    }
+
+    @Override
+    public void setWindInternal(Wind wind) {
+        this.wind = wind;
     }
 
     public TimePoint getTimePointBeforeForAnalysis() {

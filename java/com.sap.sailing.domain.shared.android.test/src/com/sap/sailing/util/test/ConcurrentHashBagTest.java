@@ -1,15 +1,15 @@
 package com.sap.sailing.util.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Iterator;
 import java.util.Random;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.concurrent.ConcurrentHashBag;
 
@@ -24,7 +24,7 @@ public class ConcurrentHashBagTest {
     final static Random random = new Random();
     private ConcurrentHashBag<String> bag;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         bag = new ConcurrentHashBag<>();
     }

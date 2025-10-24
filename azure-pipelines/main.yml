@@ -28,7 +28,7 @@ resources:
       # For available versions, please have a look here (use the tag, not the release name):
       # https://github.tools.sap/SAPMobile/sap-mobile-pipeline/releases
       # ----------
-      # ref: 'refs/tags/1.0.0'
+      ref: 'refs/tags/3.12.0' # last version to support Android API Level 33
 
 #################################################################
 ######################### Pipeline Start ########################

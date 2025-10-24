@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Upgrades the AWS EC2 instance that this script is assumed to be executed on.
+# The steps are as follows:
+
+. `dirname $0`/imageupgrade_functions.sh
+
+METADATA=$( get_ec2_user_data )
+echo "Metadata: ${METADATA}"
+if echo "${METADATA}" | grep -q "^image-upgrade$"; then
+  echo "Image upgrade..."
+  run_dnf_upgrade
+  download_and_install_latest_sap_jvm_8
+  clean_logrotate_target
+  clean_httpd_logs
+  clean_servers_dir
+  clean_startup_logs
+  build_crontab_and_setup_files sailing_server
+  # Installing secrets would require an SSH key that authenticates as root@sapsailing.com, but currently during imageupgrade we don't have this...
+  # install_secrets
+  finalize
+fi

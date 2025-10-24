@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.google.gwt.dom.client.MediaElement;
@@ -76,7 +77,6 @@ public class MediaPlayerManagerComponent extends AbstractComponent<MediaPlayerSe
     private final SimplePanel rootPanel = new SimplePanel();
     private final UserService userService;
 
-    private MediaPlayer dockedVideoPlayer;
     private final Map<MediaTrack, MediaPlayerContainer> activePlayerContainers = new HashMap<MediaTrack, MediaPlayerContainer>();
     private Collection<MediaTrackWithSecurityDTO> assignedMediaTracks = new ArrayList<>();
     private Collection<MediaTrackWithSecurityDTO> overlappingMediaTracks = new ArrayList<>();
@@ -97,6 +97,11 @@ public class MediaPlayerManagerComponent extends AbstractComponent<MediaPlayerSe
     private final FileStorageServiceConnectionTestObservable storageServiceAvailable;
 
     private List<PlayerChangeListener> playerChangeListener = new ArrayList<>();
+    
+    /**
+     * Used in case a take-down request is to be filed
+     */
+    private UUID eventId;
 
     public MediaPlayerManagerComponent(Component<?> parent, ComponentContext<?> context,
             MediaPlayerLifecycle mediaPlayerLifecycle, SailingServiceWriteAsync sailingServiceWrite,
@@ -104,8 +109,9 @@ public class MediaPlayerManagerComponent extends AbstractComponent<MediaPlayerSe
             Timer raceTimer, MediaServiceAsync mediaService, MediaServiceWriteAsync mediaServiceWrite,
             UserService userService, StringMessages stringMessages, ErrorReporter errorReporter,
             UserAgentDetails userAgent, PopupPositionProvider popupPositionProvider, MediaPlayerSettings settings,
-            RaceDTO raceDto) {
+            RaceDTO raceDto, String leaderboardGroupName, UUID eventId) {
         super(parent, context);
+        this.eventId = eventId;
         this.mediaPlayerLifecycle = mediaPlayerLifecycle;
         this.userService = userService;
         this.raceIdentifier = selectedRaceIdentifier;
@@ -127,7 +133,6 @@ public class MediaPlayerManagerComponent extends AbstractComponent<MediaPlayerSe
         this.storageServiceAvailable = new FileStorageServiceConnectionTestObservable(sailingServiceWrite);
         Window.addCloseHandler(this);
         Window.addWindowClosingHandler(this);
-
         userService.addUserStatusEventHandler(new UserStatusEventHandler() {
             @Override
             public void onUserStatusChange(UserDTO user, boolean preAuthenticated) {
@@ -299,8 +304,6 @@ public class MediaPlayerManagerComponent extends AbstractComponent<MediaPlayerSe
     /**
      * Wraps the callback handling functions in an object to better document their purpose. onSuccess and onError are
      * simply too generic to tell about their concrete use.
-     * 
-     * @return
      */
     private AsyncCallback<Iterable<MediaTrackWithSecurityDTO>> getOverlappingMediaCallback() {
         return new AsyncCallback<Iterable<MediaTrackWithSecurityDTO>>() {
@@ -330,36 +333,6 @@ public class MediaPlayerManagerComponent extends AbstractComponent<MediaPlayerSe
     }
 
     @Override
-    public void playDockedVideo(MediaTrackWithSecurityDTO videoTrack) {
-        if ((dockedVideoPlayer == null) || (dockedVideoPlayer.getMediaTrack() != videoTrack)) {
-            closeDockedVideo();
-            closeFloatingPlayer(videoTrack);
-            MediaPlayerContainer videoDockedContainer = createAndWrapVideoPlayer(videoTrack,
-                    new VideoContainerFactory<VideoDockedContainer>() {
-                        @Override
-                        public VideoDockedContainer createVideoContainer(MediaSynchPlayer videoPlayer,
-                                UserService userService, MediaServiceWriteAsync mediaServiceWrite, ErrorReporter errorReporter,
-                                PlayerCloseListener playerCloseListener, PopoutListener popoutListener) {
-                            VideoDockedContainer videoDockedContainer = new VideoDockedContainer(rootPanel,
-                                    videoPlayer, playerCloseListener, popoutListener);
-                            return videoDockedContainer;
-                        }
-                    });
-            registerVideoContainer(videoTrack, videoDockedContainer);
-            notifyStateChange();
-        }
-    }
-
-    @Override
-    public void closeDockedVideo() {
-        if (dockedVideoPlayer != null) {
-            dockedVideoPlayer.shutDown();
-            dockedVideoPlayer = null;
-            notifyStateChange();
-        }
-    }
-
-    @Override
     public void playAudio(MediaTrackWithSecurityDTO audioTrack) {
         muteAudio();
         playFloatingVideo(audioTrack);
@@ -381,23 +354,19 @@ public class MediaPlayerManagerComponent extends AbstractComponent<MediaPlayerSe
 
     @Override
     public void playFloatingVideo(final MediaTrackWithSecurityDTO videoTrack) {
-        if (dockedVideoPlayer != null && dockedVideoPlayer.getMediaTrack() == videoTrack) {
-            closeDockedVideo();
-        }
         MediaPlayerContainer activeVideoContainer = activePlayerContainers.get(videoTrack);
         if (activeVideoContainer == null) {
             FloatingMediaPlayerContainer videoFloatingContainer = createAndWrapVideoPlayer(videoTrack,
                     new VideoContainerFactory<FloatingMediaPlayerContainer>() {
                         @Override
                         public FloatingMediaPlayerContainer createVideoContainer(MediaSynchPlayer videoPlayer,
-                                UserService userservice, MediaServiceWriteAsync mediaServiceWrite, ErrorReporter errorReporter,
+                                UserService userService, MediaServiceWriteAsync mediaServiceWrite, ErrorReporter errorReporter,
                                 PlayerCloseListener playerCloseListener, PopoutListener popoutListener) {
                             FloatingMediaPlayerContainer videoFloatingContainer = new FloatingMediaPlayerContainer(videoPlayer, popupPositionProvider,
-                                    userservice, mediaServiceWrite, errorReporter, playerCloseListener, popoutListener);
+                                    userService, mediaServiceWrite, errorReporter, playerCloseListener, popoutListener);
                             return videoFloatingContainer;
                         }
                     });
-
             registerVideoContainer(videoTrack, videoFloatingContainer);
             notifyStateChange();
         }
@@ -428,9 +397,9 @@ public class MediaPlayerManagerComponent extends AbstractComponent<MediaPlayerSe
             public void popoutVideo(MediaTrackWithSecurityDTO videoTrack) {
                 MediaPlayerContainer videoContainer;
                 if (videoTrack.isYoutube()) {
-                    videoContainer = new YoutubeWindowPlayer(videoTrack, playerCloseListener);
+                    videoContainer = new YoutubeWindowPlayer(videoTrack, playerCloseListener); // TODO bug6105 make YouTube player show take-down request button
                 } else {
-                    videoContainer = new VideoJSWindowPlayer(videoTrack, playerCloseListener);
+                    videoContainer = new VideoJSWindowPlayer(videoTrack, playerCloseListener, raceIdentifier.toString(), eventId);
                 }
                 playerCloseListener.setVideoContainer(videoContainer);
                 closeFloatingPlayer(videoTrack);
@@ -438,11 +407,10 @@ public class MediaPlayerManagerComponent extends AbstractComponent<MediaPlayerSe
         };
         final MediaSynchPlayer videoPlayer;
         if (videoTrack.isYoutube()) {
-            videoPlayer = new VideoYoutubePlayer(videoTrack, getRaceStartTime(), raceTimer);
+            videoPlayer = new VideoYoutubePlayer(videoTrack, getRaceStartTime(), raceTimer, userService, raceIdentifier);
         } else {
-            videoPlayer = new VideoJSSyncPlayer(videoTrack, getRaceStartTime(), raceTimer);
+            videoPlayer = new VideoJSSyncPlayer(videoTrack, getRaceStartTime(), raceTimer, userService, raceIdentifier.toString(), eventId);
         }
-
         return videoContainerFactory.createVideoContainer(videoPlayer, userService, getMediaServiceWrite(), errorReporter,
                 playerCloseListener, popoutListener);
     }
@@ -633,11 +601,6 @@ public class MediaPlayerManagerComponent extends AbstractComponent<MediaPlayerSe
     public void addPlayerChangeListener(PlayerChangeListener playerChangeListener) {
         this.playerChangeListener.add(playerChangeListener);
 
-    }
-
-    @Override
-    public MediaTrack getDockedVideoTrack() {
-        return dockedVideoPlayer != null ? dockedVideoPlayer.getMediaTrack() : null;
     }
 
     @Override

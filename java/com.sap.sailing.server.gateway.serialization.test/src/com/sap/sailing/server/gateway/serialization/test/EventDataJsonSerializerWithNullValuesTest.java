@@ -1,6 +1,6 @@
 package com.sap.sailing.server.gateway.serialization.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -12,8 +12,8 @@ import java.util.Date;
 import java.util.UUID;
 
 import org.json.simple.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.DomainFactory;
 import com.sap.sailing.domain.base.EventBase;
@@ -54,7 +54,7 @@ public class EventDataJsonSerializerWithNullValuesTest {
     protected EventBase event;
 
     // see https://groups.google.com/forum/?fromgroups=#!topic/mockito/iMumB0_bpdo
-    @Before
+    @BeforeEach
     public void setUp() {
         // Event and its basic attributes ...
         event = mock(EventBase.class);

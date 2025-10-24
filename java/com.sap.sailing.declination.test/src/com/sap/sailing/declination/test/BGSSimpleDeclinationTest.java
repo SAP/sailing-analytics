@@ -1,11 +1,11 @@
 package com.sap.sailing.declination.test;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.sap.sailing.declination.impl.BGSImporter;
 
 public class BGSSimpleDeclinationTest extends SimpleDeclinationTest<BGSImporter> {
-    @Before
+    @BeforeEach
     public void setUp() {
         importer = new BGSImporter();
     }

@@ -3,7 +3,7 @@ package com.sap.sailing.landscape.ui.client;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -80,7 +80,7 @@ public class MoveAllAwayFromHostDialog extends DataEntryDialog<String> {
     }
 
     @Override
-    public FocusWidget getInitialFocusWidget() {
+    public Focusable getInitialFocusWidget() {
         return getInstanceTypeListBox();
     }
     

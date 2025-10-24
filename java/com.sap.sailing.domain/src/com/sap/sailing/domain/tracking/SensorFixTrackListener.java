@@ -1,6 +1,7 @@
 package com.sap.sailing.domain.tracking;
 
 import com.sap.sailing.domain.common.tracking.SensorFix;
+import com.sap.sailing.domain.shared.tracking.AddResult;
 
 /**
  * Listener to observe a {@link com.sap.sailing.domain.tracking.SensorFixTrack} to get informed whenever a new fix is

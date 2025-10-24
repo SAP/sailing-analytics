@@ -3,31 +3,23 @@
 # Purpose: The first parameter is an image type. This script iterates over the image types' USER folders,
 # concatenating all the symbolic links (referencing locations within configuration/crontabs) into one crontab
 # file for each user. It also takes the name of the user containing a copy of the git repo as well as the name of the 
-# dir within that user to go to. The created files for each user go into that user's home dir and are installed for
-# that user too. 
-# Within these crontab stubs, are certain string literals, which are replaced: PATH_OF_GIT_HOME_DIR_TO_REPLACE becomes
-# the absolute path to the git home dir, and PATH_OF_HOME_DIR_TO_REPLACE is changed to the path of the home directory
-# in which the crontab will be installed. 
+# dir within that user to go to. The created crontab for each user go into that user's home dir and are installed for
+# that user too.
+# Within these crontab stubs, are certain string literals, which are replaced: PATH_OF_HOME_DIR_TO_REPLACE is changed
+# to the path of the home directory in which the crontab will be installed (ie. that user's home).
 # Furthermore, within the users folder optional uid, gid and groups files an exist. uid should store the user's uid,
-# gid the group id and groups should have secondary groups (one per line). The secondary groups are added after all users are 
-# created.
+# gid the group id and groups should have secondary groups (one per line). The user is added to the secondary groups
+# after all users are created.
 # Useful files are also copied across from the "files" dir within each image type.
 # Finally, the script ends by performing a deamon reload and reenabling all the systemd units in the files directory,
 # so that the correct wants, requires, etc. are installed/linked. Any systemd units, within the mimicked filesystem,
-# will be automatically enabled. 
-
-if [[ $# -lt 3 || $# -gt 6 ]]; then
-    echo "$0 <ENVIRONMENT_TYPE> <USER_WITH_COPY_OF_REPO> <RELATIVE_PATH_OF_GIT_DIR_WITHIN_USER>  "
-    echo ""
-    echo "Where USER_WITH_COPY_OF_REPO is a user that contains a checked out copy of the main git."
-    echo "And where RELATIVE_PATH_OF_GIT_DIR_WITHIN_USER is the path to the git repo from the USER_WITH_COPY_OF_REPO's home directory."
-    echo "Use the f(iles) flag to disable file copying. Use the c(rontab) flag to disable the creation of users and the creation of crontab files for those users."
-    echo "If the c flag is not used then the n(o install) flag can be used to setup the crontabs but not install them."
-    exit 2
-fi
+# will be automatically enabled.
+# For options, see the help below.
+# This script should NOT be installed into /usr/local/bin. See the README for more.
+. repo/usr/local/bin/imageupgrade_functions.sh
 INSTALL_CRONTAB="true"
 COPY_FILES="true"
-CREATE_CRONTABS="true";
+CREATE_CRONTABS="true"
 options='fnc'
 while getopts $options option
 do
@@ -35,14 +27,19 @@ do
         c) CREATE_CRONTABS="false";;
         f) COPY_FILES="false";;
         n) INSTALL_CRONTAB="false";;
-        \?) echo "Invalid option"
+        \?) echo "Invalid option"  # getops replaces unknown options with a question mark, so we have to escape the question mark.
             exit 4;;
     esac
 done
-shift $((OPTIND-1)) # shift the arguments along so -s is no longer $1
+shift $((OPTIND-1)) # shift the arguments along so there are no options in the arguments anymore.
+if [[ "$#" -ne 1 ]]; then
+    echo "$0 [ -f ] [ -n ] [ -c ] <ENVIRONMENT_TYPE>"
+    echo ""
+    echo "Use the f(iles) flag to disable file copying. Use the c(rontab) flag to disable the creation of users and the creation of crontab files for those users."
+    echo "If the c flag is not used then the n(o install) flag can be used to setup the crontabs but not install them."
+    exit 2
+fi
 ENV_TYPE="$1"
-GIT_USER="$2"
-RELATIVE_GIT_DIR_NAME="$3"
 cd "$(dirname "$0")/${ENV_TYPE}"
 if [[ -d "groups" ]]; then
     cd "groups"
@@ -59,9 +56,9 @@ if [[ -d "groups" ]]; then
 fi
 if [[ -d "users" ]]; then
     cd "users"
-    GIT_PATH="$(eval echo $(printf "~%q" "$GIT_USER"))/${RELATIVE_GIT_DIR_NAME}" # The path to the git repo that contains the files needed.
-    for dir in $(ls -d */ ); do
-        USERNAME=$(echo "$dir" | sed "s/\/$//") # Dirname is the username. The trailing slash is removed.
+    for dir in *; do
+        [[ -d "$dir" ]] || continue
+        USERNAME="$dir"
         user_UID=""
         user_GID=""
         echo "STARTING WORK ON USER $USERNAME"
@@ -92,13 +89,15 @@ if [[ -d "users" ]]; then
             if [[ "$CREATE_CRONTABS" == "true" ]]; then  # 9 is the exit code indicating the username already exists.
                 # Clear the crontab file before assembling it from the snippets:
                 > $HOME_DIR/crontab
+                echo "# Note that this file should not be edited manually. Please instead make use of the build_crontab_and_setup_files command in imageupgrade_functions.sh">>"$HOME_DIR"/crontab
+                echo "# which concatenates the crontabs found at users/*/* into this file. Please edit these crontab stubs in the git repo to make permanent changes.">>"$HOME_DIR"/crontab
+                echo "">>"$HOME_DIR"/crontab
                 for crontab in ${USERNAME}/crontab*; do
                     [[ -e $crontab ]] || continue
-                    cat "${crontab}">> $HOME_DIR/crontab
+                    cat "${crontab}" | eval $( get_replacements_from_crontab_filename_as_sed_command "${crontab}" ) >> $HOME_DIR/crontab
                     echo "">> $HOME_DIR/crontab
                 done
                 chown "$USERNAME":"$USERNAME" $HOME_DIR/crontab
-                sed -i "s|PATH_OF_GIT_HOME_DIR_TO_REPLACE|${GIT_PATH}|g" "$HOME_DIR"/crontab # Sets correct path to the git repo within the crontab.
                 sed -i "s|PATH_OF_HOME_DIR_TO_REPLACE|${HOME_DIR}|g" "$HOME_DIR"/crontab # Sets the correct path to the home dir of the user whose crontab will be installed.
                 sed -i '/^$/d' $HOME_DIR/crontab # purges random empty lines.
                 echo "">>$HOME_DIR/crontab  # Adds a newline
@@ -107,12 +106,12 @@ if [[ -d "users" ]]; then
                 fi
             fi
         fi
-        
         echo "****** finished user ******"
     done
     # Add to groups after all the groups exist.
-    for dir in $(ls -d */ ); do
-        USERNAME=$(echo "$dir" | sed "s/\/$//") # Dirname is the username. The trailing slash is removed.
+    for dir in *; do
+        [[ -d "$dir" ]] || continue
+        USERNAME="$dir"
         [[ -e "$USERNAME"/groups ]] || continue
         echo "ADDING $USERNAME TO THE GROUPS SPECIFIED IN THEIR 'groups' FILE"
         for group in $(cat "$USERNAME"/groups); do
@@ -135,9 +134,10 @@ if [[ -d "groups" ]]; then
 fi
 if [[ "$COPY_FILES" == "true" && -d "files" ]]; then
     cd "files"
-    \cp -rL * /   # copies all files accross, realising any symbolic links. The backslash escapes the alias cp -i.
+    \cp --remove-destination -rL * /   # copies all files accross, realising any symbolic links. The backslash escapes the alias cp -i.
     systemctl daemon-reload
-    for unit in $(find etc/systemd/system -type f); do
+    for unit in etc/systemd/system/*; do
+        [[ -f "$unit" ]] || continue
         systemctl reenable /"${unit}" # to recreate all the dependency links.
     done
     cd ..

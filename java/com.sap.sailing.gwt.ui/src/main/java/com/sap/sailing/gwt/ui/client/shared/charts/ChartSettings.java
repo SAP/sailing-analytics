@@ -15,9 +15,11 @@ public class ChartSettings extends AbstractGenericSerializableSettings {
     }
     
     public ChartSettings() {
+        super();
     }
     
     public ChartSettings(long stepSizeInMillis) {
+        this();
         this.stepSizeInMillis.setValue(stepSizeInMillis);
     }
 

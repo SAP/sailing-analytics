@@ -33,41 +33,6 @@ public enum LabelType {
             return StringMessages.INSTANCE.upcoming();
         }
     },
-    NEW_("new") {
-        @Override
-        public String getLabel() {
-//            return StringMessages.INSTANCE.;
-            return null;
-        }
-    },
-    UPDATED("updated") {
-        @Override
-        public String getLabel() {
-//            return StringMessages.INSTANCE.;
-            return null;
-        }
-    },
-    ESS("ess") {
-        @Override
-        public String getLabel() {
-//            return StringMessages.INSTANCE.;
-            return null;
-        }
-    },
-    WORLDCUP("worldcup") {
-        @Override
-        public String getLabel() {
-//            return StringMessages.INSTANCE.;
-            return null;
-        }
-    },
-    BUNDESLIGA("bundesliga") {
-        @Override
-        public String getLabel() {
-//            return StringMessages.INSTANCE.;
-            return null;
-        }
-    },
     ACTIVE("active") {
         @Override
         public String getLabel() {

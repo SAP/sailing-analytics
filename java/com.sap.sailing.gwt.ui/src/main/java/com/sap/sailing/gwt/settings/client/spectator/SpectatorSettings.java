@@ -17,9 +17,11 @@ public class SpectatorSettings extends AbstractGenericSerializableSettings {
     private transient BooleanSetting embedded;
     
     public SpectatorSettings() {
+        super();
     }
     
     public SpectatorSettings(boolean showRaceDetails) {
+        this();
         this.showRaceDetails.setValue(showRaceDetails);
     }
     

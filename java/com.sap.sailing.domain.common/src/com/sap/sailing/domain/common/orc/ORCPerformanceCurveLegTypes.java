@@ -14,7 +14,7 @@ public enum ORCPerformanceCurveLegTypes {
      * 
      * For all other ORC leg types, rhumb-line projection is forced by returning {@link LegType#REACHING}.
      */
-    static public LegType getLegType(ORCPerformanceCurveLegTypes orcLegType) {
+    public static LegType getLegType(ORCPerformanceCurveLegTypes orcLegType) {
         final LegType result;
         if (orcLegType == null || orcLegType.isProjectToWindForUpwindAndDownwind()) {
             result = null;

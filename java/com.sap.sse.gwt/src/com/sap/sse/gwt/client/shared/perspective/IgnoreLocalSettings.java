@@ -10,9 +10,11 @@ public class IgnoreLocalSettings extends AbstractGenericSerializableSettings {
     private transient BooleanSetting ignoreLocalSettings;
     
     public IgnoreLocalSettings() {
+        super();
     }
     
     public IgnoreLocalSettings(boolean ignoreLocalSettings) {
+        this();
         this.ignoreLocalSettings.setValue(ignoreLocalSettings);
     }
     

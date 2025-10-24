@@ -13,8 +13,8 @@ import com.sap.sailing.gwt.home.communication.SailingAction;
 import com.sap.sailing.gwt.home.communication.SailingDispatchSystem;
 import com.sap.sailing.gwt.home.shared.refresh.ActionProvider.DefaultActionProvider;
 import com.sap.sse.common.Duration;
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
 import com.sap.sse.gwt.dispatch.shared.commands.ResultWithTTL;
+import com.sap.sse.gwt.shared.DTO;
 
 /**
  * Provides automatic refresh functionality for widgets based on the {@link SailingDispatchSystem}.
@@ -136,52 +136,51 @@ public abstract class RefreshManager {
      * Ensures that the next update is scheduled by a timer.
      */
     private void reschedule() {
-        if (scheduled) {
-            return;
-        }
-        scheduled = true;
-        Scheduler.get().scheduleFinally(new ScheduledCommand() {
-            @Override
-            public void execute() {
-                scheduled = false;
-                if (refreshables.isEmpty()) {
-                    LOG.log(Level.FINE, "No refreshables found -> skipping refresh");
-                    return;
-                }
-                if (!started) {
-                    LOG.log(Level.FINE, "Refresh not started yet -> skipping refresh");
-                    return;
-                }
-                if (!canExecute()) {
-                    LOG.log(Level.FINE, "Refresh not allowed to execute -> skipping refresh");
-                    return;
-                }
-                Long nextUpdate = null;
-                for (final RefreshHolder<DTO, SailingAction<ResultWithTTL<DTO>>> refreshable : refreshables) {
-                    if (refreshable.callRunning || !refreshable.provider.isActive()) {
-                        continue;
+        if (!scheduled) {
+            scheduled = true;
+            Scheduler.get().scheduleFinally(new ScheduledCommand() {
+                @Override
+                public void execute() {
+                    scheduled = false;
+                    if (refreshables.isEmpty()) {
+                        LOG.log(Level.FINE, "No refreshables found -> skipping refresh");
+                        return;
+                    }
+                    if (!started) {
+                        LOG.log(Level.FINE, "Refresh not started yet -> skipping refresh");
+                        return;
+                    }
+                    if (!canExecute()) {
+                        LOG.log(Level.FINE, "Refresh not allowed to execute -> skipping refresh");
+                        return;
+                    }
+                    Long nextUpdate = null;
+                    for (final RefreshHolder<DTO, SailingAction<ResultWithTTL<DTO>>> refreshable : refreshables) {
+                        if (refreshable.callRunning || !refreshable.provider.isActive()) {
+                            continue;
+                        }
+                        if (nextUpdate == null) {
+                            nextUpdate = refreshable.timeout;
+                        } else {
+                            nextUpdate = Math.min(nextUpdate, refreshable.timeout);
+                        }
                     }
                     if (nextUpdate == null) {
-                        nextUpdate = refreshable.timeout;
+                        // This can occur if there is already a call running for all RefreshableWidgets 
+                        LOG.log(Level.FINE, "Nothing to auto update");
                     } else {
-                        nextUpdate = Math.min(nextUpdate, refreshable.timeout);
+                        int delayMillis = (int) (nextUpdate - System.currentTimeMillis());
+                        if (delayMillis <= 0) {
+                            LOG.log(Level.FINE, "Auto updating immediately");
+                            update();
+                        } else {
+                            LOG.log(Level.FINE, "Scheduling auto refresh in " + delayMillis + "ms");
+                            timer.schedule(delayMillis);
+                        }
                     }
                 }
-                if (nextUpdate == null) {
-                    // This can occur if there is already a call running for all RefreshableWidgets 
-                    LOG.log(Level.FINE, "Nothing to auto update");
-                } else {
-                    int delayMillis = (int) (nextUpdate - System.currentTimeMillis());
-                    if (delayMillis <= 0) {
-                        LOG.log(Level.FINE, "Auto updating immediately");
-                        update();
-                    } else {
-                        LOG.log(Level.FINE, "Scheduling auto refresh in " + delayMillis + "ms");
-                        timer.schedule(delayMillis);
-                    }
-                }
-            }
-        });
+            });
+        }
     }
     
     public void forceReschedule() {

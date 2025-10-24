@@ -31,10 +31,10 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.sap.sailing.gwt.ui.client.SailingServiceWriteAsync;
 import com.sap.sailing.gwt.ui.client.StringMessages;
-import com.sap.sailing.gwt.ui.common.client.DateAndTimeFormatterUtil;
 import com.sap.sse.common.media.MediaTagConstants;
 import com.sap.sse.common.util.NaturalComparator;
 import com.sap.sse.gwt.adminconsole.AdminConsoleTableResources;
+import com.sap.sse.gwt.client.DateAndTimeFormatterUtil;
 import com.sap.sse.gwt.client.Notification;
 import com.sap.sse.gwt.client.Notification.NotificationType;
 import com.sap.sse.gwt.client.celltable.BaseCelltable;
@@ -360,7 +360,7 @@ public class ImagesListComposite extends Composite {
         }
     }
     
-    public void fillImages(List<ImageDTO> images) {
+    public void fillImages(List<? extends ImageDTO> images) {
         imageSelectionModel.clear();
         imageListDataProvider.getList().clear();
         imageListDataProvider.getList().addAll(images);

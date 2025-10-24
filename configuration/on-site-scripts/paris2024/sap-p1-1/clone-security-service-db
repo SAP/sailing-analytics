@@ -4,7 +4,7 @@ logger -t sailing "Copying an existing local security_service DB to security_ser
 echo 'use security_service_bak
 db.dropDatabase()
 db.copyDatabase("security_service", "security_service_bak")
-quit()' | mongo "mongodb://localhost/security_service_bak?replicaSet=security_service&retryWrites=true&readPreference=nearest"
+quit()' | mongosh "mongodb://localhost/security_service_bak?replicaSet=security_service&retryWrites=true&readPreference=nearest"
 cd /tmp
 rm -rf /tmp/dump
 ssh ec2-user@paris-ssh.sapsailing.com "cd /tmp; rm -rf /tmp/dump; mongodump --host live/mongo0.internal.sapsailing.com,mongo1.internal.sapsailing.com,dbserver.internal.sapsailing.com:10203 --db security_service; tar czvpf - dump" | tar xzvpf -

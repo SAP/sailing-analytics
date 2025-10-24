@@ -22,12 +22,12 @@ else
       echo "${message}" | notify-operators "${message}"
     else
       read first others <<<"${IPs}"
-      if ! ssh -o StrictHostKeyChecking=no root@${first} "curl https://palma2024.sailing.omegatiming.com/gwt/status 2>/dev/null >/dev/null"; then
-	echo "Problem reaching palma2024.sailing.omegatiming.com from instance ${first} in region ${i}" >&2
-	message="Problem reaching palma2024.sailing.omegatiming.com from instance ${first} in region ${i}"
-	echo "${message}" | notify-operators "${message}"
+      if ! ssh -o StrictHostKeyChecking=no root@${first} "curl https://paris2024.sailing.omegatiming.com/gwt/status 2>/dev/null >/dev/null"; then
+        echo "Problem reaching paris2024.sailing.omegatiming.com from instance ${first} in region ${i}" >&2
+        message="Problem reaching paris2024.sailing.omegatiming.com from instance ${first} in region ${i}"
+        echo "${message}" | notify-operators "${message}"
       else
-	echo "Access from region ${i}, IP ${first} OK." >&2
+        echo "Access from region ${i}, IP ${first} OK." >&2
       fi
     fi
   done

@@ -1,4 +1,3 @@
-/* InfoPlist.strings\n    SAPTracker\n  \n    Created by Raimund Wege on 04.11.16.\n    Copyright © 2016 com.sap.sailing. All rights reserved. */
 "NSLocationAlwaysUsageDescription" = "For at kunne spore hele din kapsejlads skal din telefon fortsætte sporing, også når du slukker den eller låser skærmen, hvilket hjælper med at spare på batteriet og undgå utilsigtet stop af sporingsprocessen.";
 
 "NSLocationWhenInUseUsageDescription" = "For at kunne spore hele din kapsejlads skal din telefon fortsætte sporing, også når du slukker den eller låser skærmen, hvilket hjælper med at spare på batteriet og undgå utilsigtet stop af sporingsprocessen.";

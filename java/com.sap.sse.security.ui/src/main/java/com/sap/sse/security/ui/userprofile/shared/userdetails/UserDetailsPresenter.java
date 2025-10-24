@@ -103,6 +103,8 @@ public class UserDetailsPresenter implements AbstractUserDetails.Presenter {
                                 Notification.notify(i18n_sec.passwordDoesNotMeetRequirements(), NotificationType.ERROR);
                             } else if (UserManagementException.INVALID_CREDENTIALS.equals(message)) {
                                 Notification.notify(i18n_sec.invalidCredentials(), NotificationType.ERROR);
+                            } else if (UserManagementException.PASSWORD_AUTHENTICATION_CURRENTLY_LOCKED_FOR_USER.equals(message)) {
+                                Notification.notify(i18n_sec.passwordAuthenticationCurrentlyLockedForUser(), NotificationType.ERROR);
                             } else {
                                 Notification.notify(i18n_sec.errorChangingPassword(caught.getMessage()), NotificationType.ERROR);
                             }

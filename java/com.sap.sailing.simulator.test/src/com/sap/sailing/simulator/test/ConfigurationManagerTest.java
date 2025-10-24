@@ -3,8 +3,9 @@ package com.sap.sailing.simulator.test;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.simulator.BoatClassProperties;
@@ -13,14 +14,12 @@ import com.sap.sailing.simulator.impl.BoatClassPropertiesImpl;
 import com.sap.sailing.simulator.impl.ConfigurationManager;
 import com.sap.sailing.simulator.impl.RacePropertiesImpl;
 
-import org.junit.Assert;
-
 public class ConfigurationManagerTest {
 
     private final List<BoatClassProperties> _boatClassesInfo = new ArrayList<BoatClassProperties>();
     private final List<RaceProperties> _racesInfo = new ArrayList<RaceProperties>();
 
-    @Before
+    @BeforeEach
     public void initialize() {
         this._boatClassesInfo.add(new BoatClassPropertiesImpl("49er Static", new MeterDistance(4.995), "PolarDiagram49.csv", 0));
         this._boatClassesInfo.add(new BoatClassPropertiesImpl("49er Bethwaite", new MeterDistance(4.876), "PolarDiagram49Bethwaite.csv", 1));
@@ -56,30 +55,30 @@ public class ConfigurationManagerTest {
 
     @Test
     public void test_getPolarDiagramFileLocation() {
-        Assert.assertEquals("PolarDiagram49.csv", ConfigurationManager.INSTANCE
+        Assertions.assertEquals("PolarDiagram49.csv", ConfigurationManager.INSTANCE
                 .getPolarDiagramFileLocation(0));
-        Assert.assertEquals("PolarDiagram49Bethwaite.csv", ConfigurationManager.INSTANCE
+        Assertions.assertEquals("PolarDiagram49Bethwaite.csv", ConfigurationManager.INSTANCE
                 .getPolarDiagramFileLocation(1));
-        Assert.assertEquals("PolarDiagram49ORC.csv", ConfigurationManager.INSTANCE
+        Assertions.assertEquals("PolarDiagram49ORC.csv", ConfigurationManager.INSTANCE
                 .getPolarDiagramFileLocation(2));
-        Assert.assertEquals("PolarDiagram49STG.csv", ConfigurationManager.INSTANCE
+        Assertions.assertEquals("PolarDiagram49STG.csv", ConfigurationManager.INSTANCE
                 .getPolarDiagramFileLocation(3));
-        Assert.assertEquals("PolarDiagram505STG.csv", ConfigurationManager.INSTANCE
+        Assertions.assertEquals("PolarDiagram505STG.csv", ConfigurationManager.INSTANCE
                 .getPolarDiagramFileLocation(4));
     }
 
     @Test
     public void test_getBoatClassesInfoCount() {
-        Assert.assertEquals(5, ConfigurationManager.INSTANCE.getBoatClassesInfoCount());
+        Assertions.assertEquals(5, ConfigurationManager.INSTANCE.getBoatClassesInfoCount());
     }
 
     @Test
     public void test_getBoatClassesInfo() {
         int index = 0;
         for (final BoatClassProperties tuple : ConfigurationManager.INSTANCE.getBoatClassesInfo()) {
-            Assert.assertEquals(this._boatClassesInfo.get(index).getName(), tuple.getName());
-            Assert.assertEquals(this._boatClassesInfo.get(index).getLength(), tuple.getLength());
-            Assert.assertEquals(this._boatClassesInfo.get(index).getPolar(), tuple.getPolar());
+            Assertions.assertEquals(this._boatClassesInfo.get(index).getName(), tuple.getName());
+            Assertions.assertEquals(this._boatClassesInfo.get(index).getLength(), tuple.getLength());
+            Assertions.assertEquals(this._boatClassesInfo.get(index).getPolar(), tuple.getPolar());
             index++;
         }
     }
@@ -88,9 +87,9 @@ public class ConfigurationManagerTest {
     public void test_getRacesInfo() {
         int index = 0;
         for (final RaceProperties tuple : ConfigurationManager.INSTANCE.getRacesInfo()) {
-            Assert.assertEquals(this._racesInfo.get(index).getName(), tuple.getName());
-            Assert.assertEquals(this._racesInfo.get(index).getBoatClass(), tuple.getBoatClass());
-            Assert.assertEquals(this._racesInfo.get(index).getURL(), tuple.getURL());
+            Assertions.assertEquals(this._racesInfo.get(index).getName(), tuple.getName());
+            Assertions.assertEquals(this._racesInfo.get(index).getBoatClass(), tuple.getBoatClass());
+            Assertions.assertEquals(this._racesInfo.get(index).getURL(), tuple.getURL());
             index++;
         }
     }

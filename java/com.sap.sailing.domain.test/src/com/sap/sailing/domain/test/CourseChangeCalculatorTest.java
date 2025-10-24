@@ -1,9 +1,9 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.NauticalSide;
 import com.sap.sailing.domain.tracking.impl.CourseChangeCalculator;
@@ -12,7 +12,7 @@ import com.sap.sse.common.impl.DegreeBearingImpl;
 public class CourseChangeCalculatorTest {
     private CourseChangeCalculator ccc;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ccc = new CourseChangeCalculator();
     }

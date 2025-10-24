@@ -19,8 +19,8 @@ import com.sap.sailing.domain.leaderboard.LeaderboardGroup;
 import com.sap.sailing.gwt.home.communication.event.SimpleCompetitorWithIdDTO;
 import com.sap.sailing.gwt.home.communication.user.profile.domain.BadgeDTO;
 import com.sap.sailing.gwt.home.communication.user.profile.domain.SailorProfileDTO;
-import com.sap.sailing.server.impl.preferences.model.SailorProfilePreference;
 import com.sap.sailing.server.interfaces.RacingEventService;
+import com.sap.sailing.server.preferences.SailorProfilePreference;
 
 public interface SailorProfileConverter {
     /**

@@ -50,6 +50,14 @@ public interface Event extends EventBase {
     void setLeaderboardGroups(Iterable<LeaderboardGroup> leaderboardGroups);
     
     /**
+     * Adds an event listener to this event. Note that event listeners are <em>not</em> serialized together with this
+     * event. The de-serialized event starts out with a new, empty event listener collection.
+     */
+    void addEventListener(EventListener eventListener);
+    
+    void removeEventListener(EventListener eventListener);
+    
+    /**
      * An event may happen in the vicinity of one or more WindFinder (https://www.windfinder.com) weather stations.
      * Which ones those are can be defined using {@link #setWindFinderReviewedSpotsCollection(Iterable)}, and this
      * getter returns the IDs last set.

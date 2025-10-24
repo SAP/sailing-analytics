@@ -16,12 +16,14 @@ public class AutoPlayContextDefinitionImpl extends AbstractGenericSerializableSe
     private transient StringSetting leaderboardName;
 
     public AutoPlayContextDefinitionImpl(AutoPlayType type, UUID eventUUID, String leaderboardName) {
+        this();
         this.eventUUID.setValue(eventUUID);
         this.leaderboardName.setValue(leaderboardName);
         this.type.setValue(type);
     }
 
     public AutoPlayContextDefinitionImpl() {
+        super();
     }
 
     @Override

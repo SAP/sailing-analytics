@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.yellowbrickadapter.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -9,8 +9,8 @@ import java.text.SimpleDateFormat;
 import java.util.Optional;
 
 import org.json.simple.parser.ParseException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.yellowbrickadapter.YellowBrickRace;
 import com.sap.sse.common.TimePoint;
@@ -20,7 +20,7 @@ public class YellowBrickAdapterTest {
     private static final String RMSR2019 = "rmsr2019";
     private YellowBrickTrackingAdapterImpl adapter;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         adapter = new YellowBrickTrackingAdapterImpl(/* base domain factory */ null);
     }

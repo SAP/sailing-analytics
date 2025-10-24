@@ -1,12 +1,12 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
 import com.sap.sailing.domain.abstractlog.race.RaceLog;
@@ -74,12 +74,12 @@ import com.sap.sailing.domain.leaderboard.meta.LeaderboardGroupMetaLeaderboard;
 import com.sap.sailing.domain.racelog.impl.EmptyRaceLogStore;
 import com.sap.sailing.domain.ranking.OneDesignRankingMetric;
 import com.sap.sailing.domain.regattalog.impl.EmptyRegattaLogStore;
+import com.sap.sailing.domain.shared.tracking.impl.TimedComparator;
 import com.sap.sailing.domain.test.mock.MockedTrackedRaceWithStartTimeAndRanks;
 import com.sap.sailing.domain.tracking.MarkPassing;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.domain.tracking.TrackedRegattaRegistry;
 import com.sap.sailing.domain.tracking.impl.MarkPassingImpl;
-import com.sap.sailing.domain.tracking.impl.TimedComparator;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
@@ -711,13 +711,13 @@ public class LeaderboardScoringAndRankingTest extends LeaderboardScoringAndRanki
         RaceColumn q2Column = qualificationSeries.getRaceColumnByName("Q2");
         q2Column.setTrackedRace(q2Column.getFleetByName("Yellow"), q2Yellow);
         for (Competitor competitor : competitors.subList(3, 8)) {
-            assertTrue("Competitor "+competitor+" has no discard but should have one",
-                    leaderboard.isDiscarded(competitor, q1Column, later) || leaderboard.isDiscarded(competitor, q2Column, later));
+            assertTrue(leaderboard.isDiscarded(competitor, q1Column, later) || leaderboard.isDiscarded(competitor, q2Column, later),
+                    "Competitor "+competitor+" has no discard but should have one");
         }
         for (Competitor competitor : Arrays.asList(new Competitor[] { competitors.get(0), competitors.get(1), competitors.get(2),
                 competitors.get(8), competitors.get(9) })) {
-            assertFalse("Competitor "+competitor+" has a discard but should'nt have one",
-                    leaderboard.isDiscarded(competitor, q1Column, later) || leaderboard.isDiscarded(competitor, q2Column, later));
+            assertFalse(leaderboard.isDiscarded(competitor, q1Column, later) || leaderboard.isDiscarded(competitor, q2Column, later),
+                    "Competitor "+competitor+" has a discard but should'nt have one");
         }
         // now add a tracked race for the blue fleet for Q2 and assert that all competitors have one discard
         TrackedRace q2Blue = new MockedTrackedRaceWithStartTimeAndRanks(now,
@@ -725,8 +725,8 @@ public class LeaderboardScoringAndRankingTest extends LeaderboardScoringAndRanki
                         competitors.get(8), competitors.get(9) }));
         q2Column.setTrackedRace(q2Column.getFleetByName("Blue"), q2Blue);
         for (Competitor competitor : competitors) {
-            assertTrue("Competitor "+competitor+" has no discard but should",
-                    leaderboard.isDiscarded(competitor, q1Column, later) || leaderboard.isDiscarded(competitor, q2Column, later));
+            assertTrue(leaderboard.isDiscarded(competitor, q1Column, later) || leaderboard.isDiscarded(competitor, q2Column, later),
+                    "Competitor "+competitor+" has no discard but should");
         }
     }
 
@@ -760,14 +760,14 @@ public class LeaderboardScoringAndRankingTest extends LeaderboardScoringAndRanki
         RaceColumn f2Column = finalSeries.getRaceColumnByName("F2");
         f2Column.setTrackedRace(f2Column.getFleetByName("Gold"), f2Gold);
         for (int i=0; i<5; i++) {
-            assertTrue("Competitor "+competitors.get(i)+" has no discard in F1 or F2 but should",
-                    leaderboard.isDiscarded(competitors.get(i), f1Column, later) ||
-                    leaderboard.isDiscarded(competitors.get(i), f2Column, later));
+            assertTrue(leaderboard.isDiscarded(competitors.get(i), f1Column, later) ||
+            leaderboard.isDiscarded(competitors.get(i), f2Column, later),
+                    "Competitor "+competitors.get(i)+" has no discard in F1 or F2 but should");
         }
         for (int i=5; i<10; i++) {
-            assertFalse("Competitor "+competitors.get(i)+" has a discard in F1 or F2 but shouldn't",
-                    leaderboard.isDiscarded(competitors.get(i), f1Column, later) ||
-                    leaderboard.isDiscarded(competitors.get(i), f2Column, later));
+            assertFalse(leaderboard.isDiscarded(competitors.get(i), f1Column, later) ||
+            leaderboard.isDiscarded(competitors.get(i), f2Column, later),
+                    "Competitor "+competitors.get(i)+" has a discard in F1 or F2 but shouldn't");
         }
     }
 
@@ -1936,8 +1936,8 @@ public class LeaderboardScoringAndRankingTest extends LeaderboardScoringAndRanki
         final double expectedPointsForFirstEightBoats = (1.0 + 2.0 + 3.0 + 4.0 + 5.0 + 6.0 + 7.0 + 8.0) / 8.0;
         for (int i=0; i<8; i++) {
             assertEquals(expectedPointsForFirstEightBoats, leaderboard.getNetPoints(c[8*i], later), 0.0000001);
-            assertEquals("Competitor "+Util.get(rankedCompetitors, i)+" not in list of best eight ",
-                    0, Arrays.asList(c).indexOf(Util.get(rankedCompetitors, i))%8); // each first competitor in a heat ranks in the top 8
+            assertEquals(0,
+                    Arrays.asList(c).indexOf(Util.get(rankedCompetitors, i))%8, "Competitor "+Util.get(rankedCompetitors, i)+" not in list of best eight "); // each first competitor in a heat ranks in the top 8
         }
         for (int i=1; i<=3; i++) {
             for (Competitor comp : c) {
@@ -2786,10 +2786,10 @@ public class LeaderboardScoringAndRankingTest extends LeaderboardScoringAndRanki
         for (Competitor rankedCompetitor : rankedCompetitors) {
             // with a high-point scoring scheme, assert that as competitors get worse, scores get less
             double rankedCompetitorScore = netPoints.get(rankedCompetitor);
-            assertTrue("Expected " + rankedCompetitor + " with rank "
-                    + (Util.indexOf(rankedCompetitors, rankedCompetitor) + 1)
-                    + " to have worse (lesser) score than its immediate better competitor who scored " + lastScore
-                    + " but was " + rankedCompetitorScore, rankedCompetitorScore <= lastScore);
+            assertTrue(rankedCompetitorScore <= lastScore, "Expected " + rankedCompetitor + " with rank "
+                            + (Util.indexOf(rankedCompetitors, rankedCompetitor) + 1)
+                            + " to have worse (lesser) score than its immediate better competitor who scored " + lastScore
+                            + " but was " + rankedCompetitorScore);
             lastScore = rankedCompetitorScore;
             // assert that the qualification race consistently has zero points for all competitors because it is discarded
             assertTrue(leaderboard.isDiscarded(rankedCompetitor, qColumn, later));
@@ -2918,16 +2918,10 @@ public class LeaderboardScoringAndRankingTest extends LeaderboardScoringAndRanki
                 assertTrue(Util.indexOf(rankedCompetitors, lastRaceGoldParticipant) < Util.indexOf(rankedCompetitors, silverParticipant));
             }
         }
-        // assert that theUntrackedCompetitorInLastRace ended up between the last race's silver and gold fleet participants
-        // based on the "extreme fleet" rule:
+        // assert that theUntrackedCompetitorInLastRace ended up ranked worse than all participants of ranked fleets:
         for (final Competitor c : competitors) {
             if (c != theUntrackedCompetitorInLastRace) {
-                if (lastRaceGold.contains(c) || medal.contains(c)) {
-                    assertTrue(Util.indexOf(rankedCompetitors, c) < Util.indexOf(rankedCompetitors, theUntrackedCompetitorInLastRace));
-                } else {
-                    assertTrue(silver.contains(c));
-                    assertTrue(Util.indexOf(rankedCompetitors, c) > Util.indexOf(rankedCompetitors, theUntrackedCompetitorInLastRace));
-                }
+                assertTrue(Util.indexOf(rankedCompetitors, c) < Util.indexOf(rankedCompetitors, theUntrackedCompetitorInLastRace));
             }
         }
     }

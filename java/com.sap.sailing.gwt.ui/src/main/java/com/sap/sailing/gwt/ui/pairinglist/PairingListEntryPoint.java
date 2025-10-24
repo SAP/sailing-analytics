@@ -26,6 +26,7 @@ import com.sap.sailing.gwt.ui.shared.StrippedLeaderboardDTO;
 import com.sap.sse.common.Color;
 import com.sap.sse.gwt.settings.SettingsToUrlSerializer;
 import com.sap.sse.security.ui.client.premium.PaywallResolver;
+import com.sap.sse.security.ui.client.premium.PaywallResolverImpl;
 
 public class PairingListEntryPoint extends AbstractSailingReadEntryPoint implements ProvidesLeaderboardRouting {
 
@@ -64,7 +65,7 @@ public class PairingListEntryPoint extends AbstractSailingReadEntryPoint impleme
         mainPanel.setHeight("100%");
         SAPSailingHeaderWithAuthentication header = new SAPSailingHeaderWithAuthentication(
                 pairingListContextDefinition.getLeaderboardName());
-        PaywallResolver paywallResolver = new PaywallResolver(getUserService(), getSubscriptionServiceFactory());
+        PaywallResolver paywallResolver = new PaywallResolverImpl(getUserService(), getSubscriptionServiceFactory());
         new FixedSailingAuthentication(getUserService(), paywallResolver, header.getAuthenticationMenuView());
         mainPanel.addNorth(header, 75);
         VerticalPanel contentPanel = new VerticalPanel();

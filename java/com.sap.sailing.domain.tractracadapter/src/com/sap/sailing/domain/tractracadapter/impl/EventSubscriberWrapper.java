@@ -8,10 +8,10 @@ import com.tractrac.subscription.lib.api.IEventSubscriber;
 import com.tractrac.subscription.lib.api.SubscriberInitializationException;
 import com.tractrac.subscription.lib.api.SubscriptionLocator;
 import com.tractrac.subscription.lib.api.competitor.ICompetitorsListener;
-import com.tractrac.subscription.lib.api.control.IControlsListener;
 import com.tractrac.subscription.lib.api.event.IConnectionStatusListener;
 import com.tractrac.subscription.lib.api.event.IEventMessageListener;
 import com.tractrac.subscription.lib.api.event.IServerTimeListener;
+import com.tractrac.subscription.lib.api.map.IMapItemsListener;
 import com.tractrac.subscription.lib.api.race.IRacesListener;
 import com.tractrac.subscription.lib.api.race.IStartStopTimesChangeListener;
 
@@ -78,13 +78,13 @@ public class EventSubscriberWrapper implements IEventSubscriber {
     }
 
     @Override
-    public void subscribeControls(IControlsListener listener) {
-        delegate.subscribeControls(listener);
+    public void subscribeMapItems(IMapItemsListener listener) {
+        delegate.subscribeMapItems(listener);
     }
 
     @Override
-    public void unsubscribeControls(IControlsListener listener) {
-        delegate.unsubscribeControls(listener);
+    public void unsubscribeMapItems(IMapItemsListener listener) {
+        delegate.unsubscribeMapItems(listener);
     }
 
     @Override

@@ -304,6 +304,7 @@ public class LeaderboardsResourceV2 extends AbstractLeaderboardsResource {
 
     private DetailType[] getAvailableRaceDetailColumnTypes() {
         return new DetailType[] { DetailType.RACE_GAP_TO_LEADER_IN_SECONDS,
+                DetailType.PERCENT_TARGET_BOAT_SPEED,
                 DetailType.RACE_AVERAGE_SPEED_OVER_GROUND_IN_KNOTS,
                 DetailType.RACE_DISTANCE_TRAVELED,
                 DetailType.RACE_TIME_TRAVELED,

@@ -1,5 +1,10 @@
 package com.sap.sailing.landscape.common;
 
+import java.util.Arrays;
+import java.util.Collections;
+
+import com.sap.sse.common.Util;
+
 public interface SharedLandscapeConstants {
     /**
      * If no specific domain name is provided, e.g., when creating a new application replica set, this will be
@@ -7,6 +12,58 @@ public interface SharedLandscapeConstants {
      * replica set's name.
      */
     String DEFAULT_DOMAIN_NAME = "sapsailing.com";
+
+    /**
+     * Servers in any of these domains we want to trust. This can and shall be used, e.g., to guard server-side requests
+     * to URLs that may have been provided through an API or UI by some potentially untrusted client or user.
+     */
+    Iterable<String> TRUSTED_DOMAINS = Collections.unmodifiableCollection(Arrays.asList(new String[] {
+        DEFAULT_DOMAIN_NAME, "sailing.omegatiming.com", "localhost", "127.0.0.1"
+    }));
+    
+    /**
+     * Checks that {@code domain} equals one of {@link #TRUSTED_DOMAINS} or is a sub-domain of any of these
+     */
+    static boolean isTrustedDomain(String domain) {
+        while (Util.hasLength(domain)) {
+            if (Util.contains(TRUSTED_DOMAINS, domain)) {
+                return true;
+            } else {
+                final int indexOfSubdomainSeparator = domain.indexOf('.');
+                domain = indexOfSubdomainSeparator >= 0 ? domain.substring(indexOfSubdomainSeparator+1) : "";
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * The default name of the replica set in the landscape we use to receive data from Igtimi WindBot devices.
+     */
+    String IGTIMI_DEFAULT_RIOT_REPLICA_SET_NAME = "wind";
+    
+    /**
+     * The default host name under which at port {@link #IGTIMI_DEFAULT_RIOT_PORT} the Riot server can be reached by the
+     * Igtimi WindBot devices. Constructed from the {@link #IGTIMI_DEFAULT_RIOT_REPLICA_SET_NAME default Riot replica
+     * set name} and the {@link #DEFAULT_DOMAIN_NAME default domain name}.
+     */
+    String IGTIMI_DEFAULT_RIOT_HOSTNAME = IGTIMI_DEFAULT_RIOT_REPLICA_SET_NAME + "." + DEFAULT_DOMAIN_NAME;
+    
+    /**
+     * The default value for the property whose name is given by {@link #IGTIMI_BASE_URL_PROPERTY_NAME}; ends with a
+     * slash (/)
+     */
+    String IGTIMI_BASE_URL_DEFAULT = "https://" + IGTIMI_DEFAULT_RIOT_REPLICA_SET_NAME + "." + DEFAULT_DOMAIN_NAME + "/";
+    
+    /**
+     * The port of our default Igtimi "Riot" server implementation that WindBot devices may send their data to.
+     * WindBots can be configured in their {@code config.ini} file with a line like
+     * <pre>
+     *   riot server_address &lt;hostname&gt; &lt;port&gt;
+     * </pre>
+     * Where the hostname should by default be the one used in the {@link #IGTIMI_BASE_URL_DEFAULT}, and the
+     * port should be the value of this constant.
+     */
+    int IGTIMI_DEFAULT_RIOT_PORT = 6000;
     
     /**
      * If a shared security realm is to be used for a domain then this constant tells the name of the application
@@ -20,7 +77,7 @@ public interface SharedLandscapeConstants {
      */
     String DEFAULT_SECURITY_SERVICE_REPLICA_SET_NAME = "security-service";
     
-    String RABBIT_IN_DEFAULT_REGION_HOSTNAME = "rabbit.internal.sapsailing.com";
+    String RABBIT_IN_DEFAULT_REGION_HOSTNAME = "rabbit.internal."+DEFAULT_DOMAIN_NAME;
 
     String DEFAULT_REGION = "eu-west-1";
     
@@ -97,4 +154,14 @@ public interface SharedLandscapeConstants {
     String DEFAULT_REVERSE_PROXY_INSTANCE_TYPE = "T3_MEDIUM";
 
     String DEFAULT_DISPOSABLE_REVERSE_PROXY_INSTANCE_NAME = "DisposableReverseProxy";
+
+    /**
+     * Hostname of failover archive. It is defined in {@code root@sapsailing.com:/etc/httpd/conf.d/001-events.conf} and
+     * points to the IP address defined as {@code ARCHIVE_FAILOVER_IP} in
+     * {@code root@sapsailing.com:/etc/httpd/conf.d/000-macros.conf}. Both files are maintained in the {@code httpdConf}
+     * Git repository that currently has its headless home under {@code httpdConf@sapsailing.com:repo.git} and is used
+     * in particular to synchronize configuration changes across central and disposable reverse proxies.
+     * See also <a href="...">the Wiki article about this.</a>
+     */
+    String ARCHIVE_FAILOVER_ADDRESS = "archive-failover." +DEFAULT_DOMAIN_NAME;
 }

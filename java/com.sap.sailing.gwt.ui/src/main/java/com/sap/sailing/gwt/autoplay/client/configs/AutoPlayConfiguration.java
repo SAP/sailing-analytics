@@ -32,7 +32,7 @@ public abstract class AutoPlayConfiguration {
      * This method should be pure/standalone, it is not allowed to make any guesses on fields written by startRootNode,
      * as it can be called before that
      */
-    public void loadSettingsDefault(EventDTO selectedEvent, AutoPlayContextDefinition apcd,
+    public void loadSettingsDefault(AutoPlayContextDefinition apcd,
             StrippedLeaderboardDTO leaderboard, UserService userService, SubscriptionServiceFactory subscriptionServiceFactory, OnSettingsCallback holder) {
         holder.newSettings(null, getUrlWithSettings(apcd, null));
     }

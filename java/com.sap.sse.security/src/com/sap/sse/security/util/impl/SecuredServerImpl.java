@@ -37,6 +37,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.HTTP;
 import org.apache.shiro.authz.AuthorizationException;
+import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -55,6 +56,10 @@ import com.sap.sse.util.HttpUrlConnectionHelper;
 import com.sap.sse.util.LaxRedirectStrategyForAllRedirectResponseCodes;
 
 public class SecuredServerImpl implements SecuredServer {
+    private static final String BEARER_TOKEN_PREFIX_IN_AUTHORIZATION_HEADER = "Bearer ";
+
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+
     private static final Logger logger = Logger.getLogger(SecuredServerImpl.class.getName());
 
     private final String bearerToken;
@@ -108,7 +113,13 @@ public class SecuredServerImpl implements SecuredServer {
 
     private void authenticate(HttpRequest request) {
         if (bearerToken != null) {
-            request.setHeader("Authorization", "Bearer " + bearerToken);
+            request.setHeader(AUTHORIZATION_HEADER, BEARER_TOKEN_PREFIX_IN_AUTHORIZATION_HEADER + bearerToken);
+        }
+    }
+    
+    protected void authenticate(ClientUpgradeRequest websocketUpgradeRequest) {
+        if (bearerToken != null) {
+            websocketUpgradeRequest.setHeader(AUTHORIZATION_HEADER, BEARER_TOKEN_PREFIX_IN_AUTHORIZATION_HEADER + bearerToken);
         }
     }
     

@@ -1,14 +1,14 @@
 package com.sap.sse.datamining.impl.criterias;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.components.FilterCriterion;
 import com.sap.sse.datamining.functions.Function;
@@ -37,15 +37,15 @@ public class TestFilterCriteria {
         
         regexFilterCriterion = new StringRegexFilterCriterion(stringsToMatch[0] + "|" + stringsToMatch[1] + "|" + stringsToMatch[2]);
         for (String stringToMatch : stringsToMatch) {
-            assertTrue("Failed to match " + stringToMatch, regexFilterCriterion.matches(stringToMatch));
+            assertTrue(regexFilterCriterion.matches(stringToMatch), "Failed to match " + stringToMatch);
         }
-        assertFalse("'Fourth Regatta' shouldn't be matched", regexFilterCriterion.matches("Fourth Regatta"));
+        assertFalse(regexFilterCriterion.matches("Fourth Regatta"), "'Fourth Regatta' shouldn't be matched");
         
         regexFilterCriterion = new StringRegexFilterCriterion(".*Regatta");
         for (String stringToMatch : stringsToMatch) {
-            assertTrue("Failed to match " + stringToMatch, regexFilterCriterion.matches(stringToMatch));
+            assertTrue(regexFilterCriterion.matches(stringToMatch), "Failed to match " + stringToMatch);
         }
-        assertFalse("'Regatta (29ER)' shouldn't be matched", regexFilterCriterion.matches("Regatta (29ER)"));
+        assertFalse(regexFilterCriterion.matches("Regatta (29ER)"), "'Regatta (29ER)' shouldn't be matched");
     }
     
     @Test

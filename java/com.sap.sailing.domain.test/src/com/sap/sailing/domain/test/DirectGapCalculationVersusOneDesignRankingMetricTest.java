@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -10,8 +10,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.common.NoWindException;
@@ -43,11 +43,10 @@ public class DirectGapCalculationVersusOneDesignRankingMetricTest extends Abstra
 
     @Override
     protected String getExpectedEventName() {
-        // don't worry about the missing "r" at the end of "Kiele"; this is what we're getting from TracTrac
-        return "Kiele Woche 2014 - Olympic Week";
+        return "Kieler Woche 2014 - Olympic Week";
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         URI storedUri = new URI("file:///"+new File("resources/event_20140619_KieleWoche-R1_Blue_Laser.mtb").getCanonicalPath().replace('\\', '/'));
@@ -68,14 +67,14 @@ public class DirectGapCalculationVersusOneDesignRankingMetricTest extends Abstra
      */
     @Test
     public void testBuhlisGapsAtVariousTimePoints() throws ParseException, NoWindException {
-        Competitor buhli = getCompetitorByName("Philipp Buhl");
+        Competitor buhli = getCompetitorByName("Buhl");
         TimePoint timePoint = getTrackedRace().getStartOfRace();
         for (int i=1; i<10; i++) {
             timePoint = timePoint.plus(Duration.ONE_MINUTE);
             Duration classicGap = getTrackedRace().getTrackedLeg(buhli, timePoint).getGapToLeader(timePoint,
                     getTrackedRace().getRankingMetric().getRankingInfo(timePoint), WindPositionMode.LEG_MIDDLE);
             Duration rankingMetricGap = getTrackedRace().getRankingMetric().getGapToLeaderInOwnTime(buhli, timePoint);
-            assertEquals("At "+i+" minutes into the race ("+timePoint+"): ", classicGap.asSeconds(), rankingMetricGap.asSeconds(), 0.000001);
+            assertEquals(classicGap.asSeconds(), rankingMetricGap.asSeconds(), 0.000001, "At "+i+" minutes into the race ("+timePoint+"): ");
         }
     }
     
@@ -88,7 +87,7 @@ public class DirectGapCalculationVersusOneDesignRankingMetricTest extends Abstra
             Competitor oneDesignRankingMetricLeader = getTrackedRace().getRankingMetric()
                     .getRankingInfo(timePoint, new LeaderboardDTOCalculationReuseCache(timePoint))
                     .getLeaderByCorrectedEstimatedTimeToCompetitorFarthestAhead();
-            assertSame("At "+i+" minutes into the race ("+timePoint+"): ", classicOverallLeader, oneDesignRankingMetricLeader);
+            assertSame(classicOverallLeader, oneDesignRankingMetricLeader, "At "+i+" minutes into the race ("+timePoint+"): ");
         }
     }
 }

@@ -14,9 +14,9 @@ import com.sap.sailing.domain.common.dto.LeaderboardDTO;
 import com.sap.sailing.domain.common.dto.RaceColumnDTO;
 import com.sap.sailing.gwt.ui.client.LeaderboardUpdateListener;
 import com.sap.sailing.gwt.ui.client.StringMessages;
-import com.sap.sailing.gwt.ui.common.client.DateAndTimeFormatterUtil;
 import com.sap.sailing.gwt.ui.leaderboard.MultiRaceLeaderboardPanel;
 import com.sap.sailing.gwt.ui.leaderboard.ScoringSchemeTypeFormatter;
+import com.sap.sse.gwt.client.DateAndTimeFormatterUtil;
 
 public class OldLeaderboard extends Composite implements LeaderboardUpdateListener {
     private static LeaderboardUiBinder uiBinder = GWT.create(LeaderboardUiBinder.class);

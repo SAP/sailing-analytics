@@ -36,6 +36,7 @@ import com.sap.sse.gwt.client.LinkUtil;
 import com.sap.sse.gwt.client.controls.dropdown.DropdownHandler;
 import com.sap.sse.gwt.client.controls.dropdown.DropdownItem;
 import com.sap.sse.gwt.client.controls.dropdown.DropdownResources;
+import com.sap.sse.gwt.client.media.MediaMenuIcon;
 
 public class EventHeader extends Composite {
     private static EventHeaderUiBinder uiBinder = GWT.create(EventHeaderUiBinder.class);
@@ -46,6 +47,7 @@ public class EventHeader extends Composite {
     @UiField StringMessages i18n;
     
     @UiField DivElement eventLogo;
+    @UiField(provided=true) MediaMenuIcon eventLogoMenuButton;
     @UiField AnchorElement eventLogoAnchorUi;
     @UiField HeadingElement staticTitle;
     @UiField SpanElement eventName;
@@ -74,6 +76,7 @@ public class EventHeader extends Composite {
     public EventHeader(EventView.Presenter presenter) {
         this.event = presenter.getEventDTO();
         this.presenter = presenter;
+        eventLogoMenuButton = new MediaMenuIcon(presenter.getUserService(), "takedownRequestForLogoImage");
         initWidget(uiBinder.createAndBindUi(this));
         local_res.css().ensureInjected();
         dropdownitem_res.css().ensureInjected();
@@ -98,7 +101,7 @@ public class EventHeader extends Composite {
     }
 
     private void initFields() {
-        LogoUtil.setEventLogo(eventLogo, event);
+        LogoUtil.setEventLogo(eventLogo, event, eventLogoMenuButton);
         if (presenter.showRegattaMetadata()) {
             presenter.getCurrentEventNavigation().configureAnchorElement(eventLogoAnchorUi);
         }

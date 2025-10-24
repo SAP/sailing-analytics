@@ -1,9 +1,9 @@
 package com.sap.sse.datamining.impl.components;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,8 +12,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.datamining.components.AdditionalResultDataBuilder;
@@ -28,7 +28,7 @@ public class TestAbstractParallelProcessorElementProcessing {
     private Processor<Pair<Long, Integer>, Object> processor;
     private List<StatefulBlockingInstruction<?>> createdInstructions;
     
-    @Before
+    @BeforeEach
     public void initialize() {
         int corePoolSize = Runtime.getRuntime().availableProcessors();
         executor = new ThreadPoolExecutor(corePoolSize, corePoolSize, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
@@ -61,12 +61,12 @@ public class TestAbstractParallelProcessorElementProcessing {
         assertThat("Unexpected amount of created instructions", createdInstructions.size(), is(elementCount));
         double executionTime = Math.ceil((double) elementCount / executor.getMaximumPoolSize()) * stepDuration * numberOfSteps;
         executor.shutdown();
-        assertTrue("Executor couldn't terminate", executor.awaitTermination((long) (executionTime * 1.2), TimeUnit.SECONDS));
+        assertTrue(executor.awaitTermination((long) (executionTime * 1.2), TimeUnit.SECONDS), "Executor couldn't terminate");
         for (StatefulBlockingInstruction<?> instruction : createdInstructions) {
-            assertTrue("run wasn't called", instruction.runWasCalled());
-            assertTrue("computeResult wasn't called", instruction.computeResultWasCalled());
-            assertTrue("computeResult didn't finish", instruction.computeResultWasFinished());
-            assertFalse("computeResult was aborted", instruction.computeResultWasAborted());
+            assertTrue(instruction.runWasCalled(), "run wasn't called");
+            assertTrue(instruction.computeResultWasCalled(), "computeResult wasn't called");
+            assertTrue(instruction.computeResultWasFinished(), "computeResult didn't finish");
+            assertFalse(instruction.computeResultWasAborted(), "computeResult was aborted");
         }
     }
     
@@ -86,22 +86,22 @@ public class TestAbstractParallelProcessorElementProcessing {
         do {
             Thread.sleep(1);
         } while (!finishingThread.isAlive());
-        assertFalse("Processor is already finished", processor.isFinished());
+        assertFalse(processor.isFinished(), "Processor is already finished");
         // Processor not yet finished. New elements will be accepted
         processor.processElement(input);
         elementCount++;
         assertThat("Unexpected amount of created instructions", createdInstructions.size(), is(elementCount));
         
         finishingThread.join();
-        assertTrue("Processor isn't finished", processor.isFinished());
+        assertTrue(processor.isFinished(), "Processor isn't finished");
         processor.processElement(input);
         assertThat("Unexpected amount of created instructions", createdInstructions.size(), is(elementCount));
         
         for (StatefulBlockingInstruction<?> instruction : createdInstructions) {
-            assertTrue("run wasn't called", instruction.runWasCalled());
-            assertTrue("computeResult wasn't called", instruction.computeResultWasCalled());
-            assertTrue("computeResult didn't finish", instruction.computeResultWasFinished());
-            assertFalse("computeResult was aborted", instruction.computeResultWasAborted());
+            assertTrue(instruction.runWasCalled(), "run wasn't called");
+            assertTrue(instruction.computeResultWasCalled(), "computeResult wasn't called");
+            assertTrue(instruction.computeResultWasFinished(), "computeResult didn't finish");
+            assertFalse(instruction.computeResultWasAborted(), "computeResult was aborted");
         }
     }
     
@@ -125,26 +125,26 @@ public class TestAbstractParallelProcessorElementProcessing {
         assertThat("Unexpected amount of created instructions", createdInstructions.size(), is(elementCount));
         
         executor.shutdown();
-        assertTrue("Executor couldn't terminate", executor.awaitTermination(2 * stepDuration, TimeUnit.MILLISECONDS));
+        assertTrue(executor.awaitTermination(2 * stepDuration, TimeUnit.MILLISECONDS), "Executor couldn't terminate");
         for (int i = 0; i < createdInstructions.size(); i++) {
             StatefulBlockingInstruction<?> instruction = createdInstructions.get(i);
             // run should be called for all instructions
-            assertTrue("run wasn't called", instruction.runWasCalled());
+            assertTrue(instruction.runWasCalled(), "run wasn't called");
             if (i < executor.getMaximumPoolSize()) {
                 // First set of instructions should be processed normally
-                assertTrue("computeResult wasn't called", instruction.computeResultWasCalled());
-                assertTrue("computeResult didn't finish", instruction.computeResultWasFinished());
-                assertFalse("computeResult was aborted", instruction.computeResultWasAborted());
+                assertTrue(instruction.computeResultWasCalled(), "computeResult wasn't called");
+                assertTrue(instruction.computeResultWasFinished(), "computeResult didn't finish");
+                assertFalse(instruction.computeResultWasAborted(), "computeResult was aborted");
             } else if (i < executor.getMaximumPoolSize() * 2) {
                 // Second set of instructions was running when the processor was aborted. computeResult should be aborted
-                assertTrue("computeResult wasn't called", instruction.computeResultWasCalled());
-                assertTrue("computeResult didn't finish", instruction.computeResultWasFinished());
-                assertTrue("computeResult wasn't aborted", instruction.computeResultWasAborted());
+                assertTrue(instruction.computeResultWasCalled(), "computeResult wasn't called");
+                assertTrue(instruction.computeResultWasFinished(), "computeResult didn't finish");
+                assertTrue(instruction.computeResultWasAborted(), "computeResult wasn't aborted");
             } else {
                 // Last instructions was still scheduled when the processor was aborted. computeResult should not be called
-                assertFalse("computeResult of last instruction was called", instruction.computeResultWasCalled());
-                assertFalse("computeResult of last instruction finished", instruction.computeResultWasFinished());
-                assertFalse("computeResult was aborted", instruction.computeResultWasAborted());
+                assertFalse(instruction.computeResultWasCalled(), "computeResult of last instruction was called");
+                assertFalse(instruction.computeResultWasFinished(), "computeResult of last instruction finished");
+                assertFalse(instruction.computeResultWasAborted(), "computeResult was aborted");
             }
         }
     }

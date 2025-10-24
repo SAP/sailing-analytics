@@ -1,7 +1,7 @@
 package com.sap.sse.security.ui.client.component;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -111,7 +111,7 @@ public class CreateUserGroupDialog extends DataEntryDialog<UserGroupData> {
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return nameBox;
     }
     protected StringMessages getStringMessages() {

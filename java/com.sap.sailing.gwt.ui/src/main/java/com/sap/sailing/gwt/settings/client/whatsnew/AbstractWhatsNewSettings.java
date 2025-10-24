@@ -14,9 +14,11 @@ public abstract class AbstractWhatsNewSettings extends AbstractGenericSerializab
     private transient LongSetting numberOfCharsOnLastLogin;
 
     protected AbstractWhatsNewSettings() {
+        super();
     }
 
     protected AbstractWhatsNewSettings(final Long numberOfCharsOnLastLogin) {
+        this();
         this.numberOfCharsOnLastLogin.setValue(numberOfCharsOnLastLogin);
     }
 

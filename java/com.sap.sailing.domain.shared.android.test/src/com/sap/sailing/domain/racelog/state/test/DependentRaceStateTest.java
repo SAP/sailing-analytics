@@ -1,13 +1,13 @@
 package com.sap.sailing.domain.racelog.state.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
@@ -67,7 +67,7 @@ public class DependentRaceStateTest {
 
     private RaceLogResolver raceLogResolver;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         author = new LogEventAuthorImpl("Test", 1);
         configuration = new EmptyRegattaConfiguration();

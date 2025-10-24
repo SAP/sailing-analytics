@@ -1,0 +1,11 @@
+[Unit]
+Description=Ensures /dev/nvme0n1 or /dev/xvdb is XFS-formatted
+Requires=-.mount cloud-init.service systemd-networkd.service
+After=-.mount cloud-init.service systemd-networkd.service
+
+[Install]
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/local/bin/ephemeralvolume

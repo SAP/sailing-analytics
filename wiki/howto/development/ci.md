@@ -1,8 +1,48 @@
-# Continuous Integration with Hudson/Jenkins
+# Continuous Integration with Hudson/Jenkins and Github Actions
 
-Our default Hudson runs on https://hudson.sapsailing.com. If you need access, please contact axel.uhl@sap.com or simon.marcel.pamies@sap.com. We have a build job running for the master branch which will automatically pick up any changes, run a build with tests and inform committers about flaws they introduced that broke the build.
+## Access
 
-It is good practice to set up a new Hudson job for major branches that require solid testing before being merged into the master branch. The entry page at http://hudson.sapsailing.com explains how to do this. It basically comes down to copying a template job and adjusting the branch name. As easy as that :-)
+Our default Hudson runs on https://hudson.sapsailing.com. If you need access, please contact axel.uhl@sap.com or petr.janacek@sap.com. Usernames typically are {firstname}{lastname}, all lowercase.
+
+Our use of a CI tool such as Hudson (could also be Jenkins, see [[below|#in-case-you-d-like-to-set-up-your-own-hudson-jenkins]]) is special in so far as the actual build is not run under its control. Instead, we use it only as an aggregator for build logs, test results and measurements collected during the builds. While historically we _did_ use Hudson to run our builds, also in conjunction with a fleet of AWS build slaves that allowed us to parallelize builds and configure hardware resources for it as needed, with the move to Github we also migrated our build to Github Actions, defining the [release](https://github.com/SAP/sailing-analytics/actions/workflows/release.yml) workflow which by and large takes over the heavy lifting of our build environment.
+
+It turns out, though, that Github Actions is not particularly good at managing build logs that exceed tens of thousands of lines (like ours), and it is not good at managing test results and measurements, or presenting and preserving Selenium-provided screenshots recorded from headless browsers used for UI testing. That's why we decided to keep a more "classic" CI around, but instead of using it for actually _running_ the builds, we would instead only forward the build outputs produced by Github Actions to the CI where it then gets evaluated, stored, evaluated statistically and presented in an easy-to-access way.
+
+The key to this type of integration is that at the end of the ``release`` workflow a Hudson job is triggered through an HTTP request made by the workflow. The scripts which are then used by the Hudson job to obtain the build results and if needed copy a Github release to https://releases.sapsailing.com can be found under [configuration/github-download-workflow-artifacts.sh](https://github.com/SAP/sailing-analytics/blob/main/configuration/github-download-workflow-artifacts.sh) and [configuration/github-copy-release-to-sapsailing-com.sh](https://github.com/SAP/sailing-analytics/blob/main/configuration/github-copy-release-to-sapsailing-com.sh), respectively.
+
+Access to the Github repository is granted to the Hudson jobs through a Github personal access token (PAT) to an account with read-only permissions to the repository.
+
+## Build Jobs
+
+There are a number of standard build jobs:
+* [SAPSailingAnalytics-master](https://hudson.sapsailing.com/job/SAPSailingAnalytics-master/): builds the ``main`` branch; if it shows "green" then a release and docker images will have been built
+* [SAPSailingAnalytics-master-fasttrack-no-tests](https://hudson.sapsailing.com/job/SAPSailingAnalytics-master-fasttrack-no-tests/): gets triggered by builds that were run with no tests being executed, e.g., by manually invoking the [Github Release Workflow](https://github.com/SAP/sailing-analytics/actions/workflows/release.yml) with the build parameter "skip all tests" set to ``true``
+* [SDBG](https://hudson.sapsailing.com/job/SDBG/) runs in the unlikely case that still some committer makes a change to the Eclipse GWT Super Dev Mode debugger; it would build a new release of the corresponding Plugin p2 repository and upload it to [https://p2.sapsailing.com/p2/sdbg](https://p2.sapsailing.com/p2/sdbg)
+* [translation](https://hudson.sapsailing.com/job/translation/) is triggered by the corresponding ``translation`` branch, and as such follows the general pattern of branch names equalling the build job names; however, at its end, if the build was successful, the ``translation`` branch will be merged into the ``main`` branch by the build job
+* ``bugXXXX`` jobs are the ones that correspond with branches in Git, just like a few for special branches such as ``management-console``; they are [[triggered by pushing to them in Git|wiki/howto/development/ci.md#github-webhook-on-push]]
+* [CopyTemplate](https://hudson.sapsailing.com/view/archived%20jobs%20/job/CopyTemplate/) is a disabled job that serves as the template used by the ``configuration/createdHudsonJobForBug.sh`` script, so don't delete this, and don't enable this!
+
+## How Jobs are Usually Triggered
+
+### Github Actions ``release`` Workflow
+
+The [release](https://github.com/SAP/sailing-analytics/actions/workflows/release.yml) workflow in Github is defined such that at its end it makes an HTTP request to https://hudson.sapsailing.com/job/${JOB}/build, passing a secret access token as defined in the Hudson build jobs (taken from the CopyTemplate job), which will trigger the build job that corresponds to the branch the ``release`` workflow just tried to build. No rule without exceptions: the ``main`` branch is mapped to ``SAPSailingAnalytics-master``, and if ``main`` was built without test execution, then ``SAPSailingAnalytics-master-fasttrack-no-tests``. Furthermore, branches named ``releases/...`` then the ``releases/`` is stripped from the branch name to obtain the name of the build job to trigger (see also [[Building with Release|wiki/info/landscape/development-environment.md#exceptionally-building-without-running-tests-more-fewer-cpus-and-with-release]]).
+
+### Manually Triggering a Job
+
+The ``release`` workflow can be dispatched manually. It has a few build parameters you can use to configure the build. If you skip tests but build a branch producing a release, that release will be named "untested-..." for clarity. You can also configure the number of CPUs within certain limits and steps. Should you have made changes to the [[target platform|wiki/info/general/workspace-bundles-projects-structure.md#target-platform]] on your branch that would require a different set of bundles in our base p2 repository under https://p2.sapsailing.com/p2/sailing, you can also explicitly ask for a build here which will first construct a temporary base p2 repository during the build and use that instead of the regular one.
+
+### Github Webhook on Push
+
+When commits are pushed to our Github repository, a [webhook](https://github.com/SAP/sailing-analytics/settings/hooks/480929064) is triggered which sends an HTTP request to [https://git.sapsailing.com/hooks/github.cgi](https://git.sapsailing.com/hooks/github.cgi). This, in turn, is backed by the script ``/var/www/cgi-bin/github.cgi`` which is installed there when the central reverse proxy is set up from [configuration/environments_scripts/central_reverse_proxy/files/var/www/cgi-bin/github.cgi](https://github.com/SAP/sailing-analytics/blob/main/configuration/environments_scripts/central_reverse_proxy/files/var/www/cgi-bin/github.cgi). Currently, that script's only task is to check whether the push originated from the translators making contributions to the ``translation`` branch and if so, push those changes also to the ``translation`` branch of our internal Git repository at ssh://trac@sapsailing.com/home/trac/git.
+
+## Disabling a Job
+
+When done with a branch for the time being or for good, you can disable the corresponding Hudson job that was created for it. The job's page has a corresponding "Disable job" button on it.
+
+Disabling (rather than deleting) jobs has the benefit of all data (logs, test runs, measurements) of those builds that are kept (usually the latest ten builds) will be preserved. This way it is usually safe to reference build and test results in your Bugzilla comments.
+
+Disabled jobs will not show directly on the landing page at [https://hudson.sapsailing.com](https://hudson.sapsailing.com) but instead can be found under the [archived jobs](https://hudson.sapsailing.com/view/archived%20jobs%20/) tab. This way, the landing page stays clean and tidy.
 
 ## Collecting measurements using Hudson/Jenkins
 

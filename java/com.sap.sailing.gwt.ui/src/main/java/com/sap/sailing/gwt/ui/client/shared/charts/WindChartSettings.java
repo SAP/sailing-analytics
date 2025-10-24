@@ -42,10 +42,12 @@ public class WindChartSettings extends AbstractGenericSerializableSettings {
      *  The default settings
      */
     public WindChartSettings() {
+        super();
     }
     
     public WindChartSettings(boolean showWindSpeedSeries, Set<WindSourceType> windSpeedSourcesToDisplay, 
             boolean showWindDirectionsSeries, Set<WindSourceType> windDirectionSourcesToDisplay, long resolutionInMilliseconds) {
+        this();
         this.showWindSpeedSeries.setValue(showWindSpeedSeries);
         this.windSpeedSourcesToDisplay.setValues(windSpeedSourcesToDisplay);
         this.showWindDirectionsSeries.setValue(showWindDirectionsSeries);

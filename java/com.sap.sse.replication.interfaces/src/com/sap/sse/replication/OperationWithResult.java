@@ -3,6 +3,7 @@ package com.sap.sse.replication;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import com.sap.sse.ServerInfo;
 import com.sap.sse.operationaltransformation.Operation;
 
 /**
@@ -82,4 +83,12 @@ public interface OperationWithResult<S, R> extends Operation<S>, Serializable {
         }
     }
 
+    /**
+     * Returns {@code null} by default; however, operations that originated on a different server and were sent
+     * to their primary will return their {@link ServerInfo#getName() server name}. This can be used, e.g., for
+     * debug output.
+     */
+    default String getOriginServerName() {
+        return null;
+    }
 }

@@ -12,6 +12,7 @@ public class BoatClassNotificationPreferences extends AbstractGenericSerializabl
     private transient SettingsList<BoatClassNotificationPreference> boatClasses;
 
     public BoatClassNotificationPreferences(RacingEventService racingEventService) {
+        super();
         boatClasses = new SettingsList<>("boatClasses", this,
                 () -> new BoatClassNotificationPreference(racingEventService.getBaseDomainFactory()));
     }

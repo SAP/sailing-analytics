@@ -25,6 +25,7 @@ import com.sap.sse.common.Duration;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.gwt.client.player.Timer.PlayModes;
 import com.sap.sse.gwt.client.player.Timer.PlayStates;
+import com.sap.sse.security.ui.client.SecurityChildSettingsContext;
 import com.sap.sse.security.ui.settings.ComponentContextWithSettingsStorageAndAdditionalSettingsLayers.OnSettingsReloadedCallback;
 
 /**
@@ -63,27 +64,13 @@ public class StartAnalysisMode extends RaceBoardModeWithPerRaceCompetitors {
     private void adjustMapSettings() {
         RaceMap raceMap = getRaceBoardPanel().getMap();
         final RaceMapSettings defaultSettings = raceMap.getLifecycle().createDefaultSettings();
-        final RaceMapSettings additiveSettings = new RaceMapSettings(
-                new RaceMapZoomSettings(Collections.singleton(ZoomTypes.BOATS), /* zoomToSelected */ false),
-                defaultSettings.getHelpLinesSettings(),
-                defaultSettings.getTransparentHoverlines(),
-                defaultSettings.getHoverlineStrokeWeight(),
-                defaultSettings.getTailLengthInMilliseconds(),
-                /* existingMapSettings.isWindUp() */ true,
-                defaultSettings.getBuoyZoneRadius(),
-                defaultSettings.isShowOnlySelectedCompetitors(),
-                defaultSettings.isShowSelectedCompetitorsInfo(),
-                defaultSettings.isShowWindStreamletColors(),
-                defaultSettings.isShowWindStreamletOverlay(),
-                defaultSettings.isShowSimulationOverlay(),
-                defaultSettings.isShowMapControls(),
-                defaultSettings.getManeuverTypesToShow(),
-                defaultSettings.isShowDouglasPeuckerPoints(),
-                defaultSettings.isShowEstimatedDuration(),
-                defaultSettings.getStartCountDownFontSizeScaling(),
-                defaultSettings.isShowManeuverLossVisualization(),
-                defaultSettings.isShowSatelliteLayer(),
-                defaultSettings.isShowWindLadder());
+        RaceMapZoomSettings raceMapZoomSettings = new RaceMapZoomSettings(Collections.singleton(ZoomTypes.BOATS), /* zoomToSelected */ false);
+        boolean isWindUp = true;
+        final RaceMapSettings additiveSettings = new RaceMapSettings
+                .RaceMapSettingsBuilder(defaultSettings, raceMap.getLifecycle().getRaceDTO(), raceMap.getLifecycle().getPaywallResolver())
+                .withZoomSettings(raceMapZoomSettings)
+                .withWindUp(isWindUp)
+                .build();
         ((RaceBoardComponentContext) raceMap.getComponentContext()).addModesPatching(raceMap, additiveSettings, new OnSettingsReloadedCallback<RaceMapSettings>() {
             @Override
             public void onSettingsReloaded(RaceMapSettings patchedSettings) {
@@ -189,8 +176,9 @@ public class StartAnalysisMode extends RaceBoardModeWithPerRaceCompetitors {
         raceDetailsToShow.add(DetailType.TIME_BETWEEN_RACE_START_AND_COMPETITOR_START);
         raceDetailsToShow.add(DetailType.START_TACK);
         raceDetailsToShow.add(DetailType.RACE_GAP_TO_LEADER_IN_SECONDS);
+        SecurityChildSettingsContext context = new SecurityChildSettingsContext(getLeaderboard(), leaderboardPanel.getPaywallResolver());
         final SingleRaceLeaderboardSettings additiveSettings = SingleRaceLeaderboardSettings
-                .createDefaultSettingsWithRaceDetailValues(raceDetailsToShow);
+                .createDefaultSettingsWithRaceDetailValues(raceDetailsToShow, context);
         ((RaceBoardComponentContext) leaderboardPanel.getComponentContext()).addModesPatching(leaderboardPanel, additiveSettings, new OnSettingsReloadedCallback<SingleRaceLeaderboardSettings>() {
 
             @Override

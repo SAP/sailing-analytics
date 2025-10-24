@@ -1,13 +1,14 @@
 package com.sap.sse.datamining.impl.functions;
 
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.lang.reflect.Method;
 import java.util.Locale;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.functions.Function;
 import com.sap.sse.datamining.test.data.impl.SimpleClassWithMarkedMethods;
@@ -22,17 +23,19 @@ public class TestMethodWrappingFunction {
     private Method sideEffectFreeValueMethod;
     private Method externalLibraryMethod;
 
-    @Before
+    @BeforeEach
     public void initializeMethods() {
         dimensionMethod = FunctionTestsUtil.getMethodFromClass(SimpleClassWithMarkedMethods.class, "dimension");
         sideEffectFreeValueMethod = FunctionTestsUtil.getMethodFromClass(SimpleClassWithMarkedMethods.class, "sideEffectFreeValue");
         externalLibraryMethod = FunctionTestsUtil.getMethodFromClass(Test_ExternalLibraryClass.class, "foo");
     }
     
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testMethodReturnTypeAndGivenReturnTypeDoesntMatch() {
-        @SuppressWarnings("unused")
-        Function<String> function = new MethodWrappingFunction<>(externalLibraryMethod, String.class);
+        assertThrows(IllegalArgumentException.class, () -> {
+            @SuppressWarnings("unused")
+            Function<String> function = new MethodWrappingFunction<>(externalLibraryMethod, String.class);
+        });
     }
     
     @Test

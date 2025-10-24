@@ -1,15 +1,16 @@
 package net.sf.marineapi.nmea.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import net.sf.marineapi.nmea.sentence.GSASentence;
 import net.sf.marineapi.nmea.sentence.TalkerId;
 import net.sf.marineapi.nmea.util.FaaMode;
 import net.sf.marineapi.nmea.util.GpsFixStatus;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the GSA sentence parser.
@@ -24,7 +25,7 @@ public class GSATest {
 	private GSASentence empty;
 	private GSASentence instance;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		try {
 			empty = new GSAParser(TalkerId.GP);

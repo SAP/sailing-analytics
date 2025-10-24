@@ -10,9 +10,9 @@ public class InfoEventNewsItem extends AbstractEventNewsItem {
     private Map<Locale, String> titles;
     private Map<Locale, String> messages;
     
-    public InfoEventNewsItem(UUID eventId, String title, String message, Date createdAtDate, String category,
-            URL relatedItemLink, Map<Locale, String> titles, Map<Locale, String> messages) {
-        super(eventId, title, message, createdAtDate, category, relatedItemLink);
+    public InfoEventNewsItem(UUID eventId, String title, String message, Date createdAtDate, URL relatedItemLink,
+            Map<Locale, String> titles, Map<Locale, String> messages) {
+        super(eventId, title, message, createdAtDate, relatedItemLink);
         this.titles = titles;
         this.messages = messages;
     }

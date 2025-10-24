@@ -118,7 +118,9 @@ implements Procedure<ShardingKey>, StartFromSailingAnalyticsImage {
     }
 
     public SailingAnalyticsProcess<ShardingKey> getSailingAnalyticsProcess() {
-        return new SailingAnalyticsProcessImpl<>(getApplicationConfiguration().getPort(), getHost(), getApplicationConfiguration().getServerDirectory(),
-                getApplicationConfiguration().getTelnetPort(), getApplicationConfiguration().getServerName(), getApplicationConfiguration().getExpeditionPort(), getLandscape());
+        return new SailingAnalyticsProcessImpl<>(getApplicationConfiguration().getPort(), getHost(),
+                getApplicationConfiguration().getServerDirectory(), getApplicationConfiguration().getTelnetPort(),
+                getApplicationConfiguration().getServerName(), getApplicationConfiguration().getExpeditionPort(),
+                getApplicationConfiguration().getIgtimiRiotPort(), getLandscape());
     }
 }

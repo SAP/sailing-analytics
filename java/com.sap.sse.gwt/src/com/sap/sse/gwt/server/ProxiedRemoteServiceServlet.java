@@ -27,6 +27,7 @@ import com.sap.sse.common.HttpRequestHeaderConstants;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util.Triple;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
+import com.sap.sse.util.HttpRequestUtils;
 
 /**
  * Using GWT in a proxyfied environment can be tricky and leads to strange errors
@@ -149,8 +150,11 @@ public abstract class ProxiedRemoteServiceServlet extends RemoteServiceServlet {
         final TimePoint afterSendingResultToResponse = MillisecondsTimePoint.now();
         final Triple<RPCRequest, TimePoint, TimePoint> startAndEndOfProcessing = processingStartAndFinishTime.get();
         if (startAndEndOfProcessing == null) {
-            logger.warning("A request with method "+req.getMethod()+" from address "+req.getRemoteAddr()
-                +" was processed. No timing information available. Perhaps there was an IncompatibleRemoteServiceException thrown, so the call was not processed.");
+            // the processing time annotation happens only for POST requests in the doPost-->processCall-->afterProcessCall method chain
+            if (req.getMethod().equals("POST")) {
+                logger.warning("A request with method POST from address "+HttpRequestUtils.getClientIP(req)
+                    +" was processed. No timing information available. Perhaps there was an IncompatibleRemoteServiceException thrown, so the call was not processed.");
+            }
         } else {
             final Duration totalTime = startAndEndOfProcessing.getB().until(afterSendingResultToResponse);
             if (totalTime.compareTo(LOG_REQUESTS_TAKING_LONGER_THAN) > 0) {
@@ -201,7 +205,7 @@ public abstract class ProxiedRemoteServiceServlet extends RemoteServiceServlet {
      * A parameter name is considered security-sensitive if it has any of "secret", "pass", "pw", "token", or "code" in
      * its name, regardless the case and where in the parameter name any of these sub-strings appear.
      */
-    private static final String[] SENSITIVE_PARAMETER_NAME_SUBSTRINGS = {"secret", "pass", "pw", "token", "code"};
+    private static final String[] SENSITIVE_PARAMETER_NAME_SUBSTRINGS = {"secret", "pass", "pw", "token", "code", "credentials"};
     private boolean isSecuritySensitiveParameterName(String name) {
         for (final String sensitiveSubstring : SENSITIVE_PARAMETER_NAME_SUBSTRINGS) {
             if (name.toLowerCase().contains(sensitiveSubstring)) {

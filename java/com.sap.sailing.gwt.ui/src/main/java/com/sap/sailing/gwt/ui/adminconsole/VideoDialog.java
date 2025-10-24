@@ -14,7 +14,7 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.FlexTable;
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -346,7 +346,7 @@ public abstract class VideoDialog extends DataEntryDialog<List<VideoDTO>>
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return videoURLAndUploadComposite.getInitialFocusWidget();
     }
 

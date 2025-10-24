@@ -2,8 +2,8 @@ package com.sap.sailing.server.gateway.test.jaxrs;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,8 +14,8 @@ import java.util.UUID;
 import javax.ws.rs.core.Response;
 
 import org.json.simple.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.sap.sailing.domain.abstractlog.regatta.RegattaLog;
@@ -50,7 +50,7 @@ public class LeaderboardsResourceCheckinAndOutTest extends AbstractJaxRsApiTest 
     private BoatClass boatClass = new BoatClassImpl("49er", false);
     private Regatta regatta;
     
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         Competitor c = createCompetitors(1).get(0);
@@ -122,8 +122,8 @@ public class LeaderboardsResourceCheckinAndOutTest extends AbstractJaxRsApiTest 
         assertThat("checkout returns OK", response.getStatus(), equalTo(Response.Status.OK.getStatusCode()));
         mappings = new RegattaLogDeviceCompetitorMappingFinder(log).analyze();
         mappingForC = mappings.get(competitor).get(0);
-        assertTrue("mapping now ends at checkout timepoint", mappingForC.getTimeRange().includes(new MillisecondsTimePoint(toMillis)));
-        assertFalse("mapping now ends at checkout timepoint", mappingForC.getTimeRange().includes(new MillisecondsTimePoint(toMillis+1)));
+        assertTrue(mappingForC.getTimeRange().includes(new MillisecondsTimePoint(toMillis)), "mapping now ends at checkout timepoint");
+        assertFalse(mappingForC.getTimeRange().includes(new MillisecondsTimePoint(toMillis+1)), "mapping now ends at checkout timepoint");
     }
 
 }

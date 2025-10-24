@@ -9,8 +9,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.components.FilterCriterion;
 import com.sap.sse.datamining.components.Processor;
@@ -26,7 +26,7 @@ public class TestRetrieverFilterProcessorChain {
     
     private Collection<Integer> receivedResults = new ArrayList<>();
     
-    @Before
+    @BeforeEach
     public void setUpDataSource() {
         dataSource = Arrays.asList(-2, -1, 0, 1, 2);
     }
@@ -98,7 +98,7 @@ public class TestRetrieverFilterProcessorChain {
     }
     
     @SuppressWarnings("unchecked")
-    @Before
+    @BeforeEach
     public void setUpResultReceiverAndProcessors() {
         Processor<Integer, Void> resultReceiver = new NullProcessor<Integer, Void>(Integer.class, Void.class) {
             @Override

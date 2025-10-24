@@ -1,9 +1,9 @@
 package com.sap.sailing.domain.swisstimingadapter.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -13,10 +13,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.TrackedRaceStatusEnum;
 import com.sap.sailing.domain.swisstimingadapter.Competitor;
@@ -35,17 +35,17 @@ import com.sap.sse.common.Speed;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 
-@Ignore("This test doesn't work as long as the server doesn't play an actual race")
+@Disabled("This test doesn't work as long as the server doesn't play an actual race")
 public class SwissTimingSailMasterLiveTest implements SailMasterListener {
     private int rpdCounter;
     private SailMasterConnector connector;
 
-    @Before
+    @BeforeEach
     public void connect() throws InterruptedException, ParseException {
         connector = SwissTimingFactory.INSTANCE.getOrCreateSailMasterConnector("gps.sportresult.com", 40300, "W4702", /* raceDataUrl */ null, "R2", "Women 470 Race 2", null /* boat class*/, /* SwissTimingRaceTracker */ null);
     }
     
-    @After
+    @AfterEach
     public void stopConnector() throws IOException {
         connector.stop();
     }

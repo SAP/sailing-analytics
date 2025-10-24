@@ -2,6 +2,8 @@ package com.sap.sse.security.subscription.chargebee;
 
 import java.util.logging.Logger;
 
+import com.sap.sse.common.Util;
+
 /**
  * Subscription configuration. The system will get these information from server application startup arguments:
  * {@code chargebee.site}, {@code chargebee.apikey}
@@ -26,10 +28,10 @@ public class ChargebeeConfiguration {
 
     public static ChargebeeConfiguration getInstance() {
         if (instance == null) {
-            String site = System.getProperty(CHARGEBEE_SITE);
-            String apiKey = System.getProperty(CHARGEBEE_APIKEY);
+            final String site = System.getProperty(CHARGEBEE_SITE);
+            final String apiKey = System.getProperty(CHARGEBEE_APIKEY);
             logger.info("Chargebee site: " + site);
-            if (site != null && apiKey != null) {
+            if (Util.hasLength(site) && Util.hasLength(apiKey)) {
                 instance = new ChargebeeConfiguration(site, apiKey);
                 logger.info("Activating Chargebee Configuration and service");
             } else {

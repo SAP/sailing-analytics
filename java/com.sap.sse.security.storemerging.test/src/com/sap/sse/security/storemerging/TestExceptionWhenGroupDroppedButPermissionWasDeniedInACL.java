@@ -1,16 +1,16 @@
 package com.sap.sse.security.storemerging;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.security.SecurityService;
@@ -22,7 +22,7 @@ import com.sap.sse.security.shared.impl.User;
 import com.sap.sse.security.shared.impl.UserGroup;
 
 public class TestExceptionWhenGroupDroppedButPermissionWasDeniedInACL extends AbstractStoreMergeTest {
-    @Before
+    @BeforeEach
     public void setUp() throws IOException, UserStoreManagementException {
         setUp("source_TestExceptionWhenGroupDroppedButPermissionWasDeniedInACL", "target_TestExceptionWhenGroupDroppedButPermissionWasDeniedInACL");
     }

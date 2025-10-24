@@ -1,29 +1,14 @@
 #!/bin/bash
-
 if [ $# -eq 0 ]; then
-    echo "$0 [-t -r ] <bugid>"
+    echo "$0 <bugid>"
     echo ""
-    echo "-t Disable tests"
-    echo "-r Build release"
     echo
     echo "Constructs a Hudson job for the given bugid"
-    echo "Example: $0 -r 4221"
-    echo "Builds a Hudson job for bug branch bug4221, linking to the Bugzilla bug and building a release"
+    echo "Example: $0 4221"
+    echo "Builds a Hudson job for bug branch bug4221, linking to the Bugzilla bug and copying a release"
+    echo "from Github to https://releases.sapsailing.com if the Github Actions Workflow built one"
     exit 2
 fi
-
-options='tr'
-while getopts $options option
-do
-    case $option in
-        t) SKIP_TESTS=1;;
-        r) BUILD_RELEASE=1;;
-        \?) echo "Invalid option"
-            exit 4;;
-    esac
-done
-
-shift $((OPTIND-1))
 
 BUG_ID="$1"
 
@@ -42,25 +27,47 @@ curl -s -X GET $COPY_TEMPLATE_CONFIG_URL -u "$USERNAME:$PASSWORD" -o "$CONFIGFIL
 # On macosx is gnu-sed needed
 if [[ "$OSTYPE" == *"$OS_FOR_GSED"* ]]; then
   echo "Using gsed"
-  gsed -i'' -e 's|<description>..*</description>|<description>This is the build job for \&lt;a href=\&quot;'$BUGZILLA_BASE'/show_bug.cgi?id='$BUG_ID'\&quot;\&gt;Bug '$BUG_ID'\&lt;/a\&gt;</description>|' -e 's|<disabled>true</disabled>|<disabled>false</disabled>|' "$CONFIGFILE"
+  gsed -i'' -e 's|<description>..*</description>|<description>This is the CI job for \&lt;a href=\&quot;'$BUGZILLA_BASE'/show_bug.cgi?id='$BUG_ID'\&quot;\&gt;Bug '$BUG_ID'\&lt;/a\&gt;. See its latest \&lt;a href=\&quot;/userContent/measurements.html?job=bug'$BUG_ID'\&quot;\&gt;quality and performance measurements here.\&lt;/a\&gt;</description>|' -e 's|<disabled>true</disabled>|<disabled>false</disabled>|' "$CONFIGFILE"
 else
-  sed -i -e 's|<description>..*</description>|<description>This is the build job for \&lt;a href=\&quot;'$BUGZILLA_BASE'/show_bug.cgi?id='$BUG_ID'\&quot;\&gt;Bug '$BUG_ID'\&lt;/a\&gt;</description>|' -e 's|<disabled>true</disabled>|<disabled>false</disabled>|' "$CONFIGFILE"
+  sed -i -e 's|<description>..*</description>|<description>This is the CI job for \&lt;a href=\&quot;'$BUGZILLA_BASE'/show_bug.cgi?id='$BUG_ID'\&quot;\&gt;Bug '$BUG_ID'\&lt;/a\&gt;. See its latest \&lt;a href=\&quot;/userContent/measurements.html?job=bug'$BUG_ID'\&quot;\&gt;quality and performance measurements here.\&lt;/a\&gt;</description>|' -e 's|<disabled>true</disabled>|<disabled>false</disabled>|' "$CONFIGFILE"
 fi
 
-if [ "$SKIP_TESTS" = "1" ]; then
-  if [[ "$OSTYPE" == *"$OS_FOR_GSED"* ]]; then
-    gsed -i'' -e 's|<command>\([^<]*\)build *</command>|<command>\1-t build</command>|' "$CONFIGFILE"
-  else
-    sed -i -e 's|<command>\([^<]*\)build *</command>|<command>\1-t build</command>|' "$CONFIGFILE"
-  fi
+# On macosx is gnu-sed needed
+if [[ "$OSTYPE" == *"$OS_FOR_GSED"* ]]; then
+  echo "Using gsed"
+  gsed -i'' -n -e ':loop
+/<command>/b InCommand
+p
+$b
+N
+D
+b loop
+:InCommand
+s/BRANCH/'bug${BUG_ID}'/g
+/<\/command>/p
+/<\/command>/b End
+N
+b InCommand
+:End
+' "$CONFIGFILE"
+else
+  sed -i -n -e ':loop
+/<command>/b InCommand
+p
+$b
+N
+D
+b loop
+:InCommand
+s/BRANCH/'bug${BUG_ID}'/g
+/<\/command>/p
+/<\/command>/b End
+N
+b InCommand
+:End
+' "$CONFIGFILE"
 fi
-if [ "$BUILD_RELEASE" = "1" ]; then
-  if [[ "$OSTYPE" == *"$OS_FOR_GSED"* ]]; then
-    gsed -i'' -e 's|<command>\([^<]*\)</command>|<command>\1 \&amp;\&amp; PATH=/usr/local/bin:${PATH} configuration/buildAndUpdateProduct.sh -n bug'$BUG_ID' -w trac@sapsailing.com -u release</command>|' "$CONFIGFILE"
-  else
-    sed -i -e 's|<command>\([^<]*\)</command>|<command>\1 \&amp;\&amp; PATH=/usr/local/bin:${PATH} configuration/buildAndUpdateProduct.sh -n bug'$BUG_ID' -w trac@sapsailing.com -u release</command>|' "$CONFIGFILE"
-  fi
-fi
+
 if [[ "$OSTYPE" == *"$OS_FOR_GSED"* ]]; then
   gsed -i'' -e '/<branches>$/{
   N

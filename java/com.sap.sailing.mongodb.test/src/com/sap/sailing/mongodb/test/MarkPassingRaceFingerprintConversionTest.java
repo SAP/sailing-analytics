@@ -1,15 +1,15 @@
 package com.sap.sailing.mongodb.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoClient;
@@ -48,7 +48,7 @@ public class MarkPassingRaceFingerprintConversionTest extends OnlineTracTracBase
         return "Academy Tracking 2011";
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         newMongo().getDatabase(dbConfiguration.getDatabaseName()).drop();
         super.setUp("event_20110505_SailingTea", // Semifinale
@@ -71,7 +71,7 @@ public class MarkPassingRaceFingerprintConversionTest extends OnlineTracTracBase
         DomainObjectFactory dF = PersistenceFactory.INSTANCE.getDomainObjectFactory(dbConfiguration.getService(), getDomainFactory().getBaseDomainFactory());
         Map<RaceIdentifier, MarkPassingRaceFingerprint> fingerprintHashMap = dF.loadFingerprintsForMarkPassingHashes();
         MarkPassingRaceFingerprint fingerprintAfterDB = fingerprintHashMap.get(trackedRace1.getRaceIdentifier());
-        assertTrue("Original and de-serialized copy are equal", fingerprintAfterDB.matches(trackedRace1));
+        assertTrue(fingerprintAfterDB.matches(trackedRace1), "Original and de-serialized copy are equal");
         final Map<Competitor, Map<Waypoint, MarkPassing>> markPassingsLoaded = dF.loadMarkPassings(trackedRace1.getRaceIdentifier(), trackedRace1.getRace().getCourse());
         assertEquals(markPassings, markPassingsLoaded);
     }

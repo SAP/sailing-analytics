@@ -5,7 +5,8 @@ Bundle-SymbolicName: com.sap.sailing.server.gateway
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: SAP
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Import-Package: com.sap.sailing.server,
+Import-Package: com.sap.sailing.domain.igtimiadapter.shared,
+ com.sap.sailing.server,
  com.sap.sailing.server.operationaltransformation,
  javax.ws.rs;version="1.1.1",
  javax.ws.rs.core;version="1.1.1",
@@ -17,7 +18,8 @@ Import-Package: com.sap.sailing.server,
  org.json.simple,
  org.json.simple.parser,
  org.osgi.framework;version="1.3.0",
- org.osgi.util.tracker;version="1.3.1"
+ org.osgi.util.tracker;version="1.3.1",
+ slash.common.io
 Require-Bundle: com.sap.sailing.domain,
  com.sap.sailing.expeditionconnector,
  com.sap.sailing.declination,
@@ -68,7 +70,8 @@ Require-Bundle: com.sap.sailing.domain,
  com.sap.sailing.shared.server.gateway,
  org.apache.httpcomponents.httpclient,
  org.apache.httpcomponents.httpcore,
- com.sap.sailing.server.gateway.interfaces
+ com.sap.sailing.server.gateway.interfaces,
+ com.sap.sailing.landscape.common
 Bundle-ClassPath: .
 Web-ContextPath: /sailingserver
 Export-Package: com.sap.sailing.server.gateway,

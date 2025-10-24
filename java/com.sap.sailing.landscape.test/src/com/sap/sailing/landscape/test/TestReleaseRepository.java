@@ -1,9 +1,9 @@
 package com.sap.sailing.landscape.test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.landscape.SailingReleaseRepository;
 import com.sap.sse.common.Util;

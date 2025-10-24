@@ -34,6 +34,15 @@
         <url-pattern>/service/sailing</url-pattern>
         <url-pattern>/service/sailing/*</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <display-name>User Management Write</display-name>
+        <servlet-name>UserManagementService</servlet-name>
+        <servlet-class>com.sap.sse.security.ui.server.UserManagementWriteServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UserManagementService</servlet-name>
+        <url-pattern>/service/usermanagement</url-pattern>
+    </servlet-mapping>
 
 	<filter>
 		<filter-name>LocaleInjectionFilter</filter-name>
@@ -44,6 +53,29 @@
 		<url-pattern>*.html</url-pattern>
 	</filter-mapping>
 
+	<!-- Apache Shiro -->
+	<context-param>
+		<param-name>shiroEnvironmentClass</param-name>
+		<param-value>org.apache.shiro.web.env.IniWebEnvironment</param-value>
+	</context-param>
+	<listener>
+		<listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
+	</listener>
+	<filter>
+		<filter-name>ShiroFilter</filter-name>
+		<filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+	</filter>
+	<!-- Make sure any request you want accessible to Shiro is filtered. "/*" 
+		catches all requests. Usually this filter mapping is defined first (before all 
+		others) to ensure that Shiro works in subsequent filters in the filter chain: -->
+	<filter-mapping>
+		<filter-name>ShiroFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+		<dispatcher>INCLUDE</dispatcher>
+		<dispatcher>ERROR</dispatcher>
+	</filter-mapping>
     <filter>
             <filter-name>GWTCacheControlServletFilter</filter-name>
             <filter-class>com.sap.sse.gwt.server.GWTCacheControlServletFilter</filter-class>

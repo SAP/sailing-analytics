@@ -3,6 +3,7 @@ package com.sap.sailing.datamining.impl.data;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NavigableSet;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
@@ -28,8 +29,9 @@ import com.sap.sailing.domain.common.Tack;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.leaderboard.Leaderboard;
+import com.sap.sailing.domain.shared.tracking.LineDetails;
+import com.sap.sailing.domain.shared.tracking.impl.TimedComparator;
 import com.sap.sailing.domain.tracking.GPSFixTrack;
-import com.sap.sailing.domain.tracking.LineDetails;
 import com.sap.sailing.domain.tracking.Maneuver;
 import com.sap.sailing.domain.tracking.MarkPassing;
 import com.sap.sailing.domain.tracking.TrackedLeg;
@@ -219,10 +221,36 @@ public class RaceOfCompetitorWithContext implements HasRaceOfCompetitorContext {
         return getTrackedRaceContext().getLeaderboardContext().getLeaderboard().getMaxPointsReason(competitor,
                 getTrackedRaceContext().getRaceColumn(), MillisecondsTimePoint.now());
     }
+    
+    @Override
+    public boolean isDiscarded() {
+        return getTrackedRaceContext().getLeaderboardContext().getLeaderboard().isDiscarded(competitor,
+                getTrackedRaceContext().getRaceColumn(), MillisecondsTimePoint.now());
+    }
 
     @Override
     public Speed getSpeedWhenStarting() {
         return getTrackedRace().getSpeedWhenCrossingStartLine(getCompetitor());
+    }
+    
+    @Override
+    public Duration getStartDelay() {
+        final NavigableSet<MarkPassing> competitorMarkPassings = getTrackedRace().getMarkPassings(competitor);
+        getTrackedRace().lockForRead(competitorMarkPassings);
+        try {
+            final Duration result;
+            final TimePoint startOfRace;
+            if (!competitorMarkPassings.isEmpty() && (startOfRace = getTrackedRace().getStartOfRace()) != null) {
+                final MarkPassing firstMarkPassing = competitorMarkPassings.iterator().next();
+                TimePoint competitorStartTime = firstMarkPassing.getTimePoint();
+                result = startOfRace.until(competitorStartTime);
+            } else {
+                result = null;
+            }
+            return result;
+        } finally {
+            getTrackedRace().unlockAfterRead(competitorMarkPassings);
+        }
     }
     
     @Override
@@ -353,9 +381,18 @@ public class RaceOfCompetitorWithContext implements HasRaceOfCompetitorContext {
     
     @Override
     public Double getRelativeDistanceToAdvantageousEndOfLineAtStartOfRace() {
-        TrackedRace trackedRace = getTrackedRace();
-        TimePoint startOfRace = trackedRace.getStartOfRace();
-        LineDetails startLine = trackedRace.getStartLine(startOfRace);
+        final TimePoint startOfRace = getTrackedRace().getStartOfRace();
+        return getRelativeDistanceToAdvantageousEndOfLine(startOfRace);
+    }
+    
+    @Override
+    public Double getRelativeDistanceToAdvantageousEndOfLineAtStartOfCompetitor() {
+        final TimePoint competitorStartTimePoint = getTrackedRace().getTrackedLeg(getCompetitor(), getTrackedRace().getRace().getCourse().getFirstLeg()).getStartTime();
+        return getRelativeDistanceToAdvantageousEndOfLine(competitorStartTimePoint);
+    }
+
+    private Double getRelativeDistanceToAdvantageousEndOfLine(final TimePoint timePoint) {
+        final LineDetails startLine = getTrackedRace().getStartLine(timePoint);
         Mark advantageousMark = null;
         switch (startLine.getAdvantageousSideWhileApproachingLine()) {
         case PORT:
@@ -368,14 +405,14 @@ public class RaceOfCompetitorWithContext implements HasRaceOfCompetitorContext {
         if (advantageousMark == null) {
             return null;
         }
-        GPSFixTrack<Mark, GPSFix> advantageousMarkTrack = trackedRace.getOrCreateTrack(advantageousMark);
-        Position advantageousMarkPosition = advantageousMarkTrack.getEstimatedPosition(startOfRace, false);
-        GPSFixTrack<Competitor, GPSFixMoving> competitorTrack = trackedRace.getTrack(getCompetitor());
-        Position competitorPosition = competitorTrack.getEstimatedPosition(startOfRace, false);
-        Double distance = competitorPosition.getDistance(advantageousMarkPosition).getMeters();
-        TrackedLegOfCompetitor firstTrackedLegOfCompetitor = getTrackedRace().getTrackedLeg(competitor, trackedRace.getRace().getCourse().getFirstLeg());
-        TimePoint competitorStartTime = firstTrackedLegOfCompetitor.getStartTime();
-        Double length = trackedRace.getStartLine(competitorStartTime).getLength().getMeters();
+        final GPSFixTrack<Mark, GPSFix> advantageousMarkTrack = getTrackedRace().getOrCreateTrack(advantageousMark);
+        final Position advantageousMarkPosition = advantageousMarkTrack.getEstimatedPosition(timePoint, false);
+        final GPSFixTrack<Competitor, GPSFixMoving> competitorTrack = getTrackedRace().getTrack(getCompetitor());
+        final Position competitorPosition = competitorTrack.getEstimatedPosition(timePoint, false);
+        final Double distance = competitorPosition.getDistance(advantageousMarkPosition).getMeters();
+        final TrackedLegOfCompetitor firstTrackedLegOfCompetitor = getTrackedRace().getTrackedLeg(competitor, getTrackedRace().getRace().getCourse().getFirstLeg());
+        final TimePoint competitorStartTime = firstTrackedLegOfCompetitor.getStartTime();
+        final Double length = getTrackedRace().getStartLine(competitorStartTime).getLength().getMeters();
         return distance / length;
     }
     
@@ -391,6 +428,26 @@ public class RaceOfCompetitorWithContext implements HasRaceOfCompetitorContext {
             duration = new MillisecondsDurationImpl(durationMillis);
         }
         return duration;
+    }
+
+    @Override
+    public Duration getDurationFromStartToFirstTack() {
+        final TrackedRace race = getTrackedRace();
+        final Duration result;
+        if (race.getStartOfRace() == null) {
+            result = null;
+        } else {
+            final Iterable<Maneuver> maneuvers = race.getManeuvers(competitor, /* wait for latest */ false);
+            final List<Maneuver> tacks = Util.asList(Util.filter(maneuvers,
+                    m->m.getType() == ManeuverType.TACK && !m.getTimePoint().before(race.getStartOfRace())));
+            if (tacks.isEmpty()) {
+                result = null;
+            } else {
+                tacks.sort(TimedComparator.INSTANCE);
+                result = race.getStartOfRace().until(tacks.get(0).getTimePoint());
+            }
+        }
+        return result;
     }
 
     @Override

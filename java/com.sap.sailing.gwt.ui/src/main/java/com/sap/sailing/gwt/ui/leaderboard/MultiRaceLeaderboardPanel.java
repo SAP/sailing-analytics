@@ -39,6 +39,7 @@ import com.sap.sse.gwt.client.shared.components.Component;
 import com.sap.sse.gwt.client.shared.components.SettingsDialog;
 import com.sap.sse.gwt.client.shared.components.SettingsDialogComponent;
 import com.sap.sse.gwt.client.shared.settings.ComponentContext;
+import com.sap.sse.security.ui.client.SecurityChildSettingsContext;
 import com.sap.sse.security.ui.client.WithSecurity;
 
 /**
@@ -85,7 +86,7 @@ public class MultiRaceLeaderboardPanel extends LeaderboardPanel<MultiRaceLeaderb
                 selectedLegDetails, selectedRaceDetails, selectedOverallDetailColumns, namesOfRaceColumnsToShow,
                 raceColumnSelection.getNumberOfLastRaceColumnsToShow(), timer.getRefreshInterval(),
                 raceColumnSelection.getType(), isShowAddedScores(), isShowCompetitorShortName(),
-                isShowCompetitorFullName(), isShowCompetitorBoatInfo(), isShowCompetitorNationality);
+                isShowCompetitorFullName(), isShowCompetitorBoatInfo(), isShowCompetitorNationality, new SecurityChildSettingsContext(leaderboard, paywallResolver));
         return leaderboardSettings;
     }
 
@@ -119,7 +120,8 @@ public class MultiRaceLeaderboardPanel extends LeaderboardPanel<MultiRaceLeaderb
     @Override
     protected MultiRaceLeaderboardSettings overrideDefaultsForNamesOfRaceColumns(
             MultiRaceLeaderboardSettings currentSettings, LeaderboardDTO result) {
-        return currentSettings.withNamesOfRaceColumnsToShowDefaults(result.getNamesOfRaceColumns());
+        return currentSettings.withNamesOfRaceColumnsToShowDefaults(result.getNamesOfRaceColumns(),
+                new SecurityChildSettingsContext(leaderboard, paywallResolver));
     }
 
     @Override

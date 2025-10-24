@@ -224,6 +224,14 @@ implements ProcedureCreatingLoadBalancerMapping<ShardingKey> {
                     Level.INFO, "Waiting for instance "+getHost().getId()+" to be in state RUNNING");
             getLandscape().addTargetsToTargetGroup(masterTargetGroupCreated, Collections.singleton(getHost()));
             getLandscape().addTargetsToTargetGroup(publicTargetGroupCreated, Collections.singleton(getHost()));
+            /*
+             * TODO bug6083: If the host is "believed" to be/become part of a replica set that would list additional target groups
+             * (we would discover those during establishState), check if the "process" needs to become part of one of them based
+             * on its additional ports such as the Igtimi Riot port, and then add the host to that target group, too.
+             * 
+             * But how would we discover this? When no load balancer rules exist yet, discovering any target groups won't work.
+             * We need the hosts to already be configured in the target groups in order to discover matching ports in establishState.
+             */
             getLoadBalancerUsed().addRulesAssigningUnusedPriorities(/* forceContiguous */ true,
                     Optional.empty(), createRules(getLoadBalancerUsed(), getHostName(), masterTargetGroupCreated, publicTargetGroupCreated));
         } catch (Exception e) {

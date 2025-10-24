@@ -3,24 +3,25 @@ package com.sap.sailing.selenium.api.test;
 import static com.sap.sailing.selenium.api.core.ApiContext.SHARED_SERVER_CONTEXT;
 import static com.sap.sailing.selenium.api.core.ApiContext.createAdminApiContext;
 import static java.util.UUID.randomUUID;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 
 import com.sap.sailing.selenium.api.core.ApiContext;
 import com.sap.sailing.selenium.api.core.HttpException;
 import com.sap.sailing.selenium.api.coursetemplate.MarkProperties;
 import com.sap.sailing.selenium.api.coursetemplate.MarkPropertiesApi;
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.test.AbstractSeleniumTest;
 
 public class MarkPropertiesTest extends AbstractSeleniumTest {
@@ -43,39 +44,39 @@ public class MarkPropertiesTest extends AbstractSeleniumTest {
 
     private final MarkPropertiesApi markPropertiesApi = new MarkPropertiesApi();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot(), /* headless */ true);
     }
 
-    @Test
+    @SeleniumTestCase
     public void createMarkPropertyWithDeviceUuidTest() {
         final ApiContext ctx = createAdminApiContext(getContextRoot(), SHARED_SERVER_CONTEXT);
         final UUID deviceUuid = randomUUID();
         MarkProperties markProperties = markPropertiesApi.createMarkProperties(ctx, MARK_PROPERTIES_NAME,
                 MARK_PROPERTIES_SHORTNAME, deviceUuid.toString(), MARK_PROPERTIES_COLOR, "shape", "pattern",
                 MARK_PROPERTIES_TYPE, MARK_PROPERTIES_TAGS, null, null);
-        assertNotNull("read: no MarkProperties returnded", markProperties);
+        assertNotNull(markProperties, "read: no MarkProperties returnded");
         assertDefaultValues(markProperties);
         assertTrue(markProperties.hasDevice());
     }
 
-    @Test
+    @SeleniumTestCase
     public void createAndGetMarkPropertiesWithoutDeviceUuidTest() {
         final ApiContext ctx = createAdminApiContext(getContextRoot(), SHARED_SERVER_CONTEXT);
         MarkProperties createdMarkProperties = markPropertiesApi.createMarkProperties(ctx, MARK_PROPERTIES_NAME,
                 MARK_PROPERTIES_SHORTNAME, null, MARK_PROPERTIES_COLOR, MARK_PROPERTIES_SHAPE, MARK_PROPERTIES_PATTERN,
                 MARK_PROPERTIES_TYPE, MARK_PROPERTIES_TAGS, MARK_PROPERTIES_LATDEG, MARK_PROPERTIES_LONDEG);
-        assertNotNull("create: no MarkProperties returnded", createdMarkProperties);
-        assertNotNull("create: MarkProperties.id is missing", createdMarkProperties.getId());
+        assertNotNull(createdMarkProperties, "create: no MarkProperties returnded");
+        assertNotNull(createdMarkProperties.getId(), "create: MarkProperties.id is missing");
 
         MarkProperties foundMarkProperties = markPropertiesApi.getMarkProperties(ctx, createdMarkProperties.getId());
         assertDefaultValues(foundMarkProperties);
-        assertEquals("read: MarkProperties.latDeg is different", MARK_PROPERTIES_LATDEG, foundMarkProperties.getLatDeg());
-        assertEquals("read: MarkProperties.lonDeg is different", MARK_PROPERTIES_LONDEG, foundMarkProperties.getLonDeg());
+        assertEquals(MARK_PROPERTIES_LATDEG, foundMarkProperties.getLatDeg(), "read: MarkProperties.latDeg is different");
+        assertEquals(MARK_PROPERTIES_LONDEG, foundMarkProperties.getLonDeg(), "read: MarkProperties.lonDeg is different");
     }
 
-    @Test
+    @SeleniumTestCase
     public void createSeveralMarkPropertiesAndGetAll() {
         final ApiContext ctx = createAdminApiContext(getContextRoot(), SHARED_SERVER_CONTEXT);
         MarkProperties markProperties1 = markPropertiesApi.createMarkProperties(ctx, MARK_PROPERTIES_NAME,
@@ -93,7 +94,7 @@ public class MarkPropertiesTest extends AbstractSeleniumTest {
         }
     }
 
-    @Ignore
+    @Disabled
     public void createAndUpdateMarkProperties() {
         final ApiContext ctx = createAdminApiContext(getContextRoot(), SHARED_SERVER_CONTEXT);
         MarkProperties createdMarkProperties = markPropertiesApi.createMarkProperties(ctx, MARK_PROPERTIES_NAME,
@@ -102,36 +103,38 @@ public class MarkPropertiesTest extends AbstractSeleniumTest {
         final UUID deviceUuid = randomUUID();
         MarkProperties updatedMarkProperties = markPropertiesApi.updateMarkPropertiesPositioning(ctx,
                 createdMarkProperties.getId(), deviceUuid, 1.0, 2.0);
-        assertTrue("read: MarkProperties.latDeg is different", 1.0 == updatedMarkProperties.getLatDeg().doubleValue());
-        assertTrue("read: MarkProperties.lonDeg is different", 2.0 == updatedMarkProperties.getLonDeg().doubleValue());
+        assertTrue(1.0 == updatedMarkProperties.getLatDeg().doubleValue(), "read: MarkProperties.latDeg is different");
+        assertTrue(2.0 == updatedMarkProperties.getLonDeg().doubleValue(), "read: MarkProperties.lonDeg is different");
     }
 
     private void assertDefaultValues(MarkProperties markProperties) {
-        assertNotNull("read: MarkProperties.id is missing", markProperties.getId());
-        assertEquals("read: MarkProperties.name is different", MARK_PROPERTIES_NAME, markProperties.getName());
-        assertEquals("read: MarkProperties.shortName is different", MARK_PROPERTIES_SHORTNAME,
-                markProperties.getShortName());
-        assertEquals("read: MarkProperties.color is different", MARK_PROPERTIES_COLOR, markProperties.getColor());
-        assertEquals("read: MarkProperties.shape is different", MARK_PROPERTIES_SHAPE, markProperties.getShape());
-        assertEquals("read: MarkProperties.pattern is different", MARK_PROPERTIES_PATTERN, markProperties.getPattern());
-        assertEquals("read: MarkProperties.type is different", MARK_PROPERTIES_TYPE,
-                markProperties.getMarkType().name());
+        assertNotNull(markProperties.getId(), "read: MarkProperties.id is missing");
+        assertEquals(MARK_PROPERTIES_NAME, markProperties.getName(), "read: MarkProperties.name is different");
+        assertEquals(MARK_PROPERTIES_SHORTNAME, markProperties.getShortName(),
+                "read: MarkProperties.shortName is different");
+        assertEquals(MARK_PROPERTIES_COLOR, markProperties.getColor(), "read: MarkProperties.color is different");
+        assertEquals(MARK_PROPERTIES_SHAPE, markProperties.getShape(), "read: MarkProperties.shape is different");
+        assertEquals(MARK_PROPERTIES_PATTERN, markProperties.getPattern(), "read: MarkProperties.pattern is different");
+        assertEquals(MARK_PROPERTIES_TYPE, markProperties.getMarkType().name(),
+                "read: MarkProperties.type is different");
     }
 
-    @Test(expected = HttpException.NotFound.class)
+    @SeleniumTestCase
     public void createAndDeleteMarkPropertiesTest() {
-        final ApiContext ctx = createAdminApiContext(getContextRoot(), SHARED_SERVER_CONTEXT);
-        MarkProperties createdMarkProperties = markPropertiesApi.createMarkProperties(ctx, MARK_PROPERTIES_NAME,
-                MARK_PROPERTIES_SHORTNAME, null, MARK_PROPERTIES_COLOR, MARK_PROPERTIES_SHAPE, MARK_PROPERTIES_PATTERN,
-                MARK_PROPERTIES_TYPE, MARK_PROPERTIES_TAGS, MARK_PROPERTIES_LATDEG, MARK_PROPERTIES_LONDEG);
-        assertNotNull("create: no MarkProperties returnded", createdMarkProperties);
-        assertNotNull("create: MarkProperties.id is missing", createdMarkProperties.getId());
-
-        markPropertiesApi.deleteMarkProperties(ctx, createdMarkProperties.getId());
-        markPropertiesApi.getMarkProperties(ctx, createdMarkProperties.getId());
+        assertThrows(HttpException.NotFound.class, () -> {
+            final ApiContext ctx = createAdminApiContext(getContextRoot(), SHARED_SERVER_CONTEXT);
+            MarkProperties createdMarkProperties = markPropertiesApi.createMarkProperties(ctx, MARK_PROPERTIES_NAME,
+                    MARK_PROPERTIES_SHORTNAME, null, MARK_PROPERTIES_COLOR, MARK_PROPERTIES_SHAPE, MARK_PROPERTIES_PATTERN,
+                    MARK_PROPERTIES_TYPE, MARK_PROPERTIES_TAGS, MARK_PROPERTIES_LATDEG, MARK_PROPERTIES_LONDEG);
+            assertNotNull(createdMarkProperties, "create: no MarkProperties returnded");
+            assertNotNull(createdMarkProperties.getId(), "create: MarkProperties.id is missing");
+    
+            markPropertiesApi.deleteMarkProperties(ctx, createdMarkProperties.getId());
+            markPropertiesApi.getMarkProperties(ctx, createdMarkProperties.getId());
+        });
     }
 
-    @Test
+    @SeleniumTestCase
     public void testExclusionOfDeviceUuidAndFixedPositioning() {
         final ApiContext ctx = createAdminApiContext(getContextRoot(), SHARED_SERVER_CONTEXT);
         MarkProperties createdMarkProperties = markPropertiesApi.createMarkProperties(ctx, MARK_PROPERTIES_NAME,
@@ -151,12 +154,14 @@ public class MarkPropertiesTest extends AbstractSeleniumTest {
         assertTrue(updatedMarkProperties.hasDevice());
     }
     
-    @Test(expected = HttpException.class)
+    @SeleniumTestCase
     public void testOverlapOfDeviceUuidAndFixedPositioning() {
-        final ApiContext ctx = createAdminApiContext(getContextRoot(), SHARED_SERVER_CONTEXT);
-        final UUID deviceUuid = UUID.randomUUID();
-        markPropertiesApi.createMarkProperties(ctx, MARK_PROPERTIES_NAME,
-                MARK_PROPERTIES_SHORTNAME, deviceUuid.toString(), MARK_PROPERTIES_COLOR, MARK_PROPERTIES_SHAPE, MARK_PROPERTIES_PATTERN,
-                MARK_PROPERTIES_TYPE, MARK_PROPERTIES_TAGS, MARK_PROPERTIES_LATDEG, MARK_PROPERTIES_LONDEG);
+        assertThrows(HttpException.class, () -> {
+            final ApiContext ctx = createAdminApiContext(getContextRoot(), SHARED_SERVER_CONTEXT);
+            final UUID deviceUuid = UUID.randomUUID();
+            markPropertiesApi.createMarkProperties(ctx, MARK_PROPERTIES_NAME,
+                    MARK_PROPERTIES_SHORTNAME, deviceUuid.toString(), MARK_PROPERTIES_COLOR, MARK_PROPERTIES_SHAPE, MARK_PROPERTIES_PATTERN,
+                    MARK_PROPERTIES_TYPE, MARK_PROPERTIES_TAGS, MARK_PROPERTIES_LATDEG, MARK_PROPERTIES_LONDEG);
+        });
     }
 }

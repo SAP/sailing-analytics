@@ -1,12 +1,12 @@
 package com.sap.sse.security.storemerging;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.IOException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.security.interfaces.AccessControlStore;
@@ -18,7 +18,7 @@ public class TestPreferenceMerging extends AbstractStoreMergeTest {
     private final static String PREF_B = "b";
     private final static String PREF_C = "c";
     
-    @Before
+    @BeforeEach
     public void setUp() throws IOException, UserStoreManagementException {
         // using another test's set-up as a dummy, mainly to get the admin user object
         setUp("source_TestRoleHandlingInUserGroupMerge", "target_TestRoleHandlingInUserGroupMerge");

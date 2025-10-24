@@ -2,7 +2,7 @@ package com.sap.sailing.gwt.ui.adminconsole;
 
 import java.util.List;
 
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -57,7 +57,7 @@ public class SelectNameForNewDeviceConfigurationDialog extends DataEntryDialog<S
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return identifierBox;
     }
 

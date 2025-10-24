@@ -21,6 +21,7 @@ import com.sap.sse.gwt.client.dialog.ConfirmationDialog;
 import com.sap.sse.security.shared.HasPermissions.Action;
 import com.sap.sse.security.shared.dto.SecuredDTO;
 import com.sap.sse.security.ui.client.i18n.StringMessages;
+import com.sap.sse.security.ui.client.premium.settings.AbstractSecuredValueSetting;
 
 public abstract class PremiumCheckBox extends PremiumUiElement implements HasValue<Boolean>, HasAllKeyHandlers {
 
@@ -53,6 +54,7 @@ public abstract class PremiumCheckBox extends PremiumUiElement implements HasVal
     protected final Image image;
     @UiField(provided = true)
     protected final CheckBox checkBox;
+    private final boolean defaultValue;
 
     private final ConfirmationDialog subscribeDialog;
 
@@ -60,15 +62,21 @@ public abstract class PremiumCheckBox extends PremiumUiElement implements HasVal
      * A Composite component, that includes a checkbox and an additional premium icon, indicating that the feature to be
      * enabled is a premium feature if the user does not have the permission.
      */
-    protected PremiumCheckBox(final String label, final Action action, final PaywallResolver paywallResolver, final SecuredDTO contextDTO) {
+    protected PremiumCheckBox(final String label, final Action action, final PaywallResolver paywallResolver, final SecuredDTO contextDTO, final boolean defaultValue) {
         super(action, paywallResolver, contextDTO);
-        this.image = createPremiumIcon();
-        this.checkBox = new CheckBox(label);
+        image = createPremiumIcon();
+        this.defaultValue = defaultValue;
+        checkBox = new CheckBox(label);
+        checkBox.setValue(defaultValue);
         initWidget(uiBinder.createAndBindUi(this));
         this.subscribeDialog = ConfirmationDialog.create(i18n.subscriptionSuggestionTitle(),
                 i18n.pleaseSubscribeToUse(), i18n.takeMeToSubscriptions(), i18n.cancel(),
                 () -> paywallResolver.getUnlockingSubscriptionPlans(action, contextDTO, this::onSubscribeDialogConfirmation));
         updateUserPermission();
+    }
+
+    protected PremiumCheckBox(final String label, AbstractSecuredValueSetting<Boolean> setting) {
+        this(label, setting.getAction(), setting.getPaywallResolver(), setting.getSecuredDTO(), setting.getValue());
     }
 
     protected abstract void onSubscribeDialogConfirmation(Iterable<String> unlockingPlans);
@@ -105,7 +113,13 @@ public abstract class PremiumCheckBox extends PremiumUiElement implements HasVal
 
     @Override
     public Boolean getValue() {
-        return hasPermission() && checkBox.getValue();
+        final Boolean result;
+        if (hasPermission()) {
+            result = checkBox.getValue();
+        } else {
+            result = defaultValue;
+        }
+        return result;
     }
 
     @Override
@@ -115,8 +129,10 @@ public abstract class PremiumCheckBox extends PremiumUiElement implements HasVal
 
     @Override
     public void setEnabled(final boolean enabled) {
-        super.setEnabled(enabled);
-        checkBox.setEnabled(enabled);
+        if (hasPermission()) {
+            super.setEnabled(enabled);
+            checkBox.setEnabled(enabled);
+        }
     }
 
     @Override

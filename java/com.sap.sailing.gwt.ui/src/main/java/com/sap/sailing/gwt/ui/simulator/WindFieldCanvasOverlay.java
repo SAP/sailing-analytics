@@ -110,7 +110,7 @@ public class WindFieldCanvasOverlay extends FullCanvasOverlay implements TimeLis
     @Override
     protected void draw() {
         super.draw();
-        if (mapProjection != null && windFieldDTO != null) {
+        if (getMapProjection() != null && windFieldDTO != null) {
             clear();
             drawWindField();
         }

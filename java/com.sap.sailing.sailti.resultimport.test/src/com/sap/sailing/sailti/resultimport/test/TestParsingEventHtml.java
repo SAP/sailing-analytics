@@ -1,7 +1,7 @@
 package com.sap.sailing.sailti.resultimport.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.RegattaScoreCorrections;
 import com.sap.sailing.domain.common.ScoreCorrectionProvider;
@@ -57,9 +57,9 @@ public class TestParsingEventHtml {
         for (final Pair<String, TimePoint> boatClassAndResultTimePoint : resultsPerBoatClass) {
             final RegattaScoreCorrections result = scoreCorrectionProvider.getScoreCorrections(eventName, boatClassAndResultTimePoint.getA(), boatClassAndResultTimePoint.getB());
             assertNotNull(
+                    result,
                     "Expected result for event " + eventName + " and boat class " + boatClassAndResultTimePoint.getA()
-                            + " for time point " + boatClassAndResultTimePoint.getB() + " to not be null",
-                    result);
+                            + " for time point " + boatClassAndResultTimePoint.getB() + " to not be null");
         }
     }
 }

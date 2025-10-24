@@ -222,7 +222,8 @@ echo TMP will be used for java.io.tmpdir and is $TMP
 if [ "$TMP" = "" ]; then
   export TMP=/tmp
 fi
-extra="${extra} -Dgwt.workers=${GWT_WORKERS} -Djava.io.tmpdir=$TMP"
+extra="${extra} -Dgwt.workers=${GWT_WORKERS} -Djava.io.tmpdir=$TMP -Dgwt.workDir=$TMP"
+extra="${extra} -Djdk.xml.maxGeneralEntitySizeLimit=0 -Djdk.xml.totalEntitySizeLimit=0"
 
 shift $((OPTIND-1))
 
@@ -299,6 +300,7 @@ if [[ "$@" == "release" ]]; then
     cp -v $PROJECT_HOME/java/target/configuration/JavaSE-11.profile $ACDIR/
     cp -v $PROJECT_HOME/java/target/refreshInstance.sh $ACDIR/
     cp -v $PROJECT_HOME/java/target/stopReplicating.sh $ACDIR/
+    cp -v $PROJECT_HOME/java/target/generateMailProperties.sh $ACDIR/
 
     cp -v $PROJECT_HOME/java/target/env.sh $ACDIR/
     cp -v $PROJECT_HOME/java/target/env-default-rules.sh $ACDIR/
@@ -667,10 +669,13 @@ if [[ "$@" == "build" ]] || [[ "$@" == "all" ]]; then
         echo "ANDROID_HOME=$ANDROID_HOME"
         PATH=$PATH:$ANDROID_HOME/tools/bin
         PATH=$PATH:$ANDROID_HOME/platform-tools
-        SDK_MANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+        SDK_MANAGER="$ANDROID_HOME/cmdline-tools/8.0/bin/sdkmanager"
         if [ \! -x "$SDK_MANAGER" ]; then
             SDK_MANAGER="$ANDROID_HOME/tools/bin/sdkmanager.bat"
         fi
+        echo "SDK_MANAGER=${SDK_MANAGER}"
+        echo "cmdline-tools:"
+        ls -l "$ANDROID_HOME/cmdline-tools/"
         
         BUILD_TOOLS_VERSION=`grep "buildTools = " build.gradle | cut -d "\"" -f 2`
         echo "BUILD_TOOLS_VERSION=$BUILD_TOOLS_VERSION"
@@ -761,7 +766,7 @@ if [[ "$@" == "build" ]] || [[ "$@" == "all" ]]; then
 	    JAVA_HOME="${JAVA8_HOME}" `dirname $0`/install-gwt "${PROJECT_HOME}"
           else
             echo "Downloading and installing forked GWT version..."
-            `dirname $0`/install-gwt-from-fork-releases https://github.com/SAP/gwt-forward-serialization-rpc https://github.com/SAP/gwt-maven-plugin-forward-serialization-rpc 2.11.0 .
+            `dirname $0`/install-gwt-from-fork-releases https://github.com/SAP/gwt-forward-serialization-rpc https://github.com/SAP/gwt-maven-plugin-forward-serialization-rpc 2.11.1 .
           fi
         fi
         echo "Using following command: mvn $extra -DargLine=\"$APP_PARAMETERS\" -fae -s $MAVEN_SETTINGS $clean install"
@@ -857,6 +862,7 @@ if [[ "$@" == "install" ]] || [[ "$@" == "all" ]]; then
     cp -v $PROJECT_HOME/java/target/configuration/JavaSE-11.profile $ACDIR/
     cp -v $PROJECT_HOME/java/target/refreshInstance.sh $ACDIR/
     cp -v $PROJECT_HOME/java/target/stopReplicating.sh $ACDIR/
+    cp -v $PROJECT_HOME/java/target/generateMailProperties.sh $ACDIR/
     cp -v $PROJECT_HOME/java/target/udpmirror $ACDIR/
     cp -v $PROJECT_HOME/java/target/http2udpmirror $ACDIR
 
@@ -964,6 +970,7 @@ if [[ "$@" == "remote-deploy" ]]; then
         $SCP_CMD $PROJECT_HOME/java/target/status $REMOTE_SERVER_LOGIN:$REMOTE_SERVER/
         $SCP_CMD $PROJECT_HOME/java/target/refreshInstance.sh $REMOTE_SERVER_LOGIN:$REMOTE_SERVER/
         $SCP_CMD $PROJECT_HOME/java/target/stopReplicating.sh $REMOTE_SERVER_LOGIN:$REMOTE_SERVER/
+        $SCP_CMD $PROJECT_HOME/java/target/generateMailProperties.sh $REMOTE_SERVER_LOGIN:$REMOTE_SERVER/
         $SCP_CMD $PROJECT_HOME/java/target/udpmirror $REMOTE_SERVER_LOGIN:$REMOTE_SERVER/
 
         $SCP_CMD $PROJECT_HOME/java/target/http2udpmirror $REMOTE_SERVER_LOGIN:$REMOTE_SERVER/

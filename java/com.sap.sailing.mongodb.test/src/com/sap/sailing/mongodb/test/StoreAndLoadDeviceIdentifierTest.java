@@ -1,13 +1,13 @@
 package com.sap.sailing.mongodb.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.net.UnknownHostException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.mongodb.MongoException;
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
@@ -24,8 +24,8 @@ import com.sap.sailing.domain.persistence.impl.MongoObjectFactoryImpl;
 import com.sap.sailing.domain.persistence.impl.MongoRegattaLogStoreImpl;
 import com.sap.sailing.domain.racelog.tracking.test.mock.MockEmptyServiceFinderFactory;
 import com.sap.sailing.domain.racelog.tracking.test.mock.MockSmartphoneImeiServiceFinderFactory;
-import com.sap.sailing.domain.racelog.tracking.test.mock.SmartphoneImeiIdentifier;
 import com.sap.sailing.domain.racelogtracking.PlaceHolderDeviceIdentifier;
+import com.sap.sailing.domain.racelogtracking.impl.SmartphoneImeiIdentifierImpl;
 import com.sap.sailing.domain.regattalike.RegattaLikeIdentifier;
 import com.sap.sailing.domain.trackfiles.TrackFileImportDeviceIdentifierImpl;
 import com.sap.sse.common.NoCorrespondingServiceRegisteredException;
@@ -54,7 +54,7 @@ public class StoreAndLoadDeviceIdentifierTest extends AbstractMongoDBTest {
         return MillisecondsTimePoint.now();
     }
     
-    @Before
+    @BeforeEach
     public void setup() throws UnknownHostException, MongoException, InterruptedException {
         dropTestDB();
 
@@ -90,7 +90,7 @@ public class StoreAndLoadDeviceIdentifierTest extends AbstractMongoDBTest {
     @Test
     public void testNormal() throws TransformationException, NoCorrespondingServiceRegisteredException {
         TypeBasedServiceFinderFactory factory = new MockSmartphoneImeiServiceFinderFactory();
-        DeviceIdentifier smartphone = new SmartphoneImeiIdentifier("abc");
+        DeviceIdentifier smartphone = new SmartphoneImeiIdentifierImpl("abc");
         DeviceIdentifier loaded = storeAndLoad(smartphone, factory, factory);
         assertEquals(smartphone, loaded);
     }
@@ -100,7 +100,7 @@ public class StoreAndLoadDeviceIdentifierTest extends AbstractMongoDBTest {
         TypeBasedServiceFinderFactory forStoring = new MockSmartphoneImeiServiceFinderFactory();
         TypeBasedServiceFinderFactory forLoading = new MockEmptyServiceFinderFactory();
 
-        DeviceIdentifier smartphone = new SmartphoneImeiIdentifier("abc");
+        DeviceIdentifier smartphone = new SmartphoneImeiIdentifierImpl("abc");
         DeviceIdentifier loaded = storeAndLoad(smartphone, forStoring, forLoading);
         
         assertTrue(loaded instanceof PlaceHolderDeviceIdentifier);
@@ -113,11 +113,11 @@ public class StoreAndLoadDeviceIdentifierTest extends AbstractMongoDBTest {
         TypeBasedServiceFinderFactory forLoading = new MockSmartphoneImeiServiceFinderFactory();
         TypeBasedServiceFinderFactory forStoring = new MockEmptyServiceFinderFactory();
 
-        DeviceIdentifier smartphone = new SmartphoneImeiIdentifier("abc");
+        DeviceIdentifier smartphone = new SmartphoneImeiIdentifierImpl("abc");
         DeviceIdentifier loaded = storeAndLoad(smartphone, forStoring, forLoading);
         
         //smartphone imei identifier can be restored from string rep
-        assertTrue(loaded instanceof SmartphoneImeiIdentifier);
+        assertTrue(loaded instanceof SmartphoneImeiIdentifierImpl);
         assertEquals(smartphone.getIdentifierType(), loaded.getIdentifierType());
         assertEquals(smartphone.getStringRepresentation(), loaded.getStringRepresentation());
     }

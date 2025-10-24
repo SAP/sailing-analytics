@@ -1,6 +1,6 @@
 package com.sap.sailing.gwt.home.communication.event.eventoverview;
 
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
+import com.sap.sse.gwt.shared.DTO;
 
 public class EventOverviewStageDTO implements DTO {
 

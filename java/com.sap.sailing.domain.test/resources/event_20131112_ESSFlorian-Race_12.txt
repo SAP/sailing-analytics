@@ -1,9 +1,5 @@
-stored-uri:datafiles/event_20131112_ESSFlorian-Race_12.mtb
+stored-uri:datafiles/535cccd0-2dd0-0131-28e8-60a44ce903c3.mtb
 StartReplay:1
-
-// Input from params_static:
-
-// Input from event_parameters:
 
 ResultColumn1Name:#
 ResultColumn1Size:20
@@ -25,9 +21,21 @@ PopUpRow3Name:Ranking
 PopUpRow3Type:RowNumber
 PopUpRow4Name:After
 PopUpRow4Type:BoatAfter
+EnableResults:0
+ResultsLayout:[{"key":"Order","header":"#","description":"Position","printable":true,"align":"right","collapsible":false},{"key":"Name","header":"Name","description":"Competitor's name","printable":true,"align":"left","collapsible":false},{"key":"ShortName","header":"Short Name","description":"Competitor's short name","printable":true,"align":"left","collapsible":true},{"key":"LegTime","header":"Leg","description":"Leg time","printable":false,"align":"right","collapsible":true},{"key":"LegPosition","header":"#","description":"Leg position","printable":false,"align":"right","collapsible":true},{"key":"Time","header":"Total","description":"Total time","printable":true,"align":"right","collapsible":false},{"key":"After","header":"Total &Delta;","description":"Total &Delta;","printable":true,"align":"right","collapsible":false}]
+PerformanceTableLayout:[{"key":"Pos","header":"Pos","tooltip":"Position","options":null},{"key":"Name","header":"Name","tooltip":"Name","options":null},{"key":"Short","header":"Short","tooltip":"Short name","options":null},{"key":"Country","header":"Country","tooltip":"Country","options":null},{"key":"After","header":"After","tooltip":"After","options":null},{"key":"Leg pos","header":"Leg pos","tooltip":"Leg position","options":null},{"key":"Leg time","header":"Leg time","tooltip":"Leg time","options":null},{"key":"SOG","header":"SOG","tooltip":"SOG","options":null},{"key":"VMG","header":"VMG","tooltip":"VMG","options":null},{"key":"Top speed","header":"Top Speed","tooltip":"Top Speed","options":null},{"key":"Distance","header":"Distance","tooltip":"Distance","options":null}]
+DefaultPanel:
+smsProvider:0
 CompMarkerUUID:1
 CodanIsSponsor:0
 DefaultTailLength:60
+ResultColumn1Tooltip:
+ResultColumn2Tooltip:
+ResultColumn3Tooltip:
+ResultColumn4Tooltip:
+ResultColumn5Tooltip:
+StartTimeType:Race
+smsParams:0,tracanonym,4525720572,3,10,15
 APzoomChangeTime:2500
 disableAutoProduce:0
 autoProduce:1
@@ -39,7 +47,9 @@ APmarkSwitch:0.13
 APmarkZoomBehindMarks:0.10
 APmarkZoomInFrontOfMarks:0.20
 PopupMarkerUUID:2
+ws-uri:ws://tracms.traclive.dk:8888
 ManualUrl:http://www.tractrac.com/files/userguide_sailing.pdf
+enableDiplomas:0
 Marker1UUID:1
 Marker1Type:RGBMarkerFactory
 Marker1Directional:1
@@ -52,7 +62,7 @@ MaxMetersPerSecond:20
 PrecisionMeters:20
 ShortAvgTime:180
 LongAvgTime:900
-TimeZone:
+TimeZone:-3
 CompMarkerTimeout:5
 FramesPerSecond:8
 replayspeedup:5
@@ -78,12 +88,33 @@ DisableRotation:0
 ControlPointMarkerRadius:36
 disableselection:1
 disableleaderline:0
+delayIntervals:3,10,15
 DisableChangeRace:0
+MapUrl:http://tile.traclive.dk/osm
+MarkerSymbol:standardBoat
+MarkerMinPixelSize:36
+ShowFlagInLabel:0
+ShowRankInLabel:1
+TailOpacity:70
+TailWidth:1
+ResultColumn1DefaultOrder:1
+ResultColumn2DefaultOrder:0
+ResultColumn3DefaultOrder:0
+ResultColumn4DefaultOrder:0
+ResultColumn5DefaultOrder:0
+DatabaseVersion:01.00.20
+LabelNoBackground:0
+LaggingThreshold:5
+LowBatteryThreshold:5
+dimmingLevel:1
+BatteryLevelWarn:20
+BatteryLevelDanger:13
+dimmingSeconds:60
 DisableLeaderboard:0
 DisableAnalysis:0
 TableFontSize:11
-//live-uri:tcp://192.168.1.203:4400
-//stored-uri:tcp://192.168.1.203:4401
+//live-uri:tcp://tracms.traclive.dk:4400
+//stored-uri:tcp://tracms.traclive.dk:4401
 compInitialsFontSize:11
 AutoRotate:1
 MassStart:0
@@ -93,14 +124,23 @@ ReCalcDirAndSpeed:0
 RaceHandicapSystem:NONE
 TeamCompetitionType:NONE
 LiveDelaySecs: 10
+LiveDelaySecsRace: 
+LiveDelaySecsEvent: 10
 
-//-------- AUTO GENERATED PARAMETERS START ----------------
+Maps:[]
 
 EventID:ed5a0cc0-29e1-0131-26b2-60a44ce903c3
 EventName:ESS Florianopolis 2013
+EventAnalyticsName:ESS Florianopolis 2013
 EventDB:event_20131112_ESSFlorian
 EventStartTime:2013-11-12 00:00:00
 EventEndTime:2013-11-18 00:00:00
+EventType:a1b74ca0-fdd8-11dc-8811-005056c00008
+EventJSON:https://historical1.tractrac.com/events/event_20131112_ESSFlorian/jsonservice.php
+DBReplicaEnabled:0
+HighLoadEnabled:
+MultipleDataservers:0
+WebURL:https://www.tractrac.com/event-page/event_20131112_ESSFlorian/632
 
 RaceID:535cccd0-2dd0-0131-28e8-60a44ce903c3
 RaceName:Race 12
@@ -108,8 +148,12 @@ RaceStartTime:2013-11-16 16:05:00
 RaceEndTime:
 RaceTrackingStartTime:2013-11-16 15:59:00
 RaceTrackingEndTime:2013-11-16 16:19:11
+Initialized:1
 RaceDefaultRouteUUID:535c5a10-2dd0-0131-28e7-60a44ce903c3
 RaceHandicapSystem:NONE
+RaceStatus:NONE
+RaceStatusTime:
+RaceStatusUpdatedAt:
 
 Image1UUID:64a7b348-83db-11e2-88c0-10bf48d758ce
 Image1Type:Logo
@@ -143,52 +187,43 @@ Image6Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/ima
 
 Class1UUID:648ee25a-83db-11e2-88c0-10bf48d758ce
 Class1Name:Extreme40
+Class1BoatClassId:
 
-Team1UUID:a73aabc0-d6d6-0130-8be2-60a44ce903c3
-Team1Name:Team I
+Team1UUID:649f1dbe-83db-11e2-88c0-10bf48d758ce
+Team1Name:TeamA
+Team1Comp1UUID:648bd4f2-83db-11e2-88c0-10bf48d758ce
 
-Team2UUID:bbf81f60-d6d6-0130-8be3-60a44ce903c3
-Team2Name:Team J
+Team2UUID:64bf0854-83db-11e2-88c0-10bf48d758ce
+Team2Name:TeamB
+Team2Comp1UUID:64bbff7e-83db-11e2-88c0-10bf48d758ce
 
-Team3UUID:649f1dbe-83db-11e2-88c0-10bf48d758ce
-Team3Name:TeamA
-Team3Comp1UUID:648bd4f2-83db-11e2-88c0-10bf48d758ce
+Team3UUID:64dd7988-83db-11e2-88c0-10bf48d758ce
+Team3Name:TeamC
+Team3Comp1UUID:64da7c24-83db-11e2-88c0-10bf48d758ce
 
-Team4UUID:64bf0854-83db-11e2-88c0-10bf48d758ce
-Team4Name:TeamB
-Team4Comp1UUID:64bbff7e-83db-11e2-88c0-10bf48d758ce
+Team4UUID:65351d82-83db-11e2-88c0-10bf48d758ce
+Team4Name:TeamE
+Team4Comp1UUID:65322500-83db-11e2-88c0-10bf48d758ce
 
-Team5UUID:64dd7988-83db-11e2-88c0-10bf48d758ce
-Team5Name:TeamC
-Team5Comp1UUID:64da7c24-83db-11e2-88c0-10bf48d758ce
+Team5UUID:655ed82a-83db-11e2-88c0-10bf48d758ce
+Team5Name:TeamF
+Team5Comp1UUID:655bd56c-83db-11e2-88c0-10bf48d758ce
 
-Team6UUID:64ffc402-83db-11e2-88c0-10bf48d758ce
-Team6Name:TeamD
+Team6UUID:65659280-eda3-0130-c5c0-10b11c4ed8fd
+Team6Name:TeamK
+Team6Comp1UUID:8716c6f0-eda3-0130-c5c1-10b11c4ed8fd
 
-Team7UUID:65351d82-83db-11e2-88c0-10bf48d758ce
-Team7Name:TeamE
-Team7Comp1UUID:65322500-83db-11e2-88c0-10bf48d758ce
+Team7UUID:65829fa8-83db-11e2-88c0-10bf48d758ce
+Team7Name:TeamG
+Team7Comp1UUID:657fa5a0-83db-11e2-88c0-10bf48d758ce
 
-Team8UUID:655ed82a-83db-11e2-88c0-10bf48d758ce
-Team8Name:TeamF
-Team8Comp1UUID:655bd56c-83db-11e2-88c0-10bf48d758ce
-
-Team9UUID:65829fa8-83db-11e2-88c0-10bf48d758ce
-Team9Name:TeamG
-Team9Comp1UUID:657fa5a0-83db-11e2-88c0-10bf48d758ce
-
-Team10UUID:e4459a20-83db-11e2-88c0-10bf48d758ce
-Team10Name:TeamH
-Team10Comp1UUID:e442a414-83db-11e2-88c0-10bf48d758ce
-
-Team11UUID:65659280-eda3-0130-c5c0-10b11c4ed8fd
-Team11Name:TeamK
-Team11Comp1UUID:8716c6f0-eda3-0130-c5c1-10b11c4ed8fd
+Team8UUID:e4459a20-83db-11e2-88c0-10bf48d758ce
+Team8Name:TeamH
+Team8Comp1UUID:e442a414-83db-11e2-88c0-10bf48d758ce
 
 Comp1UUID:648bd4f2-83db-11e2-88c0-10bf48d758ce
 Comp1Name:Alinghi
 Comp1NameShort:Alinghi
-Comp1Color:00FF00
 Comp1Nationality:SUI
 Comp1Description:
 Comp1Handicap:1.0000000000
@@ -197,11 +232,11 @@ Comp1StartTime:2013-11-16 16:05:00
 Comp1PictureUUID:64a7b348-83db-11e2-88c0-10bf48d758ce
 Comp1ClassUUID:648ee25a-83db-11e2-88c0-10bf48d758ce
 Comp1RouteUUID:535c5a10-2dd0-0131-28e7-60a44ce903c3
+Comp1Color:00FF00
 
 Comp2UUID:64bbff7e-83db-11e2-88c0-10bf48d758ce
 Comp2Name:GAC Pindar
 Comp2NameShort:GAC Pindar
-Comp2Color:000080
 Comp2Nationality:NZL
 Comp2Description:
 Comp2Handicap:1.0000000000
@@ -210,11 +245,11 @@ Comp2StartTime:2013-11-16 16:05:00
 Comp2PictureUUID:64c3a8fa-83db-11e2-88c0-10bf48d758ce
 Comp2ClassUUID:648ee25a-83db-11e2-88c0-10bf48d758ce
 Comp2RouteUUID:535c5a10-2dd0-0131-28e7-60a44ce903c3
+Comp2Color:000080
 
 Comp3UUID:64da7c24-83db-11e2-88c0-10bf48d758ce
 Comp3Name:Realteam
 Comp3NameShort:Realteam
-Comp3Color:000000
 Comp3Nationality:SUI
 Comp3Description:
 Comp3Handicap:1.0000000000
@@ -223,11 +258,11 @@ Comp3StartTime:2013-11-16 16:05:00
 Comp3PictureUUID:64a7b348-83db-11e2-88c0-10bf48d758ce
 Comp3ClassUUID:648ee25a-83db-11e2-88c0-10bf48d758ce
 Comp3RouteUUID:535c5a10-2dd0-0131-28e7-60a44ce903c3
+Comp3Color:000000
 
 Comp4UUID:65322500-83db-11e2-88c0-10bf48d758ce
 Comp4Name:Red Bull Sailing Team
 Comp4NameShort:Red Bull
-Comp4Color:008080
 Comp4Nationality:AUT
 Comp4Description:
 Comp4Handicap:1.0000000000
@@ -236,11 +271,11 @@ Comp4StartTime:2013-11-16 16:05:00
 Comp4PictureUUID:653c1ab0-83db-11e2-88c0-10bf48d758ce
 Comp4ClassUUID:648ee25a-83db-11e2-88c0-10bf48d758ce
 Comp4RouteUUID:535c5a10-2dd0-0131-28e7-60a44ce903c3
+Comp4Color:008080
 
 Comp5UUID:655bd56c-83db-11e2-88c0-10bf48d758ce
 Comp5Name:SAP Extreme Sailing Team
 Comp5NameShort:SAP
-Comp5Color:FFFFFF
 Comp5Nationality:DEN
 Comp5Description:
 Comp5Handicap:1.0000000000
@@ -249,11 +284,11 @@ Comp5StartTime:2013-11-16 16:05:00
 Comp5PictureUUID:65637da8-83db-11e2-88c0-10bf48d758ce
 Comp5ClassUUID:648ee25a-83db-11e2-88c0-10bf48d758ce
 Comp5RouteUUID:535c5a10-2dd0-0131-28e7-60a44ce903c3
+Comp5Color:FFFFFF
 
 Comp6UUID:657fa5a0-83db-11e2-88c0-10bf48d758ce
 Comp6Name:The Wave Muscat
 Comp6NameShort:The Wave
-Comp6Color:800080
 Comp6Nationality:OMA
 Comp6Description:
 Comp6Handicap:1.0000000000
@@ -262,11 +297,11 @@ Comp6StartTime:2013-11-16 16:05:00
 Comp6PictureUUID:65875138-83db-11e2-88c0-10bf48d758ce
 Comp6ClassUUID:648ee25a-83db-11e2-88c0-10bf48d758ce
 Comp6RouteUUID:535c5a10-2dd0-0131-28e7-60a44ce903c3
+Comp6Color:800080
 
 Comp7UUID:e442a414-83db-11e2-88c0-10bf48d758ce
 Comp7Name:Invite
 Comp7NameShort:Invite
-Comp7Color:FFFF00
 Comp7Nationality:BRA
 Comp7Description:
 Comp7Handicap:1.0000000000
@@ -274,11 +309,11 @@ Comp7HandicapDistance:0.00000
 Comp7StartTime:2013-11-16 16:05:00
 Comp7ClassUUID:648ee25a-83db-11e2-88c0-10bf48d758ce
 Comp7RouteUUID:535c5a10-2dd0-0131-28e7-60a44ce903c3
+Comp7Color:FFFF00
 
 Comp8UUID:8716c6f0-eda3-0130-c5c1-10b11c4ed8fd
 Comp8Name:ChinaSpirit
 Comp8NameShort:ChinaSpirit
-Comp8Color:800000
 Comp8Nationality:CHN
 Comp8Description:
 Comp8Handicap:1.0000000000
@@ -286,294 +321,761 @@ Comp8HandicapDistance:0.00000
 Comp8StartTime:2013-11-16 16:05:00
 Comp8ClassUUID:648ee25a-83db-11e2-88c0-10bf48d758ce
 Comp8RouteUUID:535c5a10-2dd0-0131-28e7-60a44ce903c3
+Comp8Color:800000
 
-ControlPoint1UUID:0f82e950-3046-0131-cf67-10b11c4ed8fd
-ControlPoint1Name:RC-Green
-ControlPoint1HasTwoPoints:1
-ControlPoint1ShortName:S
-ControlPoint1DataSheet:P1.Type=StartBoat###BREAKLINE###P1.Name=Race Committee###BREAKLINE###P1.UUID=3e6c1c94-83bf-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Green###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Green###BREAKLINE###P2.UUID=785c3e44-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
-ControlPoint1Mark1Lon:-48.561672
-ControlPoint1Mark1Lat:-27.584913
-ControlPoint1Mark2Lon:-48.556278
-ControlPoint1Mark2Lat:-27.583408
+PositionedItem1UUID:aac2d6b0-855c-013d-98d0-1c6b00518c70
+PositionedItem1Name:RC-Green - 1
+PositionedItem1CourseArea:
+PositionedItem1Static:0
+PositionedItem1Positions:
+PositionedItem1DataSheet:Type=StartBoat###BREAKLINE###Name=Race Committee###BREAKLINE###UUID=3e6c1c94-83bf-11e2-88c0-10bf48d758ce
 
-ControlPoint2UUID:1286f15e-83be-11e2-88c0-10bf48d758ce
-ControlPoint2Name:Orange
-ControlPoint2HasTwoPoints:0
-ControlPoint2ShortName:O
-ControlPoint2DataSheet:Type=Buoy###BREAKLINE###Color=Orange###BREAKLINE###Shape=Conical###BREAKLINE###Name=Orange
-ControlPoint2Mark1Lon:-48.557140
-ControlPoint2Mark1Lat:-27.578955
+PositionedItem2UUID:aaf97000-855c-013d-98d1-1c6b00518c70
+PositionedItem2Name:RC-Green - 2
+PositionedItem2CourseArea:
+PositionedItem2Static:0
+PositionedItem2Positions:
+PositionedItem2DataSheet:Type=Buoy###BREAKLINE###Color=Green###BREAKLINE###Shape=Conical###BREAKLINE###Name=Green###BREAKLINE###UUID=785c3e44-83be-11e2-88c0-10bf48d758ce
 
-ControlPoint3UUID:133d41f0-2dca-0131-279a-60a44ce903c3
-ControlPoint3Name:RC-Black Conical
-ControlPoint3HasTwoPoints:1
-ControlPoint3ShortName:S
-ControlPoint3DataSheet:P1.Type=StartBoat###BREAKLINE###P1.Name=Race Committee###BREAKLINE###P1.UUID=3e6c1c94-83bf-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Black###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Pattern=Checkered###BREAKLINE###P2.Name=Black Conical###BREAKLINE###P2.UUID=d78695ea-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
-ControlPoint3Mark1Lon:-48.561672
-ControlPoint3Mark1Lat:-27.584913
-ControlPoint3Mark2Lon:-48.560630
-ControlPoint3Mark2Lat:-27.583535
+PositionedItem3UUID:ab7dede0-855c-013d-98d4-1c6b00518c70
+PositionedItem3Name:Orange
+PositionedItem3CourseArea:
+PositionedItem3Static:0
+PositionedItem3Positions:
+PositionedItem3DataSheet:Type=Buoy###BREAKLINE###Color=Orange###BREAKLINE###Shape=Conical###BREAKLINE###Name=Orange
 
-ControlPoint4UUID:1c17f4d0-2dc9-0131-274a-60a44ce903c3
-ControlPoint4Name:Black Conical-WhiteP
-ControlPoint4HasTwoPoints:1
-ControlPoint4ShortName:S
-ControlPoint4DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Black###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Pattern=Checkered###BREAKLINE###P1.Name=Black Conical###BREAKLINE###P1.UUID=d78695ea-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=White###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=White P###BREAKLINE###P2.UUID=e9ec42f8-83bd-11e2-88c0-10bf48d758ce###BREAKLINE###
-ControlPoint4Mark1Lon:-48.560630
-ControlPoint4Mark1Lat:-27.583535
-ControlPoint4Mark2Lon:-48.557163
-ControlPoint4Mark2Lat:-27.579110
+PositionedItem4UUID:abc6aa20-855c-013d-98d5-1c6b00518c70
+PositionedItem4Name:RC-Black Conical - 1
+PositionedItem4CourseArea:
+PositionedItem4Static:0
+PositionedItem4Positions:
+PositionedItem4DataSheet:Type=StartBoat###BREAKLINE###Name=Race Committee###BREAKLINE###UUID=3e6c1c94-83bf-11e2-88c0-10bf48d758ce
 
-ControlPoint5UUID:2b184930-2dca-0131-27a4-60a44ce903c3
-ControlPoint5Name:RC-Black Cylinder
-ControlPoint5HasTwoPoints:1
-ControlPoint5ShortName:F
-ControlPoint5DataSheet:P1.Type=StartBoat###BREAKLINE###P1.Name=Race Committee###BREAKLINE###P1.UUID=3e6c1c94-83bf-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Black###BREAKLINE###P2.Shape=Cylinder###BREAKLINE###P2.Pattern=Checkered###BREAKLINE###P2.Name=Black Cylinder###BREAKLINE###P2.UUID=b153dfd6-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
-ControlPoint5Mark1Lon:-48.561672
-ControlPoint5Mark1Lat:-27.584913
-ControlPoint5Mark2Lon:-48.558762
-ControlPoint5Mark2Lat:-27.586213
+PositionedItem5UUID:abfddf80-855c-013d-98d6-1c6b00518c70
+PositionedItem5Name:RC-Black Conical - 2
+PositionedItem5CourseArea:
+PositionedItem5Static:0
+PositionedItem5Positions:
+PositionedItem5DataSheet:Type=Buoy###BREAKLINE###Color=Black###BREAKLINE###Shape=Conical###BREAKLINE###Pattern=Checkered###BREAKLINE###Name=Black Conical###BREAKLINE###UUID=d78695ea-83be-11e2-88c0-10bf48d758ce
 
-ControlPoint6UUID:2c46b4a0-2dc9-0131-2754-60a44ce903c3
-ControlPoint6Name:Black Conical-WhiteS
-ControlPoint6HasTwoPoints:1
-ControlPoint6ShortName:S
-ControlPoint6DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Black###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Pattern=Checkered###BREAKLINE###P1.Name=Black Conical###BREAKLINE###P1.UUID=d78695ea-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=White###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=White S###BREAKLINE###P2.UUID=bf6777e6-83bd-11e2-88c0-10bf48d758ce###BREAKLINE###
-ControlPoint6Mark1Lon:-48.560630
-ControlPoint6Mark1Lat:-27.583535
-ControlPoint6Mark2Lon:-48.558173
-ControlPoint6Mark2Lat:-27.579170
+PositionedItem6UUID:ac73ce20-855c-013d-98d9-1c6b00518c70
+PositionedItem6Name:Black Conical-WhiteP - 1
+PositionedItem6CourseArea:
+PositionedItem6Static:0
+PositionedItem6Positions:
+PositionedItem6DataSheet:Type=Buoy###BREAKLINE###Color=Black###BREAKLINE###Shape=Conical###BREAKLINE###Pattern=Checkered###BREAKLINE###Name=Black Conical###BREAKLINE###UUID=d78695ea-83be-11e2-88c0-10bf48d758ce
 
-ControlPoint7UUID:3240586c-83c0-11e2-88c0-10bf48d758ce
-ControlPoint7Name:Finish Pole
-ControlPoint7HasTwoPoints:0
-ControlPoint7ShortName:F
-ControlPoint7DataSheet:Color=Black###BREAKLINE###Type=Landmark###BREAKLINE###Name=Finish Pole
-ControlPoint7Mark1Lon:-48.557442
-ControlPoint7Mark1Lat:-27.587342
+PositionedItem7UUID:acac2c20-855c-013d-98da-1c6b00518c70
+PositionedItem7Name:Black Conical-WhiteP - 2
+PositionedItem7CourseArea:
+PositionedItem7Static:0
+PositionedItem7Positions:
+PositionedItem7DataSheet:Type=Buoy###BREAKLINE###Color=White###BREAKLINE###Shape=Conical###BREAKLINE###Name=White P###BREAKLINE###UUID=e9ec42f8-83bd-11e2-88c0-10bf48d758ce
 
-ControlPoint8UUID:32e7cd80-2f60-0131-ce8e-10b11c4ed8fd
-ControlPoint8Name:Black Conical - Orange
-ControlPoint8HasTwoPoints:1
-ControlPoint8ShortName:BO
-ControlPoint8DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Black###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Pattern=Checkered###BREAKLINE###P1.Name=Black Conical###BREAKLINE###P1.UUID=d78695ea-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Orange###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Orange###BREAKLINE###P2.UUID=1286f15e-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
-ControlPoint8Mark1Lon:-48.557167
-ControlPoint8Mark1Lat:-27.587635
-ControlPoint8Mark2Lon:-48.557228
-ControlPoint8Mark2Lat:-27.587597
+PositionedItem8UUID:ad31aab0-855c-013d-98dd-1c6b00518c70
+PositionedItem8Name:RC-Black Cylinder - 1
+PositionedItem8CourseArea:
+PositionedItem8Static:0
+PositionedItem8Positions:
+PositionedItem8DataSheet:Type=StartBoat###BREAKLINE###Name=Race Committee###BREAKLINE###UUID=3e6c1c94-83bf-11e2-88c0-10bf48d758ce
 
-ControlPoint9UUID:38e5ec90-30f1-0131-d0ad-10b11c4ed8fd
-ControlPoint9Name:R9 Yellow
-ControlPoint9HasTwoPoints:0
-ControlPoint9ShortName:Y
-ControlPoint9Mark1Lon:-48.556918
-ControlPoint9Mark1Lat:-27.574885
+PositionedItem9UUID:adaf7e00-855c-013d-98de-1c6b00518c70
+PositionedItem9Name:RC-Black Cylinder - 2
+PositionedItem9CourseArea:
+PositionedItem9Static:0
+PositionedItem9Positions:
+PositionedItem9DataSheet:Type=Buoy###BREAKLINE###Color=Black###BREAKLINE###Shape=Cylinder###BREAKLINE###Pattern=Checkered###BREAKLINE###Name=Black Cylinder###BREAKLINE###UUID=b153dfd6-83be-11e2-88c0-10bf48d758ce
 
-ControlPoint10UUID:3e6c1c94-83bf-11e2-88c0-10bf48d758ce
-ControlPoint10Name:Race Committee
-ControlPoint10HasTwoPoints:0
-ControlPoint10ShortName:RC
-ControlPoint10DataSheet:Type=StartBoat###BREAKLINE###Name=Race Committee
-ControlPoint10Mark1Lon:-48.561672
-ControlPoint10Mark1Lat:-27.584913
+PositionedItem10UUID:adebd7d1-855c-013d-98e1-1c6b00518c70
+PositionedItem10Name:Black Conical-WhiteS - 1
+PositionedItem10CourseArea:
+PositionedItem10Static:0
+PositionedItem10Positions:
+PositionedItem10DataSheet:Type=Buoy###BREAKLINE###Color=Black###BREAKLINE###Shape=Conical###BREAKLINE###Pattern=Checkered###BREAKLINE###Name=Black Conical###BREAKLINE###UUID=d78695ea-83be-11e2-88c0-10bf48d758ce
 
-ControlPoint11UUID:3fdd2402-83be-11e2-88c0-10bf48d758ce
-ControlPoint11Name:Yellow
-ControlPoint11HasTwoPoints:0
-ControlPoint11ShortName:Y
-ControlPoint11DataSheet:Type=Buoy###BREAKLINE###Color=Yellow###BREAKLINE###Shape=Conical###BREAKLINE###Name=Yellow
-ControlPoint11Mark1Lon:-48.558205
-ControlPoint11Mark1Lat:-27.584870
+PositionedItem11UUID:ae02f510-855c-013d-98e2-1c6b00518c70
+PositionedItem11Name:Black Conical-WhiteS - 2
+PositionedItem11CourseArea:
+PositionedItem11Static:0
+PositionedItem11Positions:
+PositionedItem11DataSheet:Type=Buoy###BREAKLINE###Color=White###BREAKLINE###Shape=Conical###BREAKLINE###Name=White S###BREAKLINE###UUID=bf6777e6-83bd-11e2-88c0-10bf48d758ce
 
-ControlPoint12UUID:4bea7160-2dc9-0131-275e-60a44ce903c3
-ControlPoint12Name:Black Conical-Yellow
-ControlPoint12HasTwoPoints:1
-ControlPoint12ShortName:S
-ControlPoint12DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Black###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Pattern=Checkered###BREAKLINE###P1.Name=Black Conical###BREAKLINE###P1.UUID=d78695ea-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Yellow###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Yellow###BREAKLINE###P2.UUID=3fdd2402-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
-ControlPoint12Mark1Lon:-48.560630
-ControlPoint12Mark1Lat:-27.583535
-ControlPoint12Mark2Lon:-48.558205
-ControlPoint12Mark2Lat:-27.584870
+PositionedItem12UUID:ae4ba7e0-855c-013d-98e5-1c6b00518c70
+PositionedItem12Name:Finish Pole
+PositionedItem12CourseArea:
+PositionedItem12Static:0
+PositionedItem12Positions:
+PositionedItem12DataSheet:Color=Black###BREAKLINE###Type=Landmark###BREAKLINE###Name=Finish Pole
 
-ControlPoint13UUID:4f74d870-2dca-0131-27ae-60a44ce903c3
-ControlPoint13Name:Red-Green
-ControlPoint13HasTwoPoints:1
-ControlPoint13ShortName:RG
-ControlPoint13DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Red###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Name=Red###BREAKLINE###P1.UUID=5427c7d2-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Green###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Green###BREAKLINE###P2.UUID=785c3e44-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
-ControlPoint13Mark1Lon:-48.560718
-ControlPoint13Mark1Lat:-27.586750
-ControlPoint13Mark2Lon:-48.556278
-ControlPoint13Mark2Lat:-27.583408
+PositionedItem13UUID:ae764c40-855c-013d-98e6-1c6b00518c70
+PositionedItem13Name:Black Conical - Orange - 1
+PositionedItem13CourseArea:
+PositionedItem13Static:0
+PositionedItem13Positions:
+PositionedItem13DataSheet:Type=Buoy###BREAKLINE###Color=Black###BREAKLINE###Shape=Conical###BREAKLINE###Pattern=Checkered###BREAKLINE###Name=Black Conical###BREAKLINE###UUID=d78695ea-83be-11e2-88c0-10bf48d758ce
 
-ControlPoint14UUID:5427c7d2-83be-11e2-88c0-10bf48d758ce
-ControlPoint14Name:Red
-ControlPoint14HasTwoPoints:0
-ControlPoint14ShortName:R
-ControlPoint14DataSheet:Type=Buoy###BREAKLINE###Color=Red###BREAKLINE###Shape=Conical###BREAKLINE###Name=Red
-ControlPoint14Mark1Lon:-48.560718
-ControlPoint14Mark1Lat:-27.586750
+PositionedItem14UUID:ae832a90-855c-013d-98e7-1c6b00518c70
+PositionedItem14Name:Black Conical - Orange - 2
+PositionedItem14CourseArea:
+PositionedItem14Static:0
+PositionedItem14Positions:
+PositionedItem14DataSheet:Type=Buoy###BREAKLINE###Color=Orange###BREAKLINE###Shape=Conical###BREAKLINE###Name=Orange###BREAKLINE###UUID=1286f15e-83be-11e2-88c0-10bf48d758ce
 
-ControlPoint15UUID:60e54960-2dc8-0131-2722-60a44ce903c3
-ControlPoint15Name:Black Gate
-ControlPoint15HasTwoPoints:1
-ControlPoint15ShortName:B
-ControlPoint15DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Black###BREAKLINE###P1.Shape=Cylinder###BREAKLINE###P1.Pattern=Checkered###BREAKLINE###P1.Name=Black Cylinder###BREAKLINE###P1.UUID=b153dfd6-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Black###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Pattern=Checkered###BREAKLINE###P2.Name=Black Conical###BREAKLINE###P2.UUID=d78695ea-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
-ControlPoint15Mark1Lon:-48.558762
-ControlPoint15Mark1Lat:-27.586213
-ControlPoint15Mark2Lon:-48.560630
-ControlPoint15Mark2Lat:-27.583535
+PositionedItem15UUID:aea97310-855c-013d-98ea-1c6b00518c70
+PositionedItem15Name:R9 Yellow
+PositionedItem15CourseArea:
+PositionedItem15Static:0
+PositionedItem15Positions:
+PositionedItem15DataSheet:
 
-ControlPoint16UUID:648db960-2dca-0131-27b8-60a44ce903c3
-ControlPoint16Name:Red-Orange
-ControlPoint16HasTwoPoints:1
-ControlPoint16ShortName:RO
-ControlPoint16DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Red###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Name=Red###BREAKLINE###P1.UUID=5427c7d2-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Orange###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Orange###BREAKLINE###P2.UUID=1286f15e-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
-ControlPoint16Mark1Lon:-48.560718
-ControlPoint16Mark1Lat:-27.586750
-ControlPoint16Mark2Lon:-48.557140
-ControlPoint16Mark2Lat:-27.578955
+PositionedItem16UUID:aecf3a80-855c-013d-98eb-1c6b00518c70
+PositionedItem16Name:Race Committee
+PositionedItem16CourseArea:
+PositionedItem16Static:0
+PositionedItem16Positions:
+PositionedItem16DataSheet:Type=StartBoat###BREAKLINE###Name=Race Committee
 
-ControlPoint17UUID:72216ea0-2dca-0131-27c2-60a44ce903c3
-ControlPoint17Name:Red-Yellow
-ControlPoint17HasTwoPoints:1
-ControlPoint17ShortName:RY
-ControlPoint17DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Red###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Name=Red###BREAKLINE###P1.UUID=5427c7d2-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Yellow###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Yellow###BREAKLINE###P2.UUID=3fdd2402-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
-ControlPoint17Mark1Lon:-48.560718
-ControlPoint17Mark1Lat:-27.586750
-ControlPoint17Mark2Lon:-48.558205
-ControlPoint17Mark2Lat:-27.584870
+PositionedItem17UUID:aee63660-855c-013d-98ec-1c6b00518c70
+PositionedItem17Name:Yellow
+PositionedItem17CourseArea:
+PositionedItem17Static:0
+PositionedItem17Positions:
+PositionedItem17DataSheet:Type=Buoy###BREAKLINE###Color=Yellow###BREAKLINE###Shape=Conical###BREAKLINE###Name=Yellow
 
-ControlPoint18UUID:785c3e44-83be-11e2-88c0-10bf48d758ce
-ControlPoint18Name:Green
-ControlPoint18HasTwoPoints:0
-ControlPoint18ShortName:G
-ControlPoint18DataSheet:Type=Buoy###BREAKLINE###Color=Green###BREAKLINE###Shape=Conical###BREAKLINE###Name=Green
-ControlPoint18Mark1Lon:-48.556278
-ControlPoint18Mark1Lat:-27.583408
+PositionedItem18UUID:af1dfd40-855c-013d-98ed-1c6b00518c70
+PositionedItem18Name:Black Conical-Yellow - 1
+PositionedItem18CourseArea:
+PositionedItem18Static:0
+PositionedItem18Positions:
+PositionedItem18DataSheet:Type=Buoy###BREAKLINE###Color=Black###BREAKLINE###Shape=Conical###BREAKLINE###Pattern=Checkered###BREAKLINE###Name=Black Conical###BREAKLINE###UUID=d78695ea-83be-11e2-88c0-10bf48d758ce
 
-ControlPoint19UUID:7c057f10-2dc9-0131-2768-60a44ce903c3
-ControlPoint19Name:Green-Orange
-ControlPoint19HasTwoPoints:1
-ControlPoint19ShortName:GO
-ControlPoint19DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Green###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Name=Green###BREAKLINE###P1.UUID=785c3e44-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Orange###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Orange###BREAKLINE###P2.UUID=1286f15e-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
-ControlPoint19Mark1Lon:-48.556278
-ControlPoint19Mark1Lat:-27.583408
-ControlPoint19Mark2Lon:-48.557140
-ControlPoint19Mark2Lat:-27.578955
+PositionedItem19UUID:af2f9170-855c-013d-98ee-1c6b00518c70
+PositionedItem19Name:Black Conical-Yellow - 2
+PositionedItem19CourseArea:
+PositionedItem19Static:0
+PositionedItem19Positions:
+PositionedItem19DataSheet:Type=Buoy###BREAKLINE###Color=Yellow###BREAKLINE###Shape=Conical###BREAKLINE###Name=Yellow###BREAKLINE###UUID=3fdd2402-83be-11e2-88c0-10bf48d758ce
 
-ControlPoint20UUID:914f22b0-2dca-0131-27cc-60a44ce903c3
-ControlPoint20Name:White Gate
-ControlPoint20HasTwoPoints:1
-ControlPoint20ShortName:W
-ControlPoint20DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=White###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Name=White S###BREAKLINE###P1.UUID=bf6777e6-83bd-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=White###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=White P###BREAKLINE###P2.UUID=e9ec42f8-83bd-11e2-88c0-10bf48d758ce###BREAKLINE###
-ControlPoint20Mark1Lon:-48.558173
-ControlPoint20Mark1Lat:-27.579170
-ControlPoint20Mark2Lon:-48.557163
-ControlPoint20Mark2Lat:-27.579110
+PositionedItem20UUID:af76bca1-855c-013d-98f1-1c6b00518c70
+PositionedItem20Name:Red-Green - 1
+PositionedItem20CourseArea:
+PositionedItem20Static:0
+PositionedItem20Positions:
+PositionedItem20DataSheet:Type=Buoy###BREAKLINE###Color=Red###BREAKLINE###Shape=Conical###BREAKLINE###Name=Red###BREAKLINE###UUID=5427c7d2-83be-11e2-88c0-10bf48d758ce
 
-ControlPoint21UUID:aa831320-2dc8-0131-272c-60a44ce903c3
-ControlPoint21Name:Finish Pole-Cylinder
-ControlPoint21HasTwoPoints:1
-ControlPoint21ShortName:F
-ControlPoint21DataSheet:P1.Color=Black###BREAKLINE###P1.Type=Landmark###BREAKLINE###P1.Name=Finish Pole###BREAKLINE###P1.UUID=3240586c-83c0-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Black###BREAKLINE###P2.Shape=Cylinder###BREAKLINE###P2.Pattern=Checkered###BREAKLINE###P2.Name=Black Cylinder###BREAKLINE###P2.UUID=b153dfd6-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
-ControlPoint21Mark1Lon:-48.557442
-ControlPoint21Mark1Lat:-27.587342
-ControlPoint21Mark2Lon:-48.558762
-ControlPoint21Mark2Lat:-27.586213
+PositionedItem21UUID:afad9880-855c-013d-98f2-1c6b00518c70
+PositionedItem21Name:Red-Green - 2
+PositionedItem21CourseArea:
+PositionedItem21Static:0
+PositionedItem21Positions:
+PositionedItem21DataSheet:Type=Buoy###BREAKLINE###Color=Green###BREAKLINE###Shape=Conical###BREAKLINE###Name=Green###BREAKLINE###UUID=785c3e44-83be-11e2-88c0-10bf48d758ce
 
-ControlPoint22UUID:af4e4920-2dc9-0131-2772-60a44ce903c3
-ControlPoint22Name:Green-WhiteP
-ControlPoint22HasTwoPoints:1
-ControlPoint22ShortName:GP
-ControlPoint22DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Green###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Name=Green###BREAKLINE###P1.UUID=785c3e44-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=White###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=White P###BREAKLINE###P2.UUID=e9ec42f8-83bd-11e2-88c0-10bf48d758ce###BREAKLINE###
-ControlPoint22Mark1Lon:-48.556278
-ControlPoint22Mark1Lat:-27.583408
-ControlPoint22Mark2Lon:-48.557163
-ControlPoint22Mark2Lat:-27.579110
+PositionedItem22UUID:aff73730-855c-013d-98f5-1c6b00518c70
+PositionedItem22Name:R20-Green
+PositionedItem22CourseArea:
+PositionedItem22Static:0
+PositionedItem22Positions:
+PositionedItem22DataSheet:
 
-ControlPoint23UUID:b153dfd6-83be-11e2-88c0-10bf48d758ce
-ControlPoint23Name:Black Cylinder
-ControlPoint23HasTwoPoints:0
-ControlPoint23ShortName:B
-ControlPoint23DataSheet:Type=Buoy###BREAKLINE###Color=Black###BREAKLINE###Shape=Cylinder###BREAKLINE###Pattern=Checkered###BREAKLINE###Name=Black Cylinder
-ControlPoint23Mark1Lon:-48.558762
-ControlPoint23Mark1Lat:-27.586213
+PositionedItem23UUID:b0178e50-855c-013d-98f6-1c6b00518c70
+PositionedItem23Name:Red
+PositionedItem23CourseArea:
+PositionedItem23Static:0
+PositionedItem23Positions:
+PositionedItem23DataSheet:Type=Buoy###BREAKLINE###Color=Red###BREAKLINE###Shape=Conical###BREAKLINE###Name=Red
 
-ControlPoint24UUID:bf6777e6-83bd-11e2-88c0-10bf48d758ce
-ControlPoint24Name:White S
-ControlPoint24HasTwoPoints:0
-ControlPoint24ShortName:W
-ControlPoint24DataSheet:Type=Buoy###BREAKLINE###Color=White###BREAKLINE###Shape=Conical###BREAKLINE###Name=White S
-ControlPoint24Mark1Lon:-48.558173
-ControlPoint24Mark1Lat:-27.579170
+PositionedItem24UUID:b030cff0-855c-013d-98f7-1c6b00518c70
+PositionedItem24Name:Black Gate - 1
+PositionedItem24CourseArea:
+PositionedItem24Static:0
+PositionedItem24Positions:
+PositionedItem24DataSheet:Type=Buoy###BREAKLINE###Color=Black###BREAKLINE###Shape=Cylinder###BREAKLINE###Pattern=Checkered###BREAKLINE###Name=Black Cylinder###BREAKLINE###UUID=b153dfd6-83be-11e2-88c0-10bf48d758ce
 
-ControlPoint25UUID:ca1aabf0-2dc9-0131-277c-60a44ce903c3
-ControlPoint25Name:Green-WhiteS
-ControlPoint25HasTwoPoints:1
-ControlPoint25ShortName:GS
-ControlPoint25DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Green###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Name=Green###BREAKLINE###P1.UUID=785c3e44-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=White###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=White S###BREAKLINE###P2.UUID=bf6777e6-83bd-11e2-88c0-10bf48d758ce###BREAKLINE###
-ControlPoint25Mark1Lon:-48.556278
-ControlPoint25Mark1Lat:-27.583408
-ControlPoint25Mark2Lon:-48.558173
-ControlPoint25Mark2Lat:-27.579170
+PositionedItem25UUID:b0551020-855c-013d-98f8-1c6b00518c70
+PositionedItem25Name:Black Gate - 2
+PositionedItem25CourseArea:
+PositionedItem25Static:0
+PositionedItem25Positions:
+PositionedItem25DataSheet:Type=Buoy###BREAKLINE###Color=Black###BREAKLINE###Shape=Conical###BREAKLINE###Pattern=Checkered###BREAKLINE###Name=Black Conical###BREAKLINE###UUID=d78695ea-83be-11e2-88c0-10bf48d758ce
 
-ControlPoint26UUID:d78695ea-83be-11e2-88c0-10bf48d758ce
-ControlPoint26Name:Black Conical
-ControlPoint26HasTwoPoints:0
-ControlPoint26ShortName:B
-ControlPoint26DataSheet:Type=Buoy###BREAKLINE###Color=Black###BREAKLINE###Shape=Conical###BREAKLINE###Pattern=Checkered###BREAKLINE###Name=Black Conical
-ControlPoint26Mark1Lon:-48.560630
-ControlPoint26Mark1Lat:-27.583535
+PositionedItem26UUID:b07163c0-855c-013d-98fb-1c6b00518c70
+PositionedItem26Name:Red-Orange - 1
+PositionedItem26CourseArea:
+PositionedItem26Static:0
+PositionedItem26Positions:
+PositionedItem26DataSheet:Type=Buoy###BREAKLINE###Color=Red###BREAKLINE###Shape=Conical###BREAKLINE###Name=Red###BREAKLINE###UUID=5427c7d2-83be-11e2-88c0-10bf48d758ce
 
-ControlPoint27UUID:da6bf290-2dc8-0131-2736-60a44ce903c3
-ControlPoint27Name:Black Conical-Green
-ControlPoint27HasTwoPoints:1
-ControlPoint27ShortName:S
-ControlPoint27DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Black###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Pattern=Checkered###BREAKLINE###P1.Name=Black Conical###BREAKLINE###P1.UUID=d78695ea-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Green###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Green###BREAKLINE###P2.UUID=785c3e44-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
-ControlPoint27Mark1Lon:-48.560630
-ControlPoint27Mark1Lat:-27.583535
-ControlPoint27Mark2Lon:-48.556278
-ControlPoint27Mark2Lat:-27.583408
+PositionedItem27UUID:b07fd8f0-855c-013d-98fc-1c6b00518c70
+PositionedItem27Name:Red-Orange - 2
+PositionedItem27CourseArea:
+PositionedItem27Static:0
+PositionedItem27Positions:
+PositionedItem27DataSheet:Type=Buoy###BREAKLINE###Color=Orange###BREAKLINE###Shape=Conical###BREAKLINE###Name=Orange###BREAKLINE###UUID=1286f15e-83be-11e2-88c0-10bf48d758ce
 
-ControlPoint28UUID:e00b6730-2dc9-0131-2786-60a44ce903c3
-ControlPoint28Name:Green-Yellow
-ControlPoint28HasTwoPoints:1
-ControlPoint28ShortName:GY
-ControlPoint28DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Green###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Name=Green###BREAKLINE###P1.UUID=785c3e44-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Yellow###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Yellow###BREAKLINE###P2.UUID=3fdd2402-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
-ControlPoint28Mark1Lon:-48.556278
-ControlPoint28Mark1Lat:-27.583408
-ControlPoint28Mark2Lon:-48.558205
-ControlPoint28Mark2Lat:-27.584870
+PositionedItem28UUID:b09dbe30-855c-013d-98ff-1c6b00518c70
+PositionedItem28Name:Red-Yellow - 1
+PositionedItem28CourseArea:
+PositionedItem28Static:0
+PositionedItem28Positions:
+PositionedItem28DataSheet:Type=Buoy###BREAKLINE###Color=Red###BREAKLINE###Shape=Conical###BREAKLINE###Name=Red###BREAKLINE###UUID=5427c7d2-83be-11e2-88c0-10bf48d758ce
 
-ControlPoint29UUID:e9ec42f8-83bd-11e2-88c0-10bf48d758ce
-ControlPoint29Name:White P
-ControlPoint29HasTwoPoints:0
-ControlPoint29ShortName:W
-ControlPoint29DataSheet:Type=Buoy###BREAKLINE###Color=White###BREAKLINE###Shape=Conical###BREAKLINE###Name=White P
-ControlPoint29Mark1Lon:-48.557163
-ControlPoint29Mark1Lat:-27.579110
+PositionedItem29UUID:b0b45870-855c-013d-9900-1c6b00518c70
+PositionedItem29Name:Red-Yellow - 2
+PositionedItem29CourseArea:
+PositionedItem29Static:0
+PositionedItem29Positions:
+PositionedItem29DataSheet:Type=Buoy###BREAKLINE###Color=Yellow###BREAKLINE###Shape=Conical###BREAKLINE###Name=Yellow###BREAKLINE###UUID=3fdd2402-83be-11e2-88c0-10bf48d758ce
 
-ControlPoint30UUID:fc08e310-2dc9-0131-2790-60a44ce903c3
-ControlPoint30Name:Orange-Yellow
-ControlPoint30HasTwoPoints:1
-ControlPoint30ShortName:OY
-ControlPoint30DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Orange###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Name=Orange###BREAKLINE###P1.UUID=1286f15e-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Yellow###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Yellow###BREAKLINE###P2.UUID=3fdd2402-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
-ControlPoint30Mark1Lon:-48.557140
-ControlPoint30Mark1Lat:-27.578955
-ControlPoint30Mark2Lon:-48.558205
-ControlPoint30Mark2Lat:-27.584870
+PositionedItem30UUID:b0d84e10-855c-013d-9903-1c6b00518c70
+PositionedItem30Name:Green
+PositionedItem30CourseArea:
+PositionedItem30Static:0
+PositionedItem30Positions:
+PositionedItem30DataSheet:Type=Buoy###BREAKLINE###Color=Green###BREAKLINE###Shape=Conical###BREAKLINE###Name=Green
 
-ControlPoint31UUID:fc09f220-2dc8-0131-2740-60a44ce903c3
-ControlPoint31Name:Black Conical-Red
-ControlPoint31HasTwoPoints:1
-ControlPoint31ShortName:S
-ControlPoint31DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Black###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Pattern=Checkered###BREAKLINE###P1.Name=Black Conical###BREAKLINE###P1.UUID=d78695ea-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Red###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Red###BREAKLINE###P2.UUID=5427c7d2-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
-ControlPoint31Mark1Lon:-48.560630
-ControlPoint31Mark1Lat:-27.583535
-ControlPoint31Mark2Lon:-48.560718
-ControlPoint31Mark2Lat:-27.586750
+PositionedItem31UUID:b0e9f290-855c-013d-9905-1c6b00518c70
+PositionedItem31Name:Green-Orange - 1
+PositionedItem31CourseArea:
+PositionedItem31Static:0
+PositionedItem31Positions:
+PositionedItem31DataSheet:Type=Buoy###BREAKLINE###Color=Green###BREAKLINE###Shape=Conical###BREAKLINE###Name=Green###BREAKLINE###UUID=785c3e44-83be-11e2-88c0-10bf48d758ce
 
+PositionedItem32UUID:b109b640-855c-013d-9906-1c6b00518c70
+PositionedItem32Name:Green-Orange - 2
+PositionedItem32CourseArea:
+PositionedItem32Static:0
+PositionedItem32Positions:
+PositionedItem32DataSheet:Type=Buoy###BREAKLINE###Color=Orange###BREAKLINE###Shape=Conical###BREAKLINE###Name=Orange###BREAKLINE###UUID=1286f15e-83be-11e2-88c0-10bf48d758ce
+
+PositionedItem33UUID:b11f1100-855c-013d-9909-1c6b00518c70
+PositionedItem33Name:White Gate - 1
+PositionedItem33CourseArea:
+PositionedItem33Static:0
+PositionedItem33Positions:
+PositionedItem33DataSheet:Type=Buoy###BREAKLINE###Color=White###BREAKLINE###Shape=Conical###BREAKLINE###Name=White S###BREAKLINE###UUID=bf6777e6-83bd-11e2-88c0-10bf48d758ce
+
+PositionedItem34UUID:b136c1b0-855c-013d-990a-1c6b00518c70
+PositionedItem34Name:White Gate - 2
+PositionedItem34CourseArea:
+PositionedItem34Static:0
+PositionedItem34Positions:
+PositionedItem34DataSheet:Type=Buoy###BREAKLINE###Color=White###BREAKLINE###Shape=Conical###BREAKLINE###Name=White P###BREAKLINE###UUID=e9ec42f8-83bd-11e2-88c0-10bf48d758ce
+
+PositionedItem35UUID:b1466211-855c-013d-990d-1c6b00518c70
+PositionedItem35Name:Finish Pole-Cylinder - 1
+PositionedItem35CourseArea:
+PositionedItem35Static:0
+PositionedItem35Positions:
+PositionedItem35DataSheet:Color=Black###BREAKLINE###Type=Landmark###BREAKLINE###Name=Finish Pole###BREAKLINE###UUID=3240586c-83c0-11e2-88c0-10bf48d758ce
+
+PositionedItem36UUID:b1691820-855c-013d-990e-1c6b00518c70
+PositionedItem36Name:Finish Pole-Cylinder - 2
+PositionedItem36CourseArea:
+PositionedItem36Static:0
+PositionedItem36Positions:
+PositionedItem36DataSheet:Type=Buoy###BREAKLINE###Color=Black###BREAKLINE###Shape=Cylinder###BREAKLINE###Pattern=Checkered###BREAKLINE###Name=Black Cylinder###BREAKLINE###UUID=b153dfd6-83be-11e2-88c0-10bf48d758ce
+
+PositionedItem37UUID:b1a6c920-855c-013d-9911-1c6b00518c70
+PositionedItem37Name:Green-WhiteP - 1
+PositionedItem37CourseArea:
+PositionedItem37Static:0
+PositionedItem37Positions:
+PositionedItem37DataSheet:Type=Buoy###BREAKLINE###Color=Green###BREAKLINE###Shape=Conical###BREAKLINE###Name=Green###BREAKLINE###UUID=785c3e44-83be-11e2-88c0-10bf48d758ce
+
+PositionedItem38UUID:b1c92b00-855c-013d-9912-1c6b00518c70
+PositionedItem38Name:Green-WhiteP - 2
+PositionedItem38CourseArea:
+PositionedItem38Static:0
+PositionedItem38Positions:
+PositionedItem38DataSheet:Type=Buoy###BREAKLINE###Color=White###BREAKLINE###Shape=Conical###BREAKLINE###Name=White P###BREAKLINE###UUID=e9ec42f8-83bd-11e2-88c0-10bf48d758ce
+
+PositionedItem39UUID:b2190740-855c-013d-9915-1c6b00518c70
+PositionedItem39Name:Black Cylinder
+PositionedItem39CourseArea:
+PositionedItem39Static:0
+PositionedItem39Positions:
+PositionedItem39DataSheet:Type=Buoy###BREAKLINE###Color=Black###BREAKLINE###Shape=Cylinder###BREAKLINE###Pattern=Checkered###BREAKLINE###Name=Black Cylinder
+
+PositionedItem40UUID:b23cfab0-855c-013d-9916-1c6b00518c70
+PositionedItem40Name:White S
+PositionedItem40CourseArea:
+PositionedItem40Static:0
+PositionedItem40Positions:
+PositionedItem40DataSheet:Type=Buoy###BREAKLINE###Color=White###BREAKLINE###Shape=Conical###BREAKLINE###Name=White S
+
+PositionedItem41UUID:b26f5160-855c-013d-9917-1c6b00518c70
+PositionedItem41Name:Green-WhiteS - 1
+PositionedItem41CourseArea:
+PositionedItem41Static:0
+PositionedItem41Positions:
+PositionedItem41DataSheet:Type=Buoy###BREAKLINE###Color=Green###BREAKLINE###Shape=Conical###BREAKLINE###Name=Green###BREAKLINE###UUID=785c3e44-83be-11e2-88c0-10bf48d758ce
+
+PositionedItem42UUID:b2847590-855c-013d-9918-1c6b00518c70
+PositionedItem42Name:Green-WhiteS - 2
+PositionedItem42CourseArea:
+PositionedItem42Static:0
+PositionedItem42Positions:
+PositionedItem42DataSheet:Type=Buoy###BREAKLINE###Color=White###BREAKLINE###Shape=Conical###BREAKLINE###Name=White S###BREAKLINE###UUID=bf6777e6-83bd-11e2-88c0-10bf48d758ce
+
+PositionedItem43UUID:b2adfae1-855c-013d-991b-1c6b00518c70
+PositionedItem43Name:Black Conical
+PositionedItem43CourseArea:
+PositionedItem43Static:0
+PositionedItem43Positions:
+PositionedItem43DataSheet:Type=Buoy###BREAKLINE###Color=Black###BREAKLINE###Shape=Conical###BREAKLINE###Pattern=Checkered###BREAKLINE###Name=Black Conical
+
+PositionedItem44UUID:b2eaaa00-855c-013d-991c-1c6b00518c70
+PositionedItem44Name:Black Conical-Green - 1
+PositionedItem44CourseArea:
+PositionedItem44Static:0
+PositionedItem44Positions:
+PositionedItem44DataSheet:Type=Buoy###BREAKLINE###Color=Black###BREAKLINE###Shape=Conical###BREAKLINE###Pattern=Checkered###BREAKLINE###Name=Black Conical###BREAKLINE###UUID=d78695ea-83be-11e2-88c0-10bf48d758ce
+
+PositionedItem45UUID:b322f1f0-855c-013d-991d-1c6b00518c70
+PositionedItem45Name:Black Conical-Green - 2
+PositionedItem45CourseArea:
+PositionedItem45Static:0
+PositionedItem45Positions:
+PositionedItem45DataSheet:Type=Buoy###BREAKLINE###Color=Green###BREAKLINE###Shape=Conical###BREAKLINE###Name=Green###BREAKLINE###UUID=785c3e44-83be-11e2-88c0-10bf48d758ce
+
+PositionedItem46UUID:b3a8c820-855c-013d-9920-1c6b00518c70
+PositionedItem46Name:Green-Yellow - 1
+PositionedItem46CourseArea:
+PositionedItem46Static:0
+PositionedItem46Positions:
+PositionedItem46DataSheet:Type=Buoy###BREAKLINE###Color=Green###BREAKLINE###Shape=Conical###BREAKLINE###Name=Green###BREAKLINE###UUID=785c3e44-83be-11e2-88c0-10bf48d758ce
+
+PositionedItem47UUID:b3e8a5c0-855c-013d-9921-1c6b00518c70
+PositionedItem47Name:Green-Yellow - 2
+PositionedItem47CourseArea:
+PositionedItem47Static:0
+PositionedItem47Positions:
+PositionedItem47DataSheet:Type=Buoy###BREAKLINE###Color=Yellow###BREAKLINE###Shape=Conical###BREAKLINE###Name=Yellow###BREAKLINE###UUID=3fdd2402-83be-11e2-88c0-10bf48d758ce
+
+PositionedItem48UUID:b4596120-855c-013d-9924-1c6b00518c70
+PositionedItem48Name:White P
+PositionedItem48CourseArea:
+PositionedItem48Static:0
+PositionedItem48Positions:
+PositionedItem48DataSheet:Type=Buoy###BREAKLINE###Color=White###BREAKLINE###Shape=Conical###BREAKLINE###Name=White P
+
+PositionedItem49UUID:b49eced0-855c-013d-9925-1c6b00518c70
+PositionedItem49Name:Orange-Yellow - 1
+PositionedItem49CourseArea:
+PositionedItem49Static:0
+PositionedItem49Positions:
+PositionedItem49DataSheet:Type=Buoy###BREAKLINE###Color=Orange###BREAKLINE###Shape=Conical###BREAKLINE###Name=Orange###BREAKLINE###UUID=1286f15e-83be-11e2-88c0-10bf48d758ce
+
+PositionedItem50UUID:b4dd7770-855c-013d-9926-1c6b00518c70
+PositionedItem50Name:Orange-Yellow - 2
+PositionedItem50CourseArea:
+PositionedItem50Static:0
+PositionedItem50Positions:
+PositionedItem50DataSheet:Type=Buoy###BREAKLINE###Color=Yellow###BREAKLINE###Shape=Conical###BREAKLINE###Name=Yellow###BREAKLINE###UUID=3fdd2402-83be-11e2-88c0-10bf48d758ce
+
+PositionedItem51UUID:b5495720-855c-013d-9929-1c6b00518c70
+PositionedItem51Name:Black Conical-Red - 1
+PositionedItem51CourseArea:
+PositionedItem51Static:0
+PositionedItem51Positions:
+PositionedItem51DataSheet:Type=Buoy###BREAKLINE###Color=Black###BREAKLINE###Shape=Conical###BREAKLINE###Pattern=Checkered###BREAKLINE###Name=Black Conical###BREAKLINE###UUID=d78695ea-83be-11e2-88c0-10bf48d758ce
+
+PositionedItem52UUID:b57bf700-855c-013d-992a-1c6b00518c70
+PositionedItem52Name:Black Conical-Red - 2
+PositionedItem52CourseArea:
+PositionedItem52Static:0
+PositionedItem52Positions:
+PositionedItem52DataSheet:Type=Buoy###BREAKLINE###Color=Red###BREAKLINE###Shape=Conical###BREAKLINE###Name=Red###BREAKLINE###UUID=5427c7d2-83be-11e2-88c0-10bf48d758ce
+
+MapItem1UUID:0f82e950-3046-0131-cf67-10b11c4ed8fd
+MapItem1Name:RC-Green
+MapItem1ShortName:S
+MapItem1PositionedItemIds:["aac2d6b0-855c-013d-98d0-1c6b00518c70", "aaf97000-855c-013d-98d1-1c6b00518c70"]
+MapItem1DataSheet:P1.Type=StartBoat###BREAKLINE###P1.Name=Race Committee###BREAKLINE###P1.UUID=3e6c1c94-83bf-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Green###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Green###BREAKLINE###P2.UUID=785c3e44-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
+
+MapItem2UUID:1286f15e-83be-11e2-88c0-10bf48d758ce
+MapItem2Name:Orange
+MapItem2ShortName:O
+MapItem2PositionedItemIds:["ab7dede0-855c-013d-98d4-1c6b00518c70"]
+MapItem2DataSheet:Type=Buoy###BREAKLINE###Color=Orange###BREAKLINE###Shape=Conical###BREAKLINE###Name=Orange
+
+MapItem3UUID:133d41f0-2dca-0131-279a-60a44ce903c3
+MapItem3Name:RC-Black Conical
+MapItem3ShortName:S
+MapItem3PositionedItemIds:["abc6aa20-855c-013d-98d5-1c6b00518c70", "abfddf80-855c-013d-98d6-1c6b00518c70"]
+MapItem3DataSheet:P1.Type=StartBoat###BREAKLINE###P1.Name=Race Committee###BREAKLINE###P1.UUID=3e6c1c94-83bf-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Black###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Pattern=Checkered###BREAKLINE###P2.Name=Black Conical###BREAKLINE###P2.UUID=d78695ea-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
+
+MapItem4UUID:1c17f4d0-2dc9-0131-274a-60a44ce903c3
+MapItem4Name:Black Conical-WhiteP
+MapItem4ShortName:S
+MapItem4PositionedItemIds:["ac73ce20-855c-013d-98d9-1c6b00518c70", "acac2c20-855c-013d-98da-1c6b00518c70"]
+MapItem4DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Black###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Pattern=Checkered###BREAKLINE###P1.Name=Black Conical###BREAKLINE###P1.UUID=d78695ea-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=White###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=White P###BREAKLINE###P2.UUID=e9ec42f8-83bd-11e2-88c0-10bf48d758ce###BREAKLINE###
+
+MapItem5UUID:2b184930-2dca-0131-27a4-60a44ce903c3
+MapItem5Name:RC-Black Cylinder
+MapItem5ShortName:F
+MapItem5PositionedItemIds:["ad31aab0-855c-013d-98dd-1c6b00518c70", "adaf7e00-855c-013d-98de-1c6b00518c70"]
+MapItem5DataSheet:P1.Type=StartBoat###BREAKLINE###P1.Name=Race Committee###BREAKLINE###P1.UUID=3e6c1c94-83bf-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Black###BREAKLINE###P2.Shape=Cylinder###BREAKLINE###P2.Pattern=Checkered###BREAKLINE###P2.Name=Black Cylinder###BREAKLINE###P2.UUID=b153dfd6-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
+
+MapItem6UUID:2c46b4a0-2dc9-0131-2754-60a44ce903c3
+MapItem6Name:Black Conical-WhiteS
+MapItem6ShortName:S
+MapItem6PositionedItemIds:["adebd7d1-855c-013d-98e1-1c6b00518c70", "ae02f510-855c-013d-98e2-1c6b00518c70"]
+MapItem6DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Black###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Pattern=Checkered###BREAKLINE###P1.Name=Black Conical###BREAKLINE###P1.UUID=d78695ea-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=White###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=White S###BREAKLINE###P2.UUID=bf6777e6-83bd-11e2-88c0-10bf48d758ce###BREAKLINE###
+
+MapItem7UUID:3240586c-83c0-11e2-88c0-10bf48d758ce
+MapItem7Name:Finish Pole
+MapItem7ShortName:F
+MapItem7PositionedItemIds:["ae4ba7e0-855c-013d-98e5-1c6b00518c70"]
+MapItem7DataSheet:Color=Black###BREAKLINE###Type=Landmark###BREAKLINE###Name=Finish Pole
+
+MapItem8UUID:32e7cd80-2f60-0131-ce8e-10b11c4ed8fd
+MapItem8Name:Black Conical - Orange
+MapItem8ShortName:BO
+MapItem8PositionedItemIds:["ae764c40-855c-013d-98e6-1c6b00518c70", "ae832a90-855c-013d-98e7-1c6b00518c70"]
+MapItem8DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Black###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Pattern=Checkered###BREAKLINE###P1.Name=Black Conical###BREAKLINE###P1.UUID=d78695ea-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Orange###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Orange###BREAKLINE###P2.UUID=1286f15e-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
+
+MapItem9UUID:38e5ec90-30f1-0131-d0ad-10b11c4ed8fd
+MapItem9Name:R9 Yellow
+MapItem9ShortName:Y
+MapItem9PositionedItemIds:["aea97310-855c-013d-98ea-1c6b00518c70"]
+
+MapItem10UUID:3e6c1c94-83bf-11e2-88c0-10bf48d758ce
+MapItem10Name:Race Committee
+MapItem10ShortName:RC
+MapItem10PositionedItemIds:["aecf3a80-855c-013d-98eb-1c6b00518c70"]
+MapItem10DataSheet:Type=StartBoat###BREAKLINE###Name=Race Committee
+
+MapItem11UUID:3fdd2402-83be-11e2-88c0-10bf48d758ce
+MapItem11Name:Yellow
+MapItem11ShortName:Y
+MapItem11PositionedItemIds:["aee63660-855c-013d-98ec-1c6b00518c70"]
+MapItem11DataSheet:Type=Buoy###BREAKLINE###Color=Yellow###BREAKLINE###Shape=Conical###BREAKLINE###Name=Yellow
+
+MapItem12UUID:4bea7160-2dc9-0131-275e-60a44ce903c3
+MapItem12Name:Black Conical-Yellow
+MapItem12ShortName:S
+MapItem12PositionedItemIds:["af1dfd40-855c-013d-98ed-1c6b00518c70", "af2f9170-855c-013d-98ee-1c6b00518c70"]
+MapItem12DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Black###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Pattern=Checkered###BREAKLINE###P1.Name=Black Conical###BREAKLINE###P1.UUID=d78695ea-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Yellow###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Yellow###BREAKLINE###P2.UUID=3fdd2402-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
+
+MapItem13UUID:4f74d870-2dca-0131-27ae-60a44ce903c3
+MapItem13Name:Red-Green
+MapItem13ShortName:RG
+MapItem13PositionedItemIds:["af76bca1-855c-013d-98f1-1c6b00518c70", "afad9880-855c-013d-98f2-1c6b00518c70"]
+MapItem13DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Red###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Name=Red###BREAKLINE###P1.UUID=5427c7d2-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Green###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Green###BREAKLINE###P2.UUID=785c3e44-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
+
+MapItem14UUID:538c48e0-31fd-0131-cc02-10bf48d758ce
+MapItem14Name:R20-Green
+MapItem14ShortName:G
+MapItem14PositionedItemIds:["aff73730-855c-013d-98f5-1c6b00518c70"]
+
+MapItem15UUID:5427c7d2-83be-11e2-88c0-10bf48d758ce
+MapItem15Name:Red
+MapItem15ShortName:R
+MapItem15PositionedItemIds:["b0178e50-855c-013d-98f6-1c6b00518c70"]
+MapItem15DataSheet:Type=Buoy###BREAKLINE###Color=Red###BREAKLINE###Shape=Conical###BREAKLINE###Name=Red
+
+MapItem16UUID:60e54960-2dc8-0131-2722-60a44ce903c3
+MapItem16Name:Black Gate
+MapItem16ShortName:B
+MapItem16PositionedItemIds:["b030cff0-855c-013d-98f7-1c6b00518c70", "b0551020-855c-013d-98f8-1c6b00518c70"]
+MapItem16DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Black###BREAKLINE###P1.Shape=Cylinder###BREAKLINE###P1.Pattern=Checkered###BREAKLINE###P1.Name=Black Cylinder###BREAKLINE###P1.UUID=b153dfd6-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Black###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Pattern=Checkered###BREAKLINE###P2.Name=Black Conical###BREAKLINE###P2.UUID=d78695ea-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
+
+MapItem17UUID:648db960-2dca-0131-27b8-60a44ce903c3
+MapItem17Name:Red-Orange
+MapItem17ShortName:RO
+MapItem17PositionedItemIds:["b07163c0-855c-013d-98fb-1c6b00518c70", "b07fd8f0-855c-013d-98fc-1c6b00518c70"]
+MapItem17DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Red###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Name=Red###BREAKLINE###P1.UUID=5427c7d2-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Orange###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Orange###BREAKLINE###P2.UUID=1286f15e-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
+
+MapItem18UUID:72216ea0-2dca-0131-27c2-60a44ce903c3
+MapItem18Name:Red-Yellow
+MapItem18ShortName:RY
+MapItem18PositionedItemIds:["b09dbe30-855c-013d-98ff-1c6b00518c70", "b0b45870-855c-013d-9900-1c6b00518c70"]
+MapItem18DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Red###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Name=Red###BREAKLINE###P1.UUID=5427c7d2-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Yellow###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Yellow###BREAKLINE###P2.UUID=3fdd2402-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
+
+MapItem19UUID:785c3e44-83be-11e2-88c0-10bf48d758ce
+MapItem19Name:Green
+MapItem19ShortName:G
+MapItem19PositionedItemIds:["b0d84e10-855c-013d-9903-1c6b00518c70"]
+MapItem19DataSheet:Type=Buoy###BREAKLINE###Color=Green###BREAKLINE###Shape=Conical###BREAKLINE###Name=Green
+
+MapItem20UUID:7c057f10-2dc9-0131-2768-60a44ce903c3
+MapItem20Name:Green-Orange
+MapItem20ShortName:GO
+MapItem20PositionedItemIds:["b0e9f290-855c-013d-9905-1c6b00518c70", "b109b640-855c-013d-9906-1c6b00518c70"]
+MapItem20DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Green###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Name=Green###BREAKLINE###P1.UUID=785c3e44-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Orange###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Orange###BREAKLINE###P2.UUID=1286f15e-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
+
+MapItem21UUID:914f22b0-2dca-0131-27cc-60a44ce903c3
+MapItem21Name:White Gate
+MapItem21ShortName:W
+MapItem21PositionedItemIds:["b11f1100-855c-013d-9909-1c6b00518c70", "b136c1b0-855c-013d-990a-1c6b00518c70"]
+MapItem21DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=White###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Name=White S###BREAKLINE###P1.UUID=bf6777e6-83bd-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=White###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=White P###BREAKLINE###P2.UUID=e9ec42f8-83bd-11e2-88c0-10bf48d758ce###BREAKLINE###
+
+MapItem22UUID:aa831320-2dc8-0131-272c-60a44ce903c3
+MapItem22Name:Finish Pole-Cylinder
+MapItem22ShortName:F
+MapItem22PositionedItemIds:["b1466211-855c-013d-990d-1c6b00518c70", "b1691820-855c-013d-990e-1c6b00518c70"]
+MapItem22DataSheet:P1.Color=Black###BREAKLINE###P1.Type=Landmark###BREAKLINE###P1.Name=Finish Pole###BREAKLINE###P1.UUID=3240586c-83c0-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Black###BREAKLINE###P2.Shape=Cylinder###BREAKLINE###P2.Pattern=Checkered###BREAKLINE###P2.Name=Black Cylinder###BREAKLINE###P2.UUID=b153dfd6-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
+
+MapItem23UUID:ab74ba10-855c-013d-98d2-1c6b00518c70
+MapItem23Name:RC-Green - 1
+MapItem23ShortName:S
+MapItem23PositionedItemIds:["aac2d6b0-855c-013d-98d0-1c6b00518c70"]
+
+MapItem24UUID:ab7892d0-855c-013d-98d3-1c6b00518c70
+MapItem24Name:RC-Green - 2
+MapItem24ShortName:S
+MapItem24PositionedItemIds:["aaf97000-855c-013d-98d1-1c6b00518c70"]
+
+MapItem25UUID:ac4c4de0-855c-013d-98d7-1c6b00518c70
+MapItem25Name:RC-Black Conical - 1
+MapItem25ShortName:S
+MapItem25PositionedItemIds:["abc6aa20-855c-013d-98d5-1c6b00518c70"]
+
+MapItem26UUID:ac4fbaa0-855c-013d-98d8-1c6b00518c70
+MapItem26Name:RC-Black Conical - 2
+MapItem26ShortName:S
+MapItem26PositionedItemIds:["abfddf80-855c-013d-98d6-1c6b00518c70"]
+
+MapItem27UUID:ad2bf550-855c-013d-98db-1c6b00518c70
+MapItem27Name:Black Conical-WhiteP - 1
+MapItem27ShortName:S
+MapItem27PositionedItemIds:["ac73ce20-855c-013d-98d9-1c6b00518c70"]
+
+MapItem28UUID:ad30c040-855c-013d-98dc-1c6b00518c70
+MapItem28Name:Black Conical-WhiteP - 2
+MapItem28ShortName:S
+MapItem28PositionedItemIds:["acac2c20-855c-013d-98da-1c6b00518c70"]
+
+MapItem29UUID:add9cea0-855c-013d-98df-1c6b00518c70
+MapItem29Name:RC-Black Cylinder - 1
+MapItem29ShortName:F
+MapItem29PositionedItemIds:["ad31aab0-855c-013d-98dd-1c6b00518c70"]
+
+MapItem30UUID:ade94700-855c-013d-98e0-1c6b00518c70
+MapItem30Name:RC-Black Cylinder - 2
+MapItem30ShortName:F
+MapItem30PositionedItemIds:["adaf7e00-855c-013d-98de-1c6b00518c70"]
+
+MapItem31UUID:ae3bb1b0-855c-013d-98e3-1c6b00518c70
+MapItem31Name:Black Conical-WhiteS - 1
+MapItem31ShortName:S
+MapItem31PositionedItemIds:["adebd7d1-855c-013d-98e1-1c6b00518c70"]
+
+MapItem32UUID:ae4ae260-855c-013d-98e4-1c6b00518c70
+MapItem32Name:Black Conical-WhiteS - 2
+MapItem32ShortName:S
+MapItem32PositionedItemIds:["ae02f510-855c-013d-98e2-1c6b00518c70"]
+
+MapItem33UUID:ae989c70-855c-013d-98e8-1c6b00518c70
+MapItem33Name:Black Conical - Orange - 1
+MapItem33ShortName:BO
+MapItem33PositionedItemIds:["ae764c40-855c-013d-98e6-1c6b00518c70"]
+
+MapItem34UUID:ae99aad0-855c-013d-98e9-1c6b00518c70
+MapItem34Name:Black Conical - Orange - 2
+MapItem34ShortName:BO
+MapItem34PositionedItemIds:["ae832a90-855c-013d-98e7-1c6b00518c70"]
+
+MapItem35UUID:af4e4920-2dc9-0131-2772-60a44ce903c3
+MapItem35Name:Green-WhiteP
+MapItem35ShortName:GP
+MapItem35PositionedItemIds:["b1a6c920-855c-013d-9911-1c6b00518c70", "b1c92b00-855c-013d-9912-1c6b00518c70"]
+MapItem35DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Green###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Name=Green###BREAKLINE###P1.UUID=785c3e44-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=White###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=White P###BREAKLINE###P2.UUID=e9ec42f8-83bd-11e2-88c0-10bf48d758ce###BREAKLINE###
+
+MapItem36UUID:af63a7b0-855c-013d-98ef-1c6b00518c70
+MapItem36Name:Black Conical-Yellow - 1
+MapItem36ShortName:S
+MapItem36PositionedItemIds:["af1dfd40-855c-013d-98ed-1c6b00518c70"]
+
+MapItem37UUID:af6dbf30-855c-013d-98f0-1c6b00518c70
+MapItem37Name:Black Conical-Yellow - 2
+MapItem37ShortName:S
+MapItem37PositionedItemIds:["af2f9170-855c-013d-98ee-1c6b00518c70"]
+
+MapItem38UUID:afee39d0-855c-013d-98f3-1c6b00518c70
+MapItem38Name:Red-Green - 1
+MapItem38ShortName:RG
+MapItem38PositionedItemIds:["af76bca1-855c-013d-98f1-1c6b00518c70"]
+
+MapItem39UUID:aff600b0-855c-013d-98f4-1c6b00518c70
+MapItem39Name:Red-Green - 2
+MapItem39ShortName:RG
+MapItem39PositionedItemIds:["afad9880-855c-013d-98f2-1c6b00518c70"]
+
+MapItem40UUID:b065a5c0-855c-013d-98f9-1c6b00518c70
+MapItem40Name:Black Gate - 1
+MapItem40ShortName:B
+MapItem40PositionedItemIds:["b030cff0-855c-013d-98f7-1c6b00518c70"]
+
+MapItem41UUID:b06977c0-855c-013d-98fa-1c6b00518c70
+MapItem41Name:Black Gate - 2
+MapItem41ShortName:B
+MapItem41PositionedItemIds:["b0551020-855c-013d-98f8-1c6b00518c70"]
+
+MapItem42UUID:b09c39e0-855c-013d-98fd-1c6b00518c70
+MapItem42Name:Red-Orange - 1
+MapItem42ShortName:RO
+MapItem42PositionedItemIds:["b07163c0-855c-013d-98fb-1c6b00518c70"]
+
+MapItem43UUID:b09d0640-855c-013d-98fe-1c6b00518c70
+MapItem43Name:Red-Orange - 2
+MapItem43ShortName:RO
+MapItem43PositionedItemIds:["b07fd8f0-855c-013d-98fc-1c6b00518c70"]
+
+MapItem44UUID:b0c86890-855c-013d-9901-1c6b00518c70
+MapItem44Name:Red-Yellow - 1
+MapItem44ShortName:RY
+MapItem44PositionedItemIds:["b09dbe30-855c-013d-98ff-1c6b00518c70"]
+
+MapItem45UUID:b0ca2a00-855c-013d-9902-1c6b00518c70
+MapItem45Name:Red-Yellow - 2
+MapItem45ShortName:RY
+MapItem45PositionedItemIds:["b0b45870-855c-013d-9900-1c6b00518c70"]
+
+MapItem46UUID:b11dac70-855c-013d-9907-1c6b00518c70
+MapItem46Name:Green-Orange - 1
+MapItem46ShortName:GO
+MapItem46PositionedItemIds:["b0e9f290-855c-013d-9905-1c6b00518c70"]
+
+MapItem47UUID:b11e5580-855c-013d-9908-1c6b00518c70
+MapItem47Name:Green-Orange - 2
+MapItem47ShortName:GO
+MapItem47PositionedItemIds:["b109b640-855c-013d-9906-1c6b00518c70"]
+
+MapItem48UUID:b13deef0-855c-013d-990b-1c6b00518c70
+MapItem48Name:White Gate - 1
+MapItem48ShortName:W
+MapItem48PositionedItemIds:["b11f1100-855c-013d-9909-1c6b00518c70"]
+
+MapItem49UUID:b1430900-855c-013d-990c-1c6b00518c70
+MapItem49Name:White Gate - 2
+MapItem49ShortName:W
+MapItem49PositionedItemIds:["b136c1b0-855c-013d-990a-1c6b00518c70"]
+
+MapItem50UUID:b153dfd6-83be-11e2-88c0-10bf48d758ce
+MapItem50Name:Black Cylinder
+MapItem50ShortName:B
+MapItem50PositionedItemIds:["b2190740-855c-013d-9915-1c6b00518c70"]
+MapItem50DataSheet:Type=Buoy###BREAKLINE###Color=Black###BREAKLINE###Shape=Cylinder###BREAKLINE###Pattern=Checkered###BREAKLINE###Name=Black Cylinder
+
+MapItem51UUID:b1a26b00-855c-013d-990f-1c6b00518c70
+MapItem51Name:Finish Pole-Cylinder - 1
+MapItem51ShortName:F
+MapItem51PositionedItemIds:["b1466211-855c-013d-990d-1c6b00518c70"]
+
+MapItem52UUID:b1a597b0-855c-013d-9910-1c6b00518c70
+MapItem52Name:Finish Pole-Cylinder - 2
+MapItem52ShortName:F
+MapItem52PositionedItemIds:["b1691820-855c-013d-990e-1c6b00518c70"]
+
+MapItem53UUID:b20ad1f0-855c-013d-9913-1c6b00518c70
+MapItem53Name:Green-WhiteP - 1
+MapItem53ShortName:GP
+MapItem53PositionedItemIds:["b1a6c920-855c-013d-9911-1c6b00518c70"]
+
+MapItem54UUID:b2137ea0-855c-013d-9914-1c6b00518c70
+MapItem54Name:Green-WhiteP - 2
+MapItem54ShortName:GP
+MapItem54PositionedItemIds:["b1c92b00-855c-013d-9912-1c6b00518c70"]
+
+MapItem55UUID:b2a16ff0-855c-013d-9919-1c6b00518c70
+MapItem55Name:Green-WhiteS - 1
+MapItem55ShortName:GS
+MapItem55PositionedItemIds:["b26f5160-855c-013d-9917-1c6b00518c70"]
+
+MapItem56UUID:b2a31700-855c-013d-991a-1c6b00518c70
+MapItem56Name:Green-WhiteS - 2
+MapItem56ShortName:GS
+MapItem56PositionedItemIds:["b2847590-855c-013d-9918-1c6b00518c70"]
+
+MapItem57UUID:b373aac0-855c-013d-991e-1c6b00518c70
+MapItem57Name:Black Conical-Green - 1
+MapItem57ShortName:S
+MapItem57PositionedItemIds:["b2eaaa00-855c-013d-991c-1c6b00518c70"]
+
+MapItem58UUID:b39c68b0-855c-013d-991f-1c6b00518c70
+MapItem58Name:Black Conical-Green - 2
+MapItem58ShortName:S
+MapItem58PositionedItemIds:["b322f1f0-855c-013d-991d-1c6b00518c70"]
+
+MapItem59UUID:b44183e0-855c-013d-9922-1c6b00518c70
+MapItem59Name:Green-Yellow - 1
+MapItem59ShortName:GY
+MapItem59PositionedItemIds:["b3a8c820-855c-013d-9920-1c6b00518c70"]
+
+MapItem60UUID:b4455b00-855c-013d-9923-1c6b00518c70
+MapItem60Name:Green-Yellow - 2
+MapItem60ShortName:GY
+MapItem60PositionedItemIds:["b3e8a5c0-855c-013d-9921-1c6b00518c70"]
+
+MapItem61UUID:b5238d80-855c-013d-9927-1c6b00518c70
+MapItem61Name:Orange-Yellow - 1
+MapItem61ShortName:OY
+MapItem61PositionedItemIds:["b49eced0-855c-013d-9925-1c6b00518c70"]
+
+MapItem62UUID:b5429ab0-855c-013d-9928-1c6b00518c70
+MapItem62Name:Orange-Yellow - 2
+MapItem62ShortName:OY
+MapItem62PositionedItemIds:["b4dd7770-855c-013d-9926-1c6b00518c70"]
+
+MapItem63UUID:b5b50540-855c-013d-992b-1c6b00518c70
+MapItem63Name:Black Conical-Red - 1
+MapItem63ShortName:S
+MapItem63PositionedItemIds:["b5495720-855c-013d-9929-1c6b00518c70"]
+
+MapItem64UUID:b5bfe020-855c-013d-992c-1c6b00518c70
+MapItem64Name:Black Conical-Red - 2
+MapItem64ShortName:S
+MapItem64PositionedItemIds:["b57bf700-855c-013d-992a-1c6b00518c70"]
+
+MapItem65UUID:bf6777e6-83bd-11e2-88c0-10bf48d758ce
+MapItem65Name:White S
+MapItem65ShortName:W
+MapItem65PositionedItemIds:["b23cfab0-855c-013d-9916-1c6b00518c70"]
+MapItem65DataSheet:Type=Buoy###BREAKLINE###Color=White###BREAKLINE###Shape=Conical###BREAKLINE###Name=White S
+
+MapItem66UUID:ca1aabf0-2dc9-0131-277c-60a44ce903c3
+MapItem66Name:Green-WhiteS
+MapItem66ShortName:GS
+MapItem66PositionedItemIds:["b26f5160-855c-013d-9917-1c6b00518c70", "b2847590-855c-013d-9918-1c6b00518c70"]
+MapItem66DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Green###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Name=Green###BREAKLINE###P1.UUID=785c3e44-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=White###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=White S###BREAKLINE###P2.UUID=bf6777e6-83bd-11e2-88c0-10bf48d758ce###BREAKLINE###
+
+MapItem67UUID:d78695ea-83be-11e2-88c0-10bf48d758ce
+MapItem67Name:Black Conical
+MapItem67ShortName:B
+MapItem67PositionedItemIds:["b2adfae1-855c-013d-991b-1c6b00518c70"]
+MapItem67DataSheet:Type=Buoy###BREAKLINE###Color=Black###BREAKLINE###Shape=Conical###BREAKLINE###Pattern=Checkered###BREAKLINE###Name=Black Conical
+
+MapItem68UUID:da6bf290-2dc8-0131-2736-60a44ce903c3
+MapItem68Name:Black Conical-Green
+MapItem68ShortName:S
+MapItem68PositionedItemIds:["b2eaaa00-855c-013d-991c-1c6b00518c70", "b322f1f0-855c-013d-991d-1c6b00518c70"]
+MapItem68DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Black###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Pattern=Checkered###BREAKLINE###P1.Name=Black Conical###BREAKLINE###P1.UUID=d78695ea-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Green###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Green###BREAKLINE###P2.UUID=785c3e44-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
+
+MapItem69UUID:e00b6730-2dc9-0131-2786-60a44ce903c3
+MapItem69Name:Green-Yellow
+MapItem69ShortName:GY
+MapItem69PositionedItemIds:["b3a8c820-855c-013d-9920-1c6b00518c70", "b3e8a5c0-855c-013d-9921-1c6b00518c70"]
+MapItem69DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Green###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Name=Green###BREAKLINE###P1.UUID=785c3e44-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Yellow###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Yellow###BREAKLINE###P2.UUID=3fdd2402-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
+
+MapItem70UUID:e9ec42f8-83bd-11e2-88c0-10bf48d758ce
+MapItem70Name:White P
+MapItem70ShortName:W
+MapItem70PositionedItemIds:["b4596120-855c-013d-9924-1c6b00518c70"]
+MapItem70DataSheet:Type=Buoy###BREAKLINE###Color=White###BREAKLINE###Shape=Conical###BREAKLINE###Name=White P
+
+MapItem71UUID:fc08e310-2dc9-0131-2790-60a44ce903c3
+MapItem71Name:Orange-Yellow
+MapItem71ShortName:OY
+MapItem71PositionedItemIds:["b49eced0-855c-013d-9925-1c6b00518c70", "b4dd7770-855c-013d-9926-1c6b00518c70"]
+MapItem71DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Orange###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Name=Orange###BREAKLINE###P1.UUID=1286f15e-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Yellow###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Yellow###BREAKLINE###P2.UUID=3fdd2402-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
+
+MapItem72UUID:fc09f220-2dc8-0131-2740-60a44ce903c3
+MapItem72Name:Black Conical-Red
+MapItem72ShortName:S
+MapItem72PositionedItemIds:["b5495720-855c-013d-9929-1c6b00518c70", "b57bf700-855c-013d-992a-1c6b00518c70"]
+MapItem72DataSheet:P1.Type=Buoy###BREAKLINE###P1.Color=Black###BREAKLINE###P1.Shape=Conical###BREAKLINE###P1.Pattern=Checkered###BREAKLINE###P1.Name=Black Conical###BREAKLINE###P1.UUID=d78695ea-83be-11e2-88c0-10bf48d758ce###BREAKLINE###P2.Type=Buoy###BREAKLINE###P2.Color=Red###BREAKLINE###P2.Shape=Conical###BREAKLINE###P2.Name=Red###BREAKLINE###P2.UUID=5427c7d2-83be-11e2-88c0-10bf48d758ce###BREAKLINE###
 
 SegmentFile:segments.php
 Route1UUID:535c5a10-2dd0-0131-28e7-60a44ce903c3
@@ -588,4 +1090,3 @@ Route1ControlPoint6UUID:914f22b0-2dca-0131-27cc-60a44ce903c3
 Route1ControlPoint7UUID:5427c7d2-83be-11e2-88c0-10bf48d758ce
 Route1ControlPoint8UUID:aa831320-2dc8-0131-272c-60a44ce903c3
 
-//-------- AUTO GENERATED PARAMETERS END ------------------

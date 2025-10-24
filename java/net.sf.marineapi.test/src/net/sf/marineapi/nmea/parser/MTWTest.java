@@ -1,11 +1,12 @@
 package net.sf.marineapi.nmea.parser;
 
-import static org.junit.Assert.assertEquals;
 import net.sf.marineapi.nmea.sentence.MTWSentence;
 import net.sf.marineapi.nmea.sentence.TalkerId;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * MTW parser tests.
@@ -21,7 +22,7 @@ public class MTWTest {
 	/**
 	 * @throws java.lang.Exception
 	 */
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		mtw = new MTWParser(EXAMPLE);
 	}

@@ -5,8 +5,8 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.sap.sailing.domain.trackfiles.TrackFileImportDeviceIdentifier;
 import com.sap.sailing.domain.trackimport.DoubleVectorFixImporter;
@@ -34,7 +34,7 @@ public abstract class AbstractBravoDataImportTest {
         int getExpectedFixesConsolidated();
     }
     
-    @Before
+    @BeforeEach
     public void setUp() {
         this.callbackCallCount = 0;
         bravoDataImporter = new BaseBravoDataImporterImpl(getColumnData(), BravoDataImporterImpl.BRAVO_TYPE) {
@@ -53,9 +53,9 @@ public abstract class AbstractBravoDataImportTest {
             bravoDataImporter.importFixes(is, Charset.defaultCharset(), (fixes, device) -> {
                 callbackCallCount+=Util.size(fixes);
             }, "filename", "source", /* downsample */ true);
-            Assert.assertEquals(importData.getExpectedFixesCount(), downsampler.getCountSourceTtl());
-            Assert.assertEquals(importData.getExpectedFixesConsolidated(), downsampler.getCountImportedTtl());
-            Assert.assertEquals(importData.getExpectedFixesConsolidated(), callbackCallCount);
+            Assertions.assertEquals(importData.getExpectedFixesCount(), downsampler.getCountSourceTtl());
+            Assertions.assertEquals(importData.getExpectedFixesConsolidated(), downsampler.getCountImportedTtl());
+            Assertions.assertEquals(importData.getExpectedFixesConsolidated(), callbackCallCount);
         }
     }
 

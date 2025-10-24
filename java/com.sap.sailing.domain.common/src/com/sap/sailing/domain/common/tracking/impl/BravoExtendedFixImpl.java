@@ -255,4 +255,9 @@ public class BravoExtendedFixImpl extends BravoFixImpl implements BravoExtendedF
         }
         return null;
     }
+
+    @Override
+    public Double getExpeditionKickerTension() {
+        return fix.get(BravoExtendedSensorDataMetadata.EXPEDITION_KICKER_TENSION.getColumnIndex());
+    }
 }

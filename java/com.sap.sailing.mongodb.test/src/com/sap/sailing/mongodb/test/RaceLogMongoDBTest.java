@@ -1,14 +1,14 @@
 package com.sap.sailing.mongodb.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.UUID;
 
-import org.junit.Assert;
-import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.mongodb.MongoException;
 import com.sap.sailing.domain.abstractlog.race.CompetitorResult;
@@ -54,7 +54,7 @@ public abstract class RaceLogMongoDBTest extends AbstractMongoDBTest {
         super();
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         mongoObjectFactory = PersistenceFactory.INSTANCE.getMongoObjectFactory(getMongoService());
         domainObjectFactory = PersistenceFactory.INSTANCE.getDomainObjectFactory(getMongoService(),
@@ -64,8 +64,8 @@ public abstract class RaceLogMongoDBTest extends AbstractMongoDBTest {
     protected void compareCourseData(CourseBase storedCourse, CourseBase loadedCourse) {
         assertEquals(storedCourse.getFirstWaypoint().getPassingInstructions(), PassingInstruction.None);
         assertEquals(loadedCourse.getFirstWaypoint().getPassingInstructions(), PassingInstruction.None);
-        Assert.assertTrue(storedCourse.getFirstWaypoint().getControlPoint() instanceof ControlPointWithTwoMarks);
-        Assert.assertTrue(loadedCourse.getFirstWaypoint().getControlPoint() instanceof ControlPointWithTwoMarks);
+        Assertions.assertTrue(storedCourse.getFirstWaypoint().getControlPoint() instanceof ControlPointWithTwoMarks);
+        Assertions.assertTrue(loadedCourse.getFirstWaypoint().getControlPoint() instanceof ControlPointWithTwoMarks);
 
         ControlPointWithTwoMarks storedGate = (ControlPointWithTwoMarks) storedCourse.getFirstWaypoint()
                 .getControlPoint();
@@ -80,8 +80,8 @@ public abstract class RaceLogMongoDBTest extends AbstractMongoDBTest {
 
         assertEquals(storedCourse.getLastWaypoint().getPassingInstructions(), PassingInstruction.Port);
         assertEquals(loadedCourse.getLastWaypoint().getPassingInstructions(), PassingInstruction.Port);
-        Assert.assertTrue(storedCourse.getLastWaypoint().getControlPoint() instanceof Mark);
-        Assert.assertTrue(loadedCourse.getLastWaypoint().getControlPoint() instanceof Mark);
+        Assertions.assertTrue(storedCourse.getLastWaypoint().getControlPoint() instanceof Mark);
+        Assertions.assertTrue(loadedCourse.getLastWaypoint().getControlPoint() instanceof Mark);
 
         Mark storedMark = (Mark) storedCourse.getLastWaypoint().getControlPoint();
         Mark loadedMark = (Mark) loadedCourse.getLastWaypoint().getControlPoint();

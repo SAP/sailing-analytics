@@ -34,7 +34,6 @@ public class Activator implements BundleActivator {
         } catch (IOException ioe) {
             logger.log(Level.SEVERE, "Couldn't read mail properties from " + propertiesfile.getCanonicalPath(), ioe);
         }
-
         MailService mailService = new MailServiceImpl(mailProperties, new MailServiceResolverAgainstOsgiRegistryImpl(
                 new CachedOsgiTypeBasedServiceFinderFactory(context).createServiceFinder(MailService.class)));
         registration = context.registerService(MailService.class, mailService, null);

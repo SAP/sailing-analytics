@@ -2,7 +2,7 @@ package com.sap.sailing.gwt.ui.adminconsole;
 
 import java.util.Date;
 
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -114,7 +114,7 @@ public class AddWindFixDialog extends DataEntryDialog<WindDTO> {
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return speedInKnotsBox;
     }
 }

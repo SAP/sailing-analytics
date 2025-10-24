@@ -62,27 +62,26 @@ public class TaggingServiceImpl implements TaggingService {
     }
 
     private void addPublicTag(String leaderboardName, String raceColumnName, String fleetName, String tag,
-            String comment, String imageURL, String resizedImageURL, TimePoint raceTimepoint)
+            String comment, String hiddenInfo, String imageURL, String resizedImageURL, TimePoint raceTimepoint)
             throws RaceLogNotFoundException, TagAlreadyExistsException {
-        getSecurityService().checkCurrentUserUpdatePermission(racingService.getLeaderboardByName(leaderboardName));
         RaceLog raceLog = racingService.getRaceLog(leaderboardName, raceColumnName, fleetName);
         if (raceLog == null) {
             throw new RaceLogNotFoundException();
         }
         // check if tag already exists
-        List<TagDTO> publicTags = getPublicTags(leaderboardName, raceColumnName, fleetName, null, false);
+        List<TagDTO> publicTags = getPublicTags(leaderboardName, raceColumnName, fleetName, /* search since */ null, /* return revoked tags */ false);
         for (TagDTO publicTag : publicTags) {
-            if (publicTag.equals(tag, comment, imageURL, resizedImageURL, true,
-                    racingService.getServerAuthor().getName(), raceTimepoint)) {
+            if (publicTag.equals(tag, comment, hiddenInfo, imageURL, resizedImageURL,
+                    true, racingService.getServerAuthor().getName(), raceTimepoint)) {
                 throw new TagAlreadyExistsException();
             }
         }
-        raceLog.add(new RaceLogTagEventImpl(tag, comment, imageURL, resizedImageURL, raceTimepoint,
-                racingService.getServerAuthor(), raceLog.getCurrentPassId()));
+        raceLog.add(new RaceLogTagEventImpl(tag, comment, hiddenInfo, imageURL, resizedImageURL,
+                raceTimepoint, racingService.getServerAuthor(), raceLog.getCurrentPassId()));
     }
 
     private void addPrivateTag(String leaderboardName, String raceColumnName, String fleetName, String tag,
-            String comment, String imageURL, String resizedImageURL, TimePoint raceTimepoint)
+            String comment, String hiddenInfo, String imageURL, String resizedImageURL, TimePoint raceTimepoint)
             throws AuthorizationException, ServiceNotFoundException, TagAlreadyExistsException {
         SecurityService securityService = getSecurityService();
         String username = getCurrentUsername();
@@ -90,8 +89,8 @@ public class TaggingServiceImpl implements TaggingService {
         String key = serializer.generateUniqueKey(leaderboardName, raceColumnName, fleetName);
         String privateTagsJson = securityService.getPreference(username, key);
         List<TagDTO> privateTags = serializer.deserializeTags(privateTagsJson);
-        TagDTO tagToAdd = new TagDTO(tag, comment, imageURL, resizedImageURL, false, username, raceTimepoint,
-                MillisecondsTimePoint.now());
+        TagDTO tagToAdd = new TagDTO(tag, comment, hiddenInfo, imageURL, resizedImageURL, /* visibleForPublic */ false, username,
+                raceTimepoint, /* created at */ MillisecondsTimePoint.now());
         if (privateTags.contains(tagToAdd)) {
             throw new TagAlreadyExistsException();
         }
@@ -142,7 +141,7 @@ public class TaggingServiceImpl implements TaggingService {
 
     @Override
     public void addTag(String leaderboardName, String raceColumnName, String fleetName, String tag, String comment,
-            String imageURL, String resizedImageURL, boolean visibleForPublic, TimePoint raceTimepoint)
+            String hiddenInfo, String imageURL, String resizedImageURL, boolean visibleForPublic, TimePoint raceTimepoint)
             throws AuthorizationException, IllegalArgumentException, RaceLogNotFoundException, ServiceNotFoundException,
             TagAlreadyExistsException {
         // prefill optional parameters
@@ -157,11 +156,11 @@ public class TaggingServiceImpl implements TaggingService {
             throw new IllegalArgumentException("Timepoint may not be empty!");
         }
         if (visibleForPublic) {
-            addPublicTag(leaderboardName, raceColumnName, fleetName, tag, comment, imageURL, resizedImageURL,
-                    raceTimepoint);
+            addPublicTag(leaderboardName, raceColumnName, fleetName, tag, comment, hiddenInfo, imageURL,
+                    resizedImageURL, raceTimepoint);
         } else {
-            addPrivateTag(leaderboardName, raceColumnName, fleetName, tag, comment, imageURL, resizedImageURL,
-                    raceTimepoint);
+            addPrivateTag(leaderboardName, raceColumnName, fleetName, tag, comment, hiddenInfo, imageURL,
+                    resizedImageURL, raceTimepoint);
         }
     }
 
@@ -181,14 +180,14 @@ public class TaggingServiceImpl implements TaggingService {
 
     @Override
     public void updateTag(String leaderboardName, String raceColumnName, String fleetName, TagDTO tagToUpdate,
-            String tag, String comment, String imageURL, String resizedImageURL, boolean visibleForPublic)
+            String tag, String comment, String hiddenInfo, String imageURL, String resizedImageURL, boolean visibleForPublic)
             throws AuthorizationException, IllegalArgumentException, NotRevokableException, RaceLogNotFoundException,
             ServiceNotFoundException, TagAlreadyExistsException {
         String username = getCurrentUsername();
         if (username != null && tagToUpdate.getUsername().equals(username)) {
             removeTag(leaderboardName, raceColumnName, fleetName, tagToUpdate);
-            addTag(leaderboardName, raceColumnName, fleetName, tag, comment, imageURL, resizedImageURL,
-                    visibleForPublic, tagToUpdate.getRaceTimepoint());
+            addTag(leaderboardName, raceColumnName, fleetName, tag, comment, hiddenInfo, imageURL,
+                    resizedImageURL, visibleForPublic, tagToUpdate.getRaceTimepoint());
 
         }
     }
@@ -238,9 +237,9 @@ public class TaggingServiceImpl implements TaggingService {
                 if (searchSince == null || (searchSince != null && tagEvent.getCreatedAt().after(searchSince)
                         && (tagEvent.getRevokedAt() == null
                                 || (tagEvent.getRevokedAt() != null && tagEvent.getRevokedAt().after(searchSince))))) {
-                    result.add(new TagDTO(tagEvent.getTag(), tagEvent.getComment(), tagEvent.getImageURL(),
-                            tagEvent.getResizedImageURL(), true, tagEvent.getUsername(), tagEvent.getLogicalTimePoint(),
-                            tagEvent.getCreatedAt(), tagEvent.getRevokedAt()));
+                    result.add(new TagDTO(tagEvent.getTag(), tagEvent.getComment(), tagEvent.getHiddenInfo(),
+                            tagEvent.getImageURL(), tagEvent.getResizedImageURL(), true, tagEvent.getUsername(),
+                            tagEvent.getLogicalTimePoint(), tagEvent.getCreatedAt(), tagEvent.getRevokedAt()));
                 }
             }
         }
@@ -250,12 +249,13 @@ public class TaggingServiceImpl implements TaggingService {
     public List<TagDTO> getPublicTags(RegattaAndRaceIdentifier raceIdentifier, TimePoint searchSince) {
         Leaderboard leaderBoard = racingService.getLeaderboardByName(raceIdentifier.getRegattaName());
         getSecurityService().checkCurrentUserReadPermission(leaderBoard);
-
         final List<TagDTO> result = new ArrayList<TagDTO>();
         TrackedRace trackedRace = racingService.getExistingTrackedRace(raceIdentifier);
-        Iterable<RaceLog> raceLogs = trackedRace.getAttachedRaceLogs();
-        for (RaceLog raceLog : raceLogs) {
-            extractPublicTagsFromLogInternal(raceLog, searchSince, false, result);
+        if (trackedRace != null) {
+            Iterable<RaceLog> raceLogs = trackedRace.getAttachedRaceLogs();
+            for (RaceLog raceLog : raceLogs) {
+                extractPublicTagsFromLogInternal(raceLog, searchSince, false, result);
+            }
         }
         return result;
     }

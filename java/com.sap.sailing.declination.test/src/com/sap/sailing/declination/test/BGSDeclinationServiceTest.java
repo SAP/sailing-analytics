@@ -1,13 +1,13 @@
 package com.sap.sailing.declination.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.text.ParseException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.declination.Declination;
 import com.sap.sailing.declination.impl.BGSImporter;
@@ -16,7 +16,7 @@ import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 public class BGSDeclinationServiceTest extends DeclinationServiceTest<BGSImporter> {
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         importer = new BGSImporter();
         super.setUp();

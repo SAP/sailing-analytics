@@ -20,7 +20,12 @@ public class OverallRacesStateCalculator implements RaceCallback {
         hasLiveRace |= raceViewState == RaceViewState.RUNNING;
         hasFinishedRace |= raceViewState == RaceViewState.FINISHED;
         hasAbandonedOrPostponedRace |= raceViewState == RaceViewState.POSTPONED || raceViewState == RaceViewState.ABANDONED;
-        hasUnfinishedRace |= raceViewState != RaceViewState.FINISHED;
+        // To be considered unfinished, the enclosing regatta (if it exists) must have no end date or an end date in the future;
+        // otherwise, the regatta containing the race is considered finished, and therefore all its races are considered finished,
+        // too, even if the race was not even started. This solves bug 6001 and will display regattas in multi-class events as
+        // finished if they, e.g., occur in the event's first "half" if this first half has finished already.
+        hasUnfinishedRace |= (raceViewState != RaceViewState.FINISHED &&
+                (context.getRegatta() == null || context.getRegatta().getEndDate() == null || context.getRegatta().getEndDate().after(context.getLiveTimePoint())));
     }
 
     /**

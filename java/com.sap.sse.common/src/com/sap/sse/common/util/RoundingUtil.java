@@ -6,7 +6,7 @@ public class RoundingUtil {
     public static final RoundingUtil knotsDecimalFormatter = new RoundingUtil(2);
     public static final RoundingUtil bearingDecimalFormatter = new RoundingUtil(1);
     public static final RoundingUtil speedDecimalFormatter = new RoundingUtil(1);
-    public static final RoundingUtil latLngDecimalFormatter = new RoundingUtil(6);
+    public static final RoundingUtil latLngDecimalFormatter = new RoundingUtil(7);
     
     private final double shiftFactor; 
     

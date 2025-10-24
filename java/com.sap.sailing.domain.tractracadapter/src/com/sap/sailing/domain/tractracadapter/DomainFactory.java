@@ -61,8 +61,8 @@ import com.tractrac.model.lib.api.event.CreateModelException;
 import com.tractrac.model.lib.api.event.ICompetitor;
 import com.tractrac.model.lib.api.event.IEvent;
 import com.tractrac.model.lib.api.event.IRace;
-import com.tractrac.model.lib.api.route.IControl;
-import com.tractrac.model.lib.api.route.IControlPoint;
+import com.tractrac.model.lib.api.map.IPositionedItem;
+import com.tractrac.model.lib.api.map.IMapItem;
 import com.tractrac.subscription.lib.api.IEventSubscriber;
 import com.tractrac.subscription.lib.api.IRaceSubscriber;
 import com.tractrac.subscription.lib.api.SubscriberInitializationException;
@@ -84,9 +84,9 @@ public interface DomainFactory {
 
     com.sap.sse.common.TimePoint createTimePoint(long timestamp);
 
-    Course createCourse(String name, Iterable<Util.Pair<TracTracControlPoint, PassingInstruction>> controlPoints);
+    Course createCourse(String name, Iterable<Util.Pair<IMapItem, PassingInstruction>> controlPoints);
 
-    Sideline createSideline(String name, Iterable<TracTracControlPoint> controlPoints);
+    Sideline createSideline(String name, Iterable<IPositionedItem> marks);
 
     com.sap.sailing.domain.base.Boat getOrCreateBoat(Serializable boatId, String boatName, BoatClass boatClass,
             String sailId, Color boatColor, RaceTrackingHandler raceTrackingHandler);
@@ -228,9 +228,11 @@ public interface DomainFactory {
      * The record may be for a single mark or a gate. If for a gate, the {@link ControlPointPositionData#getIndex()
      * index} is used to determine which of its marks is affected.
      */
-    Mark getMark(TracTracControlPoint controlPoint, int zeroBasedMarkIndex);
+    Mark getMark(IPositionedItem positionedItem);
 
-    com.sap.sailing.domain.base.ControlPoint getOrCreateControlPoint(TracTracControlPoint controlPoint);
+    com.sap.sailing.domain.base.ControlPoint getOrCreateControlPoint(IMapItem controlPoint);
+
+    com.sap.sailing.domain.base.ControlPoint getOrCreateMark(IPositionedItem mark);
 
     MarkPassing createMarkPassing(TimePoint timePoint, Waypoint passed, com.sap.sailing.domain.base.Competitor competitor);
 
@@ -256,7 +258,7 @@ public interface DomainFactory {
      * of waypoints. The waypoints are created from the control points and represent usages of the control points
      * in a course. A single control point may be used more than once in a course's list of waypoints.
      */
-    void updateCourseWaypoints(Course courseToUpdate, Iterable<Util.Pair<TracTracControlPoint, PassingInstruction>> controlPoints) throws PatchFailedException;
+    void updateCourseWaypoints(Course courseToUpdate, Iterable<Util.Pair<IMapItem, PassingInstruction>> controlPoints) throws PatchFailedException;
 
     TracTracConfiguration createTracTracConfiguration(String creatorName, String name, String jsonURL,
             String liveDataURI, String storedDataURI, String courseDesignUpdateURI, String tracTracUsername,
@@ -315,7 +317,7 @@ public interface DomainFactory {
 
     BoatClass getDominantBoatClass(Iterable<String> competitorClassNames);
 
-    List<Sideline> createSidelines(String raceMetadataString, Iterable<? extends TracTracControlPoint> allEventControlPoints);
+    List<Sideline> createSidelines(String raceMetadataString, Iterable<? extends IMapItem> allEventControlPoints);
 
     /**
      * When a tracked race has been created for tracking with the TracTrac adapter, change listeners have to be subscribed to
@@ -327,17 +329,17 @@ public interface DomainFactory {
 
     /**
      * Since TracAPI 3.6.1 the TracAPI provides a course area name for {@link IRace} objects. Furthermore, the
-     * {@link IControl} control points can now tell their {@link IControl#getCourseArea() course area}. This allows
-     * us to fetch the {@link IControl}s for a specific course area, thereby, e.g., restricting the marks of an
+     * {@link IMapItem} control points can now tell their {@link IMapItem#getCourseArea() course area}. This allows
+     * us to fetch the {@link IMapItem}s for a specific course area, thereby, e.g., restricting the marks of an
      * event that we offer to the Race Manager app's course designer to those available on the course area.
      */
-    Iterable<IControl> getControlsForCourseArea(IEvent tracTracEvent, String tracTracCourseAreaName);
+    Iterable<IMapItem> getControlsForCourseArea(IEvent tracTracEvent, String tracTracCourseAreaName);
 
     /**
-     * Looks for an {@link IControl} in the {@code candidates} that contains two {@link IControlPoint}s that map to the
+     * Looks for an {@link IMapItem} in the {@code candidates} that contains two {@link IPositionedItem}s that map to the
      * {@code first} and {@code second} mark.
      */
-    ControlPoint getExistingControlWithTwoMarks(Iterable<IControl> candidates, Mark first, Mark second);
+    ControlPoint getExistingControlWithTwoMarks(Iterable<IMapItem> candidates, Mark first, Mark second);
 
     /**
      * Event subscribers created by this call are cached in this domain factory, using the three parameters as a compound

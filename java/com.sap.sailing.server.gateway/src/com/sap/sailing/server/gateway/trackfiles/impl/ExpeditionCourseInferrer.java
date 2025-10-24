@@ -84,13 +84,14 @@ public class ExpeditionCourseInferrer {
                     String headerLine = buffer.readLine();
                     lineNr.incrementAndGet();
                     logger.fine("Validate and parse header columns");
-                    final Map<String, Integer> colIndices = ExpeditionExtendedDataImporterImpl.parseHeader(headerLine);
-                    ExpeditionExtendedDataImporterImpl.validateHeader(colIndices);
+                    final ExpeditionExtendedDataImporterImpl importer = new ExpeditionExtendedDataImporterImpl();
+                    final Map<String, Integer> colIndices = importer.parseHeader(headerLine);
+                    importer.validateHeader(colIndices);
                     final Double lastTimeToGunValue[] = new Double[1];
                     buffer.lines().forEach(line -> {
                         lineNr.incrementAndGet();
                         if (!line.trim().isEmpty()) {
-                            ExpeditionExtendedDataImporterImpl.parseLine(lineNr.get(), filenameWithSuffix, line, colIndices,
+                            importer.parseLine(lineNr.get(), filenameWithSuffix, line, colIndices,
                                     (timePoint, lineContentTokens, columnsInFileFromHeader) -> {
                                         // look for a start time based on the time to gun turning negative
                                         final Double timeToGunValue = getColumnValue(lineContentTokens, columnsInFileFromHeader,

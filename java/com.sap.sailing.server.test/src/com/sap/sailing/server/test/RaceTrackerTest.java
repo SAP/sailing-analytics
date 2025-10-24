@@ -1,9 +1,9 @@
 package com.sap.sailing.server.test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -13,9 +13,9 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.RaceDefinition;
 import com.sap.sailing.domain.racelog.impl.EmptyRaceLogStore;
@@ -67,7 +67,7 @@ public class RaceTrackerTest {
         tracTracPassword = "tracTest";
     }
     
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         service = new RacingEventServiceImpl();
         logger.info("Calling service.addTracTracRace");
@@ -86,7 +86,7 @@ public class RaceTrackerTest {
         assertTrue(!Util.isEmpty(raceHandle.getRegatta().getAllRaces()));
     }
     
-    @After
+    @AfterEach
     public void tearDown() throws MalformedURLException, IOException, InterruptedException {
         logger.info("calling stopTrackingAndRemove("+raceHandle.getRegatta().getName()+" ("+raceHandle.getRegatta().hashCode()+"))");
         service.stopTrackingAndRemove(raceHandle.getRegatta());

@@ -1,6 +1,7 @@
 eclipse.preferences.version=1
 encoding//src/main/java/com/sap/sse/security/ui/client/UserService.java=utf-8
 encoding//src/main/java/com/sap/sse/security/ui/client/i18n/StringMessages.properties=UTF-8
+encoding//src/main/java/com/sap/sse/security/ui/client/i18n/StringMessages_cs.properties=UTF-8
 encoding//src/main/java/com/sap/sse/security/ui/client/i18n/StringMessages_de.properties=UTF-8
 encoding//src/main/java/com/sap/sse/security/ui/client/i18n/StringMessages_es.properties=UTF-8
 encoding//src/main/java/com/sap/sse/security/ui/client/i18n/StringMessages_fr.properties=UTF-8

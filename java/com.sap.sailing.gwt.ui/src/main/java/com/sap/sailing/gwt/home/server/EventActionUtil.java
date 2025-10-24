@@ -22,9 +22,9 @@ import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.MillisecondsDurationImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
 import com.sap.sse.gwt.dispatch.shared.commands.ResultWithTTL;
 import com.sap.sse.gwt.dispatch.shared.exceptions.DispatchException;
+import com.sap.sse.gwt.shared.DTO;
 
 /**
  * This is a convenience class, which e.g. provides static methods to iterate over leaderboards or races of an entire

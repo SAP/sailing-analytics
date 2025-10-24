@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.sap.sailing.domain.common.ScoringSchemeType;
@@ -43,7 +43,7 @@ public abstract class AbstractLeaderboardDialog<LD extends LeaderboardDescriptor
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return nameTextBox;
     }
 
@@ -70,8 +70,8 @@ public abstract class AbstractLeaderboardDialog<LD extends LeaderboardDescriptor
         return result;
     }
     
-    protected ListBox createSortedRegattaLeaderboardsListBox(Collection<StrippedLeaderboardDTO> existingLeaderboards, String preSelectedRegattaName) {
-        ListBox result = createListBox(false);
+    protected static <T> ListBox createSortedRegattaLeaderboardsListBox(Collection<StrippedLeaderboardDTO> existingLeaderboards, String preSelectedRegattaName, StringMessages stringMessages, DataEntryDialog<T> dialog) {
+        ListBox result = dialog.createListBox(false);
         // sort the regatta names
         List<StrippedLeaderboardDTO> sortedRegattaLeaderboards = new ArrayList<>();
         for (StrippedLeaderboardDTO leaderboard : existingLeaderboards) {

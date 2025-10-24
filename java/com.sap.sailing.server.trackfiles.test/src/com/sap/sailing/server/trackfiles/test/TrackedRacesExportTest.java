@@ -1,6 +1,6 @@
 package com.sap.sailing.server.trackfiles.test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -12,8 +12,8 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.zip.ZipOutputStream;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.trackfiles.TrackFilesDataSource;
 import com.sap.sailing.domain.common.trackfiles.TrackFilesFormat;
@@ -35,7 +35,7 @@ public class TrackedRacesExportTest extends OnlineTracTracBasedTest {
         return "49er European Championship";
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws URISyntaxException, IOException, InterruptedException, SubscriberInitializationException,
             CreateModelException {
         URI storedUri = new URI("file:///" + new File("resources/event_20120905_erEuropean-Gold_fleet_-_race_1.mtb")

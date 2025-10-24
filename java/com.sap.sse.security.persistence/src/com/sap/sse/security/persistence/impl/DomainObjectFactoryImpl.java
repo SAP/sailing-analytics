@@ -1,8 +1,10 @@
 package com.sap.sse.security.persistence.impl;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -15,6 +17,7 @@ import org.bson.Document;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.impl.MillisecondsDurationImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.security.persistence.DomainObjectFactory;
@@ -22,9 +25,11 @@ import com.sap.sse.security.persistence.DomainObjectFactory;
 public class DomainObjectFactoryImpl implements DomainObjectFactory {
     private static final Logger logger = Logger.getLogger(DomainObjectFactoryImpl.class.getName());
     private final MongoCollection<Document> sessionsCollection;
+    private final MongoCollection<Document> corsFilterConfigurationsCollection;
     
     public DomainObjectFactoryImpl(MongoDatabase mongoDatabase) {
         sessionsCollection = mongoDatabase.getCollection(CollectionNames.SESSIONS.name());
+        corsFilterConfigurationsCollection = mongoDatabase.getCollection(CollectionNames.CORS_FILTER_CONFIGURATIONS.name());
     }
 
     @Override
@@ -81,6 +86,18 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
                     result.setAttribute(sessionAttributeDocument.getString(FieldNames.SESSION_ATTRIBUTE_NAME.name()), value);
                 }
             }
+        }
+        return result;
+    }
+
+    @Override
+    public Map<String, Pair<Boolean, Set<String>>> loadCORSFilterConfigurationsForReplicaSetNames() {
+        final Map<String, Pair<Boolean, Set<String>>> result = new HashMap<>();
+        for (final Document d : corsFilterConfigurationsCollection.find()) {
+            final String serverName = d.getString(FieldNames.CORS_FILTER_CONFIGURATION_SERVER_NAME.name());
+            final boolean isWildcard = d.getBoolean(FieldNames.CORS_FILTER_CONFIGURATION_IS_WILDCARD.name());
+            final List<String> allowedOrigins = isWildcard ? Collections.emptyList() : d.getList(FieldNames.CORS_FILTER_CONFIGURATION_ALLOWED_ORIGINS.name(), String.class);
+            result.put(serverName, new Pair<>(isWildcard, Util.asNewSet(allowedOrigins)));
         }
         return result;
     }

@@ -1,14 +1,14 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Boat;
 import com.sap.sailing.domain.base.BoatClass;
@@ -37,7 +37,7 @@ public class TackTest extends StoredTrackBasedTestWithTrackedRace {
     private Competitor competitor;
     
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         BoatClass boatClass = new BoatClassImpl("505", /* typicallyStartsUpwind */ true);
         competitor = new CompetitorImpl(123, "Wolfgang Hunger", "KYC", Color.RED, null, null, new TeamImpl("STG", Collections.singleton(

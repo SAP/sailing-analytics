@@ -78,7 +78,7 @@ public class SmallTransparentInfoOverlay extends CanvasOverlayV3 {
         final int LEFT_MARGIN = 8;
         final int RIGHT_MARGIN = 9;
         final int POLE_LENGTH = 25;
-        if (mapProjection != null && position != null) {
+        if (getMapProjection() != null && position != null) {
             LatLng latLngPosition = coordinateSystem.toLatLng(position);
             Context2d context2d = getCanvas().getContext2d();
             final int fontSizeInPx = (int) (fontScalingFactor*(12+2*Math.max(0, map.getZoom()-15)));
@@ -122,7 +122,7 @@ public class SmallTransparentInfoOverlay extends CanvasOverlayV3 {
                 y += LINE_HEIGHT;
             }
             context2d.stroke();
-            Point objectPositionInPx = mapProjection.fromLatLngToDivPixel(latLngPosition);
+            Point objectPositionInPx = getMapProjection().fromLatLngToDivPixel(latLngPosition);
             setCanvasPosition(objectPositionInPx.getX(), objectPositionInPx.getY() - canvasHeight);
         }
     }

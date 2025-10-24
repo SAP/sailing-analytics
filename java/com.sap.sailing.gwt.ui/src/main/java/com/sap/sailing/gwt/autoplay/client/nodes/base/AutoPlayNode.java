@@ -11,6 +11,10 @@ public interface AutoPlayNode {
 
     void log(String logMessage);
     
+    void onStart();
+    
+    default void onStop() {}
+    
     /**
      * Will be called before onStart, before calling this the default duration is submitted. Override for custom duration.
      * A time can be supplied multiple times, the timer will restart from the time of submission

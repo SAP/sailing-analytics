@@ -1,13 +1,13 @@
 package com.sap.sailing.domain.orc;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.Collection;
 
 import org.json.simple.parser.ParseException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.orc.ORCCertificate;
 
@@ -26,7 +26,7 @@ public class TestORCCertificateImporterJSON extends AbstractORCCertificateImport
     @FailIfNoValidOrcCertificates
     @Test
     public void testSimpleOnlineFileRead() throws IOException, ParseException, InterruptedException {
-        Collection<ORCCertificate> certificates = customIgnoreRule.getAvailableCerts();
+        Collection<ORCCertificate> certificates = FailIfNoValidOrcCertificateRule.getAvailableCerts();
         final ORCCertificate referenceCert = certificates.stream().findFirst().get();
         assertNotNull(referenceCert);
         assertTrue(referenceCert.getWindwardLeewardSpeedPrediction().get(ORCCertificate.ALLOWANCES_TRUE_WIND_SPEEDS[0]).getDuration(ORCCertificate.NAUTICAL_MILE).asSeconds() > 10); 

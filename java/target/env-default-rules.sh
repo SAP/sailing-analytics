@@ -8,13 +8,13 @@
 if [ -z "${SERVER_NAME}" ]; then
   SERVER_NAME=MASTER
 fi
-if [ -n "$AUTO_REPLICATE" ]; then
+if [ -n "${AUTO_REPLICATE}" ]; then
   if [ -z "${REPLICATE_ON_START}" ]; then
     # To start replication upon startup provide the fully-qualified names of the Replicable service classes
     # for which to trigger replication. If you activate this make sure to
     # set the REPLICATE_MASTER_EXCHANGE_NAME variable to the
     # same channel the master is using in its REPLICATION_CHANNEL variable
-    REPLICATE_ON_START=com.sap.sailing.server.impl.RacingEventServiceImpl,com.sap.sse.security.impl.SecurityServiceImpl,com.sap.sse.filestorage.impl.FileStorageManagementServiceImpl,com.sap.sse.mail.impl.MailServiceImpl,com.sap.sailing.polars.impl.PolarDataServiceImpl,com.sap.sailing.domain.racelogtracking.impl.fixtracker.RegattaLogFixTrackerRegattaListener,com.sap.sailing.windestimation.integration.WindEstimationFactoryServiceImpl,com.sap.sailing.shared.server.impl.SharedSailingDataImpl,com.sap.sse.landscape.aws.impl.AwsLandscapeStateImpl
+    REPLICATE_ON_START=com.sap.sailing.server.impl.RacingEventServiceImpl,com.sap.sse.security.impl.SecurityServiceImpl,com.sap.sse.filestorage.impl.FileStorageManagementServiceImpl,com.sap.sse.mail.impl.MailServiceImpl,com.sap.sailing.polars.impl.PolarDataServiceImpl,com.sap.sailing.domain.racelogtracking.impl.fixtracker.RegattaLogFixTrackerRegattaListener,com.sap.sailing.windestimation.integration.WindEstimationFactoryServiceImpl,com.sap.sailing.shared.server.impl.SharedSailingDataImpl,com.sap.sse.landscape.aws.impl.AwsLandscapeStateImpl,com.sap.sailing.domain.igtimiadapter.server.riot.impl.RiotServerImpl
   fi
 fi
 # Message Queue hostname where to
@@ -29,7 +29,7 @@ fi
 # The name of the message queuing fan-out exchange that this server will use in its role as replication master.
 # Make sure this is unique so that no other master is writing to this exchange at any time.
 if [ -z "${REPLICATION_CHANNEL}" ]; then
-  if [ -n "$AUTO_REPLICATE" ]; then
+  if [ -n "${AUTO_REPLICATE}" ]; then
     # This seems to be a replica; use a dedicated outbound channel for "transitive replication"
     REPLICATION_CHANNEL=${SERVER_NAME}-${INSTANCE_NAME}
   else
@@ -46,7 +46,7 @@ if [ -z "${SERVER_PORT}" ]; then
   SERVER_PORT=8888
 fi
 if [ -z "${MONGODB_NAME}" ]; then
-  if [ -n "$AUTO_REPLICATE" ]; then
+  if [ -n "${AUTO_REPLICATE}" ]; then
     # This seems to be a replica; use a "phony" DB for all replicas:
     MONGODB_NAME=${SERVER_NAME}-replica
   else
@@ -58,7 +58,7 @@ if [ -z "${MONGODB_PORT}" ]; then
   MONGODB_PORT=27017
 fi
 if [ -z "${MONGODB_HOST}" -a -z "${MONGODB_URI}" ]; then
-  if [ -n "$AUTO_REPLICATE" ]; then
+  if [ -n "${AUTO_REPLICATE}" ]; then
     # An auto-replication replica by default assumes it has a local MongoDB replica set running on localhost,
     # called "replica" and running on the default port 27017:
     MONGODB_URI="mongodb://localhost/${MONGODB_NAME}?replicaSet=replica&retryWrites=true&readPreference=nearest"
@@ -110,24 +110,33 @@ if [ -z "${MEMORY}" ]; then
   fi
   export MEMORY="${MEMORY_PER_INSTANCE_IN_MB}m"
 fi
-if [ -n ${CHARGEBEE_SITE} -a -n ${CHARGEBEE_APIKEY} ]; then
+if [ -n "${CHARGEBEE_SITE}" -a -n "${CHARGEBEE_APIKEY}" ]; then
   ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -Dchargebee.site=${CHARGEBEE_SITE} -Dchargebee.apikey=${CHARGEBEE_APIKEY}"
 fi
-if [ -n ${MANAGE2SAIL_ACCESS_TOKEN} ]; then
+if [ -n "${MANAGE2SAIL_ACCESS_TOKEN}" ]; then
   ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -Dmanage2sail.accesstoken=${MANAGE2SAIL_ACCESS_TOKEN}"
 fi
-if [ -n ${IGTIMI_CLIENT_ID} ]; then
-  ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -Digtimi.client.id=${IGTIMI_CLIENT_ID}"
+if [ -n "${IGTIMI_BASE_URL}" ]; then
+  ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -Digtimi.base.url=${IGTIMI_BASE_URL}"
 fi
-if [ -n ${IGTIMI_CLIENT_SECRET} ]; then
-  ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -Digtimi.client.secret=${IGTIMI_CLIENT_SECRET}"
+if [ -n "${IGTIMI_BEARER_TOKEN}" ]; then
+  ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -Digtimi.bearer.token=${IGTIMI_BEARER_TOKEN}"
 fi
-if [ -n ${GOOGLE_MAPS_AUTHENTICATION_PARAMS} ]; then
+if [ -n "${IGTIMI_RIOT_PORT}" ]; then
+  ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -Digtimi.riot.port=${IGTIMI_RIOT_PORT}"
+fi
+if [ -n "${GOOGLE_MAPS_AUTHENTICATION_PARAMS}" ]; then
   ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -Dgoogle.maps.authenticationparams=${GOOGLE_MAPS_AUTHENTICATION_PARAMS}"
 fi
-if [ -n ${WINDESTIMATION_BEARER_TOKEN} ]; then
+if [ -n "${YOUTUBE_API_KEY}" ]; then
+  ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -Dyoutube.api.key=${YOUTUBE_API_KEY}"
+fi
+if [ -n "${WINDESTIMATION_BEARER_TOKEN}" ]; then
   ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -Dwindestimation.source.bearertoken=${WINDESTIMATION_BEARER_TOKEN}"
 fi
-if [ -n ${POLAR_DATA_BEARER_TOKEN} ]; then
+if [ -n "${POLAR_DATA_BEARER_TOKEN}" ]; then
   ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -Dpolardata.source.bearertoken=${POLAR_DATA_BEARER_TOKEN}"
+fi
+if [ -n "${GEONAMES_ORG_USERNAMES}" ]; then
+  ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -Dgeonames.org.usernames=${GEONAMES_ORG_USERNAMES}"
 fi

@@ -34,7 +34,7 @@ public class GetStartlineAdvantageByGeometryAction extends RequiresLiveRaceAndCa
         if (liveRace != null) {
             startlineAdvantageByGeometry = StartlineAdvantageByGeometryCalculator.calculateStartlineAdvantageByGeometry(liveRace);
         }
-        result.startLineAdvatageType = StartlineAdvantageType.GEOMETRIC;
+        result.startLineAdvantageType = StartlineAdvantageType.GEOMETRIC;
         result.startLineAdvantage = startlineAdvantageByGeometry;
         Double average = null;
         if (startlineAdvantageByGeometry != null) {

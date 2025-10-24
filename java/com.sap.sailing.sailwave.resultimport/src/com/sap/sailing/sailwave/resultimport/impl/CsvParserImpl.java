@@ -116,9 +116,8 @@ public class CsvParserImpl implements CsvParser {
                                             pointsAndMaxPointsReasonAndDiscard.length() - 1);
                                     discarded = true;
                                 }
-                                if (pointsAndMaxPointsReasonAndDiscard.matches(".*(,| ).*")) {
-                                    String[] splittedPointsAndMaxPointReason = pointsAndMaxPointsReasonAndDiscard
-                                            .split(",| ");
+                                if (pointsAndMaxPointsReasonAndDiscard.indexOf(' ') >= 0 || pointsAndMaxPointsReasonAndDiscard.indexOf(',') >= 0) {
+                                    String[] splittedPointsAndMaxPointReason = pointsAndMaxPointsReasonAndDiscard.split(",| ");
                                     points = Double.valueOf(splittedPointsAndMaxPointReason[0]);
                                     maxPointsReason = splittedPointsAndMaxPointReason[1];
                                 } else {

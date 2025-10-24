@@ -21,7 +21,7 @@ public class AuthenticationContextImpl implements AuthenticationContext {
     private final static UserDTO ANONYMOUS = new UserDTO("Anonymous", "", "", "", null, false, new ArrayList<AccountDTO>(),
             new ArrayList<RoleWithSecurityDTO>(), /* default tenant */ null,
             new ArrayList<WildcardPermissionWithSecurityDTO>(),
-            /* groups */ null);
+            /* groups */ null, /* lockedUntil */ null);
     private final UserService userService;
     private final PaywallResolver paywallResolver;
 

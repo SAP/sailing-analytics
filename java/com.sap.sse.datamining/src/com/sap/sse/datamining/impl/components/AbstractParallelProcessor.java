@@ -6,6 +6,9 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.UnavailableSecurityManagerException;
+import org.apache.shiro.subject.Subject;
 
 import com.sap.sse.datamining.components.AdditionalResultDataBuilder;
 import com.sap.sse.datamining.components.Processor;
@@ -46,7 +49,14 @@ public abstract class AbstractParallelProcessor<InputType, ResultType> extends A
             if (isInstructionValid(instruction)) {
                 unfinishedInstructionsCounter.getAndIncrement();
                 try {
-                    executor.execute(instruction);
+                    Runnable instructionToRun;
+                    try {
+                        final Subject subject = SecurityUtils.getSubject(); // pass on the current subject to the instruction
+                        instructionToRun = subject == null ? instruction : subject.associateWith(instruction);
+                    } catch (UnavailableSecurityManagerException e) {
+                        instructionToRun = instruction;
+                    }
+                    executor.execute(instructionToRun);
                 } catch (RejectedExecutionException exc) {
                     LOGGER.log(Level.FINEST, "A " + RejectedExecutionException.class.getSimpleName()
                             + " appeared during the processing.");

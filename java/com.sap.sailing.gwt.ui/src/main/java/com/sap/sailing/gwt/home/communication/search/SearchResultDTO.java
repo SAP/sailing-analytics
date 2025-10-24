@@ -8,7 +8,7 @@ import java.util.UUID;
 import com.google.gwt.core.shared.GwtIncompatible;
 import com.sap.sailing.domain.base.EventBase;
 import com.sap.sailing.domain.base.LeaderboardSearchResultBase;
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
+import com.sap.sse.gwt.shared.DTO;
 
 public class SearchResultDTO implements DTO {
     

@@ -1,13 +1,13 @@
 package com.sap.sse.util.apachelog;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ApacheLogAnalysisTest {
     @Test

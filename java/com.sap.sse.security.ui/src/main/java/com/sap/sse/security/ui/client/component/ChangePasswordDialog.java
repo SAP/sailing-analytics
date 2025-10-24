@@ -1,6 +1,6 @@
 package com.sap.sse.security.ui.client.component;
 
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.sap.sse.security.shared.dto.UserDTO;
 import com.sap.sse.security.ui.client.UserManagementServiceAsync;
 import com.sap.sse.security.ui.client.i18n.StringMessages;
@@ -15,7 +15,7 @@ public class ChangePasswordDialog extends AbstractUserDialog {
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return getPwBox();
     }
 }

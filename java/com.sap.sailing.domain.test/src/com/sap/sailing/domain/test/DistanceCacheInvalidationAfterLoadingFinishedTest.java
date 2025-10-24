@@ -1,12 +1,12 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Collections;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Boat;
 import com.sap.sailing.domain.base.Competitor;
@@ -38,7 +38,7 @@ public class DistanceCacheInvalidationAfterLoadingFinishedTest extends TrackBase
     private CompetitorWithBoat competitor;
     private DynamicTrackedRace trackedRace;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         competitor = createCompetitorWithBoat("Test Competitor");
         Map<Competitor, Boat> competitorsAndBoats = TrackBasedTest.createCompetitorAndBoatsMap(competitor);

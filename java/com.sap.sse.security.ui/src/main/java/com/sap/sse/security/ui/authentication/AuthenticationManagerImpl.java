@@ -23,6 +23,7 @@ import com.sap.sse.security.ui.client.UserStatusEventHandler;
 import com.sap.sse.security.ui.client.WithSecurity;
 import com.sap.sse.security.ui.client.i18n.StringMessages;
 import com.sap.sse.security.ui.client.premium.PaywallResolver;
+import com.sap.sse.security.ui.client.premium.PaywallResolverImpl;
 import com.sap.sse.security.ui.shared.SuccessInfo;
 
 /**
@@ -60,7 +61,7 @@ public class AuthenticationManagerImpl implements AuthenticationManager {
     public AuthenticationManagerImpl(WithSecurity clientFactory, EventBus eventBus,
             String emailConfirmationUrl, String passwordResetUrl) {
         this(clientFactory.getUserManagementWriteService(), clientFactory.getUserService(), 
-                new PaywallResolver(clientFactory.getUserService(), clientFactory.getSubscriptionServiceFactory()),
+                new PaywallResolverImpl(clientFactory.getUserService(), clientFactory.getSubscriptionServiceFactory()),
                 eventBus, emailConfirmationUrl, passwordResetUrl);
     }
     
@@ -124,8 +125,12 @@ public class AuthenticationManagerImpl implements AuthenticationManager {
                     @Override
                     public void onFailure(Throwable caught) {
                         if (caught instanceof UserManagementException) {
-                            if (USER_ALREADY_EXISTS.equals(((UserManagementException) caught).getMessage())) {
+                            if (Util.hasLength(caught.getMessage()) && caught.getMessage().equals(USER_ALREADY_EXISTS)) {
                                 view.setErrorMessage(i18n.userAlreadyExists(name));
+                            } else if (Util.hasLength(caught.getMessage()) && caught.getMessage().equals(UserManagementException.CLIENT_CURRENTLY_LOCKED_FOR_USER_CREATION)) {
+                                view.setErrorMessage(i18n.clientCurrentlyLockedForUserCreation());
+                            } else {
+                                Notification.notify(i18n.errorCreatingUser(name, caught.getMessage()==null?"":caught.getMessage()), NotificationType.ERROR);
                             }
                         } else {
                             view.setErrorMessage(i18n.errorCreatingUser(name, caught.getMessage()));

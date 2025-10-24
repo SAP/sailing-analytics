@@ -2,7 +2,7 @@
 YESFILE="/tmp/osg2024tev2023results.json"
 YESFILE_OLD="${YESFILE}.old"
 MAILINGLIST="/home/sailing/mailinglists/osg2024tev2023updatemailinglist"
-URL="http://10.1.33.40/info/api/public/links/event/1be7a4cb-4537-44d6-88b3-646b308c2dbf?accesstoken=bDAv8CwsTM94ujZ&mediaType=json"
+URL="http://manage2sail-a/info/api/public/links/event/6bae8051-23f3-4329-bcb3-f5b3ce0e69d6?accesstoken=bDAv8CwsTM94ujZ&mediaType=json"
 dosendmail=false
 wget -O "$YESFILE" "$URL"
 if [ -f "$YESFILE_OLD" ]; then
@@ -26,7 +26,7 @@ if [ "$dosendmail" = "true" ]; then
   echo "$YESFILE has changed. Consider re-importing results for Olympic Test Event Marseille 2023. Differences:
 
 ------------------
-`diff -U 10 "$YESFILE_OLD_FORMATTED" "$YESFILE_FORMATTED"`
+`diff -U 15 "$YESFILE_OLD_FORMATTED" "$YESFILE_FORMATTED"`
 ------------------
 
 To unsubscribe, change $MAILINGLIST on `hostname`." | mail -s "$YESFILE was updated" `cat "$MAILINGLIST" | grep -v "^#"`

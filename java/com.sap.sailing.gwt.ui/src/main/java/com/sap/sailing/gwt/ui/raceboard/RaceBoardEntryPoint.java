@@ -47,6 +47,7 @@ import com.sap.sse.gwt.client.shared.settings.DefaultOnSettingsLoadedCallback;
 import com.sap.sse.gwt.settings.SettingsToUrlSerializer;
 import com.sap.sse.security.ui.authentication.generic.sapheader.SAPHeaderWithAuthentication;
 import com.sap.sse.security.ui.client.premium.PaywallResolver;
+import com.sap.sse.security.ui.client.premium.PaywallResolverImpl;
 import com.sap.sse.security.ui.settings.ComponentContextWithSettingsStorage;
 import com.sap.sse.security.ui.settings.StoredSettingsLocation;
 
@@ -121,7 +122,7 @@ public class RaceBoardEntryPoint extends AbstractSailingReadEntryPoint implement
         }
         final StoredSettingsLocation storageDefinition = StoredSettingsLocationFactory
                 .createStoredSettingsLocatorForRaceBoard(raceboardContextDefinition, mode != null ? mode.name() : null);
-        PaywallResolver paywallResolver = new PaywallResolver(getUserService(), getSubscriptionServiceFactory());
+        PaywallResolver paywallResolver = new PaywallResolverImpl(getUserService(), getSubscriptionServiceFactory());
         final RaceBoardPerspectiveLifecycle lifeCycle = new RaceBoardPerspectiveLifecycle(
                 raceboardData.getLeaderboard(), StringMessages.INSTANCE,
                 raceboardData.getDetailTypesForCompetitorChart(), getUserService(), paywallResolver,
@@ -142,7 +143,7 @@ public class RaceBoardEntryPoint extends AbstractSailingReadEntryPoint implement
     private void createErrorPage(String message) {
         final DockLayoutPanel vp = new DockLayoutPanel(Unit.PX);
         final SAPHeaderWithAuthentication header = new SAPSailingHeaderWithAuthentication();
-        PaywallResolver paywallResolver = new PaywallResolver(getUserService(), getSubscriptionServiceFactory());
+        PaywallResolver paywallResolver = new PaywallResolverImpl(getUserService(), getSubscriptionServiceFactory());
         new FixedSailingAuthentication(getUserService(), paywallResolver, header.getAuthenticationMenuView());
         RootLayoutPanel.get().add(vp);
         vp.addNorth(header, 100);

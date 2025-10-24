@@ -28,6 +28,7 @@ implements SailingAnalyticsHost<ShardingKey> {
     protected Map<String, Boolean> getAdditionalEnvironmentPropertiesAndWhetherStringTyped() {
         return MapBuilder.of(super.getAdditionalEnvironmentPropertiesAndWhetherStringTyped())
                 .put(SailingProcessConfigurationVariables.EXPEDITION_PORT.name(), /* String-typed */ false)
+                .put(SailingProcessConfigurationVariables.IGTIMI_RIOT_PORT.name(), /* String-typed */ false)
                 .build();
     }
 

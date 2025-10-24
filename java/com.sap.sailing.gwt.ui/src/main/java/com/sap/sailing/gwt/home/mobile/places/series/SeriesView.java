@@ -9,6 +9,7 @@ import com.sap.sailing.gwt.home.communication.fakeseries.EventSeriesViewDTO;
 import com.sap.sailing.gwt.home.mobile.places.SeriesLeaderboardNavigationProvider;
 import com.sap.sailing.gwt.home.shared.app.PlaceNavigation;
 import com.sap.sailing.gwt.home.shared.places.fakeseries.SeriesContext;
+import com.sap.sse.security.ui.client.UserService;
 
 public interface SeriesView extends IsWidget {
 
@@ -22,6 +23,8 @@ public interface SeriesView extends IsWidget {
         PlaceNavigation<?> getEventNavigation(String eventId);
 
         EventSeriesViewDTO getSeriesDTO();
+        
+        UserService getUserService();
     }
 }
 

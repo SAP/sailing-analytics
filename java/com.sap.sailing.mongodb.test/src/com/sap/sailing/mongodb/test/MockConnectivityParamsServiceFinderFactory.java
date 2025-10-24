@@ -1,7 +1,8 @@
 package com.sap.sailing.mongodb.test;
 
-import java.util.HashMap;
 import static org.mockito.Mockito.mock;
+
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -11,8 +12,8 @@ import com.sap.sailing.domain.persistence.MongoObjectFactory;
 import com.sap.sailing.domain.persistence.MongoRaceLogStoreFactory;
 import com.sap.sailing.domain.persistence.MongoRegattaLogStoreFactory;
 import com.sap.sailing.domain.racelog.tracking.test.mock.AbstractTypeBasedServiceFinder;
-import com.sap.sailing.domain.racelog.tracking.test.mock.SmartphoneImeiIdentifier;
 import com.sap.sailing.domain.racelogtracking.impl.RaceLogConnectivityParams;
+import com.sap.sailing.domain.racelogtracking.impl.SmartphoneImeiIdentifierImpl;
 import com.sap.sailing.domain.swisstimingadapter.DomainFactory;
 import com.sap.sailing.domain.swisstimingadapter.impl.SwissTimingAdapterFactoryImpl;
 import com.sap.sailing.domain.swisstimingadapter.impl.SwissTimingTrackingConnectivityParameters;
@@ -35,7 +36,7 @@ import com.sap.sse.security.SecurityService;
 
 /**
  * A simplified implementation of the {@link TypeBasedServiceFinder} interface that, when the device type
- * {@link SmartphoneImeiIdentifier#TYPE} is requested, returns a specific handler that was passed to this object's
+ * {@link SmartphoneImeiIdentifierImpl#TYPE} is requested, returns a specific handler that was passed to this object's
  * constructor.
  * 
  * @author Fredrik Teschke

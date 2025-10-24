@@ -17,12 +17,13 @@ import com.sap.sailing.gwt.home.communication.event.LiveRaceDTO;
 import com.sap.sailing.gwt.home.communication.eventview.RegattaMetadataDTO;
 import com.sap.sailing.gwt.home.mobile.partials.section.IsMobileSection;
 import com.sap.sailing.gwt.home.mobile.partials.section.MobileSection;
-import com.sap.sailing.gwt.home.mobile.partials.sectionHeader.SectionHeaderDataIndicators;
 import com.sap.sailing.gwt.home.mobile.partials.sectionHeader.SectionHeaderContent;
+import com.sap.sailing.gwt.home.mobile.partials.sectionHeader.SectionHeaderDataIndicators;
 import com.sap.sailing.gwt.home.mobile.places.event.EventViewBase.Presenter;
 import com.sap.sailing.gwt.home.shared.app.PlaceNavigation;
 import com.sap.sailing.gwt.home.shared.partials.regattalist.RegattaListView.RegattaListItem;
 import com.sap.sse.security.ui.client.premium.PaywallResolver;
+import com.sap.sse.security.ui.client.premium.PaywallResolverImpl;
 
 public class RegattaStatusRegatta extends Composite implements IsMobileSection, RegattaListItem {
 
@@ -48,7 +49,7 @@ public class RegattaStatusRegatta extends Composite implements IsMobileSection, 
     }
     
     public void addRaces(Set<LiveRaceDTO> races) {
-        final PaywallResolver paywallResolver = new PaywallResolver(presenter.getUserService(), 
+        final PaywallResolver paywallResolver = new PaywallResolverImpl(presenter.getUserService(), 
                 presenter.getSubscriptionServiceFactory());
         races.stream()
                 .map(race -> new RegattaStatusRace(race, presenter::getRaceViewerURL, r -> presenter

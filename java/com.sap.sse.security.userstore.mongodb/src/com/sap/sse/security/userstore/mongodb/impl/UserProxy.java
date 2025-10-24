@@ -10,6 +10,7 @@ import com.sap.sse.security.shared.HasPermissions;
 import com.sap.sse.security.shared.QualifiedObjectIdentifier;
 import com.sap.sse.security.shared.UserGroupProvider;
 import com.sap.sse.security.shared.WildcardPermission;
+import com.sap.sse.security.shared.impl.LockingAndBanning;
 import com.sap.sse.security.shared.impl.Role;
 import com.sap.sse.security.shared.impl.User;
 import com.sap.sse.security.shared.impl.UserGroup;
@@ -237,6 +238,11 @@ public class UserProxy implements User {
 
     @Override
     public boolean hasActiveSubscription(String planId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public LockingAndBanning getLockingAndBanning() {
         throw new UnsupportedOperationException();
     }
 }

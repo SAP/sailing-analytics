@@ -12,6 +12,7 @@ public class WhatsNewSettings extends AbstractWhatsNewSettings {
     public static final String PREF_NAME = "sailing.whatsnew.admin";
 
     public WhatsNewSettings() {
+        super();
     }
 
     public WhatsNewSettings(final Long numberOfCharsOnLastLogin) {

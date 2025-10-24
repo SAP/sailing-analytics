@@ -101,6 +101,11 @@
                   <autoStart>true</autoStart>
                 </bundle>
                 <bundle>
+                  <id>com.sap.sailing.domain.vakarosadapter</id>
+                  <level>4</level>
+                  <autoStart>true</autoStart>
+                </bundle>
+                <bundle>
                   <id>com.sap.sailing.domain.windfinderadapter</id>
                   <level>4</level>
                   <autoStart>true</autoStart>
@@ -176,6 +181,11 @@
                   <autoStart>true</autoStart>
                 </bundle>
                 <bundle>
+                  <id>com.sap.sailing.sailwave.html.resultimport</id>
+                  <level>4</level>
+                  <autoStart>true</autoStart>
+                </bundle>
+                <bundle>
                   <id>com.sap.sailing.manage2sail.resultimport</id>
                   <level>4</level>
                   <autoStart>true</autoStart>
@@ -206,7 +216,7 @@
                   <autoStart>true</autoStart>
                 </bundle>
                 <bundle>
-                  <id>com.sap.sailing.domain.igtimiadapter</id>
+                  <id>com.sap.sailing.domain.igtimiadapter.server</id>
                   <level>4</level>
                   <autoStart>true</autoStart>
                 </bundle>
@@ -303,6 +313,26 @@
                 <bundle>
                   <id>com.sap.sailing.hanaexport</id>
                   <level>5</level>
+                  <autoStart>true</autoStart>
+                </bundle>
+                <bundle>
+                  <id>com.sap.sailing.domain.queclinkadapter</id>
+                  <level>5</level>
+                  <autoStart>true</autoStart>
+                </bundle>
+                <bundle>
+                  <id>com.sap.sailing.aiagent</id>
+                  <level>4</level>
+                  <autoStart>true</autoStart>
+                </bundle>
+                <bundle>
+                  <id>com.sap.sailing.aiagent.persistence</id>
+                  <level>5</level>
+                  <autoStart>true</autoStart>
+                </bundle>
+                <bundle>
+                  <id>com.sap.sailing.aiagent.gateway</id>
+                  <level>6</level>
                   <autoStart>true</autoStart>
                 </bundle>
                 <bundle>

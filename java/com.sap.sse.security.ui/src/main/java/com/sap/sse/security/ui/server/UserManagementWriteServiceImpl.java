@@ -1,5 +1,6 @@
 package com.sap.sse.security.ui.server;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -14,12 +15,15 @@ import java.util.logging.Logger;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.AuthorizationException;
 
+import com.sap.sse.ServerInfo;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Triple;
 import com.sap.sse.common.mail.MailException;
+import com.sap.sse.common.media.TakedownNoticeRequestContext;
 import com.sap.sse.security.Action;
 import com.sap.sse.security.SecurityService;
 import com.sap.sse.security.shared.HasPermissions.DefaultActions;
+import com.sap.sse.security.shared.PermissionChecker;
 import com.sap.sse.security.shared.QualifiedObjectIdentifier;
 import com.sap.sse.security.shared.RoleDefinition;
 import com.sap.sse.security.shared.TypeRelativeObjectIdentifier;
@@ -39,6 +43,7 @@ import com.sap.sse.security.shared.impl.Ownership;
 import com.sap.sse.security.shared.impl.PermissionAndRoleAssociation;
 import com.sap.sse.security.shared.impl.Role;
 import com.sap.sse.security.shared.impl.SecuredSecurityTypes;
+import com.sap.sse.security.shared.impl.SecuredSecurityTypes.ServerActions;
 import com.sap.sse.security.shared.impl.SecuredSecurityTypes.UserActions;
 import com.sap.sse.security.shared.impl.User;
 import com.sap.sse.security.shared.impl.UserGroup;
@@ -47,6 +52,7 @@ import com.sap.sse.security.ui.client.UserManagementWriteService;
 import com.sap.sse.security.ui.oauth.client.CredentialDTO;
 import com.sap.sse.security.ui.oauth.shared.OAuthException;
 import com.sap.sse.security.ui.shared.SuccessInfo;
+import com.sap.sse.util.HttpRequestUtils;
 
 public class UserManagementWriteServiceImpl extends UserManagementServiceImpl implements UserManagementWriteService {
     private static final long serialVersionUID = -8123229851467370537L;
@@ -262,7 +268,8 @@ public class UserManagementWriteServiceImpl extends UserManagementServiceImpl im
     public UserDTO createSimpleUser(final String username, final String email, final String password,
             final String fullName, final String company, final String localeName, final String validationBaseURL)
             throws UserManagementException, MailException, UnauthorizedException {
-        User user = getSecurityService().checkPermissionForObjectCreationAndRevertOnErrorForUserCreation(username,
+        final String clientIP = HttpRequestUtils.getClientIP(getThreadLocalRequest());
+        User user = getSecurityService().checkPermissionForUserCreationAndRevertOnErrorForUserCreation(username,
                 new Callable<User>() {
                     @Override
                     public User call() throws Exception {
@@ -273,10 +280,14 @@ public class UserManagementWriteServiceImpl extends UserManagementServiceImpl im
                         try {
                             User newUser = getSecurityService().createSimpleUser(username, email, password, fullName,
                                     company, getLocaleFromLocaleName(localeName), validationBaseURL,
-                                    getSecurityService().getDefaultTenantForCurrentUser());
+                                    getSecurityService().getDefaultTenantForCurrentUser(), clientIP,
+                                    /* enforce strong password */ true);
                             return newUser;
-                        } catch (UserManagementException | UserGroupManagementException e) {
-                            logger.log(Level.SEVERE, "Error creating user " + username, e);
+                        } catch (UserManagementException e) {
+                            logger.severe("Error creating user " + username+": "+e.getMessage());
+                            throw e;
+                        } catch (UserGroupManagementException e) {
+                            logger.severe("Error creating user " + username+": "+e.getMessage());
                             throw new UserManagementException(e.getMessage());
                         }
                     }
@@ -289,10 +300,16 @@ public class UserManagementWriteServiceImpl extends UserManagementServiceImpl im
         final User user = getSecurityService().getUserByName(username);
         // Is, e.g., admin is allowed to update the password without knowing the old password and/or secret?
         if (getSecurityService().hasCurrentUserOneOfExplicitPermissions(user, UserActions.FORCE_OVERWRITE_PASSWORD)
-        || // someone knew a username and the correct password for that user
-        (oldPassword != null && getSecurityService().checkPassword(username, oldPassword))
-        || // someone provided the correct password reset secret for the correct username
-        (passwordResetSecret != null && getSecurityService().checkPasswordResetSecret(username, passwordResetSecret))) {
+        || ((
+               // someone knew a username and the correct password for that user
+            oldPassword != null && getSecurityService().checkPassword(username, oldPassword)
+            || // someone provided the correct password reset secret for the correct username
+            (passwordResetSecret != null && getSecurityService().checkPasswordResetSecret(username, passwordResetSecret)))
+               // but in any case the user as which they authenticate in one of these ways has to have the UPDATE permission
+          && PermissionChecker.isPermitted(user.getPermissionType().getPermission(DefaultActions.UPDATE),
+                user, getSecurityService().getAllUser(),
+                getSecurityService().getOwnership(user.getIdentifier())==null?null:getSecurityService().getOwnership(user.getIdentifier()).getAnnotation(),
+                getSecurityService().getAccessControlList(user.getIdentifier())==null?null:getSecurityService().getAccessControlList(user.getIdentifier()).getAnnotation()))) {
             getSecurityService().updateSimpleUserPassword(username, newPassword);
             sendPasswordChangedMailAsync(username);
         } else {
@@ -658,8 +675,7 @@ public class UserManagementWriteServiceImpl extends UserManagementServiceImpl im
             AccessControlListDTO acl) throws UnauthorizedException {
         if (SecurityUtils.getSubject()
                 .isPermitted(idOfAccessControlledObject.getStringPermission(DefaultActions.CHANGE_ACL))) {
-            
-            Map<UserGroup, Set<String>> aclActionsByGroup = new HashMap<>();
+            final Map<UserGroup, Set<String>> aclActionsByGroup = new HashMap<>();
             for (Entry<StrippedUserGroupDTO, Set<String>> entry : acl.getActionsByUserGroup().entrySet()) {
                 final StrippedUserGroupDTO groupDTO = entry.getKey();
                 final UserGroup userGroup;
@@ -670,11 +686,27 @@ public class UserManagementWriteServiceImpl extends UserManagementServiceImpl im
                 }
                 aclActionsByGroup.put(userGroup, entry.getValue());
             }
-
             return securityDTOFactory.createAccessControlListDTO(getSecurityService()
                     .overrideAccessControlList(idOfAccessControlledObject, aclActionsByGroup));
         } else {
             throw new UnauthorizedException("Not permitted to update the ACL for a user");
         }
+    }
+
+    @Override
+    public void setCORSFilterConfigurationToWildcard() {
+        getSecurityService().checkCurrentUserServerPermission(ServerActions.CONFIGURE_CORS_FILTER);
+        getSecurityService().setCORSFilterConfigurationToWildcard(ServerInfo.getName());
+    }
+
+    @Override
+    public void setCORSFilterConfigurationAllowedOrigins(ArrayList<String> allowedOrigins) {
+        getSecurityService().checkCurrentUserServerPermission(ServerActions.CONFIGURE_CORS_FILTER);
+        getSecurityService().setCORSFilterConfigurationAllowedOrigins(ServerInfo.getName(), allowedOrigins.toArray(new String[0]));
+    }
+    
+    @Override
+    public void fileTakedownNotice(TakedownNoticeRequestContext takedownNoticeRequestContext) throws MailException {
+        getSecurityService().fileTakedownNotice(takedownNoticeRequestContext);
     }
 }

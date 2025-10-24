@@ -13,6 +13,7 @@ import com.sap.sailing.landscape.procedures.DeployProcessOnMultiServer;
 import com.sap.sailing.landscape.procedures.SailingAnalyticsMasterConfiguration;
 import com.sap.sailing.landscape.procedures.SailingAnalyticsReplicaConfiguration;
 import com.sap.sailing.landscape.procedures.SailingAnalyticsReplicaConfiguration.Builder;
+import com.sap.sailing.landscape.procedures.SailingProcessConfigurationVariables;
 import com.sap.sailing.landscape.procedures.StartMultiServer;
 import com.sap.sailing.server.gateway.interfaces.CompareServersResult;
 import com.sap.sailing.server.gateway.interfaces.SailingServer;
@@ -123,8 +124,12 @@ public interface LandscapeService {
      *            fraction of the "physical" RAM (as seen by the operating system running on the instance) minus some
      *            space reserved for the operating system itself and for the Java VM. It can be thought of as an
      *            approximation for how many processes configured this way will fit into the instance's physical memory
-     *            without the need for massive swapping activity. The parameter will be ignored for a new dedicated master
-     *            instance where we assume that almost all physical RAM shall be made available to the process.
+     *            without the need for massive swapping activity. The parameter will be ignored for a new dedicated
+     *            master instance where we assume that almost all physical RAM shall be made available to the process.
+     * @param optionalIgtimiRiotPort
+     *            if non-{@code null}, this will be used for the
+     *            {@link SailingProcessConfigurationVariables#IGTIMI_RIOT_PORT} variable in both, primary/master and
+     *            replica.
      * @param minimumAutoScalingGroupSize
      *            if {@code 0}, a replica process will be started on a shared host that must run in an availability zone
      *            different from the one on which the master process runs. If no such shared host exists that is
@@ -144,25 +149,29 @@ public interface LandscapeService {
             String releaseNameOrNullForLatestMaster, String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
             String masterReplicationBearerToken, String replicaReplicationBearerToken, String optionalDomainName,
             Integer optionalMemoryInMegabytesOrNull, Integer optionalMemoryTotalSizeFactorOrNull,
-            Optional<Integer> minimumAutoScalingGroupSize, Optional<Integer> maximumAutoScalingGroupSize)
+            Integer optionalIgtimiRiotPort, Optional<Integer> minimumAutoScalingGroupSize, Optional<Integer> maximumAutoScalingGroupSize)
             throws Exception;
 
     /**
      * Starts a first master process of a new replica set whose name is provided by the {@code replicaSetName}
      * parameter. The process is started on the host identified by the {@code hostToDeployTo} parameter. A set of
      * available ports is identified and chosen automatically. The target groups and load balancing set-up is created.
-     * The {@code replicaInstanceType} is used to configure the launch configuration used by the auto-scaling group
-     * which is also created so that when dedicated replicas need to be provided during auto-scaling, their instance
-     * type is known. The choice of {@code dynamicLoadBalancerMapping} must only be set if the host to deploy to lives
-     * in the default region; otherwise, the DNS wildcard record for the overall domain would be made point to a wrong
-     * region. If set to {@code false}, a DNS entry will be created that points to the load balancer used for the new
-     * replica set's routing rules.
+     * The {@code replicaInstanceType} is used to configure the launch template used by the auto-scaling group which is
+     * also created so that when dedicated replicas need to be provided during auto-scaling, their instance type is
+     * known. The choice of {@code dynamicLoadBalancerMapping} must only be set if the host to deploy to lives in the
+     * default region; otherwise, the DNS wildcard record for the overall domain would be made point to a wrong region.
+     * If set to {@code false}, a DNS entry will be created that points to the load balancer used for the new replica
+     * set's routing rules.
      * <p>
      * 
      * @param optionalMinimumAutoScalingGroupSize
      *            defaults to 1; if 0, a replica process will be launched on an eligible shared instance in an
      *            availability zone different from that of the instance hosting the master process. Otherwise, at least
      *            one auto-scaling replica will ensure availability of the replica set.
+     * @param optionalIgtimiRiotPort
+     *            if non-{@code null}, this will be used to configure the
+     *            {@link SailingProcessConfigurationVariables#IGTIMI_RIOT_PORT} variable for primary/master and replica
+     *            processes
      */
     AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> deployApplicationToExistingHost(String replicaSetName,
             SailingAnalyticsHost<String> hostToDeployTo, String replicaInstanceType, boolean dynamicLoadBalancerMapping,
@@ -170,7 +179,8 @@ public interface LandscapeService {
             String masterReplicationBearerToken, String replicaReplicationBearerToken,
             String optionalDomainName, Optional<Integer> optionalMinimumAutoScalingGroupSize, Optional<Integer> optionalMaximumAutoScalingGroupSize,
             Integer optionalMemoryInMegabytesOrNull,
-            Integer optionalMemoryTotalSizeFactorOrNull, Optional<InstanceType> optionalSharedInstanceTypeForNewReplicaHost,
+            Integer optionalMemoryTotalSizeFactorOrNull, Integer optionalIgtimiRiotPort,
+            Optional<InstanceType> optionalSharedInstanceTypeForNewReplicaHost,
             Optional<SailingAnalyticsHost<String>> optionalPreferredInstanceToDeployUnmanagedReplicaTo) throws Exception;
     
     /**
@@ -218,10 +228,9 @@ public interface LandscapeService {
      * until the replica has reached its healthy state. The replica is then registered in the public target group.<p>
      * 
      * Then, the {@code ./refreshInstance.sh install-release <release>} command is sent to the master which will
-     * download and unpack the new release but will not yet stop the master process. In parallel, an existing
-     * launch configuration will be copied and updated with user data reflecting the new release to be used.
-     * An existing auto-scaling group will then be updated to use the new launch configuration. The old launch
-     * configuration will then be removed.<p>
+     * download and unpack the new release but will not yet stop the master process. In parallel, the existing
+     * default launch template version will be copied and updated with user data reflecting the new release to be used.
+     * The existing auto-scaling group will then use the new default launch template version.<p>
      * 
      * Replication is then stopped for all existing replicas, then the master is de-registered from the master
      * target group and the public target group, effectively making the replica set "read-only." Then, the {@code ./stop}
@@ -265,6 +274,7 @@ public interface LandscapeService {
      * eligible} for deploying a process of the replica set to it. In particular, the directory as derived from the
      * replica set name and the HTTP port must not be used by any other application already deployed on that host.
      * The replica process is registered with the {@code replicaSet}'s public target group.
+     * @param optionalIgtimiRiotPort TODO
      */
     <AppConfigBuilderT extends Builder<AppConfigBuilderT, String>,
      MultiServerDeployerBuilderT extends DeployProcessOnMultiServer.Builder<MultiServerDeployerBuilderT, String, SailingAnalyticsHost<String>, SailingAnalyticsReplicaConfiguration<String>, AppConfigBuilderT>>
@@ -272,7 +282,7 @@ public interface LandscapeService {
                     AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet,
                     SailingAnalyticsHost<String> hostToDeployTo, String optionalKeyName,
                     byte[] privateKeyEncryptionPassphrase, String replicaReplicationBearerToken,
-                    Integer optionalMemoryInMegabytesOrNull, Integer optionalMemoryTotalSizeFactorOrNull)
+                    Integer optionalMemoryInMegabytesOrNull, Integer optionalMemoryTotalSizeFactorOrNull, Integer optionalIgtimiRiotPort)
                     throws Exception;
 
     /**
@@ -304,20 +314,23 @@ public interface LandscapeService {
             byte[] privateKeyEncryptionPassphrase) throws Exception;
 
     /**
-     * Updates the AMI to use in the launch configurations of those of the {@code replicaSets} that have an auto-scaling group.
+     * Updates the AMI to use in the launch template version of those of the {@code replicaSets} that have an auto-scaling group.
      * Any running replica will not be affected by this. Only new replicas will be launched based on the AMI specified.
-     * 
      * @param replicaSets
      *            those without an auto-scaling group won't be affected
      * @param optionalAmi
      *            defaults to the latest image of type {@link SharedLandscapeConstants#IMAGE_TYPE_TAG_VALUE_SAILING}
+     * @param optionalTimeout TODO
+     * @param optionalKeyName TODO
+     * @param privateKeyEncryptionPassphrase TODO
+     * 
      * @return those replica sets that were updated according to this request; those from {@code replicaSets} not part
      *         of this result have not had their AMI upgraded, probably because we didn't find an auto-scaling group and
-     *         hence no launch configuration to update
+     *         hence no launch template version to update
      */
     Iterable<AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>>> updateImageForReplicaSets(AwsRegion region,
             Iterable<AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>>> replicaSets,
-            Optional<AmazonMachineImage<String>> optionalAmi) throws InterruptedException, ExecutionException, TimeoutException;
+            Optional<AmazonMachineImage<String>> optionalAmi, Optional<Duration> optionalTimeout, Optional<String> optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws InterruptedException, ExecutionException, TimeoutException;
 
     /**
      * For an existing replica set with an {@link AwsApplicationReplicaSet#getAutoScalingGroup() auto-scaling group}
@@ -399,21 +412,21 @@ public interface LandscapeService {
             InterruptedException, ExecutionException, Exception;
 
     /**
-     * If the {@code replicaSet} provided has one or more auto-scaling groups, their launch configuration is adjusted such that it
-     * matches the {@code optionalInstanceType}. The existing replicas managed currently by the auto-scaling group are
-     * replaced one by one with new instances with the new configuration. This happens by setting the auto-scaling
-     * group's new minimum size to the current number of instances managed by the auto-scaling group plus one, then
-     * waiting for the new instance to become available, and then terminating one of the old auto-scaling group managed
-     * replicas, again waiting for the one next new replica to become ready, and so on, until the last old auto-scaling
-     * replica has been stopped/terminated. Then, the auto-scaling group's minimum size is reset to what it was when
-     * this method was called.
+     * If the {@code replicaSet} provided has one or more auto-scaling groups, their default launch template version is
+     * adjusted such that it matches the {@code optionalInstanceType}. The existing replicas managed currently by the
+     * auto-scaling group are replaced one by one with new instances with the new configuration. This happens by setting
+     * the auto-scaling group's new minimum size to the current number of instances managed by the auto-scaling group
+     * plus one, then waiting for the new instance to become available, and then terminating one of the old auto-scaling
+     * group managed replicas, again waiting for the one next new replica to become ready, and so on, until the last old
+     * auto-scaling replica has been stopped/terminated. Then, the auto-scaling group's minimum size is reset to what it
+     * was when this method was called.
      */
     AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> changeAutoScalingReplicasInstanceType(
             AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet,
-            InstanceType instanceType) throws Exception;
+            InstanceType instanceType, Optional<Duration> optionalTimeout, Optional<String> optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception;
 
-    <ShardingKey> boolean isEligibleForDeployment(SailingAnalyticsHost<ShardingKey> host, String serverName, int port, Optional<Duration> waitForProcessTimeout,
-            String optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception;
+    <ShardingKey> boolean isEligibleForDeployment(SailingAnalyticsHost<ShardingKey> host, String serverName, int port, Integer optionalIgtimiRiotPort,
+            Optional<Duration> waitForProcessTimeout, String optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception;
 
     SailingServer getSailingServer(String hostname, String username, String password, Optional<Integer> port)
             throws MalformedURLException;

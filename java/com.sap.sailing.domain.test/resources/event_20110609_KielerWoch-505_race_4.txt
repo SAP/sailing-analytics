@@ -1,14 +1,21 @@
-stored-uri:datafiles/event_20110609_KielerWoch-505_race_4.mtb
+stored-uri:datafiles/7c666e50-9dde-11e0-85be-406186cbf87c.mtb
 StartReplay:1
 
-// Input from params_static:
-
-// Input from event_parameters:
-
+EnableResults:0
+ResultsLayout:[{"key":"Order","header":"#","description":"Position","printable":true,"align":"right","collapsible":false},{"key":"Name","header":"Name","description":"Competitor's name","printable":true,"align":"left","collapsible":false},{"key":"ShortName","header":"Short Name","description":"Competitor's short name","printable":true,"align":"left","collapsible":true},{"key":"LegTime","header":"Leg","description":"Leg time","printable":false,"align":"right","collapsible":true},{"key":"LegPosition","header":"#","description":"Leg position","printable":false,"align":"right","collapsible":true},{"key":"Time","header":"Total","description":"Total time","printable":true,"align":"right","collapsible":false},{"key":"After","header":"Total &Delta;","description":"Total &Delta;","printable":true,"align":"right","collapsible":false}]
+PerformanceTableLayout:[{"key":"Pos","header":"Pos","tooltip":"Position","options":null},{"key":"Name","header":"Name","tooltip":"Name","options":null},{"key":"Short","header":"Short","tooltip":"Short name","options":null},{"key":"Country","header":"Country","tooltip":"Country","options":null},{"key":"After","header":"After","tooltip":"After","options":null},{"key":"Leg pos","header":"Leg pos","tooltip":"Leg position","options":null},{"key":"Leg time","header":"Leg time","tooltip":"Leg time","options":null},{"key":"SOG","header":"SOG","tooltip":"SOG","options":null},{"key":"VMG","header":"VMG","tooltip":"VMG","options":null},{"key":"Top speed","header":"Top Speed","tooltip":"Top Speed","options":null},{"key":"Distance","header":"Distance","tooltip":"Distance","options":null}]
+DefaultPanel:
+LabelNoBackground:0
 CompMarkerUUID:1
 CodanIsSponsor:0
 EnablePrint:1
 DefaultTailLength:60
+ResultColumn1Tooltip:
+ResultColumn2Tooltip:
+ResultColumn3Tooltip:
+ResultColumn4Tooltip:
+StartTimeType:Race
+smsParams:0,4525720572,4525720572,3,10,15
 APzoomChangeTime:2500
 disableAutoProduce:0
 autoProduce:0
@@ -20,8 +27,10 @@ APmarkSwitch:0.13
 APmarkZoomBehindMarks:0.10
 APmarkZoomInFrontOfMarks:0.20
 PopupMarkerUUID:2
+ws-uri:ws://tracms.traclive.dk:8888
 ManualUrl:http://www.tractrac.com/files/userguide_sailing.pdf
 WeatherLat1:56
+enableDiplomas:0
 WeatherLat2:54
 Marker1UUID:1
 Marker1Type:RGBMarkerFactory
@@ -35,7 +44,7 @@ MaxMetersPerSecond:20
 PrecisionMeters:20
 ShortAvgTime:180
 LongAvgTime:900
-TimeZone:2
+TimeZone:
 CompMarkerTimeout:60
 FramesPerSecond:8
 replayspeedup:5
@@ -47,7 +56,7 @@ MinimapUseLayers:1
 Minimapgeorect:9.840775,54.516538,10.3022,54.309554
 MinimapMarkerUUID:2
 Marker4UUID:2
-Marker4Type:RGBmarkerFactory
+Marker4Type:CircularMarker
 Marker4Directional:1
 Marker4Image:markers/boat_FF0000_small.png
 MetersPerPixel:25
@@ -63,7 +72,20 @@ disableselection:0
 disableleaderline:0
 WeatherLon1:9
 WeatherLon2:12
+delayIntervals:3,10,15
 DisableChangeRace:0
+MapUrl:http://tile.traclive.dk/osm
+MarkerSymbol:standardBoat
+MarkerMinPixelSize:36
+ShowFlagInLabel:0
+ShowRankInLabel:1
+TailOpacity:70
+TailWidth:1
+ResultColumn1DefaultOrder:1
+ResultColumn2DefaultOrder:0
+ResultColumn3DefaultOrder:0
+ResultColumn4DefaultOrder:0
+DatabaseVersion:01.00.20
 PopUpRow1Name:
 PopUpRow1Type:Name
 PopUpRow2Name:Knots
@@ -74,6 +96,12 @@ PopUpRow4Name:Sail
 PopUpRow4Type:Ini
 PopUpRow5Name:After
 PopUpRow5Type:BoatAfter
+LaggingThreshold:5
+LowBatteryThreshold:5
+dimmingLevel:1
+BatteryLevelWarn:20
+BatteryLevelDanger:13
+dimmingSeconds:60
 ResultColumn1Name:#
 ResultColumn1Size:25
 ResultColumn1Type:RowNumber
@@ -94,8 +122,8 @@ ResultColumn6Type:BoatSpeed
 DisableLeaderboard:0
 DisableAnalysis:0
 TableFontSize:11
-//live-uri:tcp://germanmaster.traclive.dk:4400
-//stored-uri:tcp://germanmaster.traclive.dk:4401
+//live-uri:tcp://tracms.traclive.dk:4400
+//stored-uri:tcp://tracms.traclive.dk:4401
 compInitialsFontSize:11
 AutoRotate:0
 MassStart:0
@@ -105,14 +133,22 @@ ReCalcDirAndSpeed:0
 RaceHandicapSystem:NONE
 TeamCompetitionType:NONE
 LiveDelaySecs: 180
+LiveDelaySecsRace: 
+LiveDelaySecsEvent: 180
 
-//-------- AUTO GENERATED PARAMETERS START ----------------
+Maps:[]
 
 EventID:f34b232a-934e-11e0-b3bb-406186cbf87c
 EventName:Kieler Woche
+EventAnalyticsName:Kieler Woche
 EventDB:event_20110609_KielerWoch
 EventStartTime:2011-06-15 09:00:00
 EventEndTime:2011-06-26 23:59:00
+EventType:a1b74ca0-fdd8-11dc-8811-005056c88008
+EventJSON:https://historical1.tractrac.com/events/event_20110609_KielerWoch/jsonservice.php
+DBReplicaEnabled:0
+HighLoadEnabled:
+MultipleDataservers:0
 
 RaceID:7c666e50-9dde-11e0-85be-406186cbf87c
 RaceName:505 race 4
@@ -120,8 +156,12 @@ RaceStartTime:2011-06-24 09:15:00
 RaceEndTime:
 RaceTrackingStartTime:2011-06-24 08:39:54
 RaceTrackingEndTime:2011-06-24 10:47:32
+Initialized:1
 RaceDefaultRouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
 RaceHandicapSystem:NONE
+RaceStatus:NONE
+RaceStatusTime:
+RaceStatusUpdatedAt:
 
 Image1UUID:0ba089bc-996f-11e0-85be-406186cbf87c
 Image1Type:Logo
@@ -141,12 +181,12 @@ Image3Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/ima
 Image4UUID:22b1a988-98e3-11e0-85be-406186cbf87c
 Image4Type:Logo
 Image4Description:Veolia
-Image4Image:
+Image4Image:pictures/22b1a988-98e3-11e0-85be-406186cbf87c/veolia.png
 
 Image5UUID:22ba0304-98d8-11e0-85be-406186cbf87c
 Image5Type:Logo
 Image5Description:Kieler Woche
-Image5Image:
+Image5Image:pictures/22ba0304-98d8-11e0-85be-406186cbf87c/kiellogo.png
 
 Image6UUID:2767b7e8-996e-11e0-85be-406186cbf87c
 Image6Type:Logo
@@ -161,12 +201,12 @@ Image7Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/ima
 Image8UUID:3313b588-98d8-11e0-85be-406186cbf87c
 Image8Type:Logo
 Image8Description:Audi
-Image8Image:
+Image8Image:pictures/3313b588-98d8-11e0-85be-406186cbf87c/audi.png
 
 Image9UUID:33a26700-98e3-11e0-85be-406186cbf87c
 Image9Type:Logo
 Image9Description:HSH NORDBANK
-Image9Image:
+Image9Image:pictures/33a26700-98e3-11e0-85be-406186cbf87c/hsh.png
 
 Image10UUID:373009a0-996e-11e0-85be-406186cbf87c
 Image10Type:Logo
@@ -181,7 +221,7 @@ Image11Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/im
 Image12UUID:514008f8-98e3-11e0-85be-406186cbf87c
 Image12Type:Logo
 Image12Description:ISAF SAILING WORLDCUP
-Image12Image:
+Image12Image:pictures/514008f8-98e3-11e0-85be-406186cbf87c/isaf.png
 
 Image13UUID:5222c1c6-996e-11e0-85be-406186cbf87c
 Image13Type:Logo
@@ -191,284 +231,208 @@ Image13Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/im
 Image14UUID:574e0d40-98d8-11e0-85be-406186cbf87c
 Image14Type:Logo
 Image14Description:SAP
-Image14Image:
+Image14Image:pictures/574e0d40-98d8-11e0-85be-406186cbf87c/SAP.png
 
 Image15UUID:617e8236-996e-11e0-85be-406186cbf87c
 Image15Type:Logo
 Image15Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/GBR.gif
 Image15Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/GBR.gif
 
-Image16UUID:6d332670-9934-11e0-85be-406186cbf87c
+Image16UUID:68708b50-9f56-11e0-85be-406186cbf87c
 Image16Type:Logo
-Image16Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/AUS.gif
-Image16Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/AUS.gif
+Image16Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/CZE.gif
+Image16Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/CZE.gif
 
-Image17UUID:6de07500-9e2a-11e0-85be-406186cbf87c
+Image17UUID:6d332670-9934-11e0-85be-406186cbf87c
 Image17Type:Logo
-Image17Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/SIN.gif
-Image17Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/SIN.gif
+Image17Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/AUS.gif
+Image17Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/AUS.gif
 
-Image18UUID:7252c142-9934-11e0-85be-406186cbf87c
+Image18UUID:6de07500-9e2a-11e0-85be-406186cbf87c
 Image18Type:Logo
-Image18Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/CAN.gif
-Image18Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/CAN.gif
+Image18Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/SIN.gif
+Image18Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/SIN.gif
 
-Image19UUID:77555f2e-9934-11e0-85be-406186cbf87c
+Image19UUID:7252c142-9934-11e0-85be-406186cbf87c
 Image19Type:Logo
-Image19Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/CRO.gif
-Image19Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/CRO.gif
+Image19Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/CAN.gif
+Image19Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/CAN.gif
 
-Image20UUID:7c87105a-9934-11e0-85be-406186cbf87c
+Image20UUID:7328d994-9f56-11e0-85be-406186cbf87c
 Image20Type:Logo
-Image20Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/DEN.gif
-Image20Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/DEN.gif
+Image20Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/ESP.gif
+Image20Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/ESP.gif
 
-Image21UUID:7deb67ce-9930-11e0-85be-406186cbf87c
+Image21UUID:77555f2e-9934-11e0-85be-406186cbf87c
 Image21Type:Logo
-Image21Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/RUS.gif
-Image21Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/RUS.gif
+Image21Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/CRO.gif
+Image21Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/CRO.gif
 
-Image22UUID:81fea498-9930-11e0-85be-406186cbf87c
+Image22UUID:7c87105a-9934-11e0-85be-406186cbf87c
 Image22Type:Logo
-Image22Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/GER.gif
-Image22Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/GER.gif
+Image22Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/DEN.gif
+Image22Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/DEN.gif
 
-Image23UUID:93a58cc0-9930-11e0-85be-406186cbf87c
+Image23UUID:7deb67ce-9930-11e0-85be-406186cbf87c
 Image23Type:Logo
-Image23Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/USA.gif
-Image23Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/USA.gif
+Image23Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/RUS.gif
+Image23Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/RUS.gif
 
-Image24UUID:bc6068c4-9d77-11e0-85be-406186cbf87c
+Image24UUID:81fea498-9930-11e0-85be-406186cbf87c
 Image24Type:Logo
-Image24Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/UAE.gif
-Image24Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/UAE.gif
+Image24Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/GER.gif
+Image24Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/GER.gif
 
-Image25UUID:be8c642a-996e-11e0-85be-406186cbf87c
+Image25UUID:93a58cc0-9930-11e0-85be-406186cbf87c
 Image25Type:Logo
-Image25Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/GRE.gif
-Image25Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/GRE.gif
+Image25Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/USA.gif
+Image25Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/USA.gif
 
-Image26UUID:c2fdb14c-9934-11e0-85be-406186cbf87c
+Image26UUID:bc6068c4-9d77-11e0-85be-406186cbf87c
 Image26Type:Logo
-Image26Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/HUN.gif
-Image26Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/HUN.gif
+Image26Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/UAE.gif
+Image26Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/UAE.gif
 
-Image27UUID:c3a2eaa6-996e-11e0-85be-406186cbf87c
+Image27UUID:be8c642a-996e-11e0-85be-406186cbf87c
 Image27Type:Logo
-Image27Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/IRL.gif
-Image27Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/IRL.gif
+Image27Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/GRE.gif
+Image27Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/GRE.gif
 
-Image28UUID:c85b16fc-9934-11e0-85be-406186cbf87c
+Image28UUID:c2fdb14c-9934-11e0-85be-406186cbf87c
 Image28Type:Logo
-Image28Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/ISV.gif
-Image28Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/ISV.gif
+Image28Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/HUN.gif
+Image28Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/HUN.gif
 
-Image29UUID:c8eaf36e-996e-11e0-85be-406186cbf87c
+Image29UUID:c3a2eaa6-996e-11e0-85be-406186cbf87c
 Image29Type:Logo
-Image29Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/MEX.gif
-Image29Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/MEX.gif
+Image29Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/IRL.gif
+Image29Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/IRL.gif
 
-Image30UUID:cd74b15c-9934-11e0-85be-406186cbf87c
+Image30UUID:c85b16fc-9934-11e0-85be-406186cbf87c
 Image30Type:Logo
-Image30Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/ITA.gif
-Image30Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/ITA.gif
+Image30Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/ISV.gif
+Image30Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/ISV.gif
 
-Image31UUID:cdf05d40-996e-11e0-85be-406186cbf87c
+Image31UUID:c8eaf36e-996e-11e0-85be-406186cbf87c
 Image31Type:Logo
-Image31Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/NED.gif
-Image31Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/NED.gif
+Image31Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/MEX.gif
+Image31Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/MEX.gif
 
-Image32UUID:d3764b44-996e-11e0-85be-406186cbf87c
+Image32UUID:cd74b15c-9934-11e0-85be-406186cbf87c
 Image32Type:Logo
-Image32Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/POL.gif
-Image32Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/POL.gif
+Image32Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/ITA.gif
+Image32Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/ITA.gif
 
-Image33UUID:d77c220c-9934-11e0-85be-406186cbf87c
+Image33UUID:cdf05d40-996e-11e0-85be-406186cbf87c
 Image33Type:Logo
-Image33Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/JPN.gif
-Image33Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/JPN.gif
+Image33Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/NED.gif
+Image33Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/NED.gif
 
-Image34UUID:dcb92152-9934-11e0-85be-406186cbf87c
+Image34UUID:d3764b44-996e-11e0-85be-406186cbf87c
 Image34Type:Logo
-Image34Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/NOR.gif
-Image34Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/NOR.gif
+Image34Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/POL.gif
+Image34Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/POL.gif
 
-Image35UUID:dff55d64-9e29-11e0-85be-406186cbf87c
+Image35UUID:d77c220c-9934-11e0-85be-406186cbf87c
 Image35Type:Logo
-Image35Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/FIN.gif
-Image35Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/FIN.gif
+Image35Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/JPN.gif
+Image35Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/JPN.gif
 
-Image36UUID:e69d47f2-9934-11e0-85be-406186cbf87c
+Image36UUID:dcb92152-9934-11e0-85be-406186cbf87c
 Image36Type:Logo
-Image36Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/SUI.gif
-Image36Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/SUI.gif
+Image36Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/NOR.gif
+Image36Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/NOR.gif
 
-Image37UUID:ebb4c5da-9934-11e0-85be-406186cbf87c
+Image37UUID:dff55d64-9e29-11e0-85be-406186cbf87c
 Image37Type:Logo
-Image37Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/SWE.gif
-Image37Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/SWE.gif
+Image37Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/FIN.gif
+Image37Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/FIN.gif
 
-Image38UUID:f5cab6b0-9934-11e0-85be-406186cbf87c
+Image38UUID:e69d47f2-9934-11e0-85be-406186cbf87c
 Image38Type:Logo
-Image38Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/UKR.gif
-Image38Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/UKR.gif
+Image38Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/SUI.gif
+Image38Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/SUI.gif
+
+Image39UUID:ebb4c5da-9934-11e0-85be-406186cbf87c
+Image39Type:Logo
+Image39Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/SWE.gif
+Image39Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/SWE.gif
+
+Image40UUID:f5cab6b0-9934-11e0-85be-406186cbf87c
+Image40Type:Logo
+Image40Description:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/UKR.gif
+Image40Image:http://germanmaster.traclive.dk/events/event_20100806_SailforGol/images/UKR.gif
 
 Class1UUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Class1Name:5o5
+Class1BoatClassId:
 
-Team1UUID:6cf050ac-9934-11e0-85be-406186cbf87c
-Team1Name:AUS
-Team1Comp1UUID:de7d2ba8-9d14-11e0-85be-406186cbf87c
+Team1UUID:51d56ce6-996e-11e0-85be-406186cbf87c
+Team1Name:FRA
+Team1Comp1UUID:fda897ba-9d14-11e0-85be-406186cbf87c
+Team1Comp2UUID:f969da74-9d14-11e0-85be-406186cbf87c
+Team1Comp3UUID:f50675be-9d14-11e0-85be-406186cbf87c
 
-Team2UUID:1d07e516-996e-11e0-85be-406186cbf87c
-Team2Name:AUT
+Team2UUID:6cf050ac-9934-11e0-85be-406186cbf87c
+Team2Name:AUS
+Team2Comp1UUID:de7d2ba8-9d14-11e0-85be-406186cbf87c
 
-Team3UUID:271ac230-996e-11e0-85be-406186cbf87c
-Team3Name:BEL
+Team3UUID:7c3a4770-9934-11e0-85be-406186cbf87c
+Team3Name:DEN
+Team3Comp1UUID:f0c9604c-9d14-11e0-85be-406186cbf87c
+Team3Comp2UUID:ec336744-9d14-11e0-85be-406186cbf87c
+Team3Comp3UUID:e7bc96f4-9d14-11e0-85be-406186cbf87c
+Team3Comp4UUID:e3587876-9d14-11e0-85be-406186cbf87c
 
-Team4UUID:2c8e2630-996e-11e0-85be-406186cbf87c
-Team4Name:BRA
+Team4UUID:81b951d6-9930-11e0-85be-406186cbf87c
+Team4Name:GER
+Team4Comp1UUID:01f09174-9d15-11e0-85be-406186cbf87c
+Team4Comp2UUID:5b14f704-9d15-11e0-85be-406186cbf87c
+Team4Comp3UUID:5f520bea-9d15-11e0-85be-406186cbf87c
+Team4Comp4UUID:63855546-9d15-11e0-85be-406186cbf87c
+Team4Comp5UUID:68315036-9d15-11e0-85be-406186cbf87c
+Team4Comp6UUID:70eb542e-9d15-11e0-85be-406186cbf87c
+Team4Comp7UUID:75325a1e-9d15-11e0-85be-406186cbf87c
+Team4Comp8UUID:7e051528-9d15-11e0-85be-406186cbf87c
+Team4Comp9UUID:826bdcb4-9d15-11e0-85be-406186cbf87c
+Team4Comp10UUID:86d2fb5c-9d15-11e0-85be-406186cbf87c
+Team4Comp11UUID:8b618332-9d15-11e0-85be-406186cbf87c
+Team4Comp12UUID:949b11b6-9d15-11e0-85be-406186cbf87c
+Team4Comp13UUID:991ab354-9d15-11e0-85be-406186cbf87c
+Team4Comp14UUID:9d4e23d4-9d15-11e0-85be-406186cbf87c
+Team4Comp15UUID:a1f9ca46-9d15-11e0-85be-406186cbf87c
+Team4Comp16UUID:aa852246-9d15-11e0-85be-406186cbf87c
+Team4Comp17UUID:13e98db8-9d15-11e0-85be-406186cbf87c
+Team4Comp18UUID:2f1009e6-9d15-11e0-85be-406186cbf87c
+Team4Comp19UUID:33500f24-9d15-11e0-85be-406186cbf87c
+Team4Comp20UUID:525a0dc0-9d15-11e0-85be-406186cbf87c
+Team4Comp21UUID:6c9514c8-9d15-11e0-85be-406186cbf87c
+Team4Comp22UUID:7980a4cc-9d15-11e0-85be-406186cbf87c
+Team4Comp23UUID:9006c3d4-9d15-11e0-85be-406186cbf87c
+Team4Comp24UUID:a65d72a4-9d15-11e0-85be-406186cbf87c
+Team4Comp25UUID:062ea47e-9d15-11e0-85be-406186cbf87c
+Team4Comp26UUID:0a917a14-9d15-11e0-85be-406186cbf87c
+Team4Comp27UUID:0f4448e8-9d15-11e0-85be-406186cbf87c
+Team4Comp28UUID:56b22d94-9d15-11e0-85be-406186cbf87c
+Team4Comp29UUID:1859e280-9d15-11e0-85be-406186cbf87c
+Team4Comp30UUID:1cd7dcc2-9d15-11e0-85be-406186cbf87c
+Team4Comp31UUID:21584926-9d15-11e0-85be-406186cbf87c
+Team4Comp32UUID:25ea8cce-9d15-11e0-85be-406186cbf87c
+Team4Comp33UUID:2a8fbab0-9d15-11e0-85be-406186cbf87c
+Team4Comp34UUID:37b2223c-9d15-11e0-85be-406186cbf87c
+Team4Comp35UUID:3c1fb294-9d15-11e0-85be-406186cbf87c
+Team4Comp36UUID:40bd6314-9d15-11e0-85be-406186cbf87c
+Team4Comp37UUID:450c5a92-9d15-11e0-85be-406186cbf87c
+Team4Comp38UUID:498b40ec-9d15-11e0-85be-406186cbf87c
+Team4Comp39UUID:4e00eaa0-9d15-11e0-85be-406186cbf87c
 
-Team5UUID:7210a622-9934-11e0-85be-406186cbf87c
-Team5Name:CAN
-
-Team6UUID:36ebe888-996e-11e0-85be-406186cbf87c
-Team6Name:CHI
-
-Team7UUID:77133b08-9934-11e0-85be-406186cbf87c
-Team7Name:CRO
-
-Team8UUID:7c3a4770-9934-11e0-85be-406186cbf87c
-Team8Name:DEN
-Team8Comp1UUID:e7bc96f4-9d14-11e0-85be-406186cbf87c
-Team8Comp2UUID:f0c9604c-9d14-11e0-85be-406186cbf87c
-Team8Comp3UUID:ec336744-9d14-11e0-85be-406186cbf87c
-Team8Comp4UUID:e3587876-9d14-11e0-85be-406186cbf87c
-
-Team9UUID:4c650fc8-996e-11e0-85be-406186cbf87c
-Team9Name:EST
-
-Team10UUID:dfacd47c-9e29-11e0-85be-406186cbf87c
-Team10Name:FIN
-
-Team11UUID:51d56ce6-996e-11e0-85be-406186cbf87c
-Team11Name:FRA
-Team11Comp1UUID:f969da74-9d14-11e0-85be-406186cbf87c
-Team11Comp2UUID:f50675be-9d14-11e0-85be-406186cbf87c
-Team11Comp3UUID:fda897ba-9d14-11e0-85be-406186cbf87c
-
-Team12UUID:613a12ea-996e-11e0-85be-406186cbf87c
-Team12Name:GBR
-
-Team13UUID:81b951d6-9930-11e0-85be-406186cbf87c
-Team13Name:GER
-Team13Comp1UUID:70eb542e-9d15-11e0-85be-406186cbf87c
-Team13Comp2UUID:40bd6314-9d15-11e0-85be-406186cbf87c
-Team13Comp3UUID:0a917a14-9d15-11e0-85be-406186cbf87c
-Team13Comp4UUID:9d4e23d4-9d15-11e0-85be-406186cbf87c
-Team13Comp5UUID:498b40ec-9d15-11e0-85be-406186cbf87c
-Team13Comp6UUID:7e051528-9d15-11e0-85be-406186cbf87c
-Team13Comp7UUID:949b11b6-9d15-11e0-85be-406186cbf87c
-Team13Comp8UUID:991ab354-9d15-11e0-85be-406186cbf87c
-Team13Comp9UUID:826bdcb4-9d15-11e0-85be-406186cbf87c
-Team13Comp10UUID:3c1fb294-9d15-11e0-85be-406186cbf87c
-Team13Comp11UUID:4e00eaa0-9d15-11e0-85be-406186cbf87c
-Team13Comp12UUID:a1f9ca46-9d15-11e0-85be-406186cbf87c
-Team13Comp13UUID:1cd7dcc2-9d15-11e0-85be-406186cbf87c
-Team13Comp14UUID:5b14f704-9d15-11e0-85be-406186cbf87c
-Team13Comp15UUID:5f520bea-9d15-11e0-85be-406186cbf87c
-Team13Comp16UUID:86d2fb5c-9d15-11e0-85be-406186cbf87c
-Team13Comp17UUID:6c9514c8-9d15-11e0-85be-406186cbf87c
-Team13Comp18UUID:13e98db8-9d15-11e0-85be-406186cbf87c
-Team13Comp19UUID:21584926-9d15-11e0-85be-406186cbf87c
-Team13Comp20UUID:2f1009e6-9d15-11e0-85be-406186cbf87c
-Team13Comp21UUID:450c5a92-9d15-11e0-85be-406186cbf87c
-Team13Comp22UUID:8b618332-9d15-11e0-85be-406186cbf87c
-Team13Comp23UUID:75325a1e-9d15-11e0-85be-406186cbf87c
-Team13Comp24UUID:37b2223c-9d15-11e0-85be-406186cbf87c
-Team13Comp25UUID:062ea47e-9d15-11e0-85be-406186cbf87c
-Team13Comp26UUID:525a0dc0-9d15-11e0-85be-406186cbf87c
-Team13Comp27UUID:2a8fbab0-9d15-11e0-85be-406186cbf87c
-Team13Comp28UUID:56b22d94-9d15-11e0-85be-406186cbf87c
-Team13Comp29UUID:63855546-9d15-11e0-85be-406186cbf87c
-Team13Comp30UUID:25ea8cce-9d15-11e0-85be-406186cbf87c
-Team13Comp31UUID:68315036-9d15-11e0-85be-406186cbf87c
-Team13Comp32UUID:a65d72a4-9d15-11e0-85be-406186cbf87c
-Team13Comp33UUID:01f09174-9d15-11e0-85be-406186cbf87c
-Team13Comp34UUID:aa852246-9d15-11e0-85be-406186cbf87c
-Team13Comp35UUID:0f4448e8-9d15-11e0-85be-406186cbf87c
-Team13Comp36UUID:7980a4cc-9d15-11e0-85be-406186cbf87c
-Team13Comp37UUID:33500f24-9d15-11e0-85be-406186cbf87c
-Team13Comp38UUID:1859e280-9d15-11e0-85be-406186cbf87c
-Team13Comp39UUID:9006c3d4-9d15-11e0-85be-406186cbf87c
-
-Team14UUID:be35f1ee-996e-11e0-85be-406186cbf87c
-Team14Name:GRE
-
-Team15UUID:c2b1d6a0-9934-11e0-85be-406186cbf87c
-Team15Name:HUN
-
-Team16UUID:c3601ba4-996e-11e0-85be-406186cbf87c
-Team16Name:IRL
-
-Team17UUID:c818eb6a-9934-11e0-85be-406186cbf87c
-Team17Name:ISV
-
-Team18UUID:cd2435f6-9934-11e0-85be-406186cbf87c
-Team18Name:ITA
-
-Team19UUID:d737d124-9934-11e0-85be-406186cbf87c
-Team19Name:JPN
-
-Team20UUID:c8a808d8-996e-11e0-85be-406186cbf87c
-Team20Name:MEX
-
-Team21UUID:cdaadaae-996e-11e0-85be-406186cbf87c
-Team21Name:NED
-
-Team22UUID:dc76ea44-9934-11e0-85be-406186cbf87c
-Team22Name:NOR
-
-Team23UUID:1e8f7452-9c49-11e0-85be-406186cbf87c
-Team23Name:NZL
-
-Team24UUID:d3297b7a-996e-11e0-85be-406186cbf87c
-Team24Name:POL
-
-Team25UUID:7d9ca8fa-9930-11e0-85be-406186cbf87c
-Team25Name:RUS
-
-Team26UUID:6d98ab8a-9e2a-11e0-85be-406186cbf87c
-Team26Name:SIN
-
-Team27UUID:e6510b62-9934-11e0-85be-406186cbf87c
-Team27Name:SUI
-
-Team28UUID:eb727d9c-9934-11e0-85be-406186cbf87c
-Team28Name:SWE
-Team28Comp1UUID:aec14cd6-9d15-11e0-85be-406186cbf87c
-
-Team29UUID:ffb184b0-98e4-11e0-85be-406186cbf87c
-Team29Name:Test
-
-Team30UUID:bc22780c-9d77-11e0-85be-406186cbf87c
-Team30Name:UAE
-
-Team31UUID:f57e7ea8-9934-11e0-85be-406186cbf87c
-Team31Name:UKR
-
-Team32UUID:0b5469f6-996f-11e0-85be-406186cbf87c
-Team32Name:URU
-
-Team33UUID:9361c468-9930-11e0-85be-406186cbf87c
-Team33Name:USA
-SELECT Competitors.UUID,FirstName,LastName,Initials,Color,Nationality,Description,Icon,Picture,ClassId,Handicap,HandicapDistance,StartTime FROM event_20110609_KielerWoch.RaceObject INNER JOIN event_20110609_KielerWoch.Competitors ON event_20110609_KielerWoch.RaceObject.TrackedObjectId = event_20110609_KielerWoch.Competitors.UUID WHERE RaceId='7c666e50-9dde-11e0-85be-406186cbf87c' ORDER BY LID,StartTime,Competitors.UUID
-
+Team5UUID:eb727d9c-9934-11e0-85be-406186cbf87c
+Team5Name:SWE
+Team5Comp1UUID:aec14cd6-9d15-11e0-85be-406186cbf87c
 
 Comp1UUID:de7d2ba8-9d14-11e0-85be-406186cbf87c
 Comp1Name:Kevin
 Comp1NameShort:AUS9061
-Comp1Color:FF0000
 Comp1Nationality:AUS
 Comp1Description:
 Comp1Handicap:1.0000000000
@@ -477,11 +441,11 @@ Comp1StartTime:2011-06-24 09:15:00
 Comp1PictureUUID:6d332670-9934-11e0-85be-406186cbf87c
 Comp1ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp1RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp1Color:FF0000
 
 Comp2UUID:e3587876-9d14-11e0-85be-406186cbf87c
 Comp2Name:van Wonterghem
 Comp2NameShort:DEN8828
-Comp2Color:808000
 Comp2Nationality:DEN
 Comp2Description:
 Comp2Handicap:1.0000000000
@@ -490,11 +454,11 @@ Comp2StartTime:2011-06-24 09:15:00
 Comp2PictureUUID:7c87105a-9934-11e0-85be-406186cbf87c
 Comp2ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp2RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp2Color:808000
 
 Comp3UUID:e7bc96f4-9d14-11e0-85be-406186cbf87c
 Comp3Name:Buhl
 Comp3NameShort:DEN8958
-Comp3Color:FFFFFF
 Comp3Nationality:DEN
 Comp3Description:
 Comp3Handicap:1.0000000000
@@ -503,11 +467,11 @@ Comp3StartTime:2011-06-24 09:15:00
 Comp3PictureUUID:7c87105a-9934-11e0-85be-406186cbf87c
 Comp3ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp3RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp3Color:FFFFFF
 
 Comp4UUID:ec336744-9d14-11e0-85be-406186cbf87c
 Comp4Name:Saugmann
 Comp4NameShort:DEN8964
-Comp4Color:FFFF00
 Comp4Nationality:DEN
 Comp4Description:
 Comp4Handicap:1.0000000000
@@ -516,11 +480,11 @@ Comp4StartTime:2011-06-24 09:15:00
 Comp4PictureUUID:7c87105a-9934-11e0-85be-406186cbf87c
 Comp4ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp4RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp4Color:FFFF00
 
 Comp5UUID:f0c9604c-9d14-11e0-85be-406186cbf87c
 Comp5Name:Bøjland
 Comp5NameShort:DEN9023
-Comp5Color:800080
 Comp5Nationality:DEN
 Comp5Description:
 Comp5Handicap:1.0000000000
@@ -529,11 +493,11 @@ Comp5StartTime:2011-06-24 09:15:00
 Comp5PictureUUID:7c87105a-9934-11e0-85be-406186cbf87c
 Comp5ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp5RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp5Color:800080
 
 Comp6UUID:f50675be-9d14-11e0-85be-406186cbf87c
 Comp6Name:Broise
 Comp6NameShort:FRA8844
-Comp6Color:008080
 Comp6Nationality:FRA
 Comp6Description:
 Comp6Handicap:1.0000000000
@@ -542,11 +506,11 @@ Comp6StartTime:2011-06-24 09:15:00
 Comp6PictureUUID:5222c1c6-996e-11e0-85be-406186cbf87c
 Comp6ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp6RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp6Color:008080
 
 Comp7UUID:f969da74-9d14-11e0-85be-406186cbf87c
 Comp7Name:boite
 Comp7NameShort:FRA8902
-Comp7Color:800000
 Comp7Nationality:FRA
 Comp7Description:
 Comp7Handicap:1.0000000000
@@ -555,11 +519,11 @@ Comp7StartTime:2011-06-24 09:15:00
 Comp7PictureUUID:5222c1c6-996e-11e0-85be-406186cbf87c
 Comp7ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp7RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp7Color:800000
 
 Comp8UUID:fda897ba-9d14-11e0-85be-406186cbf87c
 Comp8Name:de Lisle
 Comp8NameShort:FRA9068
-Comp8Color:000080
 Comp8Nationality:FRA
 Comp8Description:
 Comp8Handicap:1.0000000000
@@ -568,11 +532,11 @@ Comp8StartTime:2011-06-24 09:15:00
 Comp8PictureUUID:5222c1c6-996e-11e0-85be-406186cbf87c
 Comp8ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp8RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp8Color:000080
 
 Comp9UUID:01f09174-9d15-11e0-85be-406186cbf87c
 Comp9Name:Schneidewind
 Comp9NameShort:GER6817
-Comp9Color:00FFFF
 Comp9Nationality:GER
 Comp9Description:
 Comp9Handicap:1.0000000000
@@ -581,11 +545,11 @@ Comp9StartTime:2011-06-24 09:15:00
 Comp9PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp9ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp9RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp9Color:00FFFF
 
 Comp10UUID:062ea47e-9d15-11e0-85be-406186cbf87c
 Comp10Name:Menge
 Comp10NameShort:GER7861
-Comp10Color:000000
 Comp10Nationality:GER
 Comp10Description:
 Comp10Handicap:1.0000000000
@@ -594,11 +558,11 @@ Comp10StartTime:2011-06-24 09:15:00
 Comp10PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp10ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp10RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp10Color:000000
 
 Comp11UUID:0a917a14-9d15-11e0-85be-406186cbf87c
 Comp11Name:Barop
 Comp11NameShort:GER8392
-Comp11Color:0000FF
 Comp11Nationality:GER
 Comp11Description:
 Comp11Handicap:1.0000000000
@@ -607,11 +571,11 @@ Comp11StartTime:2011-06-24 09:15:00
 Comp11PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp11ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp11RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp11Color:0000FF
 
 Comp12UUID:0f4448e8-9d15-11e0-85be-406186cbf87c
 Comp12Name:Steffen
 Comp12NameShort:GER8437
-Comp12Color:FF00FF
 Comp12Nationality:GER
 Comp12Description:
 Comp12Handicap:1.0000000000
@@ -620,11 +584,11 @@ Comp12StartTime:2011-06-24 09:15:00
 Comp12PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp12ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp12RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp12Color:FF00FF
 
 Comp13UUID:13e98db8-9d15-11e0-85be-406186cbf87c
 Comp13Name:Katja
 Comp13NameShort:GER8500
-Comp13Color:008000
 Comp13Nationality:GER
 Comp13Description:
 Comp13Handicap:1.0000000000
@@ -633,11 +597,11 @@ Comp13StartTime:2011-06-24 09:15:00
 Comp13PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp13ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp13RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp13Color:008000
 
 Comp14UUID:1859e280-9d15-11e0-85be-406186cbf87c
 Comp14Name:von Nerée
 Comp14NameShort:GER8522
-Comp14Color:00FF00
 Comp14Nationality:GER
 Comp14Description:
 Comp14Handicap:1.0000000000
@@ -646,11 +610,11 @@ Comp14StartTime:2011-06-24 09:15:00
 Comp14PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp14ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp14RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp14Color:00FF00
 
 Comp15UUID:1cd7dcc2-9d15-11e0-85be-406186cbf87c
 Comp15Name:Goedeking
 Comp15NameShort:GER8622
-Comp15Color:FF0000
 Comp15Nationality:GER
 Comp15Description:
 Comp15Handicap:1.0000000000
@@ -659,11 +623,11 @@ Comp15StartTime:2011-06-24 09:15:00
 Comp15PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp15ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp15RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp15Color:FF0000
 
 Comp16UUID:21584926-9d15-11e0-85be-406186cbf87c
 Comp16Name:Kellner
 Comp16NameShort:GER8651
-Comp16Color:808000
 Comp16Nationality:GER
 Comp16Description:
 Comp16Handicap:1.0000000000
@@ -672,11 +636,11 @@ Comp16StartTime:2011-06-24 09:15:00
 Comp16PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp16ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp16RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp16Color:808000
 
 Comp17UUID:25ea8cce-9d15-11e0-85be-406186cbf87c
 Comp17Name:Reincke
 Comp17NameShort:GER8656
-Comp17Color:FFFFFF
 Comp17Nationality:GER
 Comp17Description:
 Comp17Handicap:1.0000000000
@@ -685,11 +649,11 @@ Comp17StartTime:2011-06-24 09:15:00
 Comp17PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp17ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp17RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp17Color:FFFFFF
 
 Comp18UUID:2a8fbab0-9d15-11e0-85be-406186cbf87c
 Comp18Name:Neulen
 Comp18NameShort:GER8657
-Comp18Color:FFFF00
 Comp18Nationality:GER
 Comp18Description:
 Comp18Handicap:1.0000000000
@@ -698,11 +662,11 @@ Comp18StartTime:2011-06-24 09:15:00
 Comp18PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp18ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp18RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp18Color:FFFF00
 
 Comp19UUID:2f1009e6-9d15-11e0-85be-406186cbf87c
 Comp19Name:Kohl
 Comp19NameShort:GER8670
-Comp19Color:800080
 Comp19Nationality:GER
 Comp19Description:
 Comp19Handicap:1.0000000000
@@ -711,11 +675,11 @@ Comp19StartTime:2011-06-24 09:15:00
 Comp19PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp19ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp19RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp19Color:800080
 
 Comp20UUID:33500f24-9d15-11e0-85be-406186cbf87c
 Comp20Name:Tasche
 Comp20NameShort:GER8720
-Comp20Color:008080
 Comp20Nationality:GER
 Comp20Description:
 Comp20Handicap:1.0000000000
@@ -724,11 +688,11 @@ Comp20StartTime:2011-06-24 09:15:00
 Comp20PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp20ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp20RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp20Color:008080
 
 Comp21UUID:37b2223c-9d15-11e0-85be-406186cbf87c
 Comp21Name:Lietz
 Comp21NameShort:GER8721
-Comp21Color:800000
 Comp21Nationality:GER
 Comp21Description:
 Comp21Handicap:1.0000000000
@@ -737,11 +701,11 @@ Comp21StartTime:2011-06-24 09:15:00
 Comp21PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp21ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp21RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp21Color:800000
 
 Comp22UUID:3c1fb294-9d15-11e0-85be-406186cbf87c
 Comp22Name:Feldmann
 Comp22NameShort:GER8730
-Comp22Color:000080
 Comp22Nationality:GER
 Comp22Description:
 Comp22Handicap:1.0000000000
@@ -750,11 +714,11 @@ Comp22StartTime:2011-06-24 09:15:00
 Comp22PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp22ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp22RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp22Color:000080
 
 Comp23UUID:40bd6314-9d15-11e0-85be-406186cbf87c
 Comp23Name:Anton
 Comp23NameShort:GER8741
-Comp23Color:00FFFF
 Comp23Nationality:GER
 Comp23Description:
 Comp23Handicap:1.0000000000
@@ -763,11 +727,11 @@ Comp23StartTime:2011-06-24 09:15:00
 Comp23PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp23ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp23RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp23Color:00FFFF
 
 Comp24UUID:450c5a92-9d15-11e0-85be-406186cbf87c
 Comp24Name:Kraft
 Comp24NameShort:GER8843
-Comp24Color:000000
 Comp24Nationality:GER
 Comp24Description:
 Comp24Handicap:1.0000000000
@@ -776,11 +740,11 @@ Comp24StartTime:2011-06-24 09:15:00
 Comp24PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp24ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp24RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp24Color:000000
 
 Comp25UUID:498b40ec-9d15-11e0-85be-406186cbf87c
 Comp25Name:Brill
 Comp25NameShort:GER8874
-Comp25Color:0000FF
 Comp25Nationality:GER
 Comp25Description:
 Comp25Handicap:1.0000000000
@@ -789,11 +753,11 @@ Comp25StartTime:2011-06-24 09:15:00
 Comp25PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp25ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp25RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp25Color:0000FF
 
 Comp26UUID:4e00eaa0-9d15-11e0-85be-406186cbf87c
 Comp26Name:Findel
 Comp26NameShort:GER8875
-Comp26Color:FF00FF
 Comp26Nationality:GER
 Comp26Description:
 Comp26Handicap:1.0000000000
@@ -802,11 +766,11 @@ Comp26StartTime:2011-06-24 09:15:00
 Comp26PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp26ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp26RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp26Color:FF00FF
 
 Comp27UUID:525a0dc0-9d15-11e0-85be-406186cbf87c
 Comp27Name:Mäge
 Comp27NameShort:GER8901
-Comp27Color:008000
 Comp27Nationality:GER
 Comp27Description:
 Comp27Handicap:1.0000000000
@@ -815,11 +779,11 @@ Comp27StartTime:2011-06-24 09:15:00
 Comp27PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp27ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp27RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp27Color:008000
 
 Comp28UUID:56b22d94-9d15-11e0-85be-406186cbf87c
 Comp28Name:Pleßmann
 Comp28NameShort:GER8927
-Comp28Color:00FF00
 Comp28Nationality:GER
 Comp28Description:
 Comp28Handicap:1.0000000000
@@ -828,11 +792,11 @@ Comp28StartTime:2011-06-24 09:15:00
 Comp28PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp28ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp28RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp28Color:00FF00
 
 Comp29UUID:5b14f704-9d15-11e0-85be-406186cbf87c
 Comp29Name:Gosch
 Comp29NameShort:GER8929
-Comp29Color:FF0000
 Comp29Nationality:GER
 Comp29Description:
 Comp29Handicap:1.0000000000
@@ -841,11 +805,11 @@ Comp29StartTime:2011-06-24 09:15:00
 Comp29PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp29ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp29RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp29Color:FF0000
 
 Comp30UUID:5f520bea-9d15-11e0-85be-406186cbf87c
 Comp30Name:Henge
 Comp30NameShort:GER8932
-Comp30Color:808000
 Comp30Nationality:GER
 Comp30Description:
 Comp30Handicap:1.0000000000
@@ -854,11 +818,11 @@ Comp30StartTime:2011-06-24 09:15:00
 Comp30PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp30ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp30RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp30Color:808000
 
 Comp31UUID:63855546-9d15-11e0-85be-406186cbf87c
 Comp31Name:Rasenack
 Comp31NameShort:GER8956
-Comp31Color:FFFFFF
 Comp31Nationality:GER
 Comp31Description:
 Comp31Handicap:1.0000000000
@@ -867,11 +831,11 @@ Comp31StartTime:2011-06-24 09:15:00
 Comp31PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp31ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp31RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp31Color:FFFFFF
 
 Comp32UUID:68315036-9d15-11e0-85be-406186cbf87c
 Comp32Name:Roos
 Comp32NameShort:GER8972
-Comp32Color:FFFF00
 Comp32Nationality:GER
 Comp32Description:
 Comp32Handicap:1.0000000000
@@ -880,11 +844,11 @@ Comp32StartTime:2011-06-24 09:15:00
 Comp32PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp32ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp32RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp32Color:FFFF00
 
 Comp33UUID:6c9514c8-9d15-11e0-85be-406186cbf87c
 Comp33Name:Jungclaus
 Comp33NameShort:GER8989
-Comp33Color:800080
 Comp33Nationality:GER
 Comp33Description:
 Comp33Handicap:1.0000000000
@@ -893,11 +857,11 @@ Comp33StartTime:2011-06-24 09:15:00
 Comp33PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp33ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp33RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp33Color:800080
 
 Comp34UUID:70eb542e-9d15-11e0-85be-406186cbf87c
 Comp34Name:Achterberg
 Comp34NameShort:GER8990
-Comp34Color:008080
 Comp34Nationality:GER
 Comp34Description:
 Comp34Handicap:1.0000000000
@@ -906,11 +870,11 @@ Comp34StartTime:2011-06-24 09:15:00
 Comp34PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp34ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp34RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp34Color:008080
 
 Comp35UUID:75325a1e-9d15-11e0-85be-406186cbf87c
 Comp35Name:Lehmann
 Comp35NameShort:GER8992
-Comp35Color:800000
 Comp35Nationality:GER
 Comp35Description:
 Comp35Handicap:1.0000000000
@@ -919,11 +883,11 @@ Comp35StartTime:2011-06-24 09:15:00
 Comp35PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp35ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp35RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp35Color:800000
 
 Comp36UUID:7980a4cc-9d15-11e0-85be-406186cbf87c
 Comp36Name:Stuempel
 Comp36NameShort:GER8999
-Comp36Color:000080
 Comp36Nationality:GER
 Comp36Description:
 Comp36Handicap:1.0000000000
@@ -932,11 +896,11 @@ Comp36StartTime:2011-06-24 09:15:00
 Comp36PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp36ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp36RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp36Color:000080
 
 Comp37UUID:7e051528-9d15-11e0-85be-406186cbf87c
 Comp37Name:Böger
 Comp37NameShort:GER902
-Comp37Color:00FFFF
 Comp37Nationality:GER
 Comp37Description:
 Comp37Handicap:1.0000000000
@@ -945,11 +909,11 @@ Comp37StartTime:2011-06-24 09:15:00
 Comp37PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp37ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp37RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp37Color:00FFFF
 
 Comp38UUID:826bdcb4-9d15-11e0-85be-406186cbf87c
 Comp38Name:Dr.Plattner
 Comp38NameShort:GER9026
-Comp38Color:000000
 Comp38Nationality:GER
 Comp38Description:
 Comp38Handicap:1.0000000000
@@ -958,11 +922,11 @@ Comp38StartTime:2011-06-24 09:15:00
 Comp38PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp38ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp38RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp38Color:000000
 
 Comp39UUID:86d2fb5c-9d15-11e0-85be-406186cbf87c
 Comp39Name:Hunger
 Comp39NameShort:GER9027
-Comp39Color:0000FF
 Comp39Nationality:GER
 Comp39Description:
 Comp39Handicap:1.0000000000
@@ -971,11 +935,11 @@ Comp39StartTime:2011-06-24 09:15:00
 Comp39PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp39ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp39RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp39Color:0000FF
 
 Comp40UUID:8b618332-9d15-11e0-85be-406186cbf87c
 Comp40Name:Köchlin
 Comp40NameShort:GER9028
-Comp40Color:FF00FF
 Comp40Nationality:GER
 Comp40Description:
 Comp40Handicap:1.0000000000
@@ -984,11 +948,11 @@ Comp40StartTime:2011-06-24 09:15:00
 Comp40PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp40ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp40RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp40Color:FF00FF
 
 Comp41UUID:9006c3d4-9d15-11e0-85be-406186cbf87c
 Comp41Name:Waldheim
 Comp41NameShort:GER9029
-Comp41Color:008000
 Comp41Nationality:GER
 Comp41Description:
 Comp41Handicap:1.0000000000
@@ -997,11 +961,11 @@ Comp41StartTime:2011-06-24 09:15:00
 Comp41PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp41ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp41RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp41Color:008000
 
 Comp42UUID:949b11b6-9d15-11e0-85be-406186cbf87c
 Comp42Name:Böhm
 Comp42NameShort:GER9035
-Comp42Color:00FF00
 Comp42Nationality:GER
 Comp42Description:
 Comp42Handicap:1.0000000000
@@ -1010,11 +974,11 @@ Comp42StartTime:2011-06-24 09:15:00
 Comp42PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp42ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp42RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp42Color:00FF00
 
 Comp43UUID:991ab354-9d15-11e0-85be-406186cbf87c
 Comp43Name:Dasenbrook
 Comp43NameShort:GER9040
-Comp43Color:FF0000
 Comp43Nationality:GER
 Comp43Description:
 Comp43Handicap:1.0000000000
@@ -1023,11 +987,11 @@ Comp43StartTime:2011-06-24 09:15:00
 Comp43PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp43ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp43RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp43Color:FF0000
 
 Comp44UUID:9d4e23d4-9d15-11e0-85be-406186cbf87c
 Comp44Name:Birkner
 Comp44NameShort:GER9043
-Comp44Color:808000
 Comp44Nationality:GER
 Comp44Description:
 Comp44Handicap:1.0000000000
@@ -1036,11 +1000,11 @@ Comp44StartTime:2011-06-24 09:15:00
 Comp44PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp44ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp44RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp44Color:808000
 
 Comp45UUID:a1f9ca46-9d15-11e0-85be-406186cbf87c
 Comp45Name:Fischer
 Comp45NameShort:GER9054
-Comp45Color:FFFFFF
 Comp45Nationality:GER
 Comp45Description:
 Comp45Handicap:1.0000000000
@@ -1049,11 +1013,11 @@ Comp45StartTime:2011-06-24 09:15:00
 Comp45PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp45ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp45RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp45Color:FFFFFF
 
 Comp46UUID:a65d72a4-9d15-11e0-85be-406186cbf87c
 Comp46Name:Salein
 Comp46NameShort:GER9059
-Comp46Color:FFFF00
 Comp46Nationality:GER
 Comp46Description:
 Comp46Handicap:1.0000000000
@@ -1062,11 +1026,11 @@ Comp46StartTime:2011-06-24 09:15:00
 Comp46PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp46ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp46RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp46Color:FFFF00
 
 Comp47UUID:aa852246-9d15-11e0-85be-406186cbf87c
 Comp47Name:Schomäker
 Comp47NameShort:GER9070
-Comp47Color:800080
 Comp47Nationality:GER
 Comp47Description:
 Comp47Handicap:1.0000000000
@@ -1075,11 +1039,11 @@ Comp47StartTime:2011-06-24 09:15:00
 Comp47PictureUUID:81fea498-9930-11e0-85be-406186cbf87c
 Comp47ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp47RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp47Color:800080
 
 Comp48UUID:aec14cd6-9d15-11e0-85be-406186cbf87c
 Comp48Name:Hastenpflug
 Comp48NameShort:SWE8912
-Comp48Color:008080
 Comp48Nationality:SWE
 Comp48Description:
 Comp48Handicap:1.0000000000
@@ -1088,450 +1052,1089 @@ Comp48StartTime:2011-06-24 09:15:00
 Comp48PictureUUID:ebb4c5da-9934-11e0-85be-406186cbf87c
 Comp48ClassUUID:da553a2a-9d14-11e0-85be-406186cbf87c
 Comp48RouteUUID:2a75ee72-9dde-11e0-85be-406186cbf87c
+Comp48Color:008080
 
-ControlPoint1UUID:07d84022-9951-11e0-85be-406186cbf87c
-ControlPoint1Name:D Mark4
-ControlPoint1HasTwoPoints:1
-ControlPoint1ShortName:4
-ControlPoint1Mark1Lon:10.169555
-ControlPoint1Mark1Lat:54.428753
-ControlPoint1Mark2Lon:10.169408
-ControlPoint1Mark2Lat:54.428653
+PositionedItem1UUID:933ca8c0-84a0-013d-79fb-1c6b00518c70
+PositionedItem1Name:D Mark4 - 1
+PositionedItem1CourseArea:
+PositionedItem1Static:0
+PositionedItem1Positions:
+PositionedItem1DataSheet:
 
-ControlPoint2UUID:0807af7c-9b42-11e0-85be-406186cbf87c
-ControlPoint2Name:Star-R6-1
-ControlPoint2HasTwoPoints:0
-ControlPoint2ShortName:1
-ControlPoint2Mark1Lon:10.235563
-ControlPoint2Mark1Lat:54.504244
+PositionedItem2UUID:94c86aa0-84a0-013d-79fc-1c6b00518c70
+PositionedItem2Name:D Mark4 - 2
+PositionedItem2CourseArea:
+PositionedItem2Static:0
+PositionedItem2Positions:
+PositionedItem2DataSheet:
 
-ControlPoint3UUID:0beb273c-992f-11e0-85be-406186cbf87c
-ControlPoint3Name:Finish Silbernes Band
-ControlPoint3HasTwoPoints:1
-ControlPoint3ShortName:F
-ControlPoint3Mark1Lon:10.273520
-ControlPoint3Mark1Lat:54.499905
-ControlPoint3Mark2Lon:10.273137
-ControlPoint3Mark2Lat:54.500737
+PositionedItem3UUID:96885330-84a0-013d-79ff-1c6b00518c70
+PositionedItem3Name:Star-R6-1
+PositionedItem3CourseArea:
+PositionedItem3Static:0
+PositionedItem3Positions:
+PositionedItem3DataSheet:
 
-ControlPoint4UUID:144f44f4-9dac-11e0-85be-406186cbf87c
-ControlPoint4Name:SB-Mark H5 (y) (WP 33)
-ControlPoint4HasTwoPoints:0
-ControlPoint4ShortName:H5
-ControlPoint4Mark1Lon:10.666667
-ControlPoint4Mark1Lat:54.548333
+PositionedItem4UUID:969738d0-84a0-013d-7a00-1c6b00518c70
+PositionedItem4Name:Finish Silbernes Band - 1
+PositionedItem4CourseArea:
+PositionedItem4Static:0
+PositionedItem4Positions:
+PositionedItem4DataSheet:
 
-ControlPoint5UUID:18e98784-9930-11e0-85be-406186cbf87c
-ControlPoint5Name:Start Silbernes Band
-ControlPoint5HasTwoPoints:1
-ControlPoint5ShortName:S
-ControlPoint5Mark1Lon:10.171855
-ControlPoint5Mark1Lat:54.428460
-ControlPoint5Mark2Lon:10.422222
-ControlPoint5Mark2Lat:54.564262
+PositionedItem5UUID:96ed11d0-84a0-013d-7a01-1c6b00518c70
+PositionedItem5Name:Finish Silbernes Band - 2
+PositionedItem5CourseArea:
+PositionedItem5Static:0
+PositionedItem5Positions:
+PositionedItem5DataSheet:
 
-ControlPoint6UUID:1d8536e6-9a91-11e0-85be-406186cbf87c
-ControlPoint6Name:Star1-4
-ControlPoint6HasTwoPoints:1
-ControlPoint6ShortName:4
-ControlPoint6Mark1Lon:10.219525
-ControlPoint6Mark1Lat:54.500618
-ControlPoint6Mark2Lon:10.220421
-ControlPoint6Mark2Lat:54.500744
+PositionedItem6UUID:97629450-84a0-013d-7a04-1c6b00518c70
+PositionedItem6Name:SB-Mark H5 (y) (WP 33)
+PositionedItem6CourseArea:
+PositionedItem6Static:0
+PositionedItem6Positions:
+PositionedItem6DataSheet:
 
-ControlPoint7UUID:22475d30-9951-11e0-85be-406186cbf87c
-ControlPoint7Name:Audi Start
-ControlPoint7HasTwoPoints:1
-ControlPoint7ShortName:S
-ControlPoint7Mark1Lon:10.170118
-ControlPoint7Mark1Lat:54.342563
-ControlPoint7Mark2Lon:10.170157
-ControlPoint7Mark2Lat:54.341457
+PositionedItem7UUID:97715de0-84a0-013d-7a05-1c6b00518c70
+PositionedItem7Name:Start Silbernes Band - 1
+PositionedItem7CourseArea:
+PositionedItem7Static:0
+PositionedItem7Positions:
+PositionedItem7DataSheet:
 
-ControlPoint8UUID:2307bec6-992f-11e0-85be-406186cbf87c
-ControlPoint8Name:Mark KO2 red/white
-ControlPoint8HasTwoPoints:0
-ControlPoint8ShortName:KO
-ControlPoint8Mark1Lon:10.450000
-ControlPoint8Mark1Lat:54.533333
+PositionedItem8UUID:97e77bd0-84a0-013d-7a06-1c6b00518c70
+PositionedItem8Name:Start Silbernes Band - 2
+PositionedItem8CourseArea:
+PositionedItem8Static:0
+PositionedItem8Positions:
+PositionedItem8DataSheet:
 
-ControlPoint9UUID:2497f822-9ab1-11e0-85be-406186cbf87c
-ControlPoint9Name:49Y-R7-1
-ControlPoint9HasTwoPoints:0
-ControlPoint9ShortName:1
-ControlPoint9Mark1Lon:10.207426
-ControlPoint9Mark1Lat:54.435751
+PositionedItem9UUID:98a195d0-84a0-013d-7a09-1c6b00518c70
+PositionedItem9Name:Star1-4 - 1
+PositionedItem9CourseArea:
+PositionedItem9Static:0
+PositionedItem9Positions:
+PositionedItem9DataSheet:
 
-ControlPoint10UUID:27c13096-9a8d-11e0-85be-406186cbf87c
-ControlPoint10Name:49b4-4
-ControlPoint10HasTwoPoints:1
-ControlPoint10ShortName:4
-ControlPoint10Mark1Lon:10.208914
-ControlPoint10Mark1Lat:54.445496
-ControlPoint10Mark2Lon:10.209630
-ControlPoint10Mark2Lat:54.444822
+PositionedItem10UUID:98ba00c0-84a0-013d-7a0a-1c6b00518c70
+PositionedItem10Name:Star1-4 - 2
+PositionedItem10CourseArea:
+PositionedItem10Static:0
+PositionedItem10Positions:
+PositionedItem10DataSheet:
 
-ControlPoint11UUID:2c8584ca-9dac-11e0-85be-406186cbf87c
-ControlPoint11Name:SB-Finish (Ziel) at Kiel Lighthouse
-ControlPoint11HasTwoPoints:0
-ControlPoint11ShortName:KL
-ControlPoint11Mark1Lon:10.278333
-ControlPoint11Mark1Lat:54.498333
+PositionedItem11UUID:98d60e00-84a0-013d-7a0d-1c6b00518c70
+PositionedItem11Name:H Mark 5
+PositionedItem11CourseArea:
+PositionedItem11Static:0
+PositionedItem11Positions:
+PositionedItem11DataSheet:
 
-ControlPoint12UUID:32ad8a14-992e-11e0-85be-406186cbf87c
-ControlPoint12Name:Mark 14 red (Fahrwassertonne 14)
-ControlPoint12HasTwoPoints:0
-ControlPoint12ShortName:14
-ControlPoint12Mark1Lon:10.185000
-ControlPoint12Mark1Lat:54.371667
+PositionedItem12UUID:99136050-84a0-013d-7a0e-1c6b00518c70
+PositionedItem12Name:Audi Start - 1
+PositionedItem12CourseArea:
+PositionedItem12Static:0
+PositionedItem12Positions:
+PositionedItem12DataSheet:
 
-ControlPoint13UUID:32fb2850-9951-11e0-85be-406186cbf87c
-ControlPoint13Name:Audi Mark1
-ControlPoint13HasTwoPoints:0
-ControlPoint13ShortName:1
-ControlPoint13Mark1Lon:10.159550
-ControlPoint13Mark1Lat:54.341178
+PositionedItem13UUID:9a180970-84a0-013d-7a0f-1c6b00518c70
+PositionedItem13Name:Audi Start - 2
+PositionedItem13CourseArea:
+PositionedItem13Static:0
+PositionedItem13Positions:
+PositionedItem13DataSheet:
 
-ControlPoint14UUID:34feeaea-9c32-11e0-85be-406186cbf87c
-ControlPoint14Name:Star7-1a
-ControlPoint14HasTwoPoints:0
-ControlPoint14ShortName:1a
-ControlPoint14Mark1Lon:10.230608
-ControlPoint14Mark1Lat:54.508407
+PositionedItem14UUID:9af8b3e0-84a0-013d-7a12-1c6b00518c70
+PositionedItem14Name:Mark KO2 red/white
+PositionedItem14CourseArea:
+PositionedItem14Static:0
+PositionedItem14Positions:
+PositionedItem14DataSheet:
 
-ControlPoint15UUID:3ecf9ade-992f-11e0-85be-406186cbf87c
-ControlPoint15Name:Schlei Safe Water Mark red/white
-ControlPoint15HasTwoPoints:0
-ControlPoint15ShortName:SS
-ControlPoint15Mark1Lon:10.055000
-ControlPoint15Mark1Lat:54.668333
+PositionedItem15UUID:9b2775f0-84a0-013d-7a13-1c6b00518c70
+PositionedItem15Name:49Y-R7-1
+PositionedItem15CourseArea:
+PositionedItem15Static:0
+PositionedItem15Positions:
+PositionedItem15DataSheet:
 
-ControlPoint16UUID:405f346c-99e9-11e0-85be-406186cbf87c
-ControlPoint16Name:49erYR2-1
-ControlPoint16HasTwoPoints:0
-ControlPoint16ShortName:1
-ControlPoint16Mark1Lon:10.200182
-ControlPoint16Mark1Lat:54.427670
+PositionedItem16UUID:9b55ee60-84a0-013d-7a14-1c6b00518c70
+PositionedItem16Name:49b4-4 - 1
+PositionedItem16CourseArea:
+PositionedItem16Static:0
+PositionedItem16Positions:
+PositionedItem16DataSheet:
 
-ControlPoint17UUID:4123b6ea-9951-11e0-85be-406186cbf87c
-ControlPoint17Name:Audi Mark2
-ControlPoint17HasTwoPoints:0
-ControlPoint17ShortName:2
-ControlPoint17Mark1Lon:10.170157
-ControlPoint17Mark1Lat:54.341457
+PositionedItem17UUID:9b572fb0-84a0-013d-7a15-1c6b00518c70
+PositionedItem17Name:49b4-4 - 2
+PositionedItem17CourseArea:
+PositionedItem17Static:0
+PositionedItem17Positions:
+PositionedItem17DataSheet:
 
-ControlPoint18UUID:4bac3eca-992e-11e0-85be-406186cbf87c
-ControlPoint18Name:Three yellow marks* (3 gelbe Tonnen)
-ControlPoint18HasTwoPoints:0
-ControlPoint18ShortName:3y
-ControlPoint18Mark1Lon:10.198333
-ControlPoint18Mark1Lat:54.386667
+PositionedItem18UUID:9b8a3d20-84a0-013d-7a18-1c6b00518c70
+PositionedItem18Name:SB-Finish (Ziel) at Kiel Lighthouse
+PositionedItem18CourseArea:
+PositionedItem18Static:0
+PositionedItem18Positions:
+PositionedItem18DataSheet:
 
-ControlPoint19UUID:535fb3f4-9951-11e0-85be-406186cbf87c
-ControlPoint19Name:Audi Finish
-ControlPoint19HasTwoPoints:1
-ControlPoint19ShortName:F
-ControlPoint19Mark1Lon:10.159708
-ControlPoint19Mark1Lat:54.340965
-ControlPoint19Mark2Lon:10.159503
-ControlPoint19Mark2Lat:54.341232
+PositionedItem19UUID:9b9a2210-84a0-013d-7a19-1c6b00518c70
+PositionedItem19Name:Mark 14 red (Fahrwassertonne 14)
+PositionedItem19CourseArea:
+PositionedItem19Static:0
+PositionedItem19Positions:
+PositionedItem19DataSheet:
 
-ControlPoint20UUID:56f63cf8-99e8-11e0-85be-406186cbf87c
-ControlPoint20Name:49erYR1-T
-ControlPoint20HasTwoPoints:0
-ControlPoint20ShortName:T
-ControlPoint20Mark1Lon:10.199148
-ControlPoint20Mark1Lat:54.429370
+PositionedItem20UUID:9bb9d780-84a0-013d-7a1a-1c6b00518c70
+PositionedItem20Name:Audi Mark1
+PositionedItem20CourseArea:
+PositionedItem20Static:0
+PositionedItem20Positions:
+PositionedItem20DataSheet:
 
-ControlPoint21UUID:5933cdca-9950-11e0-85be-406186cbf87c
-ControlPoint21Name:H Start
-ControlPoint21HasTwoPoints:1
-ControlPoint21ShortName:S
-ControlPoint21Mark1Lon:10.169470
-ControlPoint21Mark1Lat:54.428662
-ControlPoint21Mark2Lon:10.169382
-ControlPoint21Mark2Lat:54.428875
+PositionedItem21UUID:9ce6c9d0-84a0-013d-7a1b-1c6b00518c70
+PositionedItem21Name:Star7-1a
+PositionedItem21CourseArea:
+PositionedItem21Static:0
+PositionedItem21Positions:
+PositionedItem21DataSheet:
 
-ControlPoint22UUID:65b2dfbc-9b64-11e0-85be-406186cbf87c
-ControlPoint22Name:K Start
-ControlPoint22HasTwoPoints:1
-ControlPoint22ShortName:S
-ControlPoint22Mark1Lon:10.200427
-ControlPoint22Mark1Lat:54.494328
-ControlPoint22Mark2Lon:10.198325
-ControlPoint22Mark2Lat:54.497162
+PositionedItem22UUID:9d20b220-84a0-013d-7a1c-1c6b00518c70
+PositionedItem22Name:Schlei Safe Water Mark red/white
+PositionedItem22CourseArea:
+PositionedItem22Static:0
+PositionedItem22Positions:
+PositionedItem22DataSheet:
 
-ControlPoint23UUID:65c3a9ec-992e-11e0-85be-406186cbf87c
-ControlPoint23Name:Mark 4 red (Fahrwassertonne 4)
-ControlPoint23HasTwoPoints:0
-ControlPoint23ShortName:4
-ControlPoint23Mark1Lon:10.233333
-ControlPoint23Mark1Lat:54.428333
+PositionedItem23UUID:9d36d450-84a0-013d-7a1d-1c6b00518c70
+PositionedItem23Name:49erYR2-1
+PositionedItem23CourseArea:
+PositionedItem23Static:0
+PositionedItem23Positions:
+PositionedItem23DataSheet:
 
-ControlPoint24UUID:69a347b2-9950-11e0-85be-406186cbf87c
-ControlPoint24Name:H Mark1
-ControlPoint24HasTwoPoints:0
-ControlPoint24ShortName:1
-ControlPoint24Mark1Lon:10.169522
-ControlPoint24Mark1Lat:54.428727
+PositionedItem24UUID:9d79d050-84a0-013d-7a1e-1c6b00518c70
+PositionedItem24Name:Audi Mark2
+PositionedItem24CourseArea:
+PositionedItem24Static:0
+PositionedItem24Positions:
+PositionedItem24DataSheet:
 
-ControlPoint25UUID:6c30e118-9a8d-11e0-85be-406186cbf87c
-ControlPoint25Name:49b4-F
-ControlPoint25HasTwoPoints:1
-ControlPoint25ShortName:F
-ControlPoint25Mark1Lon:10.209712
-ControlPoint25Mark1Lat:54.445952
-ControlPoint25Mark2Lon:10.210658
-ControlPoint25Mark2Lat:54.445241
+PositionedItem25UUID:9e6f17a0-84a0-013d-7a1f-1c6b00518c70
+PositionedItem25Name:Three yellow marks* (3 gelbe Tonnen)
+PositionedItem25CourseArea:
+PositionedItem25Static:0
+PositionedItem25Positions:
+PositionedItem25DataSheet:
 
-ControlPoint26UUID:7634bbfe-9dac-11e0-85be-406186cbf87c
-ControlPoint26Name:SB-Mark Red (WP 124)
-ControlPoint26HasTwoPoints:0
-ControlPoint26ShortName:WP
-ControlPoint26Mark1Lon:10.236667
-ControlPoint26Mark1Lat:55.045000
+PositionedItem26UUID:9e9c1300-84a0-013d-7a20-1c6b00518c70
+PositionedItem26Name:Audi Finish - 1
+PositionedItem26CourseArea:
+PositionedItem26Static:0
+PositionedItem26Positions:
+PositionedItem26DataSheet:
 
-ControlPoint27UUID:79dab2ea-9aaf-11e0-85be-406186cbf87c
-ControlPoint27Name:49erB5-4
-ControlPoint27HasTwoPoints:1
-ControlPoint27ShortName:4
-ControlPoint27Mark1Lon:10.201355
-ControlPoint27Mark1Lat:54.446073
-ControlPoint27Mark2Lon:10.197830
-ControlPoint27Mark2Lat:54.446886
+PositionedItem27UUID:9f7a77f0-84a0-013d-7a21-1c6b00518c70
+PositionedItem27Name:Audi Finish - 2
+PositionedItem27CourseArea:
+PositionedItem27Static:0
+PositionedItem27Positions:
+PositionedItem27DataSheet:
 
-ControlPoint28UUID:7a218886-9b64-11e0-85be-406186cbf87c
-ControlPoint28Name:K Mark1
-ControlPoint28HasTwoPoints:0
-ControlPoint28ShortName:1
-ControlPoint28Mark1Lon:10.165025
-ControlPoint28Mark1Lat:54.503712
+PositionedItem28UUID:a0d31e10-84a0-013d-7a24-1c6b00518c70
+PositionedItem28Name:49erYR1-T
+PositionedItem28CourseArea:
+PositionedItem28Static:0
+PositionedItem28Positions:
+PositionedItem28DataSheet:
 
-ControlPoint29UUID:7c639ea8-9da9-11e0-85be-406186cbf87c
-ControlPoint29Name:SB Mark1 (Schleimünde Approach (r/w) )
-ControlPoint29HasTwoPoints:0
-ControlPoint29ShortName:1
-ControlPoint29Mark1Lon:10.060000
-ControlPoint29Mark1Lat:54.665000
+PositionedItem29UUID:a0e71ed0-84a0-013d-7a25-1c6b00518c70
+PositionedItem29Name:H Start - 1
+PositionedItem29CourseArea:
+PositionedItem29Static:0
+PositionedItem29Positions:
+PositionedItem29DataSheet:
 
-ControlPoint30UUID:8145342e-992e-11e0-85be-406186cbf87c
-ControlPoint30Name:Mark 2 red (Fahrwassertonne 2)
-ControlPoint30HasTwoPoints:0
-ControlPoint30ShortName:2
-ControlPoint30Mark1Lon:10.283333
-ControlPoint30Mark1Lat:54.465000
+PositionedItem30UUID:a277bc90-84a0-013d-7a26-1c6b00518c70
+PositionedItem30Name:H Start - 2
+PositionedItem30CourseArea:
+PositionedItem30Static:0
+PositionedItem30Positions:
+PositionedItem30DataSheet:
 
-ControlPoint31UUID:84009c94-98e3-11e0-85be-406186cbf87c
-ControlPoint31Name:Test - Top Mark
-ControlPoint31HasTwoPoints:0
-ControlPoint31ShortName:1
-ControlPoint31Mark1Lon:10.169028
-ControlPoint31Mark1Lat:54.428993
+PositionedItem31UUID:a4795150-84a0-013d-7a29-1c6b00518c70
+PositionedItem31Name:K Start - 1
+PositionedItem31CourseArea:
+PositionedItem31Static:0
+PositionedItem31Positions:
+PositionedItem31DataSheet:
 
-ControlPoint32UUID:86c90a6e-9a9c-11e0-85be-406186cbf87c
-ControlPoint32Name:S3-4
-ControlPoint32HasTwoPoints:1
-ControlPoint32ShortName:4
-ControlPoint32Mark1Lon:10.218663
-ControlPoint32Mark1Lat:54.515525
-ControlPoint32Mark2Lon:10.218214
-ControlPoint32Mark2Lat:54.515649
+PositionedItem32UUID:a6a10140-84a0-013d-7a2a-1c6b00518c70
+PositionedItem32Name:K Start - 2
+PositionedItem32CourseArea:
+PositionedItem32Static:0
+PositionedItem32Positions:
+PositionedItem32DataSheet:
 
-ControlPoint33UUID:8d1c4750-9b64-11e0-85be-406186cbf87c
-ControlPoint33Name:K Mark2
-ControlPoint33HasTwoPoints:0
-ControlPoint33ShortName:2
-ControlPoint33Mark1Lon:10.169415
-ControlPoint33Mark1Lat:54.428730
+PositionedItem33UUID:a8762830-84a0-013d-7a2d-1c6b00518c70
+PositionedItem33Name:Mark 4 red (Fahrwassertonne 4)
+PositionedItem33CourseArea:
+PositionedItem33Static:0
+PositionedItem33Positions:
+PositionedItem33DataSheet:
 
-ControlPoint34UUID:99cae4d0-992e-11e0-85be-406186cbf87c
-ControlPoint34Name:Mark 1 green (Fahrwassertonne 1)
-ControlPoint34HasTwoPoints:0
-ControlPoint34ShortName:1
-ControlPoint34Mark1Lon:10.251667
-ControlPoint34Mark1Lat:54.475000
+PositionedItem34UUID:a8843a70-84a0-013d-7a2e-1c6b00518c70
+PositionedItem34Name:H Mark1
+PositionedItem34CourseArea:
+PositionedItem34Static:0
+PositionedItem34Positions:
+PositionedItem34DataSheet:
 
-ControlPoint35UUID:9beca160-9a8f-11e0-85be-406186cbf87c
-ControlPoint35Name:49erb1-1
-ControlPoint35HasTwoPoints:0
-ControlPoint35ShortName:T
-ControlPoint35Mark1Lon:10.196778
-ControlPoint35Mark1Lat:54.439621
+PositionedItem35UUID:aaa05870-84a0-013d-7a2f-1c6b00518c70
+PositionedItem35Name:49b4-F - 1
+PositionedItem35CourseArea:
+PositionedItem35Static:0
+PositionedItem35Positions:
+PositionedItem35DataSheet:
 
-ControlPoint36UUID:9c4e4984-9a93-11e0-85be-406186cbf87c
-ControlPoint36Name:Star2-4
-ControlPoint36HasTwoPoints:1
-ControlPoint36ShortName:4
-ControlPoint36Mark1Lon:10.230194
-ControlPoint36Mark1Lat:54.504793
-ControlPoint36Mark2Lon:10.229448
-ControlPoint36Mark2Lat:54.505033
+PositionedItem36UUID:aac8e700-84a0-013d-7a30-1c6b00518c70
+PositionedItem36Name:49b4-F - 2
+PositionedItem36CourseArea:
+PositionedItem36Static:0
+PositionedItem36Positions:
+PositionedItem36DataSheet:
 
-ControlPoint37UUID:9caa2f3a-98e3-11e0-85be-406186cbf87c
-ControlPoint37Name:Test - start
-ControlPoint37HasTwoPoints:1
-ControlPoint37ShortName:S
-ControlPoint37Mark1Lon:10.169440
-ControlPoint37Mark1Lat:54.428712
-ControlPoint37Mark2Lon:10.169403
-ControlPoint37Mark2Lat:54.428872
+PositionedItem37UUID:ab21aaa0-84a0-013d-7a33-1c6b00518c70
+PositionedItem37Name:SB-Mark Red (WP 124)
+PositionedItem37CourseArea:
+PositionedItem37Static:0
+PositionedItem37Positions:
+PositionedItem37DataSheet:
 
-ControlPoint38UUID:9da911ea-9950-11e0-85be-406186cbf87c
-ControlPoint38Name:H Mark4
-ControlPoint38HasTwoPoints:1
-ControlPoint38ShortName:4
-ControlPoint38Mark1Lon:10.169477
-ControlPoint38Mark1Lat:54.428658
-ControlPoint38Mark2Lon:10.169432
-ControlPoint38Mark2Lat:54.428505
+PositionedItem38UUID:ab477f20-84a0-013d-7a34-1c6b00518c70
+PositionedItem38Name:49erB5-4 - 1
+PositionedItem38CourseArea:
+PositionedItem38Static:0
+PositionedItem38Positions:
+PositionedItem38DataSheet:
 
-ControlPoint39UUID:a0cbd40c-9dab-11e0-85be-406186cbf87c
-ControlPoint39Name:SB-Mark Schleimünde Approach (r/w) 
-ControlPoint39HasTwoPoints:0
-ControlPoint39ShortName:SA
-ControlPoint39Mark1Lon:10.060000
-ControlPoint39Mark1Lat:54.665000
+PositionedItem39UUID:ab5c6880-84a0-013d-7a35-1c6b00518c70
+PositionedItem39Name:49erB5-4 - 2
+PositionedItem39CourseArea:
+PositionedItem39Static:0
+PositionedItem39Positions:
+PositionedItem39DataSheet:
 
-ControlPoint40UUID:a68cc03e-9b64-11e0-85be-406186cbf87c
-ControlPoint40Name:K Mark3
-ControlPoint40HasTwoPoints:1
-ControlPoint40ShortName:3
-ControlPoint40Mark1Lon:10.169510
-ControlPoint40Mark1Lat:54.428703
-ControlPoint40Mark2Lon:10.237422
-ControlPoint40Mark2Lat:54.480728
+PositionedItem40UUID:ab726f30-84a0-013d-7a38-1c6b00518c70
+PositionedItem40Name:K Mark1
+PositionedItem40CourseArea:
+PositionedItem40Static:0
+PositionedItem40Positions:
+PositionedItem40DataSheet:
 
-ControlPoint41UUID:a8c75c3e-9a8c-11e0-85be-406186cbf87c
-ControlPoint41Name:49b4-Start
-ControlPoint41HasTwoPoints:1
-ControlPoint41ShortName:S
-ControlPoint41Mark1Lon:10.209545
-ControlPoint41Mark1Lat:54.446065
-ControlPoint41Mark2Lon:10.211504
-ControlPoint41Mark2Lat:54.444520
+PositionedItem41UUID:ace55970-84a0-013d-7a39-1c6b00518c70
+PositionedItem41Name:SB Mark1 (Schleimünde Approach (r/w) )
+PositionedItem41CourseArea:
+PositionedItem41Static:0
+PositionedItem41Positions:
+PositionedItem41DataSheet:
 
-ControlPoint42UUID:a91da4ea-9dac-11e0-85be-406186cbf87c
-ControlPoint42Name:SB-Mark Thurö Rev (Y/B) (WP 277)
-ControlPoint42HasTwoPoints:0
-ControlPoint42ShortName:Th
-ControlPoint42Mark1Lon:10.735000
-ControlPoint42Mark1Lat:55.020000
+PositionedItem42UUID:ad109cd0-84a0-013d-7a3a-1c6b00518c70
+PositionedItem42Name:Mark 2 red (Fahrwassertonne 2)
+PositionedItem42CourseArea:
+PositionedItem42Static:0
+PositionedItem42Positions:
+PositionedItem42DataSheet:
 
-ControlPoint43UUID:b2ad1adc-9950-11e0-85be-406186cbf87c
-ControlPoint43Name:H Finish
-ControlPoint43HasTwoPoints:1
-ControlPoint43ShortName:F
-ControlPoint43Mark1Lon:10.169398
-ControlPoint43Mark1Lat:54.428765
-ControlPoint43Mark2Lon:10.169380
-ControlPoint43Mark2Lat:54.428638
+PositionedItem43UUID:ad1e22e1-84a0-013d-7a3b-1c6b00518c70
+PositionedItem43Name:Test - Top Mark
+PositionedItem43CourseArea:
+PositionedItem43Static:0
+PositionedItem43Positions:
+PositionedItem43DataSheet:
 
-ControlPoint44UUID:b31eaad0-9dab-11e0-85be-406186cbf87c
-ControlPoint44Name:SB-Mark Spodsbjerg-SE
-ControlPoint44HasTwoPoints:0
-ControlPoint44ShortName:Sp
-ControlPoint44Mark1Lon:10.845000
-ControlPoint44Mark1Lat:54.918333
+PositionedItem44UUID:ad853b90-84a0-013d-7a3c-1c6b00518c70
+PositionedItem44Name:S3-4 - 1
+PositionedItem44CourseArea:
+PositionedItem44Static:0
+PositionedItem44Positions:
+PositionedItem44DataSheet:
 
-ControlPoint45UUID:b3af1998-992e-11e0-85be-406186cbf87c
-ControlPoint45Name:Mark K yellow (Kabeltonne)
-ControlPoint45HasTwoPoints:0
-ControlPoint45ShortName:K
-ControlPoint45Mark1Lon:10.255000
-ControlPoint45Mark1Lat:54.488333
+PositionedItem45UUID:ad93f320-84a0-013d-7a3d-1c6b00518c70
+PositionedItem45Name:S3-4 - 2
+PositionedItem45CourseArea:
+PositionedItem45Static:0
+PositionedItem45Positions:
+PositionedItem45DataSheet:
 
-ControlPoint46UUID:bfe4dc42-9b64-11e0-85be-406186cbf87c
-ControlPoint46Name:K Mark4
-ControlPoint46HasTwoPoints:1
-ControlPoint46ShortName:4
-ControlPoint46Mark1Lon:10.198390
-ControlPoint46Mark1Lat:54.497398
-ControlPoint46Mark2Lon:10.198355
-ControlPoint46Mark2Lat:54.497917
+PositionedItem46UUID:ade00250-84a0-013d-7a40-1c6b00518c70
+PositionedItem46Name:H Mark2
+PositionedItem46CourseArea:
+PositionedItem46Static:0
+PositionedItem46Positions:
+PositionedItem46DataSheet:
 
-ControlPoint47UUID:c2199936-9dac-11e0-85be-406186cbf87c
-ControlPoint47Name:SB-Mark Black Yellow (WP 253)
-ControlPoint47HasTwoPoints:0
-ControlPoint47ShortName:BY
-ControlPoint47Mark1Lon:10.936667
-ControlPoint47Mark1Lat:55.185000
+PositionedItem47UUID:aeca99f0-84a0-013d-7a41-1c6b00518c70
+PositionedItem47Name:Mark 1 green (Fahrwassertonne 1)
+PositionedItem47CourseArea:
+PositionedItem47Static:0
+PositionedItem47Positions:
+PositionedItem47DataSheet:
 
-ControlPoint48UUID:c583e438-9950-11e0-85be-406186cbf87c
-ControlPoint48Name:D Start
-ControlPoint48HasTwoPoints:1
-ControlPoint48ShortName:S
-ControlPoint48Mark1Lon:10.169462
-ControlPoint48Mark1Lat:54.428848
-ControlPoint48Mark2Lon:10.169363
-ControlPoint48Mark2Lat:54.428722
+PositionedItem48UUID:aedc2100-84a0-013d-7a42-1c6b00518c70
+PositionedItem48Name:49erb1-1
+PositionedItem48CourseArea:
+PositionedItem48Static:0
+PositionedItem48Positions:
+PositionedItem48DataSheet:
 
-ControlPoint49UUID:cd57b5f8-992e-11e0-85be-406186cbf87c
-ControlPoint49Name:Stollergrund-N (black/yellow)
-ControlPoint49HasTwoPoints:0
-ControlPoint49ShortName:SN
-ControlPoint49Mark1Lon:10.200000
-ControlPoint49Mark1Lat:54.536667
+PositionedItem49UUID:af014730-84a0-013d-7a43-1c6b00518c70
+PositionedItem49Name:Star2-4 - 1
+PositionedItem49CourseArea:
+PositionedItem49Static:0
+PositionedItem49Positions:
+PositionedItem49DataSheet:
 
-ControlPoint50UUID:d2b4c5d2-9950-11e0-85be-406186cbf87c
-ControlPoint50Name:D Mark1
-ControlPoint50HasTwoPoints:0
-ControlPoint50ShortName:1
-ControlPoint50Mark1Lon:10.166928
-ControlPoint50Mark1Lat:54.345997
+PositionedItem50UUID:af072b00-84a0-013d-7a44-1c6b00518c70
+PositionedItem50Name:Star2-4 - 2
+PositionedItem50CourseArea:
+PositionedItem50Static:0
+PositionedItem50Positions:
+PositionedItem50DataSheet:
 
-ControlPoint51UUID:de21cff2-9ab6-11e0-85be-406186cbf87c
-ControlPoint51Name:49Y-R8-1a
-ControlPoint51HasTwoPoints:0
-ControlPoint51ShortName:1
-ControlPoint51Mark1Lon:10.207476
-ControlPoint51Mark1Lat:54.435762
+PositionedItem51UUID:af36f5f0-84a0-013d-7a47-1c6b00518c70
+PositionedItem51Name:Test - start - 1
+PositionedItem51CourseArea:
+PositionedItem51Static:0
+PositionedItem51Positions:
+PositionedItem51DataSheet:
 
-ControlPoint52UUID:e299f688-9dac-11e0-85be-406186cbf87c
-ControlPoint52Name:SB-Gate DW 59 green and DW 56 red
-ControlPoint52HasTwoPoints:0
-ControlPoint52ShortName:59
-ControlPoint52Mark1Lon:10.780000
-ControlPoint52Mark1Lat:54.736667
+PositionedItem52UUID:af8adf00-84a0-013d-7a48-1c6b00518c70
+PositionedItem52Name:Test - start - 2
+PositionedItem52CourseArea:
+PositionedItem52Static:0
+PositionedItem52Positions:
+PositionedItem52DataSheet:
 
-ControlPoint53UUID:e59815c6-9b64-11e0-85be-406186cbf87c
-ControlPoint53Name:K Finish
-ControlPoint53HasTwoPoints:1
-ControlPoint53ShortName:F
-ControlPoint53Mark1Lon:10.163997
-ControlPoint53Mark1Lat:54.499787
-ControlPoint53Mark2Lon:10.163545
-ControlPoint53Mark2Lat:54.500347
+PositionedItem53UUID:afeba6c1-84a0-013d-7a4b-1c6b00518c70
+PositionedItem53Name:H Mark3 - 1
+PositionedItem53CourseArea:
+PositionedItem53Static:0
+PositionedItem53Positions:
+PositionedItem53DataSheet:
 
-ControlPoint54UUID:e663db6c-9a8c-11e0-85be-406186cbf87c
-ControlPoint54Name:49b4-1
-ControlPoint54HasTwoPoints:0
-ControlPoint54ShortName:1
-ControlPoint54Mark1Lon:10.196146
-ControlPoint54Mark1Lat:54.441407
+PositionedItem54UUID:b2555210-84a0-013d-7a4c-1c6b00518c70
+PositionedItem54Name:H Mark3 - 2
+PositionedItem54CourseArea:
+PositionedItem54Static:0
+PositionedItem54Positions:
+PositionedItem54DataSheet:
 
-ControlPoint55UUID:f214ea50-992e-11e0-85be-406186cbf87c
-ControlPoint55Name:Gate between Mittelgrund-N
-ControlPoint55HasTwoPoints:0
-ControlPoint55ShortName:MN
-ControlPoint55Mark1Lon:10.055000
-ControlPoint55Mark1Lat:54.513333
+PositionedItem55UUID:b3ff2470-84a0-013d-7a4f-1c6b00518c70
+PositionedItem55Name:SB-Mark Schleimünde Approach (r/w) 
+PositionedItem55CourseArea:
+PositionedItem55Static:0
+PositionedItem55Positions:
+PositionedItem55DataSheet:
 
-ControlPoint56UUID:f641d92e-9ab6-11e0-85be-406186cbf87c
-ControlPoint56Name:49Y-R8-1b
-ControlPoint56HasTwoPoints:0
-ControlPoint56ShortName:1
-ControlPoint56Mark1Lon:10.203712
-ControlPoint56Mark1Lat:54.434916
+PositionedItem56UUID:b43f9e60-84a0-013d-7a50-1c6b00518c70
+PositionedItem56Name:H Finish - 1
+PositionedItem56CourseArea:
+PositionedItem56Static:0
+PositionedItem56Positions:
+PositionedItem56DataSheet:
 
-ControlPoint57UUID:f76bea2c-9a95-11e0-85be-406186cbf87c
-ControlPoint57Name:DIM1-F
-ControlPoint57HasTwoPoints:1
-ControlPoint57ShortName:F
-ControlPoint57Mark1Lon:9.850912
-ControlPoint57Mark1Lat:54.474097
-ControlPoint57Mark2Lon:9.849851
-ControlPoint57Mark2Lat:54.472319
+PositionedItem57UUID:b50c7f00-84a0-013d-7a51-1c6b00518c70
+PositionedItem57Name:H Finish - 2
+PositionedItem57CourseArea:
+PositionedItem57Static:0
+PositionedItem57Positions:
+PositionedItem57DataSheet:
 
+PositionedItem58UUID:b6576fa0-84a0-013d-7a54-1c6b00518c70
+PositionedItem58Name:49b4-Start - 1
+PositionedItem58CourseArea:
+PositionedItem58Static:0
+PositionedItem58Positions:
+PositionedItem58DataSheet:
+
+PositionedItem59UUID:b66a3520-84a0-013d-7a55-1c6b00518c70
+PositionedItem59Name:49b4-Start - 2
+PositionedItem59CourseArea:
+PositionedItem59Static:0
+PositionedItem59Positions:
+PositionedItem59DataSheet:
+
+PositionedItem60UUID:b680e2f0-84a0-013d-7a58-1c6b00518c70
+PositionedItem60Name:SB-Mark Thurö Rev (Y/B) (WP 277)
+PositionedItem60CourseArea:
+PositionedItem60Static:0
+PositionedItem60Positions:
+PositionedItem60DataSheet:
+
+PositionedItem61UUID:b6c8ace0-84a0-013d-7a59-1c6b00518c70
+PositionedItem61Name:H Finish-old - 1
+PositionedItem61CourseArea:
+PositionedItem61Static:0
+PositionedItem61Positions:
+PositionedItem61DataSheet:
+
+PositionedItem62UUID:b8b73e30-84a0-013d-7a5a-1c6b00518c70
+PositionedItem62Name:H Finish-old - 2
+PositionedItem62CourseArea:
+PositionedItem62Static:0
+PositionedItem62Positions:
+PositionedItem62DataSheet:
+
+PositionedItem63UUID:bb21ab40-84a0-013d-7a5d-1c6b00518c70
+PositionedItem63Name:SB-Mark Spodsbjerg-SE
+PositionedItem63CourseArea:
+PositionedItem63Static:0
+PositionedItem63Positions:
+PositionedItem63DataSheet:
+
+PositionedItem64UUID:bb767b40-84a0-013d-7a5e-1c6b00518c70
+PositionedItem64Name:Mark K yellow (Kabeltonne)
+PositionedItem64CourseArea:
+PositionedItem64Static:0
+PositionedItem64Positions:
+PositionedItem64DataSheet:
+
+PositionedItem65UUID:bb89b1c0-84a0-013d-7a5f-1c6b00518c70
+PositionedItem65Name:K Mark4 - 1
+PositionedItem65CourseArea:
+PositionedItem65Static:0
+PositionedItem65Positions:
+PositionedItem65DataSheet:
+
+PositionedItem66UUID:bcf777a0-84a0-013d-7a60-1c6b00518c70
+PositionedItem66Name:K Mark4 - 2
+PositionedItem66CourseArea:
+PositionedItem66Static:0
+PositionedItem66Positions:
+PositionedItem66DataSheet:
+
+PositionedItem67UUID:be5638c0-84a0-013d-7a63-1c6b00518c70
+PositionedItem67Name:SB-Mark Black Yellow (WP 253)
+PositionedItem67CourseArea:
+PositionedItem67Static:0
+PositionedItem67Positions:
+PositionedItem67DataSheet:
+
+PositionedItem68UUID:be678a91-84a0-013d-7a64-1c6b00518c70
+PositionedItem68Name:D Start - 1
+PositionedItem68CourseArea:
+PositionedItem68Static:0
+PositionedItem68Positions:
+PositionedItem68DataSheet:
+
+PositionedItem69UUID:bfea7780-84a0-013d-7a65-1c6b00518c70
+PositionedItem69Name:D Start - 2
+PositionedItem69CourseArea:
+PositionedItem69Static:0
+PositionedItem69Positions:
+PositionedItem69DataSheet:
+
+PositionedItem70UUID:c17bf9f0-84a0-013d-7a68-1c6b00518c70
+PositionedItem70Name:H Mark2
+PositionedItem70CourseArea:
+PositionedItem70Static:0
+PositionedItem70Positions:
+PositionedItem70DataSheet:
+
+PositionedItem71UUID:c1ac1340-84a0-013d-7a69-1c6b00518c70
+PositionedItem71Name:Stollergrund-N (black/yellow)
+PositionedItem71CourseArea:
+PositionedItem71Static:0
+PositionedItem71Positions:
+PositionedItem71DataSheet:
+
+PositionedItem72UUID:c1e23db0-84a0-013d-7a6a-1c6b00518c70
+PositionedItem72Name:D Mark1
+PositionedItem72CourseArea:
+PositionedItem72Static:0
+PositionedItem72Positions:
+PositionedItem72DataSheet:
+
+PositionedItem73UUID:c33ba2e0-84a0-013d-7a6b-1c6b00518c70
+PositionedItem73Name:49Y-R8-1a
+PositionedItem73CourseArea:
+PositionedItem73Static:0
+PositionedItem73Positions:
+PositionedItem73DataSheet:
+
+PositionedItem74UUID:c360b650-84a0-013d-7a6c-1c6b00518c70
+PositionedItem74Name:SB-Gate DW 59 green and DW 56 red
+PositionedItem74CourseArea:
+PositionedItem74Static:0
+PositionedItem74Positions:
+PositionedItem74DataSheet:
+
+PositionedItem75UUID:c3c37d00-84a0-013d-7a6d-1c6b00518c70
+PositionedItem75Name:K Finish - 1
+PositionedItem75CourseArea:
+PositionedItem75Static:0
+PositionedItem75Positions:
+PositionedItem75DataSheet:
+
+PositionedItem76UUID:c4d224e0-84a0-013d-7a6e-1c6b00518c70
+PositionedItem76Name:K Finish - 2
+PositionedItem76CourseArea:
+PositionedItem76Static:0
+PositionedItem76Positions:
+PositionedItem76DataSheet:
+
+PositionedItem77UUID:c5d20790-84a0-013d-7a71-1c6b00518c70
+PositionedItem77Name:49b4-1
+PositionedItem77CourseArea:
+PositionedItem77Static:0
+PositionedItem77Positions:
+PositionedItem77DataSheet:
+
+PositionedItem78UUID:c5e21ae1-84a0-013d-7a72-1c6b00518c70
+PositionedItem78Name:Gate between Mittelgrund-N
+PositionedItem78CourseArea:
+PositionedItem78Static:0
+PositionedItem78Positions:
+PositionedItem78DataSheet:
+
+PositionedItem79UUID:c6288c70-84a0-013d-7a73-1c6b00518c70
+PositionedItem79Name:49Y-R8-1b
+PositionedItem79CourseArea:
+PositionedItem79Static:0
+PositionedItem79Positions:
+PositionedItem79DataSheet:
+
+PositionedItem80UUID:c63173b0-84a0-013d-7a74-1c6b00518c70
+PositionedItem80Name:DIM1-F - 1
+PositionedItem80CourseArea:
+PositionedItem80Static:0
+PositionedItem80Positions:
+PositionedItem80DataSheet:
+
+PositionedItem81UUID:c653ff30-84a0-013d-7a75-1c6b00518c70
+PositionedItem81Name:DIM1-F - 2
+PositionedItem81CourseArea:
+PositionedItem81Static:0
+PositionedItem81Positions:
+PositionedItem81DataSheet:
+
+MapItem1UUID:07d84022-9951-11e0-85be-406186cbf87c
+MapItem1Name:D Mark4
+MapItem1ShortName:4
+MapItem1PositionedItemIds:["933ca8c0-84a0-013d-79fb-1c6b00518c70", "94c86aa0-84a0-013d-79fc-1c6b00518c70"]
+
+MapItem2UUID:0807af7c-9b42-11e0-85be-406186cbf87c
+MapItem2Name:Star-R6-1
+MapItem2ShortName:1
+MapItem2PositionedItemIds:["96885330-84a0-013d-79ff-1c6b00518c70"]
+
+MapItem3UUID:0beb273c-992f-11e0-85be-406186cbf87c
+MapItem3Name:Finish Silbernes Band
+MapItem3ShortName:F
+MapItem3PositionedItemIds:["969738d0-84a0-013d-7a00-1c6b00518c70", "96ed11d0-84a0-013d-7a01-1c6b00518c70"]
+
+MapItem4UUID:144f44f4-9dac-11e0-85be-406186cbf87c
+MapItem4Name:SB-Mark H5 (y) (WP 33)
+MapItem4ShortName:H5
+MapItem4PositionedItemIds:["97629450-84a0-013d-7a04-1c6b00518c70"]
+
+MapItem5UUID:18e98784-9930-11e0-85be-406186cbf87c
+MapItem5Name:Start Silbernes Band
+MapItem5ShortName:S
+MapItem5PositionedItemIds:["97715de0-84a0-013d-7a05-1c6b00518c70", "97e77bd0-84a0-013d-7a06-1c6b00518c70"]
+
+MapItem6UUID:1d8536e6-9a91-11e0-85be-406186cbf87c
+MapItem6Name:Star1-4
+MapItem6ShortName:4
+MapItem6PositionedItemIds:["98a195d0-84a0-013d-7a09-1c6b00518c70", "98ba00c0-84a0-013d-7a0a-1c6b00518c70"]
+
+MapItem7UUID:214d069e-9fcf-11e0-85be-406186cbf87c
+MapItem7Name:H Mark 5
+MapItem7ShortName:5
+MapItem7PositionedItemIds:["98d60e00-84a0-013d-7a0d-1c6b00518c70"]
+
+MapItem8UUID:22475d30-9951-11e0-85be-406186cbf87c
+MapItem8Name:Audi Start
+MapItem8ShortName:S
+MapItem8PositionedItemIds:["99136050-84a0-013d-7a0e-1c6b00518c70", "9a180970-84a0-013d-7a0f-1c6b00518c70"]
+
+MapItem9UUID:2307bec6-992f-11e0-85be-406186cbf87c
+MapItem9Name:Mark KO2 red/white
+MapItem9ShortName:KO
+MapItem9PositionedItemIds:["9af8b3e0-84a0-013d-7a12-1c6b00518c70"]
+
+MapItem10UUID:2497f822-9ab1-11e0-85be-406186cbf87c
+MapItem10Name:49Y-R7-1
+MapItem10ShortName:1
+MapItem10PositionedItemIds:["9b2775f0-84a0-013d-7a13-1c6b00518c70"]
+
+MapItem11UUID:27c13096-9a8d-11e0-85be-406186cbf87c
+MapItem11Name:49b4-4
+MapItem11ShortName:4
+MapItem11PositionedItemIds:["9b55ee60-84a0-013d-7a14-1c6b00518c70", "9b572fb0-84a0-013d-7a15-1c6b00518c70"]
+
+MapItem12UUID:2c8584ca-9dac-11e0-85be-406186cbf87c
+MapItem12Name:SB-Finish (Ziel) at Kiel Lighthouse
+MapItem12ShortName:KL
+MapItem12PositionedItemIds:["9b8a3d20-84a0-013d-7a18-1c6b00518c70"]
+
+MapItem13UUID:32ad8a14-992e-11e0-85be-406186cbf87c
+MapItem13Name:Mark 14 red (Fahrwassertonne 14)
+MapItem13ShortName:14
+MapItem13PositionedItemIds:["9b9a2210-84a0-013d-7a19-1c6b00518c70"]
+
+MapItem14UUID:32fb2850-9951-11e0-85be-406186cbf87c
+MapItem14Name:Audi Mark1
+MapItem14ShortName:1
+MapItem14PositionedItemIds:["9bb9d780-84a0-013d-7a1a-1c6b00518c70"]
+
+MapItem15UUID:34feeaea-9c32-11e0-85be-406186cbf87c
+MapItem15Name:Star7-1a
+MapItem15ShortName:1a
+MapItem15PositionedItemIds:["9ce6c9d0-84a0-013d-7a1b-1c6b00518c70"]
+
+MapItem16UUID:3ecf9ade-992f-11e0-85be-406186cbf87c
+MapItem16Name:Schlei Safe Water Mark red/white
+MapItem16ShortName:SS
+MapItem16PositionedItemIds:["9d20b220-84a0-013d-7a1c-1c6b00518c70"]
+
+MapItem17UUID:405f346c-99e9-11e0-85be-406186cbf87c
+MapItem17Name:49erYR2-1
+MapItem17ShortName:1
+MapItem17PositionedItemIds:["9d36d450-84a0-013d-7a1d-1c6b00518c70"]
+
+MapItem18UUID:4123b6ea-9951-11e0-85be-406186cbf87c
+MapItem18Name:Audi Mark2
+MapItem18ShortName:2
+MapItem18PositionedItemIds:["9d79d050-84a0-013d-7a1e-1c6b00518c70"]
+
+MapItem19UUID:4bac3eca-992e-11e0-85be-406186cbf87c
+MapItem19Name:Three yellow marks* (3 gelbe Tonnen)
+MapItem19ShortName:3y
+MapItem19PositionedItemIds:["9e6f17a0-84a0-013d-7a1f-1c6b00518c70"]
+
+MapItem20UUID:535fb3f4-9951-11e0-85be-406186cbf87c
+MapItem20Name:Audi Finish
+MapItem20ShortName:F
+MapItem20PositionedItemIds:["9e9c1300-84a0-013d-7a20-1c6b00518c70", "9f7a77f0-84a0-013d-7a21-1c6b00518c70"]
+
+MapItem21UUID:56f63cf8-99e8-11e0-85be-406186cbf87c
+MapItem21Name:49erYR1-T
+MapItem21ShortName:T
+MapItem21PositionedItemIds:["a0d31e10-84a0-013d-7a24-1c6b00518c70"]
+
+MapItem22UUID:5933cdca-9950-11e0-85be-406186cbf87c
+MapItem22Name:H Start
+MapItem22ShortName:S
+MapItem22PositionedItemIds:["a0e71ed0-84a0-013d-7a25-1c6b00518c70", "a277bc90-84a0-013d-7a26-1c6b00518c70"]
+
+MapItem23UUID:65b2dfbc-9b64-11e0-85be-406186cbf87c
+MapItem23Name:K Start
+MapItem23ShortName:S
+MapItem23PositionedItemIds:["a4795150-84a0-013d-7a29-1c6b00518c70", "a6a10140-84a0-013d-7a2a-1c6b00518c70"]
+
+MapItem24UUID:65c3a9ec-992e-11e0-85be-406186cbf87c
+MapItem24Name:Mark 4 red (Fahrwassertonne 4)
+MapItem24ShortName:4
+MapItem24PositionedItemIds:["a8762830-84a0-013d-7a2d-1c6b00518c70"]
+
+MapItem25UUID:69a347b2-9950-11e0-85be-406186cbf87c
+MapItem25Name:H Mark1
+MapItem25ShortName:1
+MapItem25PositionedItemIds:["a8843a70-84a0-013d-7a2e-1c6b00518c70"]
+
+MapItem26UUID:6c30e118-9a8d-11e0-85be-406186cbf87c
+MapItem26Name:49b4-F
+MapItem26ShortName:F
+MapItem26PositionedItemIds:["aaa05870-84a0-013d-7a2f-1c6b00518c70", "aac8e700-84a0-013d-7a30-1c6b00518c70"]
+
+MapItem27UUID:7634bbfe-9dac-11e0-85be-406186cbf87c
+MapItem27Name:SB-Mark Red (WP 124)
+MapItem27ShortName:WP
+MapItem27PositionedItemIds:["ab21aaa0-84a0-013d-7a33-1c6b00518c70"]
+
+MapItem28UUID:79dab2ea-9aaf-11e0-85be-406186cbf87c
+MapItem28Name:49erB5-4
+MapItem28ShortName:4
+MapItem28PositionedItemIds:["ab477f20-84a0-013d-7a34-1c6b00518c70", "ab5c6880-84a0-013d-7a35-1c6b00518c70"]
+
+MapItem29UUID:7a218886-9b64-11e0-85be-406186cbf87c
+MapItem29Name:K Mark1
+MapItem29ShortName:1
+MapItem29PositionedItemIds:["ab726f30-84a0-013d-7a38-1c6b00518c70"]
+
+MapItem30UUID:7c639ea8-9da9-11e0-85be-406186cbf87c
+MapItem30Name:SB Mark1 (Schleimünde Approach (r/w) )
+MapItem30ShortName:1
+MapItem30PositionedItemIds:["ace55970-84a0-013d-7a39-1c6b00518c70"]
+
+MapItem31UUID:8145342e-992e-11e0-85be-406186cbf87c
+MapItem31Name:Mark 2 red (Fahrwassertonne 2)
+MapItem31ShortName:2
+MapItem31PositionedItemIds:["ad109cd0-84a0-013d-7a3a-1c6b00518c70"]
+
+MapItem32UUID:84009c94-98e3-11e0-85be-406186cbf87c
+MapItem32Name:Test - Top Mark
+MapItem32ShortName:1
+MapItem32PositionedItemIds:["ad1e22e1-84a0-013d-7a3b-1c6b00518c70"]
+
+MapItem33UUID:86c90a6e-9a9c-11e0-85be-406186cbf87c
+MapItem33Name:S3-4
+MapItem33ShortName:4
+MapItem33PositionedItemIds:["ad853b90-84a0-013d-7a3c-1c6b00518c70", "ad93f320-84a0-013d-7a3d-1c6b00518c70"]
+
+MapItem34UUID:8d1c4750-9b64-11e0-85be-406186cbf87c
+MapItem34Name:H Mark2
+MapItem34ShortName:2
+MapItem34PositionedItemIds:["ade00250-84a0-013d-7a40-1c6b00518c70"]
+
+MapItem35UUID:966f68a0-84a0-013d-79fd-1c6b00518c70
+MapItem35Name:D Mark4 - 1
+MapItem35ShortName:4
+MapItem35PositionedItemIds:["933ca8c0-84a0-013d-79fb-1c6b00518c70"]
+
+MapItem36UUID:96701cb0-84a0-013d-79fe-1c6b00518c70
+MapItem36Name:D Mark4 - 2
+MapItem36ShortName:4
+MapItem36PositionedItemIds:["94c86aa0-84a0-013d-79fc-1c6b00518c70"]
+
+MapItem37UUID:97547d40-84a0-013d-7a02-1c6b00518c70
+MapItem37Name:Finish Silbernes Band - 1
+MapItem37ShortName:F
+MapItem37PositionedItemIds:["969738d0-84a0-013d-7a00-1c6b00518c70"]
+
+MapItem38UUID:975d0c20-84a0-013d-7a03-1c6b00518c70
+MapItem38Name:Finish Silbernes Band - 2
+MapItem38ShortName:F
+MapItem38PositionedItemIds:["96ed11d0-84a0-013d-7a01-1c6b00518c70"]
+
+MapItem39UUID:988699f0-84a0-013d-7a07-1c6b00518c70
+MapItem39Name:Start Silbernes Band - 1
+MapItem39ShortName:S
+MapItem39PositionedItemIds:["97715de0-84a0-013d-7a05-1c6b00518c70"]
+
+MapItem40UUID:98a08fa0-84a0-013d-7a08-1c6b00518c70
+MapItem40Name:Start Silbernes Band - 2
+MapItem40ShortName:S
+MapItem40PositionedItemIds:["97e77bd0-84a0-013d-7a06-1c6b00518c70"]
+
+MapItem41UUID:98d34ca0-84a0-013d-7a0b-1c6b00518c70
+MapItem41Name:Star1-4 - 1
+MapItem41ShortName:4
+MapItem41PositionedItemIds:["98a195d0-84a0-013d-7a09-1c6b00518c70"]
+
+MapItem42UUID:98d41bc0-84a0-013d-7a0c-1c6b00518c70
+MapItem42Name:Star1-4 - 2
+MapItem42ShortName:4
+MapItem42PositionedItemIds:["98ba00c0-84a0-013d-7a0a-1c6b00518c70"]
+
+MapItem43UUID:99cae4d0-992e-11e0-85be-406186cbf87c
+MapItem43Name:Mark 1 green (Fahrwassertonne 1)
+MapItem43ShortName:1
+MapItem43PositionedItemIds:["aeca99f0-84a0-013d-7a41-1c6b00518c70"]
+
+MapItem44UUID:9af115b0-84a0-013d-7a10-1c6b00518c70
+MapItem44Name:Audi Start - 1
+MapItem44ShortName:S
+MapItem44PositionedItemIds:["99136050-84a0-013d-7a0e-1c6b00518c70"]
+
+MapItem45UUID:9af1e5c0-84a0-013d-7a11-1c6b00518c70
+MapItem45Name:Audi Start - 2
+MapItem45ShortName:S
+MapItem45PositionedItemIds:["9a180970-84a0-013d-7a0f-1c6b00518c70"]
+
+MapItem46UUID:9b83d4e0-84a0-013d-7a16-1c6b00518c70
+MapItem46Name:49b4-4 - 1
+MapItem46ShortName:4
+MapItem46PositionedItemIds:["9b55ee60-84a0-013d-7a14-1c6b00518c70"]
+
+MapItem47UUID:9b882201-84a0-013d-7a17-1c6b00518c70
+MapItem47Name:49b4-4 - 2
+MapItem47ShortName:4
+MapItem47PositionedItemIds:["9b572fb0-84a0-013d-7a15-1c6b00518c70"]
+
+MapItem48UUID:9beca160-9a8f-11e0-85be-406186cbf87c
+MapItem48Name:49erb1-1
+MapItem48ShortName:T
+MapItem48PositionedItemIds:["aedc2100-84a0-013d-7a42-1c6b00518c70"]
+
+MapItem49UUID:9c4e4984-9a93-11e0-85be-406186cbf87c
+MapItem49Name:Star2-4
+MapItem49ShortName:4
+MapItem49PositionedItemIds:["af014730-84a0-013d-7a43-1c6b00518c70", "af072b00-84a0-013d-7a44-1c6b00518c70"]
+
+MapItem50UUID:9caa2f3a-98e3-11e0-85be-406186cbf87c
+MapItem50Name:Test - start
+MapItem50ShortName:S
+MapItem50PositionedItemIds:["af36f5f0-84a0-013d-7a47-1c6b00518c70", "af8adf00-84a0-013d-7a48-1c6b00518c70"]
+
+MapItem51UUID:9da911ea-9950-11e0-85be-406186cbf87c
+MapItem51Name:H Mark3
+MapItem51ShortName:3
+MapItem51PositionedItemIds:["afeba6c1-84a0-013d-7a4b-1c6b00518c70", "b2555210-84a0-013d-7a4c-1c6b00518c70"]
+
+MapItem52UUID:a0b87580-84a0-013d-7a22-1c6b00518c70
+MapItem52Name:Audi Finish - 1
+MapItem52ShortName:F
+MapItem52PositionedItemIds:["9e9c1300-84a0-013d-7a20-1c6b00518c70"]
+
+MapItem53UUID:a0bfff20-84a0-013d-7a23-1c6b00518c70
+MapItem53Name:Audi Finish - 2
+MapItem53ShortName:F
+MapItem53PositionedItemIds:["9f7a77f0-84a0-013d-7a21-1c6b00518c70"]
+
+MapItem54UUID:a0cbd40c-9dab-11e0-85be-406186cbf87c
+MapItem54Name:SB-Mark Schleimünde Approach (r/w) 
+MapItem54ShortName:SA
+MapItem54PositionedItemIds:["b3ff2470-84a0-013d-7a4f-1c6b00518c70"]
+
+MapItem55UUID:a4672f10-84a0-013d-7a27-1c6b00518c70
+MapItem55Name:H Start - 1
+MapItem55ShortName:S
+MapItem55PositionedItemIds:["a0e71ed0-84a0-013d-7a25-1c6b00518c70"]
+
+MapItem56UUID:a46b5a00-84a0-013d-7a28-1c6b00518c70
+MapItem56Name:H Start - 2
+MapItem56ShortName:S
+MapItem56PositionedItemIds:["a277bc90-84a0-013d-7a26-1c6b00518c70"]
+
+MapItem57UUID:a68cc03e-9b64-11e0-85be-406186cbf87c
+MapItem57Name:H Finish
+MapItem57ShortName:F
+MapItem57PositionedItemIds:["b43f9e60-84a0-013d-7a50-1c6b00518c70", "b50c7f00-84a0-013d-7a51-1c6b00518c70"]
+
+MapItem58UUID:a8518500-84a0-013d-7a2b-1c6b00518c70
+MapItem58Name:K Start - 1
+MapItem58ShortName:S
+MapItem58PositionedItemIds:["a4795150-84a0-013d-7a29-1c6b00518c70"]
+
+MapItem59UUID:a863e930-84a0-013d-7a2c-1c6b00518c70
+MapItem59Name:K Start - 2
+MapItem59ShortName:S
+MapItem59PositionedItemIds:["a6a10140-84a0-013d-7a2a-1c6b00518c70"]
+
+MapItem60UUID:a8c75c3e-9a8c-11e0-85be-406186cbf87c
+MapItem60Name:49b4-Start
+MapItem60ShortName:S
+MapItem60PositionedItemIds:["b6576fa0-84a0-013d-7a54-1c6b00518c70", "b66a3520-84a0-013d-7a55-1c6b00518c70"]
+
+MapItem61UUID:a91da4ea-9dac-11e0-85be-406186cbf87c
+MapItem61Name:SB-Mark Thurö Rev (Y/B) (WP 277)
+MapItem61ShortName:Th
+MapItem61PositionedItemIds:["b680e2f0-84a0-013d-7a58-1c6b00518c70"]
+
+MapItem62UUID:ab03b680-84a0-013d-7a31-1c6b00518c70
+MapItem62Name:49b4-F - 1
+MapItem62ShortName:F
+MapItem62PositionedItemIds:["aaa05870-84a0-013d-7a2f-1c6b00518c70"]
+
+MapItem63UUID:ab10b6e0-84a0-013d-7a32-1c6b00518c70
+MapItem63Name:49b4-F - 2
+MapItem63ShortName:F
+MapItem63PositionedItemIds:["aac8e700-84a0-013d-7a30-1c6b00518c70"]
+
+MapItem64UUID:ab65be40-84a0-013d-7a36-1c6b00518c70
+MapItem64Name:49erB5-4 - 1
+MapItem64ShortName:4
+MapItem64PositionedItemIds:["ab477f20-84a0-013d-7a34-1c6b00518c70"]
+
+MapItem65UUID:ab6c84c0-84a0-013d-7a37-1c6b00518c70
+MapItem65Name:49erB5-4 - 2
+MapItem65ShortName:4
+MapItem65PositionedItemIds:["ab5c6880-84a0-013d-7a35-1c6b00518c70"]
+
+MapItem66UUID:add480a0-84a0-013d-7a3e-1c6b00518c70
+MapItem66Name:S3-4 - 1
+MapItem66ShortName:4
+MapItem66PositionedItemIds:["ad853b90-84a0-013d-7a3c-1c6b00518c70"]
+
+MapItem67UUID:addf09e0-84a0-013d-7a3f-1c6b00518c70
+MapItem67Name:S3-4 - 2
+MapItem67ShortName:4
+MapItem67PositionedItemIds:["ad93f320-84a0-013d-7a3d-1c6b00518c70"]
+
+MapItem68UUID:af1d8970-84a0-013d-7a45-1c6b00518c70
+MapItem68Name:Star2-4 - 1
+MapItem68ShortName:4
+MapItem68PositionedItemIds:["af014730-84a0-013d-7a43-1c6b00518c70"]
+
+MapItem69UUID:af3166f0-84a0-013d-7a46-1c6b00518c70
+MapItem69Name:Star2-4 - 2
+MapItem69ShortName:4
+MapItem69PositionedItemIds:["af072b00-84a0-013d-7a44-1c6b00518c70"]
+
+MapItem70UUID:afd0e0c0-84a0-013d-7a49-1c6b00518c70
+MapItem70Name:Test - start - 1
+MapItem70ShortName:S
+MapItem70PositionedItemIds:["af36f5f0-84a0-013d-7a47-1c6b00518c70"]
+
+MapItem71UUID:afe039d0-84a0-013d-7a4a-1c6b00518c70
+MapItem71Name:Test - start - 2
+MapItem71ShortName:S
+MapItem71PositionedItemIds:["af8adf00-84a0-013d-7a48-1c6b00518c70"]
+
+MapItem72UUID:b2ad1adc-9950-11e0-85be-406186cbf87c
+MapItem72Name:H Finish-old
+MapItem72ShortName:F
+MapItem72PositionedItemIds:["b6c8ace0-84a0-013d-7a59-1c6b00518c70", "b8b73e30-84a0-013d-7a5a-1c6b00518c70"]
+
+MapItem73UUID:b31eaad0-9dab-11e0-85be-406186cbf87c
+MapItem73Name:SB-Mark Spodsbjerg-SE
+MapItem73ShortName:Sp
+MapItem73PositionedItemIds:["bb21ab40-84a0-013d-7a5d-1c6b00518c70"]
+
+MapItem74UUID:b3af1998-992e-11e0-85be-406186cbf87c
+MapItem74Name:Mark K yellow (Kabeltonne)
+MapItem74ShortName:K
+MapItem74PositionedItemIds:["bb767b40-84a0-013d-7a5e-1c6b00518c70"]
+
+MapItem75UUID:b3fa0b30-84a0-013d-7a4d-1c6b00518c70
+MapItem75Name:H Mark3 - 1
+MapItem75ShortName:3
+MapItem75PositionedItemIds:["afeba6c1-84a0-013d-7a4b-1c6b00518c70"]
+
+MapItem76UUID:b3fe0e50-84a0-013d-7a4e-1c6b00518c70
+MapItem76Name:H Mark3 - 2
+MapItem76ShortName:3
+MapItem76PositionedItemIds:["b2555210-84a0-013d-7a4c-1c6b00518c70"]
+
+MapItem77UUID:b62b82b0-84a0-013d-7a52-1c6b00518c70
+MapItem77Name:H Finish - 1
+MapItem77ShortName:F
+MapItem77PositionedItemIds:["b43f9e60-84a0-013d-7a50-1c6b00518c70"]
+
+MapItem78UUID:b63f8770-84a0-013d-7a53-1c6b00518c70
+MapItem78Name:H Finish - 2
+MapItem78ShortName:F
+MapItem78PositionedItemIds:["b50c7f00-84a0-013d-7a51-1c6b00518c70"]
+
+MapItem79UUID:b67a3680-84a0-013d-7a56-1c6b00518c70
+MapItem79Name:49b4-Start - 1
+MapItem79ShortName:S
+MapItem79PositionedItemIds:["b6576fa0-84a0-013d-7a54-1c6b00518c70"]
+
+MapItem80UUID:b67f1f70-84a0-013d-7a57-1c6b00518c70
+MapItem80Name:49b4-Start - 2
+MapItem80ShortName:S
+MapItem80PositionedItemIds:["b66a3520-84a0-013d-7a55-1c6b00518c70"]
+
+MapItem81UUID:bb1d2820-84a0-013d-7a5b-1c6b00518c70
+MapItem81Name:H Finish-old - 1
+MapItem81ShortName:F
+MapItem81PositionedItemIds:["b6c8ace0-84a0-013d-7a59-1c6b00518c70"]
+
+MapItem82UUID:bb1f3cd0-84a0-013d-7a5c-1c6b00518c70
+MapItem82Name:H Finish-old - 2
+MapItem82ShortName:F
+MapItem82PositionedItemIds:["b8b73e30-84a0-013d-7a5a-1c6b00518c70"]
+
+MapItem83UUID:be3d8ec0-84a0-013d-7a61-1c6b00518c70
+MapItem83Name:K Mark4 - 1
+MapItem83ShortName:4
+MapItem83PositionedItemIds:["bb89b1c0-84a0-013d-7a5f-1c6b00518c70"]
+
+MapItem84UUID:be4eeda0-84a0-013d-7a62-1c6b00518c70
+MapItem84Name:K Mark4 - 2
+MapItem84ShortName:4
+MapItem84PositionedItemIds:["bcf777a0-84a0-013d-7a60-1c6b00518c70"]
+
+MapItem85UUID:bfe4dc42-9b64-11e0-85be-406186cbf87c
+MapItem85Name:K Mark4
+MapItem85ShortName:4
+MapItem85PositionedItemIds:["bb89b1c0-84a0-013d-7a5f-1c6b00518c70", "bcf777a0-84a0-013d-7a60-1c6b00518c70"]
+
+MapItem86UUID:c1757a70-84a0-013d-7a66-1c6b00518c70
+MapItem86Name:D Start - 1
+MapItem86ShortName:S
+MapItem86PositionedItemIds:["be678a91-84a0-013d-7a64-1c6b00518c70"]
+
+MapItem87UUID:c17aa650-84a0-013d-7a67-1c6b00518c70
+MapItem87Name:D Start - 2
+MapItem87ShortName:S
+MapItem87PositionedItemIds:["bfea7780-84a0-013d-7a65-1c6b00518c70"]
+
+MapItem88UUID:c2199936-9dac-11e0-85be-406186cbf87c
+MapItem88Name:SB-Mark Black Yellow (WP 253)
+MapItem88ShortName:BY
+MapItem88PositionedItemIds:["be5638c0-84a0-013d-7a63-1c6b00518c70"]
+
+MapItem89UUID:c583e438-9950-11e0-85be-406186cbf87c
+MapItem89Name:D Start
+MapItem89ShortName:S
+MapItem89PositionedItemIds:["be678a91-84a0-013d-7a64-1c6b00518c70", "bfea7780-84a0-013d-7a65-1c6b00518c70"]
+
+MapItem90UUID:c5b72700-84a0-013d-7a6f-1c6b00518c70
+MapItem90Name:K Finish - 1
+MapItem90ShortName:F
+MapItem90PositionedItemIds:["c3c37d00-84a0-013d-7a6d-1c6b00518c70"]
+
+MapItem91UUID:c5caeaa0-84a0-013d-7a70-1c6b00518c70
+MapItem91Name:K Finish - 2
+MapItem91ShortName:F
+MapItem91PositionedItemIds:["c4d224e0-84a0-013d-7a6e-1c6b00518c70"]
+
+MapItem92UUID:c6b36010-84a0-013d-7a76-1c6b00518c70
+MapItem92Name:DIM1-F - 1
+MapItem92ShortName:F
+MapItem92PositionedItemIds:["c63173b0-84a0-013d-7a74-1c6b00518c70"]
+
+MapItem93UUID:c6c8ce30-84a0-013d-7a77-1c6b00518c70
+MapItem93Name:DIM1-F - 2
+MapItem93ShortName:F
+MapItem93PositionedItemIds:["c653ff30-84a0-013d-7a75-1c6b00518c70"]
+
+MapItem94UUID:cab2d262-9f53-11e0-85be-406186cbf87c
+MapItem94Name:H Mark2
+MapItem94ShortName:2
+MapItem94PositionedItemIds:["c17bf9f0-84a0-013d-7a68-1c6b00518c70"]
+
+MapItem95UUID:cd57b5f8-992e-11e0-85be-406186cbf87c
+MapItem95Name:Stollergrund-N (black/yellow)
+MapItem95ShortName:SN
+MapItem95PositionedItemIds:["c1ac1340-84a0-013d-7a69-1c6b00518c70"]
+
+MapItem96UUID:d2b4c5d2-9950-11e0-85be-406186cbf87c
+MapItem96Name:D Mark1
+MapItem96ShortName:1
+MapItem96PositionedItemIds:["c1e23db0-84a0-013d-7a6a-1c6b00518c70"]
+
+MapItem97UUID:de21cff2-9ab6-11e0-85be-406186cbf87c
+MapItem97Name:49Y-R8-1a
+MapItem97ShortName:1
+MapItem97PositionedItemIds:["c33ba2e0-84a0-013d-7a6b-1c6b00518c70"]
+
+MapItem98UUID:e299f688-9dac-11e0-85be-406186cbf87c
+MapItem98Name:SB-Gate DW 59 green and DW 56 red
+MapItem98ShortName:59
+MapItem98PositionedItemIds:["c360b650-84a0-013d-7a6c-1c6b00518c70"]
+
+MapItem99UUID:e59815c6-9b64-11e0-85be-406186cbf87c
+MapItem99Name:K Finish
+MapItem99ShortName:F
+MapItem99PositionedItemIds:["c3c37d00-84a0-013d-7a6d-1c6b00518c70", "c4d224e0-84a0-013d-7a6e-1c6b00518c70"]
+
+MapItem100UUID:e663db6c-9a8c-11e0-85be-406186cbf87c
+MapItem100Name:49b4-1
+MapItem100ShortName:1
+MapItem100PositionedItemIds:["c5d20790-84a0-013d-7a71-1c6b00518c70"]
+
+MapItem101UUID:f214ea50-992e-11e0-85be-406186cbf87c
+MapItem101Name:Gate between Mittelgrund-N
+MapItem101ShortName:MN
+MapItem101PositionedItemIds:["c5e21ae1-84a0-013d-7a72-1c6b00518c70"]
+
+MapItem102UUID:f641d92e-9ab6-11e0-85be-406186cbf87c
+MapItem102Name:49Y-R8-1b
+MapItem102ShortName:1
+MapItem102PositionedItemIds:["c6288c70-84a0-013d-7a73-1c6b00518c70"]
+
+MapItem103UUID:f76bea2c-9a95-11e0-85be-406186cbf87c
+MapItem103Name:DIM1-F
+MapItem103ShortName:F
+MapItem103PositionedItemIds:["c63173b0-84a0-013d-7a74-1c6b00518c70", "c653ff30-84a0-013d-7a75-1c6b00518c70"]
 
 SegmentFile:segments.php
 Route1UUID:2a75ee72-9dde-11e0-85be-406186cbf87c
@@ -1544,4 +2147,3 @@ Route1ControlPoint4UUID:7a218886-9b64-11e0-85be-406186cbf87c
 Route1ControlPoint5UUID:bfe4dc42-9b64-11e0-85be-406186cbf87c
 Route1ControlPoint6UUID:e59815c6-9b64-11e0-85be-406186cbf87c
 
-//-------- AUTO GENERATED PARAMETERS END ------------------

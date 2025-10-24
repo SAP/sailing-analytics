@@ -31,7 +31,7 @@ import com.sap.sailing.gwt.home.shared.partials.placeholder.InfoPlaceholder;
 import com.sap.sailing.gwt.home.shared.partials.regattacompetition.RegattaCompetitionPresenter;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sse.gwt.dispatch.shared.commands.ListResult;
-import com.sap.sse.security.ui.client.premium.PaywallResolver;
+import com.sap.sse.security.ui.client.premium.PaywallResolverImpl;
 
 public class RacesViewImpl extends AbstractEventView<RacesView.Presenter> implements RacesView {
 
@@ -69,7 +69,7 @@ public class RacesViewImpl extends AbstractEventView<RacesView.Presenter> implem
     
     private class MobileRegattaCompetitionPresenter extends RegattaCompetitionPresenter {
         public MobileRegattaCompetitionPresenter() {
-            super(regattaCompetitionUi, new PaywallResolver(currentPresenter.getUserService(),
+            super(regattaCompetitionUi, new PaywallResolverImpl(currentPresenter.getUserService(),
                     currentPresenter.getSubscriptionServiceFactory()));
         }
         

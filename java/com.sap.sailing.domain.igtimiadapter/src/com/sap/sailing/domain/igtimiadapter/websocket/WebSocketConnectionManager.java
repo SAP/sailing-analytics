@@ -3,6 +3,7 @@ package com.sap.sailing.domain.igtimiadapter.websocket;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -22,12 +23,13 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import com.sap.sailing.domain.igtimiadapter.Account;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.igtimi.IgtimiStream.Msg;
 import com.sap.sailing.domain.igtimiadapter.BulkFixReceiver;
+import com.sap.sailing.domain.igtimiadapter.FixFactory;
+import com.sap.sailing.domain.igtimiadapter.IgtimiConnection;
 import com.sap.sailing.domain.igtimiadapter.LiveDataConnection;
 import com.sap.sailing.domain.igtimiadapter.datatypes.Fix;
-import com.sap.sailing.domain.igtimiadapter.impl.FixFactory;
-import com.sap.sailing.domain.igtimiadapter.impl.IgtimiConnectionFactoryImpl;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
@@ -46,14 +48,15 @@ public class WebSocketConnectionManager implements LiveDataConnection {
     private static final long DURATION_BETWEEN_HEARTBEAT_SENDS_IN_MILLIS = 15000l;
     
     private static final Logger logger = Logger.getLogger(WebSocketConnectionManager.class.getName());
-    private final IgtimiConnectionFactoryImpl connectionFactory;
+    private final IgtimiConnection connection;
     private static enum TargetState { OPEN, CLOSED };
     private TargetState targetState;
     private WebSocketClient client;
     private final JSONObject configurationMessage;
-    private final Timer timer;
+    private static final Timer timer = new Timer("Timer for WebSocketConnectionManager", /* isDaemon */ true);
+    private final TimerTask heartbeatTask;
+    private final TimerTask serverHeartbeatTask;
     private final Iterable<String> deviceIds;
-    private final Account account;
     private final FixFactory fixFactory;
     private boolean receivedServerHeartbeatInInterval;
     private final ConcurrentMap<BulkFixReceiver, BulkFixReceiver> listeners;
@@ -71,17 +74,15 @@ public class WebSocketConnectionManager implements LiveDataConnection {
     
     private static final long CONNECTION_TIMEOUT_IN_MILLIS = 5000;
     
-    public WebSocketConnectionManager(IgtimiConnectionFactoryImpl connectionFactory, Iterable<String> deviceSerialNumbers, Account account) throws Exception {
-        this.timer = new Timer("Timer for WebSocketConnectionManager for units "+deviceSerialNumbers+" and account "+account, /* isDaemon */ true);
+    public WebSocketConnectionManager(IgtimiConnection connection, Iterable<String> deviceSerialNumbers) throws Exception {
         this.deviceIds = deviceSerialNumbers;
-        this.account = account;
         this.fixFactory = new FixFactory();
-        this.connectionFactory = connectionFactory;
+        this.connection = connection;
         this.listeners = new ConcurrentHashMap<>();
-        configurationMessage = connectionFactory.getWebSocketConfigurationMessage(account, deviceSerialNumbers);
+        configurationMessage = connection.getWebSocketConfigurationMessage(deviceSerialNumbers);
         reconnect();
-        startClientHeartbeat();
-        startListeningForServerHeartbeat();
+        heartbeatTask = startClientHeartbeat();
+        serverHeartbeatTask = startListeningForServerHeartbeat();
     }
     
     private Session getSession() {
@@ -116,7 +117,8 @@ public class WebSocketConnectionManager implements LiveDataConnection {
     public void stop() throws Exception {
         logger.info("Stopping connection mananager "+this);
         targetState = TargetState.CLOSED;
-        timer.cancel();
+        heartbeatTask.cancel();
+        serverHeartbeatTask.cancel();
         final Session session = getSession();
         if (session != null) {
             session.disconnect();
@@ -185,35 +187,51 @@ public class WebSocketConnectionManager implements LiveDataConnection {
                 logger.fine("Received server heartbeat for "+this);
                 receivedServerHeartbeatInInterval = true;
             } else if (message.startsWith("[")) {
-                messageCount++;
-                if (messageCount % LOG_EVERY_SO_MANY_MESSAGES == 0) {
-                    logger.info("Received another "+LOG_EVERY_SO_MANY_MESSAGES+" Igtimi messages. Last message was: "+message);
-                }
-                List<Fix> fixes = new ArrayList<>();
+                logMessageCount(message);
+                final List<Fix> fixes = new ArrayList<>();
                 try {
-                    JSONArray jsonArray = (JSONArray) new JSONParser().parse(message);
-                    for (Object o : jsonArray) {
+                    final JSONArray jsonArray = (JSONArray) new JSONParser().parse(message);
+                    for (final Object o : jsonArray) {
                         for (final Fix fix : fixFactory.createFixes((JSONObject) o)) {
                             fixes.add(fix);
-                            if (!Util.contains(deviceIds, fix.getSensor().getDeviceSerialNumber())) {
-                                logger.warning("Received fix "+fix+" in message "+message+" which is from device "+fix.getSensor().getDeviceSerialNumber()+
-                                        " which this connection is not configured for: "+deviceIds);
-                            }
+                            warnUnknownDeviceId(message, fix);
                         }
                     }
                     logger.finest(()->"Received fixes"+fixes+" for "+this);
                     notifyListeners(fixes);
-                } catch (ParseException e) {
+                } catch (ParseException | InvalidProtocolBufferException e) {
                     logger.log(Level.SEVERE, "Error trying to parse a web socket data package coming from Igtimi "+this, e);
                 }
             } else {
                 // try to parse server time stamp in response to the configuration message
-                synchronized (this) {
+                synchronized (WebSocketConnectionManager.this) {
                     igtimiServerTimepoint = new MillisecondsTimePoint(Long.valueOf(message));
                     localTimepointWhenServerTimepointWasReceived = MillisecondsTimePoint.now();
                     logger.info("Received server timestamp "+igtimiServerTimepoint);
-                    notifyAll();
+                    WebSocketConnectionManager.this.notifyAll();
                 }
+            }
+        }
+        
+        @Override
+        public void onWebSocketBinary(byte[] payload, int offset, int len) {
+            final ByteBuffer bb = ByteBuffer.wrap(payload, offset, len);
+            try {
+                final Msg msg = Msg.parseFrom(bb);
+                logMessageCount(msg.toString());
+                final Iterable<Fix> fixes = fixFactory.createFixes(msg);
+                fixes.forEach(fix->warnUnknownDeviceId(msg, fix));
+                notifyListeners(fixes);
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Error trying to parse or send bytes received on web socket", e);
+                throw new RuntimeException(e);
+            }
+        }
+
+        private void logMessageCount(final String msg) {
+            messageCount++;
+            if (messageCount % LOG_EVERY_SO_MANY_MESSAGES == 0) {
+                logger.info("Received another "+LOG_EVERY_SO_MANY_MESSAGES+" Igtimi messages. Last message was: "+msg);
             }
         }
         
@@ -245,7 +263,7 @@ public class WebSocketConnectionManager implements LiveDataConnection {
         listeners.remove(listener);
     }
 
-    private void notifyListeners(List<Fix> fixes) {
+    private void notifyListeners(Iterable<Fix> fixes) {
         for (BulkFixReceiver listener : listeners.keySet()) {
             try {
                 listener.received(fixes);
@@ -257,11 +275,11 @@ public class WebSocketConnectionManager implements LiveDataConnection {
 
     @Override
     public String toString() {
-        return "Web Socket Connection Manager for devices "+deviceIds+" and account "+account+" with web socket session "+getSession();
+        return "Web Socket Connection Manager for devices "+deviceIds+" with web socket session "+getSession();
     }
 
-    private void startListeningForServerHeartbeat() {
-        timer.scheduleAtFixedRate(new TimerTask() {
+    private TimerTask startListeningForServerHeartbeat() {
+        final TimerTask task = new TimerTask() {
             @Override
             public void run() {
                 try {
@@ -275,23 +293,27 @@ public class WebSocketConnectionManager implements LiveDataConnection {
                     logger.log(Level.WARNING, "Error with server heartbeat in "+this, e);
                 }
             }
-        }, TIMEOUT_AFTER_NOT_RECEIVING_HEARTBEAT_IN_MILLIS, TIMEOUT_AFTER_NOT_RECEIVING_HEARTBEAT_IN_MILLIS);
+        };
+        timer.scheduleAtFixedRate(task, TIMEOUT_AFTER_NOT_RECEIVING_HEARTBEAT_IN_MILLIS, TIMEOUT_AFTER_NOT_RECEIVING_HEARTBEAT_IN_MILLIS);
+        return task;
     }
 
-    private void startClientHeartbeat() {
-        timer.scheduleAtFixedRate(new TimerTask() {
+    private TimerTask startClientHeartbeat() {
+        final TimerTask task = new TimerTask() {
             @Override
             public void run() {
                 try {
                     if (getRemote() != null) {
                         logger.fine("Sending client heartbeat for " + WebSocketConnectionManager.this);
-                        getRemote().sendString("1");
+                        getRemote().sendStringByFuture("1");
                     }
                 } catch (Exception e) {
                     logger.log(Level.WARNING, "Couldn't send heartbeat to Igtimi web socket session in "+WebSocketConnectionManager.this+". Will continue to try...", e);
                 }
             }
-        }, /* delay */ 0, DURATION_BETWEEN_HEARTBEAT_SENDS_IN_MILLIS);
+        };
+        timer.scheduleAtFixedRate(task, /* delay */ 0, DURATION_BETWEEN_HEARTBEAT_SENDS_IN_MILLIS);
+        return task;
     }
 
     private synchronized void reconnect() throws Exception {
@@ -303,7 +325,7 @@ public class WebSocketConnectionManager implements LiveDataConnection {
             client.destroy();
         }
         IOException lastException = null;
-        for (URI uri : connectionFactory.getWebsocketServers()) {
+        for (URI uri : connection.getWebsocketServers()) {
             try {
                 if (uri.getScheme().equals("ws") || uri.getScheme().equals("wss")) {
                     logger.log(Level.INFO, "Trying to connect to " + uri + " for " + this);
@@ -311,7 +333,9 @@ public class WebSocketConnectionManager implements LiveDataConnection {
                     client.start();
                     currentSocket = new WebSocket();
                     igtimiServerTimepoint = null;
-                    client.connect(currentSocket, uri, new ClientUpgradeRequest());
+                    final ClientUpgradeRequest clientUpgradeRequest = new ClientUpgradeRequest();
+                    connection.authenticate(clientUpgradeRequest);
+                    client.connect(currentSocket, uri, clientUpgradeRequest);
                     if (waitForConnection(CONNECTION_TIMEOUT_IN_MILLIS)) {
                         logger.log(Level.INFO, "Successfully connected to " + uri + " for " + this);
                         lastException = null;
@@ -336,5 +360,12 @@ public class WebSocketConnectionManager implements LiveDataConnection {
     @Override
     public InetSocketAddress getRemoteAddress() {
         return getSession() == null ? null : getSession().getRemoteAddress();
+    }
+
+    private void warnUnknownDeviceId(Object message, final Fix fix) {
+        if (!Util.contains(deviceIds, fix.getSensor().getDeviceSerialNumber())) {
+            logger.warning("Received fix "+fix+" in message "+message+" which is from device "+fix.getSensor().getDeviceSerialNumber()+
+                    " which this connection is not configured for: "+deviceIds);
+        }
     }
 }

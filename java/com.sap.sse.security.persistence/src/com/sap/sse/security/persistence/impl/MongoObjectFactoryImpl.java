@@ -2,6 +2,8 @@ package com.sap.sse.security.persistence.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -18,12 +20,16 @@ import com.sap.sse.security.persistence.MongoObjectFactory;
 public class MongoObjectFactoryImpl implements MongoObjectFactory {
     private static final Logger logger = Logger.getLogger(MongoObjectFactoryImpl.class.getName());
     private final MongoCollection<Document> sessionCollection;
+    private final MongoCollection<Document> corsFilterConfigurationsCollection;
     
     public MongoObjectFactoryImpl(MongoDatabase mongoDatabase) {
         sessionCollection = mongoDatabase.getCollection(CollectionNames.SESSIONS.name());
         sessionCollection.createIndex(new Document().
                 append(FieldNames.CACHE_NAME.name(), 1).
                 append(FieldNames.SESSION_ID.name(), 1), new IndexOptions().name("cachenameandsessionid").background(false));
+        corsFilterConfigurationsCollection = mongoDatabase.getCollection(CollectionNames.CORS_FILTER_CONFIGURATIONS.name());
+        corsFilterConfigurationsCollection.createIndex(new Document().
+                append(FieldNames.CORS_FILTER_CONFIGURATION_SERVER_NAME.name(), 1), new IndexOptions().name("servername").background(false));
     }
 
     private Document getKey(String cacheName, Session session) {
@@ -92,5 +98,25 @@ public class MongoObjectFactoryImpl implements MongoObjectFactory {
     @Override
     public void removeSession(String cacheName, Session session) {
         sessionCollection.deleteOne(getKey(cacheName, session));
+    }
+
+    @Override
+    public void storeCORSFilterConfigurationIsWildcard(String serverName) {
+        final Document filter = new Document().append(FieldNames.CORS_FILTER_CONFIGURATION_SERVER_NAME.name(), serverName);
+        final Document d = new Document()
+                .append(FieldNames.CORS_FILTER_CONFIGURATION_SERVER_NAME.name(), serverName)
+                .append(FieldNames.CORS_FILTER_CONFIGURATION_IS_WILDCARD.name(), true)
+                .append(FieldNames.CORS_FILTER_CONFIGURATION_ALLOWED_ORIGINS.name(), Collections.emptyList());
+        corsFilterConfigurationsCollection.replaceOne(filter, d, new ReplaceOptions().upsert(true));
+    }
+
+    @Override
+    public void storeCORSFilterConfigurationAllowedOrigins(String serverName, String... allowedOrigins) {
+        final Document filter = new Document().append(FieldNames.CORS_FILTER_CONFIGURATION_SERVER_NAME.name(), serverName);
+        final Document d = new Document()
+                .append(FieldNames.CORS_FILTER_CONFIGURATION_SERVER_NAME.name(), serverName)
+                .append(FieldNames.CORS_FILTER_CONFIGURATION_IS_WILDCARD.name(), false)
+                .append(FieldNames.CORS_FILTER_CONFIGURATION_ALLOWED_ORIGINS.name(), allowedOrigins == null ? Collections.emptyList() : Arrays.asList(allowedOrigins));
+        corsFilterConfigurationsCollection.replaceOne(filter, d, new ReplaceOptions().upsert(true));
     }
 }

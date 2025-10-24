@@ -15,7 +15,7 @@ import com.sap.sailing.datamining.impl.components.GPSFixRetrievalProcessor;
 import com.sap.sailing.datamining.impl.components.LeaderboardGroupRetrievalProcessor;
 import com.sap.sailing.datamining.impl.components.LeaderboardRetrievalProcessor;
 import com.sap.sailing.datamining.impl.components.RaceOfCompetitorRetrievalProcessor;
-import com.sap.sailing.datamining.impl.components.TrackedLegOfCompetitorRetrievalProcessor;
+import com.sap.sailing.datamining.impl.components.TerminalTrackedLegOfCompetitorRetrievalProcessor;
 import com.sap.sailing.datamining.impl.components.TrackedLegRetrievalProcessor;
 import com.sap.sailing.datamining.impl.components.TrackedRaceRetrievalProcessor;
 import com.sap.sailing.domain.common.LegType;
@@ -66,7 +66,7 @@ public class SailingPredefinedQueries {
         retrieverLevels.add(new DataRetrieverLevelDTO(1, LeaderboardRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasLeaderboardContext.class.getName(), ""), null));
         retrieverLevels.add(new DataRetrieverLevelDTO(2, TrackedRaceRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasTrackedRaceContext.class.getName(), ""), null));
         retrieverLevels.add(new DataRetrieverLevelDTO(3, TrackedLegRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasTrackedLegContext.class.getName(), ""), null));
-        retrieverLevels.add(new DataRetrieverLevelDTO(4, TrackedLegOfCompetitorRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasTrackedLegOfCompetitorContext.class.getName(), ""), null));
+        retrieverLevels.add(new DataRetrieverLevelDTO(4, TerminalTrackedLegOfCompetitorRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasTrackedLegOfCompetitorContext.class.getName(), ""), null));
         retrieverLevels.add(new DataRetrieverLevelDTO(5, GPSFixRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasGPSFixContext.class.getName(), ""), null));
         DataRetrieverChainDefinitionDTO retrieverChain = new DataRetrieverChainDefinitionDTO("", RacingEventService.class.getName(), retrieverLevels);
 
@@ -90,7 +90,7 @@ public class SailingPredefinedQueries {
         retrieverLevels.add(new DataRetrieverLevelDTO(1, LeaderboardRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasLeaderboardContext.class.getName(), ""), null));
         retrieverLevels.add(new DataRetrieverLevelDTO(2, TrackedRaceRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasTrackedRaceContext.class.getName(), ""), null));
         retrieverLevels.add(new DataRetrieverLevelDTO(3, TrackedLegRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasTrackedLegContext.class.getName(), ""), null));
-        retrieverLevels.add(new DataRetrieverLevelDTO(4, TrackedLegOfCompetitorRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasTrackedLegOfCompetitorContext.class.getName(), ""), null));
+        retrieverLevels.add(new DataRetrieverLevelDTO(4, TerminalTrackedLegOfCompetitorRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasTrackedLegOfCompetitorContext.class.getName(), ""), null));
         retrieverLevels.add(new DataRetrieverLevelDTO(5, GPSFixRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasGPSFixContext.class.getName(), ""), null));
         DataRetrieverChainDefinitionDTO retrieverChain = new DataRetrieverChainDefinitionDTO("", RacingEventService.class.getName(), retrieverLevels);
 
@@ -114,7 +114,7 @@ public class SailingPredefinedQueries {
         retrieverLevels.add(new DataRetrieverLevelDTO(1, LeaderboardRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasLeaderboardContext.class.getName(), ""), null));
         retrieverLevels.add(new DataRetrieverLevelDTO(2, TrackedRaceRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasTrackedRaceContext.class.getName(), ""), null));
         retrieverLevels.add(new DataRetrieverLevelDTO(3, TrackedLegRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasTrackedLegContext.class.getName(), ""), null));
-        retrieverLevels.add(new DataRetrieverLevelDTO(4, TrackedLegOfCompetitorRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasTrackedLegOfCompetitorContext.class.getName(), ""), null));
+        retrieverLevels.add(new DataRetrieverLevelDTO(4, TerminalTrackedLegOfCompetitorRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasTrackedLegOfCompetitorContext.class.getName(), ""), null));
         DataRetrieverChainDefinitionDTO retrieverChain = new DataRetrieverChainDefinitionDTO("", RacingEventService.class.getName(), retrieverLevels);
 
         ModifiableStatisticQueryDefinitionDTO queryDefinition = new ModifiableStatisticQueryDefinitionDTO("default", statistic, aggregator, retrieverChain);
@@ -137,7 +137,7 @@ public class SailingPredefinedQueries {
         retrieverLevels.add(new DataRetrieverLevelDTO(1, LeaderboardRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasLeaderboardContext.class.getName(), ""), null));
         retrieverLevels.add(new DataRetrieverLevelDTO(2, TrackedRaceRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasTrackedRaceContext.class.getName(), ""), null));
         retrieverLevels.add(new DataRetrieverLevelDTO(3, TrackedLegRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasTrackedLegContext.class.getName(), ""), null));
-        retrieverLevels.add(new DataRetrieverLevelDTO(4, TrackedLegOfCompetitorRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasTrackedLegOfCompetitorContext.class.getName(), ""), null));
+        retrieverLevels.add(new DataRetrieverLevelDTO(4, TerminalTrackedLegOfCompetitorRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasTrackedLegOfCompetitorContext.class.getName(), ""), null));
         retrieverLevels.add(new DataRetrieverLevelDTO(5, GPSFixRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasGPSFixContext.class.getName(), ""), null));
         DataRetrieverChainDefinitionDTO retrieverChain = new DataRetrieverChainDefinitionDTO("", RacingEventService.class.getName(), retrieverLevels);
 
@@ -158,7 +158,7 @@ public class SailingPredefinedQueries {
         retrieverLevels.add(new DataRetrieverLevelDTO(1, LeaderboardRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasLeaderboardContext.class.getName(), ""), null));
         retrieverLevels.add(new DataRetrieverLevelDTO(2, TrackedRaceRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasTrackedRaceContext.class.getName(), ""), null));
         retrieverLevels.add(new DataRetrieverLevelDTO(3, TrackedLegRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasTrackedLegContext.class.getName(), ""), null));
-        retrieverLevels.add(new DataRetrieverLevelDTO(4, TrackedLegOfCompetitorRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasTrackedLegOfCompetitorContext.class.getName(), ""), null));
+        retrieverLevels.add(new DataRetrieverLevelDTO(4, TerminalTrackedLegOfCompetitorRetrievalProcessor.class.getName(), new LocalizedTypeDTO(HasTrackedLegOfCompetitorContext.class.getName(), ""), null));
         DataRetrieverChainDefinitionDTO retrieverChain = new DataRetrieverChainDefinitionDTO("", RacingEventService.class.getName(), retrieverLevels);
 
         ModifiableStatisticQueryDefinitionDTO queryDefinition = new ModifiableStatisticQueryDefinitionDTO("default", statistic, aggregator, retrieverChain);

@@ -19,6 +19,7 @@ import com.sap.sailing.gwt.home.shared.places.fakeseries.SeriesContext;
 import com.sap.sailing.gwt.home.shared.places.fakeseries.SeriesDefaultPlace;
 import com.sap.sailing.gwt.ui.client.FlagImageResolver;
 import com.sap.sailing.gwt.ui.client.StringMessages;
+import com.sap.sse.security.ui.client.UserService;
 
 public class SeriesMiniOverallLeaderboardActivity extends AbstractActivity implements SeriesMiniOverallLeaderboardView.Presenter {
     private final MobileApplicationClientFactory clientFactory;
@@ -96,5 +97,10 @@ public class SeriesMiniOverallLeaderboardActivity extends AbstractActivity imple
     @Override
     public EventSeriesViewDTO getSeriesDTO() {
         return series;
+    }
+
+    @Override
+    public UserService getUserService() {
+        return clientFactory.getUserService();
     }
 }

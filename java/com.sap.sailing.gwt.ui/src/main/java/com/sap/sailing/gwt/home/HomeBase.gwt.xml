@@ -10,7 +10,7 @@
 	<inherits name="com.sap.sse.gwt.SSESharedGWT" />
 	<inherits name="com.sap.sse.SSECommon" />
 	<inherits name="com.sap.sailing.domain.SailingDomain" />
-        <inherits name="com.sap.sailing.landscape.LandscapeCommon" />
+    <inherits name="com.sap.sailing.landscape.LandscapeCommon" />
 	<inherits name="com.sap.sse.gwt.AdminConsole" />
 	<inherits name="com.sap.sse.security.ui.LoginPanel" />
 	<inherits name="com.sap.sse.security.ui.Authentication" />
@@ -23,7 +23,7 @@
 	<inherits name='com.google.gwt.ajaxloader.AjaxLoader' />
   	<inherits name='com.google.gwt.maps.Maps' />
   	
-        <!-- module containing locale configuration -->
+    <!-- module containing locale configuration -->
 	<inherits name='com.sap.sailing.gwt.common.SailingLocalesSinglePermutation' />
 	
 	<source path='client' />
@@ -39,10 +39,10 @@
 	<inherits name='com.sap.sailing.gwt.ui.SourceActions'/>
 	<inherits name='com.sap.sailing.gwt.ui.SourceSimulator'/>
 	<inherits name="com.sap.sailing.gwt.ui.SourceAdminConsole"/>
-        <!-- TODO: probably only used for flag images. Move RegattaRaceStatesFlagsResources to shared -->
+    <!-- TODO: probably only used for flag images. Move RegattaRaceStatesFlagsResources to shared -->
 	<inherits name="com.sap.sailing.gwt.regattaoverview.SourceRegattaOverview"/>
 	<inherits name="com.sap.sailing.gwt.ui.SourceLeaderboard"/>
-        <inherits name="com.sap.sailing.gwt.ui.SourceRaceboard"/>
+    <inherits name="com.sap.sailing.gwt.ui.SourceRaceboard"/>
   	<inherits name='com.sap.sse.gwt.CommonControlCSS'/>
 	<inherits name='com.sap.sailing.gwt.settings.Settings'/>
 	

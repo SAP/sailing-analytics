@@ -1,16 +1,14 @@
 package com.sap.sailing.dashboards.gwt.shared.dto;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
 import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
 import com.sap.sailing.domain.common.dto.CompetitorDTO;
 import com.sap.sailing.domain.common.racelog.RacingProcedureType;
 
-public class StartAnalysisDTO implements Serializable, Comparable<StartAnalysisDTO> {
-
-    private static final long serialVersionUID = -1325150193180234561L;
+public class StartAnalysisDTO implements IsSerializable, Comparable<StartAnalysisDTO> {
 
     public String raceName;
     public CompetitorDTO competitor;

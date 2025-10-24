@@ -254,42 +254,56 @@
          id="org.mortbay.jasper.apache-el"
          download-size="0"
          install-size="0"
-         version="8.5.70"
+         version="8.5.100"
          unpack="false"/>
 
    <plugin
          id="org.mortbay.jasper.apache-jsp"
          download-size="0"
          install-size="0"
-         version="8.5.70"
+         version="8.5.100"
+         unpack="false"/>
+
+   <plugin
+         id="org.mortbay.jasper.apache-el.source"
+         download-size="0"
+         install-size="0"
+         version="8.5.100"
+         unpack="false"/>
+
+   <plugin
+         id="org.mortbay.jasper.apache-jsp.source"
+         download-size="0"
+         install-size="0"
+         version="8.5.100"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.apache-jsp"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.apache-jsp.source"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.osgi.boot.jsp"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.osgi.boot.jsp.source"
          download-size="0"
          install-size="0"
-         version="9.4.54.v20240208"
+         version="9.4.57.v20241219"
          unpack="false"/>
 
    <plugin
@@ -480,6 +494,36 @@
          download-size="0"
          install-size="0"
          version="1.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.protobuf"
+         feature="true"
+         download-size="0"
+         install-size="0"
+         version="4.28.3"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.protobuf.source"
+         feature="true"
+         download-size="0"
+         install-size="0"
+         version="4.28.3"
+         unpack="false"/>
+
+   <plugin
+         id="com.nulab-inc.zxcvbn"
+         download-size="0"
+         install-size="0"
+         version="1.9.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.nulab-inc.zxcvbn.source"
+         download-size="0"
+         install-size="0"
+         version="1.9.0"
          unpack="false"/>
 
 </feature>

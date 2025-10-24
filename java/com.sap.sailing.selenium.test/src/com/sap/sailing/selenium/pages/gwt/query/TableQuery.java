@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.sap.sailing.selenium.pages.gwt.CellTablePO;
 import com.sap.sailing.selenium.pages.gwt.DataEntryPO;
-
 import com.sap.sailing.selenium.pages.gwt.query.operation.bool.And;
 
 public class TableQuery<S extends DataEntryPO> {

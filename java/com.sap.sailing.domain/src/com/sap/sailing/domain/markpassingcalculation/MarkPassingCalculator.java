@@ -30,9 +30,9 @@ import com.sap.sailing.domain.markpassingcalculation.impl.CandidateFinderImpl;
 import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprint;
 import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprintFactory;
 import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprintRegistry;
+import com.sap.sailing.domain.shared.tracking.impl.TimedComparator;
 import com.sap.sailing.domain.tracking.DynamicTrackedRace;
 import com.sap.sailing.domain.tracking.MarkPassing;
-import com.sap.sailing.domain.tracking.impl.TimedComparator;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
@@ -679,6 +679,6 @@ public class MarkPassingCalculator {
 
     @Override
     public String toString() {
-        return getClass().getName() + " for " + race + " with chooser " + chooser;
+        return getClass().getName() + " for " + race + " / " + race.getTrackedRegatta().getRegatta() + " with chooser " + chooser;
     }
 }

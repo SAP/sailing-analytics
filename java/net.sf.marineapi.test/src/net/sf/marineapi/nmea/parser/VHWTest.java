@@ -20,13 +20,14 @@
  */
 package net.sf.marineapi.nmea.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import net.sf.marineapi.nmea.sentence.SentenceId;
 import net.sf.marineapi.nmea.sentence.TalkerId;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kimmo Tuukkanen
@@ -40,7 +41,7 @@ public class VHWTest {
 	/**
 	 * @throws java.lang.Exception
 	 */
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		vhw = new VHWParser(EXAMPLE);
 	}

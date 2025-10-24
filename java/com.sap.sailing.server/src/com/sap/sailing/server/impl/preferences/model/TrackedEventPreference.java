@@ -22,6 +22,7 @@ public class TrackedEventPreference extends AbstractGenericSerializableSettings 
     private transient SettingsList<TrackedElementWithDeviceId> trackedElements;
 
     public TrackedEventPreference() {
+        super();
     }
 
     /** copy constructor */

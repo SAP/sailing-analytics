@@ -1,13 +1,15 @@
 package com.sap.sailing.server.gateway.trackfiles.impl;
 
-import static com.sap.sailing.server.trackfiles.impl.ExpeditionImportFileHandler.supportedExpeditionArchiveFileExtensions;
-import static com.sap.sailing.server.trackfiles.impl.ExpeditionImportFileHandler.supportedExpeditionLogFileExtensions;
+import java.util.Arrays;
+
+import com.sap.sailing.server.trackfiles.impl.ExpeditionImportFileHandler;
 
 class ExpeditionImportFilenameUtils {
+    private static final Iterable<String> supportedExpeditionArchiveFileExtensions = Arrays.asList("gz", "zip");
 
-    static String truncateFilenameExtentions(String filenameWithExtensions) {
+    static String truncateFilenameExtentions(String filenameWithExtensions, ExpeditionImportFileHandler fileHandler) {
         return removeTailIfExists(removeTailIfExists(filenameWithExtensions, supportedExpeditionArchiveFileExtensions),
-                supportedExpeditionLogFileExtensions);
+                fileHandler.getSupportedFileExtensions());
     }
 
     private static String removeTailIfExists(String source, Iterable<String> extensionsToRemove) {

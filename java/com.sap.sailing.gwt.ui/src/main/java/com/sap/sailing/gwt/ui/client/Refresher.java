@@ -5,12 +5,10 @@ import java.util.function.Predicate;
 import com.sap.sse.gwt.client.celltable.EntityIdentityComparator;
 
 /**
- * A {@link Refresher} offers methods to register a displayer of a specific DTO type, force reloads and give the
+ * A {@link Refresher} offers methods to register a {@link Displayer} of a specific DTO type, force reloads and give the
  * possibility to update the centrally managed data. The displayer will be informed asynchronously after data changes
  * have applied.
  * 
- * @param <D>
- *            the {@link Displayer}
  * @param <T>
  *            the base DTO of {@link Displayer} and {@link Refresher}.
  */

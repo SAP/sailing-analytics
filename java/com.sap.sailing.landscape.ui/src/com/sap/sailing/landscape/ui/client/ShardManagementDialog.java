@@ -11,9 +11,10 @@ public class ShardManagementDialog extends DataEntryDialog<Boolean> {
 
     ShardManagementDialog(LandscapeManagementWriteServiceAsync landscapeManagementWriteServiceAsync,
             SailingApplicationReplicaSetDTO<String> applicastionReplicaSet, String region, ErrorReporter errorReporter,
-            StringMessages stringMessages, DialogCallback<Boolean> callback) {
+            StringMessages stringMessages, String optionalKeyName, byte[] privateKeyEncryptionPassphrase, DialogCallback<Boolean> callback) {
         super(stringMessages.shard(), stringMessages.shardingDescription(), stringMessages.close(), /* no cancel button */ null, /* validator */ null, callback);
-        shardPanel = new ShardManagementPanel(landscapeManagementWriteServiceAsync, errorReporter, stringMessages);
+        shardPanel = new ShardManagementPanel(landscapeManagementWriteServiceAsync, errorReporter, stringMessages,
+                optionalKeyName, privateKeyEncryptionPassphrase);
         shardPanel.setRegion(region);
         shardPanel.setReplicaSet(applicastionReplicaSet);
         shardPanel.refresh();

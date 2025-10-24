@@ -7,7 +7,8 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: SAP
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Web-ContextPath: /
-Import-Package: javax.servlet;version="3.1.0",
+Import-Package: com.sap.sse.rest,
+ javax.servlet;version="3.1.0",
  javax.servlet.http;version="3.1.0"
 Bundle-ClassPath: .
 Export-Package: com.sap.sailing.www

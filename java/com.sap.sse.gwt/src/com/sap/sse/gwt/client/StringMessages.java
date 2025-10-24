@@ -114,4 +114,16 @@ public interface StringMessages extends Messages {
     String temporarilyUnavailable();
     String sapAnalytics();
     String sapAnalyticsURL();
+    String takedownNoticeDialogTitle();
+    String takedownNoticeDialogMessage(String contentUrl);
+    String natureOfTakedownClaim();
+    String comment();
+    String supportingURLs();
+    String mustBeLoggedInAndWithValidatedEmail();
+    String natureOfClaim_None();
+    String natureOfClaim_CopyrightInfringement();
+    String natureOfClaim_DefamatoryContent();
+    String natureOfClaim_Inappropriate();
+    String natureOfClaim_Violence();
+    String natureOfClaim_Other();
 }

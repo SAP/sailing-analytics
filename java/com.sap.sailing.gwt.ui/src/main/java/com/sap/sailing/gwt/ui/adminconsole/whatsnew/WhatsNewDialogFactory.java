@@ -47,7 +47,7 @@ public final class WhatsNewDialogFactory extends AbstractWhatsNewDialogFactory<W
 
     @Override
     protected WhatsNewSettings getInstanceForDeserialization() {
-        return new WhatsNewSettings();
+        return new WhatsNewSettings(null);
     }
 
     @Override

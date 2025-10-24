@@ -78,7 +78,11 @@ Require-Bundle: com.sap.sailing.domain,
  com.sap.sailing.domain.yellowbrickadapter
 Bundle-Activator: com.sap.sailing.gwt.ui.server.Activator
 Bundle-ActivationPolicy: lazy
-Import-Package: javax.servlet;version="3.1.0",
+Import-Package: com.google.protobuf;version="4.28.3",
+ com.sap.sailing.aiagent.interfaces,
+ com.sap.sailing.domain.igtimiadapter.server.riot,
+ com.sap.sse.aicore,
+ javax.servlet;version="3.1.0",
  javax.servlet.descriptor;version="3.1.0",
  javax.servlet.http;version="3.1.0",
  javax.ws.rs;version="1.1.1",

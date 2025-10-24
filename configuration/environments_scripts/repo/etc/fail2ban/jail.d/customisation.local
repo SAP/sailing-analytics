@@ -1,0 +1,8 @@
+    [ssh-iptables]
+
+    enabled  = true
+    filter   = sshd[mode=aggressive]
+    action   = iptables[name=SSH, port=ssh, protocol=tcp]
+            sendmail-whois[name=SSH, dest=axel.uhl@sap.com, sender=fail2ban@sapsailing.com]
+    logpath  = /var/log/fail2ban.log
+    maxretry = 5

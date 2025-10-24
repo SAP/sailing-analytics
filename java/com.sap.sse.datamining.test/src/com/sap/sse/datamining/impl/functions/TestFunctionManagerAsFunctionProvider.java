@@ -2,6 +2,7 @@ package com.sap.sse.datamining.impl.functions;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.lang.reflect.Method;
@@ -14,8 +15,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.Util;
 import com.sap.sse.datamining.ModifiableDataMiningServer;
@@ -51,7 +52,7 @@ public class TestFunctionManagerAsFunctionProvider {
     private ExpectedFunctionRegistryUtil functionRegistryUtil;
     private ModifiableDataMiningServer server;
     
-    @Before
+    @BeforeEach
     public void initializeDataMiningServer() throws NoSuchMethodException, SecurityException {
         functionRegistryUtil = new ExpectedFunctionRegistryUtil();
         server = TestsUtil.createNewServer();
@@ -271,10 +272,12 @@ public class TestFunctionManagerAsFunctionProvider {
         assertThat(server.getFunctionForDTO(null), is(nullValue()));
     }
     
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testGetFunctionForDTOWithNonExistingClass() {
-        FunctionDTO functionDTO = new FunctionDTO(false, "Not relevant", "Impossible Class", "Impossible Class", new ArrayList<String>(), "Not relevant", 0);
-        server.getFunctionForDTO(functionDTO);
+        assertThrows(IllegalArgumentException.class, () -> {
+            FunctionDTO functionDTO = new FunctionDTO(false, "Not relevant", "Impossible Class", "Impossible Class", new ArrayList<String>(), "Not relevant", 0);
+            server.getFunctionForDTO(functionDTO);
+        });
     }
 
 }

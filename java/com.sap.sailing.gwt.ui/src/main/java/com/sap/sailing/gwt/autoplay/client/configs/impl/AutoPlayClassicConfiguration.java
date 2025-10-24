@@ -24,6 +24,7 @@ import com.sap.sse.gwt.client.shared.components.SettingsDialogForLinkSharing;
 import com.sap.sse.gwt.client.shared.perspective.PerspectiveCompositeSettings;
 import com.sap.sse.security.ui.client.UserService;
 import com.sap.sse.security.ui.client.premium.PaywallResolver;
+import com.sap.sse.security.ui.client.premium.PaywallResolverImpl;
 import com.sap.sse.security.ui.client.subscription.SubscriptionServiceFactory;
 
 public class AutoPlayClassicConfiguration extends AutoPlayConfiguration {
@@ -43,7 +44,7 @@ public class AutoPlayClassicConfiguration extends AutoPlayConfiguration {
                     public void onSuccess(Iterable<DetailType> result) {
                         StrippedLeaderboardDTO leaderBoardDTO = AutoplayHelper.getSelectedLeaderboard(initialEventData,
                                 context.getLeaderboardName());
-                        PaywallResolver paywallResolver = new PaywallResolver(cf.getUserService(), cf.getSubscriptionServiceFactory());
+                        PaywallResolver paywallResolver = new PaywallResolverImpl(cf.getUserService(), cf.getSubscriptionServiceFactory());
                         AutoplayPerspectiveLifecycle autoplayLifecycle = new AutoplayPerspectiveLifecycle(
                                 leaderBoardDTO, cf.getUserService(), paywallResolver, result);
                         cf.setAutoPlayContext(new AutoPlayContextImpl(autoplayLifecycle,
@@ -85,7 +86,7 @@ public class AutoPlayClassicConfiguration extends AutoPlayConfiguration {
     }
 
     @Override
-    public void loadSettingsDefault(EventDTO selectedEvent, AutoPlayContextDefinition apcd,
+    public void loadSettingsDefault(AutoPlayContextDefinition apcd,
             StrippedLeaderboardDTO leaderboard, UserService userService, SubscriptionServiceFactory subscriptionServiceFactory, OnSettingsCallback settingsCallback) {
         AutoplayPerspectiveLifecycle autoplayLifecycle = new AutoplayPerspectiveLifecycle(leaderboard, userService, subscriptionServiceFactory,
                 Arrays.asList(DetailType.values()));

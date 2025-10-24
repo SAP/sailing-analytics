@@ -1,3 +1,0 @@
-* * * * *	export PATH=/bin:/usr/bin:/usr/local/bin; sleep $(( $RANDOM * 60 / 32768 )); update_authorized_keys_for_landscape_managers_if_changed $( cat /root/ssh-key-reader.token ) https://security-service.sapsailing.com /home/ec2-user 2>&1 >>/var/log/sailing.err
-# NOTICE: Please try to reference the customised crontabs at $GIT_HOME/configuration/crontabs or use
-# the build-crontab-and-cp-files script. This file has been maintained for continuity, but is deprecated.

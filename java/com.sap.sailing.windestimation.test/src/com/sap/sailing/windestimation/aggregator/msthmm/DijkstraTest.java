@@ -1,8 +1,8 @@
 package com.sap.sailing.windestimation.aggregator.msthmm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.windestimation.aggregator.graph.DijkstraShortestPathFinderImpl;
 import com.sap.sailing.windestimation.aggregator.graph.DijsktraShortestPathFinder;
@@ -87,7 +87,7 @@ public class DijkstraTest {
         }
     }
     
-    @Before
+    @BeforeEach
     public void setUp() {
         startNode = new Node("Start", 1.0);
         endNode = new Node("End", 1.0);

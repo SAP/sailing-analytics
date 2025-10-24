@@ -3,7 +3,7 @@ package com.sap.sailing.domain.common.orc;
 import java.io.Serializable;
 
 /**
- * Tells for a race using ORC Performance Curve Scoring for its ranking metric, where that race is supposed to obtain
+ * Tells for a race using ORC Polar Curve Scoring for its ranking metric, where that race is supposed to obtain
  * its implied wind from. The default is that the race reports the maximum implied wind across all competitors as the
  * implied wind to use for ranking, expressed by the {@link OwnMaxImpliedWind} source. This can be overridden by race
  * log events that either specify a constant wind speed to use as that race's implied wind

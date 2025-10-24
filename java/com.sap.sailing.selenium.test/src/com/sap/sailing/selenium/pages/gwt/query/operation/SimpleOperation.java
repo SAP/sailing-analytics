@@ -3,10 +3,8 @@ package com.sap.sailing.selenium.pages.gwt.query.operation;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
-
 import com.sap.sailing.selenium.pages.gwt.query.Expression;
 import com.sap.sailing.selenium.pages.gwt.query.Operation;
-
 import com.sap.sailing.selenium.pages.gwt.query.expr.ImmutableExpression;
 
 public abstract class SimpleOperation<T> extends ImmutableExpression<T> implements Operation<T> {

@@ -23,11 +23,6 @@ public class DelegateCoordinateSystem implements CoordinateSystem {
     }
 
     @Override
-    public Position map(Position position) {
-        return coordinateSystem.map(position);
-    }
-
-    @Override
     public Bearing map(Bearing bearing) {
         return coordinateSystem.map(bearing);
     }

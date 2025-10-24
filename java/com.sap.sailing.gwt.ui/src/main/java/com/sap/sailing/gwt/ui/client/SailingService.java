@@ -52,7 +52,6 @@ import com.sap.sailing.domain.common.tracking.impl.PreciseCompactGPSFixMovingImp
 import com.sap.sailing.domain.common.windfinder.SpotDTO;
 import com.sap.sailing.domain.leaderboard.RegattaLeaderboard;
 import com.sap.sailing.expeditionconnector.ExpeditionDeviceConfiguration;
-import com.sap.sailing.gwt.ui.shared.AccountWithSecurityDTO;
 import com.sap.sailing.gwt.ui.shared.BearingWithConfidenceDTO;
 import com.sap.sailing.gwt.ui.shared.CompactBoatPositionsDTO;
 import com.sap.sailing.gwt.ui.shared.CompactRaceMapDataDTO;
@@ -63,6 +62,8 @@ import com.sap.sailing.gwt.ui.shared.DeviceConfigurationWithSecurityDTO;
 import com.sap.sailing.gwt.ui.shared.EventDTO;
 import com.sap.sailing.gwt.ui.shared.GPSFixDTO;
 import com.sap.sailing.gwt.ui.shared.GPSFixDTOWithSpeedWindTackAndLegType;
+import com.sap.sailing.gwt.ui.shared.IgtimiDataAccessWindowWithSecurityDTO;
+import com.sap.sailing.gwt.ui.shared.IgtimiDeviceWithSecurityDTO;
 import com.sap.sailing.gwt.ui.shared.LeaderboardGroupDTO;
 import com.sap.sailing.gwt.ui.shared.ManeuverDTO;
 import com.sap.sailing.gwt.ui.shared.MarkDTO;
@@ -311,9 +312,6 @@ public interface SailingService extends RemoteService, RemoteReplicationService 
     Util.Triple<Date, Date, Integer> getFinishingAndFinishTime(String leaderboardName, String raceColumnName,
             String fleetName) throws UnauthorizedException, NotFoundException;
 
-    String getIgtimiAuthorizationUrl(String redirectProtocol, String redirectHostname, String redirectPort)
-            throws UnauthorizedException, Exception;
-
     /**
      * Returns all private {@link TagDTO tags} of specified race and current user.
      * 
@@ -424,7 +422,7 @@ public interface SailingService extends RemoteService, RemoteReplicationService 
     SerializationDummy serializationDummy(PersonDTO dummy, CountryCode ccDummy,
             PreciseCompactPosition preciseCompactPosition, TypeRelativeObjectIdentifier typeRelativeObjectIdentifier,
             SecondsDurationImpl secondsDuration, KnotSpeedImpl knotSpeedImpl, KilometersPerHourSpeedImpl kmhSpeedImpl,
-            HasPermissions hasPermissions) throws UnauthorizedException;
+            HasPermissions hasPermissions, IgtimiDeviceWithSecurityDTO igtimiDeviceWithSecurityDTO) throws UnauthorizedException;
 
     Collection<CompetitorDTO> getEliminatedCompetitors(String leaderboardName) throws UnauthorizedException;
 
@@ -492,7 +490,11 @@ public interface SailingService extends RemoteService, RemoteReplicationService 
      */
     String createRaceBoardLinkQrCode(String url);
 
-    Iterable<AccountWithSecurityDTO> getAllIgtimiAccountsWithSecurity() throws UnauthorizedException;
+    ArrayList<IgtimiDeviceWithSecurityDTO> getAllIgtimiDevicesWithSecurity() throws Exception;
+    
+    ArrayList<IgtimiDataAccessWindowWithSecurityDTO> getAllIgtimiDataAccessWindowsWithSecurity() throws Exception;
+
+    Pair<String, Boolean> getIgtimiConnectionFactoryBaseUrl();
 
     /**
      * Allows reading public Boats, or Boats that are registered in races belonging in the given regatta

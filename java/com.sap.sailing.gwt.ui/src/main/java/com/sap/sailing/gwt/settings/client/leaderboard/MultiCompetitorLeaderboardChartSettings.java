@@ -11,9 +11,11 @@ public class MultiCompetitorLeaderboardChartSettings extends AbstractGenericSeri
     private EnumSetting<DetailType> detailType;
 
     private MultiCompetitorLeaderboardChartSettings() {
+        super();
     }
     
     public MultiCompetitorLeaderboardChartSettings(DetailType detailType) {
+        this();
         this.detailType.setValue(detailType);
     }
     

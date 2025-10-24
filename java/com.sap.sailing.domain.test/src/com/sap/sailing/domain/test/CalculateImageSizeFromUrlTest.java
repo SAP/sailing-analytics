@@ -1,6 +1,6 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.net.URL;
@@ -11,7 +11,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.impl.ImageSizeImpl;
 import com.sap.sse.common.media.ImageSize;

@@ -1,7 +1,7 @@
 package com.sap.sailing.server.replication.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -35,7 +35,7 @@ public class RemoteMessageStreamTest {
     private RabbitOutputStream outputStream;
     private RabbitInputStreamProvider inputStream;
     
-    @Before
+    @BeforeEach
     public void setUp() throws IOException, TimeoutException {
         ConnectionFactory factory = RabbitMQConnectionFactoryHelper.getConnectionFactory();
         Connection connection = factory.newConnection();

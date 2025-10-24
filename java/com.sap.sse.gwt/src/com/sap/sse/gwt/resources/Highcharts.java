@@ -10,7 +10,7 @@ import com.google.gwt.core.client.ScriptInjector;
  *
  */
 public final class Highcharts {
-    public static HighChartsRessource HIGHCHARTS_RESSOURCES = GWT.create(HighChartsRessource.class);
+    private static final HighChartsRessource HIGHCHARTS_RESSOURCES = GWT.create(HighChartsRessource.class);
 
     private static boolean isInjected = false;
     private static boolean isMoreInjected = false;

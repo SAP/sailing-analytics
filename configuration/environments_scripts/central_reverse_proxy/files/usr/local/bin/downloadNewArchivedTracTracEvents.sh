@@ -14,10 +14,10 @@ for i in `cat "${JSON_URLS_FILE}"`; do
   EVENT_DB="$( basename $( dirname ${i} ) )"
   if [ -d "${TARGET_DIR}/${EVENT_DB}" ]; then
     echo "Directory for event ${EVENT_DB} already found. Not downloading again. Use"
-    echo "  ${GIT_ROOT}/configuration/downloadTracTracEvent ${i} ${TARGET_DIR}"
+    echo "  downloadTracTracEvent ${i} ${TARGET_DIR}"
     echo "to force an update."
   else
     echo "Did not find directory for event ${EVENT_DB} yet in ${TARGET_DIR}. Downloading..."
-    ${GIT_ROOT}/configuration/downloadTracTracEvent "${i}" "${TARGET_DIR}"
+    downloadTracTracEvent "${i}" "${TARGET_DIR}"
   fi
 done

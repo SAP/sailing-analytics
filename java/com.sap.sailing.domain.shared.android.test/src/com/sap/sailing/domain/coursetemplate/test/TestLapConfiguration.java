@@ -1,8 +1,7 @@
 package com.sap.sailing.domain.coursetemplate.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeNoException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.MarkType;
 import com.sap.sailing.domain.common.PassingInstruction;
@@ -46,7 +45,7 @@ public class TestLapConfiguration {
     private ControlPointTemplate gate;
     private Map<MarkRole, MarkTemplate> defaultMarkTemplatesForMarkRoles;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         startBoat = new MarkTemplateImpl("Start Boat", "SB", /* color */ null, /* shape */ null, /* pattern */ null, MarkType.STARTBOAT);
         startBoatRole = new MarkRoleImpl(UUID.randomUUID(), "Start Boat", "SB");
@@ -137,7 +136,7 @@ public class TestLapConfiguration {
         try {
             courseTemplate.getWaypointTemplates(0);
         } catch (IllegalArgumentException e) {
-            assumeNoException("No IllegalArgumentException should have been thrown for zero laps because the course has no repeatable part", e);
+            fail("No IllegalArgumentException should have been thrown for zero laps because the course has no repeatable part: "+e.getMessage());
         }
     }
     

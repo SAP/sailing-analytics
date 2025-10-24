@@ -199,7 +199,7 @@ public class DeviceConfigurationDetailComposite extends Composite {
         courseAreaListBox.addItem(stringMessages.selectCourseArea(), "");
         if (event != null) {
             int i=1;
-            for (final CourseAreaDTO courseArea : event.venue.getCourseAreas()) {
+            for (final CourseAreaDTO courseArea : event.getVenue().getCourseAreas()) {
                 courseAreaListBox.addItem(courseArea.getName(), courseArea.getId().toString());
                 if (Util.equalsWithNull(originalConfiguration.courseAreaId, courseArea.getId())) {
                     courseAreaListBox.setSelectedIndex(i);

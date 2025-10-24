@@ -1,2 +1,2 @@
 #!/bin/bash
-echo Number of events on my.sapsailing.com: $( ssh ec2-user@dbserver.internal.sapsailing.com "echo 'db.EVENTS.find().count()' | mongo --quiet 'mongodb://127.0.0.1:10203/my?replicaSet=live&retryWrites=true&readPreference=nearest' 2>/dev/null | tail -n 1" ) | mail -s "Events on my.sapsailing.com" axel.uhl@sap.com marcus.baur@sapsailing.com
+echo Number of events on my.sapsailing.com: $( ssh ec2-user@dbserver.internal.sapsailing.com "mongosh --eval 'db.EVENTS.find().count()' --quiet 'mongodb://127.0.0.1:10203/my?replicaSet=live&retryWrites=true&readPreference=nearest' 2>/dev/null | tail -n 1" ) | mail -s "Events on my.sapsailing.com" axel.uhl@sap.com marcus.baur@sapsailing.com

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.sap.sailing.domain.persistence.racelog.tracking.FixMongoHandler;
+import com.sap.sailing.domain.racelogtracking.impl.SmartphoneImeiIdentifierImpl;
 import com.sap.sailing.domain.racelogtracking.impl.SmartphoneUUIDMongoHandler;
 import com.sap.sailing.server.gateway.serialization.racelog.tracking.DeviceIdentifierJsonHandler;
 import com.sap.sailing.server.gateway.serialization.racelog.tracking.GPSFixJsonHandler;
@@ -14,7 +15,7 @@ import com.sap.sse.common.TypeBasedServiceFinderFactory;
 
 /**
  * A simplified implementation of the {@link TypeBasedServiceFinder} interface that, when the device type
- * {@link SmartphoneImeiIdentifier#TYPE} is requested, returns a specific handler that was passed to this object's
+ * {@link SmartphoneImeiIdentifierImpl#TYPE} is requested, returns a specific handler that was passed to this object's
  * constructor.
  * 
  * @author Fredrik Teschke

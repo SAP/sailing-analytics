@@ -12,10 +12,12 @@ public class EmbeddedMapAndWindChartContextDefinition extends AbstractGenericSer
     private transient StringSetting fleetName;
 
     public EmbeddedMapAndWindChartContextDefinition() {
+        super();
     }
 
     public EmbeddedMapAndWindChartContextDefinition(final String regattaLikeName, final String raceColumnName,
             final String fleetName) {
+        this();
         this.regattaLikeName.setValue(regattaLikeName);
         this.raceColumnName.setValue(raceColumnName);
         this.fleetName.setValue(fleetName);

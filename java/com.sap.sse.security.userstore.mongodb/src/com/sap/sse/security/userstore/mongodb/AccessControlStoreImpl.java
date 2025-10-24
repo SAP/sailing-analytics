@@ -26,8 +26,6 @@ import com.sap.sse.security.shared.impl.UserGroupImpl;
 public class AccessControlStoreImpl implements AccessControlStore {
     private static final long serialVersionUID = 2165649781000936074L;
 
-    // private static final Logger logger = Logger.getLogger(AccessControlStoreImpl.class.getName());
-
     private String name = "Access control store";
 
     /**

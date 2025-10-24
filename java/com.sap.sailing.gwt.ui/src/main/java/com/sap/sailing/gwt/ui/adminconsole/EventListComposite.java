@@ -52,7 +52,6 @@ import com.sap.sailing.gwt.ui.client.EntryPointLinkFactory;
 import com.sap.sailing.gwt.ui.client.SailingServiceWriteAsync;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.gwt.ui.client.shared.controls.MultipleLinkCell;
-import com.sap.sailing.gwt.ui.common.client.DateAndTimeFormatterUtil;
 import com.sap.sailing.gwt.ui.shared.EventBaseDTO;
 import com.sap.sailing.gwt.ui.shared.EventDTO;
 import com.sap.sailing.gwt.ui.shared.LeaderboardGroupDTO;
@@ -62,6 +61,7 @@ import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.util.NaturalComparator;
 import com.sap.sse.gwt.adminconsole.AbstractFilterablePlace;
 import com.sap.sse.gwt.adminconsole.AdminConsoleTableResources;
+import com.sap.sse.gwt.client.DateAndTimeFormatterUtil;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.async.MarkedAsyncCallback;
 import com.sap.sse.gwt.client.celltable.AbstractSortableTextColumn;
@@ -151,8 +151,8 @@ public class EventListComposite extends Composite {
             public Iterable<String> getSearchableStrings(EventDTO t) {
                 List<String> result = new ArrayList<String>();
                 result.add(t.getName());
-                result.add(t.venue.getName());
-                for (CourseAreaDTO c : t.venue.getCourseAreas()) {
+                result.add(t.getVenue().getName());
+                for (CourseAreaDTO c : t.getVenue().getCourseAreas()) {
                     result.add(c.getName());
                 }
                 for (LeaderboardGroupDTO lg : t.getLeaderboardGroups()) {
@@ -247,7 +247,7 @@ public class EventListComposite extends Composite {
         TextColumn<EventDTO> venueNameColumn = new TextColumn<EventDTO>() {
             @Override
             public String getValue(EventDTO event) {
-                return event.venue != null ? event.venue.getName() : "";
+                return event.getVenue() != null ? event.getVenue().getName() : "";
             }
         };
         TextColumn<EventDTO> startEndDateColumn = new TextColumn<EventDTO>() {
@@ -267,9 +267,9 @@ public class EventListComposite extends Composite {
             @Override
             public SafeHtml getValue(EventDTO event) {
                 SafeHtmlBuilder builder = new SafeHtmlBuilder();
-                int courseAreasCount = event.venue.getCourseAreas().size();
+                int courseAreasCount = event.getVenue().getCourseAreas().size();
                 int i = 1;
-                for (CourseAreaDTO courseArea : event.venue.getCourseAreas()) {
+                for (CourseAreaDTO courseArea : event.getVenue().getCourseAreas()) {
                     builder.appendEscaped(courseArea.getName() == null ? "null" : courseArea.getName());
                     if (i < courseAreasCount) {
                         builder.appendHtmlConstant(",&nbsp;");
@@ -407,7 +407,7 @@ public class EventListComposite extends Composite {
         columnSortHandler.setComparator(venueNameColumn, new Comparator<EventDTO>() {
             @Override
             public int compare(EventDTO e1, EventDTO e2) {
-                return new NaturalComparator().compare(e1.venue.getName(), e2.venue.getName());
+                return new NaturalComparator().compare(e1.getVenue().getName(), e2.getVenue().getName());
             }
         });
         columnSortHandler.setComparator(startEndDateColumn, new Comparator<EventDTO>() {
@@ -435,7 +435,7 @@ public class EventListComposite extends Composite {
         columnSortHandler.setComparator(courseAreasColumn, new Comparator<EventDTO>() {
             @Override
             public int compare(EventDTO e1, EventDTO e2) {
-                return e1.venue.getCourseAreas().toString().compareTo(e2.venue.getCourseAreas().toString());
+                return e1.getVenue().getCourseAreas().toString().compareTo(e2.getVenue().getCourseAreas().toString());
             }
         });
         columnSortHandler.setComparator(leaderboardGroupsColumn, new Comparator<EventDTO>() {
@@ -634,7 +634,7 @@ public class EventListComposite extends Composite {
         final List<CourseAreaDTO> courseAreasToRemove = courseAreasToAddAndRemove.getB();
         final List<UUID> updatedEventLeaderboardGroupIds = updatedEvent.getLeaderboardGroupIds();
         sailingServiceWrite.updateEvent(oldEvent.id, oldEvent.getName(), updatedEvent.getDescription(),
-                updatedEvent.startDate, updatedEvent.endDate, updatedEvent.venue, updatedEvent.isPublic,
+                updatedEvent.startDate, updatedEvent.endDate, updatedEvent.getVenue(), updatedEvent.isPublic,
                 updatedEventLeaderboardGroupIds, updatedEvent.getOfficialWebsiteURL(), updatedEvent.getBaseURL(),
                 updatedEvent.getSailorsInfoWebsiteURLs(), updatedEvent.getImages(), updatedEvent.getVideos(),
                 updatedEvent.getWindFinderReviewedSpotsCollectionIds(), new AsyncCallback<EventDTO>() {
@@ -698,16 +698,16 @@ public class EventListComposite extends Composite {
     }
 
     private Pair<List<CourseAreaDTO>, List<CourseAreaDTO>> getCourseAreasToAdd(final EventDTO oldEvent, final EventDTO updatedEvent) {
-        List<CourseAreaDTO> courseAreasToAdd = new ArrayList<CourseAreaDTO>(updatedEvent.venue.getCourseAreas());
-        courseAreasToAdd.removeAll(oldEvent.venue.getCourseAreas());
-        List<CourseAreaDTO> courseAreasToRemove = new ArrayList<CourseAreaDTO>(oldEvent.venue.getCourseAreas());
-        courseAreasToRemove.removeAll(updatedEvent.venue.getCourseAreas());
+        List<CourseAreaDTO> courseAreasToAdd = new ArrayList<CourseAreaDTO>(updatedEvent.getVenue().getCourseAreas());
+        courseAreasToAdd.removeAll(oldEvent.getVenue().getCourseAreas());
+        List<CourseAreaDTO> courseAreasToRemove = new ArrayList<CourseAreaDTO>(oldEvent.getVenue().getCourseAreas());
+        courseAreasToRemove.removeAll(updatedEvent.getVenue().getCourseAreas());
         return new Pair<List<CourseAreaDTO>, List<CourseAreaDTO>>(courseAreasToAdd, courseAreasToRemove);
     }
 
     private void createNewEvent(final EventDTO newEvent, final List<LeaderboardGroupDTO> existingLeaderboardGroups) {
         sailingServiceWrite.createEvent(newEvent.getName(), newEvent.getDescription(), newEvent.startDate, newEvent.endDate,
-                newEvent.venue.getName(), newEvent.isPublic, newEvent.venue.getCourseAreas(), newEvent.getOfficialWebsiteURL(), newEvent.getBaseURL(),
+                newEvent.getVenue().getName(), newEvent.isPublic, newEvent.getVenue().getCourseAreas(), newEvent.getOfficialWebsiteURL(), newEvent.getBaseURL(),
                 newEvent.getSailorsInfoWebsiteURLs(), newEvent.getImages(), newEvent.getVideos(), newEvent.getLeaderboardGroupIds(),
                 new AsyncCallback<EventDTO>() {
             @Override

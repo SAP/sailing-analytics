@@ -1,16 +1,16 @@
 package com.sap.sailing.selenium.test.adminconsole;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardConfigurationPanelPO;
-import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardDetailsPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardConfigurationPanelPO.LeaderboardEntryPO;
+import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardDetailsPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardRacesTablePO.RaceEntryPO;
 import com.sap.sailing.selenium.test.AbstractSeleniumTest;
 
@@ -18,7 +18,7 @@ public class TestLeaderboardConfigSelectionModel extends AbstractSeleniumTest {
     private static final String LEADERBOARDNAME = "Test";
     
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot());
         super.setUp();
@@ -29,7 +29,7 @@ public class TestLeaderboardConfigSelectionModel extends AbstractSeleniumTest {
         leaderboardDetails.addRacesToFlexibleLeaderboard(5);
     }
     
-    @Test
+    @SeleniumTestCase
     public void testBehaviorOfRaceSelectionWithTabChange() {
         AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
         LeaderboardConfigurationPanelPO leaderboardConfiguration = adminConsole.goToLeaderboardConfiguration();
@@ -52,7 +52,7 @@ public class TestLeaderboardConfigSelectionModel extends AbstractSeleniumTest {
         assertEquals(id, leaderboardDetails.getRacesTable().getSelectedEntries().get(0).getIdentifier());
     }
 
-    @Test
+    @SeleniumTestCase
     public void testBehaviorOfRaceSelectionWithLeaderboardChange() {
         AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
         LeaderboardConfigurationPanelPO leaderboardConfiguration = adminConsole.goToLeaderboardConfiguration();

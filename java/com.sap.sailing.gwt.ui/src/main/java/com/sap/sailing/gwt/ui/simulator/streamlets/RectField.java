@@ -137,7 +137,7 @@ public class RectField implements VectorField {
     }
 
     @Override
-    public double getMotionScale(int zoomLevel) {
+    public double getMotionScale(double zoomLevel) {
         return this.motionFactor * Math.pow(1.7, Math.min(1.0, 6.0 - zoomLevel));
     }
 

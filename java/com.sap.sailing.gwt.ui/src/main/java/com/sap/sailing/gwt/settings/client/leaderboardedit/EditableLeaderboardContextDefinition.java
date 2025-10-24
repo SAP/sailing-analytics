@@ -10,9 +10,11 @@ public class EditableLeaderboardContextDefinition extends AbstractGenericSeriali
     private transient StringSetting leaderboardName;
     
     public EditableLeaderboardContextDefinition() {
+        super();
     }
     
     public EditableLeaderboardContextDefinition(String leaderboardName) {
+        this();
         this.leaderboardName.setValue(leaderboardName);
     }
     

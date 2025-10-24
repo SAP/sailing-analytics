@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -586,12 +587,7 @@ public class Util {
      * made. This is the caller's obligation.
      */
     public static <K, V> boolean addToValueSet(Map<K, Set<V>> map, K key, V value) {
-        return addToValueSet(map, key, value, new ValueCollectionConstructor<V, Set<V>>() {
-            @Override
-            public Set<V> createValueCollection() {
-                return new HashSet<V>();
-            }
-        });
+        return addToValueSet(map, key, value, HashSet::new);
     }
 
     public static interface ValueCollectionConstructor<T, C extends Collection<T>> {
@@ -1100,7 +1096,9 @@ public class Util {
     }
     
     /**
-     * Checks whether a given String is <code>null</code> or empty.
+     * Checks whether a given String is <code>null</code> or empty. Note that the string is not trimmed
+     * before performing the "empty" check, so for example "   " (three spaces) <em>will</em> be considered
+     * having a length and <tt>true</tt> would be returned in this case.
      * 
      * @param str
      *            String to check
@@ -1174,9 +1172,9 @@ public class Util {
      *         order in which they appear in {@code oldSequence}. The "contains" check is based on the
      *         {@code equivalenceRelation}.
      */
-    public static <T> boolean isOnlyAdding(final Iterable<T> newSequence, final Iterable<T> oldSequence, BiFunction<T, T, Boolean> equivalenceRelation) {
-        final Iterator<T> nIter = newSequence.iterator();
-        final Iterator<T> oIter = oldSequence.iterator();
+    public static <T> boolean isOnlyAdding(final Iterable<? extends T> newSequence, final Iterable<? extends T> oldSequence, BiFunction<T, T, Boolean> equivalenceRelation) {
+        final Iterator<? extends T> nIter = newSequence.iterator();
+        final Iterator<? extends T> oIter = oldSequence.iterator();
         boolean result = true;
         while (result && oIter.hasNext()) {
             final T nextFromOld = oIter.next();
@@ -1266,5 +1264,20 @@ public class Util {
             }
         }
         return result;
+    }
+    
+    public static <T> Enumeration<T> getEnumerationFromIterable(Iterable<T> iterable) {
+        return new Enumeration<T>() {
+            final Iterator<T> i = iterable.iterator();
+            @Override
+            public boolean hasMoreElements() {
+                return i.hasNext();
+            }
+
+            @Override
+            public T nextElement() {
+                return i.next();
+            }
+        };
     }
 }

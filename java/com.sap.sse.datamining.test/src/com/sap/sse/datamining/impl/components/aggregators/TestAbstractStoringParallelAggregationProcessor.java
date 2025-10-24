@@ -8,9 +8,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import com.sap.sse.datamining.components.Processor;
 import com.sap.sse.datamining.impl.components.GroupedDataEntry;
@@ -28,7 +30,7 @@ public class TestAbstractStoringParallelAggregationProcessor {
     
     private Collection<GroupedDataEntry<Integer>> elementStore = new ArrayList<>();
     
-    @Before
+    @BeforeEach
     public void initializeReceivers() {
         @SuppressWarnings("unchecked")
         Processor<Map<GroupKey, Integer>, Void> receiver = new NullProcessor<Map<GroupKey,Integer>, Void>((Class<Map<GroupKey, Integer>>)(Class<?>) Map.class, Void.class) {
@@ -83,7 +85,8 @@ public class TestAbstractStoringParallelAggregationProcessor {
     }
     
     @SuppressWarnings("unchecked")
-    @Test(timeout=5000)
+    @Timeout(value=5, unit=TimeUnit.SECONDS)
+    @Test
     public void testThatTheLockIsReleasedAfterStoringFailed() throws InterruptedException {
         Collection<Processor<Map<GroupKey, Integer>, ?>> receivers = new HashSet<>();
         receivers.add(new NullProcessor<Map<GroupKey, Integer>, Void>((Class<Map<GroupKey, Integer>>)(Class<?>) Map.class, Void.class) {

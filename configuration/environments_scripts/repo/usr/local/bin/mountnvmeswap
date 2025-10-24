@@ -15,6 +15,9 @@ if [[ -n "${EPHEMERAL_VOLUME_NAME}" ]]; then
         echo FSTYPE was empty, creating swap partition
         mkswap $EPHEMERAL_VOLUME
         swapon --priority 2 -a $EPHEMERAL_VOLUME
+    elif [ "$FSTYPE" = "swap" ]; then
+        # it already is formatted as swap, so we can just use it
+        swapon --priority 2 -a $EPHEMERAL_VOLUME
     else
         echo "FSTYPE was $FSTYPE, not touching"
     fi

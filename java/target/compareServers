@@ -82,12 +82,12 @@ if [ "${useRestApi}" = "1" ]; then
 else
   # If we continue, don't download again
   if [ "$continue" != "1" ]; then
-    wget --no-cache $WGET_QUIET -O - ${OLDSERVER}/sailingserver/api/v1/leaderboardgroups | sed -e 's/\",\"/\n/g' -e 's/\[/\n/' -e 's/\]/\n/' -e 's/\"//g' -e 's/\//%2F/g' | grep -v "^$" | sort >$OLDGROUPS
-    wget --no-cache $WGET_QUIET -O - ${NEWSERVER}/sailingserver/api/v1/leaderboardgroups | sed -e 's/\",\"/\n/g' -e 's/\[/\n/' -e 's/\]/\n/' -e 's/\"//g' -e 's/\//%2F/g' | grep -v "^$" | sort >$NEWGROUPS
+    wget --no-cache $WGET_QUIET -O - ${OLDSERVER}/sailingserver/api/v1/leaderboardgroups | jq -r '.[]' | sed -e 's/\//%2F/g' | sort >$OLDGROUPS
+    wget --no-cache $WGET_QUIET -O - ${NEWSERVER}/sailingserver/api/v1/leaderboardgroups | jq -r '.[]' | sed -e 's/\//%2F/g' | sort >$NEWGROUPS
   fi
 
   download_and_fix_boatclasses () {
-      wget --no-cache $WGET_QUIET -O - "$1/sailingserver/api/v1/leaderboardgroups/`echo $OLD_LB | sed -e 's/ /%20/g'`" | jq 'del(.leaderboards[].series[].fleets[].races[].raceViewerUrls)' | jq 'del(.displayName)' | grep -v "\"id\": \"[^\"]*\"" | grep -v "\"timepoint\": \"[^\"]*\"" >"$2" 2>$WGET_ERR
+      wget --no-cache $WGET_QUIET -O - "$1/sailingserver/api/v1/leaderboardgroups/`echo $OLD_LB | sed -e 's/ /%20/g'`" | jq 'del(.leaderboards[].series[].fleets[].races[].raceViewerUrls)' | jq 'del(.displayName)' | grep -v "\"id\": \"[^\"]*\"" | grep -v "\"timepoint\": \"[^\"]*\"" | grep -v "\"timepoint-ms\":" >"$2" 2>$WGET_ERR
       #wget --no-cache $WGET_QUIET -O - "$1/sailingserver/api/v1/leaderboardgroups/`echo $OLD_LB | sed -e 's/ /%20/g'`" | python -m json.tool | grep -v "\"id\": \"[^\"]*\"" | grep -v "\"timepoint\": \"[^\"]*\"" >"$2" 2>$WGET_ERR
   }
 

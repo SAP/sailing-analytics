@@ -18,6 +18,7 @@ public class RaceboardContextDefinition extends AbstractGenericSerializableSetti
     private StringSetting mode;
 
     public RaceboardContextDefinition() {
+        super();
     }
 
     /**
@@ -33,6 +34,7 @@ public class RaceboardContextDefinition extends AbstractGenericSerializableSetti
 
     public RaceboardContextDefinition(String regattaName, String raceName, String leaderboardName,
             String leaderboardGroupName, UUID leaderboardGroupId, UUID eventId, String mode, String selectedCompetitorId) {
+        this();
         this.regattaName.setValue(regattaName);
         this.raceName.setValue(raceName);
         this.leaderboardName.setValue(leaderboardName);

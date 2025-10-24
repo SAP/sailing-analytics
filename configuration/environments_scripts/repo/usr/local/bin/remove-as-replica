@@ -1,0 +1,13 @@
+#!/bin/bash
+eval $( ec2-metadata -d | sed -e 's/^user-data: //' )
+if [ -n "$REPLICA_SET_PRIMARY" ]; then
+  IP=$(ec2-metadata -o | sed -e 's/^local-ipv4: //')
+  IS_PRIMARY=$( mongosh --quiet "mongodb://$IP" --eval "rs.isMaster().ismaster" )
+  if [[ "${IS_PRIMARY}" == "true" ]]; then
+    PRIMARY_ADDRESS=$( mongosh --quiet "mongodb://$IP" --eval "rs.isMaster().primary" )
+    mongosh --quiet --eval "rs.stepDown()" "mongodb://$PRIMARY_ADDRESS"
+    sleep 10
+  fi
+  ME=$( mongosh --quiet --eval "rs.isMaster().me" "mongodb://$IP" )
+  mongosh --quiet --eval "rs.remove(\"${ME}\")" "mongodb://$IP/?replicaSet=$REPLICA_SET_NAME&retryWrites=true"
+fi

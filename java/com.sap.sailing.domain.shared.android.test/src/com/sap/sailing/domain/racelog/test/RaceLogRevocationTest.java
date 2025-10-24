@@ -2,13 +2,13 @@ package com.sap.sailing.domain.racelog.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.hamcrest.Matchers.in;
-import static org.junit.Assert.assertEquals;
 
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
@@ -37,7 +37,7 @@ public class RaceLogRevocationTest {
     private UUID clientCUUID = UUID.randomUUID();
     private AbstractLogEventAuthor clientCAuthor = new LogEventAuthorImpl("clientC", 0);
     
-    @Before
+    @BeforeEach
     public void setup() {
         serverRaceLog = new RaceLogImpl("server");
         clientARaceLog = new RaceLogImpl("clientA");

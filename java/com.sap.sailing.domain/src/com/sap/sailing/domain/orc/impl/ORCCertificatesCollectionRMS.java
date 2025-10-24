@@ -163,12 +163,22 @@ public class ORCCertificatesCollectionRMS extends AbstractORCCertificatesCollect
                 runVMGPredictionPerTrueWindSpeed.put(tws, ORCCertificate.NAUTICAL_MILE.inTime(runAllowancePerTrueWindSpeed.get(tws)));
                 windwardLeewardSpeedPredictionPerTrueWindSpeed.put(tws, ORCCertificate.NAUTICAL_MILE.inTime(
                         new SecondsDurationImpl(Double.parseDouble(certificateValues.getValue(windwardLeewardKey)))));
-                longDistanceSpeedPredictionPerTrueWindSpeed.put(tws, ORCCertificate.NAUTICAL_MILE.inTime(
-                        new SecondsDurationImpl(Double.parseDouble(certificateValues.getValue(longDistanceKey)))));
-                circularRandomSpeedPredictionPerTrueWindSpeed.put(tws, ORCCertificate.NAUTICAL_MILE.inTime(
-                        new SecondsDurationImpl(Double.parseDouble(certificateValues.getValue(circularRandomKey)))));
-                nonSpinnakerSpeedPredictionPerTrueWindSpeed.put(tws, ORCCertificate.NAUTICAL_MILE.inTime(
-                        new SecondsDurationImpl(Double.parseDouble(certificateValues.getValue(nonSpinnakerKey)))));
+                // long-distance and non-spinnaker speed predictions are optional; newer certificates may not have them
+                final String longDistanceSecondsToTheMile = certificateValues.getValue(longDistanceKey);
+                if (longDistanceSecondsToTheMile != null) {
+                    longDistanceSpeedPredictionPerTrueWindSpeed.put(tws, ORCCertificate.NAUTICAL_MILE.inTime(
+                        new SecondsDurationImpl(Double.parseDouble(longDistanceSecondsToTheMile))));
+                }
+                final String circularRandomSecondsToTheMile = certificateValues.getValue(circularRandomKey);
+                if (circularRandomSecondsToTheMile != null) {
+                    circularRandomSpeedPredictionPerTrueWindSpeed.put(tws, ORCCertificate.NAUTICAL_MILE.inTime(
+                            new SecondsDurationImpl(Double.parseDouble(circularRandomSecondsToTheMile))));
+                }
+                final String nonSpinnakerSecondsToTheMile = certificateValues.getValue(nonSpinnakerKey);
+                if (nonSpinnakerSecondsToTheMile != null) {
+                    nonSpinnakerSpeedPredictionPerTrueWindSpeed.put(tws, ORCCertificate.NAUTICAL_MILE.inTime(
+                            new SecondsDurationImpl(Double.parseDouble(nonSpinnakerSecondsToTheMile))));
+                }
                 Map<Bearing, Speed> velocityPredictionPerTrueWindAngle = new HashMap<>();
                 for (Bearing twa : ORCCertificate.ALLOWANCES_TRUE_WIND_ANGLES ) {
                     String twaCoursesKey = TWA_COURSES + Integer.toString((int) twa.getDegrees()) + windSpeed;
@@ -180,7 +190,7 @@ public class ORCCertificatesCollectionRMS extends AbstractORCCertificatesCollect
             final Triple<CountryCode, String, String> natCertNoFileId = getIssuingNationalityCertificateNumberAndFileId(certificateValues.getValue(NATCERTN_FILE_ID));
             result = new ORCCertificateImpl(refNo, natCertNoFileId.getC(), sailNumber, boatName, boatclass, length, gph,
                     cdl, issueDate, natCertNoFileId.getA(), velocityPredictionsPerTrueWindSpeedAndAngle, beatAngles,
-                    beatVMGPredictionPerTrueWindSpeed,                    beatAllowancePerTrueWindSpeed, runAngles, runVMGPredictionPerTrueWindSpeed,
+                    beatVMGPredictionPerTrueWindSpeed, beatAllowancePerTrueWindSpeed, runAngles, runVMGPredictionPerTrueWindSpeed,
                     runAllowancePerTrueWindSpeed, windwardLeewardSpeedPredictionPerTrueWindSpeed,
                     longDistanceSpeedPredictionPerTrueWindSpeed, circularRandomSpeedPredictionPerTrueWindSpeed,
                     nonSpinnakerSpeedPredictionPerTrueWindSpeed);

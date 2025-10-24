@@ -25,8 +25,7 @@ public class GoogleMapStyleHelper {
         MapTypeStyle result = MapTypeStyle.newInstance();
         result.setFeatureType(featureType);
         result.setElementType(MapTypeStyleElementType.ALL);
-        
-        MapTypeStyler[] typeStylers = new MapTypeStyler[3];
+        MapTypeStyler[] typeStylers = new MapTypeStyler[1];
         typeStylers[0] = ColorMapTypeStyler.newColorStyler(color.getAsHtml()).cast();
         result.setStylers(typeStylers);
         return result;

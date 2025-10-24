@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.UUID;
 
 import com.google.gwt.text.shared.Renderer;
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -156,7 +156,7 @@ public class MarkPropertiesEditDialog extends DataEntryDialog<MarkPropertiesDTO>
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return nameTextBox;
     }
 

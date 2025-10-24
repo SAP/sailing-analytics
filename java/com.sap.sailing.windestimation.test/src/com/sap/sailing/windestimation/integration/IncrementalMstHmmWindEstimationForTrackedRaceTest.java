@@ -1,7 +1,7 @@
 package com.sap.sailing.windestimation.integration;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.net.URI;
@@ -19,8 +19,8 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.logging.Level;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.common.NoWindException;
@@ -112,7 +112,7 @@ public class IncrementalMstHmmWindEstimationForTrackedRaceTest extends OnlineTra
         windEstimationFactoryService.importAllModelsFromModelStore(modelStore);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         URI storedUri = new URI("file:///"
@@ -149,7 +149,7 @@ public class IncrementalMstHmmWindEstimationForTrackedRaceTest extends OnlineTra
 
     @Test
     public void testIncrementalMstHmmWindEstimationForTrackedRace() throws NoWindException, ModelPersistenceException {
-        assertTrue("Wind estimation models are empty", windEstimationFactoryService.isReady());
+        assertTrue(windEstimationFactoryService.isReady(), "Wind estimation models are empty");
         DynamicTrackedRaceImpl trackedRace = getTrackedRace();
         WindTrack estimatedWindTrackOfTrackedRace = trackedRace
                 .getOrCreateWindTrack(new WindSourceImpl(WindSourceType.MANEUVER_BASED_ESTIMATION));
@@ -223,16 +223,16 @@ public class IncrementalMstHmmWindEstimationForTrackedRaceTest extends OnlineTra
                 foundCount++;
             }
         }
-        assertTrue("Expected ratio of matching fixes to be at least "+PERCENT_QUANTILE+" but was only "+(double) foundCount / (double) estimatedWindFixes.size(),
-                (double) foundCount / (double) estimatedWindFixes.size() > PERCENT_QUANTILE);
+        assertTrue((double) foundCount / (double) estimatedWindFixes.size() > PERCENT_QUANTILE,
+                "Expected ratio of matching fixes to be at least "+PERCENT_QUANTILE+" but was only "+(double) foundCount / (double) estimatedWindFixes.size());
         foundCount = 0;
         for (Wind wind : targetWindFixes) {
             if (findWithinTolerance(estimatedWindFixesMap, new Pair<>(wind.getPosition(), wind.getTimePoint())) != null) {
                 foundCount++;
             }
         }
-        assertTrue("Expected ratio of matching fixes to be at least "+PERCENT_QUANTILE+" but was only "+(double) foundCount / (double) estimatedWindFixes.size(),
-                (double) foundCount / (double) targetWindFixes.size() > PERCENT_QUANTILE);
+        assertTrue((double) foundCount / (double) targetWindFixes.size() > PERCENT_QUANTILE,
+                "Expected ratio of matching fixes to be at least "+PERCENT_QUANTILE+" but was only "+(double) foundCount / (double) estimatedWindFixes.size());
     }
 
     /**
@@ -269,11 +269,11 @@ public class IncrementalMstHmmWindEstimationForTrackedRaceTest extends OnlineTra
             }
         }
         final Bearing averageBearing = bearingSum.divide(targetWindFixes.size());
-        assertTrue("Expected at least "+((int) (100*PERCENT_QUANTILE))+"% of the wind fixes to be in range "+
-                new DegreeBearingImpl(expectedTWDAverageInDegrees).add(new DegreeBearingImpl(-toleranceForPercentQuantile))+
-                        " to "+new DegreeBearingImpl(expectedTWDAverageInDegrees).add(new DegreeBearingImpl(toleranceForPercentQuantile))+
-                        " but only "+(int) (100*(double) insideRange / targetWindFixes.size())+"% were.",
-                        (double) insideRange / targetWindFixes.size() >= PERCENT_QUANTILE);
+        assertTrue((double) insideRange / targetWindFixes.size() >= PERCENT_QUANTILE,
+                        "Expected at least "+((int) (100*PERCENT_QUANTILE))+"% of the wind fixes to be in range "+
+                                new DegreeBearingImpl(expectedTWDAverageInDegrees).add(new DegreeBearingImpl(-toleranceForPercentQuantile))+
+                                        " to "+new DegreeBearingImpl(expectedTWDAverageInDegrees).add(new DegreeBearingImpl(toleranceForPercentQuantile))+
+                                        " but only "+(int) (100*(double) insideRange / targetWindFixes.size())+"% were.");
         assertEquals(expectedTWDAverageInDegrees, averageBearing.getDegrees(), averageToleranceInDegrees);
     }
 

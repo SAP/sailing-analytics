@@ -62,43 +62,48 @@ public class ProviderSubscriptionUpdateTask implements SubscriptionApiService.On
             SubscriptionApiService provider) throws UserManagementException {
         logger.info(() -> "Subscriptions from provider " + provider.getProviderName() + " for user " + user.getName()
                 + ": " + (userSubscriptions == null ? "empty" : userSubscriptions));
-        Iterable<Subscription> currentSubscriptions = user.getSubscriptions();
-        if ((userSubscriptions == null || !userSubscriptions.iterator().hasNext())
-                && (currentSubscriptions != null && currentSubscriptions.iterator().hasNext())) {
-            // No subscriptions so we need to remove all current subscriptions of user for the provider
-            Subscription emptySubscription = createEmptySubscription(provider, null);
-            getSecurityService().updateUserSubscription(user.getName(), emptySubscription);
-        } else if (userSubscriptions != null) {
-            if (currentSubscriptions != null) {
-                Map<String, Boolean> existingPlans = getExistingPlans(userSubscriptions);
-                for (Subscription subscription : currentSubscriptions) {
-                    if (subscription.hasPlan() && !existingPlans.containsKey(subscription.getPlanId())) {
-                        // Current subscription plan doesn't exist in subscription list from provider, that means
-                        // subscription for the plan has been deleted, then we need to remove the subscription from
-                        // database
-                        Subscription emptySubscription = createEmptySubscription(provider, subscription.getPlanId());
-                        getSecurityService().updateUserSubscription(user.getName(), emptySubscription);
+        getSecurityService().lockSubscriptionsForUser(user);
+        try {
+            Iterable<Subscription> currentSubscriptions = user.getSubscriptions();
+            if ((userSubscriptions == null || !userSubscriptions.iterator().hasNext())
+                    && (currentSubscriptions != null && currentSubscriptions.iterator().hasNext())) {
+                // No subscriptions so we need to remove all current subscriptions of user for the provider
+                Subscription emptySubscription = createEmptySubscription(provider, null);
+                getSecurityService().updateUserSubscription(user.getName(), emptySubscription);
+            } else if (userSubscriptions != null) {
+                if (currentSubscriptions != null) {
+                    Map<String, Boolean> existingPlans = getExistingPlans(userSubscriptions);
+                    for (Subscription subscription : currentSubscriptions) {
+                        if (subscription.hasPlan() && !existingPlans.containsKey(subscription.getPlanId())) {
+                            // Current subscription plan doesn't exist in subscription list from provider, that means
+                            // subscription for the plan has been deleted, then we need to remove the subscription from
+                            // database
+                            Subscription emptySubscription = createEmptySubscription(provider, subscription.getPlanId());
+                            getSecurityService().updateUserSubscription(user.getName(), emptySubscription);
+                        }
                     }
                 }
-            }
-            // Only one subscription per plan has to be processed.
-            final Set<Subscription> skimmedSubscriptions = new HashSet<>();
-            for (SubscriptionPlan subscriptionPlan : getSecurityService().getAllSubscriptionPlans().values()) {
-                Subscription planSubscription = null;
-                for(Subscription userSubscription : userSubscriptions) {
-                    final boolean isSamePlan = subscriptionPlan.getId().equals(userSubscription.getPlanId());
-                    if (isSamePlan && planSubscription == null || 
-                            isSamePlan && userSubscription.isUpdatedMoreRecently(planSubscription)) {
-                        planSubscription = userSubscription;
+                // Only one subscription per plan has to be processed.
+                final Set<Subscription> skimmedSubscriptions = new HashSet<>();
+                for (SubscriptionPlan subscriptionPlan : getSecurityService().getAllSubscriptionPlans().values()) {
+                    Subscription planSubscription = null;
+                    for(Subscription userSubscription : userSubscriptions) {
+                        final boolean isSamePlan = subscriptionPlan.getId().equals(userSubscription.getPlanId());
+                        if (isSamePlan && planSubscription == null || 
+                                isSamePlan && userSubscription.isUpdatedMoreRecently(planSubscription)) {
+                            planSubscription = userSubscription;
+                        }
+                    }
+                    if (planSubscription != null) {
+                        skimmedSubscriptions.add(planSubscription);
                     }
                 }
-                if (planSubscription != null) {
-                    skimmedSubscriptions.add(planSubscription);
+                for (Subscription subscription : skimmedSubscriptions) {
+                    getSecurityService().updateUserSubscription(user.getName(), subscription);
                 }
             }
-            for (Subscription subscription : skimmedSubscriptions) {
-                getSecurityService().updateUserSubscription(user.getName(), subscription);
-            }
+        } finally {
+            getSecurityService().unlockSubscriptionsForUser(user);
         }
     }
     

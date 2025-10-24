@@ -148,7 +148,7 @@ This will make the MongoDB cloud replica running on ``paris-ssh.sapsailing.com``
 
 Then, all cloud replicas need to stop replicating because soon the on-site master will be stopped. See script ``configuration/on-site-scripts/paris2024/stop-all-cloud-replicas.sh``.
 
-### Stop On-Site Master and Launch Cloud Master on ``paris-ssh.sapsailingcom``
+### Stop On-Site Master and Launch Cloud Master on ``paris-ssh.sapsailing.com``
 
 Next, an application master for the ``paris2024`` application replica set needs to be launched on ``paris-ssh.sapsailing.com``. It uses the MongoDB URI ``mongodb://localhost:10203/paris2024?replicaSet=paris2024&retryWrites=true&readPreference=nearest``, hence connecting to the single-instance MongoDB "replica set" running on the same host. Other than this the instance uses a standard configuration for a live master. This configuration can already be prepared before the event. All that then needs to be done is to adjust the release to the one that all cloud replicas are using.
 
@@ -185,3 +185,13 @@ Combine the above scenarios: a failing production master (hardware or VM-only) w
 * master set-up on sap-p1-2 must be configured in "failover" mode by default; this means it sends to the local RabbitMQ and the security_service MongoDB replica set that does not replicate into the cloud, to keep traffic on the SSH tunnel to the cloud as low as possible
 * create a "primary master" configuration on sap-p1-2 in case sap-p1-1 fails for a longer time and we need to switch to sap-p1-2 for a longer time; in that case we would like to have DB replication into the cloud, so use the localhost:[10201|10202|10203] "paris2024" MongoDB replica set and send to the RabbitMQ in the cloud (rabbit-eu-west-3); these failover scenarios should be manageable by corresponding scripts
 * Shall we obtain the tunnel scripts via symbolic links from the respective git repo at /home/sailing/code, there then under configuration/on-site-scripts/paris2024/sap-p1-[12]? Currently, they are copies that evolve independently from the git repo.
+
+## Replacing an Access Token Accidentally Revoked in security-service DB
+
+SSH into the security-service instance, then run
+
+```
+  mongo "mongodb://dbserver.internal.sapsailing.com:10203/security_service?replicaSet=live"
+  > db.PREFERENCES.update({"USERNAME": "username", "KEYS_AND_VALUES.KEY": "___access_token___"}, { $set: { 'KEYS_AND_VALUES.$': { "KEY" : "___access_token___", "VALUE" : "asfdasdfasdfasfdasfdasdfsadfasfdasdfdsaf=" } } })
+  > quit()
+```

@@ -1,14 +1,11 @@
 package com.sap.sailing.gwt.autoplay.client.nodes.base;
 
-public abstract class BaseCompositeNode
-        extends AutoPlayNodeBase {
+public abstract class BaseCompositeNode extends AutoPlayNodeBase {
+    private AutoPlayNode currentNode;
 
     public BaseCompositeNode(String name) {
         super(name);
     }
-
-    private AutoPlayNode currentNode;
-
 
     public AutoPlayNode getCurrentNode() {
         return currentNode;
@@ -30,9 +27,6 @@ public abstract class BaseCompositeNode
 
     @Override
     public void onStop() {
-        super.onStop();
         currentNode = null;
     }
-
-
 }

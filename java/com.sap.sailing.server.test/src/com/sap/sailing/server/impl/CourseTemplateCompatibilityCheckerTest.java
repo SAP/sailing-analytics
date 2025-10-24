@@ -1,15 +1,15 @@
 package com.sap.sailing.server.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.ControlPointWithTwoMarks;
 import com.sap.sailing.domain.base.CourseBase;
@@ -46,7 +46,7 @@ public class CourseTemplateCompatibilityCheckerTest {
     private Mark startBoat, startPin, windward, gatePort, gateStarboard;
     private ControlPointWithTwoMarks startFinishLine, gate;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         // mark roles:
         startFinishBoatRole = new MarkRoleImpl(UUID.randomUUID(), "Start/Finish Boat", "SFB");

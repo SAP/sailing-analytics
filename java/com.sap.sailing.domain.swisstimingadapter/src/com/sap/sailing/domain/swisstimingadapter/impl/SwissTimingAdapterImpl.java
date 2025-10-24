@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 import com.sap.sailing.domain.base.BoatClass;
 import com.sap.sailing.domain.base.DomainFactory;
@@ -133,7 +136,7 @@ public class SwissTimingAdapterImpl implements SwissTimingAdapter {
     }
 
     @Override
-    public RegattaResults readRegattaEntryListFromXrrUrl(String xrrEntryListUrl) throws IOException, JAXBException {
+    public RegattaResults readRegattaEntryListFromXrrUrl(String xrrEntryListUrl) throws IOException, JAXBException, SAXException, ParserConfigurationException {
         // try to read the entry list from manage2sail
         URL regattaEntryListUrl = new URL(xrrEntryListUrl);
         URLConnection regattaEntryListConn = HttpUrlConnectionHelper.redirectConnection(regattaEntryListUrl);

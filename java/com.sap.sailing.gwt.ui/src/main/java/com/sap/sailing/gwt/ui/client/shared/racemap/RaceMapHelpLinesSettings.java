@@ -36,6 +36,7 @@ public class RaceMapHelpLinesSettings extends AbstractGenericSerializableSetting
      * <code>FINISHLINE</code> and <code>ADVANTAGELINE</code>.<br />
      */
     public RaceMapHelpLinesSettings() {
+        super();
     }
     
     /**
@@ -57,6 +58,7 @@ public class RaceMapHelpLinesSettings extends AbstractGenericSerializableSetting
      }
     
     public RaceMapHelpLinesSettings(Iterable<HelpLineTypes> visibleHelpLines) {
+        this();
         this.visibleHelpLines.setValues(visibleHelpLines);
     }
 

@@ -1,11 +1,11 @@
 package com.sap.sse.security.storemerging;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.Map;
@@ -13,8 +13,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.StreamSupport;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
@@ -26,7 +26,7 @@ import com.sap.sse.security.shared.impl.User;
 import com.sap.sse.security.shared.impl.UserGroup;
 
 public class TestComplexUserAndGroupMerge extends AbstractStoreMergeTest {
-    @Before
+    @BeforeEach
     public void setUp() throws IOException, UserStoreManagementException {
         setUp("source_TestComplexUserAndGroupMerge", "target_TestComplexUserAndGroupMerge");
     }
@@ -50,7 +50,7 @@ public class TestComplexUserAndGroupMerge extends AbstractStoreMergeTest {
         assertNull(targetUserStore.getUserGroupByName("test-server"));
         assertEquals(1, Util.size(targetUserStore.getUserGroupByName("uhl-tenant").getUsers()));
         assertSame(targetUserStore.getUserByName("uhl"), targetUserStore.getUserGroupByName("uhl-tenant").getUsers().iterator().next());
-        final Pair<UserStore, AccessControlStore> sourceStores = merger.importStores(cfgForSource, defaultCreationGroupNameForSource);
+        final Pair<UserStore, AccessControlStore> sourceStores = merger.importStores(causallyConsistentSessionForSource, cfgForSource, sourceService, defaultCreationGroupNameForSource);
         final UserStore sourceUserStore = sourceStores.getA();
         // Should we need the source access control store, here it is:
         // final AccessControlStore sourceAccessControlStore = sourceStores.getB();

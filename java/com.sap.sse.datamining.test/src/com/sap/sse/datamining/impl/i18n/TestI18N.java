@@ -1,15 +1,16 @@
 package com.sap.sse.datamining.impl.i18n;
 
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
 
 import java.util.Date;
 import java.util.Locale;
 import java.util.MissingResourceException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.ModifiableDataMiningServer;
 import com.sap.sse.datamining.test.util.ConcurrencyTestsUtil;
@@ -30,7 +31,7 @@ public class TestI18N {
     
     private ResourceBundleStringMessages testStringMessages;
     
-    @Before
+    @BeforeEach
     public void initializeBundleManager() {
         testStringMessages = TestsUtil.getTestStringMessages();
     }
@@ -137,14 +138,17 @@ public class TestI18N {
         assertThat(ResourceBundleStringMessages.Util.getLocaleFor("Unsupported locale info name"), is(Locale.ROOT));
     }
     
-    @Test(expected=MissingResourceException.class)
+    @Test
     public void testGettingAMessageForAMissingKeyFromSimpleStringMessages() {
-        testStringMessages.get(Locale.ENGLISH, "$%&MissingKey/()");
+        assertThrows(MissingResourceException.class, () -> {
+            testStringMessages.get(Locale.ENGLISH, "$%&MissingKey/()");
+        });
     }
     
-    @Test(expected=MissingResourceException.class)
+    @Test
     public void testGettingAMessageForAMissingKeyFromCompoundStringMessages() {
-        TestsUtil.getTestStringMessagesWithProductiveMessages().get(Locale.ENGLISH, "$%&MissingKey/()");
+        assertThrows(MissingResourceException.class, () -> {
+            TestsUtil.getTestStringMessagesWithProductiveMessages().get(Locale.ENGLISH, "$%&MissingKey/()");
+        });
     }
-
 }

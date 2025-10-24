@@ -42,16 +42,16 @@ shorthand URL notations with ":" and "@" to denote basic authentication, with th
 		<td>Examples:</td>
 		<td>
 		  <div>Using the session ID in a session cookie:<br>
-		    <code>curl -D /tmp/header -b JSESSIONID=5e94c93e-b515-4bcd-8df8-0c786805a9e0 http://127.0.0.1:8888/security/api/restsecurity/access_token</code>
+		    <code>curl -D /tmp/header -b JSESSIONID=5e94c93e-b515-4bcd-8df8-0c786805a9e0 https://sapsailing.com/security/api/restsecurity/access_token</code>
 		  </div>
 		  <div>Using POST username and password form parameters:<br>
-		    <code>curl -d "username=admin&password=admin" -D /tmp/header http://127.0.0.1:8888/security/api/restsecurity/access_token</code>
+		    <code>curl -d "username=admin&password=admin" -D /tmp/header https://sapsailing.com/security/api/restsecurity/access_token</code>
 		  </div>
 		  <div>Using a bearer access token:<br>
-		    <code>curl -D /tmp/header -H "Authorization: Bearer MVPg/uCV1QGqMDmDtUuOQBrSrB1NlIldm0LW+dnxZ2A=" http://127.0.0.1:8888/security/api/restsecurity/access_token</code>
+		    <code>curl -D /tmp/header -H "Authorization: Bearer MVPg/uCV1QGqMDmDtUuOQBrSrB1NlIldm0LW+dnxZ2A=" https://sapsailing.com/security/api/restsecurity/access_token</code>
 		  </div>
 		  <div>Using basic authentication:<br>
-		    <code>curl -D /tmp/header http://admin:admin@127.0.0.1:8888/security/api/restsecurity/access_token</code>
+		    <code>curl -D /tmp/header https://{username}:{password}@sapsailing.com/security/api/restsecurity/access_token</code>
 		  </div>
 		</td>
 	</tr>

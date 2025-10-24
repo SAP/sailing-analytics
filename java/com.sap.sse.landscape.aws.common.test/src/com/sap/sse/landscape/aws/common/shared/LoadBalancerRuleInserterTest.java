@@ -1,8 +1,8 @@
 package com.sap.sse.landscape.aws.common.shared;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
@@ -89,7 +89,7 @@ public class LoadBalancerRuleInserterTest {
         }
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         loadBalancerAdapter = new TestLoadBalancerAdapter();
         loadBalancerAdapter.addRules(Arrays.asList(new TestRuleAdapter(/* isDefault */ true, 0, DEFAULT_RULE_NAME)));

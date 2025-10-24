@@ -1,0 +1,8 @@
+package com.sap.sailing.domain.racelogtracking.impl;
+
+import com.sap.sailing.domain.racelogtracking.DeviceIdentifierStringSerializationHandler;
+
+public class SmartphoneImeiStringSerializationHandler extends SmartphoneImeiSerializationHandler
+implements DeviceIdentifierStringSerializationHandler {
+
+}

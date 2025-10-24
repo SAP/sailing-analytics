@@ -1,5 +1,7 @@
 package com.sap.sailing.server.test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,7 +9,9 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bson.Document;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
@@ -24,18 +28,16 @@ import com.sap.sailing.server.impl.RacingEventServiceImpl;
 import com.sap.sailing.server.interfaces.RacingEventService;
 import com.sap.sse.mongodb.MongoDBService;
 
-import junit.framework.TestCase;
-
-public class LeaderboardStorageTest extends TestCase {
+public class LeaderboardStorageTest {
 
     private static final String LEADERBOARD_NAME = "test";
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
         removeTestLeaderboard();
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         removeTestLeaderboard();
     }

@@ -20,6 +20,8 @@ import com.sap.sailing.gwt.home.shared.utils.LabelTypeUtil;
 import com.sap.sailing.gwt.home.shared.utils.LogoUtil;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.gwt.ui.shared.databylogo.DataByLogo;
+import com.sap.sse.gwt.client.media.MediaMenuIcon;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 
 public class EventHeader extends Composite {
     private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -32,14 +34,16 @@ public class EventHeader extends Composite {
     @UiField SpanElement eventRegattaUi;
     @UiField DivElement eventStateUi;
     @UiField AnchorElement eventLogoUi;
+    @UiField(provided=true) MediaMenuIcon eventLogoMenuButton;
     @UiField DivElement eventDateUi;
     @UiField DivElement eventLocationUi;
     @UiField DivElement eventHeader;
     @UiField DataByLogo dataByLogo;
     @UiField SharingButtons sharingButtons;
 
-    public EventHeader(EventContext eventContext, EventViewDTO event, String optionalRegattaDisplayName, PlaceNavigation<?> logoNavigation) {
+    public EventHeader(EventContext eventContext, EventViewDTO event, String optionalRegattaDisplayName, PlaceNavigation<?> logoNavigation, TakedownNoticeService takedownNoticeService) {
         EventHeaderResources.INSTANCE.css().ensureInjected();
+        this.eventLogoMenuButton = new MediaMenuIcon(takedownNoticeService, "takedownRequestForLogoImage");
         initWidget(uiBinder.createAndBindUi(this));
         setUiFieldValues(event, optionalRegattaDisplayName, logoNavigation);
         setupSharing(eventContext, event);
@@ -53,7 +57,7 @@ public class EventHeader extends Composite {
             nameSeparatorUi.removeFromParent();
         }
         LabelTypeUtil.renderLabelType(eventStateUi, event.getState().getStateMarker());
-        LogoUtil.setEventLogo(eventLogoUi, event);
+        LogoUtil.setEventLogo(eventLogoUi, event, eventLogoMenuButton);
         if (logoNavigation != null) {
             logoNavigation.configureAnchorElement(eventLogoUi);
         }

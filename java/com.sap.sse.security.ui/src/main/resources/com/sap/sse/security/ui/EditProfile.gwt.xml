@@ -13,6 +13,7 @@
   <inherits name="com.sap.sse.Security" />
   <inherits name="com.sap.sse.security.ui.SecurityLocalesSinglePermutation" />
   <inherits name="com.sap.sse.security.SSESecuritySerializers" />
+  <inherits name="com.sap.sse.landscape.aws.common.SSELandscapeAWSCommon" />
   
   <!-- Specify the app entry point class.                         -->
   <entry-point class='com.sap.sse.security.ui.editprofile.EditProfileEntryPoint'/>

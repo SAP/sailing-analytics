@@ -15,11 +15,11 @@ import com.sap.sailing.selenium.pages.adminconsole.advanced.FileStoragePO;
 import com.sap.sailing.selenium.pages.adminconsole.advanced.LocalServerPO;
 import com.sap.sailing.selenium.pages.adminconsole.advanced.MasterDataImportPO;
 import com.sap.sailing.selenium.pages.adminconsole.common.WhatsNewDialogPO;
-import com.sap.sailing.selenium.pages.adminconsole.connectors.ResultImportUrlsPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.connectors.ExpeditionDeviceConfigurationsPanelPO;
+import com.sap.sailing.selenium.pages.adminconsole.connectors.ResultImportUrlsPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.connectors.SmartphoneTrackingEventManagementPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.event.EventConfigurationPanelPO;
-import com.sap.sailing.selenium.pages.adminconsole.igtimi.IgtimiAccountsManagementPanelPO;
+import com.sap.sailing.selenium.pages.adminconsole.igtimi.IgtimiDevicesManagementPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardConfigurationPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardGroupConfigurationPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.racemanagementapp.RaceManagementAppPanelPO;
@@ -62,8 +62,8 @@ public class AdminConsolePage extends HostPageWithAuthentication {
     private static final String TRACTRAC_EVENTS_TAB_LABEL = "TracTrac Events"; //$NON-NLS-1$
     private static final String TRACTRAC_EVENTS_TAB_IDENTIFIER = "TracTracEventManagement"; //$NON-NLS-1$
     
-    private static final String IGTIMI_ACCOUNTS_TAB_LABEL = "Igtimi Accounts"; //$NON-NLS-1$
-    private static final String IGTIMI_ACCOUNTS_TAB_IDENTIFIER = "IgtimiAccounts"; //$NON-NLS-1$
+    private static final String IGTIMI_DEVICES_TAB_LABEL = "Igtimi Devices"; //$NON-NLS-1$
+    private static final String IGTIMI_DEVICES_TAB_IDENTIFIER = "IgtimiDevices"; //$NON-NLS-1$
     
     private static final String TRACKED_RACES_TAB_PARENT_LABEL = "Tracked races"; //$NON-NLS-1$
     private static final String TRACKED_RACES_TAB_PARENT_IDENTIFIER = "RacesPanel"; //$NON-NLS-1$
@@ -204,10 +204,10 @@ public class AdminConsolePage extends HostPageWithAuthentication {
                 TRACTRAC_EVENTS_TAB_IDENTIFIER, false));
     }
     
-    public IgtimiAccountsManagementPanelPO goToIgtimi() {
+    public IgtimiDevicesManagementPanelPO goToIgtimi() {
         goToTab(TRACTRAC_EVENTS_TAB_PARENT_LABEL, TRACTRAC_EVENTS_TAB_PARENT_IDENTIFIER, true);
-        return new IgtimiAccountsManagementPanelPO(this.driver, goToTab(IGTIMI_ACCOUNTS_TAB_LABEL,
-                IGTIMI_ACCOUNTS_TAB_IDENTIFIER, false));
+        return new IgtimiDevicesManagementPanelPO(this.driver, goToTab(IGTIMI_DEVICES_TAB_LABEL,
+                IGTIMI_DEVICES_TAB_IDENTIFIER, false));
     }
     
     public TrackedRacesManagementPanelPO goToTrackedRaces() {

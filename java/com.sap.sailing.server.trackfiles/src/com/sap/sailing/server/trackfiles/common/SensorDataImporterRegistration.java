@@ -19,12 +19,9 @@ public class SensorDataImporterRegistration {
         return properties;
     }
 
-    public static Collection<ServiceRegistration<DoubleVectorFixImporter>>
-        register(DoubleVectorFixImporter importer, BundleContext context) {
+    public static Collection<ServiceRegistration<DoubleVectorFixImporter>> register(DoubleVectorFixImporter importer, BundleContext context) {
         List<ServiceRegistration<DoubleVectorFixImporter>> registrations = new ArrayList<>();
-        
-        registrations
-                .add(context.registerService(DoubleVectorFixImporter.class, importer, getDict(importer.getType())));
+        registrations.add(context.registerService(DoubleVectorFixImporter.class, importer, getDict(importer.getType())));
         return registrations;
     }
 }

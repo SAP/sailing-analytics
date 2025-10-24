@@ -27,6 +27,7 @@ import com.sap.sse.security.shared.SocialUserAccount;
 import com.sap.sse.security.shared.UsernamePasswordAccount;
 import com.sap.sse.security.shared.WildcardPermission;
 import com.sap.sse.security.shared.impl.AccessControlList;
+import com.sap.sse.security.shared.impl.LockingAndBanningImpl;
 import com.sap.sse.security.shared.impl.Ownership;
 import com.sap.sse.security.shared.impl.Role;
 import com.sap.sse.security.shared.impl.User;
@@ -176,7 +177,9 @@ public class MongoObjectFactoryImpl implements MongoObjectFactory {
         dbUserGroup.put(FieldNames.UserGroup.NAME.name(), group.getName());
         BasicDBList dbUsernames = new BasicDBList();
         for (User user : group.getUsers()) {
-            dbUsernames.add(user.getName());
+            if (user != null) {
+                dbUsernames.add(user.getName());
+            }
         }
         dbUserGroup.put(FieldNames.UserGroup.USERNAMES.name(), dbUsernames);
         BasicDBList dbRoleDefinitionMap = new BasicDBList();
@@ -213,6 +216,14 @@ public class MongoObjectFactoryImpl implements MongoObjectFactory {
         dbUser.put(FieldNames.User.PASSWORD_RESET_SECRET.name(), user.getPasswordResetSecret());
         dbUser.put(FieldNames.User.VALIDATION_SECRET.name(), user.getValidationSecret());
         dbUser.put(FieldNames.User.ACCOUNTS.name(), createAccountMapObject(user.getAllAccounts()));
+        if (user.getLockingAndBanning() instanceof LockingAndBanningImpl) {
+            final LockingAndBanningImpl lockingAndBanning = ((LockingAndBanningImpl) user.getLockingAndBanning());
+            dbUser.put(FieldNames.User.LOCKED_UNTIL_MILLIS.name(), lockingAndBanning.getLockedUntil().asMillis());
+            dbUser.put(FieldNames.User.NEXT_LOCKING_DURATION_MILLIS.name(), lockingAndBanning.getNextLockingDelay().asMillis());
+        } else {
+            logger.warning("Expected user locking/banning to be of type "+LockingAndBanningImpl.class.getSimpleName()
+                    +" but was of type "+user.getLockingAndBanning().getClass().getSimpleName()+"; not storing to DB");
+        }
         BasicDBList dbRoles = new BasicDBList();
         for (Role role : user.getRoles()) {
             dbRoles.add(storeRole(role));

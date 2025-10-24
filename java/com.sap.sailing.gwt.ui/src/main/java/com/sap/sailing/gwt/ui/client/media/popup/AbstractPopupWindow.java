@@ -1,13 +1,20 @@
 package com.sap.sailing.gwt.ui.client.media.popup;
 
-import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Window;
+import com.sap.sse.gwt.client.StringMessages;
+import com.sap.sse.security.ui.client.AbstractSecureEntryPoint;
 
-public abstract class AbstractPopupWindow implements EntryPoint {
+public abstract class AbstractPopupWindow extends AbstractSecureEntryPoint<StringMessages> {
 
     @Override
-    public void onModuleLoad() {
+    public void doOnModuleLoad() {
+        super.doOnModuleLoad();
         initializePlayer();
+    }
+
+    @Override
+    protected StringMessages createStringMessages() {
+        return StringMessages.INSTANCE;
     }
     
     protected abstract void initializePlayer();
@@ -60,9 +67,7 @@ public abstract class AbstractPopupWindow implements EntryPoint {
 
     public void initPlayState(double deferredMediaTime, boolean deferredIsMuted, double deferredPlaybackSpeed,
             boolean deferredIsPlaying) {
-
         addCallbackMethods();
-
         setTime(deferredMediaTime);
         setMuted(deferredIsMuted);
         setPlaybackSpeed(deferredPlaybackSpeed);
@@ -71,18 +76,15 @@ public abstract class AbstractPopupWindow implements EntryPoint {
         } else {
             pause();
         }
-
     }
 
     protected void adjustWindowSize() {
         int windowWidth = Window.getClientWidth();
         int videoWidth = getVideoWidth();
         int widthDelta = videoWidth - windowWidth;
-
         int windowHeight = Window.getClientHeight();
         int videoHeight = getVideoHeight();
         int heightDelta = videoHeight - windowHeight;
-
         Window.resizeBy(widthDelta, heightDelta);
     }
 

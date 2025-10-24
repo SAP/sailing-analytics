@@ -31,6 +31,17 @@ public interface RaceLogTagEvent extends RaceLogEvent, Revokable {
     String getComment();
 
     /**
+     * Returns data that will not be displayed to the end user; it may be visible, e.g., when viewing the technical race log
+     * entries or user preference objects, so don't use this to store secrets. But it can be used, e.g., to store
+     * information that identifies the tag in some unique way, for example, when the tag was automatically produced by
+     * some rule or agent, and that rule or agent later needs to decide whether or not there already is a tag produced
+     * by that rule/agent for the race to which the tag pertains.
+     * 
+     * @return may be {@code null}
+     */
+    String getHiddenInfo();
+
+    /**
      * Returns optional image URL.
      * 
      * @return image URL of tag, may be <code>null</code> as images are optional

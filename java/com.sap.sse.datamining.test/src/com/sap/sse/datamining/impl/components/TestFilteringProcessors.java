@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.components.FilterCriterion;
 import com.sap.sse.datamining.components.Processor;
@@ -70,7 +70,7 @@ public class TestFilteringProcessors {
         }
     }
     
-    @Before
+    @BeforeEach
     public void initializeReceivers() {
         receivedElements = new HashMap<>();
         

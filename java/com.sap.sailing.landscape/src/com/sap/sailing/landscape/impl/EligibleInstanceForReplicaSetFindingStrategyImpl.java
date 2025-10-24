@@ -119,12 +119,13 @@ public class EligibleInstanceForReplicaSetFindingStrategyImpl implements Eligibl
 
     @Override
     public SailingAnalyticsHost<String> getInstanceToDeployTo(
-            AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet) {
+            AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet) throws Exception {
+        final Integer optionalIgtimiRiotPort = replicaSet.getMaster().getIgtimiRiotPort(Landscape.WAIT_FOR_PROCESS_TIMEOUT, Optional.ofNullable(optionalKeyName), privateKeyEncryptionPassphrase);
         return optionalPreferredInstanceToDeployTo.map(host->{
             logger.info("Checking preferred instance "+host+" for eligibility");
             try {
-                return landscapeService.isEligibleForDeployment(host, replicaSet.getServerName(), replicaSet.getPort(), Landscape.WAIT_FOR_PROCESS_TIMEOUT,
-                        optionalKeyName, privateKeyEncryptionPassphrase)
+                return landscapeService.isEligibleForDeployment(host, replicaSet.getServerName(), replicaSet.getPort(), optionalIgtimiRiotPort,
+                        Landscape.WAIT_FOR_PROCESS_TIMEOUT, optionalKeyName, privateKeyEncryptionPassphrase)
                     && isAcceptableAvailabilityZone(host.getAvailabilityZone(), replicaSet) ? host : null;
             } catch (Exception e) {
                 throw new RuntimeException(e);

@@ -111,16 +111,17 @@ public class AddShardingKeyToShard<ShardingKey, MetricsT extends ApplicationProc
             // check number of rules
             final Set<ShardingKey> keysCopy = new HashSet<>();
             keysCopy.addAll(shardingKeys);
+            final ApplicationLoadBalancer<ShardingKey> alb;
             if (Util.size(loadBalancer.getRules()) + numberOfRequiredRules(Util.size(shardingKeys))
                     < ApplicationLoadBalancer.MAX_RULES_PER_LOADBALANCER) {
-                // enough rules
-                addShardingRules(loadBalancer, keysCopy, targetgroup);
+                // enough rules can be added to existing loadBalancer
+                alb = loadBalancer;
             } else {
-                // not enough rules
-                final ApplicationLoadBalancer<ShardingKey> alb = getFreeLoadBalancerAndMoveReplicaSet();
-                // set new rules
-                addShardingRules(alb, keysCopy, targetgroup);
+                // not enough rules; move replica set to a free / new load balancer
+                alb = getFreeLoadBalancerAndMoveReplicaSet();
             }
+            // set new rules
+            addShardingRules(alb, keysCopy, targetgroup);
         }
     }
 

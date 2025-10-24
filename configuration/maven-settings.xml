@@ -33,22 +33,6 @@
         </parameters.integration-tests>
       </properties>
     </profile>
-
-    <profile>
-      <id>use-staged-third-party-artifacts</id>
-      <pluginRepositories>
-         <pluginRepository>
-            <id>staged-third-party-artifacts</id>
-            <url>http://nexus.wdf.sap.corp:8081/nexus/content/repositories/3rd-party.releases.manual-uploads.all-closed-stages/</url>
-         </pluginRepository>
-      </pluginRepositories>
-      <repositories>
-         <repository>
-            <id>staged-third-party-artifacts</id>
-            <url>http://nexus.wdf.sap.corp:8081/nexus/content/repositories/3rd-party.releases.manual-uploads.all-closed-stages/</url>
-         </repository>
-      </repositories>
-    </profile>
   </profiles>
 </settings>
 

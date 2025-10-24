@@ -25,16 +25,20 @@ public class RaceMapLifecycle implements ComponentLifecycle<RaceMapSettings> {
     public SecuredDTO getRaceDTO() {
         return raceDTO;
     }
+    
+    public PaywallResolver getPaywallResolver() {
+        return paywallResolver;
+    }
 
     @Override
     public RaceMapSettingsDialogComponent getSettingsDialogComponent(RaceMapSettings settings) {
         return new RaceMapSettingsDialogComponent(settings, stringMessages,
-                /* hasPolar */ true, paywallResolver, raceDTO);
+                /* hasPolar */ true);
     }
 
     @Override
     public RaceMapSettings createDefaultSettings() {
-        return new RaceMapSettings();
+        return new RaceMapSettings(paywallResolver, raceDTO);
     }
 
     @Override
@@ -63,7 +67,7 @@ public class RaceMapLifecycle implements ComponentLifecycle<RaceMapSettings> {
                 settings.isShowSimulationOverlay(), settings.isShowMapControls(), settings.getManeuverTypesToShow(),
                 settings.isShowDouglasPeuckerPoints(), settings.isShowEstimatedDuration(),
                 settings.getStartCountDownFontSizeScaling(), settings.isShowManeuverLossVisualization(),
-                settings.isShowSatelliteLayer(), settings.isShowWindLadder());
+                settings.isShowSatelliteLayer(), settings.isShowWindLadder(), settings.getPaywallResolver(), settings.getSecuredDTO());
     }
 
     @Override
@@ -77,6 +81,6 @@ public class RaceMapLifecycle implements ComponentLifecycle<RaceMapSettings> {
                 settings.isShowSimulationOverlay(), settings.isShowMapControls(), settings.getManeuverTypesToShow(),
                 settings.isShowDouglasPeuckerPoints(), settings.isShowEstimatedDuration(),
                 settings.getStartCountDownFontSizeScaling(), settings.isShowManeuverLossVisualization(),
-                settings.isShowSatelliteLayer(), settings.isShowWindLadder());
+                settings.isShowSatelliteLayer(), settings.isShowWindLadder(), settings.getPaywallResolver(), settings.getSecuredDTO());
     }
 }

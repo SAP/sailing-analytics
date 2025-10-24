@@ -24,9 +24,11 @@ public class ManeuverTableSettings extends AbstractGenericSerializableSettings {
      * The default settings
      */
     public ManeuverTableSettings() {
+        super();
     }
 
     public ManeuverTableSettings(Set<ManeuverType> selectedManeuverTypes) {
+        this();
         this.selectedManeuverTypes.setValues(selectedManeuverTypes);
     }
 

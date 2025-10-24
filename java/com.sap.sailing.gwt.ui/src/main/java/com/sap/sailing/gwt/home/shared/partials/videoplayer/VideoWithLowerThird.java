@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.sap.sailing.gwt.home.communication.event.LabelType;
 import com.sap.sailing.gwt.home.shared.partials.lowerthird.LowerThird;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 import com.sap.sse.gwt.client.media.VideoDTO;
 
 /**
@@ -14,12 +15,12 @@ public class VideoWithLowerThird extends VideoPlayer {
     private String videoSourceRef;
     private Date videoCreatedAt;
 
-    public VideoWithLowerThird() {
-        this(true, false);
+    public VideoWithLowerThird(TakedownNoticeService takedownNoticeService, String eventName) {
+        this(true, false, takedownNoticeService, eventName);
     }
 
-    public VideoWithLowerThird(boolean fullHeightWidth, boolean autoplay) {
-        super(fullHeightWidth, autoplay);
+    public VideoWithLowerThird(boolean fullHeightWidth, boolean autoplay, TakedownNoticeService takedownNoticeService, String eventName) {
+        super(fullHeightWidth, autoplay, takedownNoticeService, eventName);
     }
 
     @Override

@@ -16,7 +16,7 @@
     </properties>       
     <groupId>com.amazon.aws</groupId>
     <artifactId>com.amazon.aws.aws-java-api</artifactId>
-    <version>2.25.11</version>
+    <version>2.32.25</version>
     <packaging>eclipse-plugin</packaging>
         <build>
         <plugins>

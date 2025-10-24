@@ -6,6 +6,8 @@ import java.net.URL;
 
 import javax.ws.rs.core.UriInfo;
 
+import com.sap.sse.common.Base64Utils;
+
 public class TokenizedHomePlaceUrlBuilder {
     private static final String EVENT_PATH = "/event";
     private static final String SERIES_PATH = "/series";
@@ -14,7 +16,15 @@ public class TokenizedHomePlaceUrlBuilder {
     private static final String HOME_HTML = "/Home.html";
     private static final String STARTOFPARAMS = "/:";
     private static final String STARTOFTOKENPATH = "#";
+
+    /**
+     * See also {@code AbstractEventPlace.Tokenizer.PARAM_EVENTID}
+     */
     private static final String EVENT_ID_PARAM = "eventId";
+    
+    /**
+     * See also {@code AbstractEventPlace.Tokenizer.PARAM_REGATTAID}
+     */
     private static final String REGATTA_ID_PARAM = "regattaId";
     private static final String LEADERBOARD_GROUP_ID_PARAM = "leaderboardGroupId";
 
@@ -49,7 +59,7 @@ public class TokenizedHomePlaceUrlBuilder {
         String url = new String(baseUrl.toString());
         url += STARTOFTOKENPATH + REGATTA_OVERVIEW_PATH;
         url += buildToken(eventId, EVENT_ID_PARAM);
-        url += buildToken(regattaId, REGATTA_ID_PARAM);
+        url += buildToken(Base64Utils.toBase64(regattaId.getBytes()), REGATTA_ID_PARAM);
         return url;
     }
 

@@ -13,6 +13,5 @@ import com.sap.sse.replication.ReplicableWithObjectInputStream;
  */
 public interface ReplicableWindEstimationFactoryService extends WindEstimationFactoryService,
         ReplicableWithObjectInputStream<ReplicableWindEstimationFactoryService, WindEstimationModelsUpdateOperation> {
-
     void updateWindEstimationModels(ExportedModels exportedModels) throws ModelPersistenceException;
 }

@@ -13,14 +13,23 @@ import com.sap.sse.common.Bearing;
  *
  */
 public interface CoordinateSystem {
-    Position map(Position position);
-
+    /**
+     * Maps a real-world true bearing to a bearing on the map. If the map can be rotated natively,
+     * this method will simply return the same {@code bearing} passed as argument unchanged. However,
+     * a coordinate system for a map that cannot be displayed in ways other than North-Up will have
+     * to adjust the bearing by the rotation angle because then the map bearings do not correspond
+     * to true bearings anymore.
+     */
     Bearing map(Bearing bearing);
     
     /**
-     * Same as {@link #map(Bearing)}, only that the true bearing to be mapped is provided as a degree value.
+     * Similar to {@link #map(Bearing)}; the true bearing to be mapped is provided as a degree value.
      * Of course, this method can not only be used for a "bearing" but also for true headings, true
-     * courses, true directions, and so on.
+     * courses, true directions, and so on.<p>
+     * 
+     * Other than {@link #map(Bearing)}, this method transforms a display angle for the {@code div}
+     * element showing the map. A coordinate system implementation will therefore have to consider
+     * the map's rotation angle in this method.
      * 
      * @return a degree angle from the interval [0..360)
      */

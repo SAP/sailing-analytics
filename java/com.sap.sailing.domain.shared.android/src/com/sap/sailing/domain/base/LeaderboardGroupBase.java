@@ -7,6 +7,7 @@ import com.sap.sse.security.shared.WithQualifiedObjectIdentifier;
 public interface LeaderboardGroupBase extends Renamable, NamedWithUUID, WithQualifiedObjectIdentifier, WithDescription {
     void setDescriptiom(String description);
     boolean hasOverallLeaderboard();
+    String getOverallLeaderboardName();
     String getDisplayName();
     void setDisplayName(String displayName);
 }

@@ -16,7 +16,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
@@ -57,7 +57,7 @@ public abstract class ImageDialog extends DataEntryDialog<List<ImageResizingTask
     private final ExpandedUiWithCheckboxes<String> expandedUi;
     private final BusyIndicator busyIndicator;
     private int busyCounter;
-    private final HashMap<String, Pair<Integer, Integer>> imageDimensionsMap;
+    private final Map<String, Pair<Integer, Integer>> imageDimensionsMap;
 
     protected static class ImageParameterValidator implements Validator<List<ImageResizingTaskDTO>> {
         private final StringMessages stringMessages;
@@ -297,7 +297,7 @@ public abstract class ImageDialog extends DataEntryDialog<List<ImageResizingTask
                                     });
                         }
                     }
-                    if(busyCounter <= 0) {
+                    if (busyCounter <= 0) {
                         busyIndicator.setBusy(false);
                     }
                 }
@@ -367,7 +367,6 @@ public abstract class ImageDialog extends DataEntryDialog<List<ImageResizingTask
             if (dims != null) {
                 image.setSizeInPx(dims.getA(), dims.getB());
                 fileInfoText = new Label(fileName + " (" + dims.getA() + "x" + dims.getB() + ")");
-                
             } else {
                 fileInfoText = new Label(fileName);
             }
@@ -433,7 +432,7 @@ public abstract class ImageDialog extends DataEntryDialog<List<ImageResizingTask
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return imageURLAndUploadComposite.getInitialFocusWidget();
     }
     

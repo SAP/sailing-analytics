@@ -171,7 +171,7 @@ public class RegattaOverviewPanel extends SimplePanel {
 
     private void continueInitAfterRaceGroupsRetrieved() {
         final StoredSettingsLocation storageDefinition = StoredSettingsLocationFactory.createStoredSettingsLocatorForRegattaOverview(regattaOverviewContextDefinition);
-        final RegattaRaceStatesComponentLifecycle lifecycle = new RegattaRaceStatesComponentLifecycle(eventDTO == null ? null : eventDTO.venue.getCourseAreas(), raceGroupDTOs);
+        final RegattaRaceStatesComponentLifecycle lifecycle = new RegattaRaceStatesComponentLifecycle(eventDTO == null ? null : eventDTO.getVenue().getCourseAreas(), raceGroupDTOs);
         componentContext = new ComponentContextWithSettingsStorage<>(lifecycle, userService, storageDefinition);
         componentContext.getInitialSettings(new DefaultOnSettingsLoadedCallback<RegattaRaceStatesSettings>() {
             @Override

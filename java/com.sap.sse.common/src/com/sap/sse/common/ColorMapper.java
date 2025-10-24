@@ -6,20 +6,40 @@ import java.util.Set;
 /**
  * Maps a given range of values to a full color spectrum. The color spectrum could also be a grey scale. Therefore it
  * needs the max and the min value to be mapped. It uses a {@link ValueRangeFlexibleBoundaries} to get those. The
- * ColorMapper has listeners that will be notified if the colormapping has been changed.
+ * ColorMapper has {@link ColorMapperChangedListener listeners} that will be notified if the color mapping has been
+ * changed.
  * 
  * @author D073259 (Alessandro Stoltenberg)
  *
  */
 public class ColorMapper implements ValueRangeFlexibleBoundariesChangedListener {
+    public static final int MAX_HUE = 315;
     private final ValueRangeFlexibleBoundaries valueRange;
     private double minValue;
     private double maxValue;
     private boolean isGrey;
     private final Set<ColorMapperChangedListener> colorMapperChangedListeners;
+    private final ValueSpreader valueSpreader;
 
-    public ColorMapper(ValueRangeFlexibleBoundaries valueRange, boolean isGrey) {
+    /**
+     * Spreads a value that is between 0..1 to the same range 0..1, but may introduce some function
+     * in between. Most trivially would be a function f(x)=x that linearly spreads all values out across
+     * the spectrum.
+     * 
+     * @author Axel Uhl (d043530)
+     *
+     */
+    @FunctionalInterface
+    public static interface ValueSpreader {
+        ValueSpreader LINEAR = v->v;
+        ValueSpreader CUBIC_ROOT = v->(Math.pow(Math.abs(2*(v-0.5)), 1./3.)*Math.signum((v-0.5))+1.0)/2.0;
+        
+        double getSpreadOutValue(double value);
+    }
+    
+    public ColorMapper(ValueRangeFlexibleBoundaries valueRange, boolean isGrey, ValueSpreader valueSpreader) {
         this.valueRange = valueRange;
+        this.valueSpreader = valueSpreader;
         this.valueRange.addListener(this);
         minValue = this.valueRange.getMinLeft();
         maxValue = this.valueRange.getMaxRight();
@@ -46,15 +66,15 @@ public class ColorMapper implements ValueRangeFlexibleBoundariesChangedListener 
             } else if (value > maxValue) {
                 result = "rgba(255,255,255,1.0)";
             } else {
-                result = "rgba(255,255,255," + Math.min(1.0, (value - minValue) / (maxValue - minValue)) + ")";
+                result = "rgba(255,255,255," + valueSpreader.getSpreadOutValue((value - minValue) / (maxValue - minValue)) + ")";
             }
         } else {
             if (value < minValue) {
-                result = "hsl(240, 100%, 50%)";
+                result = "hsl("+MAX_HUE+", 100%, 50%)";
             } else if (value > maxValue) {
                 result = "hsl(0, 100%, 50%)";
             } else {
-                double h = (1 - (value - minValue) / (maxValue - minValue)) * 240;
+                double h = valueSpreader.getSpreadOutValue(1 - (value - minValue) / (maxValue - minValue)) * MAX_HUE;
                 result = "hsl(" + Math.round(h) + ", 100%, 50%)";
             }
         }

@@ -39,6 +39,7 @@ public interface BravoExtendedFix extends BravoFix {
     Double getExpeditionHDG();
     Double getExpeditionHeel();
     Double getExpeditionTG_Heell();
+    Double getExpeditionKickerTension();
     /**
      * The time to gun in seconds; the value is converted from the Expedition-internal time format based on days
      */

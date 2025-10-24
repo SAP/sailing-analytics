@@ -4,7 +4,7 @@ This page describes how to create the SVG graphics for different boat classes wh
 
 ## Inkscape
 
-We are using the free Inkscape (http://inkscape.org/) as the tool to create and edit SVG graphics.
+We are using the free Inkscape (https://inkscape.org/) as the tool to create and edit SVG graphics.
 However, there are some settings you have to change in Inkscape before you should start working with it.
 
 ### Inkscape preferences
@@ -18,7 +18,7 @@ To draw the boats later on the map with the right scale/size we also have to be 
 
 ## Conversion of SVG graphics into a Canvas drawing commands
 
-You can use the online tool 'SVG to HTML5 Canvas Converter' http://www.professorcloud.com/svg-to-canvas/ to convert the SVG graphics to a list of drawing commands. So for example a SVG line<br/>
+(Probably outdated: You can use the online tool 'SVG to HTML5 Canvas Converter' https://www.professorcloud.com/svg-to-canvas/ to convert the SVG graphics to a list of drawing commands. So for example a SVG line<br/>
 &lt;line x1="1050" y1="651" x2="1050" y2="49" id="line75" /><br/>
 will be converted to something like<br/>
 ctx.beginPath();<br/>
@@ -26,7 +26,9 @@ ctx.moveTo(1050,651);<br/>
 ctx.lineTo(1050,49);<br/>
 ctx.fill();<br/>
 ctx.stroke();<br/>
-This is actually javascript code but can almost directly be used as Java code as well.
+This is actually javascript code but can almost directly be used as Java code as well.)
+
+Update: according to [https://www.quora.com/How-do-I-convert-SVG-to-canvas](https://www.quora.com/How-do-I-convert-SVG-to-canvas) Inkscape meanwhile support a "Save as HTML5 canvas" option. This should probably do the trick, as professorcloud.com has long disappeared.
 
 ## Pitfalls
 Sometimes it happens during the editing of the SVG that you accidentally create transformations for the whole graphics...

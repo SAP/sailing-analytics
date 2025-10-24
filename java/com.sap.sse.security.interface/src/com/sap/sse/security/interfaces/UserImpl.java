@@ -24,6 +24,7 @@ import com.sap.sse.security.shared.Account.AccountType;
 import com.sap.sse.security.shared.RoleDefinition;
 import com.sap.sse.security.shared.UserGroupProvider;
 import com.sap.sse.security.shared.WildcardPermission;
+import com.sap.sse.security.shared.impl.LockingAndBanning;
 import com.sap.sse.security.shared.impl.Ownership;
 import com.sap.sse.security.shared.impl.Role;
 import com.sap.sse.security.shared.impl.SecurityUserImpl;
@@ -99,23 +100,26 @@ public class UserImpl extends SecurityUserImpl<RoleDefinition, Role, UserGroup, 
     private List<Role> roleListForSerialization;
 
     private Subscription[] subscriptions;
+    
+    private final LockingAndBanning lockingAndBanning;
 
     public UserImpl(String name, String email, Map<String, UserGroup> defaultTenantForServer,
-            UserGroupProvider userGroupProvider, Account... accounts) {
-        this(name, email, defaultTenantForServer, Arrays.asList(accounts), userGroupProvider);
+            UserGroupProvider userGroupProvider, LockingAndBanning lockingAndBanning, Account... accounts) {
+        this(name, email, defaultTenantForServer, Arrays.asList(accounts), userGroupProvider, lockingAndBanning);
     }
 
     public UserImpl(String name, String email, Map<String, UserGroup> defaultTenantForServer,
-            Collection<Account> accounts, UserGroupProvider userGroupProvider) {
+            Collection<Account> accounts, UserGroupProvider userGroupProvider, LockingAndBanning lockingAndBanning) {
         this(name, email, /* fullName */ null, /* company */ null, /* locale */ null, /* is email validated */ false,
                 /* password reset secret */ null, /* validation secret */ null, defaultTenantForServer, accounts,
-                userGroupProvider);
+                userGroupProvider, lockingAndBanning);
     }
 
     public UserImpl(String name, String email, String fullName, String company, Locale locale, Boolean emailValidated,
             String passwordResetSecret, String validationSecret, Map<String, UserGroup> defaultTenantForServer,
-            Collection<Account> accounts, UserGroupProvider userGroupProvider) {
+            Collection<Account> accounts, UserGroupProvider userGroupProvider, LockingAndBanning lockingAndBanning) {
         super(name);
+        this.lockingAndBanning = lockingAndBanning;
         this.defaultTenantForServer = defaultTenantForServer;
         this.fullName = fullName;
         this.company = company;
@@ -462,5 +466,10 @@ public class UserImpl extends SecurityUserImpl<RoleDefinition, Role, UserGroup, 
             }
         }
         return false;
+    }
+
+    @Override
+    public LockingAndBanning getLockingAndBanning() {
+        return lockingAndBanning;
     }
 }

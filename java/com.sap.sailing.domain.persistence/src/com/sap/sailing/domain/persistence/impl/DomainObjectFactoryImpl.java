@@ -1398,7 +1398,7 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
             final RankingMetricConstructor rankingMetricConstructor = loadRankingMetricConstructor(dbRegatta);
             String registrationLinkSecret = (String) dbRegatta.get(FieldNames.REGATTA_REGISTRATION_LINK_SECRET.name());
             if (createMigratableRegatta) {
-                result = new MigratableRegattaImpl(getRaceLogStore(), getRegattaLogStore(), name, boatClass,
+                result = new <Series> MigratableRegattaImpl(getRaceLogStore(), getRegattaLogStore(), name, boatClass,
                         canBoatsOfCompetitorsChangePerRace, competitorRegistrationType, startDate, endDate, series, /* persistent */true,
                         loadScoringScheme(dbRegatta), id, courseAreas,
                         buoyZoneRadiusInHullLengths == null ? Regatta.DEFAULT_BUOY_ZONE_RADIUS_IN_HULL_LENGTHS
@@ -1408,7 +1408,7 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
                                 autoRestartTrackingUponCompetitorSetChange == null ? false : autoRestartTrackingUponCompetitorSetChange, rankingMetricConstructor,
                                         new MongoObjectFactoryImpl(database), registrationLinkSecret);
             } else {
-                result = new RegattaImpl(getRaceLogStore(), getRegattaLogStore(), name, boatClass,
+                result = new <Series> RegattaImpl(getRaceLogStore(), getRegattaLogStore(), name, boatClass,
                         canBoatsOfCompetitorsChangePerRace, competitorRegistrationType, startDate, endDate, series, /* persistent */true,
                         loadScoringScheme(dbRegatta), id, courseAreas,
                         buoyZoneRadiusInHullLengths == null ? Regatta.DEFAULT_BUOY_ZONE_RADIUS_IN_HULL_LENGTHS
@@ -1945,9 +1945,10 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
             Document dbObject) {
         String tag = (String) dbObject.get(FieldNames.RACE_LOG_TAG.name());
         String comment = (String) dbObject.get(FieldNames.RACE_LOG_COMMENT.name());
+        String hiddenInfo = (String) dbObject.get(FieldNames.RACE_LOG_HIDDEN_INFO.name());
         String imageUrl = (String) dbObject.get(FieldNames.RACE_LOG_IMAGE_URL.name());
         String resizedImageURL = (String) dbObject.get(FieldNames.RACE_LOG_RESIZED_IMAGE_URL.name());
-        return new RaceLogTagEventImpl(tag, comment, imageUrl, resizedImageURL, createdAt, logicalTimePoint, author, id, passId);
+        return new RaceLogTagEventImpl(tag, comment, hiddenInfo, imageUrl, resizedImageURL, createdAt, logicalTimePoint, author, id, passId);
     }
 
     private RaceLogEvent loadRaceLogGateLineOpeningTimeEvent(TimePoint createdAt, AbstractLogEventAuthor author,

@@ -1,12 +1,16 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:m="urn:import:com.sap.sse.gwt.client.media">
 	<ui:with field="i18n" type="com.sap.sailing.gwt.ui.client.StringMessages" />
 	<ui:with field="res" type="com.sap.sailing.gwt.common.client.SharedResources" />
 	<ui:with field="local_res" type="com.sap.sailing.gwt.home.desktop.partials.event.EventTeaserResources" />
 	<g:HTMLPanel>
   		<div class="{local_res.css.eventteasercontainer}">
 			<a ui:field="eventLink" class="{local_res.css.eventteaser}">
-				<div ui:field="eventImage" class="{local_res.css.eventteaser_image}"></div>
+				<div ui:field="eventImage" class="{local_res.css.eventteaser_image} {res.mainCss.media_wrapper}">
+                  <m:MediaMenuIcon ui:field="takedownButton"/>
+                </div>
 				<div class="{local_res.css.eventteaser_title}">
 					<div class="{local_res.css.eventteaser_title_name}">
 						<div ui:field="eventState" data-labeltype="live" style="margin-top: 0px;"

@@ -125,9 +125,9 @@
 }
 
 .tagCellImage img {
-	min-width: 100%;
 	max-Width: 100%;
 	height: auto;
+    object-fit: scale-down;
 }
 
 .tagCellImage:not(:last-child) {

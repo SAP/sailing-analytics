@@ -321,8 +321,7 @@ public class DelegatingRegattaLeaderboardWithCompetitorElimination extends Abstr
     }
 
     @Override
-    public Double getNetPoints(Competitor competitor, Iterable<RaceColumn> raceColumnsToConsider, TimePoint timePoint)
-            throws NoWindException {
+    public Double getNetPoints(Competitor competitor, Iterable<RaceColumn> raceColumnsToConsider, TimePoint timePoint) {
         return getDelegateLeaderboard().getNetPoints(competitor, raceColumnsToConsider, timePoint);
     }
 

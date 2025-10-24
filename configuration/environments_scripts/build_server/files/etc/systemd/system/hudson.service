@@ -9,5 +9,5 @@ RequiredBy=multi-user.target
 [Service]
 Type=oneshot
 RemainAfterExit=true
-ExecStart=/etc/init.d/hudson start
-ExecStop=/etc/init.d/hudson stop
+ExecStart=/usr/local/bin/hudson start
+ExecStop=/usr/local/bin/hudson stop

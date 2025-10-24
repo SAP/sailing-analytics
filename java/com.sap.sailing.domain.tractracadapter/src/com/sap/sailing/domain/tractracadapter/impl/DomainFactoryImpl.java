@@ -69,6 +69,8 @@ import com.sap.sailing.domain.racelog.RaceLogStore;
 import com.sap.sailing.domain.ranking.RankingMetricConstructor;
 import com.sap.sailing.domain.ranking.RankingMetricsFactory;
 import com.sap.sailing.domain.regattalog.RegattaLogStore;
+import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
+import com.sap.sailing.domain.shared.tracking.impl.TrackingConnectorInfoImpl;
 import com.sap.sailing.domain.tracking.DynamicRaceDefinitionSet;
 import com.sap.sailing.domain.tracking.DynamicTrackedRace;
 import com.sap.sailing.domain.tracking.DynamicTrackedRegatta;
@@ -78,23 +80,19 @@ import com.sap.sailing.domain.tracking.RaceTrackingConnectivityParameters;
 import com.sap.sailing.domain.tracking.RaceTrackingHandler;
 import com.sap.sailing.domain.tracking.TrackedRegatta;
 import com.sap.sailing.domain.tracking.TrackedRegattaRegistry;
-import com.sap.sailing.domain.tracking.TrackingConnectorInfo;
 import com.sap.sailing.domain.tracking.WindStore;
 import com.sap.sailing.domain.tracking.WindTrack;
 import com.sap.sailing.domain.tracking.impl.FinishTimeUpdateHandler;
 import com.sap.sailing.domain.tracking.impl.RaceAbortedHandler;
 import com.sap.sailing.domain.tracking.impl.StartTimeUpdateHandler;
-import com.sap.sailing.domain.tracking.impl.TrackingConnectorInfoImpl;
 import com.sap.sailing.domain.tractracadapter.DomainFactory;
 import com.sap.sailing.domain.tractracadapter.JSONService;
 import com.sap.sailing.domain.tractracadapter.MetadataParser;
 import com.sap.sailing.domain.tractracadapter.MetadataParser.BoatMetaData;
-import com.sap.sailing.domain.tractracadapter.MetadataParser.ControlPointMetaData;
 import com.sap.sailing.domain.tractracadapter.Receiver;
 import com.sap.sailing.domain.tractracadapter.ReceiverType;
 import com.sap.sailing.domain.tractracadapter.TracTracAdapter;
 import com.sap.sailing.domain.tractracadapter.TracTracConfiguration;
-import com.sap.sailing.domain.tractracadapter.TracTracControlPoint;
 import com.sap.sailing.domain.tractracadapter.TracTracRaceTracker;
 import com.sap.sse.common.Color;
 import com.sap.sse.common.Duration;
@@ -115,7 +113,8 @@ import com.tractrac.model.lib.api.event.ICompetitorClass;
 import com.tractrac.model.lib.api.event.IEvent;
 import com.tractrac.model.lib.api.event.IRace;
 import com.tractrac.model.lib.api.event.IRaceCompetitor;
-import com.tractrac.model.lib.api.route.IControl;
+import com.tractrac.model.lib.api.map.IMapItem;
+import com.tractrac.model.lib.api.map.IPositionedItem;
 import com.tractrac.subscription.lib.api.IEventSubscriber;
 import com.tractrac.subscription.lib.api.IRaceSubscriber;
 import com.tractrac.subscription.lib.api.SubscriberInitializationException;
@@ -129,7 +128,7 @@ public class DomainFactoryImpl implements DomainFactory {
     
     private final com.sap.sailing.domain.base.DomainFactory baseDomainFactory;
     
-    private final WeakValueCache<TracTracControlPoint, com.sap.sailing.domain.base.ControlPoint> controlPointCache = new WeakValueCache<>(new HashMap<>());
+    private final WeakValueCache<IMapItem, com.sap.sailing.domain.base.ControlPoint> controlPointCache = new WeakValueCache<>(new HashMap<>());
     
     private final Map<com.sap.sse.common.Util.Pair<String, UUID>, DynamicPerson> personCache = new HashMap<>();
     
@@ -206,9 +205,9 @@ public class DomainFactoryImpl implements DomainFactory {
     }
     
     @Override
-    public void updateCourseWaypoints(Course courseToUpdate, Iterable<com.sap.sse.common.Util.Pair<TracTracControlPoint, PassingInstruction>> controlPoints) throws PatchFailedException {
+    public void updateCourseWaypoints(Course courseToUpdate, Iterable<Pair<IMapItem, PassingInstruction>> controlPoints) throws PatchFailedException {
         List<com.sap.sse.common.Util.Pair<com.sap.sailing.domain.base.ControlPoint, PassingInstruction>> newDomainControlPoints = new ArrayList<>();
-        for (com.sap.sse.common.Util.Pair<TracTracControlPoint, PassingInstruction> tractracControlPoint : controlPoints) {
+        for (Pair<IMapItem, PassingInstruction> tractracControlPoint : controlPoints) {
             com.sap.sailing.domain.base.ControlPoint newDomainControlPoint = getOrCreateControlPoint(tractracControlPoint.getA());
             newDomainControlPoints.add(new com.sap.sse.common.Util.Pair<com.sap.sailing.domain.base.ControlPoint, PassingInstruction>(newDomainControlPoint, tractracControlPoint.getB()));
         }
@@ -217,11 +216,11 @@ public class DomainFactoryImpl implements DomainFactory {
     }
 
     @Override
-    public List<Sideline> createSidelines(final String raceMetadataString, final Iterable<? extends TracTracControlPoint> allEventControlPoints) {
-        List<Sideline> sidelines = new ArrayList<Sideline>();
-        Map<String, Iterable<TracTracControlPoint>> sidelinesMetadata = getMetadataParser().parseSidelinesFromRaceMetadata(
+    public List<Sideline> createSidelines(final String raceMetadataString, final Iterable<? extends IMapItem> allEventControlPoints) {
+        final List<Sideline> sidelines = new ArrayList<Sideline>();
+        final Map<String, Iterable<IPositionedItem>> sidelinesMetadata = getMetadataParser().parseSidelinesFromRaceMetadata(
                 raceMetadataString, allEventControlPoints);
-        for (Entry<String, Iterable<TracTracControlPoint>> sidelineEntry : sidelinesMetadata.entrySet()) {
+        for (Entry<String, Iterable<IPositionedItem>> sidelineEntry : sidelinesMetadata.entrySet()) {
             if (Util.size(sidelineEntry.getValue()) > 0) {
                 sidelines.add(createSideline(sidelineEntry.getKey(), sidelineEntry.getValue()));
             }
@@ -229,40 +228,45 @@ public class DomainFactoryImpl implements DomainFactory {
         return sidelines;
     }
     
-    public com.sap.sailing.domain.base.ControlPoint getOrCreateControlPoint(TracTracControlPoint controlPoint) {
+    public ControlPoint getOrCreateControlPoint(IMapItem mapItem) {
         synchronized (controlPointCache) {
-            com.sap.sailing.domain.base.ControlPoint domainControlPoint = controlPointCache.get(controlPoint);
+            ControlPoint domainControlPoint = controlPointCache.get(mapItem);
             if (domainControlPoint == null) {
-                final Iterable<MetadataParser.ControlPointMetaData> controlPointMetadata = getMetadataParser().parseControlPointMetadata(controlPoint);
                 final List<Mark> marks = new ArrayList<Mark>();
-                for (ControlPointMetaData markMetadata : controlPointMetadata) {
-                    final Mark mark = baseDomainFactory.getOrCreateMark(markMetadata.getId(), markMetadata.getName(),
-                            /* no separate short name; use name as short name, too */ markMetadata.getName(),
-                            markMetadata.getType(), markMetadata.getColor(),
-                            markMetadata.getShape(), markMetadata.getPattern());
+                for (IPositionedItem positionedItem : mapItem.getPositionedItems()) {
+                    final Mark mark = getOrCreateMark(positionedItem);
                     marks.add(mark);
                 }
-                if (controlPoint.getHasTwoPoints()) {
-                    // it's a gate
-                    Iterator<Mark> markIter = marks.iterator();
-                    Mark mark1 = markIter.next();
-                    Mark mark2 = markIter.next();
-                    domainControlPoint = baseDomainFactory.createControlPointWithTwoMarks(controlPoint.getId(), mark1,
-                            mark2, controlPoint.getName(), controlPoint.getShortName());
+                if (mapItem.isMultiple()) {
+                    // it's a gate or line or mark with offset mark
+                    final Iterator<Mark> markIter = marks.iterator();
+                    final Mark mark1 = markIter.next();
+                    final Mark mark2 = markIter.next();
+                    domainControlPoint = baseDomainFactory.createControlPointWithTwoMarks(mapItem.getId(), mark1,
+                            mark2, mapItem.getName(), mapItem.getShortName());
                 } else {
-                    Mark mark = marks.iterator().next();
+                    final Mark mark = marks.iterator().next();
                     domainControlPoint = mark;
                 }
-                controlPointCache.put(controlPoint, domainControlPoint);
+                controlPointCache.put(mapItem, domainControlPoint);
             }
             return domainControlPoint;
         }
     }
 
+    public Mark getOrCreateMark(IPositionedItem positionedItem) {
+        final MetadataParser.ControlPointMetaData markMetadata = getMetadataParser().parseControlPointMetadata(positionedItem);
+        final Mark mark = baseDomainFactory.getOrCreateMark(markMetadata.getId(), markMetadata.getName(),
+                /* no separate short name; use name as short name, too */ markMetadata.getName(),
+                markMetadata.getType(), markMetadata.getColor(),
+                markMetadata.getShape(), markMetadata.getPattern());
+        return mark;
+    }
+
     @Override
-    public Course createCourse(String name, Iterable<com.sap.sse.common.Util.Pair<TracTracControlPoint, PassingInstruction>> controlPoints) {
+    public Course createCourse(String name, Iterable<com.sap.sse.common.Util.Pair<IMapItem, PassingInstruction>> controlPoints) {
         List<Waypoint> waypointList = new ArrayList<Waypoint>();
-        for (com.sap.sse.common.Util.Pair<TracTracControlPoint, PassingInstruction> controlPoint : controlPoints) {
+        for (com.sap.sse.common.Util.Pair<IMapItem, PassingInstruction> controlPoint : controlPoints) {
             Waypoint waypoint = baseDomainFactory.createWaypoint(getOrCreateControlPoint(controlPoint.getA()), controlPoint.getB());
             waypointList.add(waypoint);
         }
@@ -270,10 +274,10 @@ public class DomainFactoryImpl implements DomainFactory {
     }
 
     @Override
-    public Sideline createSideline(String name, Iterable<TracTracControlPoint> controlPoints) {
-        List<Mark> marks = new ArrayList<Mark>();
-        for (TracTracControlPoint controlPoint : controlPoints) {
-            ControlPoint cp = getOrCreateControlPoint(controlPoint);
+    public Sideline createSideline(String name, Iterable<IPositionedItem> positionedItems) {
+        final List<Mark> marks = new ArrayList<Mark>();
+        for (final IPositionedItem controlPoint : positionedItems) {
+            ControlPoint cp = getOrCreateMark(controlPoint);
             for (Mark mark : cp.getMarks()) {
                 marks.add(mark);
             }
@@ -724,10 +728,10 @@ public class DomainFactoryImpl implements DomainFactory {
     }
 
     @Override
-    public Iterable<IControl> getControlsForCourseArea(IEvent tracTracEvent, String tracTracCourseAreaName) {
-        final Set<IControl> result = new HashSet<>();
+    public Iterable<IMapItem> getControlsForCourseArea(IEvent tracTracEvent, String tracTracCourseAreaName) {
+        final Set<IMapItem> result = new HashSet<>();
         if (tracTracCourseAreaName != null) {
-            for (final IControl control : tracTracEvent.getControls()) {
+            for (final IMapItem control : tracTracEvent.getMapItems()) {
                 if (control.getCourseArea() != null && control.getCourseArea().equals(tracTracCourseAreaName)) {
                     result.add(control);
                 }
@@ -737,14 +741,13 @@ public class DomainFactoryImpl implements DomainFactory {
     }
 
     @Override
-    public ControlPoint getExistingControlWithTwoMarks(Iterable<IControl> candidates, Mark first, Mark second) {
+    public ControlPoint getExistingControlWithTwoMarks(Iterable<IMapItem> candidates, Mark first, Mark second) {
         final Set<Mark> pairOfMarksToFind = new HashSet<>();
         pairOfMarksToFind.add(first);
         pairOfMarksToFind.add(second);
-        for (final IControl control : candidates) {
-            TracTracControlPoint cp = new ControlPointAdapter(control);
-            Set<Mark> marksInExistingControlPoint = new HashSet<>();
-            final ControlPoint controlPoint = getOrCreateControlPoint(cp);
+        for (final IMapItem control : candidates) {
+            final Set<Mark> marksInExistingControlPoint = new HashSet<>();
+            final ControlPoint controlPoint = getOrCreateControlPoint(control);
             Util.addAll(controlPoint.getMarks(), marksInExistingControlPoint);
             if (marksInExistingControlPoint.equals(pairOfMarksToFind)) {
                 return controlPoint;
@@ -1014,21 +1017,8 @@ public class DomainFactoryImpl implements DomainFactory {
     }
 
     @Override
-    public Mark getMark(TracTracControlPoint controlPoint, int zeroBasedMarkIndex) {
-        com.sap.sailing.domain.base.ControlPoint myControlPoint = getOrCreateControlPoint(controlPoint);
-        Mark result;
-        Iterator<Mark> iter = myControlPoint.getMarks().iterator();
-        if (controlPoint.getHasTwoPoints()) {
-            if (zeroBasedMarkIndex == 0) {
-                result = iter.next();
-            } else {
-                iter.next();
-                result = iter.next();
-            }
-        } else {
-            result = iter.next();
-        }
-        return result;
+    public Mark getMark(IPositionedItem positionedItem) {
+        return getOrCreateMark(positionedItem);
     }
 
     @Override

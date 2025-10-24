@@ -3,16 +3,13 @@ package com.sap.sailing.gwt.autoplay.client.nodes.base;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 
-public abstract class FiresPlaceNode
-        extends AutoPlayNodeBase {
+public abstract class FiresPlaceNode extends AutoPlayNodeBase {
+    private Place placeToGo;
 
     public FiresPlaceNode(String name) {
         super(name);
     }
-
-    private Place placeToGo;
-
-
+    
     public void onStart() {
         firePlaceChangeAndStartTimer();
     }
@@ -30,6 +27,4 @@ public abstract class FiresPlaceNode
             getBus().fireEvent(new PlaceChangeEvent(placeToGo));
         }
     }
-
-
 }

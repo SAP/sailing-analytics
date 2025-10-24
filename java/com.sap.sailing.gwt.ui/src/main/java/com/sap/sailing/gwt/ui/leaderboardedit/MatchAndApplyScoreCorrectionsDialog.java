@@ -275,7 +275,7 @@ public class MatchAndApplyScoreCorrectionsDialog extends DataEntryDialog<BulkSco
                     // entries not considered "different' in case we haven't got an entry for the competitor/race at all;
                     // those non-existing "entries" will be ignored by getResults anyhow
                     boolean entriesDiffer = officialCorrectionEntry != null &&
-                           (((officialTotalPoints == null && entry.totalPoints != null) || (officialTotalPoints != null && (entry.totalPoints == null || !Double.valueOf(entry.totalPoints).equals(officialTotalPoints)))) ||
+                           (((officialTotalPoints == null && entry.totalPoints != null) || (officialTotalPoints != null && (entry.totalPoints == null || !Double.valueOf(entry.netPoints).equals(officialTotalPointsWithFactorApplied)))) ||
                             ((officialTotalPointsWithFactorApplied == null && entry.netPoints != null) || (officialTotalPointsWithFactorApplied != null && (entry.netPoints == null || !Double.valueOf(entry.netPoints).equals(officialTotalPointsWithFactorApplied)))) ||
                             ((officialMaxPointsReason == null && entry.reasonForMaxPoints != MaxPointsReason.NONE) ||
                                     officialMaxPointsReason != null && officialMaxPointsReason != entry.reasonForMaxPoints));

@@ -12,6 +12,7 @@ public class TrackedEventPreferences extends AbstractGenericSerializableSettings
     private transient SettingsList<TrackedEventPreference> trackedEvents;
 
     public TrackedEventPreferences() {
+        super();
     }
 
     @Override

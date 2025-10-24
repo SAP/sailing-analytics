@@ -11,7 +11,7 @@ public interface CommonIcons extends ClientBundle {
     @MimeType("image/svg+xml")
     DataResource facebook();
 
-    @Source("twitter-logo.svg")
+    @Source("x-logo.svg")
     @MimeType("image/svg+xml")
     DataResource twitter();
 

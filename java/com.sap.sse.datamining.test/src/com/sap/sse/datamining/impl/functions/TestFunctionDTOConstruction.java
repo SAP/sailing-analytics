@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.functions.Function;
 import com.sap.sse.datamining.shared.impl.dto.FunctionDTO;
@@ -28,7 +28,7 @@ public class TestFunctionDTOConstruction {
     private Method externalLibraryMethod;
     private Method incrementMethod;
 
-    @Before
+    @BeforeEach
     public void initializeMethods() {
         dimensionMethod = FunctionTestsUtil.getMethodFromClass(SimpleClassWithMarkedMethods.class, "dimension");
         sideEffectFreeValueMethod = FunctionTestsUtil.getMethodFromClass(SimpleClassWithMarkedMethods.class, "sideEffectFreeValue");

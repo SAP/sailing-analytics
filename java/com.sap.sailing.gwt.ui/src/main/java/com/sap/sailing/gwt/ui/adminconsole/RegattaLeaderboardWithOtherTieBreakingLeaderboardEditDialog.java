@@ -16,7 +16,7 @@ public class RegattaLeaderboardWithOtherTieBreakingLeaderboardEditDialog extends
         displayNameTextBox.setVisibleLength(50);
         regattaListBox = createSortedRegattaListBox(existingRegattas, leaderboardDescriptor.getRegattaName());
         regattaListBox.setEnabled(false);
-        otherTieBreakingLeaderboardsListBox = createSortedRegattaLeaderboardsListBox(otherExistingLeaderboards, leaderboardDescriptor.getOtherTieBreakingLeaderboardName());
+        otherTieBreakingLeaderboardsListBox = createSortedRegattaLeaderboardsListBox(otherExistingLeaderboards, leaderboardDescriptor.getOtherTieBreakingLeaderboardName(), stringMessages, this);
         otherTieBreakingLeaderboardsListBox.ensureDebugId("OtherTieBreakingLeaderboardsListBox");
         otherTieBreakingLeaderboardsListBox.setEnabled(false);
         if (!getSelectedRegatta().definesSeriesDiscardThresholds()) {

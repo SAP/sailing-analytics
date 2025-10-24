@@ -11,15 +11,16 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.base.LatLng;
 import com.google.gwt.maps.client.base.LatLngBounds;
+import com.google.gwt.maps.client.base.Point;
 import com.google.gwt.maps.client.events.bounds.BoundsChangeMapEvent;
 import com.google.gwt.maps.client.events.bounds.BoundsChangeMapHandler;
+import com.google.gwt.maps.client.overlays.MapCanvasProjection;
 import com.google.gwt.user.client.Timer;
-import com.sap.sailing.gwt.ui.client.shared.racemap.BoundsUtil;
-import com.sap.sailing.gwt.ui.client.shared.racemap.CoordinateSystem;
 import com.sap.sailing.gwt.ui.simulator.StreamletParameters;
 import com.sap.sailing.gwt.ui.simulator.racemap.FullCanvasOverlay;
 import com.sap.sse.common.ColorMapper;
 import com.sap.sse.common.ValueRangeFlexibleBoundaries;
+import com.sap.sse.common.ColorMapper.ValueSpreader;
 import com.sap.sse.gwt.client.player.TimeListener;
 
 public class Swarm implements TimeListener {
@@ -29,7 +30,6 @@ public class Swarm implements TimeListener {
     private StreamletParameters parameters;
 
     private Timer loopTimer;
-    private Mercator projection;
     private final VectorField field;
 
     private boolean zoomChanged = false;
@@ -54,13 +54,7 @@ public class Swarm implements TimeListener {
      */
     private boolean swarmOffScreen = false;
 
-    private int swarmPause = 0;
-
-    /**
-     * Bounds in the map's coordinate system which may have undergone rotation and translation. See the
-     * {@link CoordinateSystem} instance in place which facilitates the mapping.
-     */
-    private LatLngBounds visibleBoundsOfField;
+    private int swarmPauseInTicks = 0;
 
     private Date timePoint;
     private double cosineOfAverageLatitude;
@@ -72,6 +66,8 @@ public class Swarm implements TimeListener {
     private final ColorMapper colorMapper;
 
     private boolean clearNextFrame = false;
+    private Point upperLeftCornerDivPx;
+    private Point lowerRightCornerDivPx;
     
     /**
      * For a windfield that has no wind speed spread, e.g. only one wind speed source, this value will be used to define
@@ -92,7 +88,11 @@ public class Swarm implements TimeListener {
         diffPx = new Vector(0, 0);
         valueRange = new ValueRangeFlexibleBoundaries(/* wind speed in knots */ 0.0, /* wind speed in knots */ 60.0,
                 /* percentage */ 0.15, /* minimumHalfBoundaryWidthInKnots */ 0.35);
-        colorMapper = new ColorMapper(valueRange, !colored);
+        colorMapper = new ColorMapper(valueRange, !colored, ValueSpreader.LINEAR);
+    }
+
+    private MapCanvasProjection getMapProjection() {
+        return fullcanvas.getMapProjection();
     }
 
     public void start(final int animationIntervalMillis) {
@@ -105,7 +105,6 @@ public class Swarm implements TimeListener {
                 }
             };
         }
-
         // the map already exists, ensure swam is started
         if (map.getBounds() != null) {
             startSwarmIfNecessaryAndUpdateProjection();
@@ -123,11 +122,6 @@ public class Swarm implements TimeListener {
     }
 
     private void startSwarmIfNecessaryAndUpdateProjection() {
-        if (projection == null) {
-            projection = new Mercator(fullcanvas, map);
-        }
-        // ensure projection fits the map
-        projection.calibrate();
         // ensure canvas fits the map
         updateBounds();
         if (particles == null) {
@@ -143,9 +137,9 @@ public class Swarm implements TimeListener {
         double time0 = Duration.currentTimeMillis();
         // upon zooming the swarm is shortly paused, to ensure no strange rendering during the css zoom
         // animations
-        if (swarmPause > 1) {
-            swarmPause--;
-        } else if (swarmPause == 1) {
+        if (swarmPauseInTicks > 1) {
+            swarmPauseInTicks--;
+        } else if (swarmPauseInTicks == 1) {
             // ensure bounds and projections are up to date
             startSwarmIfNecessaryAndUpdateProjection();
             if (zoomChanged) {
@@ -157,10 +151,10 @@ public class Swarm implements TimeListener {
                 // process the offset
                 diffPx = fullcanvas.getDiffPx();
             }
-            swarmPause = 0;
+            swarmPauseInTicks = 0;
         }
         // update the swarm if it is not paused
-        if ((!swarmOffScreen) && (swarmPause == 0)) {
+        if ((!swarmOffScreen) && (swarmPauseInTicks == 0)) {
             execute(diffPx);
             diffPx = new Vector(0, 0);
         }
@@ -182,7 +176,7 @@ public class Swarm implements TimeListener {
 
     public void stop() {
         removeBoundsChangeHandler();
-        projection.clearCanvas();
+        clearCanvas();
         loopTimer.cancel();
     }
 
@@ -206,7 +200,7 @@ public class Swarm implements TimeListener {
                     } else {
                         particle.stepsToLive = 1 + (int) Math.round(Math.random() * 40);
                     }
-                    particle.currentPixelCoordinate = projection.latlng2pixel(particle.currentPosition);
+                    particle.currentPixelCoordinate = new Vector(getMapProjection().fromLatLngToContainerPixel(particle.currentPosition));
                     particle.previousPixelCoordinate = particle.currentPixelCoordinate;
                     particle.v = v;
                     done = true;
@@ -224,11 +218,9 @@ public class Swarm implements TimeListener {
         final LatLng result;
         double rndY = Math.random();
         double rndX = Math.random();
-        double latDeg = rndY * this.visibleBoundsOfField.getSouthWest().getLatitude()
-                + (1 - rndY) * this.visibleBoundsOfField.getNorthEast().getLatitude();
-        double lngDeg = rndX * this.visibleBoundsOfField.getSouthWest().getLongitude()
-                + (1 - rndX) * this.visibleBoundsOfField.getNorthEast().getLongitude();
-        result = LatLng.newInstance(latDeg, lngDeg);
+        double yPx = rndY * this.lowerRightCornerDivPx.getY() + (1 - rndY) * this.upperLeftCornerDivPx.getY();
+        double xPx = rndX * this.upperLeftCornerDivPx.getX() + (1 - rndX) * this.lowerRightCornerDivPx.getX();
+        result = getMapProjection().fromDivPixelToLatLng(Point.newInstance(xPx, yPx));
         return result;
     }
 
@@ -246,31 +238,41 @@ public class Swarm implements TimeListener {
     public void onBoundsChanged(boolean zoomChanged, int swarmPause) {
         this.zoomChanged |= zoomChanged;
         if (this.zoomChanged) {
-            projection.clearCanvas();
+            clearCanvas();
         } else {
             fullcanvas.setCanvasSettings();
         }
-        this.swarmPause = swarmPause;
+        this.swarmPauseInTicks = swarmPause;
     }
-
+    
+    private void clearCanvas() {
+        double w = this.canvas.getOffsetWidth();
+        double h = this.canvas.getOffsetHeight();
+        Context2d g = this.canvas.getContext2d();
+        g.clearRect(0, 0, w, h);
+    }
+    
     private void updateBounds() {
-        LatLngBounds fieldBounds = this.field.getFieldCorners();
-        final LatLngBounds mapBounds = map.getBounds();
-        swarmOffScreen = !fieldBounds.intersects(mapBounds);
-        visibleBoundsOfField = BoundsUtil.intersect(fieldBounds, mapBounds);
-        Vector boundsSWpx = this.projection.latlng2pixel(visibleBoundsOfField.getSouthWest());
-        Vector boundsNEpx = this.projection.latlng2pixel(visibleBoundsOfField.getNorthEast());
-        double boundsWidthpx = Math.abs(boundsNEpx.x - boundsSWpx.x);
-        double boundsHeightpx = Math.abs(boundsSWpx.y - boundsNEpx.y);
-        int newNParticles = (int) Math.round(Math.sqrt(boundsWidthpx * boundsHeightpx) * this.field.getParticleFactor()
-                * this.parameters.swarmScale);
-        if (newNParticles > this.nParticles) {
+        if (getMapProjection() != null) {
+            final int canvasWidth = fullcanvas.getMap().getDiv().getClientWidth();
+            final int canvasHeight = fullcanvas.getMap().getDiv().getClientHeight();
+            final LatLng upperLeftCornerLatLng = getMapProjection().fromContainerPixelToLatLng(Point.newInstance(0, 0));
+            upperLeftCornerDivPx = getMapProjection().fromLatLngToDivPixel(upperLeftCornerLatLng);
+            final LatLng lowerRightCornerLatLng = getMapProjection().fromContainerPixelToLatLng(Point.newInstance(canvasWidth, canvasHeight));
+            lowerRightCornerDivPx = getMapProjection().fromLatLngToDivPixel(lowerRightCornerLatLng);
+            LatLngBounds fieldBounds = this.field.getFieldCorners();
+            final LatLngBounds mapBounds = map.getBounds();
+            swarmOffScreen = !fieldBounds.intersects(mapBounds);
+            int newNParticles = (int) Math.round(Math.sqrt(canvasWidth * canvasHeight) * this.field.getParticleFactor()
+                    * this.parameters.swarmScale);
+            if (newNParticles > this.nParticles) {
+                this.nParticles = newNParticles;
+                createParticles();
+            }
             this.nParticles = newNParticles;
-            createParticles();
+            cosineOfAverageLatitude = Math.cos((lowerRightCornerLatLng.getLatitude() / 180. * Math.PI
+                    + upperLeftCornerLatLng.getLatitude() / 180. * Math.PI) / 2);
         }
-        this.nParticles = newNParticles;
-        cosineOfAverageLatitude = Math.cos((visibleBoundsOfField.getSouthWest().getLatitude() / 180. * Math.PI
-                + visibleBoundsOfField.getNorthEast().getLatitude() / 180. * Math.PI) / 2);
     }
 
     private void drawSwarm() {
@@ -288,17 +290,16 @@ public class Swarm implements TimeListener {
             ctxt.setGlobalCompositeOperation("source-over");
             ctxt.setFillStyle("white");
             for (int idx = 0; idx < nParticles && idx < particles.length; idx++) {
-                Particle particle = particles[idx];
-                if (particle == null || particle.stepsToLive == 0) {
-                    continue;
+                final Particle particle = particles[idx];
+                if (particle != null && particle.stepsToLive != 0) {
+                    double particleSpeed = particle.v == null ? 0 : particle.v.length();
+                    ctxt.setLineWidth(field.getLineWidth(particleSpeed));
+                    ctxt.setStrokeStyle(colorMapper.getColor(particleSpeed));
+                    ctxt.beginPath();
+                    ctxt.moveTo(particle.previousPixelCoordinate.x, particle.previousPixelCoordinate.y);
+                    ctxt.lineTo(particle.currentPixelCoordinate.x, particle.currentPixelCoordinate.y);
+                    ctxt.stroke();
                 }
-                double particleSpeed = particle.v == null ? 0 : particle.v.length();
-                ctxt.setLineWidth(field.getLineWidth(particleSpeed));
-                ctxt.setStrokeStyle(colorMapper.getColor(particleSpeed));
-                ctxt.beginPath();
-                ctxt.moveTo(particle.previousPixelCoordinate.x, particle.previousPixelCoordinate.y);
-                ctxt.lineTo(particle.currentPixelCoordinate.x, particle.currentPixelCoordinate.y);
-                ctxt.stroke();
             }
         }
     }
@@ -337,7 +338,7 @@ public class Swarm implements TimeListener {
                 double lngDeg = particle.currentPosition.getLongitude()
                         + speed * particle.v.x / cosineOfAverageLatitude;
                 particle.currentPosition = LatLng.newInstance(latDeg, lngDeg);
-                particle.currentPixelCoordinate = projection.latlng2pixel(particle.currentPosition);
+                particle.currentPixelCoordinate = new Vector(getMapProjection().fromLatLngToContainerPixel(particle.currentPosition));
                 particle.stepsToLive--;
                 if ((particle.stepsToLive > 0) && (this.field.inBounds(particle.currentPosition))) {
                     particle.v = field.getVector(particle.currentPosition, timePoint);
@@ -345,7 +346,7 @@ public class Swarm implements TimeListener {
                     particle.v = null;
                 }
             } else {
-                // particle timed out (age became 0) or was never created (e.g., weight too low); try to create a new one
+                // particle timed out (stepsToLive became 0) or was never created (e.g., weight too low); try to create a new one
                 particles[idx] = this.recycleOrCreateParticle(particles[idx]);
             }
             if (particles[idx] != null && particles[idx].v != null) {
@@ -382,7 +383,7 @@ public class Swarm implements TimeListener {
         timePoint = newTime;
     }
 
-    public void pause(int swarmPause) {
-        this.swarmPause = swarmPause;
+    public void pause(int swarmPauseInTicks) {
+        this.swarmPauseInTicks = swarmPauseInTicks;
     }
 }

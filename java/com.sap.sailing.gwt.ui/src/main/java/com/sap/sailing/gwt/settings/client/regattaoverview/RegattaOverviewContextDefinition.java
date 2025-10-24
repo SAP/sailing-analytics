@@ -10,6 +10,7 @@ public final class RegattaOverviewContextDefinition extends AbstractGenericSeria
     private transient UUIDSetting event;
 
     public RegattaOverviewContextDefinition() {
+        super();
     }
     
     public RegattaOverviewContextDefinition(String event) {
@@ -17,6 +18,7 @@ public final class RegattaOverviewContextDefinition extends AbstractGenericSeria
     }
     
     public RegattaOverviewContextDefinition(UUID event) {
+        this();
         this.event.setValue(event);
     }
     

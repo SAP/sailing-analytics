@@ -11,6 +11,7 @@ public class CompetitorNotificationPreferences extends AbstractGenericSerializab
     private transient SettingsList<CompetitorNotificationPreference> competitors;
 
     public CompetitorNotificationPreferences() {
+        super();
         competitors = new SettingsList<>("competitors", this,
                 () -> new CompetitorNotificationPreference());
     }

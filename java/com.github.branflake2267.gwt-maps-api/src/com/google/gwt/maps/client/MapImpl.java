@@ -56,6 +56,8 @@ import com.google.gwt.maps.client.events.mouseover.MouseOverEventFormatter;
 import com.google.gwt.maps.client.events.mouseover.MouseOverMapHandler;
 import com.google.gwt.maps.client.events.projection.ProjectionChangeEventFormatter;
 import com.google.gwt.maps.client.events.projection.ProjectionChangeMapHandler;
+import com.google.gwt.maps.client.events.renderingtype.RenderingTypeChangeEventFormatter;
+import com.google.gwt.maps.client.events.renderingtype.RenderingTypeChangeMapHandler;
 import com.google.gwt.maps.client.events.resize.ResizeEventFormatter;
 import com.google.gwt.maps.client.events.resize.ResizeMapHandler;
 import com.google.gwt.maps.client.events.rightclick.RightClickEventFormatter;
@@ -151,6 +153,19 @@ public class MapImpl extends MVCObject<MapImpl> {
   }-*/;
 
   /**
+   * gets {@link RenderingType}
+   * 
+   * @return {@link RenderingType}
+   */
+  public final RenderingType getRenderingType() {
+    return RenderingType.valueOf(getRenderingTypeImpl().toUpperCase());
+  }
+
+  private final native String getRenderingTypeImpl() /*-{
+    return this.getRenderingType();
+  }-*/;
+
+  /**
    * gets {@link MapTypeId}
    * 
    * @return {@link MapTypeId}
@@ -196,7 +211,7 @@ public class MapImpl extends MVCObject<MapImpl> {
   /**
    * get zoom
    */
-  public final native int getZoom() /*-{
+  public final native double getZoom() /*-{
     return this.getZoom();
   }-*/;
 
@@ -312,7 +327,7 @@ public class MapImpl extends MVCObject<MapImpl> {
    * 
    * @param zoom
    */
-  public final native void setZoom(int zoom) /*-{
+  public final native void setZoom(double zoom) /*-{
     this.setZoom(zoom);
   }-*/;
 
@@ -615,4 +630,10 @@ public class MapImpl extends MVCObject<MapImpl> {
     return MapHandlerRegistration.addHandler(this, MapEventType.ZOOM_CHANGED, handler, new ZoomChangeEventFormatter());
   }
 
+  /**
+   * This event is fired when the map rendering type property changes.
+   */
+  public final HandlerRegistration addRenderingTypeChangeHandler(RenderingTypeChangeMapHandler handler) {
+    return MapHandlerRegistration.addHandler(this, MapEventType.RENDERINGTYPE_CHANGED, handler, new RenderingTypeChangeEventFormatter());
+  }
 }

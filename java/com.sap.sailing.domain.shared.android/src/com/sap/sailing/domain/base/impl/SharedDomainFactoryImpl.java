@@ -36,6 +36,8 @@ import com.sap.sse.common.Color;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.WithID;
+import com.sap.sse.concurrent.LockUtil;
+import com.sap.sse.concurrent.NamedReentrantReadWriteLock;
 
 public class SharedDomainFactoryImpl<RLR extends RaceLogResolver> implements SharedDomainFactory<RLR> {
     private static final Logger logger = Logger.getLogger(SharedDomainFactoryImpl.class.getName());
@@ -47,6 +49,13 @@ public class SharedDomainFactoryImpl<RLR extends RaceLogResolver> implements Sha
     private final Map<String, Nationality> nationalityCache;
     
     private final Map<Serializable, Mark> markCache;
+    
+    /**
+     * This lock must be obtained using {@link LockUtil#lockForRead(NamedReentrantReadWriteLock)} /
+     * {@link LockUtil#lockForWrite(NamedReentrantReadWriteLock)} prior to accessing {@link #markCache}
+     * or {@link #markIdCache}.
+     */
+    private final NamedReentrantReadWriteLock markCacheLock;
     
     private final Map<Serializable, ControlPointWithTwoMarks> controlPointWithTwoMarksCache;
     
@@ -118,6 +127,7 @@ public class SharedDomainFactoryImpl<RLR extends RaceLogResolver> implements Sha
     }
     
     public SharedDomainFactoryImpl(CompetitorAndBoatStore competitorStore, RLR raceLogResolver) {
+        this.markCacheLock = new NamedReentrantReadWriteLock("SharedDomainFactoryImpl.markCacheLock", /* fair */ false);
         this.raceLogResolver = raceLogResolver;
         waypointCacheReferenceQueue = new ReferenceQueue<Waypoint>();
         nationalityCache = new HashMap<String, Nationality>();
@@ -183,24 +193,32 @@ public class SharedDomainFactoryImpl<RLR extends RaceLogResolver> implements Sha
     
     @Override
     public Mark getOrCreateMark(Serializable id, String name, String shortName, MarkType type, Color color, String shape, String pattern) {
-        Mark result = markCache.get(id);
-        if (result == null) {
-            result = new MarkImpl(id, name, shortName, type, color, shape, pattern,
-                    /* original mark template ID */ null, /* original mark properties ID */ null);
-            cacheMark(id, result);
-        }
-        return result;
+        return getOrCreateMark(id, name, shortName, type, color, shape, pattern, /* originatingMarkTemplateId */ null, /* originatingMarkPropertiesId */ null);
     }
 
     @Override
     public Mark getOrCreateMark(Serializable id, String name, String shortName, MarkType type, Color color,
             String shape, String pattern, UUID originatingMarkTemplateId,
             UUID originatingMarkPropertiesId) {
-        Mark result = markCache.get(id);
+        LockUtil.lockForRead(markCacheLock);
+        Mark result;
+        try {
+            result = markCache.get(id);
+        } finally {
+            LockUtil.unlockAfterRead(markCacheLock);
+        }
         if (result == null) {
-            result = new MarkImpl(id, name, shortName, type, color, shape, pattern, originatingMarkTemplateId,
-                    originatingMarkPropertiesId);
-            cacheMark(id, result);
+            LockUtil.lockForWrite(markCacheLock);
+            try {
+                result = markCache.get(id);
+                if (result == null) {
+                    result = new MarkImpl(id, name, shortName, type, color, shape, pattern, originatingMarkTemplateId,
+                            originatingMarkPropertiesId);
+                    cacheMark(id, result);
+                }
+            } finally {
+                LockUtil.unlockAfterWrite(markCacheLock);
+            }
         }
         return result;
     }
@@ -208,9 +226,15 @@ public class SharedDomainFactoryImpl<RLR extends RaceLogResolver> implements Sha
     @Override
     public Mark getOrCreateMark(String toStringRepresentationOfID, String name, String shortName,
             MarkType type, Color color, String shape, String pattern) {
-        Serializable id = toStringRepresentationOfID;
-        if (markIdCache.containsKey(toStringRepresentationOfID)) {
-            id = markIdCache.get(toStringRepresentationOfID);
+        Serializable id;
+        LockUtil.lockForRead(markCacheLock);
+        try {
+            id = toStringRepresentationOfID;
+            if (markIdCache.containsKey(toStringRepresentationOfID)) {
+                id = markIdCache.get(toStringRepresentationOfID);
+            }
+        } finally {
+            LockUtil.unlockAfterRead(markCacheLock);
         }
         return getOrCreateMark(id, name, shortName, type, color, shape, pattern);
     }
@@ -239,6 +263,7 @@ public class SharedDomainFactoryImpl<RLR extends RaceLogResolver> implements Sha
     }
 
     private void cacheMark(Serializable id, Mark result) {
+        assert markCacheLock.isWriteLocked();
         markCache.put(id, result);
         markIdCache.put(id.toString(), id);
     }
@@ -444,17 +469,32 @@ public class SharedDomainFactoryImpl<RLR extends RaceLogResolver> implements Sha
 
     @Override
     public Mark getExistingMarkById(Serializable id) {
-        return markCache.get(id);
+        LockUtil.lockForRead(markCacheLock);
+        try {
+            return markCache.get(id);
+        } finally {
+            LockUtil.unlockAfterRead(markCacheLock);
+        }
     }
     
     @Override
     public Mark getExistingMarkByIdAsString(String toStringRepresentationOfID) {
-        return markCache.get(markIdCache.get(toStringRepresentationOfID));
+        LockUtil.lockForRead(markCacheLock);
+        try {
+            return markCache.get(markIdCache.get(toStringRepresentationOfID));
+        } finally {
+            LockUtil.unlockAfterRead(markCacheLock);
+        }
     }
     
     @Override
     public Collection<Mark> getAllMarks() {
-        return markCache.values();
+        LockUtil.lockForRead(markCacheLock);
+        try {
+            return markCache.values();
+        } finally {
+            LockUtil.unlockAfterRead(markCacheLock);
+        }
     }
 
     @Override

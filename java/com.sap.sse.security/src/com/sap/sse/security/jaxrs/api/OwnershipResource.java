@@ -61,14 +61,14 @@ public class OwnershipResource extends AbstractSecurityResource {
         } catch (Exception ex) {
             throw new OwnershipException("Not permitted to change ownership.", Status.FORBIDDEN);
         }
-        final OwnershipAnnotation existingOwnership = getService().getOwnership(identifier);
+        final OwnershipAnnotation existingOwnership = getSecurityService().getOwnership(identifier);
         final User user;
         if (json.containsKey(KEY_USERNAME)) {
             final String username = (String) json.get(KEY_USERNAME);
             if (username == null) {
                 user = null;
             } else {
-                user = getService().getUserByName(username);
+                user = getSecurityService().getUserByName(username);
                 if (user == null) {
                     // username provided but cannot be resolved
                     throw new OwnershipException("User Not found", Status.BAD_REQUEST);
@@ -83,7 +83,7 @@ public class OwnershipResource extends AbstractSecurityResource {
             if (userGroupIdAsString == null) {
                 userGroup = null;
             } else {
-                userGroup = getService().getUserGroup(UUID.fromString(userGroupIdAsString));
+                userGroup = getSecurityService().getUserGroup(UUID.fromString(userGroupIdAsString));
                 if (userGroup == null) {
                     throw new OwnershipException("UserGroup Not found", Status.BAD_REQUEST);
                 }
@@ -92,9 +92,9 @@ public class OwnershipResource extends AbstractSecurityResource {
             userGroup = existingOwnership == null ? null : existingOwnership.getAnnotation().getTenantOwner();
         }
         if (json.containsKey(KEY_DISPLAY_NAME)) {
-            getService().setOwnership(identifier, user, userGroup, (String) json.get(KEY_DISPLAY_NAME));
+            getSecurityService().setOwnership(identifier, user, userGroup, (String) json.get(KEY_DISPLAY_NAME));
         } else {
-            getService().setOwnership(identifier, user, userGroup);
+            getSecurityService().setOwnership(identifier, user, userGroup);
         }
         return Response.ok(new GeneralResponse(true, "Ownership changed successfully").toString()).build();
     }
@@ -118,7 +118,7 @@ public class OwnershipResource extends AbstractSecurityResource {
     private Response getOwnership(String objectType, final String[] typeRelativeObjectIdArray) {
         QualifiedObjectIdentifier identifier = new QualifiedObjectIdentifierImpl(objectType,
                 new TypeRelativeObjectIdentifier(typeRelativeObjectIdArray));
-        final OwnershipAnnotation existingOwnership = getService().getOwnership(identifier);
+        final OwnershipAnnotation existingOwnership = getSecurityService().getOwnership(identifier);
         final JSONObject result = new JSONObject();
         result.put(KEY_OBJECT_TYPE, objectType);
         result.put(KEY_OBJECT_ID, identifier.getTypeRelativeObjectIdentifier().toString());
@@ -135,7 +135,7 @@ public class OwnershipResource extends AbstractSecurityResource {
             @PathParam("typeRelativeObjectId") String typeRelativeObjectId) throws OwnershipException {
         QualifiedObjectIdentifier identifier = new QualifiedObjectIdentifierImpl(objectType,
                 new TypeRelativeObjectIdentifier(typeRelativeObjectId));
-        final AccessControlListAnnotation acl = getService().getAccessControlList(identifier);
+        final AccessControlListAnnotation acl = getSecurityService().getAccessControlList(identifier);
         final JSONObject result = new JSONObject();
         result.put(KEY_OBJECT_TYPE, objectType);
         result.put(KEY_OBJECT_ID, typeRelativeObjectId);
@@ -178,7 +178,7 @@ public class OwnershipResource extends AbstractSecurityResource {
             if (groupIdAsString == null) {
                 group = null;
             } else {
-                group = getService().getUserGroup(UUID.fromString(groupIdAsString));
+                group = getSecurityService().getUserGroup(UUID.fromString(groupIdAsString));
                 if (group == null) {
                     throw new OwnershipException(String.format("UserGroup with ID %s Not found", groupIdAsString), Status.BAD_REQUEST);
                 }
@@ -192,9 +192,9 @@ public class OwnershipResource extends AbstractSecurityResource {
         }
         if (json.containsKey(KEY_DISPLAY_NAME)) {
             final String displayName = (String) json.get(KEY_DISPLAY_NAME);
-            getService().overrideAccessControlList(identifier, actionsByUserGroup, displayName);
+            getSecurityService().overrideAccessControlList(identifier, actionsByUserGroup, displayName);
         } else {
-            getService().overrideAccessControlList(identifier, actionsByUserGroup);
+            getSecurityService().overrideAccessControlList(identifier, actionsByUserGroup);
         }
         return Response.ok(new GeneralResponse(true, "ACL changed successfully").toString()).build();
     }

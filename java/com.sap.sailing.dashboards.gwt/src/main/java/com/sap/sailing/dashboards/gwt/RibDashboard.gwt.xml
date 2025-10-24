@@ -10,11 +10,13 @@
 	<!-- <inherits name="com.sap.sailing.gwt.ui.EmulatedJRE" /> -->
 	<inherits name="com.sap.sse.gwt.SSESharedGWT" />
 	<inherits name="com.sap.sse.gwt.AdminConsole" />
-        <inherits name="com.sap.sse.SSECommon" />
+    <inherits name="com.sap.sse.SSECommon" />
+    <inherits name="com.sap.sse.landscape.common.SSELandscapeCommon"/>
+    <inherits name="com.sap.sse.landscape.aws.common.SSELandscapeAWSCommon" />
 	<inherits name="com.sap.sse.Security" />
 	<inherits name="com.sap.sse.security.ui.SecurityCommon" />
 	<inherits name="com.sap.sse.security.ui.LoginPanel" />
-        <inherits name='com.sap.sailing.gwt.ui.SourceRaceboard' />
+    <inherits name='com.sap.sailing.gwt.ui.SourceRaceboard' />
 	
 	<inherits name="com.googlecode.mgwt.MGWT" />
 	<inherits name="com.googlecode.mgwt.linker.Linker" />
@@ -55,7 +57,7 @@
 	<set-property name="gwt.logging.simpleRemoteHandler" value="ENABLED" />
 	<set-property name="gwt.logging.consoleHandler" value="ENABLED"/>
 
-	<set-property name="user.agent" value="safari" />
+    <set-property name="user.agent" value="safari" />
 
 	<set-configuration-property name="mgwt.css" value="pretty" />
 	<set-configuration-property name="CssResource.enableGss" value="true" />

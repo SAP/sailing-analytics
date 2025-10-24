@@ -8,12 +8,13 @@ TARGET_GROUP_NAME=S-paris2024
 COUNT=1
 
 if [ $# -eq 0 ]; then
-    echo "$0 -g <AWS-region> -R <release-name> -b <replication-bearer-token> [-c <instance-count>] [-r <replica-set-name>] [-p <host>:<port>] [-t <instance-type>] [-i <ami-id>] [-k <key-pair-name>] [-v <VPC name> ]"
+    echo "$0 -g <AWS-region> -R <release-name> -b <replication-bearer-token> -m <google-maps-api-key> [-c <instance-count>] [-r <replica-set-name>] [-p <host>:<port>] [-t <instance-type>] [-i <ami-id>] [-k <key-pair-name>] [-v <VPC name> ]"
     echo ""
     echo "-b replication bearer token; mandatory"
     echo "-c Count; defaults to ${COUNT}"
     echo "-i Amazon Machine Image (AMI) ID to use to launch the instance; defaults to latest image tagged with image-type:sailing-analytics-server"
     echo "-g AWS Region, e.g., eu-west-1"
+    echo "-m Google Maps API key, used for the GOOGLE_MAPS_AUTHENTICATION_PARAMS variable"
     echo "-k SSH key pair name, mapping to the --key-name parameter; defaults to Axel"
     echo "-p MongoDB primary host[:port]; defaults to ${REPLICA_SET_PRIMARY}"
     echo "-r MongoDB replica set name; defaults to ${REPLICA_SET_NAME}"
@@ -31,7 +32,7 @@ if [ $# -eq 0 ]; then
     exit 2
 fi
 
-options='g:R:b:c:r:p:t:i:k:v:'
+options='g:R:b:c:r:p:t:i:k:v:m:'
 while getopts $options option
 do
     case $option in
@@ -40,6 +41,7 @@ do
 	g) REGION=$OPTARG;;
         i) IMAGE_ID=$OPTARG;;
 	k) KEY_NAME=$OPTARG;;
+        m) GOOGLE_MAPS_AUTHENTICATION_PARAMS=$OPTARG;;
 	p) REPLICA_SET_PRIMARY=$OPTARG;;
 	R) RELEASE=$OPTARG;;
 	r) REPLICA_SET_NAME=$OPTARG;;
@@ -68,6 +70,7 @@ while [ ${i} -lt ${COUNT} ]; do
   SUBNET_INDEX=$(( $RANDOM * $NUMBER_OF_SUBNETS / 32768 ))
   SUBNET_ID=$( echo "${SUBNETS}" | jq -r '.Subnets['${SUBNET_INDEX}'].SubnetId' )
   echo "Launching image with ID ${IMAGE_ID} into subnet #${SUBNET_INDEX} in region ${REGION} with ID ${SUBNET_ID} in VPC ${VPC_ID}"
+  SECURITY_OPTIONS='-Dsecurity.sharedAcrossSubdomainsOf=sailing.omegatiming.com -Dsecurity.baseUrlForCrossDomainStorage=https://security-service.sapsailing.com -Dgwt.acceptableCrossDomainStorageRequestOriginRegexp=https?://(.*\.)?sailing\.omegatiming\.com(:[0-9]*)?$'
   PRIVATE_IP_AND_INSTANCE_ID=$( aws --region ${REGION} ec2 run-instances --subnet-id ${SUBNET_ID} --instance-type ${INSTANCE_TYPE} --security-group-ids ${SECURITY_GROUP_ID} --image-id ${IMAGE_ID} --user-data "INSTALL_FROM_RELEASE=${RELEASE}
 SERVER_NAME=paris2024
 MONGODB_URI=\"mongodb://${REPLICA_SET_PRIMARY}/paris2024-replica?replicaSet=${REPLICA_SET_NAME}&retryWrites=true&readPreference=nearest\"
@@ -79,7 +82,8 @@ REPLICATE_MASTER_SERVLET_PORT=8888
 REPLICATE_MASTER_EXCHANGE_NAME=paris2024
 REPLICATE_MASTER_QUEUE_HOST=rabbit-eu-west-3.sapsailing.com
 REPLICATE_MASTER_BEARER_TOKEN=${BEARER_TOKEN}
-ADDITIONAL_JAVA_ARGS=\"${ADDITIONAL_JAVA_ARGS} -Dcom.sap.sse.debranding=false\"" --ebs-optimized --key-name $KEY_NAME --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=SL Paris2024 (Upgrade Replica)},{Key=sailing-analytics-server,Value=paris2024}]" "ResourceType=volume,Tags=[{Key=Name,Value=SL Paris2024 (Upgrade Replica)}]" | jq -r '.Instances[].PrivateIpAddress + " " + .Instances[].InstanceId' )
+GOOGLE_MAPS_AUTHENTICATION_PARAMS=\"${GOOGLE_MAPS_AUTHENTICATION_PARAMS}\"
+ADDITIONAL_JAVA_ARGS=\"\${ADDITIONAL_JAVA_ARGS} -Dcom.sap.sse.debranding=true ${SECURITY_OPTIONS}\"" --ebs-optimized --key-name $KEY_NAME --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=SL Paris2024 (Upgrade Replica)},{Key=sailing-analytics-server,Value=paris2024}]" "ResourceType=volume,Tags=[{Key=Name,Value=SL Paris2024 (Upgrade Replica)}]" | jq -r '.Instances[].PrivateIpAddress + " " + .Instances[].InstanceId' )
   EXIT_CODE=$?
   if [ "${EXIT_CODE}" != "0" ]; then
     echo "Error launching instance in region ${REGION}. Exiting with status ${EXIT_CODE}"

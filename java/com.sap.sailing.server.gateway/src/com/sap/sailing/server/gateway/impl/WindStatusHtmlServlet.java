@@ -36,24 +36,25 @@ import com.sap.sse.common.Util;
  */
 public class WindStatusHtmlServlet extends WindStatusServlet implements IgtimiWindListener, BulkFixReceiver {
 
+    private static final String SAILINGSERVER_WIND_STATUS = "/sailingserver/windStatus";
     private static final long serialVersionUID = 6091476602985063675L;
     private static final Logger logger = Logger.getLogger(WindStatusHtmlServlet.class.getName());
     
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         initializeWindReceiver(/* reinitialize requires authentication and must be POSTed to the master */ false);
-        writePostRefreshingHeadAndBodyWithRefreshForm(req, resp, "Wind Status");
+        writePostRefreshingHeadAndBodyWithRefreshForm(req, resp, "Wind Status", SAILINGSERVER_WIND_STATUS);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String reinitializeWindReceiverParameter = req.getParameter(PARAM_RELOAD_WIND_RECEIVER);
+        boolean reinitializeWindReceiver = getReloadParamter(req);
         final String configureLocalServerPermission = getPermissionToReload();
-        if (Util.hasLength(reinitializeWindReceiverParameter) && reinitializeWindReceiverParameter.equalsIgnoreCase("true")) {
+        if (reinitializeWindReceiver) {
             SecurityUtils.getSubject().checkPermission(configureLocalServerPermission);
             logger.info("Subject "+SecurityUtils.getSubject().getPrincipal()+" requested re-initialization of wind receivers");
             initializeWindReceiver(/* re-initialize */ true);
-            writePostRefreshingHeadAndBodyWithRefreshForm(req, resp, "Wind Status");
+            writePostRefreshingHeadAndBodyWithRefreshForm(req, resp, "Wind Status", SAILINGSERVER_WIND_STATUS);
         } else {
             resp.setContentType("text/html");
             PrintWriter out = resp.getWriter();
@@ -65,7 +66,6 @@ public class WindStatusHtmlServlet extends WindStatusServlet implements IgtimiWi
                 for (Map.Entry<LiveDataConnection, IgtimiConnectionInfo> entry: igtimiConnections.entrySet()) {
                     IgtimiConnectionInfo igtimiConnectionInfo = entry.getValue();
                     int deviceCount = Util.size(igtimiConnectionInfo.getDeviceIDs());
-                    out.println("<b>Account " + igtimiConnectionInfo.getAccountName() + "</b><br/>");
                     out.println(deviceCount + " devices " + igtimiConnectionInfo.getDeviceIDs().toString() + "<br/>");
                     final InetSocketAddress remoteAddress = igtimiConnectionInfo.getRemoteAddress();
                     out.println("Connection used is " + (remoteAddress == null ? "{null}" : remoteAddress.toString()) + "<br/><br/>");
@@ -126,6 +126,10 @@ public class WindStatusHtmlServlet extends WindStatusServlet implements IgtimiWi
             }
             out.close();
         }
+    }
+    
+    private boolean getReloadParamter(HttpServletRequest req) {
+        return Boolean.valueOf(req.getParameter(PARAM_RELOAD_WIND_RECEIVER));
     }
 
 }

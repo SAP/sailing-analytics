@@ -1,18 +1,18 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.TreeSet;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import com.sap.sailing.domain.tracking.impl.PartialNavigableSetView;
+import com.sap.sailing.domain.shared.tracking.impl.PartialNavigableSetView;
 
 public class PartialNavigableSetViewTest {
     private PartialNavigableSetView<Integer> fullSet;
@@ -21,7 +21,7 @@ public class PartialNavigableSetViewTest {
     private PartialNavigableSetView<Integer> oddSet;
     private TreeSet<Integer> set;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         set = new TreeSet<Integer>();
         fullSet = new PartialNavigableSetView<Integer>(set) {

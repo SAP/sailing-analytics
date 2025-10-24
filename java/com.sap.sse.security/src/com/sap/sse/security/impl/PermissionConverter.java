@@ -27,13 +27,11 @@ public class PermissionConverter {
     private final PermissionToObjectIdConverter poc = new PermissionToObjectIdConverter();
     
     public WildcardPermission getWildcardPermission(Permission permission) {
-        return new WildcardPermission(getAsString(permission));
+        final WildcardPermission result;
+        result = new WildcardPermission(permission.toString());
+        return result;
     }
 
-    private String getAsString(Permission permission) {
-        return permission.toString().replaceAll("\\[|\\]", ""); // FIXME for multi-subpart parts remove leading blanks after ,
-    }
-    
     /**
      * Splits the permission along ":" occurrences
      */

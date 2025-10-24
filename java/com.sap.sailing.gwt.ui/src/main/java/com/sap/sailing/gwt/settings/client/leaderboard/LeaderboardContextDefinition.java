@@ -14,9 +14,11 @@ public class LeaderboardContextDefinition extends AbstractGenericSerializableSet
     private transient StringSetting displayName;
 
     public LeaderboardContextDefinition() {
+        super();
     }
     
     public LeaderboardContextDefinition(String leaderboardName, String displayName) {
+        this();
         this.leaderboardName.setValue(leaderboardName);
         this.displayName.setValue(displayName);
     }

@@ -1,7 +1,5 @@
 package net.sf.marineapi.nmea.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import net.sf.marineapi.nmea.sentence.SentenceId;
 import net.sf.marineapi.nmea.sentence.TalkerId;
 import net.sf.marineapi.nmea.sentence.XTESentence;
@@ -9,8 +7,11 @@ import net.sf.marineapi.nmea.util.DataStatus;
 import net.sf.marineapi.nmea.util.Direction;
 import net.sf.marineapi.nmea.util.FaaMode;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class XTETest {
 
@@ -19,7 +20,7 @@ public class XTETest {
 	private XTESentence empty;
 	private XTESentence instance;
 	
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		instance = new XTEParser(EXAMPLE);
 		empty = new XTEParser(TalkerId.GP);

@@ -15,7 +15,7 @@ public class AbstractSailingWriteEntryPoint extends AbstractSailingEntryPoint<Sa
     protected SailingServiceWriteAsync getSailingService() {
         if (sailingService == null) {
             if (this instanceof ServiceRoutingProvider) {
-                sailingService = SailingServiceHelper.createSailingServiceWriteInstance((ServiceRoutingProvider)this);
+                sailingService = SailingServiceHelper.createSailingServiceWriteInstance((ServiceRoutingProvider) this);
             } else {
                 sailingService = SailingServiceHelper.createSailingServiceWriteInstance();
             }

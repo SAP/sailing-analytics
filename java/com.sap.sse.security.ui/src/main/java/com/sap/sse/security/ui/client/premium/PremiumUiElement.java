@@ -10,7 +10,7 @@ public abstract class PremiumUiElement extends Composite implements HasEnabled {
 
     protected final Action action;
     protected final PaywallResolver paywallResolver;
-    private final SecuredDTO contextDTO;
+    protected final SecuredDTO contextDTO;
 
     /**
      * Flag to keep track of the actual enabled/disabled state of this UI component independent of the representing

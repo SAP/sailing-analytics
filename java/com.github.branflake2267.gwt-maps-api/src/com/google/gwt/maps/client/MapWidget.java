@@ -46,6 +46,7 @@ import com.google.gwt.maps.client.events.mousemove.MouseMoveMapHandler;
 import com.google.gwt.maps.client.events.mouseout.MouseOutMapHandler;
 import com.google.gwt.maps.client.events.mouseover.MouseOverMapHandler;
 import com.google.gwt.maps.client.events.projection.ProjectionChangeMapHandler;
+import com.google.gwt.maps.client.events.renderingtype.RenderingTypeChangeMapHandler;
 import com.google.gwt.maps.client.events.resize.ResizeMapHandler;
 import com.google.gwt.maps.client.events.rightclick.RightClickMapHandler;
 import com.google.gwt.maps.client.events.tiles.TilesLoadedMapHandler;
@@ -192,6 +193,15 @@ public class MapWidget extends MVCObjectWidget<MapImpl> {
   }
 
   /**
+   * gets {@link RenderingType}
+   * 
+   * @return {@link RenderingType}
+   */
+  public final RenderingType getRenderingType() {
+    return impl.getRenderingType();
+  }
+
+  /**
    * Returns the current Projection. If the map is not yet initialized (i.e. the mapType is still null) then the result
    * is null. Listen to projection_changed and check its value to ensure it is not null.
    * 
@@ -224,7 +234,7 @@ public class MapWidget extends MVCObjectWidget<MapImpl> {
   /**
    * get zoom
    */
-  public int getZoom() {
+  public double getZoom() {
     return impl.getZoom();
   };
 
@@ -336,7 +346,7 @@ public class MapWidget extends MVCObjectWidget<MapImpl> {
    * 
    * @param zoom
    */
-  public void setZoom(int zoom) {
+  public void setZoom(double zoom) {
     impl.setZoom(zoom);
   };
 
@@ -654,6 +664,16 @@ public class MapWidget extends MVCObjectWidget<MapImpl> {
    */
   public HandlerRegistration addZoomChangeHandler(ZoomChangeMapHandler handler) {
     return impl.addZoomChangeHandler(handler);
+  }
+
+  /**
+   * This event is fired when the map zoom property changes.
+   * 
+   * @param handler {@link ZoomChangeMapHandler}
+   * @return {@link MapHandlerRegistration}
+   */
+  public HandlerRegistration addRenderingTypeChangeHandler(RenderingTypeChangeMapHandler handler) {
+    return impl.addRenderingTypeChangeHandler(handler);
   }
 
   /**

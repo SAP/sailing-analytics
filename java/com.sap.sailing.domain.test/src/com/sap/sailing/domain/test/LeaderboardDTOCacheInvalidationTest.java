@@ -1,13 +1,13 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.DomainFactory;
 import com.sap.sailing.domain.base.impl.CourseAreaImpl;

@@ -1,13 +1,13 @@
 package com.sap.sailing.domain.racelog.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
@@ -27,7 +27,7 @@ public class RegattaLogRevocationTest {
     private RegattaLog serverRegattaLog;
     private AbstractLogEventAuthor serverAuthor = new LogEventAuthorImpl("server", 2);
     
-    @Before
+    @BeforeEach
     public void setup() {
         serverRegattaLog = new RegattaLogImpl("server");
     }

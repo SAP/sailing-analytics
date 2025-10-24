@@ -8,14 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Boat;
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixMovingImpl;
-import com.sap.sailing.domain.tracking.AddResult;
+import com.sap.sailing.domain.shared.tracking.AddResult;
 import com.sap.sailing.domain.tracking.DynamicGPSFixTrack;
 import com.sap.sailing.domain.tracking.DynamicTrackedRace;
 import com.sap.sailing.domain.tracking.DynamicTrackedRegatta;
@@ -37,7 +37,7 @@ import com.tractrac.subscription.lib.api.SubscriberInitializationException;
  * @author Axel Uhl (D043530)
  *
  */
-@Ignore("Un-ignore when you need to fetch new tracks")
+@Disabled("Un-ignore when you need to fetch new tracks")
 public class FetchTracksAndStoreLocallyTest extends OnlineTracTracBasedTest {
     private final Map<Competitor, DynamicGPSFixTrack<Competitor, GPSFixMoving>> tracks;
     private TrackedRace trackedRace;
@@ -141,7 +141,7 @@ public class FetchTracksAndStoreLocallyTest extends OnlineTracTracBasedTest {
         }
     }
     
-    @Ignore
+    @Disabled
     public void store505Race2() throws InterruptedException, FileNotFoundException, IOException, URISyntaxException, SubscriberInitializationException, CreateModelException {
         storeRace("event_20110609_KielerWoch", "357c700a-9d9a-11e0-85be-406186cbf87c");
     }

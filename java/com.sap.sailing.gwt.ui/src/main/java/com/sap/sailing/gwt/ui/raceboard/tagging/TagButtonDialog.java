@@ -19,6 +19,7 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.sap.sailing.domain.common.RaceIdentifier;
 import com.sap.sailing.domain.common.dto.TagDTO;
 import com.sap.sailing.gwt.ui.client.SailingServiceAsync;
 import com.sap.sailing.gwt.ui.client.StringMessages;
@@ -109,13 +110,13 @@ public class TagButtonDialog extends DialogBox {
      *            {@link TaggingComponent} which creates this {@link TagButtonDialog}.
      * @param footerPanel
      *            footer panel of {@link TaggingComponent}
-     * @param sailingServiceWrite
-     *            Sailing Service of {@link TaggingComponent}
      * @param stringMessages
      *            string messages of {@link TaggingComponent}
+     * @param sailingServiceWrite
+     *            Sailing Service of {@link TaggingComponent}
      */
     public TagButtonDialog(TaggingComponent taggingComponent, TagFooterPanel footerPanel, SailingServiceAsync sailingService,
-            StringMessages stringMessages, UserService userService) {
+            StringMessages stringMessages, UserService userService, RaceIdentifier raceIdentifier) {
         this.taggingComponent = taggingComponent;
         this.stringMessages = stringMessages;
         this.footerPanel = footerPanel;
@@ -141,7 +142,7 @@ public class TagButtonDialog extends DialogBox {
                 }
             }
         });
-        tagPreviewPanel = new TagPreviewPanel(taggingComponent, inputPanel, stringMessages, userService);
+        tagPreviewPanel = new TagPreviewPanel(taggingComponent, inputPanel, stringMessages, userService, raceIdentifier);
         tagButtonTable = createTable(footerPanel, inputPanel, tagPreviewPanel);
         tagButtonTable.addRedrawHandler(() -> {
             // center dialog when content of tagButtonTable changes (table needs to be redrawn)

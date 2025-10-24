@@ -2,11 +2,12 @@
 TARGET_GROUP_NAME=S-paris2024
 
 if [ $# -eq 0 ]; then
-    echo "$0 -R <release-name> -b <replication-bearer-token> [-t <instance-type>] [-i <ami-id>] [-k <key-pair-name>]"
+    echo "$0 -R <release-name> -b <replication-bearer-token> -m <google-maps-api-key> [-t <instance-type>] [-i <ami-id>] [-k <key-pair-name>]"
     echo ""
     echo "-b replication bearer token; mandatory"
     echo "-i Amazon Machine Image (AMI) ID to use to launch the instance; defaults to latest image tagged with image-type:sailing-analytics-server"
     echo "-k Key pair name, mapping to the --key-name parameter; defaults to Axel"
+    echo "-m Google Maps API key, used for the GOOGLE_MAPS_AUTHENTICATION_PARAMS variable"
     echo "-R release name; must be provided to select the release, e.g., build-202106040947"
     echo "-t Instance type; defaults to ${INSTANCE_TYPE}"
     echo
@@ -19,13 +20,14 @@ if [ $# -eq 0 ]; then
     echo "in that region, with all auto-replicas registered before removed from the target group."
     exit 2
 fi
-options='R:b:t:i:k:'
+options='R:b:t:i:k:m:'
 while getopts $options option
 do
     case $option in
         b) BEARER_TOKEN=$OPTARG;;
         i) IMAGE_ID=$OPTARG;;
         k) KEY_NAME=$OPTARG;;
+        m) GOOGLE_MAPS_AUTHENTICATION_PARAMS=$OPTARG;;
         R) RELEASE=$OPTARG;;
         t) INSTANCE_TYPE=$OPTARG;;
         \?) echo "Invalid option"
@@ -64,6 +66,9 @@ for REGION in $( cat `dirname $0`/regions.txt | grep -v "^#" ); do
   fi
   if [ -n "${INSTANCE_TYPE}" ]; then
     OPTIONS="${OPTIONS} -t ${INSTANCE_TYPE}"
+  fi
+  if [ -n "${GOOGLE_MAPS_AUTHENTICATION_PARAMS}" ]; then
+    OPTIONS="${OPTIONS} -m ${GOOGLE_MAPS_AUTHENTICATION_PARAMS}"
   fi
   echo "Invoking launch-replicas-in-region.sh with options ${OPTIONS}"
   `dirname $0`/launch-replicas-in-region.sh ${OPTIONS} &

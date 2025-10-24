@@ -1,11 +1,11 @@
 package com.sap.sailing.selenium.test.adminconsole.roles;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.roles.RoleDefinitionCreationAndUpdateDialogPO;
 import com.sap.sailing.selenium.pages.adminconsole.roles.RoleDefinitionsPanelPO;
@@ -16,13 +16,13 @@ public class TestRoleDefinitionCreation extends AbstractSeleniumTest {
     private static final String TEST_PERMISSION = "USER:READ";
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot());
         super.setUp();
     }
 
-    @Test
+    @SeleniumTestCase
     public void testRoleCreation() throws InterruptedException {
         final RoleDefinitionsPanelPO roleManagementPanel = goToRoleDefinitionPanel();
         assertNull(roleManagementPanel.findRole(TEST_ROLE));
@@ -30,7 +30,7 @@ public class TestRoleDefinitionCreation extends AbstractSeleniumTest {
         assertNotNull(roleManagementPanel.findRole(TEST_ROLE));
     }
     
-    @Test
+    @SeleniumTestCase
     public void testRoleDeletion() throws InterruptedException {
         final RoleDefinitionsPanelPO roleManagementPanel = goToRoleDefinitionPanel();
         createRole(roleManagementPanel);
@@ -40,7 +40,7 @@ public class TestRoleDefinitionCreation extends AbstractSeleniumTest {
     }
     
     // FIXME: Disabled due to inconsistencies in handling of UpdateRoleDialog. See bug5364
-    // @Test
+    // @SeleniumTestCase
     // public void testRolePermissionRemoval() throws InterruptedException {
     // final RoleDefinitionsPanelPO roleManagementPanel = goToRoleDefinitionPanel();
     // createRole(roleManagementPanel);

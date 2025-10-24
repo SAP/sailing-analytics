@@ -1,7 +1,6 @@
 package com.sap.sailing.datamining.data;
 
 import com.sap.sailing.domain.base.Boat;
-import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.common.MaxPointsReason;
 import com.sap.sailing.domain.common.NoWindException;
 import com.sap.sailing.domain.common.Tack;
@@ -14,14 +13,10 @@ import com.sap.sse.datamining.annotations.Dimension;
 import com.sap.sse.datamining.annotations.Statistic;
 import com.sap.sse.datamining.shared.impl.dto.ClusterDTO;
 
-public interface HasRaceOfCompetitorContext {
-    
+public interface HasRaceOfCompetitorContext extends HasSomethingOfCompetitorContextWithTrackedRaceContext {
+    @Override
     @Connector(scanForStatistics=false)
     HasTrackedRaceContext getTrackedRaceContext();
-    
-    @Connector(messageKey="Competitor")
-    @Statistic(messageKey="Competitor")
-    Competitor getCompetitor();
     
     @Dimension(messageKey="TackAtStart", ordinal=12)
     Tack getTackAtStart() throws NoWindException;
@@ -37,6 +32,9 @@ public interface HasRaceOfCompetitorContext {
     
     @Dimension(messageKey="IRM")
     MaxPointsReason getMaxPointsReason();
+
+    @Dimension(messageKey="Discarded")
+    boolean isDiscarded();
     
     @Statistic(messageKey="DistanceAtStart", resultDecimals=2, ordinal=0)
     Distance getDistanceToStartLineAtStart();
@@ -89,6 +87,9 @@ public interface HasRaceOfCompetitorContext {
     @Connector(messageKey="SpeedWhenStarting", ordinal=3)
     Speed getSpeedWhenStarting();
     
+    @Statistic(messageKey="StartDelay", resultDecimals=1)
+    Duration getStartDelay();
+    
     @Connector(messageKey="SpeedTenSecondsBeforeStart", ordinal=4)
     Speed getSpeedTenSecondsBeforeStart();
     
@@ -137,8 +138,18 @@ public interface HasRaceOfCompetitorContext {
     @Statistic(messageKey="RelativeDistanceToAdvantageousEndOfLineAtStartOfRace", resultDecimals=2)
     Double getRelativeDistanceToAdvantageousEndOfLineAtStartOfRace();
     
+    @Statistic(messageKey="RelativeDistanceToAdvantageousEndOfLineAtStartOfCompetitor", resultDecimals=2)
+    Double getRelativeDistanceToAdvantageousEndOfLineAtStartOfCompetitor();
+    
     @Statistic(messageKey="RaceDuration")
     Duration getDuration();
+    
+    /**
+     * The time between the start of the race and the {@link #getCompetitor() competitor}'s first tack;
+     * {@code null} if no tack is found for the competitor in the race.
+     */
+    @Statistic(messageKey="DurationFromRaceStartToFirstTack")
+    Duration getDurationFromStartToFirstTack();
     
     @Statistic(messageKey="DistanceToStarboardSideAtStartOfRace", resultDecimals=2)
     public Double getRelativeDistanceToStarboardSideAtStartOfRace();

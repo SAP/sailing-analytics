@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import com.sap.sailing.domain.common.dto.AnniversaryType;
 import com.sap.sailing.domain.common.dto.EventType;
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
+import com.sap.sse.gwt.shared.DTO;
 
 /**
  * {@link DTO} object representing an anniversary entry (count-down or announcement) to be shown on the start page.

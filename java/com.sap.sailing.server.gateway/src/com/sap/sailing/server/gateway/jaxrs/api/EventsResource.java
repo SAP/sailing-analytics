@@ -608,6 +608,7 @@ public class EventsResource extends AbstractSailingServerResource {
         Callable<Util.Triple<Event, LeaderboardGroup, RegattaLeaderboard>> doCreationAction = new Callable<Util.Triple<Event, LeaderboardGroup, RegattaLeaderboard>>() {
             @Override
             public Util.Triple<Event, LeaderboardGroup, RegattaLeaderboard> call() throws Exception {
+                logger.info("User "+SecurityUtils.getSubject().getPrincipal()+" is trying to create event "+eventName);
                 Event event = getSecurityService().setOwnershipCheckPermissionForObjectCreationAndRevertOnError(
                         SecuredDomainType.EVENT, EventBaseImpl.getTypeRelativeObjectIdentifier(eventId),
                         eventName, ()->getService().apply(new CreateEvent(eventName, eventDescription, startDate, endDate, venueName, isPublic, eventId,

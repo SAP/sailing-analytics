@@ -7,7 +7,7 @@
 #
 killall autossh
 sleep 2
-autossh -M 21504 -f -A -N \
+AUTOSSH_LOGLEVEL=7 AUTOSSH_POLL=5 autossh -M 21504 -f -A -N \
   -L 22443:sapsailing.com:443 \
   -L 22222:sapsailing.com:22 \
   -R 9444:localhost:9443 \
@@ -20,7 +20,7 @@ autossh -M 21504 -f -A -N \
   -R 18222:localhost:22 \
   -L 588:email-smtp.eu-west-1.amazonaws.com:587 \
   ec2-user@paris-ssh.sapsailing.com
-autossh -M 0 -f -A -N \
+AUTOSSH_LOGLEVEL=7 AUTOSSH_POLL=5 autossh -M 0 -f -A -N \
   -L 5673:localhost:5672 \
   localhost
 #

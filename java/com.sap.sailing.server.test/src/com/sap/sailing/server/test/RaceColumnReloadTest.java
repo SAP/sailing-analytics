@@ -8,9 +8,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
@@ -77,7 +77,7 @@ public class RaceColumnReloadTest {
     private RaceLogWindFixEventImpl testWindEvent1, testWindEvent2;
     private Fleet defaultFleet;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MongoDBService.INSTANCE.getDB().drop();
         final RacingEventServiceImpl service = new RacingEventServiceImpl();
@@ -212,7 +212,7 @@ public class RaceColumnReloadTest {
         }
 
         private void assertWindFixCount(int expected) {
-            Assert.assertEquals(expected, loggedWindFixes.size());
+            Assertions.assertEquals(expected, loggedWindFixes.size());
         }
     }
 
@@ -232,7 +232,7 @@ public class RaceColumnReloadTest {
         }
 
         private void assertWindFixCount(int expected) {
-            Assert.assertEquals(expected, loggedWindFixes.size());
+            Assertions.assertEquals(expected, loggedWindFixes.size());
         }
     }
     

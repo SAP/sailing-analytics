@@ -91,5 +91,4 @@ public class PolarDataClient {
         }
         return processorResponse.getEntity().getContent();
     }
-
 }

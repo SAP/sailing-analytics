@@ -58,7 +58,7 @@ public class HomeSharingResource extends AbstractSailingServerResource {
     @Path("/events/{eventId}/regattas/{regattaId}")
     @Produces("text/html")
     public String getSharedRegatta(@PathParam("eventId") String eventId, @PathParam("regattaId") String regattaId,
-            @HeaderParam("user-agent") String userAgent) {
+            @HeaderParam("user-agent") String userAgent) throws UnsupportedEncodingException {
         RacingEventService eventService = getService();
         SecurityService securityService = getSecurityService();
         UUID uuid = UUID.fromString(eventId);

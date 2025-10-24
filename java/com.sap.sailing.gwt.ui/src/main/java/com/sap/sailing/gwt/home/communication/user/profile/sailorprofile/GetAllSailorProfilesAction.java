@@ -9,7 +9,7 @@ import com.sap.sailing.gwt.home.communication.SailingAction;
 import com.sap.sailing.gwt.home.communication.SailingDispatchContext;
 import com.sap.sailing.gwt.home.communication.user.profile.domain.SailorProfileDTO;
 import com.sap.sailing.gwt.home.communication.user.profile.domain.SailorProfilesDTO;
-import com.sap.sailing.server.impl.preferences.model.SailorProfilePreferences;
+import com.sap.sailing.server.preferences.SailorProfilePreferences;
 import com.sap.sse.gwt.dispatch.shared.exceptions.DispatchException;
 
 /**

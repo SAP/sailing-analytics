@@ -3,7 +3,6 @@ package com.sap.sailing.kiworesultimport.impl;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
@@ -11,10 +10,11 @@ import org.xml.sax.SAXException;
 
 import com.sap.sailing.kiworesultimport.ResultList;
 import com.sap.sailing.kiworesultimport.ResultListParser;
+import com.sap.sse.util.XmlUtil;
 
 public class ResultListParserImpl implements ResultListParser {
     private Document parseDocument(InputStream inputStream) throws SAXException, IOException, ParserConfigurationException {
-        return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream);
+        return XmlUtil.getSecureDocumentBuilderFactory().newDocumentBuilder().parse(inputStream);
     }
 
     @Override

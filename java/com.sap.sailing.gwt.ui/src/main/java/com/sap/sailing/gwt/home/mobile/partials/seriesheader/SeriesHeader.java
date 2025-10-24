@@ -18,6 +18,8 @@ import com.sap.sailing.gwt.home.shared.places.fakeseries.SeriesContext;
 import com.sap.sailing.gwt.home.shared.utils.LabelTypeUtil;
 import com.sap.sailing.gwt.home.shared.utils.LogoUtil;
 import com.sap.sailing.gwt.ui.client.StringMessages;
+import com.sap.sse.gwt.client.media.MediaMenuIcon;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 
 public class SeriesHeader extends Composite {
     private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -28,22 +30,24 @@ public class SeriesHeader extends Composite {
     @UiField SpanElement eventNameUi;
     @UiField DivElement eventStateUi;
     @UiField AnchorElement eventLogoUi;
+    @UiField(provided=true) MediaMenuIcon seriesLogoMenuButton;
     @UiField DivElement locationsUi;
     @UiField SharingButtons sharingButtons;
 
-    public SeriesHeader(SeriesContext seriesContext, EventSeriesViewDTO series) {
-        this(seriesContext, series, null);
+    public SeriesHeader(SeriesContext seriesContext, EventSeriesViewDTO series, TakedownNoticeService takedownNoticeService) {
+        this(seriesContext, series, null, takedownNoticeService);
     }
     
-    public SeriesHeader(SeriesContext seriesContext, EventSeriesViewDTO series, PlaceNavigation<?> logoNavigation) {
+    public SeriesHeader(SeriesContext seriesContext, EventSeriesViewDTO series, PlaceNavigation<?> logoNavigation, TakedownNoticeService takedownNoticeService) {
         SeriesHeaderResources.INSTANCE.css().ensureInjected();
+        this.seriesLogoMenuButton = new MediaMenuIcon(takedownNoticeService, "takedownRequestForLogoImage");
         initWidget(uiBinder.createAndBindUi(this));
         setUiFieldValues(series, logoNavigation);
         setupSharing(seriesContext, series);
     }
 
     private void setUiFieldValues(EventSeriesViewDTO series, PlaceNavigation<?> logoNavigation) {
-        LogoUtil.setEventLogo(eventLogoUi, series);
+        LogoUtil.setEventLogo(eventLogoUi, series, seriesLogoMenuButton);
         if (logoNavigation != null) {
             logoNavigation.configureAnchorElement(eventLogoUi);
         }

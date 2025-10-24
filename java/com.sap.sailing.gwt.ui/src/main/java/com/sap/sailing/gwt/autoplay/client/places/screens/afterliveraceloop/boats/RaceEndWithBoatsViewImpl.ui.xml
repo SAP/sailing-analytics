@@ -1,8 +1,10 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:rf="urn:import:com.sap.sse.gwt.client.panels">
-	<ui:with field="res"
-		type="com.sap.sailing.gwt.autoplay.client.resources.SixtyInchBundle" />
+	         xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:rf="urn:import:com.sap.sse.gwt.client.panels"
+             xmlns:m="urn:import:com.sap.sse.gwt.client.media">
+	<ui:with field="res" type="com.sap.sailing.gwt.autoplay.client.resources.SixtyInchBundle" />
+    <ui:with field="shared_res" type="com.sap.sse.gwt.common.CommonSharedResources" />
 	<ui:style gss="true">
 	.left {
 		position: absolute;
@@ -121,15 +123,21 @@
 		<rf:ResizableFlowPanel ui:field="infoHolder"
 			styleName="{style.right}">
 			<rf:ResizableFlowPanel styleName="{style.image}">
-				<g:FlowPanel ui:field="image2" />
+				<g:FlowPanel ui:field="image2" styleName="{shared_res.mainCss.media_wrapper}">
+                  <m:MediaMenuIcon ui:field="takedownButtonImage2"/>
+                </g:FlowPanel>
 			    <g:Label ui:field="subline2" styleName="{style.subline2}" />
 			</rf:ResizableFlowPanel>
 			<rf:ResizableFlowPanel styleName="{style.image}">
-				<g:FlowPanel ui:field="image1" />
+				<g:FlowPanel ui:field="image1" styleName="{shared_res.mainCss.media_wrapper}">
+                  <m:MediaMenuIcon ui:field="takedownButtonImage1"/>
+                </g:FlowPanel>
 			    <g:Label ui:field="subline1" styleName="{style.subline1}" />
 			</rf:ResizableFlowPanel>
 			<rf:ResizableFlowPanel styleName="{style.image}">
-				<g:FlowPanel ui:field="image3" />
+				<g:FlowPanel ui:field="image3" styleName="{shared_res.mainCss.media_wrapper}">
+                  <m:MediaMenuIcon ui:field="takedownButtonImage3"/>
+                </g:FlowPanel>
 			    <g:Label ui:field="subline3" styleName="{style.subline3}" />
 			</rf:ResizableFlowPanel>
 		</rf:ResizableFlowPanel>

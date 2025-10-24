@@ -3,23 +3,24 @@ package com.sap.sailing.server.trackfiles.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import com.sap.sailing.domain.trackimport.FormatNotSupportedException;
 
 public abstract class ExpeditionImportFileHandler implements CompressedStreamsUtil.FileHandler {
 
-    public static final List<String> supportedExpeditionLogFileExtensions = Arrays.asList("csv", "log", "txt");
-    public static final List<String> supportedExpeditionArchiveFileExtensions = Arrays.asList("gz", "zip");
-    public static final List<String> supportedExpeditionFileExtensions;
+    public final Iterable<String> supportedExpeditionLogFileExtensions;
 
-    static {
-        final List<String> allExtensions = new ArrayList<>(supportedExpeditionLogFileExtensions);
-        allExtensions.addAll(supportedExpeditionArchiveFileExtensions);
-        supportedExpeditionFileExtensions = Collections.unmodifiableList(allExtensions);
+    public Iterable<String> getSupportedFileExtensions() {
+        return supportedExpeditionLogFileExtensions;
+    }
+    
+    protected ExpeditionImportFileHandler(Iterable<String> supportedFileExtensions) {
+        this.supportedExpeditionLogFileExtensions = supportedFileExtensions;
+    }
+    
+    protected ExpeditionImportFileHandler() {
+        this(Arrays.asList("csv", "log", "txt"));
     }
 
     @Override

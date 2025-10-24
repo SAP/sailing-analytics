@@ -20,7 +20,8 @@ public enum SubscriptionWebHookEventType {
     INVOICE_UPDATED("invoice_updated"),
     PAYMENT_REFUNDED("payment_refunded"),
     SUBSCRIPTION_PAUSED("subscription_paused"),
-    SUBSCRIPTION_RESUMED("subscription_resumed");
+    SUBSCRIPTION_RESUMED("subscription_resumed"),
+    SUBSCRIPTION_CANCELLATION_REMINDER("subscription_cancellation_reminder");
 
     private final String name;
 

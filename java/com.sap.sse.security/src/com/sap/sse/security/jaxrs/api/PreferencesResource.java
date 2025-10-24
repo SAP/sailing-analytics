@@ -24,7 +24,7 @@ public class PreferencesResource extends AbstractSecurityResource {
         Response response = null;
         if (SecurityUtils.getSubject().isAuthenticated()) {
             String username = SecurityUtils.getSubject().getPrincipal().toString();
-            String settings = getService().getPreference(username, settingsKey);
+            String settings = getSecurityService().getPreference(username, settingsKey);
             if (settings == null) {
                 response = Response.noContent().build();
             } else {
@@ -43,7 +43,7 @@ public class PreferencesResource extends AbstractSecurityResource {
         Response response = null;
         if (SecurityUtils.getSubject().isAuthenticated()) {
             String username = SecurityUtils.getSubject().getPrincipal().toString();
-            getService().setPreference(username, settingsKey, json);
+            getSecurityService().setPreference(username, settingsKey, json);
             response = Response.ok().build();
         } else {
             response = Response.status(401).build();
@@ -58,7 +58,7 @@ public class PreferencesResource extends AbstractSecurityResource {
         Response response = null;
         if (SecurityUtils.getSubject().isAuthenticated()) {
             String username = SecurityUtils.getSubject().getPrincipal().toString();
-            getService().unsetPreference(username, settingsKey);
+            getSecurityService().unsetPreference(username, settingsKey);
             response = Response.ok().build();
         } else {
             response = Response.status(401).build();

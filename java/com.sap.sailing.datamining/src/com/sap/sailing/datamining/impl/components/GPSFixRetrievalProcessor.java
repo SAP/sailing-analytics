@@ -7,7 +7,6 @@ import java.util.concurrent.ExecutorService;
 import com.sap.sailing.datamining.data.HasGPSFixContext;
 import com.sap.sailing.datamining.data.HasTrackedLegOfCompetitorContext;
 import com.sap.sailing.datamining.impl.data.GPSFixWithContext;
-import com.sap.sailing.datamining.impl.data.TrackedLegOfCompetitorWithSpecificTimePointWithContext;
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.tracking.GPSFixTrack;
@@ -36,8 +35,7 @@ public class GPSFixRetrievalProcessor extends AbstractRetrievalProcessor<HasTrac
                     if (isAborted()) {
                         break;
                     }
-                    final HasGPSFixContext gpsFixWithContext = new GPSFixWithContext(new TrackedLegOfCompetitorWithSpecificTimePointWithContext(
-                            element.getTrackedLegContext(), element.getTrackedLegOfCompetitor(), gpsFix.getTimePoint()), gpsFix);
+                    final HasGPSFixContext gpsFixWithContext = new GPSFixWithContext(element, gpsFix);
                     gpsFixesWithContext.add(gpsFixWithContext);
                 }
             }

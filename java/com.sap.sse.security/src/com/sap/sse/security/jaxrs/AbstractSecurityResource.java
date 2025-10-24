@@ -12,9 +12,9 @@ import com.sap.sse.security.SecurityUrlPathProvider;
 
 public abstract class AbstractSecurityResource extends StreamingOutputUtil {
     @Context
-    ServletContext servletContext;
+    protected ServletContext servletContext;
 
-    public SecurityService getService() {
+    public SecurityService getSecurityService() {
         @SuppressWarnings("unchecked")
         ServiceTracker<SecurityService, SecurityService> tracker = (ServiceTracker<SecurityService, SecurityService>) servletContext
                 .getAttribute(RestServletContainer.SECURITY_SERVICE_TRACKER_NAME);

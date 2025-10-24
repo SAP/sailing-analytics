@@ -1,5 +1,6 @@
 package com.sap.sailing.gwt.ui.client;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -53,6 +54,8 @@ import com.sap.sailing.gwt.ui.shared.DeviceIdentifierDTO;
 import com.sap.sailing.gwt.ui.shared.DeviceMappingDTO;
 import com.sap.sailing.gwt.ui.shared.EventDTO;
 import com.sap.sailing.gwt.ui.shared.GPSFixDTO;
+import com.sap.sailing.gwt.ui.shared.IgtimiDataAccessWindowWithSecurityDTO;
+import com.sap.sailing.gwt.ui.shared.IgtimiDeviceWithSecurityDTO;
 import com.sap.sailing.gwt.ui.shared.LeaderboardGroupDTO;
 import com.sap.sailing.gwt.ui.shared.MarkDTO;
 import com.sap.sailing.gwt.ui.shared.MigrateGroupOwnerForHierarchyDTO;
@@ -125,8 +128,8 @@ public interface SailingServiceWriteAsync extends FileStorageManagementGwtServic
     void addResultImportUrl(String resultProviderName, UrlDTO url, AsyncCallback<Void> callback) throws UnauthorizedException/*, Exception*/;
 
     void addTag(String leaderboardName, String raceColumnName, String fleetName, String tag, String comment,
-            String imageURL, String resizedImageURL, boolean visibleForPublic, TimePoint raceTimepoint,
-            AsyncCallback<SuccessInfo> callback) throws UnauthorizedException;
+            String hiddenInfo, String imageURL, String resizedImageURL, boolean visibleForPublic,
+            TimePoint raceTimepoint, AsyncCallback<SuccessInfo> callback) throws UnauthorizedException;
 
     void addCompetitors(List<CompetitorDescriptor> competitorsForSaving, String searchTag, AsyncCallback<List<CompetitorWithBoatDTO>> callback)
             throws UnauthorizedException;
@@ -492,8 +495,8 @@ public interface SailingServiceWriteAsync extends FileStorageManagementGwtServic
 
     void createEvent(String eventName, String eventDescription, Date startDate, Date endDate, String venue,
             boolean isPublic, List<CourseAreaDTO> courseAreas, String officialWebsiteURL, String baseURL,
-            Map<String, String> sailorsInfoWebsiteURLsByLocaleName, List<ImageDTO> images,
-            List<VideoDTO> videos, List<UUID> leaderboardGroupIDs,
+            Map<String, String> sailorsInfoWebsiteURLsByLocaleName, List<? extends ImageDTO> images,
+            List<? extends VideoDTO> videos, List<UUID> leaderboardGroupIDs,
             AsyncCallback<EventDTO> callback);
 
     /**
@@ -513,8 +516,8 @@ public interface SailingServiceWriteAsync extends FileStorageManagementGwtServic
      */
     void updateEvent(UUID eventId, String eventName, String eventDescription, Date startDate, Date endDate,
             VenueDTO venue, boolean isPublic, List<UUID> leaderboardGroupIds, String officialWebsiteURL,
-            String baseURL, Map<String, String> sailorsInfoWebsiteURLsByLocaleName, List<ImageDTO> images,
-            List<VideoDTO> videos, List<String> windFinderReviewedSpotCollectionIds, AsyncCallback<EventDTO> callback);
+            String baseURL, Map<String, String> sailorsInfoWebsiteURLsByLocaleName, List<? extends ImageDTO> images,
+            List<? extends VideoDTO> videos, List<String> windFinderReviewedSpotCollectionIds, AsyncCallback<EventDTO> callback);
 
     void createCourseAreas(UUID eventId, List<CourseAreaDTO> courseAreas, AsyncCallback<Void> callback);
 
@@ -574,12 +577,65 @@ public interface SailingServiceWriteAsync extends FileStorageManagementGwtServic
 
     void removeDeviceConfiguration(UUID deviceConfigurationId, AsyncCallback<Boolean> asyncCallback);
 
-    void authorizeAccessToIgtimiUser(String eMailAddress, String password, AsyncCallback<Boolean> callback);
+    void addIgtimiDataAccessWindow(String deviceSerialNumber, Date from, Date to, AsyncCallback<IgtimiDataAccessWindowWithSecurityDTO> asyncCallback);
 
-    void removeIgtimiAccount(String eMailOfAccountToRemove, AsyncCallback<Void> asyncCallback);
+    void removeIgtimiDataAccessWindow(long id, AsyncCallback<Void> asyncCallback);
+
+    void updateIgtimiDevice(IgtimiDeviceWithSecurityDTO editedObject, AsyncCallback<Void> asyncCallback);
+
+    void removeIgtimiDevice(String deviceSerialNumber, AsyncCallback<Void> asyncCallback);
 
     void importWindFromIgtimi(List<RaceDTO> selectedRaces, boolean correctByDeclination,
-            AsyncCallback<Map<RegattaAndRaceIdentifier, Integer>> asyncCallback);
+            String optionalBearerTokenOrNull, AsyncCallback<Map<RegattaAndRaceIdentifier, Integer>> asyncCallback);
+
+    /**
+     * The boolean result reflects whether a connection to the device identified by {@code serialNumber}
+     * was found on the local Igtimi Riot service; if {@code false}, the message may still have been delivered
+     * through another replica to which the device maintains a live connection.
+     */
+    void sendGPSOffCommandToIgtimiDevice(String serialNumber, AsyncCallback<Boolean> callback);
+
+    /**
+     * The boolean result reflects whether a connection to the device identified by {@code serialNumber}
+     * was found on the local Igtimi Riot service; if {@code false}, the message may still have been delivered
+     * through another replica to which the device maintains a live connection.
+     */
+    void sendGPSOnCommandToIgtimiDevice(String serialNumber, AsyncCallback<Boolean> callback);
+
+    /**
+     * The boolean result reflects whether a connection to the device identified by {@code serialNumber}
+     * was found on the local Igtimi Riot service; if {@code false}, the message may still have been delivered
+     * through another replica to which the device maintains a live connection.
+     */
+    void sendPowerOffCommandToIgtimiDevice(String serialNumber, AsyncCallback<Boolean> callback);
+
+    /**
+     * The boolean result reflects whether a connection to the device identified by {@code serialNumber}
+     * was found on the local Igtimi Riot service; if {@code false}, the message may still have been delivered
+     * through another replica to which the device maintains a live connection.
+     */
+    void sendRestartCommandToIgtimiDevice(String serialNumber, AsyncCallback<Boolean> callback);
+    
+    /**
+     * Sends the command sequence to calibrate the IMU of the Igtimi device identified by {@code serialNumber}.
+     * Waits 1s in between commands to allow the device to process them. So, expect the method invocation to take
+     * at least 5 seconds.
+     * <p>
+     * 
+     * The boolean result reflects whether a connection to the device identified by {@code serialNumber} was found on
+     * the local Igtimi Riot service; if {@code false}, the message may still have been delivered through another
+     * replica to which the device maintains a live connection.
+     */
+    void sendIMUCalibrationCommandSequenceToIgtimiDevice(String serialNumber, AsyncCallback<Boolean> callback);
+
+    /**
+     * Sends a "freestyle" command to the Igtimi device identified by {@code serialNumber}.
+     */
+    void sendIgtimiCommand(String serialNumber, String command, AsyncCallback<Boolean> asyncCallback);
+    
+    void enableIgtimiDeviceOverTheAirLog(String deviceSerialNumber, boolean enable, AsyncCallback<Boolean> asyncCallback);
+    
+    void getIgtimiDeviceLogs(String serialNumber, Duration duration, AsyncCallback<ArrayList<Pair<TimePoint, String>>> asyncCallback);
 
     /**
      * @return {@code true} if the race was not yet denoted for race log tracking and now has successfully been denoted
@@ -615,7 +671,7 @@ public interface SailingServiceWriteAsync extends FileStorageManagementGwtServic
             AsyncCallback<Void> callback);
 
     void updateTag(String leaderboardName, String raceColumnName, String fleetName, TagDTO tagToUpdate, String tag,
-            String comment, String imageURL, String resizedImageURL, boolean visibleForPublic, AsyncCallback<SuccessInfo> asyncCallback);
+            String comment, String hiddenInfo, String imageURL, String resizedImageURL, boolean visibleForPublic, AsyncCallback<SuccessInfo> asyncCallback);
 
     void removeTag(String leaderboardName, String raceColumnName, String fleetName, TagDTO tag,
             AsyncCallback<SuccessInfo> asyncCallback);
@@ -694,4 +750,30 @@ public interface SailingServiceWriteAsync extends FileStorageManagementGwtServic
      *            configuration object is {@code null}, this means that the original password is to be left unchanged.
      */
     void updateYellowBrickConfiguration(YellowBrickConfigurationWithSecurityDTO editedObject, AsyncCallback<Void> callback);
+    
+    void startAICommentingOnEvent(UUID eventId, AsyncCallback<Void> callback);
+    
+    void stopAICommentingOnEvent(UUID eventId, AsyncCallback<Void> callback);
+    
+    void getIdsOfEventsWithAICommenting(AsyncCallback<List<EventDTO>> callback);
+
+    /**
+     * If {@code null} is returned to the callback's {@link AsyncCallback#onSuccess(Object) onSuccess} method, this
+     * means that the AI agent hasn't been initialized properly. The typical reason for this will be missing AI Core
+     * credentials but may also be issues with finding a valid deployment of a language model to use. In any case, if
+     * this method has delivered a {@code null} model name then the
+     * {@link #startAICommentingOnEvent(UUID, AsyncCallback)}, {@link #stopAICommentingOnEvent(UUID, AsyncCallback)} and
+     * {@link #getIdsOfEventsWithAICommenting(AsyncCallback)} methods must not be called, or you may see exceptions
+     * being thrown.
+     */
+    void getAIAgentLanguageModelName(AsyncCallback<String> callback);
+    
+    void hasAIAgentCredentials(AsyncCallback<Boolean> callback);
+
+    void setAIAgentCredentials(String credentials, AsyncCallback<Void> callback);
+    
+    void resetAIAgentCredentials(AsyncCallback<Void> callback);
+    
+    void copyPairingListFromOtherLeaderboard(String sourceLeaderboardName, String targetLeaderboardName, String fromRaceColumnName,
+            String toRaceColumnInclusiveName, AsyncCallback<Void> asyncCallback);
 }

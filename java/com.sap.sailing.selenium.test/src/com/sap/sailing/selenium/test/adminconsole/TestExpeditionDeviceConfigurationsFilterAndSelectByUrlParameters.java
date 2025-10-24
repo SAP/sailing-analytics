@@ -1,12 +1,13 @@
 package com.sap.sailing.selenium.test.adminconsole;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.connectors.ExpeditionDeviceConfigurationsPanelPO;
 import com.sap.sailing.selenium.test.AbstractSeleniumTest;
@@ -22,14 +23,14 @@ public class TestExpeditionDeviceConfigurationsFilterAndSelectByUrlParameters ex
     private static final String PARAM_FILTER_AND_SELECT = "filterAndSelect";
     
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot());
         super.setUp();
         createTestExpeditionDeviceConfigurations();
     }
     
-    @Test
+    @SeleniumTestCase
     public void testUrlParameterFilter() {        
         ExpeditionDeviceConfigurationsPanelPO configurationPanelPO = getExpeditionDeviceConfigurationsPanelPoOfPageWithUrlParams(); 
         List<String> availableConfigurations = configurationPanelPO.getAvailableExpeditionDeviceConfigurations();
@@ -49,7 +50,7 @@ public class TestExpeditionDeviceConfigurationsFilterAndSelectByUrlParameters ex
         assertEquals("Test Configuration", configurationPanelPO.getSelectedEntries().get(0).getName());
     }
     
-    @Test
+    @SeleniumTestCase
     public void testUrlParameterSelect() {       
         ExpeditionDeviceConfigurationsPanelPO configurationPanelPO = getExpeditionDeviceConfigurationsPanelPoOfPageWithUrlParams(PARAM_SELECT, "Test"); 
         List<String> availableConfigurations = configurationPanelPO.getAvailableExpeditionDeviceConfigurations();

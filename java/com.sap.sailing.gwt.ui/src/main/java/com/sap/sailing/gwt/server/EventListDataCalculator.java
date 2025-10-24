@@ -33,7 +33,7 @@ public class EventListDataCalculator implements EventVisitor {
     @Override
     public void visit(EventBase event, boolean onRemoteServer, URL baseURL) {
         if (event.getStartDate() != null) {
-            EventListEventDTO eventDTO = HomeServiceUtil.convertToEventListDTO(event, baseURL, onRemoteServer, service);
+            EventListEventDTO eventDTO = HomeServiceUtil.convertToEventListDTO(event, baseURL, onRemoteServer);
             if (HomeServiceUtil.calculateEventState(event) != EventState.UPCOMING && EventUtil.isFakeSeries(event)) {
                 final LeaderboardGroupBase seriesLeaderboardGroup = event.getLeaderboardGroups().iterator().next();
                 final UUID seriesLeaderboardGroupId = seriesLeaderboardGroup.getId();

@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.mongodb.MongoException;
 import com.mongodb.ReadConcern;
@@ -46,8 +46,8 @@ import com.sap.sailing.domain.racelog.tracking.EmptySensorFixStore;
 import com.sap.sailing.domain.racelog.tracking.SensorFixMapper;
 import com.sap.sailing.domain.racelog.tracking.SensorFixStore;
 import com.sap.sailing.domain.racelog.tracking.test.mock.MockSmartphoneImeiServiceFinderFactory;
-import com.sap.sailing.domain.racelog.tracking.test.mock.SmartphoneImeiIdentifier;
 import com.sap.sailing.domain.racelogsensortracking.SensorFixMapperFactory;
+import com.sap.sailing.domain.racelogtracking.impl.SmartphoneImeiIdentifierImpl;
 import com.sap.sailing.domain.racelogtracking.impl.fixtracker.RaceLogFixTrackerManager;
 import com.sap.sailing.domain.ranking.OneDesignRankingMetric;
 import com.sap.sailing.domain.regattalog.impl.EmptyRegattaLogStore;
@@ -61,8 +61,8 @@ import com.sap.sse.common.Timed;
 
 public class RaceLogFixTrackerManagerTest {
     protected final MockSmartphoneImeiServiceFinderFactory serviceFinderFactory = new MockSmartphoneImeiServiceFinderFactory();
-    protected final DeviceIdentifier device = new SmartphoneImeiIdentifier("a");
-    protected final DeviceIdentifier deviceTest = new SmartphoneImeiIdentifier("b");
+    protected final DeviceIdentifier device = new SmartphoneImeiIdentifierImpl("a");
+    protected final DeviceIdentifier deviceTest = new SmartphoneImeiIdentifierImpl("b");
     protected RaceLog raceLog;
     protected RaceLog raceLog2;
     protected RegattaLog regattaLog;
@@ -77,7 +77,7 @@ public class RaceLogFixTrackerManagerTest {
     protected final AbstractLogEventAuthor author = new LogEventAuthorImpl("author", 0);
     private DynamicTrackedRace trackedRace;
 
-    @Before
+    @BeforeEach
     public void setUp() throws UnknownHostException, MongoException {
         raceLog = new RaceLogImpl("racelog");
         raceLog2 = new RaceLogImpl("racelog2");

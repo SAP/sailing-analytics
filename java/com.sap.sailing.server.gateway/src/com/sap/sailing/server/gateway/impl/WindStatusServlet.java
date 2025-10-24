@@ -20,7 +20,6 @@ import org.osgi.util.tracker.ServiceTracker;
 
 import com.sap.sailing.declination.DeclinationService;
 import com.sap.sailing.domain.common.Wind;
-import com.sap.sailing.domain.igtimiadapter.Account;
 import com.sap.sailing.domain.igtimiadapter.BulkFixReceiver;
 import com.sap.sailing.domain.igtimiadapter.IgtimiConnection;
 import com.sap.sailing.domain.igtimiadapter.IgtimiConnectionFactory;
@@ -129,22 +128,21 @@ public abstract class WindStatusServlet extends SailingServerHttpServletWithPost
         IgtimiConnectionFactory igtimiConnectionFactory = igtimiServiceTracker.getService();
         igtimiWindReceiver = new IgtimiWindReceiver(DeclinationService.INSTANCE);
         igtimiWindReceiver.addListener(this);
-        for (Account account : igtimiConnectionFactory.getAllAccounts()) {
-            if (account.getUser() != null) {
-                IgtimiConnection igtimiConnection = igtimiConnectionFactory.connect(account);
-                try {
-                    LiveDataConnection newIgtimiConnection = igtimiConnection.getOrCreateLiveConnection(igtimiConnection.getWindDevices());
-                    newIgtimiConnection.addListener(igtimiWindReceiver);
-                    newIgtimiConnection.addListener(this);
-                    IgtimiConnectionInfo newIgtimiConnectionInfo = new IgtimiConnectionInfo(
-                            newIgtimiConnection, account.getUser().getEmail(),
-                            igtimiConnection.getWindDevices());
-                    igtimiConnections.put(newIgtimiConnection, newIgtimiConnectionInfo);
-                    result = true;
-                } catch (Exception e) {
-                    logger.log(Level.WARNING, "Exception trying to stop Igtimi connection "+igtimiConnection, e);
-                }
+        IgtimiConnection igtimiConnection = igtimiConnectionFactory
+                .getOrCreateConnection(() -> getSecurityService().getCurrentUser() == null ? null
+                        : getSecurityService().getAccessToken(getSecurityService().getCurrentUser().getName()));
+        try {
+            final LiveDataConnection newIgtimiConnection = igtimiConnection.getOrCreateLiveConnection(igtimiConnection.getWindDevices());
+            result = newIgtimiConnection != null;
+            if (result) {
+                newIgtimiConnection.addListener(igtimiWindReceiver);
+                newIgtimiConnection.addListener(this);
+                IgtimiConnectionInfo newIgtimiConnectionInfo = new IgtimiConnectionInfo(
+                        newIgtimiConnection, igtimiConnection.getWindDevices());
+                igtimiConnections.put(newIgtimiConnection, newIgtimiConnectionInfo);
             }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception trying to stop Igtimi connection "+igtimiConnection, e);
         }
         return result;
     }
@@ -180,13 +178,11 @@ public abstract class WindStatusServlet extends SailingServerHttpServletWithPost
 
     protected class IgtimiConnectionInfo {
         private final LiveDataConnection igtimiLiveConnection;
-        private final String accountName;
         private final Iterable<String> deviceIDs;
         
-        public IgtimiConnectionInfo(LiveDataConnection newIgtimiConnection, String accountName, Iterable<String> deviceIDs) {
+        public IgtimiConnectionInfo(LiveDataConnection newIgtimiConnection, Iterable<String> deviceIDs) {
             super();
             this.igtimiLiveConnection = newIgtimiConnection;
-            this.accountName = accountName;
             final List<String> deviceIDsList = new ArrayList<>();
             this.deviceIDs = deviceIDsList;
             Util.addAll(deviceIDs, deviceIDsList);
@@ -194,10 +190,6 @@ public abstract class WindStatusServlet extends SailingServerHttpServletWithPost
 
         public InetSocketAddress getRemoteAddress() {
             return igtimiLiveConnection.getRemoteAddress();
-        }
-
-        public String getAccountName() {
-            return accountName;
         }
 
         public Iterable<String> getDeviceIDs() {

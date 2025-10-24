@@ -11,7 +11,7 @@ import com.sap.sailing.gwt.home.communication.event.SimpleCompetitorDTO;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.util.NaturalComparator;
-import com.sap.sse.gwt.dispatch.shared.commands.DTO;
+import com.sap.sse.gwt.shared.DTO;
 import com.sap.sse.security.shared.HasPermissions;
 import com.sap.sse.security.shared.QualifiedObjectIdentifier;
 import com.sap.sse.security.shared.dto.AccessControlListDTO;

@@ -1284,6 +1284,7 @@ public class MongoObjectFactoryImpl implements MongoObjectFactory {
         result.put(FieldNames.RACE_LOG_EVENT_CLASS.name(), RaceLogTagEvent.class.getSimpleName());
         result.put(FieldNames.RACE_LOG_TAG.name(), event.getTag());
         result.put(FieldNames.RACE_LOG_COMMENT.name(), event.getComment());
+        result.put(FieldNames.RACE_LOG_HIDDEN_INFO.name(), event.getHiddenInfo());
         result.put(FieldNames.RACE_LOG_IMAGE_URL.name(), event.getImageURL());
         result.put(FieldNames.RACE_LOG_RESIZED_IMAGE_URL.name(), event.getResizedImageURL());
         return result;

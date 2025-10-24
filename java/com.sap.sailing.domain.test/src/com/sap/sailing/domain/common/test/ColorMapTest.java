@@ -1,11 +1,11 @@
 package com.sap.sailing.domain.common.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.impl.ColorMapImpl;
 import com.sap.sse.common.Color;

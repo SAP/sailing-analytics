@@ -4,9 +4,8 @@ import java.sql.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.SpeedWithBearing;
@@ -71,7 +70,7 @@ public class TreeGrowTest {
         Path path = treeGrow.getPath();
 
         // System.out.println("tree-grow path points: "+path.getPathPoints().size());
-        Assert.assertNotNull(path.getPathPoints());
+        Assertions.assertNotNull(path.getPathPoints());
 
         // for(TimedPositionWithSpeed pos : path.getPathPoints()) {
         // System.out.println(""+pos.getPosition().getLatDeg()+", "+pos.getPosition().getLngDeg());

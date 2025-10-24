@@ -1,13 +1,14 @@
 package com.sap.sse.datamining.impl.components.management;
 
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.ModifiableDataMiningServer;
 import com.sap.sse.datamining.exceptions.DataMiningComponentAlreadyRegisteredForKeyException;
@@ -26,7 +27,7 @@ public class TestQueryDefinitionDTOManagement {
     private static StatisticQueryDefinitionDTO pseudoQueryDefinition;
     private static StatisticQueryDefinitionDTO differentQueryDefinition;
 
-    @BeforeClass
+    @BeforeAll
     public static void initializeQueryDefinitions() {
         FunctionDTO statisticToCalculate = new FunctionDTO(false, "Test", "Test", "Test", new ArrayList<String>(), "Test", 0);
         AggregationProcessorDefinitionDTO aggregatorDefinition = new AggregationProcessorDefinitionDTO("Test", "Test", "Test", "Test");
@@ -54,11 +55,13 @@ public class TestQueryDefinitionDTOManagement {
         assertThat(server.getComponentsChangedTimepoint().after(beforeRegistration), is(false));
     }
     
-    @Test(expected=DataMiningComponentAlreadyRegisteredForKeyException.class)
+    @Test
     public void testQueryDefinitionRegistrationWithConflict() {
-        ModifiableDataMiningServer server = TestsUtil.createNewServer();
-        server.registerPredefinedQueryDefinition(new PredefinedQueryIdentifier("Test", "Description"), pseudoQueryDefinition);
-        server.registerPredefinedQueryDefinition(new PredefinedQueryIdentifier("Test", "Description"), differentQueryDefinition);
+        assertThrows(DataMiningComponentAlreadyRegisteredForKeyException.class, () -> {
+            ModifiableDataMiningServer server = TestsUtil.createNewServer();
+            server.registerPredefinedQueryDefinition(new PredefinedQueryIdentifier("Test", "Description"), pseudoQueryDefinition);
+            server.registerPredefinedQueryDefinition(new PredefinedQueryIdentifier("Test", "Description"), differentQueryDefinition);
+        });
     }
 
     @Test

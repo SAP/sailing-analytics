@@ -1,19 +1,19 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.Util;
 import com.sap.sse.concurrent.LockUtil;
@@ -55,7 +55,7 @@ public class SmartFutureCacheDeadlockTest {
     private Thread writerThread;
     private SmartFutureCache<String, String, EmptyUpdateInterval> sfc;
 
-    @Before
+    @BeforeEach
     public void setUp() throws InterruptedException {
         cacheUpdateBegunMonitor = new Object();
         lock = new NamedReentrantReadWriteLock("testReadReadDeadlockBetweenGetterAndTrigger", /* fair */ true);
@@ -188,7 +188,7 @@ public class SmartFutureCacheDeadlockTest {
         // see also LockUtil.NUMBER_OF_SECONDS_TO_WAIT_FOR_LOCK
     }
     
-    @After
+    @AfterEach
     public void tearDown() throws InterruptedException {
         reader.perform(Command.EXIT);
         writer.perform(Command.EXIT);

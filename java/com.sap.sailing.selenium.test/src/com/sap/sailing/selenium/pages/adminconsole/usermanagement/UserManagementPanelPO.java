@@ -2,6 +2,7 @@ package com.sap.sailing.selenium.pages.adminconsole.usermanagement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.openqa.selenium.ElementNotSelectableException;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -15,8 +16,14 @@ import com.sap.sailing.selenium.pages.adminconsole.ActionsHelper;
 import com.sap.sailing.selenium.pages.gwt.CellTablePO;
 import com.sap.sailing.selenium.pages.gwt.DataEntryPO;
 import com.sap.sailing.selenium.pages.gwt.GenericCellTablePO;
+import com.sap.sse.common.TimePoint;
+import com.sap.sse.security.SecurityService;
 
 public class UserManagementPanelPO extends PageArea {
+    private static final Logger logger = Logger.getLogger(UserManagementPanelPO.class.getName());
+    
+    public static final String PASSWORD_COMPLEXITY_SALT = "O(*lhjsfdliyljh['>O`][sodf";
+
     @FindBy(how = BySeleniumId.class, using = "UsersTable")
     private WebElement userTable;
     @FindBy(how = BySeleniumId.class, using = "CreateUserButton")
@@ -31,7 +38,7 @@ public class UserManagementPanelPO extends PageArea {
     @FindBy(how = BySeleniumId.class, using = "EditRolesAndPermissionsForUserButton")
     private WebElement editRolesAndPermissionsForUserButton;
     
-    
+    private TimePoint lastCreateUser;
 
     public UserManagementPanelPO(WebDriver driver, WebElement element) {
         super(driver, element);
@@ -82,14 +89,33 @@ public class UserManagementPanelPO extends PageArea {
     }
     
     public CreateUserDialogPO getCreateUserDialog() {
+        final TimePoint now = TimePoint.now();
+        if (lastCreateUser != null && now.minus(SecurityService.DEFAULT_CLIENT_IP_BASED_USER_CREATION_LOCKING_DURATION).before(lastCreateUser)) {
+            try {
+                final long sleepTimeMillis = now.until(lastCreateUser.plus(SecurityService.DEFAULT_CLIENT_IP_BASED_USER_CREATION_LOCKING_DURATION)).asMillis();
+                logger.info("Waiting "+sleepTimeMillis+"ms to create next user in "+this);
+                Thread.sleep(sleepTimeMillis);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            logger.info("No wait required in dialog "+this);
+        }
         createUserButton.click();
         final WebElement dialog = findElementBySeleniumId(this.driver, "CreateUserDialog");
-        return new CreateUserDialogPO(this.driver, dialog);
+        return new CreateUserDialogPO(this.driver, dialog) {
+            @Override
+            public void clickOkButtonOrThrow() {
+                super.clickOkButtonOrThrow();
+                lastCreateUser = TimePoint.now();
+            }
+        };
     }
     
     public void createUserWithEqualUsernameAndPassword(String usernameAndPassword) {
+        logger.info("Starting process to create user "+usernameAndPassword);
         final CreateUserDialogPO createUserDialog = getCreateUserDialog();
-        createUserDialog.setValues(usernameAndPassword, "", usernameAndPassword, usernameAndPassword);
+        createUserDialog.setValues(usernameAndPassword, "", usernameAndPassword+PASSWORD_COMPLEXITY_SALT, usernameAndPassword+PASSWORD_COMPLEXITY_SALT);
         createUserDialog.clickOkButtonOrThrow();
     }
 

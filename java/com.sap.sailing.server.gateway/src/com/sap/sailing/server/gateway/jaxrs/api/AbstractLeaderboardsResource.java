@@ -16,6 +16,7 @@ import com.sap.sailing.domain.base.Fleet;
 import com.sap.sailing.domain.base.Nationality;
 import com.sap.sailing.domain.base.RaceColumn;
 import com.sap.sailing.domain.base.Waypoint;
+import com.sap.sailing.domain.common.LeaderboardNameConstants;
 import com.sap.sailing.domain.common.NoWindException;
 import com.sap.sailing.domain.common.dto.BoatDTO;
 import com.sap.sailing.domain.common.dto.CompetitorDTO;
@@ -128,25 +129,35 @@ public abstract class AbstractLeaderboardsResource extends AbstractSailingServer
         }
     }
 
+    static JSONArray getDiscardingRuleAsJson(Leaderboard leaderboard) {
+        final JSONArray discardIndices;
+        final ResultDiscardingRule resultDiscardingRule = leaderboard.getResultDiscardingRule();
+        if (resultDiscardingRule instanceof ThresholdBasedResultDiscardingRule) {
+            final ThresholdBasedResultDiscardingRule thresholdBasedResultDiscardingRule = (ThresholdBasedResultDiscardingRule) resultDiscardingRule;
+            discardIndices = new JSONArray();
+            for (int index : thresholdBasedResultDiscardingRule.getDiscardIndexResultsStartingWithHowManyRaces()) {
+                discardIndices.add(index);
+            }
+        } else {
+            discardIndices = null;
+        }
+        return discardIndices;
+    }
+
     protected void writeCommonLeaderboardData(JSONObject jsonLeaderboard, Leaderboard leaderboard,
             ResultStates resultState, Date resultTimePoint, Integer maxCompetitorsCount) {
-        jsonLeaderboard.put("name", leaderboard.getName());
+        jsonLeaderboard.put(LeaderboardNameConstants.NAME, leaderboard.getName());
         final String displayName = leaderboard.getDisplayName();
-        jsonLeaderboard.put("displayName", displayName == null ? leaderboard.getName() : displayName);
+        jsonLeaderboard.put(LeaderboardNameConstants.DISPLAYNAME, displayName == null ? leaderboard.getName() : displayName);
         jsonLeaderboard.put("boatClass", leaderboard.getBoatClass() == null ? null : leaderboard.getBoatClass().getName());
         jsonLeaderboard.put("resultTimepoint", resultTimePoint != null ? resultTimePoint.getTime() : null);
         jsonLeaderboard.put("delayToLiveInMillis", leaderboard.getDelayToLiveInMillis());
         jsonLeaderboard.put("resultState", resultState.name());
         jsonLeaderboard.put("type", leaderboard.getLeaderboardType().name());
         jsonLeaderboard.put("shardingLeaderboardName", ShardingType.LEADERBOARDNAME.encodeShardingInfo(leaderboard.getName()));
-        final ResultDiscardingRule resultDiscardingRule = leaderboard.getResultDiscardingRule();
-        if (resultDiscardingRule instanceof ThresholdBasedResultDiscardingRule) {
-            final ThresholdBasedResultDiscardingRule thresholdBasedResultDiscardingRule = (ThresholdBasedResultDiscardingRule) resultDiscardingRule;
-            final JSONArray discardIndices = new JSONArray();
-            jsonLeaderboard.put("discardIndexResultsStartingWithHowManyRaces", discardIndices);
-            for (int index : thresholdBasedResultDiscardingRule.getDiscardIndexResultsStartingWithHowManyRaces()) {
-                discardIndices.add(index);
-            }
+        final JSONArray discardIndices = getDiscardingRuleAsJson(leaderboard);
+        if (discardIndices != null) {
+            jsonLeaderboard.put(LeaderboardNameConstants.DISCARDS, discardIndices);
         }
         if (leaderboard instanceof RegattaLeaderboard) {
             final RegattaLeaderboard regattaLeaderboard = (RegattaLeaderboard) leaderboard;
@@ -157,12 +168,12 @@ public abstract class AbstractLeaderboardsResource extends AbstractSailingServer
         jsonLeaderboard.put("maxCompetitorsCount", maxCompetitorsCount);
         final SettableScoreCorrection scoreCorrection = leaderboard.getScoreCorrection();
         if (scoreCorrection != null) {
-            jsonLeaderboard.put("scoringComment", scoreCorrection.getComment());
+            jsonLeaderboard.put(LeaderboardNameConstants.SCORINGCOMMENT, scoreCorrection.getComment());
             TimePoint lastUpdateTimepoint = scoreCorrection.getTimePointOfLastCorrectionsValidity();
-            jsonLeaderboard.put("lastScoringUpdate", lastUpdateTimepoint != null ? lastUpdateTimepoint.asMillis() : null);
+            jsonLeaderboard.put(LeaderboardNameConstants.LASTSCORINGUPDATE, lastUpdateTimepoint != null ? lastUpdateTimepoint.asMillis() : null);
         } else {
-            jsonLeaderboard.put("scoringComment", null);
-            jsonLeaderboard.put("lastScoringUpdate", null);
+            jsonLeaderboard.put(LeaderboardNameConstants.SCORINGCOMMENT, null);
+            jsonLeaderboard.put(LeaderboardNameConstants.LASTSCORINGUPDATE, null);
         }
         final JSONArray jsonColumnNames = new JSONArray();
         final JSONArray trackedRacesInfo = new JSONArray();
@@ -174,7 +185,7 @@ public abstract class AbstractLeaderboardsResource extends AbstractSailingServer
             trackedRacesInfo.add(raceColumnJson);
             raceColumnJson.put("raceColumnName", raceColumn.getName());
             final JSONArray fleetsJson = new JSONArray();
-            raceColumnJson.put("fleets", fleetsJson);
+            raceColumnJson.put(LeaderboardNameConstants.FLEETS, fleetsJson);
             for (final Fleet fleet : raceColumn.getFleets()) {
                 final JSONObject fleetJson = new JSONObject();
                 fleetsJson.add(fleetJson);

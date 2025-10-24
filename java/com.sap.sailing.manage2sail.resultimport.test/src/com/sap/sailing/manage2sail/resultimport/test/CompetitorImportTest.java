@@ -1,8 +1,8 @@
 package com.sap.sailing.manage2sail.resultimport.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -13,8 +13,10 @@ import java.net.URL;
 import java.util.Arrays;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
 
 import com.sap.sailing.competitorimport.CompetitorProvider;
 import com.sap.sailing.domain.common.CompetitorDescriptor;
@@ -39,7 +41,7 @@ import com.sap.sse.common.Util;
  */
 public class CompetitorImportTest extends AbstractEventResultJsonServiceTest {
     @Test
-    public void simpleCompetitorImportTest() throws FileNotFoundException, IOException, JAXBException, URISyntaxException {
+    public void simpleCompetitorImportTest() throws FileNotFoundException, IOException, JAXBException, URISyntaxException, SAXException, ParserConfigurationException {
         ResultUrlRegistry resultUrlRegistry = mock(ResultUrlRegistry.class);
         when(resultUrlRegistry.getReadableResultUrls(AbstractManage2SailProvider.NAME)).thenReturn(Arrays.asList(getClass().getClassLoader().getResource(EVENT_RESULTS_JSON+".txt")));
         final Manage2SailCompetitorProvider competitorImporter = new Manage2SailCompetitorProvider(ParserFactory.INSTANCE, resultUrlRegistry);
@@ -54,7 +56,7 @@ public class CompetitorImportTest extends AbstractEventResultJsonServiceTest {
     }
 
     @Test
-    public void simpleCompetitorImportTestNoResultsYet() throws FileNotFoundException, IOException, JAXBException, URISyntaxException {
+    public void simpleCompetitorImportTestNoResultsYet() throws FileNotFoundException, IOException, JAXBException, URISyntaxException, SAXException, ParserConfigurationException {
         ResultUrlRegistry resultUrlRegistry = mock(ResultUrlRegistry.class);
         when(resultUrlRegistry.getReadableResultUrls(AbstractManage2SailProvider.NAME)).thenReturn(Arrays.asList(getClass().getClassLoader().getResource("VSaW_420_Test.json.txt")));
         final CompetitorProvider competitorImporter = new Manage2SailCompetitorProvider(ParserFactory.INSTANCE, resultUrlRegistry) {
@@ -78,7 +80,7 @@ public class CompetitorImportTest extends AbstractEventResultJsonServiceTest {
     }
 
     @Test
-    public void simpleCompetitorImportTestNoResultsYetAndDivisionEmpty() throws FileNotFoundException, IOException, JAXBException, URISyntaxException {
+    public void simpleCompetitorImportTestNoResultsYetAndDivisionEmpty() throws FileNotFoundException, IOException, JAXBException, URISyntaxException, SAXException, ParserConfigurationException {
         ResultUrlRegistry resultUrlRegistry = mock(ResultUrlRegistry.class);
         when(resultUrlRegistry.getReadableResultUrls(AbstractManage2SailProvider.NAME)).thenReturn(Arrays.asList(getClass().getClassLoader().getResource("VSaW_420_Test_EmptyDivision.json.txt")));
         final CompetitorProvider competitorImporter = new Manage2SailCompetitorProvider(ParserFactory.INSTANCE, resultUrlRegistry) {

@@ -9,16 +9,11 @@ import com.sap.sailing.news.EventNewsItem;
 public abstract class AbstractEventNewsItem extends AbstractNewsItem implements EventNewsItem {
     private UUID eventId;
     
-    public AbstractEventNewsItem(UUID eventId, String title, String message, Date createdAtDate, String category, URL relatedItemLink) {
-        super(title, message, createdAtDate, category, relatedItemLink);
+    protected AbstractEventNewsItem(UUID eventId, String title, String message, Date createdAtDate, URL relatedItemLink) {
+        super(title, message, createdAtDate, relatedItemLink);
         this.eventId = eventId;
     }
     
-    public AbstractEventNewsItem(UUID eventId, String title, String message, Date createdAtDate, String category) {
-        super(title, message, createdAtDate, category);
-        this.eventId = eventId;
-    }
-
     @Override
     public UUID getEventUUID() {
         return eventId;

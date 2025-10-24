@@ -1,7 +1,7 @@
 package com.sap.sailing.server.replication.test;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
@@ -22,18 +22,16 @@ public class RegattaLogReplicationTest extends
         AbstractLogReplicationTest<RegattaLog, RegattaLogEvent, RegattaLogEventVisitor> {
     
     private RegattaLogEvent regattaLogEvent;
-//    private RegattaLogEvent anotherRegattaLogEvent;
     private AbstractLogEventAuthor author = new LogEventAuthorImpl("Test Author", 1);
     
     private TimePoint t(long millis) {
         return new MillisecondsTimePoint(millis);
     }
     
-    @Before
+    @BeforeEach
     public void createEvent() throws Exception {
         final CompetitorWithBoat competitor = TrackBasedTest.createCompetitorWithBoat("Test Competitor");
         regattaLogEvent = new RegattaLogRegisterCompetitorEventImpl(t(0), t(0), author, 0, competitor);
-//        anotherRegattaLogEvent = new RegattaLogRegisterCompetitorEventImpl(t(1), author, t(1), 1, null);
     }
     
     @Test

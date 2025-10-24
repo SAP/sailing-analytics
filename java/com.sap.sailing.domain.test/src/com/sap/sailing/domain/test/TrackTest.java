@@ -1,11 +1,11 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.lang.reflect.Field;
 import java.text.ParseException;
@@ -23,8 +23,8 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Boat;
 import com.sap.sailing.domain.base.impl.BoatClassImpl;
@@ -44,14 +44,14 @@ import com.sap.sailing.domain.common.tracking.impl.CompactionNotPossibleExceptio
 import com.sap.sailing.domain.common.tracking.impl.GPSFixImpl;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixMovingImpl;
 import com.sap.sailing.domain.common.tracking.impl.VeryCompactGPSFixMovingImpl;
+import com.sap.sailing.domain.shared.tracking.impl.TimeRangeCache;
+import com.sap.sailing.domain.shared.tracking.impl.TrackImpl;
 import com.sap.sailing.domain.tracking.DynamicGPSFixTrack;
 import com.sap.sailing.domain.tracking.GPSFixTrack;
 import com.sap.sailing.domain.tracking.impl.DynamicGPSFixMovingTrackImpl;
 import com.sap.sailing.domain.tracking.impl.DynamicGPSFixTrackImpl;
 import com.sap.sailing.domain.tracking.impl.GPSFixTrackImpl;
 import com.sap.sailing.domain.tracking.impl.MaxSpeedCache;
-import com.sap.sailing.domain.tracking.impl.TimeRangeCache;
-import com.sap.sailing.domain.tracking.impl.TrackImpl;
 import com.sap.sse.common.AbstractBearing;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
@@ -74,7 +74,7 @@ public class TrackTest {
     private GPSFixMovingImpl gpsFix4;
     private GPSFixMovingImpl gpsFix5;
 
-    @Before
+    @BeforeEach
     public void setUp() throws InterruptedException {
         track = new DynamicGPSFixMovingTrackImpl<Boat>(new BoatImpl("123", "MyFirstBoat", new BoatClassImpl("505", /* typicallyStartsUpwind */
         true), null), /* millisecondsOverWhichToAverage */5000, /* no smoothening */null);
@@ -204,8 +204,8 @@ public class TrackTest {
             assertTrue(p2Iter.hasNext());
             Position p1 = p1Iter.next();
             Position p2 = p2Iter.next();
-            assertEquals("Diff between "+p1+" and "+p2, p1.getLatDeg(), p2.getLatDeg(), 0.000000001);
-            assertEquals("Diff between "+p1+" and "+p2, p1.getLngDeg(), p2.getLngDeg(), 0.000000001);
+            assertEquals(p1.getLatDeg(), p2.getLatDeg(), 0.000000001, "Diff between "+p1+" and "+p2);
+            assertEquals(p1.getLngDeg(), p2.getLngDeg(), 0.000000001, "Diff between "+p1+" and "+p2);
         }
     }
     
@@ -741,9 +741,9 @@ public class TrackTest {
                                 new MillisecondsTimePoint((fixes.get(i).getTimePoint().asMillis() + fixes.get(i + 1)
                                         .getTimePoint().asMillis()) / 2), fixes.get(j).getTimePoint())
                                 .getNauticalMiles();
-                        assertTrue("for i=" + i + ", j=" + j + ": " + nauticalMilesFromHalfAfterIToJ + "<"
-                                + distanceSumInNauticalMiles,
-                                nauticalMilesFromHalfAfterIToJ < distanceSumInNauticalMiles);
+                        assertTrue(nauticalMilesFromHalfAfterIToJ < distanceSumInNauticalMiles,
+                                "for i=" + i + ", j=" + j + ": " + nauticalMilesFromHalfAfterIToJ + "<"
+                                        + distanceSumInNauticalMiles);
                         if (i > 0) {
                             // now skip half a segment before the beginning:
                             double nauticalMilesFromHalfBeforeIToJ = track.getRawDistanceTraveled(
@@ -764,9 +764,9 @@ public class TrackTest {
                                     fixes.get(i).getTimePoint(),
                                     new MillisecondsTimePoint((fixes.get(j).getTimePoint().asMillis() + fixes
                                             .get(j + 1).getTimePoint().asMillis()) / 2)).getNauticalMiles();
-                            assertTrue("for i=" + i + ", j=" + j + ": " + nauticalMilesFromIToHalfAfterJ + ">"
-                                    + distanceSumInNauticalMiles,
-                                    nauticalMilesFromIToHalfAfterJ > distanceSumInNauticalMiles);
+                            assertTrue(nauticalMilesFromIToHalfAfterJ > distanceSumInNauticalMiles,
+                                    "for i=" + i + ", j=" + j + ": " + nauticalMilesFromIToHalfAfterJ + ">"
+                                            + distanceSumInNauticalMiles);
                         }
                     }
                 }

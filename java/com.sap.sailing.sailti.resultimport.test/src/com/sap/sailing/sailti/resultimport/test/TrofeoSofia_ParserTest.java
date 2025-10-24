@@ -1,7 +1,7 @@
 package com.sap.sailing.sailti.resultimport.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.util.Set;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 import com.sap.sailing.domain.common.RegattaScoreCorrections;
@@ -29,13 +29,13 @@ import com.sap.sse.common.Util;
 
 public class TrofeoSofia_ParserTest extends AbstractTrofeoSofiaTest {
     @Test
-    public void testSimpleParsingSomeSailtiDocuments470Men() throws JAXBException, IOException {
+    public void testSimpleParsingSomeSailtiDocuments470Men() throws JAXBException, IOException, SAXException, ParserConfigurationException {
         RegattaResults regattaResults = ParserFactory.INSTANCE.createParser(getInputStream(TROFEO_SOFIA_TESTFILE_XRR_470_MEN), TROFEO_SOFIA_EVENT_NAME).parse();
         assertNotNull(regattaResults);
     }
 
     @Test
-    public void testSimpleParsingSomeSailtiDocuments470Women() throws JAXBException, IOException {
+    public void testSimpleParsingSomeSailtiDocuments470Women() throws JAXBException, IOException, SAXException, ParserConfigurationException {
         RegattaResults regattaResults = ParserFactory.INSTANCE.createParser(getInputStream(TROFEO_SOFIA_TESTFILE_XRR_470_WOMEN), TROFEO_SOFIA_EVENT_NAME).parse();
         assertNotNull(regattaResults);
     }

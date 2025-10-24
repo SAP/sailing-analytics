@@ -36,18 +36,19 @@
          When adjusting tycho-version here, also make sure to adjust it accordingly
          in java/com.amazon.aws.aws-java-api/pom.xml
      -->
-    <tycho-version>1.7.0</tycho-version>
-    <gwt.version>2.11.0</gwt.version>
+    <tycho-version>4.0.12</tycho-version>
+    <toolchains-version>3.2.0</toolchains-version>
+    <gwt.version>2.11.1</gwt.version>
     <!-- gwt-maven-plugin is typically in sync with the GWT version. But sometimes versions need extra time after a new GWT release. -->
-    <gwt.plugin.version>2.11.0</gwt.plugin.version>
-    <gwt.minVersion>2.11.0</gwt.minVersion>
+    <gwt.plugin.version>2.11.1</gwt.plugin.version>
+    <gwt.minVersion>2.11.1</gwt.minVersion>
     <gwt.workers>2</gwt.workers>
     <p2-target>race-analysis-p2-remote</p2-target><!--can be overidden through p2-target.local profile -->
     <!-- QUESTION: Which properties or settings are system dependent and differ across different machines/environments? QUESTION:
     Can we move the system property -Dmongo.dbName to "parameters.mongodb"? If so the IP of the host would be the same for all
     profiles. -->
     <parameters.common>
-      -Dfile.encoding=cp1252 -Dmongo.dbName=winddbTest -DspatialWind=true -Xss100m -Dgwt.rpc.version=9 -Dgoogle.maps.authenticationparams=key=AIzaSyD1Se4tIkt-wglccbco3S7twaHiG20hR9E
+      -Dfile.encoding=UTF-8 -Dmongo.dbName=winddbTest -DspatialWind=true -Xss100m -Dgwt.rpc.version=9 -Dgoogle.maps.authenticationparams=key=AIzaSyD1Se4tIkt-wglccbco3S7twaHiG20hR9E
     </parameters.common>
     <parameters.vm-settings>
       -ea -Xmx8192m -XX:+UseG1GC
@@ -89,6 +90,8 @@
         <module>org.hamcrest.core</module>
         <module>com.sap.sse</module>
         <module>com.sap.sse.test</module>
+        <module>com.sap.sse.aicore</module>
+        <module>com.sap.sse.aicore.test</module>
         <module>com.sap.sse.landscape.common</module>
         <module>com.sap.sse.landscape</module>
         <module>com.sap.sse.landscape.aws</module>
@@ -147,16 +150,24 @@
         <module>com.sap.sailing.domain.expeditionadapter</module>
         <module>com.sap.sailing.domain.tractracadapter</module>
         <module>com.sap.sailing.domain.tractracadapter.persistence</module>
+        <module>com.sap.sailing.domain.vakarosadapter</module>
+        <module>com.sap.sailing.domain.vakarosadapter.test</module>
         <module>com.sap.sailing.domain.windfinderadapter</module>
         <module>com.sap.sailing.domain.windfinderadapter.test</module>
         <module>com.sap.sailing.domain.igtimiadapter</module>
+        <module>com.sap.sailing.domain.igtimiadapter.server</module>
         <module>com.sap.sailing.domain.igtimiadapter.gateway</module>
         <module>com.sap.sailing.domain.igtimiadapter.persistence</module>
+        <module>com.sap.sailing.domain.queclinkadapter</module>
         <module>com.sap.sailing.domain.racelogtrackingadapter</module>
         <module>com.sap.sailing.domain.racelogtrackingadapter.testsupport</module>
         <module>com.sap.sailing.domain.swisstimingadapter</module>
         <module>com.sap.sailing.domain.swisstimingadapter.persistence</module>
         <module>com.sap.sailing.domain.swisstimingreplayadapter</module>
+        <module>com.sap.sailing.aiagent.interfaces</module>
+        <module>com.sap.sailing.aiagent</module>
+        <module>com.sap.sailing.aiagent.persistence</module>
+        <module>com.sap.sailing.aiagent.gateway</module>
         <module>com.sap.sailing.news</module>
         <module>com.sap.sailing.declination</module>
         <module>com.sap.sailing.udpconnector</module>
@@ -219,6 +230,8 @@
         <module>com.sap.sailing.datamining.test</module>
         <module>com.sap.sailing.domain.deckmanadapter.test</module>
         <module>com.sap.sailing.domain.igtimiadapter.test</module>
+        <module>com.sap.sailing.domain.igtimiadapter.persistence.test</module>
+        <module>com.sap.sailing.domain.queclinkadapter.test</module>
         <module>com.sap.sailing.domain.racelogtrackingadapter.test</module>
         <module>com.sap.sailing.xrr.resultimport.test</module>
         <module>com.sap.sailing.domain.shared.android.test</module>
@@ -243,6 +256,8 @@
         <module>com.sap.sailing.velum.resultimport.test</module>
         <module>com.sap.sailing.sailwave.resultimport</module>
         <module>com.sap.sailing.sailwave.resultimport.test</module>
+        <module>com.sap.sailing.sailwave.html.resultimport</module>
+        <module>com.sap.sailing.sailwave.html.resultimport.test</module>
         <module>com.sap.sailing.manage2sail</module>
         <module>com.sap.sailing.manage2sail.resultimport</module>
         <module>com.sap.sailing.manage2sail.resultimport.test</module>
@@ -462,6 +477,7 @@
 <build>
   <directory>bin</directory>
   <outputDirectory>bin</outputDirectory>
+  <testSourceDirectory>src</testSourceDirectory>
   <testOutputDirectory>bin</testOutputDirectory>
 
   <pluginManagement>
@@ -479,6 +495,11 @@
         <configuration>
           <reportsDirectory>${reportsdirectory}</reportsDirectory>
         </configuration>
+      </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-toolchains-plugin</artifactId>
+          <version>${toolchains-version}</version>
       </plugin>
       <plugin>
           <groupId>com.simpligility.maven.plugins</groupId>
@@ -532,6 +553,25 @@
   </pluginManagement>
 
   <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-toolchains-plugin</artifactId>
+      <version>${toolchains-version}</version>
+      <executions>
+        <execution>
+          <goals>
+            <goal>toolchain</goal>
+          </goals>
+        </execution>
+      </executions>
+      <configuration>
+        <toolchains>
+          <jdk>
+            <version>8</version>
+          </jdk>
+        </toolchains>
+      </configuration>
+    </plugin>
     <plugin>
       <groupId>org.eclipse.tycho</groupId>
       <artifactId>tycho-maven-plugin</artifactId>
@@ -593,6 +633,7 @@
         </excludes>
         <reportsDirectory>${reportsdirectory}</reportsDirectory>
         <showEclipseLog>true</showEclipseLog>
+        <useJUnitPlatform>true</useJUnitPlatform>
       </configuration>
     </plugin>
     <plugin>

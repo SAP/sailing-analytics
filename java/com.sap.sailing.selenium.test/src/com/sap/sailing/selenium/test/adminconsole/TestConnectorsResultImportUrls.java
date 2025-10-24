@@ -1,19 +1,19 @@
 package com.sap.sailing.selenium.test.adminconsole;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.connectors.ResultImportUrlsPanelPO;
 import com.sap.sailing.selenium.test.AbstractSeleniumTest;
 
 public class TestConnectorsResultImportUrls extends AbstractSeleniumTest {
 
-    private final static String TEST_URL = "http://test.test.de";
+    private final static String TEST_URL = "https://www.example.org";
     private final static String TEST_URL_PROVIDER_LABEL = "FREG HTML Score Importer";
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot());
         super.setUp();
@@ -25,7 +25,7 @@ public class TestConnectorsResultImportUrls extends AbstractSeleniumTest {
         return resultImportUrlsPanel;
     }
 
-    @Test
+    @SeleniumTestCase
     public void testUrlCreationAndDeletion() {
         final ResultImportUrlsPanelPO resultImportUrlsPanel = goToResultImportUrlsPanel();
         resultImportUrlsPanel.selectUrlProviderByLabel(TEST_URL_PROVIDER_LABEL);
@@ -34,7 +34,7 @@ public class TestConnectorsResultImportUrls extends AbstractSeleniumTest {
         resultImportUrlsPanel.removeUrl(TEST_URL);
     }
 
-    @Test
+    @SeleniumTestCase
     public void testUrlInlineDeletion() {
         final ResultImportUrlsPanelPO resultImportUrlsPanel = goToResultImportUrlsPanel();
         resultImportUrlsPanel.selectUrlProviderByLabel(TEST_URL_PROVIDER_LABEL);

@@ -6,7 +6,10 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -34,6 +37,14 @@ public class RaceLogPollingService extends Service
     private static final String TAG = RaceLogPollingService.class.getName();
 
     private AlarmManager mAlarm;
+    private Handler mHandler;
+    /**
+     * When using the {@link #mHandler}, record the time for which the last {@link #poll()}}
+     * call was scheduled. When new polls are requested to be scheduled, only request a new
+     * poll if there isn't already one scheduled (-1), or the last scheduled poll should have
+     * run more than the polling interval ago (maybe we missed a cycle...).
+     */
+    private long mLastPostedPollTimeMillis = -1;
     private PendingIntent mPendingIntent;
     private AppPreferences mAppPreferences;
     private DataStore mDataStore;
@@ -47,7 +58,11 @@ public class RaceLogPollingService extends Service
 
     @Override
     public void onCreate() {
-        mAlarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            mHandler = Handler.createAsync(Looper.getMainLooper());
+        } else {
+            mAlarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+        }
         mAppPreferences = AppPreferences.on(this);
         mAppPreferences.registerPollingActiveChangedListener(this);
         mRaces = new HashMap<>();
@@ -91,8 +106,10 @@ public class RaceLogPollingService extends Service
         if (mAppPreferences != null) {
             mAppPreferences.unregisterPollingActiveChangedListener(this);
         }
-        if (mAlarm != null && mPendingIntent != null) {
-            mAlarm.cancel(mPendingIntent);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+            if (mAlarm != null && mPendingIntent != null) {
+                mAlarm.cancel(mPendingIntent);
+            }
         }
     }
 
@@ -101,7 +118,7 @@ public class RaceLogPollingService extends Service
         if (isActive) {
             scheduleNextPoll();
             ExLog.i(this, TAG,
-                    "Polling has been activated, will start in " + mAppPreferences.getPollingInterval() + " seconds.");
+                    "Polling has been activated, will start in " + mAppPreferences.getPollingIntervalInSeconds() + " seconds.");
         } else {
             ExLog.i(this, TAG, "Polling has been deactivated, next polling attempt will be aborted.");
         }
@@ -109,7 +126,7 @@ public class RaceLogPollingService extends Service
 
     @Override
     public void onPollingFinished() {
-        if (mRaces.size() > 0) {
+        if (!mRaces.isEmpty()) {
             scheduleNextPoll();
         } else {
             stopSelf();
@@ -178,6 +195,7 @@ public class RaceLogPollingService extends Service
             @SuppressWarnings("unchecked")
             Util.Pair<String, URL>[] param = queries.toArray(new Util.Pair[0]);
             task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, param);
+            mLastPostedPollTimeMillis = -1;
         }
     }
 
@@ -193,25 +211,32 @@ public class RaceLogPollingService extends Service
      * calculate the new alarm for polling with current polling interval from preferences
      */
     private void scheduleNextPoll() {
-        if (mPendingIntent != null) {
-            mAlarm.cancel(mPendingIntent);
-        }
-
         if (mAppPreferences.isPollingActive() && !mRaces.isEmpty()) {
-            long time = MillisecondsTimePoint.now().asMillis() + (1000 * mAppPreferences.getPollingInterval());
-            Intent intent = new Intent(this, this.getClass());
-            intent.setAction(AppConstants.ACTION_POLLING_POLL);
-            int flags;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                flags = PendingIntent.FLAG_IMMUTABLE;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                if (mLastPostedPollTimeMillis == -1
+                        || mLastPostedPollTimeMillis < SystemClock.uptimeMillis() - 1000L * mAppPreferences.getPollingIntervalInSeconds()) {
+                    mLastPostedPollTimeMillis = SystemClock.uptimeMillis() + 1000L * mAppPreferences.getPollingIntervalInSeconds();
+                    mHandler.postAtTime(this::poll, mLastPostedPollTimeMillis);
+                }
             } else {
-                flags = 0;
-            }
-            mPendingIntent = PendingIntent.getService(this, 0, intent, flags);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                mAlarm.setExact(AlarmManager.RTC_WAKEUP, time, mPendingIntent);
-            } else {
-                mAlarm.set(AlarmManager.RTC_WAKEUP, time, mPendingIntent);
+                final long time = MillisecondsTimePoint.now().asMillis() + (1000L * mAppPreferences.getPollingIntervalInSeconds());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    if (mPendingIntent != null) {
+                        mAlarm.cancel(mPendingIntent);
+                    }
+                    Intent intent = new Intent(this, this.getClass());
+                    intent.setAction(AppConstants.ACTION_POLLING_POLL);
+                    int flags;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        flags = PendingIntent.FLAG_IMMUTABLE;
+                    } else {
+                        flags = 0;
+                    }
+                    mPendingIntent = PendingIntent.getService(this, 0, intent, flags);
+                    mAlarm.setExact(AlarmManager.RTC_WAKEUP, time, mPendingIntent);
+                } else {
+                    mAlarm.set(AlarmManager.RTC_WAKEUP, time, mPendingIntent);
+                }
             }
         }
     }

@@ -1,27 +1,37 @@
 #!/bin/bash
-release=$1
-if [ "${release}" = "" ]; then
-  SET_LATEST=1
-  release=$(wget -O - http://releases.sapsailing.com/ 2>/dev/null | grep 'sapmachine17-[0-9]\{10\}' | tail -1 | sed -e 's/^.*\(sapmachine17-[0-9]*\).*$/\1/')
-  echo Latest release is ${release}
-fi
+release_prefix="$1"
+GITHUB_REPOSITORY="$2"
+OWNER=${GITHUB_REPOSITORY%%/*}
+OWNER_LOWER=$(echo "$OWNER" | tr '[:upper:]' '[:lower:]')
+REPO=${GITHUB_REPOSITORY##*/}
+REPO_LOWER=$(echo "$REPO" | tr '[:upper:]' '[:lower:]')
+PACKAGE="$OWNER_LOWER/$REPO_LOWER"
 GITROOT="`dirname $0`/.."
 DOCKERDIR="${GITROOT}/docker"
 DOCKERFILE="$DOCKERDIR/Dockerfile"
-FILES_TO_COPY_FROM_JAVA_TARGET="env.sh start configuration/JavaSE-11.profile"
-echo "Copying files from GITROOT $GITROOT into Docker workspace"
-for f in ${FILES_TO_COPY_FROM_JAVA_TARGET}; do
-  cp "${GITROOT}/java/target/${f}" "$DOCKERDIR"
-done
-cd "$DOCKERDIR"
-docker build --build-arg RELEASE=${release} -t sapsailing_on_sapmachine17:${release} -f Dockerfile_sapsailing_on_sapmachine17 .
-echo "Cleaning up..."
-for f in ${FILES_TO_COPY_FROM_JAVA_TARGET}; do
-  rm "`basename ${f}`"
-done
-docker tag sapsailing_on_sapmachine17:${release} docker.sapsailing.com/sapsailing_on_sapmachine17:${release}
-docker push docker.sapsailing.com/sapsailing_on_sapmachine17:${release}
-if [ "$SET_LATEST" = "1" ]; then
-  docker tag sapsailing_on_sapmachine17:${release} docker.sapsailing.com/sapsailing_on_sapmachine17:latest
-  docker push docker.sapsailing.com/sapsailing_on_sapmachine17:latest
+if [ "${release_prefix}" = "" ]; then
+  SET_LATEST=1
+  release_prefix="docker-17-"
 fi
+pushd "${DOCKERDIR}"
+RELEASE_TAR_GZ_FILENAME=$( ${GITROOT}/configuration/github-download-release-assets.sh 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 "${release_prefix}" "${GITHUB_REPOSITORY}" )
+if [ "${RELEASE_TAR_GZ_FILENAME}" = "" ]; then
+  echo "No release with prefix ${release_prefix} found" >&2
+else
+  release=$( echo ${RELEASE_TAR_GZ_FILENAME} | sed -e 's/\.tar\.gz//' )
+  echo Release is ${release}
+  echo "Copying files from GITROOT $GITROOT into Docker workspace"
+  cp "$GITROOT/java/target/env.sh" "$DOCKERDIR"
+  cp "$GITROOT/java/target/start" "$DOCKERDIR"
+  cp "$GITROOT/java/target/configuration/JavaSE-11.profile" "$DOCKERDIR"
+  cd "$DOCKERDIR"
+  docker build --build-arg RELEASE=${release} -t ghcr.io/${PACKAGE}:${release} -f Dockerfile_sapsailing_on_sapmachine17 .
+  echo "Cleaning up..."
+  rm start env.sh JavaSE-11.profile ${RELEASE_TAR_GZ_FILENAME} release-notes.txt
+  docker push ghcr.io/${PACKAGE}:${release}
+  if [ "$SET_LATEST" = "1" ]; then
+    docker tag ghcr.io/${PACKAGE}:${release} ghcr.io/${PACKAGE}:latest-17
+    docker push ghcr.io/${PACKAGE}:latest-17
+  fi
+fi
+popd

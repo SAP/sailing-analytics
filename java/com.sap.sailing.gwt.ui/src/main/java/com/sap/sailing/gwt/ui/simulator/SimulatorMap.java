@@ -989,9 +989,7 @@ public class SimulatorMap extends AbsolutePanel implements RequiresDataInitializ
         circleOptions.setCenter(courseArea.getCenterPos());
         Circle circle = Circle.newInstance(circleOptions);
         circle.setRadius(courseArea.getRadiusInMeters());
-        
         final int regIdxFinal = regIdx;
-
         circle.addClickHandler(new ClickMapHandler() {
             public void onEvent(ClickMapEvent e) {
                 //System.out.println("Click: "+currentCourseArea.getName());
@@ -1005,16 +1003,13 @@ public class SimulatorMap extends AbsolutePanel implements RequiresDataInitializ
                     regattaAreaCanvasOverlay.updateRaceCourse(0, 0);
                     raceCourseCanvasOverlay.draw();
                 }
-
                 map.panTo(regattaAreaCanvasOverlay.getCurrentCourseArea().getCenterPos());
                 mapPan = true;
-				if (map.getZoom() < streamletPars.detailZoom) {
-					map.setZoom(streamletPars.detailZoom);
-				}
-				
+                if (map.getZoom() < streamletPars.detailZoom) {
+                    map.setZoom(streamletPars.detailZoom);
+                }
             }
         });
-        
         circle.setMap(getMap());           
     }
 }

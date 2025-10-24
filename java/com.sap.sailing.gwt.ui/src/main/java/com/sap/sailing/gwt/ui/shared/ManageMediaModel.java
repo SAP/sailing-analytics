@@ -13,10 +13,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.sap.sailing.domain.common.security.SecuredDomainType.EventActions;
 import com.sap.sailing.gwt.home.communication.eventview.EventViewDTO;
 import com.sap.sailing.gwt.home.communication.media.MediaDTO;
-import com.sap.sailing.gwt.home.communication.media.SailingImageDTO;
-import com.sap.sailing.gwt.home.communication.media.SailingVideoDTO;
 import com.sap.sailing.gwt.ui.client.SailingServiceWriteAsync;
 import com.sap.sailing.gwt.ui.client.StringMessages;
+import com.sap.sailing.gwt.ui.client.shared.SailingVideoDTO;
 import com.sap.sse.common.media.MediaTagConstants;
 import com.sap.sse.gwt.client.Notification;
 import com.sap.sse.gwt.client.Notification.NotificationType;
@@ -37,8 +36,8 @@ public class ManageMediaModel {
     private final StringMessages i18n;
     private MediaDTO mediaDto;
 
-    private Collection<ImageDTO> images = new LinkedHashSet<ImageDTO>();
-    private Collection<VideoDTO> videos = new LinkedHashSet<VideoDTO>();
+    private Collection<SailingImageDTO> images = new LinkedHashSet<>();
+    private Collection<VideoDTO> videos = new LinkedHashSet<>();
 
     public ManageMediaModel(SailingServiceWriteAsync sailingServiceWrite, UserService userService, 
             EventViewDTO eventViewDto, StringMessages i18n) {
@@ -53,7 +52,7 @@ public class ManageMediaModel {
         setImages(eventDto.getImages());
     }
 
-    public Collection<ImageDTO> getImages() {
+    public Collection<SailingImageDTO> getImages() {
         return images;
     }
 
@@ -74,8 +73,8 @@ public class ManageMediaModel {
                         .collect(Collectors.toList()));
     }
 
-    private void setImages(Collection<? extends ImageDTO> images) {
-        this.images = new LinkedHashSet<ImageDTO>(
+    private void setImages(Collection<SailingImageDTO> images) {
+        this.images = new LinkedHashSet<>(
                 images.stream().filter(video -> video.hasTag(MediaTagConstants.GALLERY.getName()))
                         .sorted(Comparator.comparing(AbstractMediaDTO::getCreatedAtDate).reversed())
                         .collect(Collectors.toList()));
@@ -83,12 +82,11 @@ public class ManageMediaModel {
 
     public void deleteImage(ImageDTO imageDto, Consumer<EventDTO> callback) {
         loadEventData(eventDto -> {
-            Collection<ImageDTO> toRemove = eventDto.getImages().stream()
+            Collection<SailingImageDTO> toRemove = eventDto.getImages().stream()
                     .filter(image -> image.getSourceRef().equals(imageDto.getSourceRef())
                             && image.getCreatedAtDate().equals(imageDto.getCreatedAtDate()))
                     .collect(Collectors.toList());
-            eventDto.getImages().removeAll(toRemove);
-            eventDto.getImages().removeAll(toRemove);
+            toRemove.forEach(eventDto::removeImage);
             updateEventDto(eventDto, callback);
             mediaDto.getPhotos().stream()
                     .filter(photo -> photo.getSourceRef().equals(imageDto.getSourceRef())
@@ -99,11 +97,11 @@ public class ManageMediaModel {
 
     public void deleteVideo(VideoDTO videoDto, Consumer<EventDTO> callback) {
         loadEventData(eventDto -> {
-            Collection<VideoDTO> toRemove = eventDto.getVideos().stream()
+            Collection<SailingVideoDTO> toRemove = eventDto.getVideos().stream()
                     .filter(video -> video.getSourceRef().equals(videoDto.getSourceRef())
                             && video.getCreatedAtDate().equals(videoDto.getCreatedAtDate()))
                     .collect(Collectors.toList());
-            eventDto.getVideos().removeAll(toRemove);
+            toRemove.forEach(eventDto::removeVideo);
             updateEventDto(eventDto, callback);
             mediaDto.getVideos().stream()
                     .filter(video -> video.getSourceRef().equals(videoDto.getSourceRef())
@@ -112,21 +110,21 @@ public class ManageMediaModel {
         });
     }
 
-    public void addImages(List<ImageDTO> imageList, Consumer<EventDTO> callback) {
+    public void addImages(List<SailingImageDTO> imageList, Consumer<EventDTO> callback) {
         loadEventData(eventDto -> {
-            for (ImageDTO image: imageList) {
-                eventDto.getImages().add(image);
+            for (SailingImageDTO image: imageList) {
+                eventDto.addImage(image);
                 mediaDto.addPhoto(new SailingImageDTO(null, image));
             }
             updateEventDto(eventDto, callback);
         });
     }
 
-    public void addVideos(List<VideoDTO> videoList, Consumer<EventDTO> callback) {
+    public void addVideos(List<SailingVideoDTO> videoList, Consumer<EventDTO> callback) {
         loadEventData(eventDto -> {
-            for (VideoDTO video: videoList) {
+            for (SailingVideoDTO video: videoList) {
                 eventDto.getVideos().add(video);
-                mediaDto.addVideo(new SailingVideoDTO(null, video));
+                mediaDto.addVideo(video);
             }
             updateEventDto(eventDto, callback);
         });
@@ -134,13 +132,11 @@ public class ManageMediaModel {
 
     public void addImagesAndVideos(List<ImageDTO> imageList, List<VideoDTO> videoList, Consumer<EventDTO> callback) {
         loadEventData(eventDto -> {
-            for (ImageDTO image: imageList) {
-                eventDto.getImages().add(image);
-                mediaDto.addPhoto(new SailingImageDTO(null, image));
+            for (ImageDTO image : imageList) {
+                mediaDto.addPhoto(eventDto.addImage(image));
             }
             for (VideoDTO video: videoList) {
-                eventDto.getVideos().add(video);
-                mediaDto.addVideo(new SailingVideoDTO(null, video));
+                mediaDto.addVideo(eventDto.addVideo(video));
             }
             updateEventDto(eventDto, callback);
         });
@@ -201,6 +197,10 @@ public class ManageMediaModel {
         return hasEventMediaPermissions(eventDto, userService);
     }
     
+    public String getEventName() {
+        return eventViewDto.getName();
+    }
+    
     public static boolean hasEventMediaPermissions(SecuredDTO securedDTO, UserService userService) {
         final boolean hasPermission;
         if (userService.hasPermission(securedDTO, HasPermissions.DefaultActions.UPDATE) || userService.hasPermission(securedDTO, EventActions.UPLOAD_MEDIA)) {
@@ -210,5 +210,4 @@ public class ManageMediaModel {
         }
         return hasPermission;
     }
-
 }

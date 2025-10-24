@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.test.markpassing;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.json.simple.parser.ParseException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.ControlPoint;
@@ -42,7 +42,7 @@ public class MarkPassingCalculatorWithTrackersOnStartBoatTest extends AbstractEx
     private CandidateChooserImpl candidateChooser;
     private TimePoint startOfSetup;
     
-    @Before
+    @BeforeEach
     public void setUp() throws IOException, ParseException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         startOfSetup = MillisecondsTimePoint.now();
         trackedRace = readRace("/MoevensteinCompetitorPositions.json.gz", "/MoevensteinMarkPositions.json.gz", new BoatClassImpl(BoatClassMasterdata.J70));

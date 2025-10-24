@@ -65,7 +65,7 @@ function shared_instance_execute() {
 	local readme_file="$servers_dir/README"
 	local comment_out_line_in_env_with_pattern='JAVA_HOME=\/opt\/jdk1.8.0_20'
 	local comment_in_line_in_env_with_pattern='sapjvm_gc'
-	local refreshInstance_file='/home/sailing/code/java/target/refreshInstance.sh'
+	local refreshInstance_file='/usr/local/bin/refreshInstance.sh'
 
 	header "Sub instance setup"
 

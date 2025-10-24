@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <link href='../../../../sailing-fontface-1.0.cache.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+    <link href='../../../main.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+    <link rel='icon' href='../../../../sap.ico' type='image/x-icon'>
+    <title>SAP Sailing Analytics Webservices API Version 1.0</title>
+</head>
+<body>
+<h1>SAP Sailing Analytics Webservices API Version 1.0</h1>
+<h2>URL: /api/v1/regattas/{regattaname}/races/{racename}/competitordata</h2>
+
+<b>Description:</b>
+<p>
+Gets values on one or more detail parameters for one or more competitors and a time range within the race, with configurable step width.
+Note that some parameters will work only if the user authenticated has the <tt>PREMIUM_LEADERBOARD_INFORMATION</tt> permission for the
+leaderboard queried; this is usually the case when the user has the <tt>premium</tt> role assigned.
+</p>
+<p>
+Note furthermore that there is a limit on the number of time points for which values can be obtained by a single request. With
+<tt>PREMIUM_LEADERBOARD_INFORMATION</tt> permission for the leaderboard queried, the response can contain values for up to 50,000
+time points; otherwise, only up to 1,000 time points can be returned by a single request.
+</p>
+<br />
+<table>
+    <tr>
+        <td>Webservice Type:</td>
+        <td>REST</td>
+    </tr>
+    <tr>
+        <td>Webservice Method:</td>
+        <td>GET</td>
+    </tr>
+    <tr>
+        <td>Output format:</td>
+        <td>Json</td>
+    </tr>
+    <tr>
+        <td>Mandatory parameters:</td>
+        <td>competitorId: can occur multiple times and specifies the ID(s) of the competitor(s) for which data is to be obtained<br>
+            leaderboardName: the name of the leaderboard, typically equal to the <tt>regattaname</tt> path parameter<br>
+            leaderboardGroupNameOrUUID: the UUID or the name of a leaderboard group that contains the leaderboard identified by <tt>leaderboardName</tt><br>
+            detailType: can occur multiple times and specifies the type of value(s) to extract for the competitor(s). Possible values are:<ul>
+              <li>LEG_TACKTYPE_LONGTACK_SHORTTACK</li>
+              <li>RACE_CURRENT_SPEED_OVER_GROUND_IN_KNOTS</li>
+              <li>RACE_CURRENT_COURSE_OVER_GROUND_IN_TRUE_DEGREES</li>
+              <li>CHART_COURSE_OVER_GROUND_TRUE_DEGREES</li>
+              <li>RACE_CURRENT_POSITION_LAT_DEG</li>
+              <li>RACE_CURRENT_POSITION_LNG_DEG</li>
+              <li>LEG_VELOCITY_MADE_GOOD_IN_KNOTS</li>
+              <li>LEG_DISTANCE_TRAVELED (unit is meters)</li>
+              <li>LEG_DISTANCE_TRAVELED_INCLUDING_GATE_START (unit is meters)</li>
+              <li>LEG_GAP_TO_LEADER_IN_SECONDS</li>
+              <li>CHART_WINDWARD_DISTANCE_TO_COMPETITOR_FARTHEST_AHEAD (unit in meters; basically the gap to leader)</li>
+              <li>RACE_IMPLIED_WIND (unit is knots)</li>
+              <li>RACE_RANK</li>
+              <li>REGATTA_RANK</li>
+              <li>OVERALL_RANK</li>
+              <li>CHART_DISTANCE_TO_START_LINE (unit is meters)</li>
+              <li>CHART_BEAT_ANGLE (unit is degrees)</li>
+              <li>CHART_ABS_TWA (unit is degrees)</li>
+              <li>BRAVO_RACE_HEEL_IN_DEGREES</li>
+              <li>BRAVO_LEG_CURRENT_HEEL_IN_DEGREES</li>
+              <li>BRAVO_RACE_PITCH_IN_DEGREES</li>
+              <li>BRAVO_LEG_CURRENT_PITCH_IN_DEGREES</li>
+              <li>BRAVO_RACE_CURRENT_RIDE_HEIGHT_IN_METERS</li>
+              <li>BRAVOEXTENDED_RACE_CURRENT_PORT_DAGGERBOARD_RAKE</li>
+              <li>BRAVOEXTENDED_RACE_CURRENT_STBD_DAGGERBOARD_RAKE</li>
+              <li>BRAVOEXTENDED_RACE_CURRENT_PORT_RUDDER_RAKE</li>
+              <li>BRAVOEXTENDED_RACE_CURRENT_STBD_RUDDER_RAKE</li>
+              <li>BRAVOEXTENDED_RACE_CURRENT_MAST_ROTATION_IN_DEGREES</li>
+              <li>BRAVOEXTENDED_RACE_CURRENT_LEEWAY_IN_DEGREES</li>
+              <li>BRAVOEXTENDED_RACE_CURRENT_SET</li>
+              <li>BRAVOEXTENDED_RACE_CURRENT_DRIFT_IN_DEGREES</li>
+              <li>BRAVOEXTENDED_RACE_CURRENT_DEPTH_IN_METERS</li>
+              <li>BRAVOEXTENDED_RACE_CURRENT_RUDDER_IN_DEGREES</li>
+              <li>BRAVOEXTENDED_RACE_CURRENT_TACK_ANGLE_IN_DEGREES</li>
+              <li>BRAVOEXTENDED_RACE_CURRENT_DEFLECTOR_PERCENTAGE</li>
+              <li>BRAVOEXTENDED_RACE_CURRENT_DEFLECTOR_IN_MILLIMETERS</li>
+              <li>BRAVOEXTENDED_RACE_CURRENT_RAKE_IN_DEGREES</li>
+              <li>BRAVOEXTENDED_RACE_CURRENT_TARGET_HEEL_ANGLE_IN_DEGREES</li>
+              <li>BRAVOEXTENDED_RACE_CURRENT_FORESTAY_LOAD</li>
+              <li>BRAVOEXTENDED_RACE_CURRENT_FORESTAY_PRESSURE</li>
+              <li>BRAVOEXTENDED_RACE_CURRENT_TARGET_BOATSPEED_PERCENTAGE</li>
+              <li>EXPEDITION_RACE_AWA</li>
+              <li>EXPEDITION_RACE_AWS</li>
+              <li>EXPEDITION_RACE_BARO</li>
+              <li>EXPEDITION_RACE_BOAT_SPEED</li>
+              <li>EXPEDITION_RACE_COG</li>
+              <li>EXPEDITION_RACE_COURSE</li>
+              <li>EXPEDITION_RACE_DIST_TO_PORT_LAYLINE</li>
+              <li>EXPEDITION_RACE_DIST_TO_STB_LAYLINE</li>
+              <li>EXPEDITION_RACE_DISTANCE_BELOW_LINE</li>
+              <li>EXPEDITION_RACE_DISTANCE_TO_COMMITTEE_BOAT</li>
+              <li>EXPEDITION_RACE_DISTANCE_TO_PIN</li>
+              <li>EXPEDITION_RACE_FORESTAY_LOAD</li>
+              <li>EXPEDITION_RACE_HEADING</li>
+              <li>EXPEDITION_RACE_JIB_CAR_PORT</li>
+              <li>EXPEDITION_RACE_JIB_CAR_STBD</li>
+              <li>EXPEDITION_RACE_LINE_SQUARE_FOR_WIND_DIRECTION</li>
+              <li>EXPEDITION_RACE_LOAD_P</li>
+              <li>EXPEDITION_RACE_LOAD_S</li>
+              <li>EXPEDITION_RACE_MAST_BUTT</li>
+              <li>EXPEDITION_RACE_RAKE</li>
+              <li>EXPEDITION_RACE_RATE_OF_TURN</li>
+              <li>EXPEDITION_RACE_RUDDER_ANGLE</li>
+              <li>EXPEDITION_RACE_SOG</li>
+              <li>EXPEDITION_RACE_TARG_BOAT_SPEED</li>
+              <li>EXPEDITION_RACE_TARG_TWA</li>
+              <li>EXPEDITION_RACE_TARGET_HEEL</li>
+              <li>EXPEDITION_RACE_TIME_TO_BURN_TO_COMMITTEE_BOAT</li>
+              <li>EXPEDITION_RACE_TIME_TO_BURN_TO_LINE</li>
+              <li>EXPEDITION_RACE_TIME_TO_BURN_TO_PIN</li>
+              <li>EXPEDITION_RACE_TIME_TO_COMMITTEE_BOAT</li>
+              <li>EXPEDITION_RACE_TIME_TO_GUN</li>
+              <li>EXPEDITION_RACE_TIME_TO_PIN</li>
+              <li>EXPEDITION_RACE_TIME_TO_PORT_LAYLINE</li>
+              <li>EXPEDITION_RACE_TIME_TO_STB_LAYLINE</li>
+              <li>EXPEDITION_RACE_TWA</li>
+              <li>EXPEDITION_RACE_TWD</li>
+              <li>EXPEDITION_RACE_TWS</li>
+              <li>EXPEDITION_RACE_VMG</li>
+              <li>EXPEDITION_RACE_VMG_TARG_VMG_DELTA</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td>Optional parameters:</td>
+        <td>
+            fromtime (ISO format, such as 2014-02-14T10:12:03Z) or fromtimeasmillis (time in milliseconds)<br>
+            totime (ISO format, such as 2014-02-14T10:12:03Z) or totimeasmillis (time in milliseconds)<br>
+            stepSizeMillis: the duration, in milliseconds, between the time points for which to compute the values; default is 1000ms (1s)<br>
+        </td>
+    </tr>
+    <tr>
+        <td>Request method:</td>
+        <td>GET</td>
+    </tr>
+    <tr>
+        <td>Example:</td>
+        <td><a href="http://www.sapsailing.com/sailingserver/api/v1/regattas/ESS%202018%20Barcelona/races/Race%204/competitordata?competitorId=01a01670-c82a-0133-a4ee-448a5b8481d8&competitorId=9e2f64f0-c829-0133-a4eb-448a5b8481d8&leaderboardGroupNameOrUUID=0dcf3fb5-6807-4fd4-86f8-af1757df514a&leaderboardName=ESS%202018%20Barcelona&detailType=LEG_DISTANCE_TRAVELED&detailType=RACE_RANK&fromtimeasmillis=1528987922924&totimeasmillis=1528987923980">
+        http://www.sapsailing.com/sailingserver/api/v1/regattas/ESS%202018%20Barcelona/races/Race%204/competitordata?competitorId=01a01670-c82a-0133-a4ee-448a5b8481d8&competitorId=9e2f64f0-c829-0133-a4eb-448a5b8481d8&leaderboardGroupNameOrUUID=0dcf3fb5-6807-4fd4-86f8-af1757df514a&leaderboardName=ESS%202018%20Barcelona&detailType=LEG_DISTANCE_TRAVELED&detailType=RACE_RANK&fromtimeasmillis=1528987922924&totimeasmillis=1528987923980
+        </a></td>
+    </tr>
+    <tr>
+        <td>Example Output:</td>
+        <td>
+            <pre>
+      {
+        "01a01670-c82a-0133-a4ee-448a5b8481d8": [
+          {
+            "timepoint-ms": 1528987922924,
+            "values": {
+              "RACE_RANK": 2,
+              "LEG_DISTANCE_TRAVELED": 4103.418328471692
+            }
+          },
+          {
+            "timepoint-ms": 1528987923924,
+            "values": {
+              "RACE_RANK": 2,
+              "LEG_DISTANCE_TRAVELED": 4115.210926626299
+            }
+          }
+        ],
+        "9e2f64f0-c829-0133-a4eb-448a5b8481d8": [
+          {
+            "timepoint-ms": 1528987922924,
+            "values": {
+              "RACE_RANK": 1,
+              "LEG_DISTANCE_TRAVELED": 4431.141055488247
+            }
+          },
+          {
+            "timepoint-ms": 1528987923924,
+            "values": {
+              "RACE_RANK": 1,
+              "LEG_DISTANCE_TRAVELED": 4442.579981511684
+            }
+          }
+        ]
+      }      
+            </pre>
+        </td>
+</table>
+<div style="height: 1em;"></div>
+<a href="index.html">Back to Web Service Overview</a> 
+</body>
+</html>

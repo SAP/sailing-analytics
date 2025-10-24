@@ -1,11 +1,11 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -18,19 +18,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.Timeout;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import com.sap.sse.util.SmartFutureCache;
 import com.sap.sse.util.SmartFutureCache.CacheUpdater;
 import com.sap.sse.util.SmartFutureCache.EmptyUpdateInterval;
 import com.sap.sse.util.SmartFutureCache.UpdateInterval;
 
+@Timeout(value=2, unit=TimeUnit.MINUTES)
 public class SmartFutureCacheTest {
-    @Rule public Timeout AbstractTracTracLiveTestTimeout = Timeout.millis(2 * 60 * 1000);
-    
     @Test
     public void testPerformanceOfGetAndCall() {
         SmartFutureCache<String, String, EmptyUpdateInterval> sfc = new SmartFutureCache<String, String, SmartFutureCache.EmptyUpdateInterval>(
@@ -235,7 +233,7 @@ public class SmartFutureCacheTest {
         assertEquals(Integer.valueOf(91), sfc.get("Trala", /* waitForLatest */ true));
     }
     
-    @Ignore // used only to solve bug 1314; it's hard to test re-cycling of tasks reliably without depending on timing issues
+    @Disabled // used only to solve bug 1314; it's hard to test re-cycling of tasks reliably without depending on timing issues
     @Test
     public void testOverloadingCacheWithUpdateRequests() throws InterruptedException {
         final Set<String> updateWasCalled = new ConcurrentSkipListSet<String>();

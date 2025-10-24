@@ -1,6 +1,6 @@
 package com.sap.sailing.gwt.ui.adminconsole;
 
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.sap.sailing.domain.common.dto.BoatClassDTO;
@@ -119,7 +119,7 @@ public abstract class AbstractCompetitorWithBoatDialog extends CompetitorEditDia
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return super.getInitialFocusWidget();
     }
 

@@ -57,6 +57,8 @@ import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
+import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.MaxIterationsExceededException;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.subject.Subject;
@@ -139,9 +141,11 @@ import com.sap.sailing.domain.common.CompetitorDescriptor;
 import com.sap.sailing.domain.common.CompetitorRegistrationType;
 import com.sap.sailing.domain.common.DataImportProgress;
 import com.sap.sailing.domain.common.DataImportSubProgress;
+import com.sap.sailing.domain.common.DetailType;
 import com.sap.sailing.domain.common.DeviceIdentifier;
 import com.sap.sailing.domain.common.LeaderboardType;
 import com.sap.sailing.domain.common.MaxPointsReason;
+import com.sap.sailing.domain.common.NoWindException;
 import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.RaceIdentifier;
 import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
@@ -149,6 +153,8 @@ import com.sap.sailing.domain.common.RegattaIdentifier;
 import com.sap.sailing.domain.common.RegattaName;
 import com.sap.sailing.domain.common.ScoreCorrectionProvider;
 import com.sap.sailing.domain.common.ScoringSchemeType;
+import com.sap.sailing.domain.common.SpeedWithBearing;
+import com.sap.sailing.domain.common.TackType;
 import com.sap.sailing.domain.common.TrackedRaceStatusEnum;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.WindSource;
@@ -161,11 +167,13 @@ import com.sap.sailing.domain.common.dto.SeriesCreationParametersDTO;
 import com.sap.sailing.domain.common.impl.DataImportProgressImpl;
 import com.sap.sailing.domain.common.impl.MasterDataImportObjectCreationCountImpl;
 import com.sap.sailing.domain.common.media.MediaTrack;
+import com.sap.sailing.domain.common.polars.NotEnoughDataHasBeenAddedException;
 import com.sap.sailing.domain.common.racelog.RaceLogRaceStatus;
 import com.sap.sailing.domain.common.racelog.RacingProcedureType;
 import com.sap.sailing.domain.common.racelog.tracking.DoesNotHaveRegattaLogException;
 import com.sap.sailing.domain.common.racelog.tracking.MarkAlreadyUsedInRaceException;
 import com.sap.sailing.domain.common.security.SecuredDomainType;
+import com.sap.sailing.domain.common.tracking.BravoFix;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.common.tracking.SensorFix;
@@ -190,6 +198,7 @@ import com.sap.sailing.domain.leaderboard.impl.ThresholdBasedResultDiscardingRul
 import com.sap.sailing.domain.leaderboard.meta.LeaderboardGroupMetaLeaderboard;
 import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprint;
 import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprintRegistry;
+import com.sap.sailing.domain.orc.ORCPerformanceCurveRankingMetric;
 import com.sap.sailing.domain.persistence.DomainObjectFactory;
 import com.sap.sailing.domain.persistence.MongoObjectFactory;
 import com.sap.sailing.domain.persistence.MongoRaceLogStoreFactory;
@@ -205,14 +214,18 @@ import com.sap.sailing.domain.racelog.RaceLogAndTrackedRaceResolver;
 import com.sap.sailing.domain.racelog.RaceLogIdentifier;
 import com.sap.sailing.domain.racelog.RaceLogStore;
 import com.sap.sailing.domain.racelog.tracking.SensorFixStore;
+import com.sap.sailing.domain.ranking.RankingMetric;
+import com.sap.sailing.domain.ranking.RankingMetric.RankingInfo;
 import com.sap.sailing.domain.ranking.RankingMetricConstructor;
 import com.sap.sailing.domain.regattalike.HasRegattaLike;
 import com.sap.sailing.domain.regattalike.IsRegattaLike;
 import com.sap.sailing.domain.regattalike.LeaderboardThatHasRegattaLike;
 import com.sap.sailing.domain.regattalog.RegattaLogStore;
 import com.sap.sailing.domain.resultimport.ResultUrlProvider;
+import com.sap.sailing.domain.shared.tracking.AddResult;
+import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
 import com.sap.sailing.domain.statistics.Statistics;
-import com.sap.sailing.domain.tracking.AddResult;
+import com.sap.sailing.domain.tracking.BravoFixTrack;
 import com.sap.sailing.domain.tracking.DynamicRaceDefinitionSet;
 import com.sap.sailing.domain.tracking.DynamicSensorFixTrack;
 import com.sap.sailing.domain.tracking.DynamicTrackedRace;
@@ -227,11 +240,13 @@ import com.sap.sailing.domain.tracking.RaceTrackingConnectivityParameters;
 import com.sap.sailing.domain.tracking.RaceTrackingConnectivityParametersHandler;
 import com.sap.sailing.domain.tracking.RaceTrackingHandler;
 import com.sap.sailing.domain.tracking.RaceTrackingHandler.DefaultRaceTrackingHandler;
+import com.sap.sailing.domain.tracking.TrackedLegOfCompetitor;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.domain.tracking.TrackedRaceStatus;
 import com.sap.sailing.domain.tracking.TrackedRegatta;
 import com.sap.sailing.domain.tracking.TrackedRegattaListener;
-import com.sap.sailing.domain.tracking.TrackingConnectorInfo;
+import com.sap.sailing.domain.tracking.WindLegTypeAndLegBearingAndORCPerformanceCurveCache;
+import com.sap.sailing.domain.tracking.WindPositionMode;
 import com.sap.sailing.domain.tracking.WindStore;
 import com.sap.sailing.domain.tracking.WindTracker;
 import com.sap.sailing.domain.tracking.WindTrackerFactory;
@@ -316,9 +331,11 @@ import com.sap.sailing.server.tagging.TaggingServiceFactory;
 import com.sap.sailing.server.util.EventUtil;
 import com.sap.sailing.shared.server.SharedSailingData;
 import com.sap.sse.ServerInfo;
+import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.PairingListCreationException;
+import com.sap.sse.common.Speed;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.TypeBasedServiceFinder;
 import com.sap.sse.common.TypeBasedServiceFinderFactory;
@@ -1879,12 +1896,12 @@ Replicator {
         if (useStartTimeInference && controlTrackingFromStartAndFinishTimes) {
             throw new IllegalArgumentException("Cannot set both of useStartTimeInference and controlTrackingFromStartAndFinishTimes to true");
         }
-        com.sap.sse.common.Util.Pair<Regatta, Boolean> regattaWithCreatedFlag = getOrCreateRegattaWithoutReplication(
+        final com.sap.sse.common.Util.Pair<Regatta, Boolean> regattaWithCreatedFlag = getOrCreateRegattaWithoutReplication(
                 fullRegattaName, boatClassName, canBoatsOfCompetitorsChangePerRace, competitorRegistrationType,
                 registrationLinkSecret, startDate, endDate, id, series, persistent, scoringScheme, courseAreaIds,
                 buoyZoneRadiusInHullLengths, useStartTimeInference, controlTrackingFromStartAndFinishTimes,
                 autoRestartTrackingUponCompetitorSetChange, rankingMetricConstructor);
-        Regatta regatta = regattaWithCreatedFlag.getA();
+        final Regatta regatta = regattaWithCreatedFlag.getA();
         if (regattaWithCreatedFlag.getB()) {
             onRegattaLikeAdded(regatta);
             replicateSpecificRegattaWithoutRaceColumns(regatta);
@@ -1916,13 +1933,13 @@ Replicator {
             ScoringScheme scoringScheme, Iterable<? extends Serializable> courseAreaIds, Double buoyZoneRadiusInHullLengths,
             boolean useStartTimeInference, boolean controlTrackingFromStartAndFinishTimes,
             boolean autoRestartTrackingUponCompetitorSetChange, RankingMetricConstructor rankingMetricConstructor) {
-        Regatta regatta = new RegattaImpl(getRaceLogStore(), getRegattaLogStore(), fullRegattaName,
+        final Regatta regatta = new RegattaImpl(getRaceLogStore(), getRegattaLogStore(), fullRegattaName,
                 getBaseDomainFactory().getOrCreateBoatClass(boatClassName), canBoatsOfCompetitorsChangePerRace,
                 competitorRegistrationType, startDate, endDate, series, persistent, scoringScheme, id,
                 Util.map(courseAreaIds, courseAreaId->getBaseDomainFactory().getExistingCourseAreaById(courseAreaId)),
                 buoyZoneRadiusInHullLengths, useStartTimeInference, controlTrackingFromStartAndFinishTimes,
                 autoRestartTrackingUponCompetitorSetChange, rankingMetricConstructor, registrationLinkSecret);
-        boolean wasCreated = addAndConnectRegatta(persistent, regatta);
+        final boolean wasCreated = addAndConnectRegatta(persistent, regatta);
         if (wasCreated) {
             logger.info("Created regatta " + regatta.getName() + " (" + hashCode() + ") on " + this);
         }
@@ -3688,6 +3705,7 @@ Replicator {
                 for (TrackedRace trackedRace : trackedRegatta.getTrackedRaces()) {
                     ((TrackedRaceImpl) trackedRace).setRaceLogResolver(this);
                     ((TrackedRaceImpl) trackedRace).registerRegattaListener();
+                    trackedRace.initializeAfterDeserialization();
                 }
             } finally {
                 trackedRegatta.unlockTrackedRacesAfterRead();
@@ -4597,14 +4615,14 @@ Replicator {
     }
 
     private void setWindEstimationOnAllTrackedRaces(WindEstimationFactoryService service) {
-        Iterable<Regatta> allRegattas = getAllRegattas();
-        for (Regatta regatta : allRegattas) {
-            DynamicTrackedRegatta trackedRegatta = getTrackedRegatta(regatta);
+        final Iterable<Regatta> allRegattas = getAllRegattas();
+        for (final Regatta regatta : allRegattas) {
+            final DynamicTrackedRegatta trackedRegatta = getTrackedRegatta(regatta);
             if (trackedRegatta != null) {
                 trackedRegatta.lockTrackedRacesForRead();
                 try {
-                    Iterable<DynamicTrackedRace> trackedRaces = trackedRegatta.getTrackedRaces();
-                    for (TrackedRace trackedRace : trackedRaces) {
+                    final Iterable<DynamicTrackedRace> trackedRaces = trackedRegatta.getTrackedRaces();
+                    for (final TrackedRace trackedRace : trackedRaces) {
                         trackedRace.setWindEstimation(
                                 service == null ? null : service.createIncrementalWindEstimationTrack(trackedRace));
                     }
@@ -5429,6 +5447,488 @@ Replicator {
                     result.add(trackedRace);
                 }
             }
+        }
+        return result;
+    }
+    
+    /**
+     * @param leaderboardGroupId
+     *            if not {@code null}, this takes precedence over the {@code leaderboardGroupName} parameter which will
+     *            then be ignored and will be used to look up an optional leaderboard group providing the context, e.g.,
+     *            for seasonal scores from an overall leaderboard
+     * @param leaderboardGroupName
+     *            evaluated only if {@code leaderboardGroupId} was {@code null}; may even be {@code null} if
+     *            {@code leaderboardGroupId} is {@code null} too because leaderboard group resolution is optional. If a
+     *            non-{@code null} name is provided here and if {@code leaderboardGroupId} was {@code null} then the
+     *            name is used to try to resolve the leaderboard group by name.
+     */
+    @Override
+    public Double getCompetitorRaceDataEntry(DetailType dataType, TrackedRace trackedRace, Competitor competitor,
+            TimePoint timePoint, LeaderboardGroup leaderboardGroup, String leaderboardName,
+            WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache) throws NoWindException, NotEnoughDataHasBeenAddedException, MaxIterationsExceededException, FunctionEvaluationException {
+        Double result = null;
+        final Course course = trackedRace.getRace().getCourse();
+        course.lockForRead(); // make sure the tracked leg survives this call even if a course update is pending
+        trackedRace.lockForRead(trackedRace.getMarkPassings(competitor));
+        try {
+            final TrackedLegOfCompetitor trackedLeg = trackedRace.getTrackedLeg(competitor, timePoint);
+            switch (dataType) {
+            case LEG_TACKTYPE_LONGTACK_SHORTTACK:
+                final TackType tackType;
+                if (trackedLeg != null && (tackType = trackedLeg.getTackType(timePoint, cache)) != null ) {
+                    result = tackType==TackType.LONGTACK ? 1.0 : -1.0;
+                } else {
+                    // trackedLeg == null || tackType == null;
+                    result = 0.0;
+                }
+                break;
+            case RACE_CURRENT_SPEED_OVER_GROUND_IN_KNOTS:
+                final GPSFixTrack<Competitor, GPSFixMoving> sogTrack = trackedRace.getTrack(competitor);
+                if (sogTrack != null) {
+                    SpeedWithBearing speedOverGround = sogTrack.getEstimatedSpeed(timePoint);
+                    result = (speedOverGround == null) ? null : speedOverGround.getKnots();
+                }
+                break;
+            case RACE_CURRENT_COURSE_OVER_GROUND_IN_TRUE_DEGREES:
+            case CHART_COURSE_OVER_GROUND_TRUE_DEGREES:
+                final GPSFixTrack<Competitor, GPSFixMoving> cogTrack = trackedRace.getTrack(competitor);
+                if (cogTrack != null) {
+                    SpeedWithBearing speedOverGround = cogTrack.getEstimatedSpeed(timePoint);
+                    result = (speedOverGround == null) ? null : speedOverGround.getBearing().getDegrees();
+                }
+                break;
+            case RACE_CURRENT_POSITION_LAT_DEG:
+                final GPSFixTrack<Competitor, GPSFixMoving> latTrack = trackedRace.getTrack(competitor);
+                if (latTrack != null) {
+                    Position position = latTrack.getEstimatedPosition(timePoint, /* extrapolate */ true);
+                    result = (position == null) ? null : position.getLatDeg();
+                }
+                break;
+            case RACE_CURRENT_POSITION_LNG_DEG:
+                final GPSFixTrack<Competitor, GPSFixMoving> lngTrack = trackedRace.getTrack(competitor);
+                if (lngTrack != null) {
+                    Position position = lngTrack.getEstimatedPosition(timePoint, /* extrapolate */ true);
+                    result = (position == null) ? null : position.getLngDeg();
+                }
+                break;
+            case LEG_VELOCITY_MADE_GOOD_IN_KNOTS:
+                final Speed velocityMadeGood;
+                if (trackedLeg != null) {
+                    velocityMadeGood = trackedLeg.getVelocityMadeGood(timePoint, WindPositionMode.EXACT, cache);
+                } else {
+                    // check if wind information is available; if so, compute a VMG only based on wind data:
+                    velocityMadeGood = trackedRace.getVelocityMadeGood(competitor, timePoint, cache);
+                }
+                result = (velocityMadeGood == null) ? null : velocityMadeGood.getKnots();
+                break;
+            case LEG_DISTANCE_TRAVELED:
+                if (trackedLeg != null) {
+                    Distance distanceTraveled = trackedRace.getDistanceTraveled(competitor, timePoint);
+                    result = distanceTraveled == null ? null : distanceTraveled.getMeters();
+                }
+                break;
+            case LEG_DISTANCE_TRAVELED_INCLUDING_GATE_START:
+                if (trackedLeg != null) {
+                    Distance distanceTraveledConsideringGateStart = trackedRace.getDistanceTraveledIncludingGateStart(competitor, timePoint);
+                    result = distanceTraveledConsideringGateStart == null ? null : distanceTraveledConsideringGateStart.getMeters();
+                }
+                break;
+            case LEG_GAP_TO_LEADER_IN_SECONDS:
+                if (trackedLeg != null) {
+                    final RankingInfo rankingInfo = trackedRace.getRankingMetric().getRankingInfo(timePoint, cache);
+                    final Duration gapToLeaderInOwnTime = trackedLeg.getTrackedLeg().getTrackedRace().getRankingMetric().getGapToLeaderInOwnTime(rankingInfo, competitor, cache);
+                    result = gapToLeaderInOwnTime == null ? null : gapToLeaderInOwnTime.asSeconds();
+                }
+                break;
+            case LEG_GAP_TO_LEADER_IN_SECONDS_CHANGE:
+                // compute the average over the last five sampling intervals
+                result = null;
+                if (trackedLeg != null) {
+                    int count=0;
+                    Duration gapDifferenceSum = Duration.NULL;
+                    Duration gapToLeaderInOwnTime = null;
+                    TimePoint tp = timePoint;
+                    final Duration samplingRate = trackedRace.getTrack(competitor).getAverageIntervalBetweenRawFixes();
+                    for (int i=0; i<5; i++) {
+                        final RankingInfo rankingInfo = trackedRace.getRankingMetric().getRankingInfo(tp, cache);
+                        final Duration nextGapToLeaderInOwnTime = trackedLeg.getTrackedLeg().getTrackedRace().getRankingMetric().getGapToLeaderInOwnTime(rankingInfo, competitor, cache);
+                        if (gapToLeaderInOwnTime != null && nextGapToLeaderInOwnTime != null) {
+                            gapDifferenceSum = gapDifferenceSum.plus(gapToLeaderInOwnTime.minus(nextGapToLeaderInOwnTime));
+                            count++;
+                        }
+                        gapToLeaderInOwnTime = nextGapToLeaderInOwnTime;
+                        tp = tp.minus(samplingRate);
+                    }
+                    result = count==0 ? null : gapDifferenceSum.times(1.0 / (double) count).asSeconds() / samplingRate.times(5).asSeconds();
+                }
+                break;
+            case CHART_WINDWARD_DISTANCE_TO_COMPETITOR_FARTHEST_AHEAD:
+                if (trackedLeg != null) {
+                    final RankingInfo rankingInfo = trackedRace.getRankingMetric().getRankingInfo(timePoint, cache);
+                    Distance distanceToLeader = trackedLeg.getWindwardDistanceToCompetitorFarthestAhead(timePoint, WindPositionMode.LEG_MIDDLE, rankingInfo, cache);
+                    result = (distanceToLeader == null) ? null : distanceToLeader.getMeters();
+                }
+                break;
+            case CHART_WINDWARD_DISTANCE_TO_COMPETITOR_FARTHEST_AHEAD_CHANGE:
+                // compute the average over the last five sampling intervals
+                result = null;
+                if (trackedLeg != null) {
+                    int count=0;
+                    Distance distanceDifferenceSum = Distance.NULL;
+                    Distance distanceToLeader = null;
+                    TimePoint tp = timePoint;
+                    final Duration samplingRate = trackedRace.getTrack(competitor).getAverageIntervalBetweenRawFixes();
+                    for (int i=0; i<5; i++) {
+                        final RankingInfo rankingInfo = trackedRace.getRankingMetric().getRankingInfo(tp, cache);
+                        final Distance nextDistanceToLeader = trackedLeg.getWindwardDistanceToCompetitorFarthestAhead(tp, WindPositionMode.LEG_MIDDLE, rankingInfo, cache);
+                        if (distanceToLeader != null && nextDistanceToLeader != null) {
+                            distanceDifferenceSum = distanceDifferenceSum.add(distanceToLeader.add(nextDistanceToLeader.scale(-1)));
+                            count++;
+                        }
+                        distanceToLeader = nextDistanceToLeader;
+                        tp = tp.minus(samplingRate);
+                    }
+                    result = count==0 ? null : distanceDifferenceSum.scale(1.0 / (double) count).getMeters() / samplingRate.times(5).asSeconds();
+                }
+                break;
+            case RACE_IMPLIED_WIND:
+                final RankingMetric rankingMetric = trackedRace.getRankingMetric();
+                if (rankingMetric instanceof ORCPerformanceCurveRankingMetric) {
+                    final ORCPerformanceCurveRankingMetric orcPcsRankingMetric =
+                            (ORCPerformanceCurveRankingMetric) rankingMetric;
+                    try {
+                        final Speed impliedWind = orcPcsRankingMetric.getImpliedWind(competitor, timePoint, cache);
+                        result = impliedWind == null ? null : impliedWind.getKnots();
+                    } catch (MaxIterationsExceededException | FunctionEvaluationException e) {
+                        logger.log(Level.WARNING, "Problem computing implied wind", e);
+                        result = null;
+                    }
+                }
+                break;
+            case RACE_RANK:
+                if (trackedLeg != null) {
+                    result = (double) trackedLeg.getRank(timePoint, cache);
+                }
+                break;
+            case REGATTA_RANK:
+                if (leaderboardName == null || leaderboardName.isEmpty()) {
+                    break;
+                }
+                Leaderboard leaderboard = getLeaderboardByName(leaderboardName);
+                result = leaderboard == null ? null : (double) leaderboard.getTotalRankOfCompetitor(competitor,
+                        timePoint);
+                break;
+            case OVERALL_RANK:
+                if (leaderboardGroup == null) {
+                    break;
+                }
+                Leaderboard overall = leaderboardGroup.getOverallLeaderboard();
+                result = overall == null ? null : (double) overall.getTotalRankOfCompetitor(competitor, timePoint);
+                break;
+            case CHART_DISTANCE_TO_START_LINE:
+                TimePoint startOfRace = trackedRace.getStartOfRace();
+                if (startOfRace == null || timePoint.before(startOfRace) || timePoint.equals(startOfRace)) {
+                    Distance distanceToStartLine = trackedRace.getDistanceToStartLine(competitor, timePoint);
+                    result = distanceToStartLine == null ? null : distanceToStartLine.getMeters();
+                }
+                break;
+            case CHART_BEAT_ANGLE:
+            case CHART_ABS_TWA:
+                Bearing twa = trackedRace.getTWA(competitor, timePoint, cache);
+                result = twa == null ? null : twa.getDegrees();
+                if (result != null && dataType == DetailType.CHART_ABS_TWA) {
+                    result = Math.abs(result);
+                }
+                break;
+            case BRAVO_RACE_HEEL_IN_DEGREES:
+            case BRAVO_LEG_CURRENT_HEEL_IN_DEGREES: {
+                result = getBravoBearingInDegrees(BravoFixTrack::getHeel, trackedRace, competitor, timePoint);
+                break;
+            }
+            case BRAVO_RACE_PITCH_IN_DEGREES:
+            case BRAVO_LEG_CURRENT_PITCH_IN_DEGREES: {
+                result = getBravoBearingInDegrees(BravoFixTrack::getPitch, trackedRace, competitor, timePoint);
+                break;
+            }
+            case BRAVO_RACE_CURRENT_RIDE_HEIGHT_IN_METERS: {
+                result = getBravoDistanceInMeters(BravoFixTrack::getRideHeight, trackedRace, competitor, timePoint);
+                break;
+            }
+            case BRAVOEXTENDED_RACE_CURRENT_PORT_DAGGERBOARD_RAKE: {
+                result = getBravoDoubleValue(BravoFixTrack::getPortDaggerboardRakeIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case BRAVOEXTENDED_RACE_CURRENT_STBD_DAGGERBOARD_RAKE: {
+                result = getBravoDoubleValue(BravoFixTrack::getStbdDaggerboardRakeStbdIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case BRAVOEXTENDED_RACE_CURRENT_PORT_RUDDER_RAKE: {
+                result = getBravoDoubleValue(BravoFixTrack::getPortRudderRakeIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case BRAVOEXTENDED_RACE_CURRENT_STBD_RUDDER_RAKE: {
+                result = getBravoDoubleValue(BravoFixTrack::getStbdRudderRakeIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case BRAVOEXTENDED_RACE_CURRENT_MAST_ROTATION_IN_DEGREES: {
+                result = getBravoBearingInDegrees(BravoFixTrack::getMastRotationIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case BRAVOEXTENDED_RACE_CURRENT_LEEWAY_IN_DEGREES: {
+                result = getBravoBearingInDegrees(BravoFixTrack::getLeewayIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case BRAVOEXTENDED_RACE_CURRENT_SET: {
+                result = getBravoDoubleValue(BravoFixTrack::getSetIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case BRAVOEXTENDED_RACE_CURRENT_DRIFT_IN_DEGREES: {
+                result = getBravoBearingInDegrees(BravoFixTrack::getDriftIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case BRAVOEXTENDED_RACE_CURRENT_DEPTH_IN_METERS: {
+                result = getBravoDistanceInMeters(BravoFixTrack::getDepthIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case BRAVOEXTENDED_RACE_CURRENT_RUDDER_IN_DEGREES: {
+                result = getBravoBearingInDegrees(BravoFixTrack::getRudderIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case BRAVOEXTENDED_RACE_CURRENT_TACK_ANGLE_IN_DEGREES: {
+                result = getBravoBearingInDegrees(BravoFixTrack::getTackAngleIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case BRAVOEXTENDED_RACE_CURRENT_DEFLECTOR_PERCENTAGE: {
+                result = getBravoDoubleValue(BravoFixTrack::getDeflectorPercentageIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case BRAVOEXTENDED_RACE_CURRENT_DEFLECTOR_IN_MILLIMETERS: {
+                Double deflectorInMeters = getBravoDistanceInMeters(BravoFixTrack::getDeflectorIfAvailable, trackedRace, competitor, timePoint);
+                result = deflectorInMeters == null ? null : (deflectorInMeters * 1000.);
+                break;
+            }
+            case BRAVOEXTENDED_RACE_CURRENT_RAKE_IN_DEGREES: {
+                result = getBravoBearingInDegrees(BravoFixTrack::getRakeIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case BRAVOEXTENDED_RACE_CURRENT_TARGET_HEEL_ANGLE_IN_DEGREES: {
+                result = getBravoBearingInDegrees(BravoFixTrack::getTargetHeelIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case BRAVOEXTENDED_RACE_CURRENT_FORESTAY_LOAD: {
+                result = getBravoDoubleValue(BravoFixTrack::getForestayLoadIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case BRAVOEXTENDED_RACE_CURRENT_FORESTAY_PRESSURE: {
+                result = getBravoDoubleValue(BravoFixTrack::getForestayPressureIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case BRAVOEXTENDED_RACE_CURRENT_TARGET_BOATSPEED_PERCENTAGE: {
+                result = getBravoDoubleValue(BravoFixTrack::getTargetBoatspeedPIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+
+            case EXPEDITION_RACE_AWA: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionAWAIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_AWS: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionAWSIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_BARO: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionBaroIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_BOAT_SPEED: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionBoatSpeedIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_COG: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionCOGIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_COURSE: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionCourseDetailIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_DIST_TO_PORT_LAYLINE: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionDistToPortLaylineIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_DIST_TO_STB_LAYLINE: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionDistToStbLaylineIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_DISTANCE_BELOW_LINE: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionDistanceBelowLineInMetersIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_DISTANCE_TO_COMMITTEE_BOAT: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionDistanceToCommitteeBoatIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_DISTANCE_TO_PIN: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionDistanceToPinDetailIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_FORESTAY_LOAD: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionForestayLoadIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_HEADING: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionHeadingIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_JIB_CAR_PORT: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionJibCarPortIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_JIB_CAR_STBD: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionJibCarStbdIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_LINE_SQUARE_FOR_WIND_DIRECTION: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionLineSquareForWindIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_LOAD_P: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionLoadPIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_LOAD_S: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionLoadSIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_MAST_BUTT: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionMastButtIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_RAKE: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionRakeIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_RATE_OF_TURN: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionRateOfTurnIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_RUDDER_ANGLE: {
+                result = getBravoBearingInDegrees(BravoFixTrack::getRudderIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_SOG: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionSOGIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_TARG_BOAT_SPEED: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionTargBoatSpeedIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_TARG_TWA: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionTargTWAIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_TARGET_HEEL: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionTargetHeelIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_TIME_TO_BURN_TO_COMMITTEE_BOAT: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionTimeToBurnToCommitteeBoatIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_TIME_TO_BURN_TO_LINE: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionTimeToBurnToLineInSecondsIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_TIME_TO_BURN_TO_PIN: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionTimeToBurnToPinIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_TIME_TO_COMMITTEE_BOAT: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionTimeToCommitteeBoatIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_TIME_TO_GUN: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionTimeToGunInSecondsIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_TIME_TO_PIN: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionTimeToPinIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_TIME_TO_PORT_LAYLINE: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionTimeToPortLaylineIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_TIME_TO_STB_LAYLINE: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionTimeToStbLaylineIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_TWA: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionTWAIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_TWD: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionTWDIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_TWS: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionTWSIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_VMG: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionVMGIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_VMG_TARG_VMG_DELTA: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionVMGTargVMGDeltaIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case EXPEDITION_RACE_KICKER_TENSION: {
+                result = getBravoDoubleValue(BravoFixTrack::getExpeditionKickerTensionIfAvailable, trackedRace, competitor, timePoint);
+                break;
+            }
+            case PERCENT_TARGET_BOAT_SPEED: {
+                result = trackedRace.getPercentTargetBoatSpeed(competitor, timePoint, cache);
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("There is currently no support for the enum value '" + dataType
+                        + "' in this method.");
+            }
+            return result;
+        } finally {
+            trackedRace.unlockAfterRead(trackedRace.getMarkPassings(competitor));
+            course.unlockAfterRead();
+        }
+    }
+
+    private Double getBravoDoubleValue(BiFunction<BravoFixTrack<Competitor>, TimePoint, Double> valueGetter,
+            TrackedRace trackedRace, Competitor competitor, TimePoint timePoint) {
+        return getBravoValue(valueGetter, Function.identity(), trackedRace, competitor, timePoint);
+    }
+
+    private Double getBravoBearingInDegrees(BiFunction<BravoFixTrack<Competitor>, TimePoint, Bearing> valueGetter,
+            TrackedRace trackedRace, Competitor competitor, TimePoint timePoint) {
+        return getBravoValue(valueGetter, Bearing::getDegrees, trackedRace, competitor, timePoint);
+    }
+
+    private Double getBravoDistanceInMeters(BiFunction<BravoFixTrack<Competitor>, TimePoint, Distance> valueGetter,
+            TrackedRace trackedRace, Competitor competitor, TimePoint timePoint) {
+        return getBravoValue(valueGetter, Distance::getMeters, trackedRace, competitor, timePoint);
+    }
+
+    private <T> Double getBravoValue(BiFunction<BravoFixTrack<Competitor>, TimePoint, T> valueGetter,
+            Function<T, Double> mapperToDouble,
+            TrackedRace trackedRace, Competitor competitor, TimePoint timePoint) {
+        final Double result;
+        final BravoFixTrack<Competitor> bravoFixTrack = trackedRace
+                .<BravoFix, BravoFixTrack<Competitor>> getSensorTrack(competitor, BravoFixTrack.TRACK_NAME);
+        if (bravoFixTrack != null) {
+            final T t = valueGetter.apply(bravoFixTrack, timePoint);
+            result = t == null ? null : mapperToDouble.apply(t);
+        } else {
+            result = null;
         }
         return result;
     }

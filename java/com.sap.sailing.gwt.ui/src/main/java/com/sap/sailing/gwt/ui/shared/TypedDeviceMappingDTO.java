@@ -10,6 +10,7 @@ public class TypedDeviceMappingDTO extends DeviceMappingDTO {
     
     public String dataType;
     
+    @Deprecated // for GWT serialization only
     protected TypedDeviceMappingDTO() {}
     
     public TypedDeviceMappingDTO(DeviceIdentifierDTO deviceId, Date from, Date to, MappableToDevice mappedTo,

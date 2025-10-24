@@ -43,7 +43,7 @@ public class ScoreCorrectionProviderImpl extends AbstractYachtScoringProvider im
     }
 
     @Override
-    public Map<String, Set<Util.Pair<String, TimePoint>>> getHasResultsForBoatClassFromDateByEventName() throws URISyntaxException {
+    public Map<String, Set<Util.Pair<String, TimePoint>>> getHasResultsForBoatClassFromDateByEventName() throws URISyntaxException, SAXException, ParserConfigurationException {
         Map<String, Set<Util.Pair<String, TimePoint>>> result = new HashMap<String, Set<Util.Pair<String,TimePoint>>>();
         try {
             for (ResultDocumentDescriptor resultDocDescr : documentProvider.getResultDocumentDescriptors()) {
@@ -90,7 +90,7 @@ public class ScoreCorrectionProviderImpl extends AbstractYachtScoringProvider im
                 /* boatClassNameFilter */ Optional.empty());
     }
 
-    private Parser resolveParser(String eventName, String boatClassName) throws IOException, URISyntaxException {
+    private Parser resolveParser(String eventName, String boatClassName) throws IOException, URISyntaxException, SAXException, ParserConfigurationException {
         Parser result = null;
         for (ResultDocumentDescriptor resultDocDescr : documentProvider.getResultDocumentDescriptors()) {
             if (eventName.equals(resultDocDescr.getEventName()) && boatClassName.equals(resultDocDescr.getBoatClass())) {

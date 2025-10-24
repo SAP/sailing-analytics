@@ -1,5 +1,7 @@
 package com.sap.sailing.gwt.ui.client.media;
 
+import java.util.UUID;
+
 import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.Widget;
 import com.sap.sailing.domain.common.media.MediaTrackWithSecurityDTO;
@@ -7,6 +9,7 @@ import com.sap.sailing.gwt.ui.client.media.shared.AbstractMediaPlayer;
 import com.sap.sailing.gwt.ui.client.media.shared.MediaSynchPlayer;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
 import com.sap.sse.gwt.client.player.Timer;
 
 public class VideoJSSyncPlayer extends AbstractMediaPlayer implements MediaSynchPlayer, RequiresResize {
@@ -16,12 +19,13 @@ public class VideoJSSyncPlayer extends AbstractMediaPlayer implements MediaSynch
     private final TimePoint raceStartTime;
     private final Timer raceTimer;
 
-    public VideoJSSyncPlayer(MediaTrackWithSecurityDTO mediaTrack, TimePoint raceStartTime, Timer raceTimer) {
+    public VideoJSSyncPlayer(MediaTrackWithSecurityDTO mediaTrack, TimePoint raceStartTime, Timer raceTimer, TakedownNoticeService takedownNoticeService,
+            String regattaAndRaceIdentifier, UUID eventId) {
         super(mediaTrack);
-        videoJsDelegate = new VideoJSPlayer(true, false);
+        videoJsDelegate = new VideoJSPlayer(true, false, takedownNoticeService, "takedownRequestForRaceVideo");
         this.raceStartTime = raceStartTime;
         this.raceTimer = raceTimer;
-        videoJsDelegate.setVideo(mediaTrack.mimeType, mediaTrack.url);
+        videoJsDelegate.setVideo(mediaTrack.mimeType, mediaTrack.url, ""+eventId+"/"+regattaAndRaceIdentifier);
     }
 
     @Override

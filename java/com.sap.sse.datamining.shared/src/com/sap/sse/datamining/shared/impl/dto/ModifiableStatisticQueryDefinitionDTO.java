@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sap.sse.common.settings.SerializableSettings;
 import com.sap.sse.datamining.shared.dto.StatisticQueryDefinitionDTO;
@@ -14,6 +16,8 @@ import com.sap.sse.datamining.shared.dto.StatisticQueryDefinitionDTO;
  * DataMiningDTOFactory. The corresponding backend instance for a DTO can be created using the DataMiningServer.
  */
 public class ModifiableStatisticQueryDefinitionDTO implements StatisticQueryDefinitionDTO {
+    private static final Logger logger = Logger.getLogger(ModifiableStatisticQueryDefinitionDTO.class.getName());
+
     private static final long serialVersionUID = -6438771277564908352L;
     
     /**
@@ -243,5 +247,16 @@ public class ModifiableStatisticQueryDefinitionDTO implements StatisticQueryDefi
     @Override
     public boolean isQueryChangedSinceLastRun() {
         return queryChangedSinceLastRun;
+    }
+    
+    @Override
+    public String toString() {
+        try {
+            return getAggregatorDefinition().toString() + " over " + getStatisticToCalculate() + ", grouped by "
+                + getDimensionsToGroupBy() + " and filtered by " + getFilterSelection();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception trying to stringify a data mining query", e);
+            return "<exception in query's toString() method: "+e.getMessage()+">";
+        }
     }
 }

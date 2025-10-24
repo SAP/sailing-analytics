@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
+
 import com.sap.sailing.datamining.data.HasTrackedLegContext;
 import com.sap.sailing.datamining.data.HasTrackedLegOfCompetitorContext;
 import com.sap.sailing.datamining.impl.data.TrackedLegOfCompetitorWithContext;
@@ -11,6 +14,7 @@ import com.sap.sailing.datamining.shared.TackTypeSegmentsDataMiningSettings;
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sse.datamining.components.Processor;
 import com.sap.sse.datamining.impl.components.AbstractRetrievalProcessor;
+import com.sap.sse.security.shared.impl.SecuredSecurityTypes;
 
 public class TrackedLegOfCompetitorRetrievalProcessor extends AbstractRetrievalProcessor<HasTrackedLegContext, HasTrackedLegOfCompetitorContext> {
     /**
@@ -35,8 +39,11 @@ public class TrackedLegOfCompetitorRetrievalProcessor extends AbstractRetrievalP
             if (isAborted()) {
                 break;
             }
-            HasTrackedLegOfCompetitorContext trackedLegOfCompetitorWithContext = new TrackedLegOfCompetitorWithContext(element, element.getTrackedLeg().getTrackedLeg(competitor), settings);
-            trackedLegOfCompetitorsWithContext.add(trackedLegOfCompetitorWithContext);
+            final Subject subject = SecurityUtils.getSubject();
+            if (subject.isPermitted(competitor.getIdentifier().getStringPermission(SecuredSecurityTypes.PublicReadableActions.READ_PUBLIC))) {
+                HasTrackedLegOfCompetitorContext trackedLegOfCompetitorWithContext = new TrackedLegOfCompetitorWithContext(element, element.getTrackedLeg().getTrackedLeg(competitor), settings);
+                trackedLegOfCompetitorsWithContext.add(trackedLegOfCompetitorWithContext);
+            }
         }
         return trackedLegOfCompetitorsWithContext;
     }

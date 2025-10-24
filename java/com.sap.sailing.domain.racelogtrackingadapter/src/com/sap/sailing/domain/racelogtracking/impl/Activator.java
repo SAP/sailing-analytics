@@ -76,6 +76,9 @@ public class Activator implements BundleActivator {
         registrations.add(context.registerService(DeviceIdentifierMongoHandler.class, new TrackFileImportDeviceIdentifierMongoHandler(), getDict(TrackFileImportDeviceIdentifier.TYPE)));
         registrations.add(context.registerService(DeviceIdentifierJsonHandler.class, new TrackFileImportDeviceIdentifierJsonHandler(), getDict(TrackFileImportDeviceIdentifier.TYPE)));
         registrations.add(context.registerService(DeviceIdentifierStringSerializationHandler.class, new TrackFileImportDeviceIdentifierStringSerializationHandler(), getDict(TrackFileImportDeviceIdentifier.TYPE)));
+        registrations.add(context.registerService(DeviceIdentifierMongoHandler.class, new SmartphoneImeiMongoHandler(), getDict(SmartphoneImeiIdentifierImpl.TYPE)));
+        registrations.add(context.registerService(DeviceIdentifierJsonHandler.class, new SmartphoneImeiJsonHandler(), getDict(SmartphoneImeiIdentifierImpl.TYPE)));
+        registrations.add(context.registerService(DeviceIdentifierStringSerializationHandler.class, new SmartphoneImeiStringSerializationHandler(), getDict(SmartphoneImeiIdentifierImpl.TYPE)));
         registerGPSFixJsonService(context, new GPSFixJsonDeserializer(), new GPSFixJsonSerializer(), GPSFixJsonDeserializer.TYPE);
         registerGPSFixJsonService(context, new GPSFixMovingJsonDeserializer(), new GPSFixMovingJsonSerializer(), GPSFixMovingJsonDeserializer.TYPE);
         registrations.add(context.registerService(RaceLogTrackingAdapterFactory.class, RaceLogTrackingAdapterFactory.INSTANCE, null));

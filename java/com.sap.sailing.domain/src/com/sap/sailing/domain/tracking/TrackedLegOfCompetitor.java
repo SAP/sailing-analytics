@@ -325,6 +325,18 @@ public interface TrackedLegOfCompetitor extends Serializable {
      * @return {@code null} if the competitor has not started or already finished the leg
      */
     Distance getSignedCrossTrackError(TimePoint timePoint);
+    
+    /**
+     * Instead of projecting onto the course middle line connecting start and end of the leg,
+     * projects onto the wind axis, attached to the leg's end waypoint.
+     */
+    Distance getUnsignedCrossTrackErrorToWindAxis(TimePoint timePoint);
+
+    /**
+     * Instead of projecting onto the course middle line connecting start and end of the leg,
+     * projects onto the wind axis, attached to the leg's end waypoint.
+     */ 
+    Distance getSignedCrossTrackErrorToWindAxis(TimePoint timePoint);
 
     TrackedLeg getTrackedLeg();
 
@@ -401,6 +413,7 @@ public interface TrackedLegOfCompetitor extends Serializable {
     Double getExpeditionJibCarPortIfAvailable(TimePoint at);
     Double getExpeditionJibCarStbdIfAvailable(TimePoint at);
     Double getExpeditionMastButtIfAvailable(TimePoint at);
+    Double getExpeditionKickerTensionIfAvailable(TimePoint at);
     Double getAverageExpeditionAWA(TimePoint at);
     Double getAverageExpeditionAWS(TimePoint at);
     Double getAverageExpeditionTWA(TimePoint at);
@@ -440,4 +453,5 @@ public interface TrackedLegOfCompetitor extends Serializable {
     Double getAverageExpeditionJibCarPortIfAvailable(TimePoint at);
     Double getAverageExpeditionJibCarStbdIfAvailable(TimePoint at);
     Double getAverageExpeditionMastButtIfAvailable(TimePoint at);
+    Double getAverageExpeditionKickerTensionIfAvailable(TimePoint at);
 }

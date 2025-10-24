@@ -1,8 +1,8 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -11,8 +11,8 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
@@ -45,7 +45,7 @@ public class TrackSmootheningTest extends StoredTrackBasedTest {
      * into {@link #firstTracked} and {@link #firstData}. All events are converted into {@link GPSFixMovingImpl}
      * objects and appended to the {@link DynamicTrackedRace}s.
      */
-    @Before
+    @BeforeEach
     public void setupListener() throws InterruptedException, FileNotFoundException, IOException {
         tracks.putAll(loadTracks());
     }
@@ -78,7 +78,7 @@ public class TrackSmootheningTest extends StoredTrackBasedTest {
         try {
             Iterable<GPSFixMoving> fixes = track.getFixes();
             GPSFixMoving outlier = getAnyOutlier(fixes);
-            assertNull("Found unexpected outlier " + outlier + " in smoothened track", outlier); // assert that we did not find an outlier
+            assertNull(outlier, "Found unexpected outlier " + outlier + " in smoothened track"); // assert that we did not find an outlier
         } finally {
             track.unlockAfterRead();
         }

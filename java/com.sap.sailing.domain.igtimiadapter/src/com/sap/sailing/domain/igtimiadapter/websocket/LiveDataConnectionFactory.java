@@ -12,5 +12,10 @@ import com.sap.sailing.domain.igtimiadapter.LiveDataConnection;
  *
  */
 public interface LiveDataConnectionFactory {
+    /**
+     * @param deviceSerialNumbers
+     *            the serial numbers of the devices of which the caller is interested in receiving live data; if empty
+     *            or {@code null}, a {@code null} result is returned
+     */
     LiveDataConnection getOrCreateLiveDataConnection(Iterable<String> deviceSerialNumbers) throws Exception;
 }

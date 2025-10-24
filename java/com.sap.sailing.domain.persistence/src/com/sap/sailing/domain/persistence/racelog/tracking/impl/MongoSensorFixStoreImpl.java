@@ -74,6 +74,12 @@ public class MongoSensorFixStoreImpl extends MongoFixHandler implements MongoSen
     private final WriteConcern writeConcern;
     
     /**
+     * The read concern to use for reading/loading fixes and metadata. Tests can use this, e.g., to work with
+     * {@link ReadConcern#MAJORITY} in order to ensure they can read their own writes.
+     */
+    private final ReadConcern readConcern;
+    
+    /**
      * Lock object to be used when accessing {@link #listeners}.
      */
     private final NamedReentrantReadWriteLock listenersLock = new NamedReentrantReadWriteLock("Listeners collection lock of " + MongoSensorFixStoreImpl.class.getName(), false);
@@ -94,6 +100,7 @@ public class MongoSensorFixStoreImpl extends MongoFixHandler implements MongoSen
         fixesCollection = mongoOF.getGPSFixCollection(clientSession);
         metadataCollection = new MetadataCollection(mongoOF, fixServiceFinder, deviceServiceFinder, readConcern, writeConcern, metadataCollectionClientSession);
         this.writeConcern = writeConcern;
+        this.readConcern = readConcern;
         this.clientSession = clientSession;
     }
 
@@ -118,16 +125,14 @@ public class MongoSensorFixStoreImpl extends MongoFixHandler implements MongoSen
     @Override
     public <FixT extends Timed> void loadFixes(Consumer<FixT> consumer, DeviceIdentifier device, TimePoint from,
             TimePoint to, boolean inclusive) throws NoCorrespondingServiceRegisteredException, TransformationException {
-        loadFixes(consumer, device, from, to, inclusive, () -> false, (d) -> {
-        });
+        loadFixes(consumer, device, from, to, inclusive, () -> false, /* progress consumer */ d -> {});
     }
     
     @Override
     public <FixT extends Timed> void loadFixes(Consumer<FixT> consumer, DeviceIdentifier device, TimePoint from,
             TimePoint to, boolean inclusive, BooleanSupplier isPreemptiveStopped, Consumer<Double> progressConsumer)
                     throws NoCorrespondingServiceRegisteredException, TransformationException {
-        loadFixes(consumer, device, from, to, inclusive, isPreemptiveStopped, progressConsumer,
-                true, false);
+        loadFixes(consumer, device, from, to, inclusive, isPreemptiveStopped, progressConsumer, true, false);
     }
 
     private <FixT extends Timed> boolean loadFixes(Consumer<FixT> consumer, DeviceIdentifier device, TimePoint from,
@@ -147,7 +152,8 @@ public class MongoSensorFixStoreImpl extends MongoFixHandler implements MongoSen
             filters.add(Filters.lt(FieldNames.TIME_AS_MILLIS.name(), loadFixesTo.asMillis()));
         }
         Bson query = Filters.and(filters);
-        FindIterable<Document> result = clientSession == null ? fixesCollection.find(query) : fixesCollection.find(clientSession, query);
+        final MongoCollection<Document> fixesCollectionWithReadConcern = fixesCollection.withReadConcern(readConcern);
+        FindIterable<Document> result = clientSession == null ? fixesCollectionWithReadConcern.find(query) : fixesCollectionWithReadConcern.find(clientSession, query);
         result.batchSize(100000).sort(new Document(FieldNames.TIME_AS_MILLIS.name(), ascending ? 1 : -1));
         if (onlyOneResult) {
             result.limit(1);

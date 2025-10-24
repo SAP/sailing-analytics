@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import com.sap.sailing.server.gateway.subscription.SubscriptionWebHookHandler;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util.Pair;
+import com.sap.sse.security.SecurityService;
 import com.sap.sse.security.shared.UserManagementException;
 import com.sap.sse.security.shared.impl.User;
 import com.sap.sse.security.shared.subscription.Subscription;
@@ -100,50 +101,56 @@ public class ChargebeeWebHookHandler extends SubscriptionWebHookHandler {
                 || occuredAt.before(subscription.getManualUpdatedAt());
     }
 
-    private void processEvent(SubscriptionWebHookEvent event, User user) throws UserManagementException {
+    private void processEvent(final SubscriptionWebHookEvent event, final User user) throws UserManagementException {
         final SubscriptionWebHookEventType eventType = event.getEventType();
         if (eventType != null) {
             logger.info(() -> "Start process webhook event \"" + eventType.getName() + "\" for user " + user.getName());
-            final Subscription userSubscription = getCurrentUserSubscriptionFromEvent(user, event);
-            switch (eventType) {
-            case CUSTOMER_DELETED:
-                updateUserSubscription(user, buildEmptySubscription(userSubscription, event));
-                break;
-            case SUBSCRIPTION_DELETED:
-                if (userSubscription != null && userSubscription.getSubscriptionId() != null
-                        && userSubscription.getSubscriptionId().equals(event.getSubscriptionId())) {
+            final SecurityService securityService = context.getSecurityService();
+            securityService.lockSubscriptionsForUser(user);
+            try {
+                final Subscription userSubscription = getCurrentUserSubscriptionFromEvent(user, event);
+                switch (eventType) {
+                case CUSTOMER_DELETED:
                     updateUserSubscription(user, buildEmptySubscription(userSubscription, event));
-                }
-                break;
-            case SUBSCRIPTION_CREATED:
-            case SUBSCRIPTION_CHANGED:
-            case SUBSCRIPTION_ACTIVATED:
-            case PAYMENT_SUCCEEDED:
-            case PAYMENT_FAILED:
-            case SUBSCRIPTION_PAUSED:
-            case SUBSCRIPTION_RESUMED:
-            case SUBSCRIPTION_CANCELLED:
-                updateUserSubscription(user, buildSubscription(userSubscription, event));
-                break;
-            case PAYMENT_REFUNDED:
-                if (userSubscription.getInvoiceId() != null
-                        && userSubscription.getInvoiceId().equals(event.getInvoiceId())) {
+                    break;
+                case SUBSCRIPTION_DELETED:
+                    if (userSubscription != null && userSubscription.getSubscriptionId() != null
+                            && userSubscription.getSubscriptionId().equals(event.getSubscriptionId())) {
+                        updateUserSubscription(user, buildEmptySubscription(userSubscription, event));
+                    }
+                    break;
+                case SUBSCRIPTION_CREATED:
+                case SUBSCRIPTION_CHANGED:
+                case SUBSCRIPTION_ACTIVATED:
+                case PAYMENT_SUCCEEDED:
+                case PAYMENT_FAILED:
+                case SUBSCRIPTION_PAUSED:
+                case SUBSCRIPTION_RESUMED:
+                case SUBSCRIPTION_CANCELLED:
                     updateUserSubscription(user, buildSubscription(userSubscription, event));
-                }
-                break;
-            case INVOICE_GENERATED:
-                updateSubscriptionInvoice(user, userSubscription, event);
-                break;
-            case INVOICE_UPDATED:
-                if (userSubscription != null && userSubscription.getInvoiceId() != null
-                        && userSubscription.getInvoiceId().equals(event.getInvoiceId())) {
+                    break;
+                case PAYMENT_REFUNDED:
+                    if (userSubscription.getInvoiceId() != null
+                            && userSubscription.getInvoiceId().equals(event.getInvoiceId())) {
+                        updateUserSubscription(user, buildSubscription(userSubscription, event));
+                    }
+                    break;
+                case INVOICE_GENERATED:
                     updateSubscriptionInvoice(user, userSubscription, event);
+                    break;
+                case INVOICE_UPDATED:
+                    if (userSubscription != null && userSubscription.getInvoiceId() != null
+                            && userSubscription.getInvoiceId().equals(event.getInvoiceId())) {
+                        updateSubscriptionInvoice(user, userSubscription, event);
+                    }
+                    break;
+                default:
+                    logger.warning(
+                            () -> "Webhook event type was unknown and will not be processed ");
+                    break;
                 }
-                break;
-            default:
-                logger.warning(
-                        () -> "Webhook event type was unknown and will not be processed ");
-                break;
+            } finally {
+                securityService.unlockSubscriptionsForUser(user);
             }
             logger.info(() -> "Webhook event \"" + eventType.getName() + "\" has been processed for user "
                     + user.getName());

@@ -64,6 +64,8 @@ import com.sap.sailing.domain.ranking.RankingMetricConstructor;
 import com.sap.sailing.domain.regattalike.IsRegattaLike;
 import com.sap.sailing.domain.regattalike.RegattaLikeIdentifier;
 import com.sap.sailing.domain.regattalike.RegattaLikeListener;
+import com.sap.sailing.domain.shared.tracking.LineDetails;
+import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
 import com.sap.sailing.domain.tracking.CourseDesignChangedListener;
 import com.sap.sailing.domain.tracking.DynamicGPSFixTrack;
 import com.sap.sailing.domain.tracking.DynamicRaceDefinitionSet;
@@ -71,7 +73,6 @@ import com.sap.sailing.domain.tracking.DynamicSensorFixTrack;
 import com.sap.sailing.domain.tracking.DynamicTrackedRace;
 import com.sap.sailing.domain.tracking.DynamicTrackedRegatta;
 import com.sap.sailing.domain.tracking.GPSFixTrack;
-import com.sap.sailing.domain.tracking.LineDetails;
 import com.sap.sailing.domain.tracking.Maneuver;
 import com.sap.sailing.domain.tracking.MarkPassing;
 import com.sap.sailing.domain.tracking.MarkPositionAtTimePointCache;
@@ -86,7 +87,6 @@ import com.sap.sailing.domain.tracking.TrackedLeg;
 import com.sap.sailing.domain.tracking.TrackedLegOfCompetitor;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.domain.tracking.TrackedRaceStatus;
-import com.sap.sailing.domain.tracking.TrackingConnectorInfo;
 import com.sap.sailing.domain.tracking.TrackingDataLoader;
 import com.sap.sailing.domain.tracking.WindLegTypeAndLegBearingAndORCPerformanceCurveCache;
 import com.sap.sailing.domain.tracking.WindPositionMode;
@@ -111,6 +111,10 @@ public class MockedTrackedRace implements DynamicTrackedRace {
     private static final long serialVersionUID = 5827912985564121181L;
     private final WindTrack windTrack = new WindTrackImpl(/* millisecondsOverWhichToAverage */30000, /* useSpeed */
     true, "TestWindTrack");
+
+    @Override
+    public void initializeAfterDeserialization() {
+    }
 
     public WindTrack getWindTrack() {
         return windTrack;
@@ -1404,6 +1408,12 @@ public class MockedTrackedRace implements DynamicTrackedRace {
 
     @Override
     public UUID getCourseAreaId() {
+        return null;
+    }
+
+    @Override
+    public Double getPercentTargetBoatSpeed(Competitor competitor, TimePoint timePoint,
+            WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache) {
         return null;
     }
 }

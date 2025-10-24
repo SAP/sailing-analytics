@@ -70,9 +70,9 @@ public class BoatOverlay extends CanvasOverlayV3 {
     
     @Override
     protected void draw() {
-        if (mapProjection != null && boatFix != null) {
+        if (getMapProjection() != null && boatFix != null) {
             // the possible zoom level range is 0 to 21 (zoom level 0 would show the whole world)
-            final long worldWidth = (long) mapProjection.getWorldWidth();
+            final long worldWidth = (long) getMapProjection().getWorldWidth();
             final Util.Pair<Size, Size> boatScaleAndSize = boatScaleAndSizePerWorldWidthCache.computeIfAbsent(worldWidth, z->getBoatScaleAndSize(boatClass));
             final Size boatSizeScaleFactor = boatScaleAndSize.getA();
             canvasWidth = (int) (boatScaleAndSize.getB().getWidth());
@@ -94,7 +94,7 @@ public class BoatOverlay extends CanvasOverlayV3 {
                 lastDisplayMode = displayMode;
             }
             LatLng latLngPosition = coordinateSystem.toLatLng(boatFix.position);
-            Point boatPositionInPx = mapProjection.fromLatLngToDivPixel(latLngPosition);
+            Point boatPositionInPx = getMapProjection().fromLatLngToDivPixel(latLngPosition);
             setCanvasPosition(boatPositionInPx.getX() - getCanvas().getCoordinateSpaceWidth() / 2,
                     boatPositionInPx.getY() - getCanvas().getCoordinateSpaceHeight() / 2);
             // now rotate the canvas accordingly
@@ -135,7 +135,7 @@ public class BoatOverlay extends CanvasOverlayV3 {
     }
 
     private Size getCorrelatedBoatSize(Distance hullLength, Distance hullBeam) {
-        Size boatSizeInPixel = calculateBoundingBox(mapProjection, boatFix.position, hullLength, hullBeam);
+        Size boatSizeInPixel = calculateBoundingBox(getMapProjection(), boatFix.position, hullLength, hullBeam);
         changeBoatSizeIfTooShortHull(boatSizeInPixel, hullLength, hullBeam);
         changeBoatSizeIfTooNarrowBeam(boatSizeInPixel, hullLength, hullBeam);
         return boatSizeInPixel;

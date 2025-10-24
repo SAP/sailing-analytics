@@ -97,7 +97,7 @@ public class GetEventOverviewStageAction implements SailingAction<ResultWithTTL<
         if (isUpcomingOrPlanned(event, state)) {
             return new EventOverviewTickerStageDTO(event.getStartDate().asDate(), event.getName(), imageUrl);
         }
-        return new EventOverviewTickerStageDTO(null, null, imageUrl);
+        return new EventOverviewTickerStageDTO(null, event.getName(), imageUrl);
         
         // TODO do the full implementation
         

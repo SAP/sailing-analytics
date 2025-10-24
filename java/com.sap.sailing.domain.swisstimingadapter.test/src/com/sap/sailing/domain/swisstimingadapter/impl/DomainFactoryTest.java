@@ -4,8 +4,8 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.DomainFactory;
 import com.sap.sailing.domain.swisstimingadapter.RaceType;
@@ -15,7 +15,7 @@ public class DomainFactoryTest {
     
     private com.sap.sailing.domain.swisstimingadapter.impl.DomainFactoryImpl swissTimingDomainFactory;
 
-    @Before
+    @BeforeEach
     public void before() {
         com.sap.sailing.domain.base.DomainFactory baseDomainFactory = new com.sap.sailing.domain.base.impl.DomainFactoryImpl(DomainFactory.TEST_RACE_LOG_RESOLVER);
         swissTimingDomainFactory = new com.sap.sailing.domain.swisstimingadapter.impl.DomainFactoryImpl(

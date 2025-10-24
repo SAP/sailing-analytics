@@ -20,9 +20,4 @@ public class RegattaLogDeviceCompetitorExpeditionExtendedMappingEventImpl extend
             TimePoint from, TimePoint to) {
         super(createdAt, logicalTimePoint, author, pId, mappedTo, device, from, to);
     }
-
-    public RegattaLogDeviceCompetitorExpeditionExtendedMappingEventImpl(TimePoint logicalTimePoint, AbstractLogEventAuthor author,
-            Competitor mappedTo, DeviceIdentifier device, TimePoint from, TimePoint to) {
-        super(logicalTimePoint, author, mappedTo, device, from, to);
-    }
 }

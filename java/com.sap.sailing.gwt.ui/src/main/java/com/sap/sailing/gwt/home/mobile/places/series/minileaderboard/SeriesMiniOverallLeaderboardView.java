@@ -10,6 +10,7 @@ import com.sap.sailing.gwt.home.mobile.places.SeriesLeaderboardNavigationProvide
 import com.sap.sailing.gwt.home.mobile.places.series.OverallLeaderboardNavigationProvider;
 import com.sap.sailing.gwt.home.shared.app.PlaceNavigation;
 import com.sap.sailing.gwt.home.shared.places.fakeseries.SeriesContext;
+import com.sap.sse.security.ui.client.UserService;
 
 public interface SeriesMiniOverallLeaderboardView {
 
@@ -21,6 +22,8 @@ public interface SeriesMiniOverallLeaderboardView {
         PlaceNavigation<?> getSeriesNavigation();
 
         EventSeriesViewDTO getSeriesDTO();
+
+        UserService getUserService();
     }
 
     Widget asWidget();

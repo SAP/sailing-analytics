@@ -6,9 +6,9 @@ import com.sap.sse.datamining.impl.components.ProcessorInstructionPriority;
 
 public abstract class StatefulProcessorInstruction<ResultType> extends AbstractProcessorInstruction<ResultType> {
     
-    private boolean runWasCalled;
-    private boolean computeResultWasCalled;
-    private boolean computeResultWasFinished;
+    private volatile boolean runWasCalled;
+    private volatile boolean computeResultWasCalled;
+    private volatile boolean computeResultWasFinished;
 
     public StatefulProcessorInstruction(ProcessorInstructionHandler<ResultType> processor, int priority) {
         super(processor, priority);
@@ -50,5 +50,4 @@ public abstract class StatefulProcessorInstruction<ResultType> extends AbstractP
     public boolean computeResultWasFinished() {
         return computeResultWasFinished;
     }
-
 }

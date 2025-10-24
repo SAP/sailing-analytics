@@ -61,7 +61,7 @@ public class ClientConfigurationListener implements javax.servlet.ServletRequest
                 final ServletContext ctx = sre.getServletContext();
                 final String ctxDebrandingActive = (String) ctx
                         .getAttribute("clientConfigurationContext.debrandingActive");
-                final boolean deBrandingActive = Boolean.valueOf(System.getProperty(DEBRANDING_PROPERTY_NAME, "false"));
+                final boolean deBrandingActive = Boolean.valueOf(System.getProperty(DEBRANDING_PROPERTY_NAME, "true"));
                 if (ctxDebrandingActive == null
                         || !Boolean.toString(deBrandingActive).equalsIgnoreCase(ctxDebrandingActive)) {
                     createReplacementMap(deBrandingActive).forEach((k, v) -> {

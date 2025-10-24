@@ -7,3 +7,5 @@ REPLICATE_MASTER_SERVLET_PORT=8888
 REPLICATE_MASTER_QUEUE_HOST=rabbit.internal.sapsailing.com
 REPLICATE_MASTER_QUEUE_PORT=5672
 ADDITIONAL_JAVA_ARGS="$ADDITIONAL_JAVA_ARGS -Dorg.eclipse.jetty.LEVEL=OFF -Dorg.eclipse.jetty.util.log.class=org.eclipse.jetty.util.log.StdErrLog -XX:ThreadPriorityPolicy=2"
+# Activate SAP Branding
+ADDITIONAL_JAVA_ARGS="$ADDITIONAL_JAVA_ARGS -Dcom.sap.sse.debranding=false"

@@ -11,6 +11,7 @@ import com.sap.sailing.gwt.settings.client.leaderboard.SingleRaceLeaderboardSett
 import com.sap.sailing.gwt.settings.client.leaderboard.SingleRaceLeaderboardSettingsDialogComponent;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sse.common.settings.generic.support.SettingsUtil;
+import com.sap.sse.security.ui.client.SecurityChildSettingsContext;
 import com.sap.sse.security.ui.client.premium.PaywallResolver;
 
 public class SingleRaceLeaderboardPanelLifecycle extends LeaderboardPanelLifecycle<SingleRaceLeaderboardSettings> {
@@ -40,7 +41,8 @@ public class SingleRaceLeaderboardPanelLifecycle extends LeaderboardPanelLifecyc
         raceDetails.add(DetailType.NUMBER_OF_MANEUVERS);
         raceDetails.add(DetailType.RACE_DISPLAY_LEGS);
         List<DetailType> overallDetails = new ArrayList<>();
-        SingleRaceLeaderboardSettings defaultSettings = new SingleRaceLeaderboardSettings(canBoatsOfCompetitorsChangePerRace);
+        SecurityChildSettingsContext context = new SecurityChildSettingsContext(leaderboardDTO, paywallResolver);
+        SingleRaceLeaderboardSettings defaultSettings = new SingleRaceLeaderboardSettings(canBoatsOfCompetitorsChangePerRace, context);
         // don't show competitor fullName column if even leaderboard isn't shown initially
         final boolean showCompetitorFullNameColumn = isScreenLargeEnoughToInitiallyDisplayLeaderboard;
         SingleRaceLeaderboardSettings settings = new SingleRaceLeaderboardSettings(
@@ -51,7 +53,7 @@ public class SingleRaceLeaderboardPanelLifecycle extends LeaderboardPanelLifecyc
                 showCompetitorFullNameColumn, 
                 /* showCompetitorBoatInfoColumn */ canBoatsOfCompetitorsChangePerRace,
                 /* isCompetitorNationalityColumnVisible */ false, 
-                /* showRaceRankColumn */ false);
+                /* showRaceRankColumn */ false, context);
         SettingsUtil.copyDefaultsFromValues(settings, settings);
         return settings;
     }

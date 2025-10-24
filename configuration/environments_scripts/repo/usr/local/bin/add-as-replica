@@ -1,0 +1,25 @@
+#!/bin/bash
+user_data=$( ec2-metadata -d | sed -e 's/^user-data: //' )
+if echo ${user_data} | grep -q "^image-upgrade$"; then
+  echo "Image upgrade... didn't expect to get this far because ephemeralvolume should have triggered upgrade and shutdown. Not registering MongoDB replica"
+else
+  eval ${user_data}
+  if [ -z "$REPLICA_SET_NAME" ]; then
+    REPLICA_SET_NAME=live
+  fi
+  if [ -z "$REPLICA_SET_PRIMARY" ]; then
+    REPLICA_SET_PRIMARY=mongo0.internal.sapsailing.com:27017
+  fi
+  if [ -z "$REPLICA_SET_PRIORITY" ]; then
+    REPLICA_SET_PRIORITY=1
+  fi
+  if [ -z "$REPLICA_SET_VOTES" ]; then
+    REPLICA_SET_VOTES=0
+  fi
+  if [ -n "$REPLICA_SET_PRIMARY" ]; then
+    IP=$(ec2-metadata -o | sed -e 's/^local-ipv4: //')
+    mongosh --quiet --eval "rs.add({host: \"$IP:27017\", priority: $REPLICA_SET_PRIORITY, votes: $REPLICA_SET_VOTES})" "mongodb://$REPLICA_SET_PRIMARY/?replicaSet=$REPLICA_SET_NAME&retryWrites=true"
+  else
+    mongosh --quiet --eval "rs.initiate()"
+  fi
+fi

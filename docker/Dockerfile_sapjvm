@@ -1,5 +1,5 @@
 FROM buildpack-deps:bullseye
-ARG SAPJVM_VERSION=8.1.098
+ARG SAPJVM_VERSION=8.1.106
 LABEL maintainer=axel.uhl@sap.com
 # Download and extract the SAP JVM 8
 ENV PATH=${PATH}:/opt/sapjvm_8/bin

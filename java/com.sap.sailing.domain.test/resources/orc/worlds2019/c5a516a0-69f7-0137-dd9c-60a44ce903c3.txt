@@ -1,15 +1,14 @@
 stored-uri:datafiles/c5a516a0-69f7-0137-dd9c-60a44ce903c3.mtb
 StartReplay:1
 
-//live-uri:tcp://event.tractrac.com:44003
-//stored-uri:tcp://event.tractrac.com:44013
-dataservers:{"stored":["tcp:\/\/event.tractrac.com:44011","tcp:\/\/event.tractrac.com:44012","tcp:\/\/event.tractrac.com:44013","tcp:\/\/event.tractrac.com:44014"],"live":["tcp:\/\/event.tractrac.com:44001","tcp:\/\/event.tractrac.com:44002","tcp:\/\/event.tractrac.com:44003","tcp:\/\/event.tractrac.com:44004"],"ws":["ws:\/\/event.tractrac.com:8891","ws:\/\/event.tractrac.com:8892","ws:\/\/event.tractrac.com:8893","ws:\/\/event.tractrac.com:8894"]}
+//live-uri:tcp://historical1.tractrac.com:4400
+//stored-uri:tcp://historical1.tractrac.com:4401
 ResultColumn4Defaultorder:0
 EnableLadderLines:
 LadderLineDistance:100
 DefaultPanel:
-ws-uri:ws://event.tractrac.com:8888
-PerformanceTableLayout:[{"key":"Pos","header":"Pos","tooltip":"Position"},{"key":"Name","header":"Name","tooltip":"Name"},{"key":"Short","header":"Short","tooltip":"Short name"},{"key":"Country","header":"Country","tooltip":"Country"},{"key":"After","header":"After","tooltip":"After"},{"key":"Leg pos","header":"Leg pos","tooltip":"Leg position"},{"key":"Leg time","header":"Leg time","tooltip":"Leg time"},{"key":"SOG","header":"SOG","tooltip":"SOG"},{"key":"VMG","header":"VMG","tooltip":"VMG"},{"key":"Top speed","header":"Top Speed","tooltip":"Top Speed"},{"key":"Distance","header":"Distance","tooltip":"Distance"}]
+ws-uri:ws://tracms.traclive.dk:8888
+PerformanceTableLayout:[{"key":"Pos","header":"Pos","tooltip":"Position","options":null},{"key":"Name","header":"Name","tooltip":"Name","options":null},{"key":"Short","header":"Short","tooltip":"Short name","options":null},{"key":"Country","header":"Country","tooltip":"Country","options":null},{"key":"After","header":"After","tooltip":"After","options":null},{"key":"Leg pos","header":"Leg pos","tooltip":"Leg position","options":null},{"key":"Leg time","header":"Leg time","tooltip":"Leg time","options":null},{"key":"SOG","header":"SOG","tooltip":"SOG","options":null},{"key":"VMG","header":"VMG","tooltip":"VMG","options":null},{"key":"Top speed","header":"Top Speed","tooltip":"Top Speed","options":null},{"key":"Distance","header":"Distance","tooltip":"Distance","options":null}]
 ResultsLayout:[{"key":"Order","header":"#","description":"Position","printable":true,"align":"right","collapsible":false},{"key":"Name","header":"Name","description":"Competitor's name","printable":true,"align":"left","collapsible":false},{"key":"ShortName","header":"Short Name","description":"Competitor's short name","printable":true,"align":"left","collapsible":true},{"key":"LegTime","header":"Leg","description":"Leg time","printable":false,"align":"right","collapsible":true},{"key":"LegPosition","header":"#","description":"Leg position","printable":false,"align":"right","collapsible":true},{"key":"Time","header":"Total","description":"Total time","printable":true,"align":"right","collapsible":false},{"key":"After","header":"Total \u0026Delta;","description":"Total \u0026Delta;","printable":true,"align":"right","collapsible":false}]
 ReCalcDirAndSpeed:
 smsProvider:0
@@ -24,7 +23,7 @@ Marker4MinPixelSize:5
 Marker4Radius:5
 ExcludeRankInfo:
 CompetitorPopUp:1
-TailWidth:4
+TailWidth:1
 DisableMarkTicker:
 LeaderboardMaxSize:
 ShowLeadersNumber:1
@@ -87,6 +86,7 @@ APmarkSwitch:0.13
 APmarkZoomBehindMarks:0.10
 APmarkZoomInFrontOfMarks:0.20
 PopupMarkerUUID:84199024-2c45-11e4-a9f6-14dae9614d7b
+LabelNoBackground:0
 ResultColumn1Visible:1
 ResultColumn1DefaultOrder:1
 ResultColumn1Tooltip:
@@ -137,7 +137,7 @@ MaxMetersPerSecond:20
 PrecisionMeters:20
 ShortAvgTime:180
 LongAvgTime:900
-TimeZone:2
+TimeZone:1
 CompMarkerTimeout:0
 FramesPerSecond:15
 replayspeedup:5
@@ -169,6 +169,12 @@ StartTimeType:Race
 delayIntervals:3,12,15
 DisableChangeRace:
 DisableLatestRoundings:0
+MarkerSymbol:standardBoat
+MarkerMinPixelSize:36
+ShowFlagInLabel:0
+ShowRankInLabel:1
+TailOpacity:70
+TailWidth:1
 cis:2
 DatabaseVersion:01.00.20
 PopUpRow1Name:
@@ -198,6 +204,7 @@ LiveDelaySecs: 70
 LiveDelaySecsRace: 
 LiveDelaySecsEvent: 70
 
+Maps:[]
 
 EventID:1a9551c0-3913-0137-6637-60a44ce903c3
 EventName:D-Marin ORC World Championship
@@ -206,19 +213,24 @@ EventDB:event_20190529_DMarinORCW
 EventStartTime:2019-06-01 22:00:00
 EventEndTime:2019-06-08 21:00:00
 EventType:a1b74ca0-fdd8-11dc-8811-005056c00008
+EventJSON:https://historical1.tractrac.com/events/event_20190529_DMarinORCW/jsonservice.php
 DBReplicaEnabled:0
 HighLoadEnabled:1
+MultipleDataservers:0
+WebURL:https://www.tractrac.com/event-page/event_20190529_DMarinORCW/1685
 
 RaceID:c5a516a0-69f7-0137-dd9c-60a44ce903c3
 RaceName:ORC A - Race 4
 RaceStartTime:2019-06-06 11:10:00
 RaceEndTime:
-RaceTrackingStartTime:2019-06-06 08:55:37
+RaceTrackingStartTime:2019-06-06 11:05:00
 RaceTrackingEndTime:2019-06-06 13:04:28
 Initialized:1
 RaceDefaultRouteUUID:8e293690-69f7-0137-dd9b-60a44ce903c3
 RaceHandicapSystem:NONE
 RaceStatus:OFFICIAL
+RaceStatusTime:
+RaceStatusUpdatedAt:
 RaceCourseArea:Standard
 
 Image1UUID:552f27f0-679a-0137-b182-60a44ce903c3
@@ -303,6 +315,7 @@ Image16Image:http://traclive.dk/events/event_20100806_SailforGol/images/EST.gif
 
 Class1UUID:9edb88e0-6798-0137-b083-60a44ce903c3
 Class1Name:ORC A
+Class1BoatClassId:
 
 Team1UUID:1b8309e0-69f8-0137-ddcd-60a44ce903c3
 Team1Name:TP52
@@ -534,47 +547,71 @@ Comp13StatusTime:2019-06-06 12:19:05
 Comp13RouteUUID:8e293690-69f7-0137-dd9b-60a44ce903c3
 Comp13Color:795548
 
-ControlPoint1UUID:0afde760-6798-0137-b073-60a44ce903c3
-ControlPoint1Name:AC Finish
-ControlPoint1HasTwoPoints:1
-ControlPoint1ShortName:F
-ControlPoint1CourseArea:Standard
-ControlPoint1Mark1Lon:15.788256
-ControlPoint1Mark1Lat:43.652692
-ControlPoint1Mark1Static:0
-ControlPoint1Mark2Lon:15.788280
-ControlPoint1Mark2Lat:43.652705
-ControlPoint1Mark2Static:0
+PositionedItem1UUID:ac791070-8845-013d-67a1-1c6b00518c70
+PositionedItem1Name:AC Finish - 1
+PositionedItem1CourseArea:Standard
+PositionedItem1Static:0
+PositionedItem1Positions:
+PositionedItem1DataSheet:
 
-ControlPoint2UUID:d73931e0-6797-0137-b063-60a44ce903c3
-ControlPoint2Name:AC 1
-ControlPoint2HasTwoPoints:0
-ControlPoint2ShortName:1
-ControlPoint2CourseArea:Standard
-ControlPoint2Mark1Lon:15.788339
-ControlPoint2Mark1Lat:43.652794
-ControlPoint2Mark1Static:0
+PositionedItem2UUID:aceeb9d0-8845-013d-67a2-1c6b00518c70
+PositionedItem2Name:AC Finish - 2
+PositionedItem2CourseArea:Standard
+PositionedItem2Static:0
+PositionedItem2Positions:
+PositionedItem2DataSheet:
 
-ControlPoint3UUID:de61c1f0-6797-0137-b066-60a44ce903c3
-ControlPoint3Name:AC 1a
-ControlPoint3HasTwoPoints:0
-ControlPoint3ShortName:1a
-ControlPoint3CourseArea:Standard
-ControlPoint3Mark1Lon:15.788332
-ControlPoint3Mark1Lat:43.652783
-ControlPoint3Mark1Static:0
+PositionedItem3UUID:c15d4eb0-8845-013d-67ea-1c6b00518c70
+PositionedItem3Name:AC 1
+PositionedItem3CourseArea:Standard
+PositionedItem3Static:0
+PositionedItem3Positions:
+PositionedItem3DataSheet:
 
-ControlPoint4UUID:fe419020-6797-0137-b06f-60a44ce903c3
-ControlPoint4Name:AC Gate
-ControlPoint4HasTwoPoints:1
-ControlPoint4ShortName:G
-ControlPoint4CourseArea:Standard
-ControlPoint4Mark1Lon:15.788240
-ControlPoint4Mark1Lat:43.652662
-ControlPoint4Mark1Static:0
-ControlPoint4Mark2Lon:15.788270
-ControlPoint4Mark2Lat:43.652706
-ControlPoint4Mark2Static:0
+PositionedItem4UUID:c21d8330-8845-013d-67eb-1c6b00518c70
+PositionedItem4Name:AC 1a
+PositionedItem4CourseArea:Standard
+PositionedItem4Static:0
+PositionedItem4Positions:
+PositionedItem4DataSheet:
+
+PositionedItem5UUID:c80c78a0-8845-013d-67f2-1c6b00518c70
+PositionedItem5Name:AC Gate - 1
+PositionedItem5CourseArea:Standard
+PositionedItem5Static:0
+PositionedItem5Positions:
+PositionedItem5DataSheet:
+
+PositionedItem6UUID:c9962da0-8845-013d-67f3-1c6b00518c70
+PositionedItem6Name:AC Gate - 2
+PositionedItem6CourseArea:Standard
+PositionedItem6Static:0
+PositionedItem6Positions:
+PositionedItem6DataSheet:
+
+MapItem1UUID:0afde760-6798-0137-b073-60a44ce903c3
+MapItem1Name:AC Finish
+MapItem1ShortName:F
+MapItem1PositionedItemIds:["ac791070-8845-013d-67a1-1c6b00518c70", "aceeb9d0-8845-013d-67a2-1c6b00518c70"]
+MapItem1CourseArea:Standard
+
+MapItem2UUID:d73931e0-6797-0137-b063-60a44ce903c3
+MapItem2Name:AC 1
+MapItem2ShortName:1
+MapItem2PositionedItemIds:["c15d4eb0-8845-013d-67ea-1c6b00518c70"]
+MapItem2CourseArea:Standard
+
+MapItem3UUID:de61c1f0-6797-0137-b066-60a44ce903c3
+MapItem3Name:AC 1a
+MapItem3ShortName:1a
+MapItem3PositionedItemIds:["c21d8330-8845-013d-67eb-1c6b00518c70"]
+MapItem3CourseArea:Standard
+
+MapItem4UUID:fe419020-6797-0137-b06f-60a44ce903c3
+MapItem4Name:AC Gate
+MapItem4ShortName:G
+MapItem4PositionedItemIds:["c80c78a0-8845-013d-67f2-1c6b00518c70", "c9962da0-8845-013d-67f3-1c6b00518c70"]
+MapItem4CourseArea:Standard
 
 SegmentFile:segments.php
 Route1UUID:8e293690-69f7-0137-dd9b-60a44ce903c3

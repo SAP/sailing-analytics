@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+    version="3.1">
+
+	<!-- Disable directory listing: -->
+	<servlet>
+		<servlet-name>default</servlet-name>
+		<servlet-class>org.eclipse.jetty.servlet.DefaultServlet
+		</servlet-class>
+		<init-param>
+			<param-name>dirAllowed</param-name>
+			<param-value>false</param-value>
+		</init-param>
+	</servlet>
+	
+    <context-param>
+        <param-name>shiroEnvironmentClass</param-name>
+        <param-value>org.apache.shiro.web.env.IniWebEnvironment</param-value>
+    </context-param>
+    
+        <!-- Apache Shiro -->
+    
+    <listener>
+        <listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
+    </listener>
+    <filter>
+        <filter-name>ShiroFilter</filter-name>
+        <filter-class>com.sap.sse.security.shiro.ShiroFilterForAllButOptionsRequests</filter-class>
+    </filter>
+    <!-- Make sure any request you want accessible to Shiro is filtered. "/*" 
+         catches all requests. Usually this filter mapping is defined first (before all 
+         others) to ensure that Shiro works in subsequent filters in the filter chain: -->
+    <filter-mapping>
+        <filter-name>ShiroFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>ERROR</dispatcher>
+    </filter-mapping>
+
+	<servlet>
+		<servlet-name>SAP Sailing AI Agent REST API</servlet-name>
+		<servlet-class>com.sap.sailing.aiagent.gateway.impl.RestServletContainer</servlet-class>
+		<init-param>
+			<param-name>javax.ws.rs.Application</param-name>
+			<param-value>com.sap.sailing.aiagent.gateway.impl.RestApiApplication</param-value>
+		</init-param>
+        <init-param>
+                <param-name>com.sun.jersey.config.feature.DisableWADL</param-name>
+                <param-value>true</param-value>
+        </init-param>
+    	<load-on-startup>1</load-on-startup>
+   	</servlet>
+	<servlet-mapping>
+    	<servlet-name>SAP Sailing AI Agent REST API</servlet-name>
+    	<url-pattern>/*</url-pattern>
+  	</servlet-mapping>
+</web-app>

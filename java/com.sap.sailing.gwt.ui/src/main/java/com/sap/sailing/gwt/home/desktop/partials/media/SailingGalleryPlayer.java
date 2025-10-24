@@ -19,11 +19,15 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.ResizeComposite;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.HasSelectionChangedHandlers;
-import com.sap.sailing.gwt.home.communication.media.SailingImageDTO;
+import com.sap.sailing.gwt.ui.shared.SailingImageDTO;
 import com.sap.sse.common.Util;
+import com.sap.sse.gwt.client.media.MediaMenuIcon;
+import com.sap.sse.gwt.client.media.TakedownNoticeService;
+import com.sap.sse.gwt.common.CommonSharedResources;
 
 public class SailingGalleryPlayer extends ResizeComposite implements HasSelectionChangedHandlers, HasClickHandlers {
     private static MyBinder uiBinder = GWT.create(MyBinder.class);
@@ -38,12 +42,18 @@ public class SailingGalleryPlayer extends ResizeComposite implements HasSelectio
     private int selectedIdx;
     private final List<SailingImageDTO> images;
 
-    public SailingGalleryPlayer(SailingImageDTO selected, Collection<SailingImageDTO> images) {
+    public SailingGalleryPlayer(SailingImageDTO selected, Collection<SailingImageDTO> images, TakedownNoticeService takedownNoticeService) {
         initWidget(uiBinder.createAndBindUi(this));
         selectedIdx = Math.max(0, Util.indexOf(images, selected));
         this.images = new ArrayList<SailingImageDTO>(images.size());
         for (SailingImageDTO i : images) {
-            mainSliderUi.appendChild(createMainImgElement(i));
+            final DivElement mainImgElement = createMainImgElement(i);
+            final MediaMenuIcon mmi = new MediaMenuIcon(takedownNoticeService, "takedownRequestForEventGalleryImage");
+            mmi.setFontSize("20px");
+            RootPanel.get().add(mmi); // required to attach to the DOM and let the mouse click handler become effective
+            mmi.setData(i.getEventLink().getDisplayName(), i.getSourceRef());
+            mainImgElement.appendChild(mmi.getElement());
+            mainSliderUi.appendChild(mainImgElement);
             subSliderUi.appendChild(createThumbImgElement(i));
             this.images.add(i);
         }
@@ -73,6 +83,7 @@ public class SailingGalleryPlayer extends ResizeComposite implements HasSelectio
     
     private DivElement createMainImgElement(SailingImageDTO i) {
         DivElement img = Document.get().createDivElement();
+        img.addClassName(CommonSharedResources.INSTANCE.mainCss().media_wrapper());
         img.getStyle().setBackgroundImage("url(\"" + i.getSourceRef() + "\")");
         img.getStyle().setProperty("backgroundSize", "contain");
         img.getStyle().setProperty("backgroundRepeat", "no-repeat");

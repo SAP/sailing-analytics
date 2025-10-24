@@ -1,6 +1,12 @@
 package com.sap.sailing.domain.igtimiadapter;
 
+import com.sap.sailing.domain.igtimiadapter.impl.SensorImpl;
+
 public interface Sensor {
+    static Sensor create(String deviceSerialNumber, long subDeviceId) {
+        return new SensorImpl(deviceSerialNumber, subDeviceId);
+    }
+    
     /**
      * The ID called "serial number" by Igtimi. This identifies the microcontroller-like device that can mange several sensors
      * such as wind, GPS or heart rate. Together with the type code and the optional {@link #getSensorId() sub-device ID} as used

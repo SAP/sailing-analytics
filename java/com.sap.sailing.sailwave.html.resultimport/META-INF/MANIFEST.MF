@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Resultimport
+Bundle-SymbolicName: com.sap.sailing.sailwave.html.resultimport
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: com.sap.sailing.sailwave.html.resultimport.impl.Activator
+Bundle-Vendor: SAP
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Automatic-Module-Name: com.sap.sailing.sailwave.html.resultimport
+Import-Package: org.apache.commons.lang;version="[2.6.0,3.0.0)",
+ org.osgi.framework;version="1.3.0",
+ org.osgi.util.tracker;version="[1.5.0,2.0.0)"
+Require-Bundle: com.sap.sailing.resultimport,
+ com.sap.sailing.domain.common,
+ com.sap.sailing.domain.shared.android,
+ com.sap.sse.common
+Bundle-ActivationPolicy: lazy

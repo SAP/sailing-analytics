@@ -105,8 +105,12 @@
     </capabilities>
   </driver-definition>
   -->
-  <!-- <driver-definition class="com.sap.sailing.selenium.core.HeadlessFirefoxDriver">
-  </driver-definition> -->
-  <!-- <driver-definition class="com.sap.sailing.selenium.core.HeadlessChromeDriver">
-  </driver-definition> -->
+  <!--
+  <driver-definition class="com.sap.sailing.selenium.core.HeadlessFirefoxDriver">
+  </driver-definition>
+  -->
+  <!--
+  <driver-definition class="com.sap.sailing.selenium.core.HeadlessChromeDriver">
+  </driver-definition>
+  -->
 </test-environment>

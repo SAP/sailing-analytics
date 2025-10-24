@@ -18,10 +18,11 @@ public class LeaderboardPerspectiveOwnSettings extends AbstractGenericSerializab
     private transient BooleanSetting livePlay;
     
     LeaderboardPerspectiveOwnSettings() {
-
+        super();
     }
     
     public LeaderboardPerspectiveOwnSettings(boolean showRaceDetails) {
+        this();
         this.showRaceDetails.setValue(showRaceDetails);
     }
     

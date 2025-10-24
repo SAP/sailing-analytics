@@ -19,7 +19,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -86,13 +85,9 @@ public class LeaderboardGroupsResource extends AbstractSailingServerResource {
         final JSONArray jsonLeaderboardGroups = getLeaderboardGroups(leaderboardGroup->leaderboardGroup.getName());
         // header option is set to allow communication between two sapsailing servers, especially for
         // the master data import functionality
-        return addAccessControlAllowOriginHeader(Response.ok(streamingOutput(jsonLeaderboardGroups))).build();
+        return Response.ok(streamingOutput(jsonLeaderboardGroups)).build();
     }
 
-    private ResponseBuilder addAccessControlAllowOriginHeader(ResponseBuilder responseBuilder) {
-        return responseBuilder.header("Access-Control-Allow-Origin", "*");
-    }
-    
     private JSONArray getLeaderboardGroups(Function<LeaderboardGroup, Object> resultObjectSupplier) {
         JSONArray jsonLeaderboardGroups = new JSONArray();
         for (final LeaderboardGroup leaderboardGroupEntry : getService().getLeaderboardGroups().values()) {
@@ -117,7 +112,7 @@ public class LeaderboardGroupsResource extends AbstractSailingServerResource {
         });
         // header option is set to allow communication between two sapsailing servers, especially for
         // the master data import functionality
-        return addAccessControlAllowOriginHeader(Response.ok(streamingOutput(jsonLeaderboardGroups))).build();
+        return Response.ok(streamingOutput(jsonLeaderboardGroups)).build();
     }
 
     @GET
@@ -139,21 +134,27 @@ public class LeaderboardGroupsResource extends AbstractSailingServerResource {
                     .type(MediaType.TEXT_PLAIN).build();
         } else {
             if (getSecurityService().hasCurrentUserReadPermission(leaderboardGroup)) {
-                TimePoint timePoint = MillisecondsTimePoint.now();
-                JSONObject jsonLeaderboardGroup = new JSONObject();
+                final TimePoint timePoint = MillisecondsTimePoint.now();
+                final JSONObject jsonLeaderboardGroup = new JSONObject();
                 jsonLeaderboardGroup.put(LeaderboardGroupConstants.NAME, leaderboardGroup.getName());
                 jsonLeaderboardGroup.put(LeaderboardGroupConstants.ID, leaderboardGroup.getId().toString());
                 jsonLeaderboardGroup.put(LeaderboardGroupConstants.DISPLAYNAME, leaderboardGroup.getDisplayName());
                 jsonLeaderboardGroup.put(LeaderboardGroupConstants.DESCRIPTION, leaderboardGroup.getDescription());
                 jsonLeaderboardGroup.put(LeaderboardGroupConstants.TIMEPOINT, timePoint.toString());
+                jsonLeaderboardGroup.put(LeaderboardGroupConstants.TIMEPOINT_MILLIS, timePoint.asMillis());
+                jsonLeaderboardGroup.put(LeaderboardGroupConstants.HAS_OVERALL_LEADERBOARD, leaderboardGroup.hasOverallLeaderboard());
+                if (leaderboardGroup.hasOverallLeaderboard()) {
+                    jsonLeaderboardGroup.put(LeaderboardGroupConstants.OVERALL_LEADERBOARD_NAME, leaderboardGroup.getOverallLeaderboardName());
+                }
                 final Set<Event> eventsReferencingLeaderboardGroup = new HashSet<>();
-                JSONArray idsOfEventsReferencingLeaderboardGroup = new JSONArray();
+                final JSONArray idsOfEventsReferencingLeaderboardGroup = new JSONArray();
                 for (final Event event : getService().getAllEvents()) {
                     if (Util.contains(event.getLeaderboardGroups(), leaderboardGroup)) {
                         eventsReferencingLeaderboardGroup.add(event);
                         idsOfEventsReferencingLeaderboardGroup.add(event.getId().toString());
                     }
                 }
+                Collections.sort(idsOfEventsReferencingLeaderboardGroup, (id1, id2)->id1.toString().compareTo(id2.toString()));
                 jsonLeaderboardGroup.put(LeaderboardGroupConstants.EVENTS, idsOfEventsReferencingLeaderboardGroup);
                 JSONArray jsonLeaderboardEntries = new JSONArray();
                 jsonLeaderboardGroup.put(LeaderboardGroupConstants.LEADERBOARDS, jsonLeaderboardEntries);
@@ -166,6 +167,10 @@ public class LeaderboardGroupsResource extends AbstractSailingServerResource {
                         jsonLeaderboard.put(LeaderboardNameConstants.DISPLAYNAME, leaderboard.getDisplayName());
                         jsonLeaderboard.put(LeaderboardNameConstants.ISMETALEADERBOARD, isMetaLeaderboard);
                         jsonLeaderboard.put(LeaderboardNameConstants.ISREGATTALEADERBOARD, isRegattaLeaderboard);
+                        final JSONArray discardIndices = AbstractLeaderboardsResource.getDiscardingRuleAsJson(leaderboard);
+                        if (discardIndices != null) {
+                            jsonLeaderboard.put(LeaderboardNameConstants.DISCARDS, discardIndices);
+                        }
                         jsonLeaderboardEntries.add(jsonLeaderboard);
                         SettableScoreCorrection scoreCorrection = leaderboard.getScoreCorrection();
                         if (scoreCorrection != null) {
@@ -173,6 +178,8 @@ public class LeaderboardGroupsResource extends AbstractSailingServerResource {
                             TimePoint lastUpdateTimepoint = scoreCorrection.getTimePointOfLastCorrectionsValidity();
                             jsonLeaderboard.put(LeaderboardNameConstants.LASTSCORINGUPDATE,
                                     lastUpdateTimepoint != null ? lastUpdateTimepoint.asDate().toString() : null);
+                            jsonLeaderboard.put(LeaderboardNameConstants.LASTSCORINGUPDATE_MILLIS,
+                                    lastUpdateTimepoint != null ? lastUpdateTimepoint.asMillis() : null);
                         } else {
                             jsonLeaderboard.put(LeaderboardNameConstants.SCORINGCOMMENT, null);
                             jsonLeaderboard.put(LeaderboardNameConstants.LASTSCORINGUPDATE, null);

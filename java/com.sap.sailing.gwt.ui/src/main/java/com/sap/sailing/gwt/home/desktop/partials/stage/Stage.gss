@@ -90,6 +90,7 @@
   -o-transition: opacity 1s ease;
   -ms-transition: opacity 1s ease;
   transition: opacity 1s ease;
+  pointer-events: none; /* allow hover events to reach the background image wrapper for takedown button to appear on hover */
 }
 .stageteaser_content_headerhidden {
   opacity: 0;

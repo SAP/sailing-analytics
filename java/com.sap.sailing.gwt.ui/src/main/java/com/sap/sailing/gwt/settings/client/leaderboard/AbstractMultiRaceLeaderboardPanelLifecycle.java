@@ -15,7 +15,7 @@ public abstract class AbstractMultiRaceLeaderboardPanelLifecycle<T extends Leade
     protected final boolean canBoatInfoBeShown;
     protected final PaywallResolver paywallResolver;
     protected final AbstractLeaderboardDTO leaderboardDTO;
-    
+
     public AbstractMultiRaceLeaderboardPanelLifecycle(AbstractLeaderboardDTO leaderboard, StringMessages stringMessages,
             Iterable<DetailType> availableDetailTypes, PaywallResolver paywallResolver) {
         this(leaderboard, leaderboard != null ? leaderboard.getNamesOfRaceColumns() : new ArrayList<String>(),

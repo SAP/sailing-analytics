@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -9,8 +9,8 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.Map.Entry;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Boat;
 import com.sap.sailing.domain.base.Competitor;
@@ -28,7 +28,7 @@ public class NonCompetingCompetitorTest extends AbstractManeuverDetectionTestCas
     }
 
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         super.setUp(

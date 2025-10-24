@@ -6,7 +6,11 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: SAP
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.hamcrest;bundle-version="2.2.0",
- org.junit;bundle-version="4.8.2",
+ junit-jupiter-api;bundle-version="5.11.3",
+ junit-jupiter-engine;bundle-version="5.11.3",
+ junit-platform-commons;bundle-version="1.11.3",
+ junit-platform-engine;bundle-version="1.11.3",
+ org.opentest4j;bundle-version="1.3.0",
  org.openqa.selenium.osgi;bundle-version="3.13.0",
  com.sap.sse.mongodb;bundle-version="1.0.0",
  com.sap.sailing.domain.common,
@@ -20,9 +24,22 @@ Require-Bundle: org.hamcrest;bundle-version="2.2.0",
  com.sap.sse.security
 Bundle-ClassPath: .
 Automatic-Module-Name: com.sap.sailing.selenium.test
-Import-Package: com.sap.sailing.server.security,
+Import-Package: com.google.protobuf;version="[4.28.0,5.0.0)",
+ com.sap.sailing.domain.igtimiadapter,
+ com.sap.sailing.domain.igtimiadapter.datatypes,
+ com.sap.sailing.domain.igtimiadapter.impl,
+ com.sap.sailing.domain.igtimiadapter.server.riot,
+ com.sap.sailing.domain.igtimiadapter.websocket,
+ com.sap.sailing.domain.tracking,
+ com.sap.sailing.landscape.common,
+ com.sap.sailing.server.security,
  javax.ws.rs.core;version="1.1.1",
  javax.xml.bind,
  org.apache.http.client;version="4.5.5",
+ org.eclipse.jetty.util.component;version="9.4.54",
+ org.eclipse.jetty.websocket.api;version="9.4.54",
+ org.eclipse.jetty.websocket.api.annotations;version="9.4.54",
+ org.eclipse.jetty.websocket.client;version="9.4.54",
+ org.eclipse.jetty.websocket.common.scopes;version="9.4.54",
  org.json.simple,
  org.json.simple.parser

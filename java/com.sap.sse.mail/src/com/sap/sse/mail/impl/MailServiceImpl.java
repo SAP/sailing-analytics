@@ -9,7 +9,6 @@ import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.mail.Message.RecipientType;
@@ -107,8 +106,7 @@ public class MailServiceImpl extends AbstractReplicableWithObjectInputStream<Rep
                     ts.close();
                     logger.info("mail sent to " + Arrays.toString(toAddresses) + " with subject " + subject);
                 } catch (MessagingException e) {
-                    logger.log(Level.SEVERE, "Error trying to send mail to " + Arrays.toString(toAddresses), e);
-                    throw new MailException(e.getMessage(), e);
+                    logger.severe("Error trying to send mail to " + Arrays.toString(toAddresses)+": "+e.getMessage());
                 } finally {
                     Thread.currentThread().setContextClassLoader(oldClassLoader);
                 }

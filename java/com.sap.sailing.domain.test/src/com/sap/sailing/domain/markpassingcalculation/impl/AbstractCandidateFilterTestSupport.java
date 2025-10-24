@@ -1,18 +1,18 @@
 package com.sap.sailing.domain.markpassingcalculation.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.sap.sailing.domain.base.Waypoint;
 import com.sap.sailing.domain.markpassingcalculation.Candidate;
-import com.sap.sailing.domain.tracking.impl.TimedComparator;
+import com.sap.sailing.domain.shared.tracking.impl.TimedComparator;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
@@ -25,7 +25,7 @@ public class AbstractCandidateFilterTestSupport {
     protected Candidate start;
     protected Candidate end;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         final TimePoint now = MillisecondsTimePoint.now();
         start = new CandidateImpl(0, now.minus(Duration.ONE_HOUR), 1.0, null);
@@ -58,15 +58,15 @@ public class AbstractCandidateFilterTestSupport {
     }
 
     protected void assertContainsExactly(Iterable<Candidate> candidates, Candidate... candidatesExpected) {
-        assertEquals(""+candidates+"'s size does not match that of "+Arrays.toString(candidatesExpected)+"; ",
-                candidatesExpected.length, Util.size(candidates));
+        assertEquals(candidatesExpected.length,
+                Util.size(candidates), ""+candidates+"'s size does not match that of "+Arrays.toString(candidatesExpected)+"; ");
         assertContains(candidates, candidatesExpected);
     }
     
     protected void assertContains(Iterable<Candidate> candidates, Candidate...candidatesExpected) {
         for (final Candidate candidateExpected : candidatesExpected) {
-            assertTrue("Expected "+candidateExpected+" to be in "+candidates+" but it wasn't; ",
-                    Util.contains(candidates, candidateExpected));
+            assertTrue(Util.contains(candidates, candidateExpected),
+                    "Expected "+candidateExpected+" to be in "+candidates+" but it wasn't; ");
         }
     }
 

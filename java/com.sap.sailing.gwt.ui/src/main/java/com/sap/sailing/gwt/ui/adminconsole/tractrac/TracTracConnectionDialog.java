@@ -1,6 +1,6 @@
 package com.sap.sailing.gwt.ui.adminconsole.tractrac;
 
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
@@ -98,7 +98,7 @@ public class TracTracConnectionDialog extends DataEntryDialog<TracTracConfigurat
     }
 
     @Override
-    protected FocusWidget getInitialFocusWidget() {
+    protected Focusable getInitialFocusWidget() {
         return jsonURLTextBox;
     }
 

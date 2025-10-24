@@ -122,7 +122,7 @@ public class Hoverline {
                 }
             }
         });
-        map.getMap().addMouseMoveHandler(new MouseMoveMapHandler() {
+        map.getMap().addMouseMoveHandler(new MouseMoveMapHandler() { // moved beyond the hoverline and onto the map
             @Override
             public void onEvent(MouseMoveMapEvent event) {
                 options.setVisible(false);

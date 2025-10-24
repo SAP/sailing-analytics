@@ -2,8 +2,8 @@ package com.sap.sse.replication.testsupport;
 
 import java.io.IOException;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.replication.Replicable;
@@ -21,7 +21,7 @@ public abstract class AbstractServerWithSingleServiceReplicationTest<ReplicableI
         this.testSetUp = testSetUp;
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         testSetUp.setUp();
         setUpDescriptorsFromTestSetup();
@@ -42,17 +42,17 @@ public abstract class AbstractServerWithSingleServiceReplicationTest<ReplicableI
         return result;
     }
     
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         testSetUp.tearDown();
     }
     
     protected ReplicableImpl createNewMaster() throws Exception {
-        return testSetUp.createNewMaster();
+        return testSetUp.createNewMaster(testSetUp.getSecurityServiceTrackerMock());
     }
     
     protected ReplicableImpl createNewReplica() throws Exception {
-        return testSetUp.createNewReplica();
+        return testSetUp.createNewReplica(testSetUp.getSecurityServiceTrackerMock());
     }
     
     protected void persistenceSetUp(boolean dropDB) {

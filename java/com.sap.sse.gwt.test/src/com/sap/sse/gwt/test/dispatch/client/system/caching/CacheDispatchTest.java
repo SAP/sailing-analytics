@@ -5,9 +5,8 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.sap.sse.gwt.dispatch.client.system.DispatchContext;
@@ -30,10 +29,10 @@ public class CacheDispatchTest {
         checkIfCached(holder, new SomeDefaultCacheAction(), 20);
         checkIfCached(holder, new SomeDefaultCacheAction(), 20);
         checkIfCached(holder, new SomeDefaultCacheAction(), 20);
-        Assert.assertEquals("One element in cache", 3, cd.ttlItemsInCache());
+        Assertions.assertEquals(3, cd.ttlItemsInCache(), "One element in cache");
         wait(210);
         cd.cleanupExpiredItems();
-        Assert.assertEquals("No element in cache", 0, cd.ttlItemsInCache());
+        Assertions.assertEquals(0, cd.ttlItemsInCache(), "No element in cache");
     }
 
     @Test
@@ -50,7 +49,7 @@ public class CacheDispatchTest {
         cd.execute(action, new SimpleCallback<SomeResult>() {
             @Override
             public void onSuccess(SomeResult result) {
-                Assert.assertNotSame("Not caching, should not be same", holder.value, result);
+                Assertions.assertNotSame(holder.value, result, "Not caching, should not be same");
             }
         });
     }
@@ -117,7 +116,7 @@ public class CacheDispatchTest {
         cd.execute(action, new SimpleCallback<R>() {
             @Override
             public void onSuccess(Result result) {
-                Assert.assertSame("Should be the same", holder.value, result);
+                Assertions.assertSame(holder.value, result, "Should be the same");
             }
         });
     }
@@ -128,7 +127,7 @@ public class CacheDispatchTest {
         cd.execute(action, new SimpleCallback<R>() {
             @Override
             public void onSuccess(Result result) {
-                Assert.assertNotSame("Should have expired, should not be same", holder.value, result);
+                Assertions.assertNotSame(holder.value, result, "Should have expired, should not be same");
             }
         });
     }

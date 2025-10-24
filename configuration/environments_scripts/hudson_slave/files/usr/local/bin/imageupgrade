@@ -5,10 +5,6 @@
 # An existing xfs partition will be left alone.
 . imageupgrade_functions.sh
 
-get_ec2_user_data() {
-  /usr/bin/ec2metadata --user
-}
-
 METADATA=$( get_ec2_user_data )
 echo "Metadata: ${METADATA}"
 if echo "${METADATA}" | grep -q "^image-upgrade$"; then

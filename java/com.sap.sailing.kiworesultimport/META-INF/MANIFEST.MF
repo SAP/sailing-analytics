@@ -13,5 +13,6 @@ Require-Bundle: com.sap.sailing.server,
  com.sap.sse.common
 Export-Package: com.sap.sailing.kiworesultimport
 Bundle-Activator: com.sap.sailing.kiworesultimport.impl.Activator
-Import-Package: org.osgi.framework
+Import-Package: com.sap.sse.util,
+ org.osgi.framework
 Automatic-Module-Name: com.sap.sailing.kiworesultimport

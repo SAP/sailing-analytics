@@ -228,7 +228,7 @@ The simple command `apachetop` shows the traffic on the Apache httpd server runn
 
 ### AWStats
 
-We use AWStats to analyze our Apache access log files and produce per-month reports at [http://awstats.sapsailing.com](http://awstats.sapsailing.com/awstats/awstats.pl?output=main&config=www.sapsailing.com&framename=index). The username is `awstats`. Ask axel.uhl@sap.com or stefan.lacher@sap.com for the password.
+We use AWStats to analyze our Apache access log files and produce per-month reports at [http://awstats.sapsailing.com](http://awstats.sapsailing.com/awstats/awstats.pl?output=main&config=www.sapsailing.com&framename=index). The username is `awstats`. Ask axel.uhl@sap.com or petr.janacek@sap.com for the password.
 
 AWStats report production is controlled by three things: a cron job hooked up by `/etc/cron.weekly/awstats` which is basically a one-liner launching the `awstats` command like this:
 
@@ -236,9 +236,11 @@ AWStats report production is controlled by three things: a cron job hooked up by
 
 and a configuration file located at `/etc/awstats/awstats.www.sapsailing.com.conf` which describes in its `LogFile` directive the filename pattern to use for collecting the log files that shall be analyzed. Currently, the file name pattern is this:
 
-`/var/log/httpd/access_log /var/log/old/access_log-???????? /var/log/old/access_log-????????.gz /var/log/old/*/elb-origin-access_log* /var/log/old/*/*/elb-origin-access_log* /var/log/old/*/access_log* /var/log/old/*/*/access_log*`
+`LogFile="/usr/share/awstats/tools/logresolvemerge.pl /var/log/logrotate-target/access_log-* /var/log/httpd/access_log /var/log/old/access_log-202????? /var/log/old/access_log-202?????.gz /var/log/old/*/*/access_log-202?????.gz /var/log/old/*/*/access_log-202????? | /bin/grep --text -v HealthChecker |"`
 
-and all log entries that contain `HealthChecker` are eliminated as they are only a "ping" request sent by the load balancer to check the instance's health status which is not to be counted as a "hit." Note that according to the above explanations of our log file formats and variants this focuses on hit analysis for those events with broken or partial / incomplete log files such as Kieler Woche 2015 and Travemünder Woche 2015. It uses the `elb-origin-*` flavors, tolerating the fact that these don't have the original client's IP address.
+and all log entries that contain `HealthChecker` are eliminated as they are only a "ping" request sent by the load balancer to check the instance's health status which is not to be counted as a "hit." Note that according to the above explanations of our log file formats and variants this focuses on hit analysis for those events with broken or partial / incomplete log files such as Kieler Woche 2015 and Travemünder Woche 2015. It uses the `elb-origin-*` flavors, tolerating the fact that these don't have the original client's IP address. Furthermore, the pattern assumes that all log files older than 2020-01-01 have already been scanned and archived under `/var/lib/awstats`. Should this library ever need to be rebuilt from scratch, the pattern above would need to be adjusted to include older log files as well.
+
+Due to the way log files are rotated and moved to the NFS share `/var/log/old`, particularly by the disposable reverse proxies which move them to `/var/log/old/REVERSE_PROXIES/{IP_ADDRESS}`, log file analysis by AWStats may lag one or two weeks behind. Log files are first moved to `/var/log/logrotate-target` by the logrotate service in one round of log rotation. Only during the next round will compression and the moving to `/var/log/old/...` take place. The `LogFile` pattern will include the `logrotate-target` contents on the central reverse proxy but not those from the disposable reverse proxies because their `logrotate-target` folder is not visible to AWStats prior to compression and moving to `/var/log/old/...`.
 
 The third element of AWStats configuration is how it is published through Apache. This is described in `/etc/httpd/conf.d/awstats.conf` and uses the password definition file `/etc/httpd/conf/passwd.awstats` which can be updated using the `htpasswd` command.
 

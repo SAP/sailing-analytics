@@ -18,7 +18,7 @@ import com.sap.sailing.gwt.home.shared.refresh.RefreshableWidget;
 import com.sap.sailing.gwt.home.shared.utils.LabelTypeUtil;
 import com.sap.sailing.gwt.ui.client.FlagImageResolver;
 import com.sap.sailing.gwt.ui.client.StringMessages;
-import com.sap.sailing.gwt.ui.common.client.DateAndTimeFormatterUtil;
+import com.sap.sse.gwt.client.DateAndTimeFormatterUtil;
 
 public class StandingsList extends Widget implements RefreshableWidget<GetMiniLeaderboardDTO> {
     interface MyUiBinder extends UiBinder<Element, StandingsList> {

@@ -58,10 +58,14 @@ public class ShardManagementPanel extends SimplePanel {
     private final SelectedElementsCountingButton<AwsShardDTO> removeShardButton;
     private final StringMessages stringMessages;
     private boolean hasAnythingChanged;
+    private final String optionalKeyName;
+    private final byte[] privateKeyEncryptionPassphrase;
 
     public ShardManagementPanel(LandscapeManagementWriteServiceAsync landscapeManagementService,
-            ErrorReporter errorReporter, StringMessages stringMessages) {
+            ErrorReporter errorReporter, StringMessages stringMessages, String optionalKeyName, byte[] privateKeyEncryptionPassphrase) {
         this.stringMessages = stringMessages;
+        this.optionalKeyName = optionalKeyName;
+        this.privateKeyEncryptionPassphrase = privateKeyEncryptionPassphrase;
         hasAnythingChanged = false;
         final VerticalPanel mainPanel = new VerticalPanel();
         mainPanel.setWidth("100%");
@@ -244,7 +248,7 @@ public class ShardManagementPanel extends SimplePanel {
 
     private void getShards() {
         setBusy(true);
-        landscapeManagementService.getShards(replicaSet, region, getBearerToken(),
+        landscapeManagementService.getShards(replicaSet, region, getBearerToken(), optionalKeyName, privateKeyEncryptionPassphrase,
                 new AsyncCallback<Map<AwsShardDTO, Iterable<String>>>() {
                     @Override
                     public void onFailure(Throwable caught) {
@@ -290,7 +294,7 @@ public class ShardManagementPanel extends SimplePanel {
                             l.addAll(selectedLeaderboards);
                             busyIndicator.setBusy(true);
                             landscapeManagementService.addShard(newShardName, l, replicaSet,
-                                    getBearerToken(), region, new AsyncCallback<Void>() {
+                                    getBearerToken(), region, optionalKeyName, privateKeyEncryptionPassphrase, new AsyncCallback<Void>() {
                                         @Override
                                         public void onSuccess(Void result) {
                                             busyIndicator.setBusy(false);
@@ -335,7 +339,7 @@ public class ShardManagementPanel extends SimplePanel {
         setBusy(true);
         for (AwsShardDTO selection : shardTable.getSelectionModel().getSelectedSet()) {
             hasAnythingChanged = true;
-            landscapeManagementService.removeShard(selection, replicaSet, region, new AsyncCallback<Void>() {
+            landscapeManagementService.removeShard(selection, replicaSet, region, optionalKeyName, privateKeyEncryptionPassphrase, new AsyncCallback<Void>() {
                 @Override
                 public void onFailure(Throwable caught) {
                     errorReporter.reportError(caught.getMessage());
@@ -359,7 +363,7 @@ public class ShardManagementPanel extends SimplePanel {
             final AwsShardDTO shard = shardTable.getSelectionModel().getSelectedSet().iterator().next();
             hasAnythingChanged = true;
             landscapeManagementService.appendShardingKeysToShard(selectedLeaderboards, region, shard.getName(),
-                    replicaSet, getBearerToken(), new AsyncCallback<Void>() {
+                    replicaSet, getBearerToken(), optionalKeyName, privateKeyEncryptionPassphrase, new AsyncCallback<Void>() {
                         @Override
                         public void onFailure(Throwable caught) {
                             setBusy(false);
@@ -385,7 +389,7 @@ public class ShardManagementPanel extends SimplePanel {
             final AwsShardDTO shard = shardTable.getSelectionModel().getSelectedSet().iterator().next();
             hasAnythingChanged = true;
             landscapeManagementService.removeShardingKeysFromShard(selectedLeaderboards, region, shard.getName(),
-                    replicaSet, getBearerToken(), new AsyncCallback<Void>() {
+                    replicaSet, getBearerToken(), optionalKeyName, privateKeyEncryptionPassphrase, new AsyncCallback<Void>() {
                         @Override
                         public void onFailure(Throwable caught) {
                             setBusy(false);

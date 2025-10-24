@@ -1,9 +1,9 @@
 package com.sap.sailing.selenium.test.home;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -12,10 +12,10 @@ import java.util.List;
 
 import javax.xml.bind.DatatypeConverter;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.WebElement;
 
+import com.sap.sailing.selenium.core.SeleniumTestCase;
 import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
 import com.sap.sailing.selenium.pages.adminconsole.event.EventConfigurationPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardConfigurationPanelPO;
@@ -55,7 +55,7 @@ public class WhitelabelTest extends AbstractSeleniumTest {
     private static final String SERIES_MEDALS = "Medals";
     
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         clearState(getContextRoot());
         super.setUp();
@@ -93,7 +93,7 @@ public class WhitelabelTest extends AbstractSeleniumTest {
         setWhitelabel(true, getContextRoot());
     }
 
-    @Test
+    @SeleniumTestCase
     public void testHomepageWhitelabel() throws UnsupportedEncodingException {
         HomePage homePage = HomePage.goToPage(getWebDriver(), getContextRoot());
         assertThat(homePage.getPageTitle(), not(containsString("SAP")));

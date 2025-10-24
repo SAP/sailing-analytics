@@ -125,7 +125,7 @@ public class EventDetailsComposite extends Composite  {
             mainPanel.setCaptionText(stringMessages.event() + " " + event.getName());
             eventName.setText(event.getName());
             eventId.setText(event.id.toString());
-            venueName.setText(event.venue.getName());
+            venueName.setText(event.getVenue().getName());
             description.setText(event.getDescription());
             startDate.setText(event.startDate != null ? event.startDate.toString() : "");
             endDate.setText(event.endDate != null ? event.endDate.toString() : "");
@@ -140,19 +140,19 @@ public class EventDetailsComposite extends Composite  {
             eventOverviewURL.setText(regattaOverviewLink);
             eventOverviewURL.setHref(UriUtils.fromString(regattaOverviewLink));
             List<String> courseAreaNames = new ArrayList<>();
-            if (event.venue.getCourseAreas() != null && event.venue.getCourseAreas().size() > 0) {
-                for (CourseAreaDTO courseArea : event.venue.getCourseAreas()) {
+            if (event.getVenue().getCourseAreas() != null && event.getVenue().getCourseAreas().size() > 0) {
+                for (CourseAreaDTO courseArea : event.getVenue().getCourseAreas()) {
                     courseAreaNames.add(courseArea.getName());
                 }
             }
             courseAreaNamesList.setValues(courseAreaNames);
             List<String> imageURLStringsAsList = new ArrayList<>();
-            for(ImageDTO image: event.getImages()) {
+            for (ImageDTO image: event.getImages()) {
                 imageURLStringsAsList.add(image.getSourceRef());
             }
             imageURLList.setValues(imageURLStringsAsList);
             List<String> videoURLStringsAsList = new ArrayList<>();
-            for(VideoDTO video: event.getVideos()) {
+            for( VideoDTO video: event.getVideos()) {
                 videoURLStringsAsList.add(video.getSourceRef());
             }
             videoURLList.setValues(videoURLStringsAsList);

@@ -217,9 +217,9 @@ public class AppPreferences {
     }
 
     /**
-     * Gets polling interval in minutes
+     * Gets polling interval in seconds
      */
-    public int getPollingInterval() {
+    public int getPollingIntervalInSeconds() {
         return helper.getInt(key(R.string.preference_polling_interval_key), 0);
     }
 

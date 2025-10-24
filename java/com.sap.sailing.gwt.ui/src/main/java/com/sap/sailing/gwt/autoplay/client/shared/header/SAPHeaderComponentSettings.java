@@ -14,6 +14,7 @@ public class SAPHeaderComponentSettings extends AbstractGenericSerializableSetti
     }
     
     public SAPHeaderComponentSettings(String title) {
+        super();
         this.title.setValue(title);
     }
 

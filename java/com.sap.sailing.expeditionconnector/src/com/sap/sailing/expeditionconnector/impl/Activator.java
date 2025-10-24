@@ -94,7 +94,7 @@ public class Activator implements BundleActivator {
                     securityService
                             .assumeOwnershipMigrated(SecuredDomainType.EXPEDITION_DEVICE_CONFIGURATION.getName());
                 } catch (Exception e) {
-                    logger.log(Level.SEVERE, "Exception trying to migrate IgtimiAccounts implementation", e);
+                    logger.log(Level.SEVERE, "Exception trying to migrate Expedition Devices implementation", e);
                 }
             }, getClass().getName() + " registering connectivity handler").start();
 

@@ -1,1 +1,1 @@
-* * * * * PATH_OF_GIT_HOME_DIR_TO_REPLACE/configuration/notify-unhealthy-mongodb 2>PATH_OF_HOME_DIR_TO_REPLACE/notify-unhealthy-mongodb.err >PATH_OF_HOME_DIR_TO_REPLACE/notify-unhealthy-mongodb.out
+* * * * *  export PATH=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin; notify-unhealthy-mongodb 2>/var/log/notify-unhealthy-mongodb.err >/var/log/notify-unhealthy-mongodb.out

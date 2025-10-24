@@ -1,6 +1,6 @@
 package com.sap.sse.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -8,10 +8,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.Timeout;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import com.sap.sse.util.impl.ThreadFactoryWithPriority;
 
@@ -22,16 +21,15 @@ import com.sap.sse.util.impl.ThreadFactoryWithPriority;
  * @author Axel Uhl (D043530)
  *
  */
+@Timeout(value=10, unit=TimeUnit.SECONDS)
 public class ThreadPoolWithExceptionsTest {
-    @Rule public Timeout threadPoolWithExceptionsTestTimeout = Timeout.millis(10 * 1000); // 10s timeout
-    
     private static final Logger logger = Logger.getLogger(ThreadPoolWithExceptionsTest.class.getName());
     
     final int THREAD_POOL_SIZE = 100;
     
     private ThreadPoolExecutor executor;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         executor = new ThreadPoolExecutor(/* corePoolSize */ THREAD_POOL_SIZE,
                 /* maximumPoolSize */ THREAD_POOL_SIZE,

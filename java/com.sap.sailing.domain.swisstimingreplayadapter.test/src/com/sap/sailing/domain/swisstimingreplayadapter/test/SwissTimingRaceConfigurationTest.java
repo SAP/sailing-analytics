@@ -1,9 +1,9 @@
 package com.sap.sailing.domain.swisstimingreplayadapter.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,8 +14,8 @@ import java.text.MessageFormat;
 import java.text.ParseException;
 import java.util.List;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.swisstimingadapter.DomainFactory;
 import com.sap.sailing.domain.swisstimingreplayadapter.SwissTimingReplayRace;
@@ -34,7 +34,7 @@ public class SwissTimingRaceConfigurationTest {
         assertFalse(races.isEmpty());
     }
     
-    @Ignore("SwissTiming shut down their configuration server for good (2020-11-13), so we cannot get at the configs anymore")
+    @Disabled("SwissTiming shut down their configuration server for good (2020-11-13), so we cannot get at the configs anymore")
     @Test
     public void testRaceConfig_446483_no_detail_config() throws Exception {
         URL configFileURL = new URL(MessageFormat.format(SwissTimingReplayServiceImpl.RACE_CONFIG_URL_TEMPLATE, "446483"));
@@ -53,7 +53,7 @@ public class SwissTimingRaceConfigurationTest {
 
     }
 
-    @Ignore("SwissTiming shut down their configuration server for good (2020-11-13), so we cannot get at the configs anymore")
+    @Disabled("SwissTiming shut down their configuration server for good (2020-11-13), so we cannot get at the configs anymore")
     @Test
     public void testRaceConfig_6260_with_detail_config() throws Exception {
         URL configFileURL = new URL(MessageFormat.format(SwissTimingReplayServiceImpl.RACE_CONFIG_URL_TEMPLATE, "6260"));

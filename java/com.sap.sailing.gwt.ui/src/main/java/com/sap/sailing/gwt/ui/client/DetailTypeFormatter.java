@@ -106,6 +106,8 @@ public class DetailTypeFormatter {
             return stringMessages.velocityMadeGoodInKnots();
         case LEG_GAP_TO_LEADER_IN_SECONDS:
             return stringMessages.gapToLeaderInSeconds();
+        case LEG_GAP_TO_LEADER_IN_SECONDS_CHANGE:
+            return stringMessages.gapToLeaderInSecondsChange();
         case LEG_CORRECTED_TIME_TRAVELED:
             return stringMessages.calculatedTimeTraveled();
         case LEG_GAP_CHANGE_SINCE_LEG_START_IN_SECONDS:
@@ -132,6 +134,8 @@ public class DetailTypeFormatter {
             return stringMessages.startTack();
         case CHART_WINDWARD_DISTANCE_TO_COMPETITOR_FARTHEST_AHEAD:
             return stringMessages.windwardDistanceToCompetitorFarthestAheadInMeters();
+        case CHART_WINDWARD_DISTANCE_TO_COMPETITOR_FARTHEST_AHEAD_CHANGE:
+            return stringMessages.windwardDistanceToCompetitorFarthestAheadInMetersChange();
         case DISTANCE_TO_START_AT_RACE_START:
             return stringMessages.distanceToLineAtRaceStart();
         case TIME_BETWEEN_RACE_START_AND_COMPETITOR_START:
@@ -378,10 +382,14 @@ public class DetailTypeFormatter {
             return AVERAGE_SYMBOL + stringMessages.expeditionRaceJibCarStbd();
         case EXPEDITION_LEG_MAST_BUTT:
             return AVERAGE_SYMBOL + stringMessages.expeditionRaceMastButt();
+        case EXPEDITION_RACE_KICKER_TENSION:
+            return stringMessages.expeditionRaceKickerTension();
         case BRAVO_RACE_HEEL_IN_DEGREES:
             return stringMessages.currentHeelInDegree();
         case BRAVO_RACE_PITCH_IN_DEGREES:
             return stringMessages.currentPitchInDegree();
+        case PERCENT_TARGET_BOAT_SPEED:
+            return stringMessages.percentTargetBoatSpeed();
         }
         return detailType.name();
     }
@@ -410,7 +418,10 @@ public class DetailTypeFormatter {
             return stringMessages.knotsUnit();
         case BRAVOEXTENDED_RACE_CURRENT_DEFLECTOR_PERCENTAGE:
         case BRAVOEXTENDED_RACE_CURRENT_TARGET_BOATSPEED_PERCENTAGE:
+        case PERCENT_TARGET_BOAT_SPEED:
             return stringMessages.percent();
+        case CHART_WINDWARD_DISTANCE_TO_COMPETITOR_FARTHEST_AHEAD_CHANGE:
+            return stringMessages.metersPerSecondUnit();
         case CHART_WINDWARD_DISTANCE_TO_COMPETITOR_FARTHEST_AHEAD:
         case LEG_WINDWARD_DISTANCE_TO_GO_IN_METERS:
         case LEG_DISTANCE_TRAVELED:
@@ -469,6 +480,8 @@ public class DetailTypeFormatter {
         case BRAVOEXTENDED_RACE_CURRENT_FORESTAY_LOAD:
         case BRAVOEXTENDED_RACE_CURRENT_FORESTAY_PRESSURE:
             return stringMessages.tonsUnit();
+        case LEG_GAP_TO_LEADER_IN_SECONDS_CHANGE:
+            return stringMessages.secondsPerSecondsUnit();
         case LEG_GAP_TO_LEADER_IN_SECONDS:
         case LEG_GAP_CHANGE_SINCE_LEG_START_IN_SECONDS:
         case RACE_GAP_TO_LEADER_IN_SECONDS:
@@ -598,6 +611,7 @@ public class DetailTypeFormatter {
         case EXPEDITION_LEG_JIB_CAR_PORT:
         case EXPEDITION_LEG_JIB_CAR_STBD:
         case EXPEDITION_LEG_MAST_BUTT:
+        case EXPEDITION_RACE_KICKER_TENSION:
             return "";
         }
         // Throwing an exception to get notified if an implementation of
@@ -653,6 +667,8 @@ public class DetailTypeFormatter {
             return stringMessages.estimatedTimeToNextWaypointInSecondsTooltip();
         case LEG_GAP_TO_LEADER_IN_SECONDS:
             return stringMessages.gapToLeaderInSecondsTooltip();
+        case LEG_GAP_TO_LEADER_IN_SECONDS_CHANGE:
+            return stringMessages.gapToLeaderInSecondsChangeTooltip();
         case LEG_CORRECTED_TIME_TRAVELED:
             return stringMessages.calculatedTimeTraveledTooltip();
         case JIBE:
@@ -731,6 +747,8 @@ public class DetailTypeFormatter {
             return stringMessages.windwardDistanceToCompetitorFarthestAheadInMetersTooltip();
         case CHART_WINDWARD_DISTANCE_TO_COMPETITOR_FARTHEST_AHEAD:
             return stringMessages.windwardDistanceToCompetitorFarthestAheadInMetersTooltip();
+        case CHART_WINDWARD_DISTANCE_TO_COMPETITOR_FARTHEST_AHEAD_CHANGE:
+            return stringMessages.windwardDistanceToCompetitorFarthestAheadInMetersChangeTooltip();
         case DISTANCE_TO_START_AT_RACE_START:
             return stringMessages.distanceToLineAtRaceStartTooltip();
         case TIME_BETWEEN_RACE_START_AND_COMPETITOR_START:
@@ -899,9 +917,12 @@ public class DetailTypeFormatter {
         case EXPEDITION_RACE_LOAD_P:
         case EXPEDITION_RACE_LOAD_S:
         case EXPEDITION_RACE_MAST_BUTT:
+        case EXPEDITION_RACE_KICKER_TENSION:
             return "";
         case LEG_TACKTYPE_LONGTACK_SHORTTACK:
             return stringMessages.tackTypeTooltip();
+        case PERCENT_TARGET_BOAT_SPEED:
+            return stringMessages.percentTargetBoatSpeedTooltip();
         }
         return "";
     }

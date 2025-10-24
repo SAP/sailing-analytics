@@ -226,9 +226,9 @@ public class ResultsChart extends AbstractNumericResultsPresenter<Settings> {
             showResultData();
         });
         addControl(showDataLabelsPanel);
-        StringMessages stringMessages = getDataMiningStringMessages();
-        ChartToCsvExporter csvExporter = new ChartToCsvExporter(stringMessages.csvCopiedToClipboard());
-        Button exportButton = new Button(stringMessages.csvExport());
+        final StringMessages stringMessages = getDataMiningStringMessages();
+        final ChartToCsvExporter csvExporter = new ChartToCsvExporter(stringMessages.csvCopiedToClipboard());
+        final Button exportButton = new Button(stringMessages.csvExport());
         exportButton.addClickHandler(e -> csvExporter.exportChartAsCsvToClipboard(chart));
         addControl(exportButton);
         seriesMappedByGroupKey = new HashMap<>();

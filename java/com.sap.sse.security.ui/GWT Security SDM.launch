@@ -14,6 +14,7 @@
     </listAttribute>
     <booleanAttribute key="com.gwtplugins.gwt.eclipse.core.SUPERDEVMODE_ENABLED" value="true"/>
     <stringAttribute key="com.gwtplugins.gwt.eclipse.core.URL" value="/security/ui/Login.html"/>
+    <booleanAttribute key="org.eclipse.debug.core.ATTR_FORCE_SYSTEM_CONSOLE_ENCODING" value="false"/>
     <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
         <listEntry value="/com.sap.sse.security.ui"/>
     </listAttribute>
@@ -99,6 +100,7 @@
         <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/com.sap.sailing.polars.datamining/resources&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#10;"/>
         <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry id=&quot;org.eclipse.jdt.launching.classpathentry.defaultClasspath&quot;&gt;&#10;    &lt;memento exportedEntriesOnly=&quot;false&quot; project=&quot;com.sap.sailing.gwt.ui&quot;/&gt;&#10;&lt;/runtimeClasspathEntry&gt;&#10;"/>
         <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry path=&quot;3&quot; projectName=&quot;com.sap.sse.common&quot; type=&quot;1&quot;/&gt;&#10;"/>
+        <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/com.sap.sse.landscape.aws.common/src&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#10;"/>
     </listAttribute>
     <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="com.gwtplugins.gwt.eclipse.core.moduleClasspathProvider"/>
     <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>

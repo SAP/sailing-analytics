@@ -12,5 +12,5 @@ import com.sap.sse.landscape.aws.AwsApplicationReplicaSet;
  *
  */
 public interface EligibleInstanceForReplicaSetFindingStrategy {
-    SailingAnalyticsHost<String> getInstanceToDeployTo(AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet);
+    SailingAnalyticsHost<String> getInstanceToDeployTo(AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet) throws Exception;
 }

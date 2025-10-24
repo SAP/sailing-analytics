@@ -8,9 +8,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.datamining.ModifiableDataMiningServer;
 import com.sap.sse.datamining.components.management.AggregationProcessorDefinitionRegistry;
@@ -40,12 +40,12 @@ public class TestFunctionManagerAsFunctionRegistry {
     private Set<Class<?>> internalClassesToScan;
     private HashSet<Class<?>> externalClassesToScan;
 
-    @BeforeClass
+    @BeforeAll
     public static void intializeExpectedFunctions() throws NoSuchMethodException, SecurityException {
         expectedFunctionRegistryUtil = new ExpectedFunctionRegistryUtil();
     }
     
-    @Before
+    @BeforeEach
     public void initializeClassesToScan() {
         internalClassesToScan = new HashSet<>();
         internalClassesToScan.add(Test_HasLegOfCompetitorContext.class);

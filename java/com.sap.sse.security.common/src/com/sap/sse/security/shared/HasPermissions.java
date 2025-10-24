@@ -124,6 +124,10 @@ public interface HasPermissions extends Named {
          */
         String name();
     }
+    
+    public static interface SecuredEnum {
+        Action getPremiumAction();
+    }
 
     /**
      * A mode of operation on a resource; the typical "CRUD" operations.

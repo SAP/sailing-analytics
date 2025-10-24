@@ -53,7 +53,7 @@ public abstract class LeaderboardSettingsDialogComponent<T extends LeaderboardSe
     protected Iterable<DetailType> availableDetailTypes;
     
     protected final PaywallResolver paywallResolver;
-    private final AbstractLeaderboardDTO leaderboardDTO;
+    protected final AbstractLeaderboardDTO leaderboardDTO;
 
     protected LeaderboardSettingsDialogComponent(T initialSettings, StringMessages stringMessages,
             Iterable<DetailType> availableDetailTypes, boolean canBoatInfoBeShownAsOverallDetail, PaywallResolver paywallResolver, AbstractLeaderboardDTO leaderboardDTO) {
@@ -126,7 +126,7 @@ public abstract class LeaderboardSettingsDialogComponent<T extends LeaderboardSe
                 // we do not need race level boats, if the boats do not change
                 continue;
             }
-            if (detailCountInCurrentFlowPanel % 8 == 0) {
+            if (detailCountInCurrentFlowPanel % 7 == 0) {
                 raceDetailDialogContent = new FlowPanel();
                 raceDetailDialogContent.addStyleName("dialogInnerContent");
                 raceDetailDialog.add(raceDetailDialogContent);
@@ -162,7 +162,7 @@ public abstract class LeaderboardSettingsDialogComponent<T extends LeaderboardSe
         Collection<DetailType> currentRaceDetailSelection = initialSettings.getRaceDetailsToShow();
         FlowPanel raceStartAnalysisDialogContent = null;
         for (DetailType type : Util.retainCopy(DetailType.getRaceStartAnalysisColumnTypes(), availableDetailTypes)) {
-            if (detailCountInCurrentFlowPanel % 8 == 0) {
+            if (detailCountInCurrentFlowPanel % 6 == 0) {
                 raceStartAnalysisDialogContent = new FlowPanel();
                 raceStartAnalysisDialogContent.addStyleName("dialogInnerContent");
                 raceStartAnalysisDialog.add(raceStartAnalysisDialogContent);
@@ -232,7 +232,7 @@ public abstract class LeaderboardSettingsDialogComponent<T extends LeaderboardSe
         Collection<DetailType> currentLegDetailSelection = initialSettings.getLegDetailsToShow();
         int detailCountInCurrentFlowPanel = 0;
         for (DetailType type : Util.retainCopy(DetailType.getAllLegDetailColumnTypes(), availableDetailTypes)) {
-            if (detailCountInCurrentFlowPanel % 8 == 0) {
+            if (detailCountInCurrentFlowPanel % 7 == 0) {
                 legDetailsContent = new FlowPanel();
                 legDetailsContent.addStyleName("dialogInnerContent");
                 legDetailsToShow.add(legDetailsContent);
@@ -293,10 +293,9 @@ public abstract class LeaderboardSettingsDialogComponent<T extends LeaderboardSe
     }
 
     protected PremiumCheckBox createPremiumCheckbox(DataEntryDialog<?> dialog, String label, boolean selected, String tooltip, Action premiumAction) {
-        PremiumCheckBox premiumCheckBox = new SailingPremiumCheckBox(label, premiumAction, paywallResolver, leaderboardDTO);
+        PremiumCheckBox premiumCheckBox = new SailingPremiumCheckBox(label, premiumAction, paywallResolver, leaderboardDTO, selected);
         dialog.registerCheckbox(premiumCheckBox.getCheckBox());
         premiumCheckBox.ensureDebugId(DebugIdHelper.createDebugId(label) + CHECK_BOX_DEBUGID_CONSTANT);
-        premiumCheckBox.setValue(selected);
         dialog.addTooltip(premiumCheckBox, tooltip);
         return premiumCheckBox;
     }

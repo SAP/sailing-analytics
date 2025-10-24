@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><resources>
+<?xml version="1.0" encoding="utf-8" standalone="no"?><resources>
     <string name="accuracy">"Přesnost"</string>
     <string name="distance">"Vzdálenost"</string>
     <string name="accuracy_detail">"polohy podle GPS"</string>

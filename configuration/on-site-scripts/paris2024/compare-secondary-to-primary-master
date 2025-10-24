@@ -1,13 +1,24 @@
 #!/bin/bash
-PRIMARY_MASTER=https://palma2024-master.sailing.omegatiming.com:9443
-SECONDARY_MASTER=https://palma2024-secondary-master.sailing.omegatiming.com:9443
+PRIMARY_MASTER=https://paris2024-master.sailing.omegatiming.com:9443
+SECONDARY_MASTER=https://paris2024-secondary-master.sailing.omegatiming.com:9443
+OUTPUTFILE=/tmp/compareservers.out
+if [ ! -f "$OUTPUTFILE" ]; then
+  touch "$OUTPUTFILE"
+fi
+STORED_OUTPUT=$(cat $OUTPUTFILE)
 COMPARE_OUTPUT=$( /home/sailing/code/java/target/compareServers -ael ${SECONDARY_MASTER} ${PRIMARY_MASTER} )
-if [ "$?" != "0" ]; then
-  echo "Comparing ${SECONDARY_MASTER} with ${PRIMARY_MASTER} showed differences:
+COMPARE_OUTPUT_EXIT_CODE=$?
+if [ "$STORED_OUTPUT" != "$COMPARE_OUTPUT" ]; then
+  if [ "$COMPARE_OUTPUT_EXIT_CODE" != 0 ]; then
+    echo "Comparing ${SECONDARY_MASTER} with ${PRIMARY_MASTER} showed differences:
 
 ${COMPARE_OUTPUT}
 
 Please consolidate, e.g., by doing a master data import or
 by repeating the administrative operation you carried out on
 the one side also on the other side." | notify-operators "DIFFERENCE BETWEEN PRIMARY AND SECONDARY MASTER"
+  else
+    notify-operators "PREVIOUS DIFFERENCE BETWEEN PRIMARY AND SECONDARY CLEARED" "Current compareServers run showed no diff between the servers"
+  fi
+  echo "$COMPARE_OUTPUT" > "$OUTPUTFILE"
 fi

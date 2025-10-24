@@ -1,8 +1,11 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:rf="urn:import:com.sap.sse.gwt.client.panels">
-	<ui:with field="res"
-		type="com.sap.sailing.gwt.autoplay.client.resources.SixtyInchBundle" />
+	         xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:rf="urn:import:com.sap.sse.gwt.client.panels"
+             xmlns:m="urn:import:com.sap.sse.gwt.client.media">
+	<ui:with field="res" type="com.sap.sailing.gwt.autoplay.client.resources.SixtyInchBundle" />
+    <ui:with field="shared_res" type="com.sap.sse.gwt.common.CommonSharedResources" />
+        
 	<ui:style>
 	.left {
 		position: absolute;
@@ -64,15 +67,15 @@
 	<rf:ResizableFlowPanel styleName="{res.style.slideBackground}">
 		<rf:ResizableFlowPanel ui:field="leaderBoardHolder"
 			styleName="{style.left}" />
-		<rf:ResizableFlowPanel ui:field="infoHolder"
-			styleName="{style.right}">
-			<g:Image ui:field="image" styleName="{style.image}" />
+		<rf:ResizableFlowPanel ui:field="infoHolder" styleName="{style.right}">
+			<g:FlowPanel ui:field="image" styleName="{style.image} {shared_res.mainCss.media_wrapper}">
+              <m:MediaMenuIcon ui:field="takedownButton"/>
+            </g:FlowPanel>
 			<g:Label ui:field="subline1" styleName="{style.subline1}" />
 			<g:Label ui:field="subline2" styleName="{style.subline2}" />
 			<g:Label ui:field="subline3" styleName="{style.subline3}" />
 		</rf:ResizableFlowPanel>
-		<rf:ResizableFlowPanel ui:field="nextRace"
-			styleName="{style.bottom}">
+		<rf:ResizableFlowPanel ui:field="nextRace" styleName="{style.bottom}">
 			<g:Label ui:field="bottomInfoPanel" />
 		</rf:ResizableFlowPanel>
 	</rf:ResizableFlowPanel>

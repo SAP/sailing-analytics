@@ -7,13 +7,13 @@ sleep 2
 # localhost:9443 is established for access to this security-service.sapsailing.com backup replacement.
 #autossh -M 20500 -f -A -N -R 9443:localhost:9443 -R '*:8888:localhost:8888' -R 10201:localhost:10201 -L 10203:localhost:10203 -L 5673:rabbit-eu-west-3.sapsailing.com:5672 -L 15673:localhost:15673 -L 5675:rabbit.internal.sapsailing.com:5672 -L 15675:rabbit.internal.sapsailing.com:15672 -L 443:security-service.sapsailing.com:443 -R 18122:localhost:22 ec2-user@paris-ssh.sapsailing.com
 # Tunnel to other laptop P1 #2, tunneling to MongoDB running on 10202, mapping to local port 10202
-autossh -M 20502 -f -A -N \
+AUTOSSH_LOGLEVEL=7 AUTOSSH_POLL=5 autossh -M 20502 -f -A -N \
   -L 10202:localhost:10202 \
   -R 10201:localhost:10201 \
   sailing@sap-p1-2
 sleep 2
 # An additional port forward from 443 to NGINX 9443 is required to reach a local backup copy of security-service.sapsailing.com
-autossh -M 20504 -f -A -N \
+AUTOSSH_LOGLEVEL=7 AUTOSSH_POLL=5 autossh -M 20504 -f -A -N \
   -L 443:localhost:9443 \
   -L 5673:localhost:5672 \
   -L 15673:localhost:15672 \

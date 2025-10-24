@@ -21,7 +21,7 @@ public class EventEditDialog extends EventDialog {
         descriptionEntryField.setCharacterWidth(50);
         descriptionEntryField.setVisibleLines(2);
         descriptionEntryField.getElement().getStyle().setProperty("resize", "none");
-        venueEntryField = createTextBox(event.venue.getName());
+        venueEntryField = createTextBox(event.getVenue().getName());
         venueEntryField.setVisibleLength(35);
         startDateBox = createDateTimeBox(event.startDate, Accuracy.MINUTES);
         endDateBox = createDateTimeBox(event.endDate, Accuracy.MINUTES);
@@ -30,7 +30,7 @@ public class EventEditDialog extends EventDialog {
         baseURLEntryField = createTextBox(event.getBaseURL());
         baseURLEntryField.setVisibleLength(50);
         id = event.id;
-        courseAreaNameList.setValue(new ArrayList<>(event.venue.getCourseAreas()));
+        courseAreaNameList.setValue(new ArrayList<>(event.getVenue().getCourseAreas()));
         List<String> leaderboardGroupNames = new ArrayList<>();
         for(LeaderboardGroupDTO leaderboardGroupDTO: event.getLeaderboardGroups()) {
             leaderboardGroupNames.add(leaderboardGroupDTO.getName());

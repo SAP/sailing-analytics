@@ -102,7 +102,7 @@ public class DataMiningServerImpl implements ModifiableDataMiningServer {
     
     private Iterable<MemoryMonitorAction> createMemoryMonitorActions() {
         Collection<MemoryMonitorAction> actions = new ArrayList<>();
-        actions.add(new AbstractMemoryMonitorAction(0.10, /* 2GB minFreeMemoryInBytes */ 2l*1024*1024*1024) {
+        actions.add(new AbstractMemoryMonitorAction(0.10, /* 10GB minFreeMemoryInBytes */ 10l*1024*1024*1024) {
             @Override
             public void performAction() {
                 memoryMonitor.logWarning("Yellow Alert free memory is below " + (100*getThreshold()) + "%!");
@@ -115,7 +115,7 @@ public class DataMiningServerImpl implements ModifiableDataMiningServer {
                 }
             }
         });
-        actions.add(new AbstractMemoryMonitorAction(0.05, /* 1GB minFreeMemoryInBytes */ 1l*1024*1024*1024) {
+        actions.add(new AbstractMemoryMonitorAction(0.05, /* 5GB minFreeMemoryInBytes */ 5l*1024*1024*1024) {
             @Override
             public void performAction() {
                 memoryMonitor.logSevere("Red Alert free memory is below " + (100*getThreshold()) + "%!");

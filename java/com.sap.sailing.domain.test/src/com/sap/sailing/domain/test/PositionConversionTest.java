@@ -1,21 +1,21 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Collections;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.tractracadapter.DomainFactory;
 import com.sap.sailing.domain.tractracadapter.LoadingQueueDoneCallBack;
 import com.sap.sailing.domain.tractracadapter.Receiver;
 import com.tractrac.model.lib.api.data.IPosition;
-import com.tractrac.model.lib.api.route.IControl;
-import com.tractrac.subscription.lib.api.control.IControlPointPositionListener;
+import com.tractrac.model.lib.api.map.IPositionedItem;
+import com.tractrac.subscription.lib.api.map.IPositionedItemPositionListener;
 
 public class PositionConversionTest extends AbstractTracTracLiveTest {
 
@@ -31,7 +31,7 @@ public class PositionConversionTest extends AbstractTracTracLiveTest {
 
     @Test
     public void testReceiptOfControlPointPosition() {
-        final IControl[] firstTracked = new IControl[1];
+        final IPositionedItem[] firstTracked = new IPositionedItem[1];
         final IPosition[] firstData = new IPosition[1];
         final Object semaphor = new Object();
         
@@ -58,11 +58,11 @@ public class PositionConversionTest extends AbstractTracTracLiveTest {
 
             @Override
             public void subscribe() {
-                getRaceSubscriber().subscribeControlPositions(new IControlPointPositionListener() {
+                getRaceSubscriber().subscribePositionedItemPositions(new IPositionedItemPositionListener() {
                     private boolean first = true;
                     
                     @Override
-                    public void gotControlPointPosition(IControl control, IPosition position, int controlPointNumber) {
+                    public void gotPositionedItemPosition(IPositionedItem control, IPosition position) {
                         if (first) {
                             synchronized (semaphor) {
                                 firstTracked[0] = control;

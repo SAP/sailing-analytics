@@ -1,11 +1,13 @@
 package com.sap.sailing.gwt.home.server;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import com.google.gwt.core.shared.GwtIncompatible;
 import com.sap.sailing.gwt.home.communication.race.SimpleRaceMetadataDTO.RaceViewState;
 import com.sap.sailing.gwt.home.server.EventActionUtil.RaceCallback;
 import com.sap.sse.common.Duration;
-import com.sap.sse.common.impl.MillisecondsDurationImpl;
-import com.sap.sse.common.impl.MillisecondsTimePoint;
+import com.sap.sse.common.TimePoint;
 
 /**
  * {@link RaceCallback} implementation, which calculates a "time to live" for the given {@link RaceContext} based on its
@@ -15,18 +17,18 @@ import com.sap.sse.common.impl.MillisecondsTimePoint;
  */
 @GwtIncompatible
 public final class RaceRefreshCalculator implements RaceCallback {
-    private long ttl = Duration.ONE_MINUTE.times(3).asMillis();
+    private Duration ttl = Duration.ONE_MINUTE.times(3);
 
     @Override
     public void doForRace(RaceContext rc) {
         RaceViewState state = rc.getLiveRaceViewState();
-        if(state == RaceViewState.RUNNING) {
-            ttl = Math.min(ttl, Duration.ONE_SECOND.times(30).asMillis());
-        } else if(state == RaceViewState.SCHEDULED) {
-            int timeTillRace = (int) MillisecondsTimePoint.now().until(rc.getStartTime()).asMillis();
-            ttl = Math.min(ttl, Math.min(Duration.ONE_MINUTE.asMillis(), timeTillRace));
-        } else if(state == RaceViewState.POSTPONED || state == RaceViewState.ABANDONED) {
-            ttl = Math.min(ttl, Duration.ONE_MINUTE.asMillis());
+        if (state == RaceViewState.RUNNING) {
+            ttl = Collections.min(Arrays.asList(ttl, Duration.ONE_SECOND.times(30)));
+        } else if (state == RaceViewState.SCHEDULED) {
+            final Duration timeTillRace = TimePoint.now().until(rc.getStartTime());
+            ttl = Collections.min(Arrays.asList(ttl, Duration.ONE_MINUTE, timeTillRace));
+        } else if (state == RaceViewState.POSTPONED || state == RaceViewState.ABANDONED) {
+            ttl = Collections.min(Arrays.asList(ttl, Duration.ONE_MINUTE));
         }
     }
 
@@ -36,6 +38,6 @@ public final class RaceRefreshCalculator implements RaceCallback {
      * @return the calculated {@link Duration time to live}
      */
     public Duration getTTL() {
-        return new MillisecondsDurationImpl(ttl);
+        return ttl;
     }
 }

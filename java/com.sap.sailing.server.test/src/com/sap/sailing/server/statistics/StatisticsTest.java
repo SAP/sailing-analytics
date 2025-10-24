@@ -1,7 +1,7 @@
 package com.sap.sailing.server.statistics;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Boat;
 import com.sap.sailing.domain.base.BoatClass;
@@ -69,7 +69,7 @@ public class StatisticsTest {
     private DynamicTrackedRegatta regatta;
     private DynamicTrackedRace trackedRace;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         regatta = new DynamicTrackedRegattaImpl(new RegattaImpl(EmptyRaceLogStore.INSTANCE,
                 EmptyRegattaLogStore.INSTANCE, RegattaImpl.getDefaultName("regatta", boatClass.getName()), boatClass, false, 

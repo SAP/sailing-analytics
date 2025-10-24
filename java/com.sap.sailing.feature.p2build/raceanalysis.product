@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="SAP  Race Analysis" uid="raceanalysis.product.id" id="raceanalysis.product" version="1.0.0" useFeatures="true" includeLaunchers="false">
+<product name="SAP  Race Analysis" uid="raceanalysis.product.id" id="raceanalysis.product" version="1.0.0" type="features" includeLaunchers="false" autoIncludeRequirements="true">
 
    <configIni use="default">
    </configIni>
@@ -39,38 +39,40 @@
       <plugin id="com.sap.sailing.domain.bravoadapter" autoStart="true" startLevel="5" />
       <plugin id="com.sap.sailing.domain.deckmanadapter" autoStart="true" startLevel="5" />
       <plugin id="com.sap.sailing.domain.expeditionadapter" autoStart="true" startLevel="5" />
-      <plugin id="com.sap.sailing.domain.igtimiadapter" autoStart="true" startLevel="4" />
+      <plugin id="com.sap.sailing.domain.igtimiadapter.server" autoStart="true" startLevel="4" />
       <plugin id="com.sap.sailing.domain.igtimiadapter.gateway" autoStart="true" startLevel="5" />
       <plugin id="com.sap.sailing.domain.oceanraceadapter" autoStart="true" startLevel="5" />
-      <plugin id="com.sap.sailing.domain.yellowbrickadapter" autoStart="true" startLevel="5" />
-      <plugin id="com.sap.sailing.domain.yellowbrickadapter.persistence" autoStart="true" startLevel="4" />
+      <plugin id="com.sap.sailing.domain.queclinkadapter" autoStart="true" startLevel="5" />
       <plugin id="com.sap.sailing.domain.racelogtrackingadapter" autoStart="true" startLevel="4" />
       <plugin id="com.sap.sailing.domain.swisstimingadapter" autoStart="true" startLevel="5" />
       <plugin id="com.sap.sailing.domain.swisstimingadapter.persistence" autoStart="true" startLevel="4" />
       <plugin id="com.sap.sailing.domain.swisstimingreplayadapter" autoStart="true" startLevel="4" />
       <plugin id="com.sap.sailing.domain.tractracadapter" autoStart="true" startLevel="5" />
       <plugin id="com.sap.sailing.domain.tractracadapter.persistence" autoStart="true" startLevel="4" />
+      <plugin id="com.sap.sailing.domain.vakarosadapter" autoStart="true" startLevel="4" />
       <plugin id="com.sap.sailing.domain.windfinderadapter" autoStart="true" startLevel="4" />
+      <plugin id="com.sap.sailing.domain.yellowbrickadapter" autoStart="true" startLevel="5" />
+      <plugin id="com.sap.sailing.domain.yellowbrickadapter.persistence" autoStart="true" startLevel="4" />
       <plugin id="com.sap.sailing.ess40.resultimport" autoStart="true" startLevel="4" />
       <plugin id="com.sap.sailing.expeditionconnector.persistence" autoStart="true" startLevel="4" />
       <plugin id="com.sap.sailing.freg.resultimport" autoStart="true" startLevel="4" />
       <plugin id="com.sap.sailing.gwt.ui" autoStart="true" startLevel="6" />
+      <plugin id="com.sap.sailing.hanaexport" autoStart="true" startLevel="5" />
       <plugin id="com.sap.sailing.kiworesultimport" autoStart="true" startLevel="4" />
+      <plugin id="com.sap.sailing.landscape.gateway" autoStart="true" startLevel="5" />
       <plugin id="com.sap.sailing.manage2sail.resultimport" autoStart="true" startLevel="4" />
-      <plugin id="com.sap.sailing.sailti.resultimport" autoStart="true" startLevel="4" />
       <plugin id="com.sap.sailing.monitoring" autoStart="true" startLevel="7" />
       <plugin id="com.sap.sailing.news" autoStart="true" startLevel="4" />
       <plugin id="com.sap.sailing.polars" autoStart="true" startLevel="5" />
-      <plugin id="com.sap.sailing.landscape.gateway" autoStart="true" startLevel="5" />
       <plugin id="com.sap.sailing.polars.datamining" autoStart="true" startLevel="5" />
-      <plugin id="com.sap.sse.security.datamining" autoStart="true" startLevel="5" />
       <plugin id="com.sap.sailing.resultimport" autoStart="true" startLevel="4" />
+      <plugin id="com.sap.sailing.sailti.resultimport" autoStart="true" startLevel="4" />
       <plugin id="com.sap.sailing.sailwave.resultimport" autoStart="true" startLevel="4" />
+      <plugin id="com.sap.sailing.sailwave.html.resultimport" autoStart="true" startLevel="4" />
       <plugin id="com.sap.sailing.server" autoStart="true" startLevel="5" />
       <plugin id="com.sap.sailing.server.gateway" autoStart="true" startLevel="5" />
       <plugin id="com.sap.sailing.shared.server" autoStart="true" startLevel="5" />
       <plugin id="com.sap.sailing.shared.server.gateway" autoStart="true" startLevel="5" />
-      <plugin id="com.sap.sailing.hanaexport" autoStart="true" startLevel="5" />
       <plugin id="com.sap.sailing.velum.resultimport" autoStart="true" startLevel="4" />
       <plugin id="com.sap.sailing.windestimation" autoStart="true" startLevel="5" />
       <plugin id="com.sap.sailing.www" autoStart="true" startLevel="5" />
@@ -80,14 +82,18 @@
       <plugin id="com.sap.sse.landscape.aws" autoStart="true" startLevel="4" />
       <plugin id="com.sap.sse.mail" autoStart="true" startLevel="5" />
       <plugin id="com.sap.sse.replication" autoStart="true" startLevel="6" />
+      <plugin id="com.sap.sse.security.datamining" autoStart="true" startLevel="5" />
+      <plugin id="com.sap.sailing.aiagent" autoStart="true" startLevel="4" />
+      <plugin id="com.sap.sailing.aiagent.persistence" autoStart="true" startLevel="5" />
+      <plugin id="com.sap.sailing.aiagent.gateway" autoStart="true" startLevel="6" />
       <plugin id="com.sap.sse.security.ui" autoStart="true" startLevel="6" />
       <plugin id="com.sap.sse.security.userstore.mongodb" autoStart="true" startLevel="4" />
       <plugin id="org.apache.aries.spifly.dynamic.bundle" autoStart="true" startLevel="3" />
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="2" />
-      <plugin id="org.eclipse.jetty.apache-jsp" autoStart="true" startLevel="4"/>
-      <plugin id="org.eclipse.jetty.annotations" autoStart="true" startLevel="4"/>
-      <plugin id="org.eclipse.jetty.http" autoStart="true" startLevel="3"/>
+      <plugin id="org.eclipse.jetty.annotations" autoStart="true" startLevel="4" />
+      <plugin id="org.eclipse.jetty.apache-jsp" autoStart="true" startLevel="4" />
+      <plugin id="org.eclipse.jetty.http" autoStart="true" startLevel="3" />
       <plugin id="org.eclipse.jetty.osgi.boot" autoStart="true" startLevel="3" />
       <plugin id="org.eclipse.osgi" autoStart="true" startLevel="-1" />
       <property name="osgi.noShutdown" value="true" />

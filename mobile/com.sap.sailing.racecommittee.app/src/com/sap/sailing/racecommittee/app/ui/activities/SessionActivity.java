@@ -1,6 +1,7 @@
 package com.sap.sailing.racecommittee.app.ui.activities;
 
 import android.os.Bundle;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 
@@ -8,13 +9,11 @@ import com.sap.sailing.android.shared.logging.ExLog;
 import com.sap.sailing.racecommittee.app.R;
 
 public abstract class SessionActivity extends BaseActivity {
-
     private static final String TAG = BaseActivity.class.getName();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -60,5 +59,6 @@ public abstract class SessionActivity extends BaseActivity {
     private void doLogout() {
         ExLog.i(this, TAG, "Do logout now!");
         super.onReset(); // resets the data manager and fades the activity
+        NotificationManagerCompat.from(this).cancelAll();
     }
 }

@@ -11,7 +11,6 @@ import java.util.zip.ZipOutputStream;
 
 import com.sap.sailing.domain.common.trackfiles.TrackFilesDataSource;
 import com.sap.sailing.domain.common.trackfiles.TrackFilesFormat;
-import com.sap.sailing.domain.trackimport.FormatNotSupportedException;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.server.trackfiles.TrackFileExporter;
 import com.sap.sse.util.ThreadPoolUtil;
@@ -30,13 +29,8 @@ public class TrackFileExporterImpl implements TrackFileExporter {
     /**
      * Writes the wanted data of all the races to the output stream. One file per race and data type.
      * 
-     * @param data
-     * @param format
-     * @param races
      * @param dataBeforeAfter
      *            false: do not include data from before the race started and after the race ended
-     * @param out
-     * @throws FormatNotSupportedException
      */
     @Override
     public void writeAllData(List<TrackFilesDataSource> data, TrackFilesFormat format, List<TrackedRace> races,

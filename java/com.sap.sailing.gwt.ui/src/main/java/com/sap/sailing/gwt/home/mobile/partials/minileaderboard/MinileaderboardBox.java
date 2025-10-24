@@ -22,7 +22,7 @@ import com.sap.sailing.gwt.home.shared.app.PlaceNavigation;
 import com.sap.sailing.gwt.home.shared.refresh.RefreshableWidget;
 import com.sap.sailing.gwt.ui.client.FlagImageResolver;
 import com.sap.sailing.gwt.ui.client.StringMessages;
-import com.sap.sailing.gwt.ui.common.client.DateAndTimeFormatterUtil;
+import com.sap.sse.gwt.client.DateAndTimeFormatterUtil;
 
 public class MinileaderboardBox extends Composite implements RefreshableWidget<GetMiniLeaderboardDTO> {
     private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);

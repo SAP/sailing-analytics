@@ -261,11 +261,9 @@ public class AdminConsolePanel<T extends Place & AdminConsolePlace> extends Head
             sysinfoPanel.add(releaseNotesLink);
             informationPanel.add(releaseNotesLink, DockPanel.EAST);
         }
-        
         if (footerAnchor != null) {
             informationPanel.add(footerAnchor, DockPanel.EAST);
         }
-        
         informationPanel.add(sysinfoPanel, DockPanel.EAST);
         informationPanel.setCellHorizontalAlignment(sysinfoPanel, HasHorizontalAlignment.ALIGN_RIGHT);
         this.setFooterWidget(informationPanel);

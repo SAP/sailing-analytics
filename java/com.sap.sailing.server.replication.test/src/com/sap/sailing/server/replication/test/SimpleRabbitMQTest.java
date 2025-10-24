@@ -1,15 +1,15 @@
 package com.sap.sailing.server.replication.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -27,7 +27,7 @@ public class SimpleRabbitMQTest {
     private Connection connection;
     private Channel channel;
     
-    @Before
+    @BeforeEach
     public void setUp() throws IOException, TimeoutException {
         received = new ConcurrentHashMap<Consumer, String>();
         factory = RabbitMQConnectionFactoryHelper.getConnectionFactory();
@@ -36,7 +36,7 @@ public class SimpleRabbitMQTest {
         channel = connection.createChannel();
     }
     
-    @After
+    @AfterEach
     public void tearDown() throws IOException, TimeoutException {
         channel.close();
         connection.close();

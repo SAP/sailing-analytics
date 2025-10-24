@@ -1,9 +1,9 @@
 package com.sap.sailing.domain.test;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.CompetitorWithBoat;
 import com.sap.sailing.domain.common.TrackedRaceStatusEnum;
@@ -22,7 +22,7 @@ public class TrackedRaceStatusUpdateTest extends TrackBasedTest {
     private CompetitorWithBoat competitor;
     private DynamicTrackedRace trackedRace;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         competitor = createCompetitorWithBoat("Test Competitor");
         trackedRace = createTestTrackedRace("Test Regatta", "Test Race", "505", createCompetitorAndBoatsMap(competitor), MillisecondsTimePoint.now(), /* useMarkPassingCalculator */ false);

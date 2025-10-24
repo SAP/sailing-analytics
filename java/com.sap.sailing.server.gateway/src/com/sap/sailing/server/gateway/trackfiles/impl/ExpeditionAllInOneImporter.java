@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
 import org.json.simple.parser.ParseException;
@@ -95,6 +96,7 @@ import com.sap.sailing.server.operationaltransformation.CreateLeaderboardGroup;
 import com.sap.sailing.server.operationaltransformation.CreateRegattaLeaderboard;
 import com.sap.sailing.server.operationaltransformation.UpdateEvent;
 import com.sap.sailing.server.security.PermissionAwareRaceTrackingHandler;
+import com.sap.sailing.server.trackfiles.impl.ExpeditionImportFileHandler;
 import com.sap.sailing.server.util.WaitForTrackedRaceUtil;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
@@ -290,7 +292,11 @@ public class ExpeditionAllInOneImporter {
         securityService.checkCurrentUserServerPermission(ServerActions.CREATE_OBJECT);
         final List<ErrorImportDTO> errors = new ArrayList<>();
         final String importTimeString = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now(ZoneOffset.UTC));
-        final String filename = ExpeditionImportFilenameUtils.truncateFilenameExtentions(filenameWithSuffix);
+        final String filename = ExpeditionImportFilenameUtils.truncateFilenameExtentions(filenameWithSuffix, new ExpeditionImportFileHandler() {
+            @Override // used only to resolve the standard file name extensions defined by the Expedition import file handler
+            protected void handleExpeditionFile(String fileName, InputStream inputStream, Charset charset)
+                    throws IOException, FormatNotSupportedException {
+            }});
         final String filenameWithDateTimeSuffix = filename + "_" + importTimeString;
         final String trackedRaceName = filenameWithDateTimeSuffix;
         final String windSourceId = filenameWithDateTimeSuffix;
@@ -329,6 +335,7 @@ public class ExpeditionAllInOneImporter {
                         final TimePointsOfFirstAndLastFix firstAndLastFixAt = importFixes(filenameWithSuffix, fileItem, jsonHolderForGpsFixImport, jsonHolderForSensorFixImport, errors);
                         final TimePoint eventStartDate = firstAndLastFixAt.getFirstFixAt();
                         final TimePoint eventEndDate = firstAndLastFixAt.getLastFixAt();
+                        logger.info("Trying to create event "+eventName+" and regatta "+regattaName+" on behalf of user "+SecurityUtils.getSubject().getPrincipal());
                         final Iterable<Triple<DynamicTrackedRace, String, String>> trackedRacesAndRaceColumnNamesAndFleetNames =
                                 createEventStructureWithASingleRaceAndTrackIt(
                                     filenameWithSuffix, boatClassName, errors, importTimeString, filename,

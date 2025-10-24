@@ -10,6 +10,7 @@ import com.sap.sailing.domain.common.dto.AbstractLeaderboardDTO;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog.Validator;
+import com.sap.sse.security.ui.client.SecurityChildSettingsContext;
 import com.sap.sse.security.ui.client.premium.PaywallResolver;
 
 public class SingleRaceLeaderboardSettingsDialogComponent
@@ -35,7 +36,7 @@ public class SingleRaceLeaderboardSettingsDialogComponent
                 /* showAddedScores */ showAddedScoresCheckBox.getValue().booleanValue(),
                 showCompetitorShortNameColumnCheckBox.getValue(), showCompetitorFullNameColumnCheckBox.getValue(),
                 showCompetitorBoatInfoColumnCheckBox.getValue(), isCompetitorNationalityColumnVisible.getValue(),
-                showRaceRankColumn.getValue());
+                showRaceRankColumn.getValue(), new SecurityChildSettingsContext(leaderboardDTO, paywallResolver));
         return newSettings;
     }
     

@@ -17,16 +17,17 @@
 KEY_NAME=Axel
 INSTANCE_NAME_TO_TERMINATE="SL paris2024 (Auto-Replica)"
 if [ $# -eq 0 ]; then
-    echo "$0 -R <release-name> -b <replication-bearer-token> [-t <instance-type>] [-i <ami-id>] [-k <key-pair-name>] [-s]"
+    echo "$0 -R <release-name> -b <replication-bearer-token> -m <google-maps-api-key> [-t <instance-type>] [-i <ami-id>] [-k <key-pair-name>] [-s]"
     echo ""
     echo "-b replication bearer token; mandatory"
     echo "-i Amazon Machine Image (AMI) ID to use to launch the instance; defaults to latest image tagged with image-type:sailing-analytics-server"
     echo "-k Key pair name, mapping to the --key-name parameter; defaults to Axel"
+    echo "-m Google Maps API key, used for the GOOGLE_MAPS_AUTHENTICATION_PARAMS variable"
     echo "-R release name; must be provided to select the release, e.g., build-202106040947"
     echo "-t Instance type; defaults to ${INSTANCE_TYPE}"
     echo "-s Skip release download"
     echo
-    echo "Example: $0 -R build-202106041327 -k Jan"
+    echo "Example: $0 -R build-202106041327 -k Jan -m key=ABC93480lasdf84398AFFIHSADF93"
 
     echo "The procedure works in the following steps:"
     echo " - patch *.conf files in sap-p1-1:servers/[master|security_service] and sap-p1-2:servers/[secondary_master|master|security_service] so"
@@ -43,13 +44,14 @@ if [ $# -eq 0 ]; then
     echo "   named \"${INSTANCE_NAME_TO_TERMINATE}\" are available"
     exit 2
 fi
-options='R:b:t:i:k:s'
+options='R:b:t:i:k:sm:'
 while getopts $options option
 do
     case $option in
 	b) BEARER_TOKEN=$OPTARG;;
         i) IMAGE_ID=$OPTARG;;
         k) KEY_NAME=$OPTARG;;
+        m) GOOGLE_MAPS_AUTHENTICATION_PARAMS=$OPTARG;;
         R) RELEASE=$OPTARG;;
 	s) SKIP_DOWNLOAD=1;;
         t) INSTANCE_TYPE=$OPTARG;;
@@ -126,6 +128,9 @@ if [ -n "${KEY_NAME}" ]; then
 fi
 if [ -n "${INSTANCE_TYPE}" ]; then
   OPTIONS="${OPTIONS} -t ${INSTANCE_TYPE}"
+fi
+if [ -n "${GOOGLE_MAPS_AUTHENTICATION_PARAMS}" ]; then
+  OPTIONS="${OPTIONS} -m ${GOOGLE_MAPS_AUTHENTICATION_PARAMS}"
 fi
 `dirname $0`/launch-replicas-in-all-regions.sh ${OPTIONS}
 EXIT_CODE=$?

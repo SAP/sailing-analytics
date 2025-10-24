@@ -1,11 +1,11 @@
 package com.sap.sse.test.jsonsimple;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * We face a strange issue with JSON String literals that represent file names coming from an iPhone

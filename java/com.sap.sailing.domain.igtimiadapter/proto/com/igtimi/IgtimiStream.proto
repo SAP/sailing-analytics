@@ -1,0 +1,163 @@
+/**
+ * File: IgtimiStream
+ * Project: IgtimiRIoT
+ *
+ * Version 0.9.0
+ *
+ * Author Stephen Markham
+ * Date 14/01/2019
+ * Copyright 2019, Igtimi Ltd.
+ * Description
+ *    Protocol definition for data passing over a streamed connection to an Igtimi RIoT node.
+ *
+ *
+ * Note: Versions < 1.0 are liable to breaking changes (including structure)
+ *        and therefore implementations based of these should proceed with caution.
+ *        After 1.0 all changes *should* be backwards compatible.
+ */
+
+syntax = "proto3";
+
+package com.igtimi;
+
+import "com/igtimi/IgtimiAPI.proto";
+import "com/igtimi/IgtimiData.proto";
+import "com/igtimi/IgtimiDevice.proto";
+
+option optimize_for = SPEED;
+
+// Top level message for streaming interface
+message Msg {
+  oneof msg {
+    ChannelManagement channel_management = 1 [json_name = "mgmt"];
+    Data data = 2 [json_name = "d"];
+    AckResponse ack_response = 3 [json_name = "ackResponse"];
+    APIData api_data = 4 [json_name = "apiData"];
+    DeviceManagement device_management = 5 [json_name = "deviceManagement"];
+  }
+}
+
+message AckResponse {
+  uint64 timestamp = 1 [json_name = "t"];
+  bool ack = 2 [json_name = "ack"];
+  uint32 code = 3 [json_name = "code"];
+  string reason = 4 [json_name = "reason"];
+  DataMsg data_message = 5 [json_name = "dataMessage"];
+}
+
+message ChannelManagement {
+  oneof mgmt {
+    uint64 heartbeat = 1 [json_name = "hb"];
+    ServerDisconnecting disconnect = 2 [json_name = "disconnect"];
+    Authentication auth = 3 [json_name = "auth"];
+    DataSubscription subscription = 4 [json_name = "sub"];
+  }
+}
+
+message ServerDisconnecting {
+  uint64 timestamp = 1 [json_name = "t"];
+  uint32 code = 2 [json_name = "code"];
+  string reason = 3 [json_name = "reason"];
+  string reconnect_url = 4 [json_name = "reconnectURL"];
+}
+
+message Authentication {
+  message AuthRequest {
+    uint64 timestamp = 1 [json_name = "t"];
+    Token token = 2 [json_name = "token"];
+  }
+
+  message AuthResponse {
+    uint64 timestamp = 1 [json_name = "t"];
+    Token token = 2 [json_name = "token"];
+    bool ack = 3 [json_name = "ack"];
+    uint32 code = 4 [json_name = "code"];
+    string reason = 5 [json_name = "reason"];
+  }
+
+  oneof auth {
+    AuthRequest auth_request = 1 [json_name = "authRequest"];
+    AuthResponse auth_response = 2 [json_name = "authResponse"];
+  }
+}
+
+message DataSubscription {
+  //     Subscription Request
+  //
+  // Request by a user or device to subscribe to data from a particular source
+  // (either a device or session). If not already provided, the requester must
+  // provide a token for authentication. See authentication for more information.
+  //
+  // Requests may be either for a device or a session, and may optionally provide
+  // a source id 'range' to filter by. We may choose to optionally provide an option
+  // for a maximum rate, for which the details will be provided if/when implemented.
+  //
+  // Requests will either ACK or NAK per device/session (one response per request).
+  message SubscriptionRequest {
+    //    Data source
+    //
+    // Data source must specify a device serial or a session id.
+    // It may also provide an optional source id filter.
+    message DataSource {
+      oneof data_source {
+        string serial_number = 1 [json_name = "serial"];
+        uint32 session_id = 2 [json_name = "session"];
+      }
+      //Optional. E.g "1-100,104,200-1000" or "1,2,3"
+      // Not provided assumes all
+      string source_id_range = 3 [json_name = "sourceIdRange"];
+      string data_type_range = 4 [json_name = "dataTypeRange"];
+
+      //Maximum requested data rate in Hz
+      //This will drop on output with prejudice
+      double max_rate = 5 [json_name = "maxRate"];
+
+      //Connection wants to be 'caught up' with this data source
+      bool catch_up = 6 [json_name = "catchUp"];
+
+      //The last known timestamp that the connection received
+      uint64 catch_up_timestamp = 7 [json_name = "catchUpTimestamp"];
+    }
+
+    uint64 timestamp = 1 [json_name = "t"];
+    // List of data sources (think devices/sessions)
+    repeated DataSource data_source = 2 [json_name = "dataSource"];
+    //Optional token if not already provided. Allows for single message subscription
+    Token token = 3 [json_name = "token"];
+    // optional identifier of the request
+    string id = 4 [json_name = "id"];
+  }
+
+  message SubscriptionResponse {
+    uint64 timestamp = 1 [json_name = "t"];
+    bool ack = 2 [json_name = "ack"];
+    uint32 code = 3 [json_name = "code"];
+    string reason = 4 [json_name = "reason"];
+    // optional identifier of the request
+    string id = 5 [json_name = "id"];
+  }
+
+  message CancelSubscription {
+    uint64 timestamp = 1 [json_name = "t"];
+    repeated string serial_numbers = 2 [json_name = "serials"];
+    repeated uint32 session_ids = 3 [json_name = "sessions"];
+    // optional identifier of the request
+    string id = 4 [json_name = "id"];
+  }
+
+  message CancelResponse {
+    uint64 timestamp = 1 [json_name = "t"];
+    bool ack = 2 [json_name = "ack"];
+    uint32 code = 3 [json_name = "code"];
+    string reason = 4 [json_name = "reason"];
+    // optional identifier of the request
+    string id = 5 [json_name = "id"];
+  }
+
+  oneof sub {
+    SubscriptionRequest subscription_request = 1 [json_name = "subscriptionRequest"];
+    SubscriptionResponse subscription_response = 2 [json_name = "subscriptionResponse"];
+    CancelSubscription cancel_subscription = 3 [json_name = "cancelSubscription"];
+    CancelResponse cancel_response = 4 [json_name = "cancelResponse"];
+  }
+}

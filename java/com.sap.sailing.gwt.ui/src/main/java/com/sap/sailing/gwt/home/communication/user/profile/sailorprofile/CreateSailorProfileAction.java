@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import com.google.gwt.core.shared.GwtIncompatible;
 import com.sap.sailing.domain.base.CompetitorAndBoatStore;
-import com.sap.sailing.server.impl.preferences.model.SailorProfilePreference;
+import com.sap.sailing.server.preferences.SailorProfilePreference;
 
 /**
  * {@link UpdateSailorProfileAction} implementation to create a new sailor profile for the currently logged in user with

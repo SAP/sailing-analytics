@@ -12,6 +12,7 @@ import com.sap.sailing.domain.common.dto.CompetitorDTO;
 import com.sap.sailing.gwt.home.desktop.places.qrcode.QRCodePlace.InvitationMode;
 import com.sap.sailing.gwt.ui.shared.MarkDTO;
 import com.sap.sailing.gwt.ui.shared.QRCodeEvent;
+import com.sap.sailing.landscape.common.SharedLandscapeConstants;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Triple;
 
@@ -57,7 +58,7 @@ public class QRCodePresenter {
 
     private boolean isSecureServer(Triple<String, String, Integer> correctServerHost) {
         String host = correctServerHost.getB();
-        if (host.endsWith("sapsailing.com")) {
+        if (host.endsWith(SharedLandscapeConstants.DEFAULT_DOMAIN_NAME)) {
             return true;
         }
         if (host.equals("127.0.0.1")) {

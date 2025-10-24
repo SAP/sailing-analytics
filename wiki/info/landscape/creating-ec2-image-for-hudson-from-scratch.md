@@ -1,6 +1,6 @@
 # Setting up an image for the hudson.sapsailing.com server
 
-Like when setting up a regular sailing application server instance, start with a fresh Amazon Linux 2 image and create an instance with a 16GB root volume. Use the "Sailing Analytics Server" security group and something like a ``t3.small`` instance type for creating the image. Then, invoke the script
+Like when setting up a regular sailing application server instance, start with a fresh Amazon Linux 2 image and create an instance with a 32GB root volume. Use the "Sailing Analytics Server" security group and something like a ``t3.medium`` instance type. Then, invoke the script
 ```
     configuration/hudson_instance_setup/setup-hudson-server.sh {external-IP-of-new-instance}
 ```
@@ -10,7 +10,7 @@ The ``/home/hudson/android-sdk-linux`` folder that is later expected to be mount
 
 When the script has finished, proceed as follows:
 
-* make a volume available that holds the ``/home/hudson`` content, including the ``android-sdk-linux`` folder. This can happen, e.g., by creating a snapshot of the existing ``/home/hudson`` volume of the running "Build/Dev/Test" server, or you may search the weekly backup snapshots for the latest version to start with. Make sure to create the volume in the same availability zone (AZ) as your instance is running in.
+* make a volume available that holds the ``/home/hudson`` content, including the ``android-sdk-linux`` folder. This can happen, e.g., by creating a snapshot of the existing ``/home/hudson`` volume of the running "Build/Dev/Test" server, or you may search the weekly backup snapshots for the latest version to start with, or you may even stop the running Hudson, unmount and detach the /home/hudson volume and attach/mount on the new instance as long as the new instance runs in the same availability zone (AZ). Make sure to create the volume in the same availability zone (AZ) as your instance is running in.
 * Based on how full the volume already is, consider re-sizing it by creating the volume larger than the snapshot.
 * Attach it.
 * In the instance, as ``root`` user, call ``dmesg``. This will show the new volume that just got attached, as well as its partition names.
@@ -27,7 +27,11 @@ To find out ``{the-UUID-of-the-partition-to-mount}``, use ``blkid``.
 ```
 * If you'd like to keep in sync with the latest version of a still running live Hudson environment, keep copying its ``/home/hudson`` contents with ``rsync -av root@dev.internal.sapsailing.com:/home/hudson/ /home/hudson/`` until you switch
 * Ensure you have EC2 / EBS snapshot backups for the volumes by tagging them as follows: ``WeeklySailingInfrastructureBackup=Yes`` for ``/`` and ``/home/hudson``.
-
+* Then run the following to correctly configure the aws keys and ssh keys. Make sure to add the correct key to your ssh agent and use agent forwarding via the -A ssh option, as it will try to connect to root@sapsailing.com in order to access the key_vault.
+```
+. imageupgrade_functions.sh
+setup_keys -p build_server # -p preserves existing ownerships and permissions.
+```
 ## In-Place Start-Up
 
 You can then either use the instance right away by starting the two essential services, as follows:
@@ -45,10 +49,9 @@ Then terminate your instance used only for image creation and launch from the AM
 
 ## Steps to Perform to Activate the New Server
 
+* Tag the new instance with the `sailing-analytics-server` tag and value `DEV`
 * Replace the old "Build/Test/Dev" instance in the "Hudson" and "S-DEV" and "S-DEV-m" target groups with the new one
-* Switch the elastic IP ``52.17.217.83`` to the new instance, too
 * Change the ``dev.internal.sapsailing.com`` Route53 DNS entry from the old instance's internal IP address to the new instance's internal IP address
-
 
 ## Testing the New and Terminating the Old Instance
 

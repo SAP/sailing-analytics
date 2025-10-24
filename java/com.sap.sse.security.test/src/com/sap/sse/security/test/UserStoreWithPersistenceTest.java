@@ -1,11 +1,11 @@
 package com.sap.sse.security.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -17,8 +17,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoDatabase;
@@ -28,12 +28,13 @@ import com.sap.sse.mongodb.MongoDBConfiguration;
 import com.sap.sse.mongodb.MongoDBService;
 import com.sap.sse.security.interfaces.UserImpl;
 import com.sap.sse.security.interfaces.UserStore;
-import com.sap.sse.security.shared.UserStoreManagementException;
 import com.sap.sse.security.shared.RoleDefinition;
 import com.sap.sse.security.shared.RoleDefinitionImpl;
 import com.sap.sse.security.shared.SecurityUser;
 import com.sap.sse.security.shared.UserGroupManagementException;
 import com.sap.sse.security.shared.UserManagementException;
+import com.sap.sse.security.shared.UserStoreManagementException;
+import com.sap.sse.security.shared.impl.LockingAndBanningImpl;
 import com.sap.sse.security.shared.impl.Ownership;
 import com.sap.sse.security.shared.impl.Role;
 import com.sap.sse.security.shared.impl.User;
@@ -59,7 +60,7 @@ public class UserStoreWithPersistenceTest {
 
     private UserStoreImpl store;
 
-    @Before
+    @BeforeEach
     public void setUp() throws UnknownHostException, MongoException, UserGroupManagementException {
         final MongoDBConfiguration dbConfiguration = MongoDBConfiguration.getDefaultTestConfiguration();
         final MongoDBService service = dbConfiguration.getService();
@@ -91,7 +92,7 @@ public class UserStoreWithPersistenceTest {
 
     @Test
     public void testCreateUser() throws UserManagementException {
-        store.createUser(username, email);
+        store.createUser(username, email, new LockingAndBanningImpl());
         assertNotNull(store.getUserByName(username));
         assertNotNull(store.getUserByEmail(email));
 
@@ -102,12 +103,12 @@ public class UserStoreWithPersistenceTest {
 
     @Test
     public void testMasterdataIsSaved() throws UserStoreManagementException {
-        store.createUser(username, email);
+        store.createUser(username, email, new LockingAndBanningImpl());
         UserGroupImpl defaultTenant = createUserGroup();
         HashMap<String, UserGroup> defaultTenantForServers = new HashMap<>();
         defaultTenantForServers.put(serverName, defaultTenant);
         store.updateUser(new UserImpl(username, email, fullName, company, Locale.GERMAN, false, null, null,
-                defaultTenantForServers, Collections.emptySet(), /* userGroupProvider */ null));
+                defaultTenantForServers, Collections.emptySet(), /* userGroupProvider */ null, new LockingAndBanningImpl()));
         newStore();
         User savedUser = store.getUserByName(username);
         assertEquals(username, savedUser.getName());
@@ -122,7 +123,7 @@ public class UserStoreWithPersistenceTest {
      */
     @Test
     public void testDeleteUser() throws UserManagementException {
-        store.createUser(username, email);
+        store.createUser(username, email, new LockingAndBanningImpl());
         store.deleteUser(username);
         assertNull(store.getUserByName(username));
         assertNull(store.getUserByEmail(email));
@@ -134,7 +135,7 @@ public class UserStoreWithPersistenceTest {
 
     @Test
     public void testSetPreferences() throws UserManagementException {
-        store.createUser(username, email);
+        store.createUser(username, email, new LockingAndBanningImpl());
         store.setPreference(username, prefKey, prefValue);
         assertEquals(prefValue, store.getPreference(username, prefKey));
         newStore();
@@ -143,7 +144,7 @@ public class UserStoreWithPersistenceTest {
 
     @Test
     public void testUnsetPreferences() throws UserManagementException {
-        store.createUser(username, email);
+        store.createUser(username, email, new LockingAndBanningImpl());
         store.setPreference(username, prefKey, prefValue);
         store.unsetPreference(username, prefKey);
         assertNull(store.getPreference(username, prefKey));
@@ -156,7 +157,7 @@ public class UserStoreWithPersistenceTest {
      */
     @Test
     public void testDeleteUserWithPreferences() throws UserManagementException {
-        store.createUser(username, email);
+        store.createUser(username, email, new LockingAndBanningImpl());
         store.setPreference(username, prefKey, prefValue);
         store.deleteUser(username);
         assertNull(store.getPreference(username, prefKey));
@@ -166,7 +167,7 @@ public class UserStoreWithPersistenceTest {
 
     @Test
     public void testCreateUserGroup() throws UserGroupManagementException, UserManagementException {
-        final User user = store.createUser(username, email);
+        final User user = store.createUser(username, email, new LockingAndBanningImpl());
         UserGroupImpl createUserGroup = createUserGroup();
         createUserGroup.add(user);
         store.updateUserGroup(createUserGroup);
@@ -195,7 +196,7 @@ public class UserStoreWithPersistenceTest {
     @Test
     public void testTenantUsers() throws UserManagementException, UserGroupManagementException {
         UserGroupImpl defaultTenant = createUserGroup();
-        final User user = store.createUser(username, email);
+        final User user = store.createUser(username, email, new LockingAndBanningImpl());
         defaultTenant.add(user);
         store.updateUserGroup(defaultTenant);
         user.getDefaultTenantMap().put(serverName, defaultTenant);
@@ -217,7 +218,7 @@ public class UserStoreWithPersistenceTest {
 
     @Test
     public void testUserGroups() throws UserManagementException, UserGroupManagementException {
-        final User user = store.createUser(username, email);
+        final User user = store.createUser(username, email, new LockingAndBanningImpl());
         final String GROUP_NAME = "group";
         final UserGroupImpl group = store.createUserGroup(UUID.randomUUID(), GROUP_NAME);
         group.add(user);
@@ -241,7 +242,7 @@ public class UserStoreWithPersistenceTest {
     @Test
     public void testGetExistingQualificationsForRoleDefinition()
             throws UserManagementException, UserGroupManagementException {
-        User user = store.createUser("def", "d@test.de");
+        User user = store.createUser("def", "d@test.de", new LockingAndBanningImpl());
         RoleDefinitionImpl roleDefinition = new RoleDefinitionImpl(UUID.randomUUID(), "My-Test-Role");
         store.createRoleDefinition(roleDefinition.getId(), roleDefinition.getName(), new ArrayList<>());
         UserGroupImpl userGroup = store.createUserGroup(UUID.randomUUID(), "Test-Usergroup");

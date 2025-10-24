@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.test.tractrac;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sse.common.Duration;
 import com.tractrac.model.lib.api.ModelLocator;
@@ -32,15 +32,15 @@ import com.tractrac.model.lib.api.data.IPosition;
 import com.tractrac.model.lib.api.event.CreateModelException;
 import com.tractrac.model.lib.api.event.IRace;
 import com.tractrac.model.lib.api.event.IRaceCompetitor;
-import com.tractrac.model.lib.api.route.IControl;
+import com.tractrac.model.lib.api.map.IPositionedItem;
 import com.tractrac.subscription.lib.api.IRaceSubscriber;
 import com.tractrac.subscription.lib.api.SubscriptionLocator;
 import com.tractrac.subscription.lib.api.competitor.IPositionListener;
 import com.tractrac.subscription.lib.api.control.IControlPassingsListener;
-import com.tractrac.subscription.lib.api.control.IControlPointPositionListener;
 import com.tractrac.subscription.lib.api.event.IConnectionStatusListener;
 import com.tractrac.subscription.lib.api.event.ILiveDataEvent;
 import com.tractrac.subscription.lib.api.event.IStoredDataEvent;
+import com.tractrac.subscription.lib.api.map.IPositionedItemPositionListener;
 import com.tractrac.util.lib.api.autolog.LoggerLocator;
 
 /**
@@ -73,7 +73,7 @@ public class JorgesTracTracParallelLoadingTest {
                         SubscriptionLogger subscriptionLogger = new SubscriptionLogger(race);
                         IRaceSubscriber raceSubscriber = SubscriptionLocator.getSusbcriberFactory().createRaceSubscriber(race);
                         raceSubscriber.subscribePositions(subscriptionLogger);
-                        raceSubscriber.subscribeControlPositions(subscriptionLogger);
+                        raceSubscriber.subscribePositionedItemPositions(subscriptionLogger);
                         raceSubscriber.subscribeControlPassings(subscriptionLogger);
                         raceSubscriber.subscribeConnectionStatus(subscriptionLogger);
                         raceSubscriber.start();
@@ -140,7 +140,7 @@ public class JorgesTracTracParallelLoadingTest {
     /**
      * Created by jorge on 15/02/17.
      */
-    public class SubscriptionLogger implements IControlPointPositionListener, IControlPassingsListener, IPositionListener,
+    public class SubscriptionLogger implements IPositionedItemPositionListener, IControlPassingsListener, IPositionListener,
             IConnectionStatusListener {
         private final IRace race;
         
@@ -191,7 +191,7 @@ public class JorgesTracTracParallelLoadingTest {
         }
 
         @Override
-        public void gotControlPointPosition(IControl control, IPosition position, int controlPointNumber) {
+        public void gotPositionedItemPosition(IPositionedItem control, IPosition position) {
             String outputFile = race.getName() + "-Control-" + control.getName() + "-Positions.txt";
             String date = String.valueOf(position.getTimestamp());
 
@@ -249,7 +249,7 @@ public class JorgesTracTracParallelLoadingTest {
             fail("Key set differs: a-b="+diff1+", b-a="+diff2+"; in the meantime the following keys were updated: "+outputs.keySet());
         }
         for (String key : firstRunsOutput.keySet()) {
-            assertEquals("values for key "+key+" differ", firstRunsOutput.get(key).toString(), secondRunsOutput.get(key).toString());
+            assertEquals(firstRunsOutput.get(key).toString(), secondRunsOutput.get(key).toString(), "values for key "+key+" differ");
         }
     }
 }

@@ -1,13 +1,13 @@
 package com.sap.sailing.server.trackfiles.test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
@@ -19,7 +19,7 @@ import com.sap.sailing.server.trackfiles.impl.RouteConverterGPSFixImporterImpl;
 public class TrackFileImportTest {
     private boolean callbackCalled = false;
 
-    @Before
+    @BeforeEach
     public void setup() {
         callbackCalled = false;
     }
