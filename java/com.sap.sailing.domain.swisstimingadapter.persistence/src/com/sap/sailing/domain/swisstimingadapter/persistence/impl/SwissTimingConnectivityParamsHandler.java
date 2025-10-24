@@ -224,7 +224,8 @@ public class SwissTimingConnectivityParamsHandler extends AbstractRaceTrackingCo
             final SwissTimingConfiguration swissTimingConfiguration = SwissTimingFactory.INSTANCE
                     .createSwissTimingConfiguration(result.getEventName(), result.getManage2SailEventUrl(), result.getHostname(), result.getPort(), result.getUpdateURL(),
                             result.getApiToken(), creatorName);
-            SwissTimingAdapterPersistence.INSTANCE.updateSwissTimingConfiguration(swissTimingConfiguration, isApiTokenAvailable);
+            SwissTimingAdapterPersistence.INSTANCE.updateSwissTimingConfiguration(swissTimingConfiguration,
+                    /* isApiTokenAvailable true because we just loaded the configuration from somewhere */ true);
             securityService.setDefaultOwnershipIfNotSet(swissTimingConfiguration.getIdentifier());
         }
         return result;
