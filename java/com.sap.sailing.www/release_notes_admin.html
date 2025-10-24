@@ -36,6 +36,15 @@
                     The API token also replaces the username/password authentication scheme for the update
                     back channel from which TracTrac can optionally receive updates coming from the Race
                     Manager app, such as race start times, race aborts, or course configurations.</li>
+                <li>For the following system properties, alternative environment variables have been introduced:
+                    <ul>
+                        <li><tt>AWS_S3_TEST_S3ACCESSID</tt> for <tt>aws.s3.test.s3AccessId</tt></li>
+                        <li><tt>AWS_S3_TEST_S3ACCESSKEY</tt> for <tt>aws.s3.test.s3AccessKey</tt></li>
+                        <li><tt>GOOGLE_MAPS_AUTHENTICATION_PARAMS</tt> for <tt>google.maps.authenticationparams</tt></li>
+                        <li><tt>YOUTUBE_V3_API_KEY</tt> for <tt>youtube.api.key</tt></li>
+                        <li><tt>GEONAMES_ORG_USERNAMES</tt> for <tt>geonames.org.usernames</tt></li>
+                    </ul>   
+                    If the system property is set, it takes precedence over the environment variable.</li>
           </ul>
           <h2 class="articleSubheadline">September 2025</h2>
           <ul class="bulletList">
