@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.TimeZone;
 import java.util.logging.Level;
@@ -36,7 +37,21 @@ import com.sap.sse.common.Util;
 import com.sap.sse.util.HttpUrlConnectionHelper;
 
 public class ReverseGeocoderImpl implements ReverseGeocoder {
+    /**
+     * The system property name to get the comma separated list of geonames.org usernames; takes precedence over
+     * the environment variable whose name is given by {@link #USERNAMES_ENV_VARIABLE_NAME}.
+     */
     private static final String USERNAMES_SYSTEM_PROPERTY_NAME = "geonames.org.usernames";
+    
+    /**
+     * The environment variable name to get the comma separated list of geonames.org usernames. Not evaluated
+     * if the system property whose name is given by {@link #USERNAMES_SYSTEM_PROPERTY_NAME} is set.
+     */
+    private static final String USERNAMES_ENV_VARIABLE_NAME = "GEONAMES_ORG_USERNAMES";
+    
+    /**
+     * Default username in case neither system property nor environment variable is set.
+     */
     private static final String GEONAMES_DEFAULT_USER_NAME = "sailtracking0";
 
     private static final String DATES = "dates";
@@ -63,7 +78,8 @@ public class ReverseGeocoderImpl implements ReverseGeocoder {
     private static final Logger logger = Logger.getLogger(ReverseGeocoderImpl.class.getName());
 
     public ReverseGeocoderImpl() {
-        final String commaSeparatedUsernames = System.getProperty(USERNAMES_SYSTEM_PROPERTY_NAME, GEONAMES_DEFAULT_USER_NAME);
+        final String commaSeparatedUsernames = System.getProperty(USERNAMES_SYSTEM_PROPERTY_NAME,
+                Optional.ofNullable(System.getenv(USERNAMES_ENV_VARIABLE_NAME)).orElse(GEONAMES_DEFAULT_USER_NAME));
         this.usernames = commaSeparatedUsernames.split(",");
     }
     
