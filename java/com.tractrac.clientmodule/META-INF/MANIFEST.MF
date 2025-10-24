@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: TracTrac Client module
 Bundle-SymbolicName: com.tractrac.clientmodule
-Bundle-Version: 4.0.3
+Bundle-Version: 4.0.4
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .,
  lib/TracAPI.jar

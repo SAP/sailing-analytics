@@ -12,7 +12,8 @@ Require-Bundle: com.sap.sailing.domain,
  com.sap.sse.common,
  net.sf.marineapi,
  com.sap.sailing.declination
-Import-Package: org.osgi.framework
+Import-Package: org.osgi.framework,
+ com.sap.sailing.domain.shared.tracking
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: com.sap.sailing.nmeaconnector.impl.Activator
 Automatic-Module-Name: com.sap.sailing.nmeaconnector

@@ -433,6 +433,8 @@ public class UserService implements TakedownNoticeService {
             try {
                 if (stringValue != null) {
                     callback.accept(new MillisecondsTimePoint(Long.parseLong(stringValue)));
+                } else {
+                    callback.accept(null);
                 }
             } catch (Exception e) {
                 logger.warning("Error parsing localstore value '" + stringValue + "'");

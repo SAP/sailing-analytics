@@ -369,4 +369,4 @@ When TracTrac publishes a TracAPI upgrade, they usually notify us by e-mail and 
 
 After downloading, extract the ``lib/TracAPI.jar`` and ``src/TracAPI-src.jar`` from the ``TracAPI-x.y.z.tar.gz`` to ``java/com.tractrac.clientmodule/lib``. Unpack the ``TracAPI-x.y.z-javadoc.tar.gz`` into ``java/com.tractrac.clientmodule/javadoc`` and adjust the versions in ``META-INF/MANIFEST.MF`` and ``pom.xml`` accordingly. Unpack the ``Readme.txt`` file from ``TracAPI-x.y.z.tar.gz`` to ``java/com.tractrac.clientmodule``. Optionally, unpack the sample sources from the ``src/com`` folder contained in ``TracAPI-x.y.z.tar.gz`` into ``java/com.tractrac.clientmodule/src``.
 
-For non-trivial upgrades use of a git branch and dedicated build job is recommended. Otherwise, committing and pushing to master with the ``SAPSailingAnalytics-master`` build job picking up and testing the changes should suffice.
+For non-trivial upgrades use of a git branch and dedicated build job is recommended. Otherwise, committing and pushing to the ``main`` branch with the ``SAPSailingAnalytics-master`` build job picking up and testing the changes should suffice.

@@ -17,6 +17,18 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - name: Convert repo name to lowercase GHCR package
+        id: ghcr
+        env:
+            GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          # $GITHUB_REPOSITORY is in format owner/repo
+          OWNER=${GITHUB_REPOSITORY%%/*}          # extract owner
+          REPO=${GITHUB_REPOSITORY##*/}           # extract repo
+          OWNER_LOWER=$(echo "$OWNER" | tr '[:upper:]' '[:lower:]')  # lowercase owner
+          REPO_LOWER=$(echo "$REPO" | tr '[:upper:]' '[:lower:]')  # lowercase repo
+          PACKAGE="$OWNER_LOWER/$REPO_LOWER"
+          echo "PACKAGE=${PACKAGE}" >> $GITHUB_OUTPUT
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -50,7 +62,7 @@ jobs:
       - name: Download release
         shell: bash
         run: |
-          RELEASE_TAR_GZ_FILENAME=$( configuration/github-download-release-assets.sh ${{ secrets.GITHUB_TOKEN }} ${{ env.RELEASE_PREFIX }} )
+          RELEASE_TAR_GZ_FILENAME=$( configuration/github-download-release-assets.sh ${{ secrets.GITHUB_TOKEN }} ${{ env.RELEASE_PREFIX }} ${{ github.repository }} )
           RELEASE=$( echo ${RELEASE_TAR_GZ_FILENAME} | sed -e 's/\.tar\.gz$//' )
           if [ -n ${RELEASE_TAR_GZ_FILENAME} ]; then
             mv ${RELEASE_TAR_GZ_FILENAME} docker/
@@ -60,7 +72,7 @@ jobs:
         uses: docker/build-push-action@ca877d9245402d1537745e0e356eab47c3520991 # v6.13.0
         with:
           build-args: RELEASE=${{ env.RELEASE }}
-          tags: ghcr.io/sap/sailing-analytics:${{ env.RELEASE }}${{ env.BRANCH == 'main' && github.event.inputs.release == '' && ',ghcr.io/sap/sailing-analytics:latest' || env.BRANCH == 'docker-17' && github.event.inputs.release == '' && ',ghcr.io/sap/sailing-analytics:latest-17' || env.BRANCH == 'docker-21' && github.event.inputs.release == '' && ',ghcr.io/sap/sailing-analytics:latest-21' || env.BRANCH == 'docker-24' && github.event.inputs.release == '' && ',ghcr.io/sap/sailing-analytics:latest-24' || '' }}
+          tags: ghcr.io/${{steps.ghcr.outputs.PACKAGE}}:${{ env.RELEASE }}${{ env.BRANCH == 'main' && github.event.inputs.release == '' && format(',ghcr.io/{0}:latest', steps.ghcr.outputs.PACKAGE) || env.BRANCH == 'docker-17' && github.event.inputs.release == '' && format(',ghcr.io/{0}:latest-17', steps.ghcr.outputs.PACKAGE) || env.BRANCH == 'docker-21' && github.event.inputs.release == '' && format(',ghcr.io/{0}:latest-21', steps.ghcr.outputs.PACKAGE) || env.BRANCH == 'docker-24' && github.event.inputs.release == '' && format(',ghcr.io/{0}:latest-24', steps.ghcr.outputs.PACKAGE) || '' }}
           annotations: |
             maintainer=axel.uhl@sap.com
             index:org.opencontainers.image.title=Sailing Analytics

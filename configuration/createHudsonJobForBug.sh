@@ -27,9 +27,9 @@ curl -s -X GET $COPY_TEMPLATE_CONFIG_URL -u "$USERNAME:$PASSWORD" -o "$CONFIGFIL
 # On macosx is gnu-sed needed
 if [[ "$OSTYPE" == *"$OS_FOR_GSED"* ]]; then
   echo "Using gsed"
-  gsed -i'' -e 's|<description>..*</description>|<description>This is the CI job for \&lt;a href=\&quot;'$BUGZILLA_BASE'/show_bug.cgi?id='$BUG_ID'\&quot;\&gt;Bug '$BUG_ID'\&lt;/a\&gt;</description>|' -e 's|<disabled>true</disabled>|<disabled>false</disabled>|' "$CONFIGFILE"
+  gsed -i'' -e 's|<description>..*</description>|<description>This is the CI job for \&lt;a href=\&quot;'$BUGZILLA_BASE'/show_bug.cgi?id='$BUG_ID'\&quot;\&gt;Bug '$BUG_ID'\&lt;/a\&gt;. See its latest \&lt;a href=\&quot;/userContent/measurements.html?job=bug'$BUG_ID'\&quot;\&gt;quality and performance measurements here.\&lt;/a\&gt;</description>|' -e 's|<disabled>true</disabled>|<disabled>false</disabled>|' "$CONFIGFILE"
 else
-  sed -i -e 's|<description>..*</description>|<description>This is the CI job for \&lt;a href=\&quot;'$BUGZILLA_BASE'/show_bug.cgi?id='$BUG_ID'\&quot;\&gt;Bug '$BUG_ID'\&lt;/a\&gt;</description>|' -e 's|<disabled>true</disabled>|<disabled>false</disabled>|' "$CONFIGFILE"
+  sed -i -e 's|<description>..*</description>|<description>This is the CI job for \&lt;a href=\&quot;'$BUGZILLA_BASE'/show_bug.cgi?id='$BUG_ID'\&quot;\&gt;Bug '$BUG_ID'\&lt;/a\&gt;. See its latest \&lt;a href=\&quot;/userContent/measurements.html?job=bug'$BUG_ID'\&quot;\&gt;quality and performance measurements here.\&lt;/a\&gt;</description>|' -e 's|<disabled>true</disabled>|<disabled>false</disabled>|' "$CONFIGFILE"
 fi
 
 # On macosx is gnu-sed needed

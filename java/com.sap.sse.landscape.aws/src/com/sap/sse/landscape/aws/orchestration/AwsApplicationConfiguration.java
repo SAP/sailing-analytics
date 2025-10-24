@@ -58,9 +58,6 @@ implements UserDataProvider {
      * <li>The {@link #setMailSmtpPort(int) SMTP port} defaults to 25.</li>
      * <li>The {@link #setMailSmtpHost(String) mail SMTP host} defaults to <tt>email-smtp.${region}.amazonaws.com</tt>.</li>
      * <li>The {@link #setMailSmtpAuth(boolean) mail SMTP authentication} is activated by default.</li>
-     * <li>The {@link #setMailSmtpUser(String) mail SMTP user} defaults to {@code AKIAIHCQEFAZDLIK7SUQ} which is the
-     * project's AWS SES (Simple e-Mail Service) username. The {@link #setMailSmtpPassword(String) password}, however,
-     * must explicitly be provided and does not default to any non-{@code null}, non-empty value.</li>
      * <li>The {@link #setMemoryInMegabytes(int) memory size} allocated to the process defaults to what {@link #setMemoryTotalSizeFactor(int)}
      * sets, or, if {@link #setMemoryTotalSizeFactor(int)} isn't used either, to 3/4 of the physical memory available
      * on the host running the application, minus some baseline allocated to the operating system.</li>
@@ -148,7 +145,6 @@ implements UserDataProvider {
          * The pattern requires the region ID as {@link String} parameter and produces an AWS SES SMTP hostname for that region.
          */
         private static final String DEFAULT_SMTP_HOSTNAME_PATTERN = "email-smtp.%s.amazonaws.com";
-        private static final String DEFAULT_SMTP_USER = "AKIAIHCQEFAZDLIK7SUQ";
         private static final Integer DEFAULT_SMTP_PORT = 25;
         private AwsLandscape<ShardingKey> landscape;
         private AwsRegion region;
@@ -388,7 +384,9 @@ implements UserDataProvider {
             userData.put(DefaultProcessConfigurationVariables.MAIL_SMTP_HOST, mailSmtpHost==null?getDefaultAwsSesMailHostForRegion():mailSmtpHost);
             userData.put(DefaultProcessConfigurationVariables.MAIL_SMTP_PORT, mailSmtpPort==null?DEFAULT_SMTP_PORT.toString():mailSmtpPort.toString());
             userData.put(DefaultProcessConfigurationVariables.MAIL_SMTP_AUTH, mailSmtpAuth==null?Boolean.TRUE.toString():mailSmtpAuth.toString());
-            userData.put(DefaultProcessConfigurationVariables.MAIL_SMTP_USER, mailSmtpUser==null?DEFAULT_SMTP_USER:mailSmtpUser);
+            if (mailSmtpUser != null) {
+                userData.put(DefaultProcessConfigurationVariables.MAIL_SMTP_USER, mailSmtpUser);
+            }
             if (mailSmtpPassword != null) {
                 userData.put(DefaultProcessConfigurationVariables.MAIL_SMTP_PASSWORD, mailSmtpPassword);
             }

@@ -55,9 +55,9 @@ Export-Package: com.sap.sailing.domain.abstractlog,
  com.sap.sailing.domain.racelogtracking,
  com.sap.sailing.domain.racelogtracking.impl,
  com.sap.sailing.domain.resultimport,
+ com.sap.sailing.domain.shared.tracking,
+ com.sap.sailing.domain.shared.tracking.impl,
  com.sap.sailing.domain.statistics,
- com.sap.sailing.domain.statistics.impl,
- com.sap.sailing.domain.tracking,
- com.sap.sailing.domain.tracking.impl
+ com.sap.sailing.domain.statistics.impl
 Automatic-Module-Name: com.sap.sailing.domain.shared.android
 Import-Package: com.sap.sse.security.shared

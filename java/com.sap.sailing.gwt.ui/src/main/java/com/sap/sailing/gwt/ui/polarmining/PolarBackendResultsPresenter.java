@@ -59,7 +59,6 @@ public class PolarBackendResultsPresenter extends AbstractSailingResultsPresente
     public PolarBackendResultsPresenter(Component<?> parent, ComponentContext<?> context,
             StringMessages stringMessages) {
         super(parent, context, stringMessages);
-
         polarChart = ChartFactory.createPolarChart();
         polarChart.getYAxis().setMin(0);
         polarChartWrapperPanel = new SimpleLayoutPanel() {
@@ -70,7 +69,6 @@ public class PolarBackendResultsPresenter extends AbstractSailingResultsPresente
             }
         };
         polarChartWrapperPanel.add(polarChart);
-
         speedChart = ChartFactory.createSpeedChart(stringMessages);
         angleChart = ChartFactory.createAngleChart(stringMessages);
         speedAndAngleChart = new DockLayoutPanel(Unit.PCT) {
@@ -84,16 +82,12 @@ public class PolarBackendResultsPresenter extends AbstractSailingResultsPresente
         };
         speedAndAngleChart.addNorth(speedChart, 50);
         speedAndAngleChart.addSouth(angleChart, 50);
-
         dockLayoutPanel = new DockLayoutPanel(Unit.PCT);
         dockLayoutPanel.addWest(polarChartWrapperPanel, 40);
         dockLayoutPanel.addEast(speedAndAngleChart, 60);
-
         ChartToCsvExporter chartToCsvExporter = new ChartToCsvExporter(stringMessages.csvCopiedToClipboard());
-
         Button exportStatisticsCurveToCsvButton = new Button(stringMessages.exportStatisticsCurveToCsv(),
                 new ClickHandler() {
-
                     @Override
                     public void onClick(ClickEvent event) {
                         chartToCsvExporter.exportChartAsCsvToClipboard(polarChart);

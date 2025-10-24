@@ -5,6 +5,7 @@ on:
       - 'wiki/**'
       - '.github/workflows/*'
       - '**/*.md'
+      - 'README.md'
   workflow_dispatch:
     inputs:
       skip_tests:
@@ -14,8 +15,8 @@ on:
         description: Build with a local target platform (set to "true" to use local target platform)
         default: 'false'
       runner_cpus:
-        description: Default is 16, but can be 4, 8, and 64 as well
-        default: '16'
+        description: Empty means ubuntu-latest, usually 4 CPUs with little disk/memory, but if you have runners named ubuntu-latest-Xcpu, it can be 4, 8, 16, and 64 as well, using, e.g., ubuntu-latest-16cpu; default is ubuntu-latest
+        default: ''
       firefox_version:
         description: Version to use for Selenium tests; default is 137.0, but could, e.g., be "141.0" or "latest"
         default: '140.0'
@@ -25,16 +26,36 @@ jobs:
     permissions:
       contents: write
       checks: write
-    runs-on: ubuntu-latest-${{ github.event.inputs.runner_cpus == '' && '16' || github.event.inputs.runner_cpus }}cpu
+      actions: read
+    runs-on: ${{ github.event.inputs.runner_cpus != '' && format('ubuntu-latest-{0}cpu', github.event.inputs.runner_cpus) || 'ubuntu-latest' }}
     steps:
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: false
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: false
+          swap-storage: true
       - name: Allocate swap space
         shell: bash
         run: |
-          sudo dd if=/dev/zero of=/mnt/large-swapfile bs=1G count=10
+          sudo dd if=/dev/zero of=/mnt/large-swapfile bs=1G count=30
           sudo chmod 600 /mnt/large-swapfile
           sudo mkswap /mnt/large-swapfile
           sudo chown root:root /mnt/large-swapfile
           sudo swapon /mnt/large-swapfile
+      - name: Create TMP space under /mnt/tmp
+        shell: bash
+        run: |
+          sudo mkdir /mnt/tmp
+          sudo chmod 777 /mnt/tmp
       - name: Collect Workflow Telemetry
         uses: catchpoint/workflow-telemetry-action@94c3c3d9567a0205de6da68a76c428ce4e769af1 # v2.0.0
         with:
@@ -79,10 +100,18 @@ jobs:
           ports: '5672:5672'
       - shell: bash
         env: # Or as an environment variable
-          APP_PARAMETERS: "-Daws.region=eu-west-1 -Dgoogle.maps.authenticationparams=${{ secrets.GOOGLE_MAPS_AUTHENTICATIONPARAMS }} -Daws.s3.test.s3AccessId=${{ secrets.AWS_S3_TEST_S3ACCESSID }} -Daws.s3.test.s3AccessKey=${{ secrets.AWS_S3_TEST_S3ACCESSKEY }} -Dgeonames.org.usernames=${{ secrets.GEONAMES_ORG_USERNAMES }}"
+          TMP: /mnt/tmp
+          AWS_S3_TEST_S3ACCESSID: ${{ secrets.AWS_S3_TEST_S3ACCESSID }}
+          AWS_S3_TEST_S3ACCESSKEY: ${{ secrets.AWS_S3_TEST_S3ACCESSKEY }}
+          GEONAMES_ORG_USERNAMES: ${{ secrets.GEONAMES_ORG_USERNAMES }}
+          GOOGLE_MAPS_AUTHENTICATION_PARAMS: ${{ secrets.GOOGLE_MAPS_AUTHENTICATION_PARAMS }}
+          APP_PARAMETERS: "-Daws.region=eu-west-1"
           JAVA8_HOME: ${{env.JAVA_HOME_8_X64}}
         run: |
-            ./configuration/buildAndUpdateProduct.sh -x ${{ github.event.inputs.runner_cpus == '' && '16' || github.event.inputs.runner_cpus }} ${{ github.event.inputs.skip_tests == 'true' && '-t' || '' }} ${{ github.event.inputs.local_target_platform == 'true' && '-v' || '' }} build 2>&1
+            ./configuration/buildAndUpdateProduct.sh -x ${{ github.event.inputs.runner_cpus == '' && '4' || github.event.inputs.runner_cpus }} ${{ github.event.inputs.skip_tests == 'true' && '-t' || '' }} ${{ github.event.inputs.local_target_platform == 'true' && '-v' || '' }} build 2>&1
+      - name: show disk stats
+        if: always()
+        run: df -h
       - name: Upload build log
         uses: actions/upload-artifact@v4
         if: always()
@@ -156,7 +185,11 @@ jobs:
           asset_name: release-notes.txt
           asset_content_type: text/plain
       - name: Trigger Hudson job
-        if: always()
+        env:
+          HUDSON_JOB_USERNAME: ${{ secrets.HUDSON_JOB_USERNAME }}
+          HUDSON_JOB_PASSWORD: ${{ secrets.HUDSON_JOB_PASSWORD }}
+          HUDSON_JOB_TOKEN: ${{ secrets.HUDSON_JOB_TOKEN }}
+        if: ${{ always() && env.HUDSON_JOB_USERNAME != '' && env.HUDSON_JOB_PASSWORD != '' && env.HUDSON_JOB_TOKEN != '' }}
         shell: bash
         run: |
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then

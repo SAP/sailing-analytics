@@ -153,7 +153,7 @@ Any geo-blocking Web ACL that shall automatically be associated with ALBs that a
 ```
 Note that in order to run this command you have to have valid credentials for the AWS region you're targeting with the request. Also consider using the ``--region`` argument if you're trying to tag a Web ACL in a region other than your AWS CLI's default region. Check your ``~/.aws/config`` file. Also see ``configuration/environments_scripts/repo/usr/local/bin/awsmfalogon.sh`` for logging on to the AWS CLI.
 
-### MongoDB Replica Setsn
+### MongoDB Replica Sets
 
 There are currently three MongoDB replica sets:
 

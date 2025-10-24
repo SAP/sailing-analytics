@@ -1,6 +1,6 @@
-package com.sap.sailing.domain.tracking.impl;
+package com.sap.sailing.domain.shared.tracking.impl;
 
-import com.sap.sailing.domain.tracking.TrackingConnectorInfo;
+import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
 
 public class TrackingConnectorInfoImpl implements TrackingConnectorInfo {
     private static final long serialVersionUID = 7970268841592389145L;

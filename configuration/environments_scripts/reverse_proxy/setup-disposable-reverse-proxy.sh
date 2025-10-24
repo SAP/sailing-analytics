@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Setup script for Amazon Linux 2023. May need to update macro definitions for the archive IP.
+# Setup script for Amazon Linux 2023. Use 50g root partition.
+# May need to update macro definitions for the archive IP.
 # Parameter 1 is the IP and parameter 2 is the bearer token to be installed in the root home dir.
 # Ensure that the security for requesting the metadata uses IMDSv1
 if [[ "$#" -ne 2 ]]; then

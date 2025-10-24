@@ -12,7 +12,7 @@ import java.util.TreeSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.sap.sailing.domain.tracking.impl.PartialNavigableSetView;
+import com.sap.sailing.domain.shared.tracking.impl.PartialNavigableSetView;
 
 public class PartialNavigableSetViewTest {
     private PartialNavigableSetView<Integer> fullSet;

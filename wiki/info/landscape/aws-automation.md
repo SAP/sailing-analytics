@@ -328,7 +328,7 @@ The user can assign values to that variable that are then used as default propos
 7. Configure target group health check
 8. Register instance within target group
 9. Create new rule within https listener that points to the correct target group
-10. Append „Use Event-SSL [domain] [eventId] 127.0.0.1 8888“ or „Use Home-SSL [domain] 127.0.0.1 8888“ to etc/httpd/conf.d/001-events.conf
+10. Append „Use Event-SSL \[domain\] \[eventId\] 127.0.0.1 8888“ or „Use Home-SSL \[domain\] 127.0.0.1 8888“ to etc/httpd/conf.d/001-events.conf
 
 #### SAP instance on a shared EC2 instance
 
@@ -349,7 +349,7 @@ The user can assign values to that variable that are then used as default propos
 15. Create target group with name „S-hared-instanceshortname“
 16. Configuration of the target group health check with the server port of the sap instance
 17. Create new rule within https listener that points to the correct target group
-18. Append „Use Event-SSL [domain] [eventId] 127.0.0.1 8888“ or „Use Home-SSL [domain] 127.0.0.1 8888“ to etc/httpd/conf.d/001-events.conf
+18. Append „Use Event-SSL \[domain\] \[eventId\] 127.0.0.1 8888“ or „Use Home-SSL \[domain\] 127.0.0.1 8888“ to etc/httpd/conf.d/001-events.conf
 19. Check apache configuration with "apachectl configtest" and reload with "sudo service httpd reload“
 
 #### SAP instance on a dedicated EC2 instance as a master

@@ -35,7 +35,7 @@ HUDSON_USER="hudson"
 #
 # Options to pass to java when running Hudson.
 #
-HUDSON_JAVA_OPTIONS="-Djava.awt.headless=true -Xmx2G -Dhudson.slaves.ChannelPinger.pingInterval=60 -Dhudson.slaves.ChannelPinger.pingIntervalSeconds=60 -Dhudson.slaves.ChannelPinger.pingTimeoutSeconds=60"
+HUDSON_JAVA_OPTIONS="-Djava.awt.headless=true -Xmx4G -Dhudson.slaves.ChannelPinger.pingInterval=60 -Dhudson.slaves.ChannelPinger.pingIntervalSeconds=60 -Dhudson.slaves.ChannelPinger.pingTimeoutSeconds=60 -XX:+UseG1GC -Xlog:gc+ergo*=trace:file=/var/log/hudson/gc_ergo.log:time:filecount=10,filesize=100000000 -Xlog:gc*:file=/var/log/hudson/gc.log:time:filecount=10,filesize=100000000 -XX:+GCHistory -XX:GCHistoryFilename=/var/log/hudson/sapjvm_gc@PID.prf"
 
 ## Type:        integer(0:65535)
 ## Default:     8080

@@ -1,7 +1,9 @@
 package com.sap.sse.datamining.ui.client;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.moxieapps.gwt.highcharts.client.Chart;
 import org.moxieapps.gwt.highcharts.client.Point;
@@ -42,30 +44,25 @@ public class ChartToCsvExporter {
     private static String createCsvExportContentForStatisticsCurve(Chart chartToExport) {
         if (chartToExport != null && chartToExport.getSeries().length > 0) {
             final StringBuilder csvStr = new StringBuilder("Series name");
-            int minX = Integer.MAX_VALUE;
+            final Map<Number, Integer> columnIndexByXValue = new HashMap<>();
             {
-                final List<String> columnNames = new ArrayList<>();
+                final TreeMap<Number, String> orderedColumnNames = new TreeMap<>((a, b) -> Double.compare(a.doubleValue(), b.doubleValue()));
                 // collect column names across all series; some may not have points for all columns
                 for (final Series series : chartToExport.getSeries()) {
-                    for (final Point p : series.getPoints()) {
-                        if (p.getX().intValue() < minX) {
-                            minX = p.getX().intValue();
-                        }
-                    }
                     for (Point point : series.getPoints()) {
-                        final String pointName = point.getName();
-                        final String columnName = pointName != null && !pointName.isEmpty() ? pointName : point.getX().toString();
-                        while (columnNames.size() <= point.getX().intValue()-minX) {
-                            columnNames.add(columnNames.size(), null);
-                        }
-                        columnNames.set(point.getX().intValue()-minX, columnName);
+                        final String columnName = getColumnName(point);
+                        orderedColumnNames.put(point.getX(), columnName);
                     }
                 }
-                for (final String columnName : columnNames) {
+                for (final String columnName : orderedColumnNames.values()) {
                     csvStr.append(';');
                     if (columnName != null && !columnName.isEmpty()) {
                         csvStr.append(columnName);
                     }
+                }
+                int columnIndex = 0;
+                for (final Entry<Number, String> e : orderedColumnNames.entrySet()) {
+                    columnIndexByXValue.put(e.getKey(), columnIndex++);
                 }
             }
             csvStr.append("\r\n");
@@ -73,7 +70,7 @@ public class ChartToCsvExporter {
                 csvStr.append(series.getName());
                 int lastXIndex = -1;
                 for (Point point : series.getPoints()) {
-                    while (lastXIndex < point.getX().intValue()-minX) {
+                    while (lastXIndex < columnIndexByXValue.get(point.getX())) {
                         csvStr.append(';');
                         lastXIndex++;
                     }
@@ -85,6 +82,12 @@ public class ChartToCsvExporter {
             return csvContentExport;
         }
         return "Statistics are empty";
+    }
+
+    private static String getColumnName(Point point) {
+        final String pointName = point.getName();
+        final String columnName = pointName != null && !pointName.isEmpty() ? pointName : point.getX().toString();
+        return columnName;
     }
 
 }

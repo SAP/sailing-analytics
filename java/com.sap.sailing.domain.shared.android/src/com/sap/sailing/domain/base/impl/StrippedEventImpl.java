@@ -6,7 +6,7 @@ import java.util.UUID;
 import com.sap.sailing.domain.base.EventBase;
 import com.sap.sailing.domain.base.LeaderboardGroupBase;
 import com.sap.sailing.domain.base.Venue;
-import com.sap.sailing.domain.tracking.TrackingConnectorInfo;
+import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
 import com.sap.sse.common.TimePoint;
 
 /**

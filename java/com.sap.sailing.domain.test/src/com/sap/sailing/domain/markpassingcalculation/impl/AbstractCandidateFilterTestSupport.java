@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 import com.sap.sailing.domain.base.Waypoint;
 import com.sap.sailing.domain.markpassingcalculation.Candidate;
-import com.sap.sailing.domain.tracking.impl.TimedComparator;
+import com.sap.sailing.domain.shared.tracking.impl.TimedComparator;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;

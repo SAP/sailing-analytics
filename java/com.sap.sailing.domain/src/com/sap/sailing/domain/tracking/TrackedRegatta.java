@@ -12,6 +12,7 @@ import com.sap.sailing.domain.base.impl.TrackedRaces;
 import com.sap.sailing.domain.common.NoWindException;
 import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprintRegistry;
 import com.sap.sailing.domain.racelog.RaceLogAndTrackedRaceResolver;
+import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.metering.HasCPUMeter;
 import com.sap.sse.util.ThreadLocalTransporter;

@@ -39,7 +39,7 @@ public class ChatSessionImpl implements ChatSession {
     private static final String USER_PROMPT = "user";
     private static final String SYSTEM_PROPMPT = "system";
     private static final String MESSAGES = "messages";
-    private static final String API_VERSION = "2024-10-21";
+    private static final String API_VERSION = "2025-04-01-preview";
     private static final String CHAT_PATH_TEMPLATE = "/v2/inference/deployments/%s/chat/completions?api-version="+API_VERSION;
 
     private final List<String> systemPrompts;

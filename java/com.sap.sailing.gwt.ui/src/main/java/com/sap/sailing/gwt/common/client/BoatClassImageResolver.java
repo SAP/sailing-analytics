@@ -46,6 +46,7 @@ public class BoatClassImageResolver {
         boatClassIconsMap.put(BoatClassMasterdata.BAVARIA_CRUISER_46.getDisplayName(), imageResources.BavariaCruiser46Icon());
         boatClassIconsMap.put(BoatClassMasterdata.BB10M.getDisplayName(), imageResources.BB10MIcon());
         boatClassIconsMap.put(BoatClassMasterdata.BENETEAU_FIRST_35.getDisplayName(), imageResources.BeneteauFirst35Icon());
+        boatClassIconsMap.put(BoatClassMasterdata.BENETEAU_FIRST_36.getDisplayName(), imageResources.BeneteauFirst36Icon());
         boatClassIconsMap.put(BoatClassMasterdata.BENETEAU_FIRST_45.getDisplayName(), imageResources.BeneteauFirst45Icon());
         boatClassIconsMap.put(BoatClassMasterdata.BRASSFAHRT_I.getDisplayName(), imageResources.Brassfahrt1Icon());
         boatClassIconsMap.put(BoatClassMasterdata.BRASSFAHRT_II.getDisplayName(), imageResources.Brassfahrt2Icon());
@@ -63,6 +64,7 @@ public class BoatClassImageResolver {
         boatClassIconsMap.put(BoatClassMasterdata.DRAGON_INT.getDisplayName(), imageResources.DragonIcon());
         boatClassIconsMap.put(BoatClassMasterdata.DYAS.getDisplayName(), imageResources.DyasIcon());
         boatClassIconsMap.put(BoatClassMasterdata.ELAN350.getDisplayName(), imageResources.Elan350Icon());
+        boatClassIconsMap.put(BoatClassMasterdata.ELAN_E4.getDisplayName(), imageResources.ElanE4Icon());
         boatClassIconsMap.put(BoatClassMasterdata.ELLIOTT_6M.getDisplayName(), imageResources.Elliott6mIcon());
         boatClassIconsMap.put(BoatClassMasterdata.EUROPE_INT.getDisplayName(), imageResources.EuropeIcon());
         boatClassIconsMap.put(BoatClassMasterdata.EXTREME_40.getDisplayName(), imageResources.Extreme40Icon());

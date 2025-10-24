@@ -2215,7 +2215,7 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
 
     @Override
     public Map<RegattaAndRaceIdentifier, Integer> importWindFromIgtimi(List<RaceDTO> selectedRaces,
-            boolean correctByDeclination)
+            boolean correctByDeclination, String optionalBearerTokenOrNull)
             throws IllegalStateException, ClientProtocolException, IOException, org.json.simple.parser.ParseException {
         final List<DynamicTrackedRace> trackedRaces = new ArrayList<>();
         if (selectedRaces != null && !selectedRaces.isEmpty()) {
@@ -2238,7 +2238,7 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
             }
         }
         Map<RegattaAndRaceIdentifier, Integer> numberOfWindFixesImportedPerRace = new HashMap<RegattaAndRaceIdentifier, Integer>();
-        final IgtimiConnection conn = createIgtimiConnection();
+        final IgtimiConnection conn = createIgtimiConnection(Optional.ofNullable(optionalBearerTokenOrNull));
         // filter account based on used permissions to read account:
         Map<TrackedRace, Integer> resultsForAccounts = conn.importWindIntoRace(trackedRaces, correctByDeclination);
         for (Entry<TrackedRace, Integer> resultForAccount : resultsForAccounts.entrySet()) {

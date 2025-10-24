@@ -3,6 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Test
 Bundle-SymbolicName: com.sap.sailing.simulator.test
 Bundle-Version: 1.0.0.qualifier
+Import-Package: com.sap.sailing.domain.shared.tracking
 Bundle-Vendor: SAP
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: com.sap.sailing.simulator;bundle-version="1.0.0",

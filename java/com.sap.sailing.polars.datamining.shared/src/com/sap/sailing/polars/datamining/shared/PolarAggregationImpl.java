@@ -11,8 +11,12 @@ public class PolarAggregationImpl implements PolarAggregation {
     private double[] sumSpeedsPerAngle = new double[360];
     private int[] countPerAngle = new int[360];
     /**
-     * FIXME Right now the histogram data is only valid, if the results are grouped by windrange.
-     * Otherwise the column-indices of different ranges are mixed in one histogram. 
+     * FIXME Right now the histogram data is only valid, if the results are grouped by windrange. Otherwise the
+     * column-indices of different ranges are mixed in one histogram.
+     * <p>
+     * 
+     * Keys are the angles in degrees (0...359). The {@link Double} key of the inner map is the histogram x-value (e.g.
+     * 5.0 for wind speed 4.5...5.5 with step 1.0).
      */
     private Map<Integer, Map<Double, Integer>> histogramData;
     private int count = 0;
@@ -80,6 +84,4 @@ public class PolarAggregationImpl implements PolarAggregation {
     public Map<Integer, Map<Double, Integer>> getCountHistogramPerAngle() {
         return histogramData;
     }
-    
-
 }

@@ -119,7 +119,7 @@ public class SimulatorOverlayTest extends AbstractSeleniumTest {
                 gpxInputStream.close();
                 final String routeconverterWindFileName = tmpFile.getAbsolutePath();
                 windPanel.importWindFromRouteconverter(routeconverterWindFileName, /* waiting up to 10 min */ 15 * 60);
-                Thread.sleep(10000); // wait for 10s to allow all wind fixes to get processed by the PolarDataService
+                Thread.sleep(30000); // wait for 30s to allow all wind fixes to get processed by the PolarDataService
             } finally {
                 tmpFile.delete();
             }
