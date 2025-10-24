@@ -5,6 +5,7 @@ on:
       - 'wiki/**'
       - '.github/workflows/*'
       - '**/*.md'
+      - 'README.md'
   workflow_dispatch:
     inputs:
       skip_tests:
@@ -103,7 +104,7 @@ jobs:
           AWS_S3_TEST_S3ACCESSID: ${{ secrets.AWS_S3_TEST_S3ACCESSID }}
           AWS_S3_TEST_S3ACCESSKEY: ${{ secrets.AWS_S3_TEST_S3ACCESSKEY }}
           GEONAMES_ORG_USERNAMES: ${{ secrets.GEONAMES_ORG_USERNAMES }}
-          GOOGLE_MAPS_AUTHENTICATION_PARAMS: ${{ secrets.GOOGLE_MAPS_AUTHENTICATIONPARAMS }}
+          GOOGLE_MAPS_AUTHENTICATION_PARAMS: ${{ secrets.GOOGLE_MAPS_AUTHENTICATION_PARAMS }}
           APP_PARAMETERS: "-Daws.region=eu-west-1"
           JAVA8_HOME: ${{env.JAVA_HOME_8_X64}}
         run: |
