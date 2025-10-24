@@ -337,24 +337,26 @@ public class RiotServerImpl extends AbstractReplicableWithObjectInputStream<Repl
             // obtain the securityService only if connections exist; otherwise, we may still be in start-up mode
             final SecurityService securityService = liveWebSocketConnections.isEmpty() ? null : getSecurityService();
             for (final RiotWebsocketHandler webSocketClient : liveWebSocketConnections) {
-                final User user = webSocketClient.getAuthenticatedUser();
-                final OwnershipAnnotation deviceOwnership = securityService.getOwnership(device.getIdentifier());
-                final AccessControlListAnnotation deviceAccessControlList = securityService.getAccessControlList(device.getIdentifier());
-                if (!Util.isEmpty(Util.filter(daws, daw->{
-                    final OwnershipAnnotation dawOownership = securityService.getOwnership(daw.getIdentifier());
-                    final AccessControlListAnnotation dawAccessControlList = securityService.getAccessControlList(daw.getIdentifier());
-                    return PermissionChecker.isPermitted(
-                            daw.getIdentifier().getPermission(DefaultActions.READ),
+                if (webSocketClient.getDeviceSerialNumbers().contains(deviceSerialNumber)) {
+                    final User user = webSocketClient.getAuthenticatedUser();
+                    final OwnershipAnnotation deviceOwnership = securityService.getOwnership(device.getIdentifier());
+                    final AccessControlListAnnotation deviceAccessControlList = securityService.getAccessControlList(device.getIdentifier());
+                    if (!Util.isEmpty(Util.filter(daws, daw->{
+                        final OwnershipAnnotation dawOownership = securityService.getOwnership(daw.getIdentifier());
+                        final AccessControlListAnnotation dawAccessControlList = securityService.getAccessControlList(daw.getIdentifier());
+                        return PermissionChecker.isPermitted(
+                                daw.getIdentifier().getPermission(DefaultActions.READ),
+                                user, securityService.getAllUser(),
+                                dawOownership==null?null:dawOownership.getAnnotation(),
+                                dawAccessControlList==null?null:dawAccessControlList.getAnnotation());
+                    }))
+                    && PermissionChecker.isPermitted(
+                            device.getIdentifier().getPermission(DefaultActions.READ),
                             user, securityService.getAllUser(),
-                            dawOownership==null?null:dawOownership.getAnnotation(),
-                            dawAccessControlList==null?null:dawAccessControlList.getAnnotation());
-                }))
-                && PermissionChecker.isPermitted(
-                        device.getIdentifier().getPermission(DefaultActions.READ),
-                        user, securityService.getAllUser(),
-                        deviceOwnership==null?null:deviceOwnership.getAnnotation(),
-                        deviceAccessControlList==null?null:deviceAccessControlList.getAnnotation()) ) {
-                    webSocketClient.sendBytesByFuture(ByteBuffer.wrap(messageAsBytes));
+                            deviceOwnership==null?null:deviceOwnership.getAnnotation(),
+                            deviceAccessControlList==null?null:deviceAccessControlList.getAnnotation()) ) {
+                        webSocketClient.sendBytesByFuture(ByteBuffer.wrap(messageAsBytes));
+                    }
                 }
             }
         }

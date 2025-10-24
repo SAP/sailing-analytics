@@ -3,6 +3,8 @@ package com.sap.sailing.domain.tracking;
 import java.io.Serializable;
 
 import com.sap.sailing.domain.common.tracking.SensorFix;
+import com.sap.sailing.domain.shared.tracking.MappedTrack;
+import com.sap.sailing.domain.shared.tracking.Track;
 import com.sap.sse.common.WithID;
 
 /**

@@ -1,4 +1,4 @@
-package com.sap.sailing.domain.tracking;
+package com.sap.sailing.domain.shared.tracking;
 
 /**
  * A predicate for a fix, for use in

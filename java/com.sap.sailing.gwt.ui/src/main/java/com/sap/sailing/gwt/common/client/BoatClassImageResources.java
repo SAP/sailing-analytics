@@ -96,6 +96,10 @@ public interface BoatClassImageResources extends ClientBundle {
     @ImageOptions(preventInlining = true)
     ImageResource BeneteauFirst35Icon();
     
+    @Source("com/sap/sailing/gwt/ui/client/images/boatclass/BENETEAU_FIRST_36.png")
+    @ImageOptions(preventInlining = true)
+    ImageResource BeneteauFirst36Icon();
+    
     @Source("com/sap/sailing/gwt/ui/client/images/boatclass/BENETEAU_FIRST_45.png")
     @ImageOptions(preventInlining = true)
     ImageResource BeneteauFirst45Icon();
@@ -151,6 +155,10 @@ public interface BoatClassImageResources extends ClientBundle {
     @Source("com/sap/sailing/gwt/ui/client/images/boatclass/ELAN350.png")
     @ImageOptions(preventInlining = true)
     ImageResource Elan350Icon();
+
+    @Source("com/sap/sailing/gwt/ui/client/images/boatclass/ELAN_E4.png")
+    @ImageOptions(preventInlining = true)
+    ImageResource ElanE4Icon();
 
     @Source("com/sap/sailing/gwt/ui/client/images/boatclass/EUROPE_INT.png")
     @ImageOptions(preventInlining = true)

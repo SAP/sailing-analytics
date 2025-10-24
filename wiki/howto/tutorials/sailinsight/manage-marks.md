@@ -1,22 +1,13 @@
 This episode shows you how to manage *marks* or pair them in **Sail Insight** :
 
-<div style="text-align: center; line-height: 0;margin-bottom: 14em;">
-  <a href="https://www.youtube.com/watch?v=f3fjGuP-SbU" target="_blank">
-    <img src="https://img.youtube.com/vi/f3fjGuP-SbU/0.jpg" alt="manage marks or pair them" style="display: inline-block;">
-  </a>
-  <div style="line-height: normal; margin-top: -14em;">
-    <a href="https://www.youtube.com/watch?v=f3fjGuP-SbU" target="_blank" style="
-      display: inline-block;
-      vertical-align: middle;
-      background-color: #007BFF;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 4px;
-      text-decoration: none;
-      font-weight: bold;
-    ">Watch the Video</a>
-  </div>
-</div>
+<video
+  controls="true"
+  src="https://sapsailing-documentation.s3.eu-west-1.amazonaws.com/SailInsight/Managing+Marks+%5Bf3fjGuP-SbU%5D.webm"
+  type="video/webm"
+  style="display:block;margin:1rem auto;max-width:100%;width:340px;height:auto;">
+  Your browser does not support the video tag.
+</video>
+
 There are **two ways** of placing marks: 
 - Pair a mark with a real-world tracking device (another mobile phone) 
 - Give it a fixed location by providing latitude and longitude.

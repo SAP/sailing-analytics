@@ -5,7 +5,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import com.sap.sailing.domain.tracking.TrackingConnectorInfo;
+import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
 import com.sap.sse.common.NamedWithID;
 import com.sap.sse.common.Renamable;
 import com.sap.sse.common.TimePoint;

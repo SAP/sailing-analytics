@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hudson CI – Measurement Graphs Overview</title>
+
+  <!-- Tailwind CSS (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    @media print {
+      #toolbar, .card-actions, .footer { display: none !important; }
+      body { background: #fff !important; }
+      .card { break-inside: avoid; }
+    }
+    .spinner {
+      border: 4px solid rgba(0,0,0,0.1);
+      border-top: 4px solid #4f46e5;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 text-gray-900">
+  <header id="toolbar" class="sticky top-0 z-50 backdrop-blur bg-white/80 border-b">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex items-center gap-3">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-indigo-600"><path d="M12 2a1 1 0 0 1 .894.553l8 16A1 1 0 0 1 20 20H4a1 1 0 0 1-.894-1.447l8-16A1 1 0 0 1 12 2Zm0 3.618L6.618 18h10.764L12 5.618Z"/></svg>
+        <div>
+          <h1 id="pageTitle" class="text-xl font-semibold leading-tight">Hudson CI – Measurement Graphs</h1>
+          <p class="text-sm text-gray-600">At-a-glance trends from build/test history</p>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="refreshAll" class="px-3 py-2 rounded-xl bg-indigo-600 text-white text-sm font-medium shadow hover:bg-indigo-700 focus:outline-none focus:ring">Refresh all</button>
+        <label class="flex items-center gap-2 text-sm">
+          <input id="autoRefreshToggle" type="checkbox" class="rounded border-gray-300"> Auto-refresh
+        </label>
+        <select id="columns" class="px-2 py-2 rounded-xl border text-sm bg-white">
+          <option value="2">2 columns</option>
+          <option value="3" selected>3 columns</option>
+          <option value="4">4 columns</option>
+        </select>
+        <input id="search" type="search" placeholder="Filter by title…" class="px-3 py-2 rounded-xl border text-sm bg-white w-48" />
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto p-4">
+    <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 transition-all"></div>
+  </main>
+
+  <footer class="footer max-w-7xl mx-auto px-4 pb-8 text-sm text-gray-500">
+    <p>Tip: Click any chart to view full-screen. Right-click an image to open it in a new tab. This page only embeds existing Hudson graph PNGs; no data is stored.</p>
+  </footer>
+
+  <dialog id="viewer" class="backdrop:bg-black/60 p-0 rounded-2xl shadow-2xl w-[95vw] max-w-6xl"> 
+    <div class="flex items-center justify-between px-4 py-3 border-b">
+      <h3 id="viewerTitle" class="font-semibold"></h3>
+      <div class="flex items-center gap-2">
+        <a id="viewerOpenSource" href="#" target="_blank" rel="noopener" class="text-sm px-2 py-1 rounded-lg border">Open source</a>
+        <button id="viewerClose" class="text-sm px-2 py-1 rounded-lg bg-gray-900 text-white">Close</button>
+      </div>
+    </div>
+    <div class="p-2 sm:p-4">
+      <img id="viewerImg" alt="Measurement graph" class="w-full h-auto rounded-xl" />
+    </div>
+  </dialog>
+
+  <script>
+    // Determine job name from query parameter or default
+    const params = new URLSearchParams(window.location.search);
+    const jobName = params.get('job') || 'SAPSailingAnalytics-master';
+
+    // Update page title with job name
+    document.getElementById('pageTitle').textContent = `Hudson CI – Measurement Graphs (${jobName})`;
+    document.title = `Hudson CI Measurement Graphs Overview – ${jobName}`;
+
+    const testNames = [
+      "FlorianopolisMarkPassingTest",
+      "KW470MarkPassingTest",
+      "Kiel2013505Test",
+      "OBMR2012VRMarkPassingTest",
+      "StarIDM2013MarkPassingTest"
+    ];
+    const measurementNames = ["Extra", "Skipped", "Different", "Accurate"];
+    const graphs = [];
+    // Build the graphs dynamically
+    testNames.forEach(test => {
+      measurementNames.forEach(measure => {
+	graphs.push({
+	  title: `${test} ${measure}`,
+	  url: `https://hudson.sapsailing.com/job/${jobName}/lastCompletedBuild/testReport/junit/com.sap.sailing.domain.test.markpassing/${test}/${test}/measurementPlots/${measure}/history/graph/png`,
+	  source: `Hudson: ${jobName} → ${test} ${measure}`
+	});
+      });
+    });
+    // Also include your Branding client script size graph as the first entry:
+    graphs.unshift({
+      title: "Branding client script size in bytes",
+      url: `https://hudson.sapsailing.com/job/${jobName}/lastCompletedBuild/testReport/junit/com.sap.sse.branding.impl/TestAndMeasureSizeOfSAPBranding/TestAndMeasureSizeOfSAPBranding/measurementPlots/Branding%20client%20script%20size%20in%20bytes/history/graph/png`,
+      source: `Hudson: ${jobName} → Branding client script size in bytes`
+    });
+    // Also include the MarkPassingCalculatorPerformanceTest.ChooserPerformance Measurement
+    graphs.unshift({
+      title: "MarkPassingCalculator Chooser Performance",
+        url: `https://hudson.sapsailing.com/job/${jobName}/lastCompletedBuild/testReport/junit/com.sap.sailing.domain.test.markpassing/MarkPassingCalculatorPerformanceTest/ChooserPerformance/measurementPlots/ChooserPerformance/history/graph/png`,
+      source: `Hudson: ${jobName} → MarkPassingCalculator Chooser Performance`
+    });
+    // Also include the MarkPassingCalculatorPerformanceTest.FinderPerformance Measurement
+    graphs.unshift({
+      title: "MarkPassingCalculator Finder Performance",
+        url: `https://hudson.sapsailing.com/job/${jobName}/lastCompletedBuild/testReport/junit/com.sap.sailing.domain.test.markpassing/MarkPassingCalculatorPerformanceTest/FinderPerformance/measurementPlots/FinderPerformance/history/graph/png`,
+      source: `Hudson: ${jobName} → MarkPassingCalculator Finder Performance`
+    });
+
+    const PREFS_KEY = "hudson-graphs-prefs";
+    const defaultPrefs = { columns: 3, autoRefresh: false };
+    const prefs = Object.assign({}, defaultPrefs, JSON.parse(localStorage.getItem(PREFS_KEY) || "{}"));
+
+    const grid = document.getElementById('grid');
+    const search = document.getElementById('search');
+    const columns = document.getElementById('columns');
+    const refreshAll = document.getElementById('refreshAll');
+    const autoRefreshToggle = document.getElementById('autoRefreshToggle');
+    const viewer = document.getElementById('viewer');
+    const viewerImg = document.getElementById('viewerImg');
+    const viewerTitle = document.getElementById('viewerTitle');
+    const viewerOpenSource = document.getElementById('viewerOpenSource');
+    const viewerClose = document.getElementById('viewerClose');
+
+    columns.value = String(prefs.columns);
+    autoRefreshToggle.checked = !!prefs.autoRefresh;
+    applyColumns();
+
+    function applyColumns() {
+      const cols = Number(columns.value || 3);
+      grid.className = `grid gap-4 transition-all grid-cols-1 sm:grid-cols-2 ${cols>=3? 'lg:grid-cols-3':''} ${cols>=4? 'xl:grid-cols-4':''}`;
+      savePrefs();
+    }
+    columns.addEventListener('change', applyColumns);
+
+    function savePrefs() {
+      localStorage.setItem(PREFS_KEY, JSON.stringify({ columns: Number(columns.value), autoRefresh: autoRefreshToggle.checked }));
+    }
+    autoRefreshToggle.addEventListener('change', savePrefs);
+
+    function render() {
+      grid.innerHTML = '';
+      const q = (search.value || '').toLowerCase();
+      graphs
+        .filter(g => !q || g.title.toLowerCase().includes(q))
+        .forEach((g, idx) => grid.appendChild(cardForGraph(g, idx)));
+    }
+
+    function cardForGraph(g, idx) {
+      const card = document.createElement('article');
+      card.className = 'card rounded-2xl bg-white border shadow-sm overflow-hidden flex flex-col';
+
+      const header = document.createElement('div');
+      header.className = 'px-4 pt-4 flex items-start justify-between gap-3';
+      const title = document.createElement('h2');
+      title.className = 'font-semibold leading-snug';
+      title.textContent = g.title;
+      header.appendChild(title);
+
+      const actions = document.createElement('div');
+      actions.className = 'card-actions flex items-center gap-2';
+      actions.innerHTML = `
+        <a href="${g.url}" target="_blank" rel="noopener" title="Open image in new tab" class="text-sm px-2 py-1 rounded-lg border">Open</a>
+        <button data-idx="${idx}" class="refresh-btn text-sm px-2 py-1 rounded-lg bg-gray-900 text-white">Refresh</button>
+      `;
+      header.appendChild(actions);
+      card.appendChild(header);
+
+      const wrap = document.createElement('div');
+      wrap.className = 'relative m-3 rounded-xl overflow-hidden ring-1 ring-gray-100 flex items-center justify-center min-h-[200px]';
+
+      const spinner = document.createElement('div');
+      spinner.className = 'spinner';
+      wrap.appendChild(spinner);
+
+      const img = document.createElement('img');
+      img.alt = g.title;
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.src = g.url;
+      img.className = 'w-full h-auto opacity-0 transition-opacity duration-300';
+
+      img.addEventListener('load', () => {
+        spinner.remove();
+        img.classList.remove('opacity-0');
+      });
+      img.addEventListener('error', () => {
+        spinner.className = 'absolute inset-0 flex items-center justify-center text-sm text-red-600 bg-red-50';
+        spinner.textContent = 'Failed to load image';
+      });
+
+      img.style.cursor = 'zoom-in';
+      img.addEventListener('click', () => openViewer(g));
+
+      wrap.appendChild(img);
+      card.appendChild(wrap);
+
+      const meta = document.createElement('div');
+      meta.className = 'px-4 pb-4 text-sm text-gray-600 flex items-center justify-between';
+      const left = document.createElement('div');
+      left.textContent = g.source || 'Hudson';
+      const right = document.createElement('div');
+      right.innerHTML = `<time class="last-updated" datetime="${new Date().toISOString()}">Updated just now</time>`;
+      meta.appendChild(left);
+      meta.appendChild(right);
+      card.appendChild(meta);
+
+      return card;
+    }
+
+    function openViewer(g) {
+      viewerImg.src = g.url;
+      viewerTitle.textContent = g.title;
+      viewerOpenSource.href = g.url;
+      if (typeof viewer.showModal === 'function') viewer.showModal();
+      else viewer.setAttribute('open', '');
+    }
+
+    viewerClose.addEventListener('click', () => viewer.close());
+    viewer.addEventListener('click', (e) => { if (e.target === viewer) viewer.close(); });
+
+    function refreshImages(scope=document) {
+      scope.querySelectorAll('img').forEach(img => {
+        const spinner = document.createElement('div');
+        spinner.className = 'spinner absolute inset-0 m-auto';
+        const parent = img.parentElement;
+        parent.appendChild(spinner);
+        img.classList.add('hidden');
+        const src = img.src.split('?')[0];
+        img.src = src + '?r=' + Date.now();
+        img.addEventListener('load', () => {
+          spinner.remove();
+          img.classList.remove('hidden');
+        }, { once: true });
+      });
+      scope.querySelectorAll('time.last-updated').forEach(t => {
+        t.textContent = 'Updated just now';
+        t.setAttribute('datetime', new Date().toISOString());
+      });
+    }
+
+    refreshAll.addEventListener('click', () => refreshImages(document));
+
+    grid.addEventListener('click', (e) => {
+      const btn = e.target.closest('button.refresh-btn');
+      if (!btn) return;
+      const card = btn.closest('.card');
+      const img = card.querySelector('img');
+      const time = card.querySelector('time.last-updated');
+      const spinner = document.createElement('div');
+      spinner.className = 'spinner absolute inset-0 m-auto';
+      img.parentElement.appendChild(spinner);
+      img.classList.add('hidden');
+      const src = img.src.split('?')[0];
+      img.src = src + '?r=' + Date.now();
+      img.addEventListener('load', () => {
+        spinner.remove();
+        img.classList.remove('hidden');
+      }, { once: true });
+      time.textContent = 'Updated just now';
+      time.setAttribute('datetime', new Date().toISOString());
+    });
+
+    search.addEventListener('input', render);
+
+    let autoTimer = null;
+    function updateAutoTimer() {
+      if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+      if (autoRefreshToggle.checked) {
+        autoTimer = setInterval(() => refreshImages(document), 5 * 60 * 1000);
+      }
+      savePrefs();
+    }
+    autoRefreshToggle.addEventListener('change', updateAutoTimer);
+    updateAutoTimer();
+
+    render();
+  </script>
+</body>
+</html>
+

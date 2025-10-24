@@ -2,8 +2,8 @@ package com.sap.sailing.server.gateway.deserialization.impl;
 
 import org.json.simple.JSONObject;
 
-import com.sap.sailing.domain.tracking.TrackingConnectorInfo;
-import com.sap.sailing.domain.tracking.impl.TrackingConnectorInfoImpl;
+import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
+import com.sap.sailing.domain.shared.tracking.impl.TrackingConnectorInfoImpl;
 import com.sap.sailing.server.gateway.serialization.impl.TrackingConnectorInfoJsonSerializer;
 import com.sap.sse.shared.json.JsonDeserializationException;
 import com.sap.sse.shared.json.JsonDeserializer;

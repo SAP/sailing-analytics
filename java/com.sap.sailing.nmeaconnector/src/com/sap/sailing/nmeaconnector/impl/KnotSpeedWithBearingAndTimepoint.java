@@ -1,13 +1,12 @@
 package com.sap.sailing.nmeaconnector.impl;
 
 import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
-import com.sap.sailing.domain.tracking.Track;
 import com.sap.sailing.nmeaconnector.TimedSpeedWithBearing;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.TimePoint;
 
 /**
- * Can be used as a wind vector in a {@link Track} because it has a {@link TimePoint}.
+ * Can be used as a wind vector in a {@code Track} because it has a {@link TimePoint}.
  * 
  * @author Axel Uhl (d043530)
  *

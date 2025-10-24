@@ -1,5 +1,6 @@
 package com.sap.sailing.domain.tracking;
 
+import com.sap.sailing.domain.shared.tracking.MappedTrack;
 import com.sap.sse.common.Timed;
 
 /**

@@ -1,22 +1,12 @@
 This guide will show you how to create an event with **Sail Insight**.
 
-<div style="text-align: center; line-height: 0;margin-bottom: 14em;">
-  <a href="https://www.youtube.com/watch?v=f_sguquMRsQ" target="_blank">
-    <img src="https://img.youtube.com/vi/f_sguquMRsQ/0.jpg" alt="How-to: Create an event with Sail Insight" style="display: inline-block;">
-  </a>
-  <div style="line-height: normal; margin-top: -14em;">
-    <a href="https://www.youtube.com/watch?v=f_sguquMRsQ" target="_blank" style="
-      display: inline-block;
-      vertical-align: middle;
-      background-color: #007BFF;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 4px;
-      text-decoration: none;
-      font-weight: bold;
-    ">Watch the Video</a>
-  </div>
-</div>
+<video
+  controls="true"
+  src="https://sapsailing-documentation.s3.eu-west-1.amazonaws.com/SailInsight/Create+an+Event+%5Bf_sguquMRsQ%5D.mp4"
+  type="video/mp4"
+  style="display:block;margin:1rem auto;max-width:100%;width:340px;height:auto;">
+  Your browser does not support the video tag.
+</video>
 
 There are two ways of *placing marks*: 
 - Pair a mark with a real-world tracking device (another mobile phone) 

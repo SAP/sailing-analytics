@@ -47,12 +47,11 @@ public class PassingInstructionParserTest extends OnlineTracTracBasedTest {
     @Test
     public void test() {
         int i = 0;
-        for(Waypoint w : getRace().getCourse().getWaypoints()){
-            if(w.getPassingInstructions()==PassingInstruction.Starboard){
+        for (Waypoint w : getRace().getCourse().getWaypoints()) {
+            if (w.getPassingInstructions() == PassingInstruction.Starboard) {
                 i++;
             }
         }
-        assertEquals(2,i);
+        assertEquals(2, i);
     }
-
 }

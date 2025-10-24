@@ -1,5 +1,6 @@
 package com.sap.sailing.domain.tracking.impl;
 
+import com.sap.sailing.domain.shared.tracking.impl.MappedTrackImpl;
 import com.sap.sailing.domain.tracking.DynamicMappedTrack;
 import com.sap.sailing.domain.tracking.DynamicTrack;
 import com.sap.sse.common.Timed;

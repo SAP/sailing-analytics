@@ -243,7 +243,7 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
             throws NotFoundException, NotDenotableForRaceLogTrackingException;
 
     Map<RegattaAndRaceIdentifier, Integer> importWindFromIgtimi(List<RaceDTO> selectedRaces,
-            boolean correctByDeclination)
+            boolean correctByDeclination, String optionalBearerTokenOrNull)
             throws IllegalStateException, Exception;
 
     IgtimiDataAccessWindowWithSecurityDTO addIgtimiDataAccessWindow(String deviceSerialNumber, Date from, Date to);

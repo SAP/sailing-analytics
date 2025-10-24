@@ -292,6 +292,9 @@ import com.sap.sailing.domain.regattalike.LeaderboardThatHasRegattaLike;
 import com.sap.sailing.domain.regattalog.RegattaLogStore;
 import com.sap.sailing.domain.resultimport.ResultUrlProvider;
 import com.sap.sailing.domain.sharding.ShardingContext;
+import com.sap.sailing.domain.shared.tracking.LineDetails;
+import com.sap.sailing.domain.shared.tracking.Track;
+import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
 import com.sap.sailing.domain.swisstimingadapter.SwissTimingAdapter;
 import com.sap.sailing.domain.swisstimingadapter.SwissTimingAdapterFactory;
 import com.sap.sailing.domain.swisstimingadapter.SwissTimingArchiveConfiguration;
@@ -307,14 +310,11 @@ import com.sap.sailing.domain.tracking.BravoFixTrack;
 import com.sap.sailing.domain.tracking.DynamicTrackedRace;
 import com.sap.sailing.domain.tracking.DynamicTrackedRegatta;
 import com.sap.sailing.domain.tracking.GPSFixTrack;
-import com.sap.sailing.domain.tracking.LineDetails;
 import com.sap.sailing.domain.tracking.Maneuver;
 import com.sap.sailing.domain.tracking.MarkPassing;
-import com.sap.sailing.domain.tracking.Track;
 import com.sap.sailing.domain.tracking.TrackedLeg;
 import com.sap.sailing.domain.tracking.TrackedLegOfCompetitor;
 import com.sap.sailing.domain.tracking.TrackedRace;
-import com.sap.sailing.domain.tracking.TrackingConnectorInfo;
 import com.sap.sailing.domain.tracking.WindLegTypeAndLegBearingAndORCPerformanceCurveCache;
 import com.sap.sailing.domain.tracking.WindTrack;
 import com.sap.sailing.domain.tracking.WindWithConfidence;
@@ -6099,7 +6099,17 @@ public class SailingServiceImpl extends ResultCachingProxiedRemoteServiceServlet
         return Activator.getInstance().getGoogleMapsLoaderAuthenticationParams();
     }
 
-    protected IgtimiConnection createIgtimiConnection() {
-        return getIgtimiConnectionFactory().getOrCreateConnection(()->getSecurityService().getCurrentUser() != null ? getSecurityService().getAccessToken(getSecurityService().getCurrentUser().getName()) : null);
+    /**
+     * @param optionalBearerToken
+     *            if present, this bearer token is used to authenticate the Igtimi connection; otherwise, we try to use
+     *            Igtimi default credentials provided at startup through the {@code igtimi.bearer.token} system
+     *            property. Only if no such system property has been set, we look for a logged-in user in the
+     *            {@link #getSecurityService() security service} and use its access token
+     */
+    protected IgtimiConnection createIgtimiConnection(Optional<String> optionalBearerToken) {
+        return optionalBearerToken.map(bearerToken->getIgtimiConnectionFactory().getOrCreateConnection(bearerToken))
+                .orElse(getIgtimiConnectionFactory().getOrCreateConnection(()->getSecurityService().getCurrentUser() != null
+                    ? getSecurityService().getAccessToken(getSecurityService().getCurrentUser().getName())
+                    : null));
     }
 }

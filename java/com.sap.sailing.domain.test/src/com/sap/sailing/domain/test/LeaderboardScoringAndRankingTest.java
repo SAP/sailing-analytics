@@ -74,12 +74,12 @@ import com.sap.sailing.domain.leaderboard.meta.LeaderboardGroupMetaLeaderboard;
 import com.sap.sailing.domain.racelog.impl.EmptyRaceLogStore;
 import com.sap.sailing.domain.ranking.OneDesignRankingMetric;
 import com.sap.sailing.domain.regattalog.impl.EmptyRegattaLogStore;
+import com.sap.sailing.domain.shared.tracking.impl.TimedComparator;
 import com.sap.sailing.domain.test.mock.MockedTrackedRaceWithStartTimeAndRanks;
 import com.sap.sailing.domain.tracking.MarkPassing;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.domain.tracking.TrackedRegattaRegistry;
 import com.sap.sailing.domain.tracking.impl.MarkPassingImpl;
-import com.sap.sailing.domain.tracking.impl.TimedComparator;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
@@ -2918,16 +2918,10 @@ public class LeaderboardScoringAndRankingTest extends LeaderboardScoringAndRanki
                 assertTrue(Util.indexOf(rankedCompetitors, lastRaceGoldParticipant) < Util.indexOf(rankedCompetitors, silverParticipant));
             }
         }
-        // assert that theUntrackedCompetitorInLastRace ended up between the last race's silver and gold fleet participants
-        // based on the "extreme fleet" rule:
+        // assert that theUntrackedCompetitorInLastRace ended up ranked worse than all participants of ranked fleets:
         for (final Competitor c : competitors) {
             if (c != theUntrackedCompetitorInLastRace) {
-                if (lastRaceGold.contains(c) || medal.contains(c)) {
-                    assertTrue(Util.indexOf(rankedCompetitors, c) < Util.indexOf(rankedCompetitors, theUntrackedCompetitorInLastRace));
-                } else {
-                    assertTrue(silver.contains(c));
-                    assertTrue(Util.indexOf(rankedCompetitors, c) > Util.indexOf(rankedCompetitors, theUntrackedCompetitorInLastRace));
-                }
+                assertTrue(Util.indexOf(rankedCompetitors, c) < Util.indexOf(rankedCompetitors, theUntrackedCompetitorInLastRace));
             }
         }
     }

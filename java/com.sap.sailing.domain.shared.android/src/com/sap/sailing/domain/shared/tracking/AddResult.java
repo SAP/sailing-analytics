@@ -1,4 +1,4 @@
-package com.sap.sailing.domain.tracking;
+package com.sap.sailing.domain.shared.tracking;
 
 import javax.swing.plaf.basic.BasicSliderUI.TrackListener;
 

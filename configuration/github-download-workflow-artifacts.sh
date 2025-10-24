@@ -12,12 +12,13 @@
 # an exit status of 2 is returned.
 BRANCH="${1}"
 BEARER_TOKEN="${2}"
+GITHUB_REPOSITORY="${3}"
 UNIX_TIME=$( date +%s )
 UNIX_DATE=$( date --iso-8601=second )
 UNIX_TIME_YESTERDAY=$(( UNIX_TIME - 10*24*3600 )) # look back ten days in time, trying to catch even re-runs of older jobs
 DATE_YESTERDAY=$( date --iso-8601=second -d @${UNIX_TIME_YESTERDAY} )
 HEADERS_FILE=$( mktemp headersXXXXX )
-NEXT_PAGE="https://api.github.com/repos/SAP/sailing-analytics/actions/runs?created=${DATE_YESTERDAY/+/%2B}..${UNIX_DATE/+/%2B}&per_page=100"
+NEXT_PAGE="https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs?created=${DATE_YESTERDAY/+/%2B}..${UNIX_DATE/+/%2B}&per_page=100"
 ARTIFACTS_JSON=""
 LATEST_RUN_STARTED_AT="0000-00-00T00:00:00Z"
 # Now go through the pages as long as we have a non-empty NEXT_PAGE URL and find the completed "release" workflow that was started last
