@@ -30,9 +30,9 @@ public class RowingBoatOverlay extends BoatOverlay {
     
     @Override
     public void draw() {
-        if (mapProjection != null && boatFix != null) {
+        if (getMapProjection() != null && boatFix != null) {
             // the possible zoom level range is 0 to 21 (zoom level 0 would show the whole world)
-            final long worldWidth = (long) mapProjection.getWorldWidth();
+            final long worldWidth = (long) getMapProjection().getWorldWidth();
             final Util.Pair<Size, Size> boatScaleAndSize = boatScaleAndSizePerWorldWidthCache.computeIfAbsent(worldWidth, z->getBoatScaleAndSize(boatClass));
             final Size boatSizeScaleFactor = boatScaleAndSize.getA();
             canvasWidth = (int) (boatScaleAndSize.getB().getWidth());
@@ -45,7 +45,7 @@ public class RowingBoatOverlay extends BoatOverlay {
                     canvasWidth, canvasHeight, boatSizeScaleFactor, color);
             
             LatLng latLngPosition = coordinateSystem.toLatLng(boatFix.position);
-            Point boatPositionInPx = mapProjection.fromLatLngToDivPixel(latLngPosition);
+            Point boatPositionInPx = getMapProjection().fromLatLngToDivPixel(latLngPosition);
             setCanvasPosition(boatPositionInPx.getX() - getCanvas().getCoordinateSpaceWidth() / 2,
                     boatPositionInPx.getY() - getCanvas().getCoordinateSpaceHeight() / 2);
             // now rotate the canvas accordingly
