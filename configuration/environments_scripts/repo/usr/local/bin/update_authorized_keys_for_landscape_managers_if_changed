@@ -28,7 +28,8 @@ if [ "${curl_exit_code}" = "0" ]; then
     logger -t sailing "New SSH key changes for landscape managers (${last_change_millis} newer than ${PREVIOUS_CHANGE})"
     if update_authorized_keys_for_landscape_managers "${BEARER_TOKEN}" "${BASE_URL}" "${LOGON_USER_HOME}" ; then
       logger -t sailing "Updating SSH keys for landscape managers successful; updating ${LAST_CHANGE_FILE}"
-      echo ${last_change_millis} >${LAST_CHANGE_FILE}
+      # /var/run is writable only for root, so we need to be able to sudo:
+      sudo bash -c "echo ${last_change_millis} >${LAST_CHANGE_FILE}"
     else
       logger -t sailing "Updating SSH keys for landscape managers failed with exit code $?; not updating ${LAST_CHANGE_FILE}"
     fi

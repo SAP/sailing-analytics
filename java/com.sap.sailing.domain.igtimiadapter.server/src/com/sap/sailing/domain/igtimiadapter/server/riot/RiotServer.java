@@ -53,9 +53,9 @@ import com.sap.sse.replication.Replicable;
  * can be registered with this server using the {@link #addListener(BulkFixReceiver)} method.
  * <p>
  * 
- * When combined with {@link IgtimiWindReceiver} (which is such a {@link BulkFixReceiver},
+ * When combined with {@link IgtimiWindReceiver} (which is such a {@link BulkFixReceiver}),
  * {@link IgtimiWindListener}s can be registered on the wind receiver, just as they can
- * for a websocket connection.
+ * for a websocket connection.<p>
  * 
  * The server uses <tt>java.nio</tt> and {@link ServerSocketChannel}s, avoiding the creation
  * of a thread per connection.<p>

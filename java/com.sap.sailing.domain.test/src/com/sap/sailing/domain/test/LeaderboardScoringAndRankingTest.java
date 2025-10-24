@@ -2918,16 +2918,10 @@ public class LeaderboardScoringAndRankingTest extends LeaderboardScoringAndRanki
                 assertTrue(Util.indexOf(rankedCompetitors, lastRaceGoldParticipant) < Util.indexOf(rankedCompetitors, silverParticipant));
             }
         }
-        // assert that theUntrackedCompetitorInLastRace ended up between the last race's silver and gold fleet participants
-        // based on the "extreme fleet" rule:
+        // assert that theUntrackedCompetitorInLastRace ended up ranked worse than all participants of ranked fleets:
         for (final Competitor c : competitors) {
             if (c != theUntrackedCompetitorInLastRace) {
-                if (lastRaceGold.contains(c) || medal.contains(c)) {
-                    assertTrue(Util.indexOf(rankedCompetitors, c) < Util.indexOf(rankedCompetitors, theUntrackedCompetitorInLastRace));
-                } else {
-                    assertTrue(silver.contains(c));
-                    assertTrue(Util.indexOf(rankedCompetitors, c) > Util.indexOf(rankedCompetitors, theUntrackedCompetitorInLastRace));
-                }
+                assertTrue(Util.indexOf(rankedCompetitors, c) < Util.indexOf(rankedCompetitors, theUntrackedCompetitorInLastRace));
             }
         }
     }

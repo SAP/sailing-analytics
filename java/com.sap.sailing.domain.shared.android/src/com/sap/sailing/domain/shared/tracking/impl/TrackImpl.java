@@ -292,6 +292,11 @@ public class TrackImpl<FixType extends Timed> implements Track<FixType> {
         return result;
     }
 
+    /**
+     * Calculates a linear interpolation of values based on their time points and a target time point that is expected
+     * to be in between (inclusive) the two time points for the two values. If the two time points for the two values
+     * are equal, the average of the two values is returned.
+     */
     private <V, T> T timeBasedAverage(TimePoint timePoint, ScalableValue<V, T> value1, TimePoint timePoint1, ScalableValue<V, T> value2, TimePoint timePoint2) {
         final T acc;
         if (timePoint1.equals(timePoint2)) {

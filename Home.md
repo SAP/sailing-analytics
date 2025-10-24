@@ -158,10 +158,8 @@ SAP is at the center of today’s technology revolution, developing innovations 
 * [[Monitoring Apache and RabbitMQ|wiki/misc/monitoring-apache-and-rabbitmq]]
 
 ## Projects
-* [[Analytics on a stick|wiki/projects/analytics-on-a-stick]]
-* [[Consolidating User Stores (bug 4006 / 4018)|wiki/projects/consolidating-user-stores]]
-* [[Cloud Infrastructure Orchestration|wiki/projects/cloud-orchestrator]]
 * [[Management Console for Easier Administration|wiki/howto/development/management-console]]
+* [[Cloud Infrastructure Orchestration|wiki/projects/cloud-orchestrator]]
 
 ## Events and Planning
 * [[Project Planning (bigger development)|wiki/events/planning]]

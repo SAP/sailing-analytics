@@ -28,7 +28,7 @@ Amazon Linux 2023 uses ``dnf`` as its package manager. An operating system upgra
 ```
     dnf --releasever=latest upgrade
 ```
-This will upgrade all packages installed as well as the kernel. When run interactively, upgrade requiring a reboot will be displayed in the update list in red color. For scripted use, consider the ``needs-restarting`` command, delivering an exit status of ``1`` if a reboot is required.
+This will upgrade all packages installed as well as the kernel. When run interactively, upgrade requiring a reboot will be displayed in the update list in red color. For scripted use, consider the ``needs-restarting -r`` command, delivering an exit status of ``1`` if a reboot is required.
 
 #### Debian
 

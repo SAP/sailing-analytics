@@ -6098,7 +6098,17 @@ public class SailingServiceImpl extends ResultCachingProxiedRemoteServiceServlet
         return Activator.getInstance().getGoogleMapsLoaderAuthenticationParams();
     }
 
-    protected IgtimiConnection createIgtimiConnection() {
-        return getIgtimiConnectionFactory().getOrCreateConnection(()->getSecurityService().getCurrentUser() != null ? getSecurityService().getAccessToken(getSecurityService().getCurrentUser().getName()) : null);
+    /**
+     * @param optionalBearerToken
+     *            if present, this bearer token is used to authenticate the Igtimi connection; otherwise, we try to use
+     *            Igtimi default credentials provided at startup through the {@code igtimi.bearer.token} system
+     *            property. Only if no such system property has been set, we look for a logged-in user in the
+     *            {@link #getSecurityService() security service} and use its access token
+     */
+    protected IgtimiConnection createIgtimiConnection(Optional<String> optionalBearerToken) {
+        return optionalBearerToken.map(bearerToken->getIgtimiConnectionFactory().getOrCreateConnection(bearerToken))
+                .orElse(getIgtimiConnectionFactory().getOrCreateConnection(()->getSecurityService().getCurrentUser() != null
+                    ? getSecurityService().getAccessToken(getSecurityService().getCurrentUser().getName())
+                    : null));
     }
 }
