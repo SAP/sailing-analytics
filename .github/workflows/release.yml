@@ -184,7 +184,7 @@ jobs:
           asset_name: release-notes.txt
           asset_content_type: text/plain
       - name: Trigger Hudson job
-        if: ${{ always() && secrets.HUDSON_JOB_USERNAME != '' && secrets.HUDSON_JOB_PASSWORD != '' && secrets.HUDSON_JOB_TOKEN != '' }}
+        if: ${{ always() && (secrets.HUDSON_JOB_USERNAME != '' && secrets.HUDSON_JOB_PASSWORD != '' && secrets.HUDSON_JOB_TOKEN != '') }}
         shell: bash
         run: |
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
