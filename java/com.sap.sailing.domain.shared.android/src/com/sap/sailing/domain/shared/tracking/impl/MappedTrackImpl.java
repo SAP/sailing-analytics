@@ -1,6 +1,6 @@
-package com.sap.sailing.domain.tracking.impl;
+package com.sap.sailing.domain.shared.tracking.impl;
 
-import com.sap.sailing.domain.tracking.MappedTrack;
+import com.sap.sailing.domain.shared.tracking.MappedTrack;
 import com.sap.sse.common.Timed;
 import com.sap.sse.shared.util.impl.ArrayListNavigableSet;
 

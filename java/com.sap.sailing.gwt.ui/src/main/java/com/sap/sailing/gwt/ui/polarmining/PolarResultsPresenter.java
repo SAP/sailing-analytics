@@ -22,7 +22,6 @@ import org.moxieapps.gwt.highcharts.client.plotOptions.SeriesPlotOptions;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
@@ -104,15 +103,16 @@ public class PolarResultsPresenter extends AbstractSailingResultsPresenter<Setti
         dockLayoutPanel = new DockLayoutPanel(Unit.PCT);
         dockLayoutPanel.addWest(polarChartWrapperPanel, 40);
         dockLayoutPanel.addEast(histogramChartsWrapperPanel, 60);
-        ChartToCsvExporter chartToCsvExporter = new ChartToCsvExporter(stringMessages.csvCopiedToClipboard());
-        Button exportStatisticsCurveToCsvButton = new Button(stringMessages.exportStatisticsCurveToCsv(),
-                new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent event) {
-                        chartToCsvExporter.exportChartAsCsvToClipboard(polarChart);
-                    }
-                });
+        final ChartToCsvExporter chartToCsvExporter = new ChartToCsvExporter(stringMessages.csvCopiedToClipboard());
+        final Button exportStatisticsCurveToCsvButton = new Button(stringMessages.exportStatisticsCurveToCsv(),
+                (ClickHandler) e->chartToCsvExporter.exportChartAsCsvToClipboard(polarChart));
         addControl(exportStatisticsCurveToCsvButton);
+        final Button exportTWAHistogramToCsvButton = new Button(stringMessages.exportTWAHistogramToCsv(),
+                (ClickHandler) e->chartToCsvExporter.exportChartAsCsvToClipboard(dataCountHistogramChart));
+        addControl(exportTWAHistogramToCsvButton);
+        final Button exportWindSpeedHistogramToCsvButton = new Button(stringMessages.exportWindSpeedHistogramToCsv(),
+                (ClickHandler) e->chartToCsvExporter.exportChartAsCsvToClipboard(dataCountPerAngleHistogramChart));
+        addControl(exportWindSpeedHistogramToCsvButton);
         setSeriesShowAndHideHandler();
     }
 
@@ -230,6 +230,7 @@ public class PolarResultsPresenter extends AbstractSailingResultsPresenter<Setti
                     if (point != null) {
                         Map<Double, Integer> histogramDataForAngle = histogramData.get(index);
                         Series dataCountPerAngleSeries = dataCountPerAngleHistogramChart.createSeries();
+                        dataCountPerAngleSeries.setName(key.asString() + " - " + convertedAngle + stringMessages.degreesShort());
                         // Iterating over the histogram data without sorting the x coordinates ascending leads
                         // to a massive occurrence of Highcharts error 15, freezing the complete UI
                         List<Double> sortedAngles = new ArrayList<>(histogramDataForAngle.keySet());

@@ -155,6 +155,7 @@ import software.amazon.awssdk.services.elasticloadbalancingv2.model.DescribeTarg
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.DescribeTargetGroupsResponse;
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.DescribeTargetHealthRequest;
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.DescribeTargetHealthResponse;
+import software.amazon.awssdk.services.elasticloadbalancingv2.model.IpAddressType;
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.Listener;
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.LoadBalancer;
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.LoadBalancerAttribute;
@@ -348,6 +349,7 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
         final CreateLoadBalancerResponse response = client
                 .createLoadBalancer(CreateLoadBalancerRequest.builder()
                         .name(name)
+                        .ipAddressType(IpAddressType.DUALSTACK) // IPv4 and IPv6
                         .subnetMappings(subnetMappings)
                         .securityGroups(getDefaultSecurityGroupForApplicationLoadBalancer(region).getId())
                         .build());

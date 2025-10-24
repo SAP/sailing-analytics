@@ -6,6 +6,8 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: SAP
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Fragment-Host: com.sap.sailing.polars
+Import-Package: com.sap.sailing.domain.shared.tracking,
+ com.sap.sailing.domain.shared.tracking.impl
 Require-Bundle: org.hamcrest;bundle-version="2.2.0",
  org.mockito.mockito-core;bundle-version="1.10.14",
  junit-jupiter-api;bundle-version="5.11.3",

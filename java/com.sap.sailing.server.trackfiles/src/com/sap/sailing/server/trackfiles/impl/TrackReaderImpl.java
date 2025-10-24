@@ -1,6 +1,6 @@
 package com.sap.sailing.server.trackfiles.impl;
 
-import com.sap.sailing.domain.tracking.Track;
+import com.sap.sailing.domain.shared.tracking.Track;
 import com.sap.sse.common.Timed;
 
 class TrackReaderImpl<E, T extends Timed> implements TrackReader<E, T>, IterableLocker {

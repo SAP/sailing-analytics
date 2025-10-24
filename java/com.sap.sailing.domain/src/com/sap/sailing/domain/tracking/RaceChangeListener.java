@@ -17,6 +17,7 @@ import com.sap.sailing.domain.common.WindSource;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.common.tracking.SensorFix;
+import com.sap.sailing.domain.shared.tracking.AddResult;
 import com.sap.sse.common.TimePoint;
 
 

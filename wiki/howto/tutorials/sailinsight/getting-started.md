@@ -5,23 +5,13 @@ You can use **Sail Insight** without an account, if you have been invited to par
 
 If you want to track your own trips or set up an event to sail with or against other people you will need to sign up for an account.
 
-<div style="text-align: center; line-height: 0;margin-bottom: 13em;">
-  <a href="https://www.youtube.com/watch?v=ZnRooWkRvas" target="_blank">
-    <img src="https://img.youtube.com/vi/ZnRooWkRvas/0.jpg" alt="Getting started with Sail Insight" style="display: inline-block;">
-  </a>
-  <div style="line-height: normal; margin-top: -14em;">
-    <a href="https://www.youtube.com/watch?v=ZnRooWkRvas" target="_blank" style="
-      display: inline-block;
-      vertical-align: middle;
-      background-color: #007BFF;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 4px;
-      text-decoration: none;
-      font-weight: bold;
-    ">Watch the Video</a>
-  </div>
-</div>
+<video
+  controls="true"
+  src="https://sapsailing-documentation.s3.eu-west-1.amazonaws.com/SailInsight/Getting+started+with+Sail+Insight.+%5BZnRooWkRvas%5D.webm"
+  type="video/webm"
+  style="display:block;margin:1rem auto;max-width:100%;width:340px;height:auto;">
+  Your browser does not support the video tag.
+</video>
 
 ## How-to create an account
 After opening **Sail Insight** create a new account by clicking on *"Register"*.

@@ -23,6 +23,7 @@ import com.sap.sailing.domain.common.tracking.impl.PreciseCompactWindImpl;
 import com.sap.sailing.domain.common.tracking.impl.VeryCompactWindImpl;
 import com.sap.sailing.domain.confidence.ConfidenceBasedWindAverager;
 import com.sap.sailing.domain.confidence.ConfidenceFactory;
+import com.sap.sailing.domain.shared.tracking.impl.TrackImpl;
 import com.sap.sailing.domain.tracking.WindListener;
 import com.sap.sailing.domain.tracking.WindTrack;
 import com.sap.sailing.domain.tracking.WindWithConfidence;

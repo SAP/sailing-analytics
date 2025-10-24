@@ -16,6 +16,18 @@ It contains also some files:
  - Manifest.txt -> manifest used to create the test.jar file
 
 ********************************************
+        TracAPI 4.0.4
+********************************************
+This is the final version. It keeps the backward compatibility. This version has been compiled with
+Java 21 but the target compatibility continues being Java 8.
+
+  Release date: 01/10/2025
+
+ 1) Bugs
+
+ - The heartbeat monitoring the connection status can stop working (Reported by Jorge Piera, 01/10/2025)
+
+********************************************
         TracAPI 4.0.3
 ********************************************
 This is the final version.  It keeps the backward compatibility. The new parameter files will be encoded in UTF-8,

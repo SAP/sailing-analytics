@@ -2,7 +2,7 @@
 
 ## About this Project
 
-The Sailing Analytics, formerly known as the "SAP Sailing Analytics," are a solution for portraying and analyzing sailing regattas, supporting training scenarios, and powering the vast archive at https://sapsailing.com. The solution consists of a cloud application with a web-based user interface, as well as three companion apps that integrate with the cloud application. This repository has the code for the cloud-based web application, and two of the three mobile apps (Buoy Pinger and Race Manager). The third companion app (Sail Insight) is found in [another repository](https://github.com/SailTracks/sailinsight).
+The Sailing Analytics, formerly known as the "SAP Sailing Analytics," are a solution for portraying and analyzing sailing regattas, supporting training scenarios, and powering the vast archive at https://sapsailing.com. The solution consists of a cloud application with a web-based user interface, as well as three companion apps that integrate with the cloud application. This repository has the code for the cloud-based web application, and two of the three mobile apps (Buoy Pinger and Race Manager). The third companion app (Sail Insight) is found in [another repository](https://github.com/SAP/sailing-analytics-sail-insight).
 
 ## Description
 

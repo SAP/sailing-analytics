@@ -26,5 +26,5 @@ public interface DynamicTrackWithRemove<FixType extends Timed> extends DynamicTr
      */
     boolean remove(FixType fix);
 
-    void removeAllUpToAndIncluding(FixType fix);
+    void removeAllUpToExcluding(FixType fix);
 }

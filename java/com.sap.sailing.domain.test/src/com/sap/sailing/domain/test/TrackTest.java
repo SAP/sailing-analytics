@@ -44,14 +44,14 @@ import com.sap.sailing.domain.common.tracking.impl.CompactionNotPossibleExceptio
 import com.sap.sailing.domain.common.tracking.impl.GPSFixImpl;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixMovingImpl;
 import com.sap.sailing.domain.common.tracking.impl.VeryCompactGPSFixMovingImpl;
+import com.sap.sailing.domain.shared.tracking.impl.TimeRangeCache;
+import com.sap.sailing.domain.shared.tracking.impl.TrackImpl;
 import com.sap.sailing.domain.tracking.DynamicGPSFixTrack;
 import com.sap.sailing.domain.tracking.GPSFixTrack;
 import com.sap.sailing.domain.tracking.impl.DynamicGPSFixMovingTrackImpl;
 import com.sap.sailing.domain.tracking.impl.DynamicGPSFixTrackImpl;
 import com.sap.sailing.domain.tracking.impl.GPSFixTrackImpl;
 import com.sap.sailing.domain.tracking.impl.MaxSpeedCache;
-import com.sap.sailing.domain.tracking.impl.TimeRangeCache;
-import com.sap.sailing.domain.tracking.impl.TrackImpl;
 import com.sap.sse.common.AbstractBearing;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;

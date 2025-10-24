@@ -1,4 +1,4 @@
-package com.sap.sailing.domain.tracking.impl;
+package com.sap.sailing.domain.shared.tracking.impl;
 
 import java.util.Comparator;
 import java.util.Iterator;

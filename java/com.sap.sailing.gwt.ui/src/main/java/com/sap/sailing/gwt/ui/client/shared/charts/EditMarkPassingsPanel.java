@@ -130,7 +130,7 @@ public class EditMarkPassingsPanel extends AbstractCompositeComponent<AbstractSe
                 enableButtons();
             }
         });
-        wayPointSelectionTable = new BaseCelltable<Util.Pair<Integer, Date>>();
+        wayPointSelectionTable = new BaseCelltable<Util.Pair<Integer, Date>>(/* pageSize */10000);
         wayPointSelectionTable.addColumn(new Column<Util.Pair<Integer, Date>, SafeHtml>(new AnchorCell()) {
             @Override
             public SafeHtml getValue(final Util.Pair<Integer, Date> object) {

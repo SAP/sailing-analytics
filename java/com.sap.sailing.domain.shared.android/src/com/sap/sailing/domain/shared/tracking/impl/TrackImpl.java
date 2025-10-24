@@ -1,4 +1,4 @@
-package com.sap.sailing.domain.tracking.impl;
+package com.sap.sailing.domain.shared.tracking.impl;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -7,9 +7,9 @@ import java.util.Iterator;
 import java.util.NavigableSet;
 import java.util.function.Function;
 
-import com.sap.sailing.domain.tracking.AddResult;
-import com.sap.sailing.domain.tracking.FixAcceptancePredicate;
-import com.sap.sailing.domain.tracking.Track;
+import com.sap.sailing.domain.shared.tracking.AddResult;
+import com.sap.sailing.domain.shared.tracking.FixAcceptancePredicate;
+import com.sap.sailing.domain.shared.tracking.Track;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Timed;
@@ -292,6 +292,11 @@ public class TrackImpl<FixType extends Timed> implements Track<FixType> {
         return result;
     }
 
+    /**
+     * Calculates a linear interpolation of values based on their time points and a target time point that is expected
+     * to be in between (inclusive) the two time points for the two values. If the two time points for the two values
+     * are equal, the average of the two values is returned.
+     */
     private <V, T> T timeBasedAverage(TimePoint timePoint, ScalableValue<V, T> value1, TimePoint timePoint1, ScalableValue<V, T> value2, TimePoint timePoint2) {
         final T acc;
         if (timePoint1.equals(timePoint2)) {

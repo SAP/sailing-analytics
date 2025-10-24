@@ -188,8 +188,9 @@ public class IgtimiWindReceiver implements BulkFixReceiver {
     }
     
     /**
-     * Returns a wind fix produced out of an AWS/AWA and other fixes, as well as the fixes used for this, including a {@link BatteryLevel}
-     * fix, if any was found, although this did technically not contribute to the production of the {@link Wind} object.
+     * Returns a wind fix produced out of an AWS/AWA and other fixes, as well as the fixes used for this (in case of
+     * interpolation between two fixes, the older one of the two is returned), including a {@link BatteryLevel} fix, if
+     * any was found, although this did technically not contribute to the production of the {@link Wind} object.
      */
     private Pair<Wind, Set<Fix>> getWind(final TimePoint timePoint, String deviceSerialNumber) throws ClassNotFoundException, IOException, ParseException {
         final Wind result;
@@ -213,7 +214,7 @@ public class IgtimiWindReceiver implements BulkFixReceiver {
                 final SpeedWithBearing apparentWindSpeedWithDirection = new KnotSpeedWithBearingImpl(aws.getKnots(), apparentWindDirection);
                 /*
                  * Hint from Brent Russell from Igtimi, at 2013-12-05 on the question whether to use GpsLatLong to
-                 * improve precision of boat speed / coarse over SOG/COG measurements:
+                 * improve precision of boat speed / course over SOG/COG measurements:
                  * 
                  * "Personally I would use COG/SOG exclusively, and if unhappy with the result add a small amount of
                  * smoothing and consider dropping samples as outliers if they cause a SOG discontinuity. The latter
@@ -260,7 +261,11 @@ public class IgtimiWindReceiver implements BulkFixReceiver {
     /**
      * Searches for the last fix at or before {@code timePoint} in the given {@link trackToCleanUp}. If such a fix is
      * found, adds the given fix to {@code fixesUsed} and clears all fixes from the {@code trackToCleanUp} that are
-     * earlier than or at the {@code timePoint} given.
+     * earlier than the {@code timePoint} given. This in particular preserves at least one live fix which will "hide"
+     * older, e.g., buffered fixes that may be received when a WindBot device sends them out-of-order. For old, buffered
+     * fixes this may still mean that could be dropped prior to being converted into a {@link Wind} object with an older
+     * time stamp, but usually---and particularly with buffered data from previous days---this shouldn't be a problem.
+     * Also, old data can still be imported at a later point in time. 
      * <p>
      * 
      * This assumes that the {@code fix} passed has been "consumed" now, and earlier fixes will not be relevant anymore.
@@ -270,7 +275,7 @@ public class IgtimiWindReceiver implements BulkFixReceiver {
         final FixType fix = trackToCleanUp.getLastFixAtOrBefore(timePoint);
         if (fix != null) {
             fixesUsed.add(fix);
-            trackToCleanUp.removeAllUpToAndIncluding(fix);
+            trackToCleanUp.removeAllUpToExcluding(fix);
         }
     }
 

@@ -2,7 +2,7 @@ package com.sap.sailing.server.gateway.serialization.impl;
 
 import org.json.simple.JSONObject;
 
-import com.sap.sailing.domain.tracking.TrackingConnectorInfo;
+import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
 import com.sap.sse.shared.json.JsonSerializer;
 
 public class TrackingConnectorInfoJsonSerializer implements JsonSerializer<TrackingConnectorInfo> {

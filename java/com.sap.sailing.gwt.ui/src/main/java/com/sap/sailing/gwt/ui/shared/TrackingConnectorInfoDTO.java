@@ -2,7 +2,7 @@ package com.sap.sailing.gwt.ui.shared;
 
 import com.google.gwt.core.shared.GwtIncompatible;
 import com.google.gwt.user.client.rpc.IsSerializable;
-import com.sap.sailing.domain.tracking.TrackingConnectorInfo;
+import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
 
 public class TrackingConnectorInfoDTO implements IsSerializable {
     private String trackingConnectorName;
