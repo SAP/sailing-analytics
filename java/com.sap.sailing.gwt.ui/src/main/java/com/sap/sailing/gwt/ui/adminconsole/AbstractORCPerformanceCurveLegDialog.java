@@ -37,7 +37,7 @@ public abstract class AbstractORCPerformanceCurveLegDialog<T> extends DataEntryD
         throw new RuntimeException("Internal error: don't know ORC performance curve leg type " + legType.name());
     }
     
-    protected ListBox createLegTypeBox(ORCPerformanceCurveLegImpl orcLegParametersSoFar) {
+    protected ListBox createLegTypeBox(ORCPerformanceCurveLeg orcLegParametersSoFar) {
         final ListBox legTypeBox = createListBox(/* isMultipleSelect */ false);
         legTypeBox.addItem("", (String) null);
         int i=1;

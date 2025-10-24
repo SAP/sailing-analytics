@@ -15,6 +15,7 @@ import com.sap.sailing.gwt.ui.client.SailingServiceAsync;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.gwt.ui.shared.DeviceMappingDTO;
 import com.sap.sailing.gwt.ui.shared.MarkDTO;
+import com.sap.sailing.gwt.ui.shared.courseCreation.ControlPointWithMarkConfigurationDTO;
 import com.sap.sailing.gwt.ui.shared.courseCreation.CourseConfigurationDTO;
 import com.sap.sailing.gwt.ui.shared.courseCreation.CourseTemplateDTO;
 import com.sap.sailing.gwt.ui.shared.courseCreation.FreestyleMarkConfigurationDTO;

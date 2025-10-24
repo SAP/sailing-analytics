@@ -30,7 +30,6 @@ public class UDPMirror {
             }
             int listeningOnPort = Integer.valueOf(args[c++]);
             byte[] buf = new byte[65536];
-            @SuppressWarnings("resource") // Can't close resource due to the infinite loop. Will be closed, when the thread is terminated.
             DatagramSocket udpSocket = new DatagramSocket(listeningOnPort);
             DatagramPacket received = new DatagramPacket(buf, buf.length);
             DatagramSocket[] sendingSockets = new DatagramSocket[(args.length - 1) / 2];
