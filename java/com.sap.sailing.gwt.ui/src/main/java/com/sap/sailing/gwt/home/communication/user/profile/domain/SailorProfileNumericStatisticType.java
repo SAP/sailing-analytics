@@ -12,7 +12,8 @@ public enum SailorProfileNumericStatisticType {
     AVERAGE_STARTLINE_DISTANCE_WITH_VALIDATION(StatisticType.AVERAGE, null, true, false, true),
     AVERAGE_VELOCITY_MADE_GOOD_UPWIND_LEG(StatisticType.AVERAGE, null, false, false, true),
     AVERAGE_VELOCITY_MADE_GOOD_DOWNWIND_LEG(StatisticType.AVERAGE, null, false, false, true),
-    AVERAGE_MANEUVERING_LOSSES(StatisticType.AVERAGE, null, true, false, true);
+    AVERAGE_SPEED_OVER_GROUND_UPWIND_LEG(StatisticType.AVERAGE, null, false, false, true),
+    AVERAGE_SPEED_OVER_GROUND_DOWNWIND_LEG(StatisticType.AVERAGE, null, false, false, true);
     
     private StatisticType type;
     private RaceBoardModes mode;

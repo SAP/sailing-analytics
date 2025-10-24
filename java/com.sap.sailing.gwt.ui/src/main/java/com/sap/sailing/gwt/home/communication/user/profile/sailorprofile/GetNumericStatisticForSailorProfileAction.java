@@ -123,18 +123,18 @@ public class GetNumericStatisticForSailorProfileAction
                                     if (!otherCompetitor.equals(competitor)) {
                                         
                                         // DEBUG
-                                        System.out.println("=== PROCESSING OTHER COMPETITOR ===");
-                                        System.out.println("Main Competitor: " + competitor.getName());
-                                        System.out.println("Other Competitor: " + otherCompetitor.getName());
-                                        System.out.println("Race: " + tr.getRace().getName());
-                                        System.out.println("Event: " + leaderboardGroup.getName());
+//                                        System.out.println("=== PROCESSING OTHER COMPETITOR ===");
+//                                        System.out.println("Main Competitor: " + competitor.getName());
+//                                        System.out.println("Other Competitor: " + otherCompetitor.getName());
+//                                        System.out.println("Race: " + tr.getRace().getName());
+//                                        System.out.println("Event: " + leaderboardGroup.getName());
                                         
                                         
                                         extractValue(otherCompetitor, aggregatorForOtherCompetitors, end, leaderboard, tr, leaderboardGroup, event);
                                         
-                                        // DEBUG
-                                        System.out.println("Processed successfully");
-                                        System.out.println("=====================================");
+//                                        // DEBUG
+//                                        System.out.println("Processed successfully");
+//                                        System.out.println("=====================================");
                                     }
                                 }
                             }
@@ -195,93 +195,18 @@ public class GetNumericStatisticForSailorProfileAction
             }
             break;
           case AVERAGE_VELOCITY_MADE_GOOD_UPWIND_LEG: 
-              // Calculate VMG for Upwind-Legs
-              for (TrackedLeg leg : tr.getTrackedLegs()) {
-                  try {
-                      LegType legType = leg.getLegType(end);
-                      if (legType == LegType.UPWIND) {
-                          TrackedLegOfCompetitor competitorLeg = leg.getTrackedLeg(competitor);
-                          if (competitorLeg != null) {
-                              Speed averageVMG = competitorLeg.getAverageVelocityMadeGood(end, 
-                                  new com.sap.sailing.domain.leaderboard.caching.LeaderboardDTOCalculationReuseCache(end));
-                              if (averageVMG != null && isValidRaceForStatistics(competitor, leaderboard, tr, end)) {
-                                  aggregator.add(averageVMG, null, null, null, null, null, null, null, null);
-                                  System.out.println("Added UPWIND VMG: " + averageVMG.getKnots() + " knots");
-                              }
-                          }
-                      }
-                  } catch (NoWindException e) {
-                      System.out.println("No wind data for upwind VMG calculation: " + e.getMessage());
-                  } catch (Exception e) {
-                      System.out.println("Error calculating upwind VMG: " + e.getMessage());
-                  }
-              }
+              calculateVMGForLegType(competitor, aggregator, end, leaderboard, tr, LegType.UPWIND);
               break;
           case AVERAGE_VELOCITY_MADE_GOOD_DOWNWIND_LEG:
-              // Calculate VMG for Downwind-Legs
-              for (TrackedLeg leg : tr.getTrackedLegs()) {
-                  try {
-                      LegType legType = leg.getLegType(end);
-                      if (legType == LegType.DOWNWIND) {
-                          TrackedLegOfCompetitor competitorLeg = leg.getTrackedLeg(competitor);
-                          if (competitorLeg != null) {
-                              Speed averageVMG = competitorLeg.getAverageVelocityMadeGood(end, 
-                                  new com.sap.sailing.domain.leaderboard.caching.LeaderboardDTOCalculationReuseCache(end));
-                              if (averageVMG != null && isValidRaceForStatistics(competitor, leaderboard, tr, end)) {
-                                  aggregator.add(averageVMG, null, null, null, null, null, null, null, null);
-                                  System.out.println("Added DOWNWIND VMG: " + averageVMG.getKnots() + " knots");
-                              }
-                          }
-                      }
-                  } catch (NoWindException e) {
-                      System.out.println("No wind data for downwind VMG calculation: " + e.getMessage());
-                  } catch (Exception e) {
-                      System.out.println("Error calculating downwind VMG: " + e.getMessage());
-                  }
-              }
+              calculateVMGForLegType(competitor, aggregator, end, leaderboard, tr, LegType.DOWNWIND);
               break;
-          case AVERAGE_MANEUVERING_LOSSES: 
-//              // Calculate Maneuvering losses
-//              Iterable<Maneuver> maneuvers = tr.getManeuvers(competitor, false);
-//              
-//              for (Maneuver maneuver : maneuvers) {
-//                  ManeuverLoss maneuverLoss = maneuver.getManeuverLoss();
-//                  if (maneuverLoss != null) {
-//                      Distance distanceLost = maneuverLoss.getProjectedDistanceLost();
-//                      if (distanceLost != null) {
-//                          // Direkt die fertig berechnete Manöververlust-Distanz verwenden
-//                          aggregator.add(distanceLost, null, null, null, null, null, null, null, null);
-//                      }
-//                  }
-//              }
-              
-              Iterable<Maneuver> maneuvers = tr.getManeuvers(competitor, false);
-              
-              System.out.println("=== MANEUVERING LOSSES DEBUG ===");
-              System.out.println("Competitor: " + competitor.getName());
-              System.out.println("Race: " + tr.getRace().getName());
-              
-              int maneuverCount = 0;
-              for (Maneuver maneuver : maneuvers) {
-                  maneuverCount++;
-                  System.out.println("Found maneuver #" + maneuverCount);
-                  
-                  ManeuverLoss maneuverLoss = maneuver.getManeuverLoss();
-                  if (maneuverLoss != null) {
-                      Distance distanceLost = maneuverLoss.getProjectedDistanceLost();
-                      if (distanceLost != null) {
-                          aggregator.add(distanceLost, null, null, null, null, null, null, null, null);
-                          System.out.println("Added maneuver loss: " + distanceLost.getMeters() + "m");
-                      } else {
-                          System.out.println("No distance lost data");
-                      }
-                  } else {
-                      System.out.println("No maneuver loss data");
-                  }
-              }
-              System.out.println("Total maneuvers found: " + maneuverCount);
-              System.out.println("===============================");
+          case AVERAGE_SPEED_OVER_GROUND_UPWIND_LEG:
+              calculateSOGForLegType(competitor, aggregator, end, leaderboard, tr, LegType.UPWIND);
               break;
+
+          case AVERAGE_SPEED_OVER_GROUND_DOWNWIND_LEG:
+              calculateSOGForLegType(competitor, aggregator, end, leaderboard, tr, LegType.DOWNWIND);
+              break;   
         default:
               break;
         }
@@ -309,7 +234,55 @@ public class GetNumericStatisticForSailorProfileAction
         return reason == null || reason == MaxPointsReason.NONE || 
                reason == MaxPointsReason.STP || reason == MaxPointsReason.RDG;
     }
-
+    
+    @GwtIncompatible
+    private void calculateVMGForLegType(Competitor competitor, final Aggregator aggregator, 
+            TimePoint end, Leaderboard leaderboard, TrackedRace tr, LegType targetLegType) {
+        
+        for (TrackedLeg leg : tr.getTrackedLegs()) {
+            try {
+                LegType legType = leg.getLegType(end);
+                if (legType == targetLegType) {
+                    TrackedLegOfCompetitor competitorLeg = leg.getTrackedLeg(competitor);
+                    if (competitorLeg != null) {
+                        Speed averageVMG = competitorLeg.getAverageVelocityMadeGood(end, 
+                            new com.sap.sailing.domain.leaderboard.caching.LeaderboardDTOCalculationReuseCache(end));
+                        if (averageVMG != null && isValidRaceForStatistics(competitor, leaderboard, tr, end)) {
+                            aggregator.add(averageVMG, null, null, null, null, null, null, null, null);
+                            System.out.println("Added " + targetLegType + " VMG: " + averageVMG.getKnots() + " knots");
+                        }
+                    }
+                }
+            } catch (NoWindException e) {
+                System.out.println("No wind data for " + targetLegType + " VMG: " + e.getMessage());
+            } catch (Exception e) {
+                System.out.println("Error calculating " + targetLegType + " VMG: " + e.getMessage());
+            }
+        }
+    }
+    
+    @GwtIncompatible
+    private void calculateSOGForLegType(Competitor competitor, final Aggregator aggregator, 
+            TimePoint end, Leaderboard leaderboard, TrackedRace tr, LegType targetLegType) {
+        
+        for (TrackedLeg leg : tr.getTrackedLegs()) {
+            try {
+                LegType legType = leg.getLegType(end);
+                if (legType == targetLegType) {
+                    TrackedLegOfCompetitor competitorLeg = leg.getTrackedLeg(competitor);
+                    if (competitorLeg != null) {
+                        Speed averageSOG = competitorLeg.getAverageSpeedOverGround(end);
+                        if (averageSOG != null && isValidRaceForStatistics(competitor, leaderboard, tr, end)) {
+                            aggregator.add(averageSOG, null, null, null, null, null, null, null, null);
+                            System.out.println("Added " + targetLegType + " SOG: " + averageSOG.getKnots() + " knots");
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Error calculating " + targetLegType + " SOG: " + e.getMessage());
+            }
+        }
+    }
 
     /** reduces result map to only the best competitor if statistic is not average */
     @GwtIncompatible
@@ -500,14 +473,14 @@ public class GetNumericStatisticForSailorProfileAction
                 }
                 
                 // DEBUG
-                System.out.println("=== AverageAggregator DEBUG ===");
-                System.out.println("Event: " + (bestLeaderboardGroupName != null ? bestLeaderboardGroupName : "Unknown"));
-                System.out.println("Leaderboard: " + (bestLeaderboardName != null ? bestLeaderboardName : "Unknown"));
-                System.out.println("Race: " + (bestRaceName != null ? bestRaceName : "Unknown"));
-                System.out.println("New Value: " + value + "m");
-                System.out.println("Running Average: " + average + "m");
-                System.out.println("Total Count: " + averageCount);
-                System.out.println("================================");
+//                System.out.println("=== AverageAggregator DEBUG ===");
+//                System.out.println("Event: " + (bestLeaderboardGroupName != null ? bestLeaderboardGroupName : "Unknown"));
+//                System.out.println("Leaderboard: " + (bestLeaderboardName != null ? bestLeaderboardName : "Unknown"));
+//                System.out.println("Race: " + (bestRaceName != null ? bestRaceName : "Unknown"));
+//                System.out.println("New Value: " + value + "m");
+//                System.out.println("Running Average: " + average + "m");
+//                System.out.println("Total Count: " + averageCount);
+//                System.out.println("================================");
             }
         }
 
