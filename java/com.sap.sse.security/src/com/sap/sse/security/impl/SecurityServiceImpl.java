@@ -1006,7 +1006,7 @@ implements ReplicableSecurityService, ClearStateTestSupport {
     
     @Override
     public void releaseBearerTokenLockOnIp(String ip) {
-        logger.info("Releasing timed lock for user creation at IP "+ip);
+        logger.info("Releasing timed lock for bearer token abuse at IP "+ip);
         apply(new ReleaseBearerTokenLockOnIpOperation(ip));
     }
     
@@ -1189,6 +1189,12 @@ implements ReplicableSecurityService, ClearStateTestSupport {
                 throw new UserManagementException("Client IP "+clientIP+" locked for user creation: "+timedLock);
             }
         }
+    }
+    
+    @Override
+    public boolean isUserCreationLockedForClientIP(String clientIP) {
+        final TimedLock timedLock = clientIPBasedTimedLocksForUserCreation.get(escapeNullClientIP(clientIP));
+        return timedLock != null && timedLock.isLocked();
     }
     
     @Override

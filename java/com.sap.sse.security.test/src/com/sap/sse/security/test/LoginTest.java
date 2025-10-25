@@ -8,11 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -274,6 +276,46 @@ public class LoginTest {
         User allUser = userStore.getUserByName(SecurityService.ALL_USERNAME);
         User user = store2.getUserByName("me");
         assertTrue(PermissionChecker.isPermitted(new WildcardPermission("a:b:c"), user, allUser, null, null));
+    }
+
+    @Test
+    public void testUnlockBearerTokenAbuser() throws UserStoreManagementException, IOException, InterruptedException {
+        final String localhost = "127.0.0.1";
+        final int attempts = 4;
+        for(int i = 0; i < attempts; i++) {
+            securityService.failedBearerTokenAuthentication(localhost);
+            final long lockDuration = (long) Math.pow(2, i) * 1000;
+            final boolean isFinalAttempt = i == (attempts - 1);
+            if (!isFinalAttempt) {
+                Thread.sleep(lockDuration);
+            }
+        }
+        assertTrue(securityService.isClientIPLockedForBearerTokenAuthentication(localhost));
+        securityService.releaseBearerTokenLockOnIp(localhost);
+        assertFalse(securityService.isClientIPLockedForBearerTokenAuthentication(localhost));
+    }
+
+    @Test
+    public void testUnlockUserCreationAbuser() throws UserStoreManagementException, IOException, InterruptedException, MailException {
+        final String localhost = "127.0.0.1";
+        final int attempts = 4;
+        for(int i = 0; i < attempts; i++) {
+            try {
+                securityService.createSimpleUser("USERNAME" + i, "a@b.c", "PASSWORD", "The User", "SAP SE",
+                        /* validation URL */ Locale.ENGLISH, null, null, /* clientIP */ localhost,
+                        /* enforce strong password */ false);
+            } catch (UserManagementException e) {
+                // do nothing, expected due to lock
+            }
+            final long lockDuration = (long) Math.pow(2, i) * 1000;
+            final boolean isFinalAttempt = i == (attempts - 1);
+            if (!isFinalAttempt) {
+                Thread.sleep(lockDuration);
+            }
+        }
+        assertTrue(securityService.isUserCreationLockedForClientIP(localhost));
+        securityService.releaseUserCreationLockOnIp(localhost);
+        assertFalse(securityService.isUserCreationLockedForClientIP(localhost));
     }
 
     private UserStoreImpl createAndLoadUserStore() throws UserStoreManagementException {

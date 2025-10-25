@@ -918,11 +918,14 @@ public interface SecurityService extends ReplicableWithObjectInputStream<Replica
      * Used in conjunction with {@link #failedBearerTokenAuthentication(String)} and
      * {@link #successfulBearerTokenAuthentication(String)}. If and only if a locking state for the combination
      * of {@code clientIP} and {@code userAgent} is known and still locked, {@code true} is returned. Unlocking
-     * will bappen by calling {@link #successfulBearerTokenAuthentication(String)} with an equal combination
-     * of {@code clientIP} and {@code userAgent}. Invoking {@link #failedBearerTokenAuthentication(String)}
-     * will establish (if not yet locked) or extend the locking duration for the combination.
+     * will happen by calling {@link #successfulBearerTokenAuthentication(String)} with an equal combination of
+     * {@code clientIP} and {@code userAgent} or by calling {@link releaseBearerTokenLockOnIp(String)}. Invoking
+     * {@link #failedBearerTokenAuthentication(String)} will establish (if not yet locked) or extend the locking
+     * duration for the combination.
      */
     boolean isClientIPLockedForBearerTokenAuthentication(String clientIP);
+
+    boolean isUserCreationLockedForClientIP(String clientIP);
 
     void fileTakedownNotice(TakedownNoticeRequestContext takedownNoticeRequestContext) throws MailException;
     
@@ -941,8 +944,8 @@ public interface SecurityService extends ReplicableWithObjectInputStream<Replica
      */
     Iterable<User> getUsersToInformAboutReplicaSet(String serverName,
             Optional<com.sap.sse.security.shared.HasPermissions.Action> alsoSendToAllUsersWithThisPermissionOnReplicaSet);
-
+    
     HashMap<String, TimedLock> getClientIPBasedTimedLocksForUserCreation();
-
+    
     HashMap<String, TimedLock> getClientIPBasedTimedLocksForBearerTokenAbuse();
 }

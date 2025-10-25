@@ -30,6 +30,7 @@ public class ApiContext {
     public static final String SECURITY_CONTEXT = "security"; //$NON-NLS-1$
     public static final String ADMIN_USERNAME = "admin"; //$NON-NLS-1$
     public static final String ADMIN_PASSWORD = "admin"; //$NON-NLS-1$
+    public static final String INVALID_TOKEN_SAMPLE = "INVALID_TOKEN_SAMPLE";
 
     private static final Logger logger = Logger.getLogger(ApiContext.class.getName());
 
@@ -72,6 +73,19 @@ public class ApiContext {
      */
     public static ApiContext createAnonymousApiContext(String contextRoot, String context) {
         return new ApiContext(contextRoot, context, null);
+    }
+
+    /**
+     * Creates an ApiContext with an invalid token. Useful for testing.
+     * 
+     * @param contextRoot
+     *            server instance
+     * @param context
+     *            web application context
+     * @return ApiContext with invalid token
+     */
+    public static ApiContext createApiContextWithInvalidToken(String contextRoot, String context) {
+        return new ApiContext(contextRoot, context, INVALID_TOKEN_SAMPLE);
     }
 
     /**

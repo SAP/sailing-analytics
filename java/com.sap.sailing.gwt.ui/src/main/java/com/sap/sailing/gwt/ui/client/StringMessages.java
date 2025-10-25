@@ -2562,4 +2562,10 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     String successfullyCopiedPairings();
     String selectFromRaceColumn();
     String selectToRaceColumn();
+    String unableToLoadIpsBlockedForBearerTokenAbuse();
+    String ipAddress();
+    String filterIpAddresses();
+    String unlock();
+    String ipsLockedForUserCreationAbuse();
+    String unableToLoadIpsBlockedForUserCreationAbuse();
 }
