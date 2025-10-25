@@ -200,7 +200,8 @@ public class JumpyTrackSmootheningTest {
             assertEquals(13, markPassings.size());
         }
         assertTrue(durationForAdjustedTrack.times(8).compareTo(durationForOriginalTrack) < 0,
-                "Expected duration for mark passing analysis on adjusted track to be at least eight times less than for original track");
+                "Expected duration for mark passing analysis on adjusted track to be at least eight times less than for original track: "+
+                durationForAdjustedTrack+" vs. "+durationForOriginalTrack);
     }
     
     private DynamicGPSFixTrack<Competitor, GPSFixMoving> readTrack(String filename) throws Exception {
