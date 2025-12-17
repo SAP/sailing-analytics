@@ -179,6 +179,28 @@ public class AccessControlledButtonPanel extends Composite {
         return resolveButtonVisibility(permissionCheck, new Button(text, wrap(permissionCheck, callback)));
     }
 
+    /**
+     * Adds an action button, appended with selection count, whose visibility depends on the provided {@link Supplier
+     * permission check}.
+     * 
+     * @param text
+     *            the {@link String text} to show on the button
+     * @param permissionCheck
+     *            the {@link Supplier permission check} to decide if the action button is visible or not
+     * @param callback
+     *            the {@link Command callback} to execute on button click, if permission is granted
+     * @return the created {@link Button} instance
+     */
+    public <T extends Named> Button addCountingAction(final String text, final SetSelectionModel<T> selectionModel,
+            final Supplier<Boolean> permissionCheck, final Command callback) {
+        if (selectionModel == null) {
+            throw new IllegalArgumentException("Selection model for a remove action must not be null");
+        }
+        final SelectedElementsCountingButton<T> button = new SelectedElementsCountingButton<T>(text,
+                selectionModel, wrap(permissionCheck, callback));
+        return resolveButtonVisibility(permissionCheck, button);
+    }
+
     private Button resolveButtonVisibility(final Supplier<Boolean> permissionCheck, final Button button) {
         this.buttonToPermissions.put(button, permissionCheck);
         button.getElement().getStyle().setMarginRight(5, Unit.PX);

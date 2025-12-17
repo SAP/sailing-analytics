@@ -27,6 +27,8 @@
     </listAttribute>
     <booleanAttribute key="org.eclipse.jdt.debug.ui.CONSIDER_INHERITED_MAIN" value="true"/>
     <booleanAttribute key="org.eclipse.jdt.debug.ui.INCLUDE_EXTERNAL_JARS" value="true"/>
+    <booleanAttribute key="org.eclipse.jdt.launching.ATTR_ATTR_USE_ARGFILE" value="false"/>
+    <booleanAttribute key="org.eclipse.jdt.launching.ATTR_SHOW_CODEDETAILS_IN_EXCEPTION_MESSAGES" value="true"/>
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_CLASSPATH_ONLY_JAR" value="false"/>
     <listAttribute key="org.eclipse.jdt.launching.CLASSPATH">
         <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry containerPath=&quot;org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8&quot; javaProject=&quot;com.sap.sailing.gwt.ui&quot; path=&quot;1&quot; type=&quot;4&quot;/&gt;&#10;"/>
@@ -101,12 +103,14 @@
         <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry id=&quot;org.eclipse.jdt.launching.classpathentry.defaultClasspath&quot;&gt;&#10;    &lt;memento exportedEntriesOnly=&quot;false&quot; project=&quot;com.sap.sailing.gwt.ui&quot;/&gt;&#10;&lt;/runtimeClasspathEntry&gt;&#10;"/>
         <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry path=&quot;3&quot; projectName=&quot;com.sap.sse.common&quot; type=&quot;1&quot;/&gt;&#10;"/>
         <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/com.sap.sse.landscape.aws.common/src&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#10;"/>
+        <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/com.sap.sse.branding/src&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#10;"/>
     </listAttribute>
     <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="com.gwtplugins.gwt.eclipse.core.moduleClasspathProvider"/>
     <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
+    <stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17/"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.google.gwt.dev.DevMode"/>
     <stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value="com.sap.sse.security.ui"/>
-    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-incremental -workDir &quot;${project_loc:com.sap.sse.security.ui}/.tmp/gwt-work&quot; -war &quot;${project_loc:com.sap.sse.security.ui}&quot; -noserver -remoteUI &quot;${gwt_remote_ui_server_port}:${unique_id}&quot; -logLevel INFO -codeServerPort 9877 -startupUrl /security/ui/Login.html -startupUrl /security/ui/EditProfile.html -startupUrl /security/ui/EmailValidation.html -startupUrl /security/ui/UserManagement.html -startupUrl /security/ui/Register.html -startupUrl /security/ui/Login.html com.sap.sse.security.ui.EditProfile com.sap.sse.security.ui.EmailValidation com.sap.sse.security.ui.OAuthLogin com.sap.sse.security.ui.UserManagementEntryPoint com.sap.sse.security.ui.Register com.sap.sse.security.ui.Login"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-incremental -workDir &quot;${project_loc:com.sap.sse.security.ui}/.tmp/gwt-work&quot; -war &quot;${project_loc:com.sap.sse.security.ui}&quot; -noserver -remoteUI &quot;${gwt_remote_ui_server_port}:${unique_id}&quot; -bindAddress 0.0.0.0 -logLevel INFO -codeServerPort 9877 -startupUrl /security/ui/Login.html -startupUrl /security/ui/EditProfile.html -startupUrl /security/ui/EmailValidation.html -startupUrl /security/ui/UserManagement.html -startupUrl /security/ui/Register.html -startupUrl /security/ui/Login.html com.sap.sse.security.ui.EditProfile com.sap.sse.security.ui.EmailValidation com.sap.sse.security.ui.OAuthLogin com.sap.sse.security.ui.UserManagementEntryPoint com.sap.sse.security.ui.Register com.sap.sse.security.ui.Login"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="com.sap.sse.security.ui"/>
     <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UseG1GC -XX:-UseStringDeduplication -Dgwt.watchFileChanges=false -Xmx2048m -Dgwt-usearchives=false -Dgwt.persistentunitcache=false"/>
     <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${project_loc:com.sap.sailing.gwt.ui}/.tmp/gwt-work"/>

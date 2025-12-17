@@ -1167,6 +1167,7 @@ public class SailingServiceImpl extends ResultCachingProxiedRemoteServiceServlet
         case RRS26_3MIN:
         case SWC:
         case SWC_4MIN:
+        case SWC_5MIN:
             ConfigurableStartModeFlagRacingProcedure linestart = state.getTypedReadonlyRacingProcedure();
             info = new LineStartInfoDTO(linestart.getStartModeFlag());
         case UNKNOWN:

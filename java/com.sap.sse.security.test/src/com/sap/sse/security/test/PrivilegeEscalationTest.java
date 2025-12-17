@@ -11,6 +11,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.sap.sse.common.impl.TimedLockImpl;
 import com.sap.sse.security.SecurityService;
 import com.sap.sse.security.impl.SecurityServiceImpl;
 import com.sap.sse.security.shared.HasPermissions;
@@ -26,7 +27,6 @@ import com.sap.sse.security.shared.UserStoreManagementException;
 import com.sap.sse.security.shared.WildcardPermission;
 import com.sap.sse.security.shared.impl.AccessControlList;
 import com.sap.sse.security.shared.impl.HasPermissionsImpl;
-import com.sap.sse.security.shared.impl.LockingAndBanningImpl;
 import com.sap.sse.security.shared.impl.Ownership;
 import com.sap.sse.security.shared.impl.Role;
 import com.sap.sse.security.shared.impl.SecuredSecurityTypes;
@@ -65,8 +65,8 @@ public class PrivilegeEscalationTest {
                 PersistenceFactory.INSTANCE.getDefaultMongoObjectFactory(), TEST_DEFAULT_TENANT);
         userStore.ensureDefaultRolesExist();
         userStore.loadAndMigrateUsers();
-        user = userStore.createUser(USER_USERNAME, null, new LockingAndBanningImpl());
-        user2 = userStore.createUser(USER2_USERNAME, null, new LockingAndBanningImpl());
+        user = userStore.createUser(USER_USERNAME, null, new TimedLockImpl());
+        user2 = userStore.createUser(USER2_USERNAME, null, new TimedLockImpl());
         userGroup = userStore.createUserGroup(USER_GROUP_UUID, USER_USERNAME+"-tenant");
         userGroup.add(user);
         userGroup.add(user2);

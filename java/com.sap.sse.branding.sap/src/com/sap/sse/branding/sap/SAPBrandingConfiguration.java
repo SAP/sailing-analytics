@@ -182,4 +182,12 @@ public class SAPBrandingConfiguration implements BrandingConfiguration {
     public String getInSailingContent(Optional<String> locale) {
         return sailingServerStringMessages.get(locale.map(l -> Locale.forLanguageTag(l)).orElse(Locale.ENGLISH), "inSailingContent");
     }
+    @Override
+    public String getFollowGitHub(Optional<String> locale) {
+        return sailingServerStringMessages.get(locale.map(l -> Locale.forLanguageTag(l)).orElse(Locale.ENGLISH), "followGitHub");
+    }
+    @Override
+    public String getGitHubLink() {
+        return "https://github.com/SAP/sailing-analytics";
+    }
 }

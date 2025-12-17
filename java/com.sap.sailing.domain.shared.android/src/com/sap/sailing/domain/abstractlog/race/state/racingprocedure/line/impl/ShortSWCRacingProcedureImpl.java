@@ -20,7 +20,7 @@ import com.sap.sse.common.TimePoint;
 
 public class ShortSWCRacingProcedureImpl extends SWCRacingProcedureImpl implements SWCRacingProcedure {
 
-    private final static Duration CLASS_AND_STARTMODE_UP_INTERVAL_4MIN = Duration.ONE_MINUTE.times(4); // 6 minutes before start
+    private final static Duration CLASS_AND_STARTMODE_UP_INTERVAL_4MIN = Duration.ONE_MINUTE.times(4); // 4 minutes before start
 
     public ShortSWCRacingProcedureImpl(RaceLog raceLog, AbstractLogEventAuthor author,
                                   SWCStartConfiguration configuration, RaceLogResolver raceLogResolver) {
@@ -57,12 +57,12 @@ public class ShortSWCRacingProcedureImpl extends SWCRacingProcedureImpl implemen
                     null,
                     Collections.singletonList(new FlagPole(cachedStartmodeFlag, true)),
                     startTime.minus(CLASS_AND_STARTMODE_UP_INTERVAL_4MIN));
-        } else if (now.before(startTime.minus(THREE_MINUTES_FLAG_UP_INTERVAL))) {
-            return new FlagPoleState(
-                    Arrays.asList(new FlagPole(cachedStartmodeFlag, true), new FlagPole(Flags.SWC_THREE, false)),
-                    startTime.minus(CLASS_AND_STARTMODE_UP_INTERVAL_4MIN),
-                    Arrays.asList(new FlagPole(cachedStartmodeFlag, true), new FlagPole(Flags.SWC_THREE, true)),
-                    startTime.minus(THREE_MINUTES_FLAG_UP_INTERVAL));
+            } else if (now.before(startTime.minus(THREE_MINUTES_FLAG_UP_INTERVAL))) {
+                return new FlagPoleState(
+                        Arrays.asList(new FlagPole(cachedStartmodeFlag, true), new FlagPole(Flags.SWC_THREE, false)),
+                        startTime.minus(CLASS_AND_STARTMODE_UP_INTERVAL_4MIN),
+                        Arrays.asList(new FlagPole(cachedStartmodeFlag, true), new FlagPole(Flags.SWC_THREE, true)),
+                        startTime.minus(THREE_MINUTES_FLAG_UP_INTERVAL));
         } else {
             return super.getActiveFlags(startTime, now);
         }

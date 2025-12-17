@@ -1,11 +1,11 @@
 /**
- * Events on the main page
+ * Events on the main page (mobile)
  */
 .socialfooter {
   font-size: 1rem;
   background: #008fcc;
   color: #fff;
-  padding: 2em 0 0 0;
+  padding: 2.5em 0 4em 0;
   margin-top: 3em;
 }
 .socialfooter_heading {
@@ -13,9 +13,22 @@
   margin-bottom: 1.875em;
   font-size: 1.066666666666667em;
 }
+.socialfooter_items {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  clear: both;
+  padding: 0;
+}
 .socialfooter_item {
   white-space: nowrap;
-  padding-bottom: 2em;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  flex: 0 1 10rem;
+  min-width: 0;
+  margin: 0 0.75rem 2em;
 }
 .socialfooter_item a {
   color: #f6f9fc;
@@ -23,15 +36,6 @@
 }
 .socialfooter_item_contentwrapper {
   visibility: visible;
-}
-.socialfooter_itemleft {
-  text-align: right;
-}
-.socialfooter_itemcenter {
-  text-align: center;
-}
-.socialfooter_itemright {
-  text-align: left;
 }
 img.socialfooter_item_icon {
   display: inline-block;

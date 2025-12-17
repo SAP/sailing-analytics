@@ -26,6 +26,7 @@ import com.sap.sse.gwt.client.celltable.RefreshableMultiSelectionModel;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog.DialogCallback;
 import com.sap.sse.gwt.client.panels.LabeledAbstractFilterablePanel;
 import com.sap.sse.security.shared.dto.UserDTO;
+import com.sap.sse.security.shared.impl.SecuredSecurityTypes.UserActions;
 import com.sap.sse.security.ui.client.UserManagementWriteServiceAsync;
 import com.sap.sse.security.ui.client.UserService;
 import com.sap.sse.security.ui.client.component.AccessControlledButtonPanel;
@@ -102,6 +103,12 @@ public class UserManagementPanel<TR extends CellTableWithCheckboxResources> exte
             }
         });
         removeButton.ensureDebugId("DeleteUserButton");
+        final boolean hasManageLockPermissionOnAnyUser = userService.hasCurrentUserAnyPermission(USER.getPermission(UserActions.MANAGE_LOCK), null);
+        if (hasManageLockPermissionOnAnyUser) {
+            final Button unlockButton = buttonPanel.addCountingAction("Unlock", userSelectionModel, () -> true,
+                    () -> onCountingUnlockButtonClick(stringMessages, userManagementWriteService, errorReporter));
+            unlockButton.ensureDebugId("UnlockUserButton");
+        }
         ScrollPanel scrollPanel = new ScrollPanel(userList.asWidget());
         LabeledAbstractFilterablePanel<UserDTO> filterBox = userList.getFilterField();
         filterBox.getElement().setPropertyString("placeholder", stringMessages.filterUsers());
@@ -137,6 +144,67 @@ public class UserManagementPanel<TR extends CellTableWithCheckboxResources> exte
         west.add(detailsPanel);
     }
 
+    private void onCountingUnlockButtonClick(final StringMessages stringMessages,
+            final UserManagementWriteServiceAsync userManagementWriteService, final ErrorReporter errorReporter) {
+        final Set<UserDTO> selectedUsers = userSelectionModel.getSelectedSet();
+        final Set<String> selectedUsernames = new HashSet<String>();
+        selectedUsers.forEach((u) -> selectedUsernames.add(u.getName()));
+        final boolean didConfirm = Window.confirm(stringMessages.doYouReallyWantToUnlockNUsers(selectedUsers.size()));
+        if (didConfirm) {
+            // run api, collect results
+            final Set<String> successUserNames = new HashSet<String>();
+            final Set<String> failureUserNames = new HashSet<String>();
+            userManagementWriteService.unlockUsers(selectedUsernames, new AsyncCallback<Set<SuccessInfo>>() {
+                @Override
+                public void onSuccess(Set<SuccessInfo> result) {
+                    for (SuccessInfo si : result) {
+                        final String username = si.getExtra();
+                        if (si.isSuccessful()) {
+                            successUserNames.add(username);
+                        } else {
+                            failureUserNames.add(username);
+                        }
+                    }
+                    // update locked until entries for successful unlocks
+                    final LabeledAbstractFilterablePanel<UserDTO> filterField = userList.getFilterField();
+                    final List<UserDTO> allUsersWithUpdatedEntries = new ArrayList<UserDTO>();
+                    for (UserDTO user : filterField.getAll()) {
+                        final boolean didSucceed = successUserNames.contains(user.getName());
+                        if (didSucceed) {
+                            allUsersWithUpdatedEntries.add(user.copyWithTimePoint(null));
+                        } else {
+                            allUsersWithUpdatedEntries.add(user);
+                        }
+                    }
+                    filterField.updateAll(allUsersWithUpdatedEntries);
+                    // create alert dialog
+                    String text = "";
+                    if (successUserNames.size() != 0) {
+                        text += stringMessages.unlockedSuccessfully() + ":\n";
+                        for (String name : successUserNames) {
+                            text += " • " + name + "\n";
+                        }
+                        text += "\n";
+                    }
+                    if (failureUserNames.size() != 0) {
+                        text += stringMessages.failedToUnlock() + ":\n";
+                        for (String name : failureUserNames) {
+                            text += " • " + name + "\n";
+                        }
+                    }
+                    if(!text.equals("")) {
+                        Window.alert(text);
+                    }
+                }
+
+                @Override
+                public void onFailure(Throwable caught) {
+                    errorReporter.reportError(stringMessages.failedToUnlock() + ": " + caught.getMessage());
+                }
+            });
+        }
+    }
+    
     /** shows the edit dialog if the user exists */
     private void showRolesAndPermissionsEditDialog(UserService userService,
             final CellTableWithCheckboxResources tableResources, final ErrorReporter errorReporter) {

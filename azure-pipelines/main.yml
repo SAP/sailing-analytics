@@ -28,7 +28,7 @@ resources:
       # For available versions, please have a look here (use the tag, not the release name):
       # https://github.tools.sap/SAPMobile/sap-mobile-pipeline/releases
       # ----------
-      ref: 'refs/tags/3.12.0' # last version to support Android API Level 33
+      ref: 'refs/tags/3.13.3'
 
 #################################################################
 ######################### Pipeline Start ########################
@@ -47,8 +47,8 @@ extends:
     testLaneName: 'test'
     # requestAuthentication: true  # enable if fetching dependencies from Artifactory or Nexus
     appCenterSlug: 'sapsailing/sapsailing-android-apps'
-    jdkVersion: 11
-    androidVersion: 33
+    jdkVersion: 17
+    androidVersion: 35
     # We are building more than one app from our repository; we will use branches
     # to determine which app is to be built/released/signed
     # Default: Race Manager App

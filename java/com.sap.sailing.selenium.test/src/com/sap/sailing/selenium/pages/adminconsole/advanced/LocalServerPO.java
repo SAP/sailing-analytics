@@ -15,12 +15,28 @@ public class LocalServerPO extends PageArea {
 
     @FindBy(how = BySeleniumId.class, using = "isSelfServiceServerCheckbox-input")
     private WebElement isSelfServiceServerCheckbox;
-    
+
     @FindBy(how = BySeleniumId.class, using = "isPublicServerCheckbox-input")
     private WebElement isPublicServerCheckbox;
-    
+
     @FindBy(how = BySeleniumId.class, using = "isStandaloneServerCheckbox-input")
     private WebElement isStandaloneServerCheckbox;
+    
+    @FindBy(how = BySeleniumId.class, using = "bearerTokenAbusePanel")
+    private WebElement bearerTokenAbusePanel;
+    
+    @FindBy(how = BySeleniumId.class, using = "userCreationAbusePanel")
+    private WebElement userCreationAbusePanel;
+
+    public IpBlocklistPanelPO getBearerTokenAbusePO() {
+        final WebElement wrappedTable = bearerTokenAbusePanel.findElement(new BySeleniumId("wrappedTable"));
+        return new IpBlocklistPanelPO(this.driver, wrappedTable);
+    }
+
+    public IpBlocklistPanelPO getUserCreationAbusePO() {
+        final WebElement wrappedTable = userCreationAbusePanel.findElement(new BySeleniumId("wrappedTable"));
+        return new IpBlocklistPanelPO(this.driver, wrappedTable);
+    }
 
     public void setSelfServiceServer(boolean selfService) {
         if (selfService != isSelfServiceServerCheckbox.isSelected()) {
@@ -28,14 +44,14 @@ public class LocalServerPO extends PageArea {
             awaitServerConfigurationUpdated();
         }
     }
-    
+
     public void setPublicServer(boolean publicServer) {
         if (publicServer != isPublicServerCheckbox.isSelected()) {
             isPublicServerCheckbox.click();
             awaitServerConfigurationUpdated();
         }
     }
-    
+
     public void setStandaloneServer(boolean standalone) {
         if (standalone != isStandaloneServerCheckbox.isSelected()) {
             isStandaloneServerCheckbox.click();
@@ -52,5 +68,4 @@ public class LocalServerPO extends PageArea {
         final String updating = isSelfServiceServerCheckbox.getAttribute("updating");
         return "true".equals(updating);
     }
-
 }

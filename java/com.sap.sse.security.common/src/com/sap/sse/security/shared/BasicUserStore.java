@@ -5,8 +5,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.sap.sse.common.Named;
+import com.sap.sse.common.TimedLock;
 import com.sap.sse.common.Util.Pair;
-import com.sap.sse.security.shared.impl.LockingAndBanning;
 import com.sap.sse.security.shared.impl.Ownership;
 import com.sap.sse.security.shared.impl.Role;
 import com.sap.sse.security.shared.impl.SecuredSecurityTypes;
@@ -60,7 +60,7 @@ public interface BasicUserStore extends UserGroupProvider, Named {
     
     User getUserByAccessToken(String accessToken);
 
-    User createUser(String name, String email, LockingAndBanning lockingAndBanning, Account... accounts)
+    User createUser(String name, String email, TimedLock timedLock, Account... accounts)
             throws UserManagementException;
 
     void addUser(User user) throws UserManagementException;

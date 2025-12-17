@@ -52,6 +52,7 @@ import com.sap.sse.security.ui.client.UserStatusEventHandler;
 import com.sap.sse.security.ui.client.component.AccessControlledButtonPanel;
 import com.sap.sse.security.ui.client.component.EditOwnershipDialog;
 import com.sap.sse.security.ui.client.component.editacl.EditACLDialog;
+import com.sap.sse.security.ui.shared.IpToTimedLockDTO;
 
 public class LocalServerManagementPanel extends SimplePanel {
     private final SailingServiceWriteAsync sailingService;
@@ -87,6 +88,8 @@ public class LocalServerManagementPanel extends SimplePanel {
         mainPanel.add(this.buttonPanel = createServerActionsUi(userService));
         mainPanel.add(createServerInfoUI());
         mainPanel.add(createServerConfigurationUI());
+        mainPanel.add(createBearerTokenAbusePanel());
+        mainPanel.add(createUserCreationAbusePanel());
         refreshServerConfiguration();
         if (userService.hasServerPermission(ServerActions.CONFIGURE_CORS_FILTER)) {
             mainPanel.add(createCORSFilterConfigurationUI());
@@ -155,6 +158,44 @@ public class LocalServerManagementPanel extends SimplePanel {
         isSelfServiceServerCheckbox = captionPanel.addCheckBox(stringMessages.selfServiceServer() + ":", callback);
         isSelfServiceServerCheckbox.ensureDebugId("isSelfServiceServerCheckbox");
         return captionPanel;
+    }
+
+    private Widget createBearerTokenAbusePanel() {
+        final ServerDataCaptionPanel panel = new ServerDataCaptionPanel(stringMessages.ipsLockedForBearerTokenAbuse(), 3);
+        panel.ensureDebugId("bearerTokenAbusePanel");
+        final IPBlocklistTableWrapper table = new IPBlocklistTableWrapper(sailingService, userService,
+                stringMessages.unableToLoadIpsBlockedForBearerTokenAbuse(), stringMessages, errorReporter) {
+            @Override
+            protected void fetchData(AsyncCallback<ArrayList<IpToTimedLockDTO>> callback) {
+                userService.getUserManagementService().getClientIPBasedTimedLocksForBearerTokenAbuse(callback);
+            }
+
+            @Override
+            protected void unlockIP(String ip, AsyncCallback<Void> asyncCallback) {
+                userService.getUserManagementWriteService().releaseBearerTokenLockOnIp(ip, asyncCallback);
+            }
+        };
+        panel.setContentWidget(table.asWidget());
+        return panel;
+    }
+
+    private Widget createUserCreationAbusePanel() {
+        final ServerDataCaptionPanel panel = new ServerDataCaptionPanel(stringMessages.ipsLockedForUserCreationAbuse(), 3);
+        panel.ensureDebugId("userCreationAbusePanel");
+        final IPBlocklistTableWrapper table = new IPBlocklistTableWrapper(sailingService, userService,
+                stringMessages.unableToLoadIpsBlockedForUserCreationAbuse(), stringMessages, errorReporter) {
+            @Override
+            protected void fetchData(AsyncCallback<ArrayList<IpToTimedLockDTO>> callback) {
+                userService.getUserManagementService().getClientIPBasedTimedLocksForUserCreation(callback);
+            }
+
+            @Override
+            protected void unlockIP(String ip, AsyncCallback<Void> asyncCallback) {
+                userService.getUserManagementWriteService().releaseUserCreationLockOnIp(ip, asyncCallback);
+            }
+        };
+        panel.setContentWidget(table.asWidget());
+        return panel;
     }
 
     private Widget createCORSFilterConfigurationUI() {

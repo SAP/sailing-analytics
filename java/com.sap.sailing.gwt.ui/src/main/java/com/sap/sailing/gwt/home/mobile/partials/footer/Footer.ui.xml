@@ -19,6 +19,9 @@
                         title="{i18n.footerPrivacy}">
                         <ui:text from='{i18n.footerPrivacy}' />
                     </a>
+                    <a ui:field="sourceCodeAnchor" target="_blank">
+                        <ui:text from='{i18n.sourceCode}'/>
+                    </a>
                     <a ui:field="jobsAnchor" target="_blank">
                         <ui:text from='{i18n.footerJobs}'/>
                     </a>

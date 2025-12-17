@@ -245,4 +245,19 @@ public interface BrandingConfiguration {
      * @return HTML or plain text. Empty to hide.
      */
     String getInSailingContent(Optional<String> locale);
+    
+    /**
+     * Localized footer label inviting users to follow the brand’s GitHub Source Code.
+     *
+     * @param locale see “Locale Parameter Conventions”.
+     * @return localized text. Empty to hide.
+     */
+    String getFollowGitHub(Optional<String> locale);
+    
+    /**
+     * Brand’s GitHub URL.
+     *
+     * @return absolute URL. Empty to hide the icon/link.
+     */
+    String getGitHubLink();
 }

@@ -23,6 +23,7 @@ import com.sap.sse.common.media.TakedownNoticeRequestContext;
 import com.sap.sse.security.Action;
 import com.sap.sse.security.SecurityService;
 import com.sap.sse.security.shared.HasPermissions.DefaultActions;
+import com.sap.sse.security.shared.IPAddress;
 import com.sap.sse.security.shared.PermissionChecker;
 import com.sap.sse.security.shared.QualifiedObjectIdentifier;
 import com.sap.sse.security.shared.RoleDefinition;
@@ -374,6 +375,38 @@ public class UserManagementWriteServiceImpl extends UserManagementServiceImpl im
             return new SuccessInfo(false, "Could not delete user.", /* redirectURL */ null, null);
         }
     }
+
+    @Override
+    public SuccessInfo unlockUser(String username) throws UnauthorizedException {
+        User user = getSecurityService().getUserByName(username);
+        if (user != null) {
+            if (!getSecurityService().hasCurrentUserExplicitPermissions(user, UserActions.MANAGE_LOCK)) {
+                logger.info("You are not permitted to manage locking on user " + username);
+                return new SuccessInfo(false, "You are not permitted to manage locking on user " + username,
+                        /* redirectURL */ null, null, username);
+            }
+            try {
+                getSecurityService().resetUserTimedLock(username);
+                logger.info("Reset lock on user: " + username + ".");
+                return new SuccessInfo(true, "Reset lock on user: " + username + ".", /* redirectURL */ null, null, username);
+            } catch (UserManagementException e) {
+                logger.info("Could not reset lock on user: " + username + ".");
+                return new SuccessInfo(false, "Could not reset lock on user " + username, /* redirectURL */ null, null, username);
+            }
+        } else {
+            logger.info("Could not reset lock on user: " + username + ".");
+            return new SuccessInfo(false, "Could not reset lock on user " + username, /* redirectURL */ null, null, username);
+        }
+    }
+    
+    @Override
+    public Set<SuccessInfo> unlockUsers(Set<String> usernames) throws UnauthorizedException {
+        final Set<SuccessInfo> result = new HashSet<>();
+        for (String username : usernames) {
+            result.add(unlockUser(username));
+        }
+        return result;
+    }
     
     @Override
     public Set<SuccessInfo> deleteUsers(Set<String> usernames) throws UnauthorizedException {
@@ -708,5 +741,25 @@ public class UserManagementWriteServiceImpl extends UserManagementServiceImpl im
     @Override
     public void fileTakedownNotice(TakedownNoticeRequestContext takedownNoticeRequestContext) throws MailException {
         getSecurityService().fileTakedownNotice(takedownNoticeRequestContext);
+    }
+
+    @Override
+    public void releaseUserCreationLockOnIp(String ip) throws UnauthorizedException {
+        final SecurityService securityService = getSecurityService();
+        final WildcardPermission deletePermission = SecuredSecurityTypes.LOCKED_IP
+                .getPermissionForObject(DefaultActions.DELETE, new IPAddress(ip));
+        // throws exception if not permitted
+        SecurityUtils.getSubject().checkPermission(deletePermission.toString());
+        securityService.releaseUserCreationLockOnIp(ip);
+    }
+
+    @Override
+    public void releaseBearerTokenLockOnIp(String ip) throws UnauthorizedException {
+        final SecurityService securityService = getSecurityService();
+        final WildcardPermission deletePermission = SecuredSecurityTypes.LOCKED_IP
+                .getPermissionForObject(DefaultActions.DELETE, new IPAddress(ip));
+        // throws exception if not permitted
+        SecurityUtils.getSubject().checkPermission(deletePermission.toString());
+        securityService.releaseBearerTokenLockOnIp(ip);
     }
 }

@@ -45,6 +45,7 @@ public class Footer extends Composite {
     @UiField AnchorElement imprintAnchorLink;
     @UiField AnchorElement desktopUi;
     @UiField AnchorElement jobsAnchor;
+    @UiField AnchorElement sourceCodeAnchor;
     @UiField AnchorElement privacyAnchor;
     @UiField SpanElement pipe;
     
@@ -71,6 +72,7 @@ public class Footer extends Composite {
             supportAnchor.getStyle().setDisplay(Display.NONE);
             jobsAnchor.getStyle().setDisplay(Display.NONE);
             privacyAnchor.getStyle().setDisplay(Display.NONE);
+            sourceCodeAnchor.setHref("https://github.com/SAP/sailing-analytics");
         } else {
             pipe.setInnerText("|");
             if (!hideIfBlank(copyrightDiv, cfg.getFooterCopyright())) {
@@ -79,6 +81,7 @@ public class Footer extends Composite {
             languageSelector.setLabelText(cfg.getBrandTitle(Optional.empty()) + " " + StringMessages.INSTANCE.whitelabelFooterLanguage());
             setHrefOrHide(privacyAnchor, cfg.getFooterPrivacyLink());
             setHrefOrHide(jobsAnchor, cfg.getFooterJobsLink());
+            setHrefOrHide(sourceCodeAnchor, cfg.getGitHubLink());
             setHrefOrHide(supportAnchor, cfg.getFooterSupportLink());
             if (!hideIfBlank(copyrightDiv, cfg.getFooterCopyright())) {
                 copyrightDiv.setInnerText(cfg.getFooterCopyright());

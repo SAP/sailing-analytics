@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.sap.sse.common.TimedLock;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.concurrent.LockUtil;
@@ -34,7 +35,6 @@ import com.sap.sse.security.shared.UserManagementException;
 import com.sap.sse.security.shared.UserRole;
 import com.sap.sse.security.shared.UserStoreManagementException;
 import com.sap.sse.security.shared.WildcardPermission;
-import com.sap.sse.security.shared.impl.LockingAndBanning;
 import com.sap.sse.security.shared.impl.Ownership;
 import com.sap.sse.security.shared.impl.Role;
 import com.sap.sse.security.shared.impl.User;
@@ -854,12 +854,12 @@ public class UserStoreImpl implements UserStore {
     }
 
     @Override
-    public User createUser(String name, String email, LockingAndBanning lockingAndBanning, Account... accounts)
+    public User createUser(String name, String email, TimedLock timedLock, Account... accounts)
             throws UserManagementException {
         return LockUtil.executeWithWriteLockAndResultExpectException(usersLock, () -> {
             checkUsernameUniqueness(name);
             final Map<String, UserGroup> tenantsForServer = new ConcurrentHashMap<>();
-            final User user = new UserImpl(name, email, tenantsForServer, /* user group provider */ this, lockingAndBanning, accounts);
+            final User user = new UserImpl(name, email, tenantsForServer, /* user group provider */ this, timedLock, accounts);
             logger.info("Creating user: " + user + " with e-mail " + email);
             addAndStoreUserInternal(user);
             return user;

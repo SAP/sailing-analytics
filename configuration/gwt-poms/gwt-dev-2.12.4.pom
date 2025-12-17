@@ -6,12 +6,12 @@
     <parent>
         <groupId>org.gwtproject</groupId>
         <artifactId>gwt</artifactId>
-        <version>2.12.3</version>
+        <version>2.12.4</version>
     </parent>
     <groupId>org.gwtproject</groupId>
     <artifactId>gwt-dev</artifactId>
     <packaging>jar</packaging>
-    <version>2.12.3</version>
+    <version>2.12.4</version>
 
     <dependencies>
         <dependency>

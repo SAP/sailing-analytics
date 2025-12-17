@@ -182,6 +182,7 @@ export AWS_S3_TEST_S3ACCESSKEY={key-for-your-S3-token}
 export GEONAMES_ORG_USERNAMES={comma-separated-list-of-geonames.org-usernames}
 export GOOGLE_MAPS_AUTHENTICATION_PARAMS=key={your-Google-Maps-API-key}
 export JAVA8_HOME={location-of-your-JDK8}
+export JAVA17_HOME={location-of-your-JDK17}
 export JAVA_HOME={location-of-your-JDK17-or-newer}
 ```
 

@@ -13,7 +13,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.4'
+        classpath 'com.android.tools.build:gradle:7.0.4'
         classpath "org.ajoberstar:grgit:2.3.0"
     }
 }
@@ -64,7 +64,7 @@ ext {
 
     // testing - jvm
     junit = "4.12"
-    mockito = "1.9.5"
+    mockito = "5.8.0"
 
     // testing - ui
     test = "0.2"

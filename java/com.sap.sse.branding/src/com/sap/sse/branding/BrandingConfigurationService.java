@@ -136,6 +136,10 @@ public interface BrandingConfigurationService {
         MORE_LOGIN_INFORMATION_SETTINGS_URL("moreLoginInformationSettingsURL"),
 
         MORE_LOGIN_INFORMATION_NOTIFICATIONS_URL("moreLoginInformationNotificationsURL"),
+        
+        FOLLOW_GITHUB("followGitHub"),
+        
+        GITHUB_LINK("gitHubLink"),
 
 
         /**

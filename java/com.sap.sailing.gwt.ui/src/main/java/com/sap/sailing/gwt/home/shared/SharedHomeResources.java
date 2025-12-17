@@ -145,4 +145,8 @@ public interface SharedHomeResources extends CommonIcons {
     @Source("plus.svg")
     @MimeType("image/svg+xml")
     DataResource plus();
+    
+    @Source("github-white.png")
+    ImageResource githubWhite();
+
 }

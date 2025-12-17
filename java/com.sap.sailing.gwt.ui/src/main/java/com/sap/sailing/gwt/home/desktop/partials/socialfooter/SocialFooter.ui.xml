@@ -9,9 +9,10 @@
     <!-- The search/social media page footer-->
     <div class="{local_res.css.socialfooter}">
       <div class="{res.mediaCss.grid}">
-        <h3 ui:field="socialHeading" class="{local_res.css.socialfooter_heading} {res.mediaCss.small12} {res.mediaCss.columns}">
+        <h3 ui:field="socialHeading" class="{local_res.css.socialfooter_heading}">
         </h3>
-        <div ui:field="xItem" class="{local_res.css.socialfooter_item} {local_res.css.socialfooter_itemleft} {res.mediaCss.small4} {res.mediaCss.columns}">
+        <div class="{local_res.css.socialfooter_items}">
+        <div ui:field="xItem" class="{local_res.css.socialfooter_item} {local_res.css.socialfooter_itemleft} ">
           <a ui:field="xLink" target="_blank" class="{local_res.css.socialfooter_item_contentwrapper} {local_res.css.socialfooter_item_contentwrappertwitter}">
             <img src="{shr.twitter.getSafeUri}" class="{local_res.css.socialfooter_item_icon}"></img>
             <div class="{local_res.css.socialfooter_item_text}">
@@ -21,7 +22,7 @@
             </div>
           </a>
         </div>
-        <div ui:field="facebookItem" class="{local_res.css.socialfooter_item} {local_res.css.socialfooter_itemcenter} {res.mediaCss.small4} {res.mediaCss.columns}">
+        <div ui:field="facebookItem" class="{local_res.css.socialfooter_item} {local_res.css.socialfooter_itemcenter}">
           <a ui:field="facebookLink" target="_blank" class="{local_res.css.socialfooter_item_contentwrapper} {local_res.css.socialfooter_item_contentwrapperfacebook}">
             <img src="{shr.facebook.getSafeUri}" class="{local_res.css.socialfooter_item_icon}"></img>
             <div class="{local_res.css.socialfooter_item_text}">
@@ -31,7 +32,7 @@
             </div>
           </a>
         </div>
-        <div ui:field="instagramItem" class="{local_res.css.socialfooter_item} {local_res.css.socialfooter_itemright} {res.mediaCss.small4} {res.mediaCss.columns}">
+        <div ui:field="instagramItem" class="{local_res.css.socialfooter_item} {local_res.css.socialfooter_itemcenter}">
           <a ui:field="instagramLink" target="_blank" class="{local_res.css.socialfooter_item_contentwrapper} {local_res.css.socialfooter_item_contentwrapperinstagram}">
             <img src="{shr.instagram.getSafeUri}" class="{local_res.css.socialfooter_item_icon}"></img>
             <div class="{local_res.css.socialfooter_item_text} {local_res.css.socialfooter_item_text_inverse}">
@@ -41,6 +42,17 @@
             </div>
           </a>
         </div>
+        <div ui:field="gitHubItem" class="{local_res.css.socialfooter_item} {local_res.css.socialfooter_itemright}">
+          <a ui:field="gitHubLink" target="_blank" class="{local_res.css.socialfooter_item_contentwrapper} {local_res.css.socialfooter_item_contentwrappergithub}">
+            <img src="{shr.githubWhite.getSafeUri}" class="{local_res.css.socialfooter_item_icon}"></img>
+            <div class="{local_res.css.socialfooter_item_text} {local_res.css.socialfooter_item_text_github}">
+              <div ui:field="gitHubTopText" class="{local_res.css.socialfooter_item_text_top}">
+              </div>
+              <div class="{local_res.css.socialfooter_item_text_bottom}">GitHub</div>
+            </div>
+          </a>
+        </div>
+      </div>
       </div>
     </div>
   </g:HTMLPanel>

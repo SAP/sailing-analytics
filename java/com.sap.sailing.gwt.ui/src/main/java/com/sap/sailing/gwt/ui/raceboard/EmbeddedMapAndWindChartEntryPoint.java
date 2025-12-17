@@ -84,8 +84,8 @@ public class EmbeddedMapAndWindChartEntryPoint extends AbstractSailingReadEntryP
     
     @Override
     protected void doOnModuleLoad() {
-        final PaywallResolver paywallResolver = new PaywallResolverImpl(getUserService(), getSubscriptionServiceFactory());
         super.doOnModuleLoad();
+        final PaywallResolver paywallResolver = new PaywallResolverImpl(getUserService(), getSubscriptionServiceFactory());
         // read mandatory parameters
         contextDefinition = SERIALIZER.deserializeFromCurrentLocation(new EmbeddedMapAndWindChartContextDefinition());
         if (!contextDefinition.isValidContext()) {

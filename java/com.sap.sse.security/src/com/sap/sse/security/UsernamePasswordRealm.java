@@ -50,8 +50,8 @@ public class UsernamePasswordRealm extends AbstractCompositeAuthorizingRealm {
             logger.warning("Rejecting authentication attempt for non-existing user "+username);
             return null;
         }
-        if (user.getLockingAndBanning().isAuthenticationLocked()) {
-            logger.warning("Rejected attempt to authenticate user "+username+" because it is locked: "+user.getLockingAndBanning());
+        if (user.getTimedLock().isLocked()) {
+            logger.warning("Rejected attempt to authenticate user "+username+" because it is locked: "+user.getTimedLock());
             throw new LockedAccountException("Password authentication for user "+username+" is currently locked");
         }
         final UsernamePasswordAccount upa = (UsernamePasswordAccount) user.getAccount(AccountType.USERNAME_PASSWORD);

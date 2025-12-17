@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.apache.shiro.session.Session;
 
+import com.sap.sse.common.TimedLock;
 import com.sap.sse.security.SecurityService;
 import com.sap.sse.security.shared.Account;
 import com.sap.sse.security.shared.QualifiedObjectIdentifier;
@@ -15,7 +16,6 @@ import com.sap.sse.security.shared.RoleDefinition;
 import com.sap.sse.security.shared.UserGroupManagementException;
 import com.sap.sse.security.shared.UserManagementException;
 import com.sap.sse.security.shared.WildcardPermission;
-import com.sap.sse.security.shared.impl.LockingAndBanning;
 import com.sap.sse.security.shared.impl.Ownership;
 import com.sap.sse.security.shared.impl.User;
 import com.sap.sse.security.shared.subscription.Subscription;
@@ -68,6 +68,8 @@ public interface ReplicableSecurityService extends SecurityService {
     Void internalUpdateSimpleUserPassword(String username, byte[] salt, String hashedPasswordBase64);
 
     Void internalUpdateUserProperties(String username, String fullName, String company, Locale locale);
+
+    Void internalResetUserTimedLock(String username);
 
     Boolean internalValidateEmail(String username, String validationSecret);
 
@@ -122,13 +124,17 @@ public interface ReplicableSecurityService extends SecurityService {
 
     Void internalSetCORSFilterConfigurationAllowedOrigins(String serverName, String... allowedOrigins);
 
-    LockingAndBanning internalFailedPasswordAuthentication(String username);
+    TimedLock internalFailedPasswordAuthentication(String username);
 
     Boolean internalSuccessfulPasswordAuthentication(String username);
 
     Boolean internalSuccessfulBearerTokenAuthentication(String clientIP);
 
-    LockingAndBanning internalFailedBearerTokenAuthentication(String clientIP);
+    TimedLock internalFailedBearerTokenAuthentication(String clientIP);
 
-    LockingAndBanning internalRecordUserCreationFromClientIP(String clientIP);
+    TimedLock internalRecordUserCreationFromClientIP(String clientIP);
+
+    void internalReleaseUserCreationLockOnIp(String ip);
+
+    void internalReleaseBearerTokenLockOnIp(String ip);
 }

@@ -16,6 +16,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.ReplaceOptions;
+import com.sap.sse.common.impl.TimedLockImpl;
 import com.sap.sse.security.interfaces.Social;
 import com.sap.sse.security.shared.AccessControlListAnnotation;
 import com.sap.sse.security.shared.Account;
@@ -27,7 +28,6 @@ import com.sap.sse.security.shared.SocialUserAccount;
 import com.sap.sse.security.shared.UsernamePasswordAccount;
 import com.sap.sse.security.shared.WildcardPermission;
 import com.sap.sse.security.shared.impl.AccessControlList;
-import com.sap.sse.security.shared.impl.LockingAndBanningImpl;
 import com.sap.sse.security.shared.impl.Ownership;
 import com.sap.sse.security.shared.impl.Role;
 import com.sap.sse.security.shared.impl.User;
@@ -216,13 +216,13 @@ public class MongoObjectFactoryImpl implements MongoObjectFactory {
         dbUser.put(FieldNames.User.PASSWORD_RESET_SECRET.name(), user.getPasswordResetSecret());
         dbUser.put(FieldNames.User.VALIDATION_SECRET.name(), user.getValidationSecret());
         dbUser.put(FieldNames.User.ACCOUNTS.name(), createAccountMapObject(user.getAllAccounts()));
-        if (user.getLockingAndBanning() instanceof LockingAndBanningImpl) {
-            final LockingAndBanningImpl lockingAndBanning = ((LockingAndBanningImpl) user.getLockingAndBanning());
-            dbUser.put(FieldNames.User.LOCKED_UNTIL_MILLIS.name(), lockingAndBanning.getLockedUntil().asMillis());
-            dbUser.put(FieldNames.User.NEXT_LOCKING_DURATION_MILLIS.name(), lockingAndBanning.getNextLockingDelay().asMillis());
+        if (user.getTimedLock() instanceof TimedLockImpl) {
+            final TimedLockImpl timedLock = ((TimedLockImpl) user.getTimedLock());
+            dbUser.put(FieldNames.User.LOCKED_UNTIL_MILLIS.name(), timedLock.getLockedUntil().asMillis());
+            dbUser.put(FieldNames.User.NEXT_LOCKING_DURATION_MILLIS.name(), timedLock.getNextLockingDelay().asMillis());
         } else {
-            logger.warning("Expected user locking/banning to be of type "+LockingAndBanningImpl.class.getSimpleName()
-                    +" but was of type "+user.getLockingAndBanning().getClass().getSimpleName()+"; not storing to DB");
+            logger.warning("Expected user locking/banning to be of type "+TimedLockImpl.class.getSimpleName()
+                    +" but was of type "+user.getTimedLock().getClass().getSimpleName()+"; not storing to DB");
         }
         BasicDBList dbRoles = new BasicDBList();
         for (Role role : user.getRoles()) {

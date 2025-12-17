@@ -4,13 +4,13 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.Map;
 
+import com.sap.sse.common.TimedLock;
 import com.sap.sse.security.shared.Account;
 import com.sap.sse.security.shared.Account.AccountType;
 import com.sap.sse.security.shared.HasPermissions;
 import com.sap.sse.security.shared.QualifiedObjectIdentifier;
 import com.sap.sse.security.shared.UserGroupProvider;
 import com.sap.sse.security.shared.WildcardPermission;
-import com.sap.sse.security.shared.impl.LockingAndBanning;
 import com.sap.sse.security.shared.impl.Role;
 import com.sap.sse.security.shared.impl.User;
 import com.sap.sse.security.shared.impl.UserGroup;
@@ -242,7 +242,7 @@ public class UserProxy implements User {
     }
 
     @Override
-    public LockingAndBanning getLockingAndBanning() {
+    public TimedLock getTimedLock() {
         throw new UnsupportedOperationException();
     }
 }

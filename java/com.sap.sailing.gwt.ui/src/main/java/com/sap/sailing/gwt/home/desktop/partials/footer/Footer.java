@@ -43,6 +43,7 @@ public class Footer extends Composite {
     @UiField AnchorElement privacyAnchorLink;
     @UiField AnchorElement mobileUi;
     @UiField AnchorElement jobsAnchor;
+    @UiField AnchorElement sourceCodeAnchor;
     @UiField(provided = true)
     final PlaceNavigation<WhatsNewPlace> releaseNotesNavigation;
 
@@ -67,10 +68,12 @@ public class Footer extends Composite {
             supportAnchor.getStyle().setDisplay(Display.NONE);
             privacyAnchorLink.getStyle().setDisplay(Display.NONE);
             jobsAnchor.getStyle().setDisplay(Display.NONE);
+            sourceCodeAnchor.setHref("https://github.com/SAP/sailing-analytics");
         } else {
             hideIfBlank(copyrightDiv, cfg.getFooterCopyright());
             setHrefOrHide(privacyAnchorLink, cfg.getFooterPrivacyLink());
             setHrefOrHide(jobsAnchor, cfg.getFooterJobsLink());
+            setHrefOrHide(sourceCodeAnchor, cfg.getGitHubLink());
             setHrefOrHide(supportAnchor, cfg.getFooterSupportLink());
             languageSelector.setLabelText(cfg.getBrandTitle(Optional.empty()) + " " + StringMessages.INSTANCE.whitelabelFooterLanguage());
             if (!hideIfBlank(copyrightDiv, cfg.getFooterCopyright())) {
@@ -79,6 +82,8 @@ public class Footer extends Composite {
         }
         copyrightDiv.setAttribute(DebugConstants.DEBUG_ID_ATTRIBUTE, "copyrightDiv");
         supportAnchor.setAttribute(DEBUG_ID_ATTRIBUTE, "supportAnchor");
+        jobsAnchor.setAttribute(DEBUG_ID_ATTRIBUTE, "jobsAnchor");
+        sourceCodeAnchor.setAttribute(DEBUG_ID_ATTRIBUTE, "sourceCodeAnchor");
         whatsNewAnchor.setAttribute(DEBUG_ID_ATTRIBUTE, "whatsNewAnchor");
         imprintAnchorLink.setAttribute(DEBUG_ID_ATTRIBUTE, "imprintAnchorLink");
         privacyAnchorLink.setAttribute(DEBUG_ID_ATTRIBUTE, "privacyAnchorLink");

@@ -23,8 +23,9 @@ public class ActionsHelper {
     public static final String UNLINK_RACE_ACTION = "ACTION_UNLINK";
     public static final String REFRESH_RACE_ACTION = "ACTION_REFRESH_RACE";
     public static final String SET_START_TIME_ACTION = "ACTION_SET_STARTTIME";
-    
+
     public static final String UPDATE_ACTION = "UPDATE";
+    public static final String UNLOCK_ACTION = "MANAGE_LOCK";
     public static final String DELETE_ACTION = "DELETE";
     public static final String CHANGE_OWNERSHIP_ACTION = "CHANGE_OWNERSHIP";
     
@@ -58,6 +59,10 @@ public class ActionsHelper {
     
     public static WebElement findUpdateAction(SearchContext context) {
         return context.findElement(By.xpath(String.format(ACTION_XPATH, UPDATE_ACTION)));
+    }
+    
+    public static WebElement findUnlockAction(SearchContext context) {
+        return context.findElement(By.xpath(String.format(ACTION_XPATH, UNLOCK_ACTION)));
     }
 
     public static WebElement findDeleteAction(SearchContext context) {

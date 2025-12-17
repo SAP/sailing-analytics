@@ -96,7 +96,7 @@ public class SecurityDTOFactory {
                 /* default tenant filled in later */ null,
                 getSecuredPermissions(filteredPermissions, user, securityService),
                 createStrippedUserGroupDTOsFromUserGroups(securityService.getUserGroupsOfUser(user),
-                        fromOriginalToStrippedDownUser, fromOriginalToStrippedDownUserGroup), user.getLockingAndBanning().getLockedUntil());
+                        fromOriginalToStrippedDownUser, fromOriginalToStrippedDownUserGroup), user.getTimedLock().getLockedUntil());
         userDTO.setDefaultTenantForCurrentServer(createStrippedUserGroupDTOFromUserGroup(
                 securityService.getDefaultTenantForCurrentUser(),
                 fromOriginalToStrippedDownUserGroup));

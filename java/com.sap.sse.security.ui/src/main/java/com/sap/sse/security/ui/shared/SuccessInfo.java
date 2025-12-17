@@ -15,6 +15,7 @@ public class SuccessInfo implements IsSerializable {
     private String message;
     private Triple<UserDTO, UserDTO, ServerInfoDTO> userDTO;
     private String redirectURL;
+    private String extra;
     
     SuccessInfo() {} // for serializtion only
     
@@ -24,6 +25,15 @@ public class SuccessInfo implements IsSerializable {
         this.message = message;
         this.redirectURL = redirectURL;
         this.userDTO = userDTO;
+    }
+    
+    public SuccessInfo(boolean successful, String message, String redirectURL, Triple<UserDTO, UserDTO, ServerInfoDTO> userDTO, String extra) {
+        super();
+        this.successful = successful;
+        this.message = message;
+        this.redirectURL = redirectURL;
+        this.userDTO = userDTO;
+        this.extra = extra;
     }
 
     public boolean isSuccessful() {
@@ -37,9 +47,12 @@ public class SuccessInfo implements IsSerializable {
     public Triple<UserDTO, UserDTO, ServerInfoDTO> getUserDTO() {
         return userDTO;
     }
-
+    
     public String getRedirectURL() {
         return redirectURL;
     }
-    
+
+    public String getExtra() {
+        return extra;
+    }
 }

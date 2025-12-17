@@ -99,7 +99,7 @@ public class SimpleSecurityReplicationTest extends AbstractSecurityReplicationTe
         assertEquals(ERNIE, replicatedErnie.getName());
         assertFalse(replica.checkPassword(ERNIE, BERT_MY_FRIEND));
         // checking with incorrect password locks user for some time; wait long enough before retrying with correct password
-        final TimePoint lockedUntil = replicatedErnie.getLockingAndBanning().getLockedUntil();
+        final TimePoint lockedUntil = replicatedErnie.getTimedLock().getLockedUntil();
         Thread.sleep(Math.max(0, TimePoint.now().until(lockedUntil).asMillis()+10));
         assertTrue(replica.checkPassword(ERNIE, newPassword));
     }

@@ -11,6 +11,8 @@
   <inherits name="com.sap.sse.Security" />
   <inherits name="com.sap.sse.security.ui.SecurityLocalesAllPermutations" />
   <inherits name="com.sap.sse.security.SSESecuritySerializers" />
+  <inherits name="com.sap.sse.gwt.SSESharedGWT" />
+  <inherits name="com.sap.sse.branding.SSEBranding" />
   <inherits name="com.sap.sse.landscape.aws.common.SSELandscapeAWSCommon" />
   
   <super-source path="jre" />

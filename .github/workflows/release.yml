@@ -6,6 +6,7 @@ on:
       - '.github/workflows/*'
       - '**/*.md'
       - 'README.md'
+      - 'docs/**'
   workflow_dispatch:
     inputs:
       skip_tests:
@@ -78,6 +79,12 @@ jobs:
           distribution: 'temurin' # See 'Supported distributions' for available options
           java-version: '8'
           mvn-toolchain-id: 'JavaSE-1.8'
+      - name: Install JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin' # See 'Supported distributions' for available options
+          java-version: '17'
+          mvn-toolchain-id: 'JavaSE-17'
       - name: Install JDK 25
         uses: actions/setup-java@v4
         with:
@@ -107,6 +114,7 @@ jobs:
           GOOGLE_MAPS_AUTHENTICATION_PARAMS: ${{ secrets.GOOGLE_MAPS_AUTHENTICATION_PARAMS }}
           APP_PARAMETERS: "-Daws.region=eu-west-1"
           JAVA8_HOME: ${{env.JAVA_HOME_8_X64}}
+          JAVA17_HOME: ${{env.JAVA_HOME_17_X64}}
         run: |
             ./configuration/buildAndUpdateProduct.sh -x ${{ github.event.inputs.runner_cpus == '' && '4' || github.event.inputs.runner_cpus }} ${{ github.event.inputs.skip_tests == 'true' && '-t' || '' }} ${{ github.event.inputs.local_target_platform == 'true' && '-v' || '' }} build 2>&1
       - name: show disk stats
@@ -159,6 +167,7 @@ jobs:
         uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2.2.1
         with:
           tag_name: ${{ env.SIMPLE_VERSION_INFO }}
+          target_commitish: ${{ github.ref_name }}
           name: ${{ env.SIMPLE_VERSION_INFO }}
           draft: false
           prerelease: false

@@ -12,27 +12,41 @@
   font-size: 2.4em;
   margin-bottom: 0.833333333333333em;
 }
-.socialfooter_item {
+.socialfooter_items {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; 
+}
+.socialfooter_items > .socialfooter_item {
+  float: none;
   white-space: nowrap;
+  box-sizing: border-box;
+  display: block;
+  flex: 0 0 17rem;
+  margin: 0 0.75rem 1.5rem;
 }
 .socialfooter_item a {
   color: #f6f9fc;
   text-decoration: none;
 }
 .socialfooter_item_contentwrapper {
-  padding: 1.133333333333333em 6.666666666666667em 1.4em 0.666666666666667em;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1em 2em 1.4em 1.3333em;
 }
 .socialfooter_item_contentwrappertwitter {
   background: #58aeee;
-  padding-left: 1.133333333333333em;
 }
 .socialfooter_item_contentwrapperfacebook {
   background: #3b5998;
-  padding-left: 1.333333333333333em;
 }
 .socialfooter_item_contentwrapperinstagram {
   background: #ffffff;
-  padding-left: 1.333333333333333em;
+}
+.socialfooter_item_contentwrappergithub {
+  background: #333333;
 }
 .socialfooter_itemleft {
   text-align: right;
@@ -44,9 +58,11 @@
   text-align: center;
 }
 img.socialfooter_item_icon {
-  display: inline-block;
-  vertical-align: middle;
-  height: 1.666666666666667em;
+  display: block;
+  height: 1.6667em;
+  width: 1.6667em;
+  object-fit: contain;
+  flex: 0 0 1.6667em;
 }
 .socialfooter_item_text {
   line-height: 1;
@@ -60,6 +76,10 @@ img.socialfooter_item_icon {
 .socialfooter_item_text_inverse {
   border-left: 1px solid rgba(51, 51, 51,0.2);
   color: #333;
+}
+.socialfooter_item_text_github {
+  border-left: 1px solid rgba(255,255,255,0.2);
+  color: #ffffff;
 }
 .socialfooter_item_text_top {
   font-size: 1em;

@@ -1,7 +1,9 @@
 package com.sap.sailing.selenium.test.adminconsole.usermanagement;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 
@@ -13,6 +15,7 @@ import com.sap.sailing.selenium.pages.adminconsole.usermanagement.EditUserDialog
 import com.sap.sailing.selenium.pages.adminconsole.usermanagement.UserManagementPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.usermanagement.UserRoleDefinitionPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.usermanagement.WildcardPermissionPanelPO;
+import com.sap.sailing.selenium.pages.authentication.AuthenticationMenuPO;
 import com.sap.sailing.selenium.test.AbstractSeleniumTest;
 
 public class TestUserManagement extends AbstractSeleniumTest {
@@ -55,7 +58,7 @@ public class TestUserManagement extends AbstractSeleniumTest {
         assertNull(userRolesPO.findRole(TEST_ROLE));
         createRole(userRolesPO);
         userManagementPanel.selectUser(TEST_USER_NAME);
-        assertNotNull(userRolesPO.findRole(TEST_ROLE + ":"+ TEST_GROUP + ":" + TEST_USER_NAME));
+        assertNotNull(userRolesPO.findRole(TEST_ROLE + ":" + TEST_GROUP + ":" + TEST_USER_NAME));
     }
 
     private void createRole(final UserRoleDefinitionPanelPO userRolesPO) {
@@ -101,6 +104,63 @@ public class TestUserManagement extends AbstractSeleniumTest {
     }
 
     @SeleniumTestCase
+    public void testUnlockUser() throws InterruptedException {
+        // at admin
+        UserManagementPanelPO userManagementPanel = goToUserManagementPanel();
+        createUser(userManagementPanel);
+        // logout so test user can login
+        AuthenticationMenuPO authenticationMenu = logoutAndGoToAdminConsolePage().getAuthenticationMenu();
+        attemptAbusiveLogins(TEST_USER_NAME, "wrongPassword", 6, authenticationMenu);
+        // 16s lock window in place now, sufficient to log into admin, unlock user
+        // and return till test user can login, within the erstwhile lock window
+        assertTrue(authenticationMenu.attemptLogin("admin", "admin"));
+        userManagementPanel = goToUserManagementPanel();
+        userManagementPanel.unlockUser(TEST_USER_NAME);
+        // logout and correct login within now-unlocked lock window
+        authenticationMenu = logoutAndGoToAdminConsolePage().getAuthenticationMenu();
+        assertTrue(
+                authenticationMenu.attemptLogin(
+                        TEST_USER_NAME, TEST_USER_PASSWORD + UserManagementPanelPO.PASSWORD_COMPLEXITY_SALT));
+    }
+
+    @SeleniumTestCase
+    public void testUnlockSelectionOfUsers() throws InterruptedException {
+        // at admin
+        UserManagementPanelPO userManagementPanel = goToUserManagementPanel();
+        createUser(userManagementPanel);
+        // logout so test user can login
+        AuthenticationMenuPO authenticationMenu = logoutAndGoToAdminConsolePage().getAuthenticationMenu();
+        attemptAbusiveLogins(TEST_USER_NAME, "wrongPassword", 5, authenticationMenu);
+        // 16s lock window in place now, sufficient to log into admin, unlock user
+        // and return till test user can login, within the erstwhile lock window
+        assertTrue(authenticationMenu.attemptLogin("admin", "admin"));
+        userManagementPanel = goToUserManagementPanel();
+        userManagementPanel.selectUser(TEST_USER_NAME);
+        userManagementPanel.unlockSelectedUsers();
+        // logout and correct login within now-unlocked lock window
+        authenticationMenu = logoutAndGoToAdminConsolePage().getAuthenticationMenu();
+        assertTrue(
+                authenticationMenu.attemptLogin(
+                        TEST_USER_NAME, TEST_USER_PASSWORD + UserManagementPanelPO.PASSWORD_COMPLEXITY_SALT));
+    }
+
+    private void attemptAbusiveLogins(final String username, final String wrongPassword, final int attempts, AuthenticationMenuPO authenticationMenu)
+            throws InterruptedException {
+        // logout so test user can login
+        for (int i = 0; i < attempts; i++) {
+            // attempt login with wrong password
+            boolean didSucceed = authenticationMenu.attemptLogin(username, wrongPassword);
+            assertFalse(didSucceed);
+            // wait for lock to pass
+            long lockDuration = (long) Math.pow(2, i) * 1000;
+            boolean isFinalAttempt = i == (attempts - 1);
+            if (!isFinalAttempt) {
+                Thread.sleep(lockDuration);
+            }
+        }
+    }
+
+    @SeleniumTestCase
     public void testRemoveUserPermission() {
         final UserManagementPanelPO userManagementPanel = goToUserManagementPanel();
         createUser(userManagementPanel);
@@ -127,5 +187,10 @@ public class TestUserManagement extends AbstractSeleniumTest {
     private UserManagementPanelPO goToUserManagementPanel() {
         final AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
         return adminConsole.goToUserManagement();
+    }
+
+    private AdminConsolePage logoutAndGoToAdminConsolePage() {
+        getWebDriver().manage().deleteCookieNamed("JSESSIONID");
+        return AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
     }
 }

@@ -26,6 +26,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.sap.sse.ServerInfo;
 import com.sap.sse.branding.BrandingConfigurationService;
 import com.sap.sse.branding.shared.BrandingConfiguration;
+import com.sap.sse.common.TimedLock;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.Util.Triple;
@@ -36,6 +37,7 @@ import com.sap.sse.security.interfaces.Credential;
 import com.sap.sse.security.shared.AccessControlListAnnotation;
 import com.sap.sse.security.shared.HasPermissions;
 import com.sap.sse.security.shared.HasPermissions.DefaultActions;
+import com.sap.sse.security.shared.IPAddress;
 import com.sap.sse.security.shared.QualifiedObjectIdentifier;
 import com.sap.sse.security.shared.TypeRelativeObjectIdentifier;
 import com.sap.sse.security.shared.UnauthorizedException;
@@ -59,6 +61,7 @@ import com.sap.sse.security.shared.impl.UserGroup;
 import com.sap.sse.security.ui.client.SerializationDummy;
 import com.sap.sse.security.ui.client.UserManagementService;
 import com.sap.sse.security.ui.oauth.client.CredentialDTO;
+import com.sap.sse.security.ui.shared.IpToTimedLockDTO;
 import com.sap.sse.security.ui.shared.SecurityServiceSharingDTO;
 import com.sap.sse.security.ui.shared.SuccessInfo;
 import com.sap.sse.util.ServiceTrackerFactory;
@@ -434,5 +437,26 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 
     private BrandingConfigurationService getBrandingConfigurationService() {
         return brandingConfigurationServiceTracker.getService();
+    }
+
+    @Override
+    public ArrayList<IpToTimedLockDTO> getClientIPBasedTimedLocksForUserCreation() throws UnauthorizedException {
+        final HashMap<String, TimedLock> ipToLockMap = getSecurityService().getClientIPBasedTimedLocksForUserCreation();
+        return filterIpToTimedLockTableByCurrentUserReadPermission(ipToLockMap);
+    }
+
+    private ArrayList<IpToTimedLockDTO> filterIpToTimedLockTableByCurrentUserReadPermission(
+            final HashMap<String, TimedLock> ipToLockMap) {
+        final SecurityService securityService = getSecurityService();
+        return Util.mapToArrayList(
+                Util.filter(ipToLockMap.entrySet(),
+                        e->securityService.hasCurrentUserReadPermission(new IPAddress(e.getKey()))),
+                e->new IpToTimedLockDTO(e.getKey(), e.getValue()));
+    }
+
+    @Override
+    public ArrayList<IpToTimedLockDTO> getClientIPBasedTimedLocksForBearerTokenAbuse() throws UnauthorizedException {
+        final HashMap<String, TimedLock> ipToLockMap = getSecurityService().getClientIPBasedTimedLocksForBearerTokenAbuse();
+        return filterIpToTimedLockTableByCurrentUserReadPermission(ipToLockMap);
     }
 }

@@ -77,9 +77,19 @@
 					<!-- GWT version detected from dependencyManagement -->
 					<execution>
 						<configuration>
+                                                        <!-- for debugger attachment: -->
+                                                        <!--
+                                                        <extraJvmArgs>
+                                                             -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:8003
+                                                        </extraJvmArgs>
+                                                        <extraJvmArgsCompiler>
+                                                             -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:8003
+                                                        </extraJvmArgsCompiler>
+                                                        <logLevel>DEBUG</logLevel>
+                                                        -->
 							<!-- <userAgents>chrome</userAgents> -->
 							<modules>
-								<module>com.sap.sse.security.ui.UserManagement</module>
+                                                                <module>com.sap.sse.security.ui.UserManagement</module>
 								<module>com.sap.sse.security.ui.UserManagementEntryPoint</module>
 								<module>com.sap.sse.security.ui.Login</module>
 								<module>com.sap.sse.security.ui.OAuthLogin</module>

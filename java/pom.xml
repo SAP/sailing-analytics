@@ -38,10 +38,10 @@
      -->
     <tycho-version>4.0.12</tycho-version>
     <toolchains-version>3.2.0</toolchains-version>
-    <gwt.version>2.12.3</gwt.version>
+    <gwt.version>2.12.4</gwt.version>
     <!-- gwt-maven-plugin is typically in sync with the GWT version. But sometimes versions need extra time after a new GWT release. -->
-    <gwt.plugin.version>2.12.3</gwt.plugin.version>
-    <gwt.minVersion>2.12.3</gwt.minVersion>
+    <gwt.plugin.version>2.12.4</gwt.plugin.version>
+    <gwt.minVersion>2.12.4</gwt.minVersion>
     <gwt.workers>2</gwt.workers>
     <p2-target>race-analysis-p2-remote</p2-target><!--can be overidden through p2-target.local profile -->
     <!-- QUESTION: Which properties or settings are system dependent and differ across different machines/environments? QUESTION:

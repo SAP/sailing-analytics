@@ -334,13 +334,12 @@ public class ScoreCorrectionImpl implements SettableScoreCorrection {
             NavigableSet<MarkPassing> markPassings = trackedRace.getMarkPassings(competitor);
             final MarkPassing lastMarkPassing;
             // count race as finished for the competitor if the finish mark passing exists or the time is after the end of race
-            if (markPassings != null && !markPassings.isEmpty() &&
-                    (lastMarkPassing = markPassings.last()).getWaypoint() == trackedRace.getRace().getCourse().getLastWaypoint()) {
-                result = timePoint.before(lastMarkPassing.getTimePoint());
-            } else {
-                // if available, use the end of the race as indicator for how long competitor may have been in the race
-                result = timePoint.before(endOfRace);
-            }
+            final boolean raceFinishedForCompetitor =
+                    (markPassings != null && !markPassings.isEmpty() &&
+                        (lastMarkPassing = markPassings.last()).getWaypoint() == trackedRace.getRace().getCourse().getLastWaypoint() &&
+                        !timePoint.before(lastMarkPassing.getTimePoint()))
+                    || !timePoint.before(endOfRace);
+            result = !raceFinishedForCompetitor;
         } else {
             boolean preResult = false;
             for (RaceColumn rc : getLeaderboard().getRaceColumns()) {

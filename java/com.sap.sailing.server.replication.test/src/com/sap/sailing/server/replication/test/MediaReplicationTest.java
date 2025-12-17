@@ -57,6 +57,7 @@ import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.MillisecondsDurationImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
+import com.sap.sse.common.impl.TimedLockImpl;
 import com.sap.sse.common.media.MimeType;
 import com.sap.sse.mongodb.MongoDBConfiguration;
 import com.sap.sse.mongodb.MongoDBService;
@@ -64,7 +65,6 @@ import com.sap.sse.replication.FullyInitializedReplicableTracker;
 import com.sap.sse.security.SecurityService;
 import com.sap.sse.security.interfaces.UserImpl;
 import com.sap.sse.security.shared.WithQualifiedObjectIdentifier;
-import com.sap.sse.security.shared.impl.LockingAndBanningImpl;
 import com.sap.sse.security.shared.impl.SecuredSecurityTypes.PublicReadableActions;
 import com.sap.sse.security.shared.impl.SecuredSecurityTypes.ServerActions;
 import com.sap.sse.security.shared.impl.User;
@@ -248,7 +248,7 @@ public class MediaReplicationTest extends AbstractServerReplicationTest {
     @Test
     public void testMasterDataImportForMediaTracks() throws Exception {
         UserGroupImpl defaultTenant = new UserGroupImpl(new UUID(0, 1), "defaultTenant");
-        User currentUser = new UserImpl("test", "email@test", Collections.emptyMap(), null, new LockingAndBanningImpl());
+        User currentUser = new UserImpl("test", "email@test", Collections.emptyMap(), null, new TimedLockImpl());
         SecurityService securityService = Mockito.mock(SecurityService.class);
         Mockito.doReturn(defaultTenant).when(securityService).getServerGroup();
         Mockito.doReturn(currentUser).when(securityService).getCurrentUser();

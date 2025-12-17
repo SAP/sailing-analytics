@@ -18,6 +18,9 @@
             <a ui:field="privacyAnchorLink" target="_blank" class="{local_res.css.dfooter_item} {local_res.css.dfooter_link}">
               <ui:text from='{i18n.footerPrivacy}' />
             </a>
+            <a ui:field="sourceCodeAnchor" target="_blank" class="{local_res.css.dfooter_item} {local_res.css.dfooter_link}">
+              <ui:text from='{i18n.sourceCode}'/>
+            </a>
             <a ui:field="jobsAnchor" target="_blank" class="{local_res.css.dfooter_item} {local_res.css.dfooter_link}">
               <ui:text from='{i18n.footerJobs}'/>
             </a>

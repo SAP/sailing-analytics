@@ -27,4 +27,4 @@ mvn --batch-mode install:install-file -Dpackaging=pom -Dfile="${SAILING_GIT_ROOT
 # gwt-maven-plugin:
 cd ..
 mvn --batch-mode install:install-file -Dfile="gwt-maven-plugin-${GWT_VERSION}.jar" -DpomFile="gwt-maven-plugin-${GWT_VERSION}.pom"
-#rm -rf "${GWT}"
+rm -rf "${GWT}"

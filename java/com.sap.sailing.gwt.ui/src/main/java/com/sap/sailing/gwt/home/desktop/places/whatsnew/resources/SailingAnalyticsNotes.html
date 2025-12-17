@@ -5,6 +5,21 @@
 <div id="mainContent">
     <h4 class="articleHeadline" id="sailingAnalyticsHeadline">What's New - Sailing Analytics</h4>
       <div class="innerContent">
+         <h5 class="articleSubheadline">December 2025</h5>
+         <ul class="bulletList">
+            <li>Added boat class Fareast 28R.</li>
+            <li>When no wind speed is measured at all, let the clustering into different tacks make
+                assumptions (e.g., 10kts true wind speed) for the wind direction estimation from the
+                courses over ground. This wind speed default assumption is then used to determine
+                average maneuver angles for the boat type in those wind speeds, which in turn helps
+                computing the minimum course difference required between the clusters for the different
+                tacks. All this helps to improve wind direction estimation results if no wind speed
+                is provided at all.</li>
+            <li>When a competitor receives a penalty that applies at race end, we now apply it at
+                blue flag down, or at the competitor's finish mark passing, whichever comes earlier.
+                So far, when a finish mark passing came after blue flag down, the penalty was displayed
+                only once the finish mark passing had been reached, which was not useful, e.g., for DNF.</li>
+         </ul>
          <h5 class="articleSubheadline">October 2025</h5>
          <ul class="bulletList">
             <li>Bug fix: the "Edit Mark Passings" panel showed only up to 15 waypoints.</li>

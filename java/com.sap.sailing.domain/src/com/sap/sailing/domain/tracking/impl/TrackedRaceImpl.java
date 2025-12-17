@@ -2983,7 +2983,9 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
         Pair<Double, Double> result;
         double defaultAngle = getRace().getBoatClass().getMinimumAngleBetweenDifferentTacksUpwind();
         double threshold = 10;
-        result = usePolarsIfPossible(wind, defaultAngle, LegType.UPWIND, threshold);
+        result = usePolarsIfPossible(wind != null && wind.getKnots()==0?new WindImpl(wind.getPosition(),
+                wind.getTimePoint(), new KnotSpeedWithBearingImpl(10 /* default 10kts */, wind.getBearing())):wind,
+                defaultAngle, LegType.UPWIND, threshold);
         return result;
     }
 

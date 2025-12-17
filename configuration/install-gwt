@@ -3,7 +3,7 @@ SAILING_GIT_ROOT="${1}"
 if [ -n "${2}" ]; then
   OUTPUT_FOLDER_FOR_GWT_ZIP="${2}"
 fi
-GWT_VERSION=2.12.3
+GWT_VERSION=2.12.4
 GWT="`mktemp -t -d gwt.XXXXX`"
 GWT_ROOT="${GWT}/trunk"
 cd "${GWT}"

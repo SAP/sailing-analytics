@@ -20,6 +20,7 @@ import com.sap.sailing.android.shared.logging.ExLog;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixImpl;
 import com.sap.sse.shared.util.impl.UUIDHelper;
 
+import android.annotation.SuppressLint;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -82,10 +83,10 @@ public class DatabaseHelper {
         if (mc != null) {
             mc.moveToFirst();
             while (!mc.isAfterLast()) {
-                final String markName = mc.getString((mc.getColumnIndex(Mark.MARK_NAME)));
+                @SuppressLint("Range") final String markName = mc.getString((mc.getColumnIndex(Mark.MARK_NAME)));
                 final String markIdAsString = mc.getString(mc.getColumnIndexOrThrow(Mark.MARK_ID));
                 final Serializable markId = UUIDHelper.tryUuidConversion(markIdAsString);
-                MarkInfo markInfo = new MarkInfo(markId, markName,
+                @SuppressLint("Range") MarkInfo markInfo = new MarkInfo(markId, markName,
                         mc.getString((mc.getColumnIndex(Mark.MARK_CLASS_NAME))), checkinDigest);
                 marks.add(markInfo);
                 mc.moveToNext();
@@ -105,7 +106,7 @@ public class DatabaseHelper {
                 long timeStamp = mpc.getLong(mpc.getColumnIndexOrThrow(MarkPing.MARK_PING_TIMESTAMP));
                 double longitude = mpc.getDouble(mpc.getColumnIndexOrThrow(MarkPing.MARK_PING_LONGITUDE));
                 double latitude = mpc.getDouble(mpc.getColumnIndexOrThrow(MarkPing.MARK_PING_LATITUDE));
-                MarkPingInfo markPingInfo = new MarkPingInfo(markID, GPSFixImpl.create(longitude, latitude, timeStamp),
+                @SuppressLint("Range") MarkPingInfo markPingInfo = new MarkPingInfo(markID, GPSFixImpl.create(longitude, latitude, timeStamp),
                         mpc.getDouble((mpc.getColumnIndex(MarkPing.MARK_PING_ACCURACY))));
                 marks.add(markPingInfo);
                 mpc.moveToNext();

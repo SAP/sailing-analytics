@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import com.sap.sse.common.Named;
+import com.sap.sse.common.TimedLock;
 import com.sap.sse.common.WithID;
 import com.sap.sse.security.shared.Account;
 import com.sap.sse.security.shared.Account.AccountType;
@@ -125,5 +126,5 @@ public interface User extends SecurityUser<RoleDefinition, Role, UserGroup> {
     
     Subscription getSubscriptionById(String subscriptionId);
     
-    LockingAndBanning getLockingAndBanning();
+    TimedLock getTimedLock();
 }

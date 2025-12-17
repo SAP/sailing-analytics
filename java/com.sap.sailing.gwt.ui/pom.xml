@@ -12,9 +12,9 @@
   <packaging>eclipse-plugin</packaging>
 
   <dependencies>
-		<!-- The following dependency needs re-declaration with the desired version 
-			because gwt-maps-api declares it with no version specifier which may be resolved 
-			to an incorrect version. -->
+    <!-- The following dependency needs re-declaration with the desired version 
+         because gwt-maps-api declares it with no version specifier which may be resolved 
+         to an incorrect version. -->
     <dependency>
       <groupId>org.gwtproject</groupId>
       <artifactId>gwt-user</artifactId>
@@ -165,7 +165,13 @@
           <execution>
             <configuration>
               <!-- <userAgents>chrome</userAgents> -->
+              <!-- Uncomment this if you'd like to attach a debugger to the GWT build:
+              <extraJvmArgs>
+                  -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:8003
+              </extraJvmArgs>
+              -->
               <modules>
+                <!-- Comment all modules but DataMining when chasing GWT issue-10181: -->
                 <module>com.sap.sailing.gwt.home.Home</module>
                 <module>com.sap.sailing.gwt.autoplay.AutoPlay</module>
                 <module>com.sap.sailing.gwt.ui.AdminConsole</module>
@@ -175,20 +181,26 @@
                 <module>com.sap.sailing.gwt.ui.RaceBoard</module>
                 <module>com.sap.sailing.gwt.ui.EmbeddedMapAndWindChart</module>
                 <module>com.sap.sailing.gwt.ui.Spectator</module>
+                <!-- -->
                 <module>com.sap.sailing.gwt.ui.DataMining</module>
+                <!-- Comment all modules but DataMining when chasing GWT issue-10181: -->
                 <module>com.sap.sailing.gwt.ui.VideoPopup</module>
                 <module>com.sap.sailing.gwt.ui.YoutubePopup</module>
                 <module>com.sap.sailing.gwt.ui.Simulator</module>
                 <module>com.sap.sailing.gwt.ui.PairingList</module>
                 <module>com.sap.sailing.gwt.regattaoverview.RegattaOverview</module>
+                <!-- -->
               </modules>
-							<!-- uncomment the following for PRETTY-printed, non-obfuscated output 
-								format <style>PRETTY</style> -->
+              <!-- uncomment the following for PRETTY-printed, non-obfuscated output format
+              <style>PRETTY</style>
+              -->
               <gen>${basedir}/.generated</gen>
               <webappDirectory>${basedir}</webappDirectory>
               <warSourceDirectory>${basedir}/src/main/resources</warSourceDirectory>
               <!-- Uncomment the following to obtain details split-point reports
-								<compileReport>true</compileReport> <detailedSoyc>true</detailedSoyc> -->
+              <compileReport>true</compileReport>
+              <detailedSoyc>true</detailedSoyc>
+              -->
             </configuration>
             <goals>
               <goal>compile</goal>

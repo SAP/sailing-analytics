@@ -21,6 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.security.SecuredDomainType;
+import com.sap.sse.common.impl.TimedLockImpl;
 import com.sap.sse.security.AbstractCompositeAuthorizingRealm;
 import com.sap.sse.security.UsernamePasswordRealm;
 import com.sap.sse.security.interfaces.AccessControlStore;
@@ -39,7 +40,6 @@ import com.sap.sse.security.shared.UserManagementException;
 import com.sap.sse.security.shared.WildcardPermission;
 import com.sap.sse.security.shared.impl.AccessControlList;
 import com.sap.sse.security.shared.impl.HasPermissionsImpl;
-import com.sap.sse.security.shared.impl.LockingAndBanningImpl;
 import com.sap.sse.security.shared.impl.Ownership;
 import com.sap.sse.security.shared.impl.Role;
 import com.sap.sse.security.shared.impl.User;
@@ -94,7 +94,7 @@ public class PermissionCheckerTest {
             userStore.deleteUser("jonas");
         }
         userTenant = userStore.createUserGroup(userTenantId, "jonas-tenant");
-        user = userStore.createUser("jonas", "jonas@dann.io", new LockingAndBanningImpl());
+        user = userStore.createUser("jonas", "jonas@dann.io", new TimedLockImpl());
         userTenant.add(user);
         userStore.updateUserGroup(userTenant);
         ownership = new Ownership(user, userTenant);

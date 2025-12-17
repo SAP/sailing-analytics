@@ -26,5 +26,8 @@ public interface SocialFooterResources extends ClientBundle {
         String socialfooter_item_text_inverse();
         String socialfooter_item_text_top();
         String socialfooter_item_text_bottom();
+        String socialfooter_items();
+        String socialfooter_item_contentwrappergithub();
+        String socialfooter_item_text_github();
     }
 }

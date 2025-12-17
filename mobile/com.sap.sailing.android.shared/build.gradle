@@ -50,8 +50,8 @@ dependencies {
 
     /* Google Play Services */
     api "com.google.android.gms:play-services-maps:${rootProject.ext.play_services}"
-    api "com.google.android.gms:play-services-vision:${rootProject.ext.play_services}"
     api "com.google.android.gms:play-services-location:${rootProject.ext.play_services}"
+    api "com.google.android.gms:play-services-vision:${rootProject.ext.play_services}"
 
     /* license dialog */
     api "de.psdev.licensesdialog:licensesdialog:${rootProject.ext.license_dialog}"

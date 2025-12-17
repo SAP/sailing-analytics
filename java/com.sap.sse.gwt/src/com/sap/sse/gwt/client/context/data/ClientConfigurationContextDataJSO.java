@@ -121,4 +121,10 @@ public class ClientConfigurationContextDataJSO extends JavaScriptObject {
     public final native String getMoreLoginInformationSimulatorURL() /*-{
         return this.moreLoginInformationSimulatorURL;
     }-*/;
+    public final native String getFollowGitHub() /*-{
+        return this.followGitHub;
+    }-*/;
+    public final native String getGitHubLink() /*-{
+        return this.gitHubLink;
+    }-*/;
 }

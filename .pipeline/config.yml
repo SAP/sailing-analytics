@@ -24,6 +24,9 @@ steps:
   sapCumulusUpload:
     pipelineId: '84d219f0-1abb-4b37-bad0-e2893612ce25'
     versioningModel: 'semantic' # overwrite default from general section -> don't spam Cumulus
+  sapCallStagingService:
+    url: https://staging.repositories.cloud.sap/stage/api
+    profile: 'naas-mobile-staging-profile'
   # Rotating vault secret if it is expring soon:
   vaultRotateSecretId:
     daysBeforeExpiry: 45

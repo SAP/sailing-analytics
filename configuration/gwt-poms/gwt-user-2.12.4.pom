@@ -6,24 +6,33 @@
     <parent>
         <groupId>org.gwtproject</groupId>
         <artifactId>gwt</artifactId>
-        <version>2.12.3</version>
+        <version>2.12.4</version>
     </parent>
     <groupId>org.gwtproject</groupId>
-    <artifactId>gwt-servlet</artifactId>
+    <artifactId>gwt-user</artifactId>
     <packaging>jar</packaging>
-    <version>2.12.3</version>
+    <version>2.12.4</version>
     <dependencies>
+        <dependency>
+            <groupId>com.google.jsinterop</groupId>
+            <artifactId>jsinterop-annotations</artifactId>
+        </dependency>
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
-            <!-- needed by RequestFactory -->
-            <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <!-- Used for source-mapping in stacktrace deobfuscation for logging -->
-            <optional>true</optional>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <classifier>sources</classifier>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.w3c.css</groupId>
+            <artifactId>sac</artifactId>
         </dependency>
     </dependencies>
 </project>

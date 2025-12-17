@@ -6,10 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.sap.sse.common.impl.TimedLockImpl;
 import com.sap.sse.security.interfaces.UserStore;
 import com.sap.sse.security.shared.UserGroupManagementException;
 import com.sap.sse.security.shared.UserManagementException;
-import com.sap.sse.security.shared.impl.LockingAndBanningImpl;
 import com.sap.sse.security.userstore.mongodb.UserStoreImpl;
 
 public class UserStoreTest {
@@ -26,7 +26,7 @@ public class UserStoreTest {
     
     @BeforeEach
     public void setUp() throws UserManagementException, UserGroupManagementException {
-        userStore.createUser(username, email, new LockingAndBanningImpl());
+        userStore.createUser(username, email, new TimedLockImpl());
         userStore.setAccessToken(username, accessToken);
         userStore.setPreference(username, prefKey, prefValue);
     }

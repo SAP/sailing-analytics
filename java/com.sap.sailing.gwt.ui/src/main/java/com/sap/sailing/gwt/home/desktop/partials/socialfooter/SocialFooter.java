@@ -27,12 +27,15 @@ public class SocialFooter extends Composite {
     @UiField HTMLPanel htmlPanel;
     @UiField HeadingElement socialHeading;
     @UiField DivElement xItem;
+    @UiField DivElement gitHubItem;
     @UiField DivElement facebookItem;
     @UiField DivElement instagramItem;
     @UiField AnchorElement xLink;
+    @UiField AnchorElement gitHubLink;
     @UiField AnchorElement facebookLink;
     @UiField AnchorElement instagramLink;
     @UiField DivElement xTopText;
+    @UiField DivElement gitHubTopText;
     @UiField DivElement facebookTopText;
     @UiField DivElement instagramTopText;
 
@@ -45,6 +48,7 @@ public class SocialFooter extends Composite {
         } else {
             socialHeading.setInnerText(cfg.getFollowSports(Optional.empty()));
             setHrefOrHide(xItem, xLink, xTopText, cfg.getxLink(), cfg.getSportsOn(Optional.empty()));
+            setHrefOrHide(gitHubItem, gitHubLink, gitHubTopText, cfg.getGitHubLink(), cfg.getFollowGitHub(Optional.empty()));
             setHrefOrHide(facebookItem, facebookLink, facebookTopText, cfg.getFacebookLink(), cfg.getSportsOn(Optional.empty()));
             setHrefOrHide(instagramItem, instagramLink, instagramTopText, cfg.getInstagramLink(), cfg.getSportsOn(Optional.empty()));
         }

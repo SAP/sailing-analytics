@@ -96,6 +96,8 @@ public class ClientConfiguration implements BrandingConfiguration {
     private String moreLoginInformationSailorProfilesURL;
     private String moreLoginInformationSimulatorURL;
     private String inSailingContent;
+    private String followGitHub;
+    private String gitHubLink;
 
     public ClientConfiguration() {
         try {
@@ -132,6 +134,9 @@ public class ClientConfiguration implements BrandingConfiguration {
             moreLoginInformationSettingsURL = dataJso.getMoreLoginInformationSettingsURL();
             moreLoginInformationSailorProfilesURL = dataJso.getMoreLoginInformationSailorProfilesURL();
             moreLoginInformationSimulatorURL = dataJso.getMoreLoginInformationSimulatorURL();
+            gitHubLink = dataJso.getGitHubLink();
+            followGitHub = dataJso.getFollowGitHub();
+            
 
         } catch (RuntimeException e) {
             GWT.log("no branding information found.");
@@ -266,5 +271,13 @@ public class ClientConfiguration implements BrandingConfiguration {
     
     public String getInSailingContent(Optional<String> locale) {
         return inSailingContent;
+    }
+    
+    public String getFollowGitHub(Optional<String> locale) {
+        return followGitHub;
+    }
+    
+    public String getGitHubLink() {
+        return gitHubLink;
     }
 }

@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import com.sap.sse.i18n.ResourceBundleStringMessages;
 
 public class ResourceBundleStringMessagesImpl implements ResourceBundleStringMessages {
-    
+    private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
     private final String resourceBaseName;
     private final ClassLoader resourceClassLoader;
     private String encoding;
@@ -36,7 +36,14 @@ public class ResourceBundleStringMessagesImpl implements ResourceBundleStringMes
     
     @Override
     public String get(Locale locale, String messageKey, String... parameters) {
-        final String message = getResourceBundle(locale).getString(messageKey);
+        final ResourceBundle bundle = getResourceBundle(locale) == null ? getResourceBundle(DEFAULT_LOCALE)
+                : getResourceBundle(locale);
+        String message;
+        try {
+            message = bundle.getString(messageKey);
+        } catch (MissingResourceException e) {
+            message = getResourceBundle(DEFAULT_LOCALE).getString(messageKey);
+        }
         return get(message, parameters);
     }
 

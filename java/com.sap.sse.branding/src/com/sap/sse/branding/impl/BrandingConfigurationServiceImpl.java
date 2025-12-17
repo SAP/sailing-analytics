@@ -143,6 +143,8 @@ public class BrandingConfigurationServiceImpl implements BrandingConfigurationSe
         map.put(BrandingConfigurationProperty.SAILING_ANALYTICS_SAILING, brandingConfiguration == null ? "" : brandingConfiguration.getSailingAnalyticsSailing(locale));
         map.put(BrandingConfigurationProperty.WELCOME_TO_SAILING_ANALYTICS, brandingConfiguration == null ? "" : brandingConfiguration.getWelcomeToSailingAnalytics(locale));
         map.put(BrandingConfigurationProperty.WELCOME_TO_SAILING_ANALYTICS_BODY, brandingConfiguration == null ? "" : brandingConfiguration.getWelcomeToSailingAnalyticsBody(locale));
+        map.put(BrandingConfigurationProperty.FOLLOW_GITHUB, brandingConfiguration == null ? "" : brandingConfiguration.getFollowGitHub(locale));
+        map.put(BrandingConfigurationProperty.GITHUB_LINK, brandingConfiguration == null ? "" : brandingConfiguration.getGitHubLink());
         map.put(BrandingConfigurationProperty.DEBRANDING_ACTIVE_JSP_PROPERTY_NAME, !isBrandingActive());
         map.put(BrandingConfigurationProperty.BRANDING_ACTIVE_JSP_PROPERTY_NAME, isBrandingActive());
         map.put(BrandingConfigurationProperty.DASH_WHITELABELED_JSP_PROPERTY_NAME, whitelabeled);

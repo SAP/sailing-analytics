@@ -2,6 +2,7 @@ package com.sap.sse.security;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -22,6 +23,7 @@ import org.apache.shiro.subject.Subject;
 import org.osgi.framework.BundleContext;
 
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.TimedLock;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.http.HttpHeaderUtil;
@@ -53,7 +55,6 @@ import com.sap.sse.security.shared.UserManagementException;
 import com.sap.sse.security.shared.WildcardPermission;
 import com.sap.sse.security.shared.WithQualifiedObjectIdentifier;
 import com.sap.sse.security.shared.impl.AccessControlList;
-import com.sap.sse.security.shared.impl.LockingAndBanning;
 import com.sap.sse.security.shared.impl.Ownership;
 import com.sap.sse.security.shared.impl.Role;
 import com.sap.sse.security.shared.impl.SecuredSecurityTypes;
@@ -178,6 +179,16 @@ public interface SecurityService extends ReplicableWithObjectInputStream<Replica
 
     void deleteUserGroup(UserGroup userGroup) throws UserGroupManagementException;
 
+    /**
+     * Releases the lock applied on IP due to user creation abuse.
+     */
+    void releaseUserCreationLockOnIp(String ip);
+
+    /**
+     * Releases the lock applied on IP due to user creation abuse.
+     */
+    void releaseBearerTokenLockOnIp(String ip);
+
     Iterable<User> getUserList();
 
     User getUserByName(String username);
@@ -221,6 +232,8 @@ public interface SecurityService extends ReplicableWithObjectInputStream<Replica
     void updateSimpleUserEmail(String username, String newEmail, String validationBaseURL) throws UserManagementException;
     
     void updateUserProperties(String username, String fullName, String company, Locale locale) throws UserManagementException;
+    
+    void resetUserTimedLock(String username) throws UserManagementException;
 
     void deleteUser(String username) throws UserManagementException;
 
@@ -873,7 +886,7 @@ public interface SecurityService extends ReplicableWithObjectInputStream<Replica
 
     Pair<Boolean, Set<String>> getCORSFilterConfiguration(String serverName);
 
-    LockingAndBanning failedPasswordAuthentication(User user);
+    TimedLock failedPasswordAuthentication(User user);
 
     void successfulPasswordAuthentication(User user);
 
@@ -890,7 +903,7 @@ public interface SecurityService extends ReplicableWithObjectInputStream<Replica
      * {@code userAgent}, the locking record including its last locking duration is expunged from the internal data
      * structures, avoiding garbage piling up.
      */
-    LockingAndBanning failedBearerTokenAuthentication(String clientIP);
+    TimedLock failedBearerTokenAuthentication(String clientIP);
 
     /**
      * Call this when the combination of {@code clientIP} and {@code userAgent} was not
@@ -905,11 +918,14 @@ public interface SecurityService extends ReplicableWithObjectInputStream<Replica
      * Used in conjunction with {@link #failedBearerTokenAuthentication(String)} and
      * {@link #successfulBearerTokenAuthentication(String)}. If and only if a locking state for the combination
      * of {@code clientIP} and {@code userAgent} is known and still locked, {@code true} is returned. Unlocking
-     * will bappen by calling {@link #successfulBearerTokenAuthentication(String)} with an equal combination
-     * of {@code clientIP} and {@code userAgent}. Invoking {@link #failedBearerTokenAuthentication(String)}
-     * will establish (if not yet locked) or extend the locking duration for the combination.
+     * will happen by calling {@link #successfulBearerTokenAuthentication(String)} with an equal combination of
+     * {@code clientIP} and {@code userAgent} or by calling {@link releaseBearerTokenLockOnIp(String)}. Invoking
+     * {@link #failedBearerTokenAuthentication(String)} will establish (if not yet locked) or extend the locking
+     * duration for the combination.
      */
     boolean isClientIPLockedForBearerTokenAuthentication(String clientIP);
+
+    boolean isUserCreationLockedForClientIP(String clientIP);
 
     void fileTakedownNotice(TakedownNoticeRequestContext takedownNoticeRequestContext) throws MailException;
     
@@ -928,4 +944,8 @@ public interface SecurityService extends ReplicableWithObjectInputStream<Replica
      */
     Iterable<User> getUsersToInformAboutReplicaSet(String serverName,
             Optional<com.sap.sse.security.shared.HasPermissions.Action> alsoSendToAllUsersWithThisPermissionOnReplicaSet);
+    
+    HashMap<String, TimedLock> getClientIPBasedTimedLocksForUserCreation();
+    
+    HashMap<String, TimedLock> getClientIPBasedTimedLocksForBearerTokenAbuse();
 }

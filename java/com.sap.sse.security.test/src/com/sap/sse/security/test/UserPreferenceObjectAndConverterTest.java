@@ -9,11 +9,11 @@ import org.junit.jupiter.api.Test;
 
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoDatabase;
+import com.sap.sse.common.impl.TimedLockImpl;
 import com.sap.sse.mongodb.MongoDBConfiguration;
 import com.sap.sse.mongodb.MongoDBService;
 import com.sap.sse.security.shared.UserGroupManagementException;
 import com.sap.sse.security.shared.UserManagementException;
-import com.sap.sse.security.shared.impl.LockingAndBanningImpl;
 import com.sap.sse.security.userstore.mongodb.UserStoreImpl;
 import com.sap.sse.security.userstore.mongodb.impl.CollectionNames;
 
@@ -115,7 +115,7 @@ public class UserPreferenceObjectAndConverterTest {
      */
     @Test
     public void deleteUserWithPreferenceObjectTest() throws UserManagementException, UserGroupManagementException {
-        store.createUser(user1, email, new LockingAndBanningImpl());
+        store.createUser(user1, email, new TimedLockImpl());
         store.registerPreferenceConverter(prefKey1, prefConverter);
         store.setPreferenceObject(user1, prefKey1, pref1);
         store.deleteUser(user1);
@@ -124,7 +124,7 @@ public class UserPreferenceObjectAndConverterTest {
     
     @Test
     public void removeConverterTest() throws UserManagementException, UserGroupManagementException {
-        store.createUser(user1, email, new LockingAndBanningImpl());
+        store.createUser(user1, email, new TimedLockImpl());
         store.registerPreferenceConverter(prefKey1, prefConverter);
         store.setPreference(user1, prefKey1, serializedPref1);
         store.removePreferenceConverter(prefKey1);
