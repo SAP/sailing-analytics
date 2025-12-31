@@ -17,6 +17,7 @@ import java.util.function.Function;
 import com.google.gwt.cell.client.AbstractSafeHtmlCell;
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.Cell.Context;
+import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.CompositeCell;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
@@ -40,6 +41,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.SafeHtmlHeader;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
@@ -226,6 +228,8 @@ public abstract class LeaderboardPanel<LS extends LeaderboardSettings> extends A
      * obtain the leaderboard contents} from the server. It may change in case the leaderboard is renamed.
      */
 
+    private boolean bulkSelectionInProgress = false;
+
     protected LS currentSettings;
 
     private String leaderboardName;
@@ -241,7 +245,7 @@ public abstract class LeaderboardPanel<LS extends LeaderboardSettings> extends A
     protected LeaderboardDTO leaderboard;
 
     private final TotalRankColumn totalRankColumn;
-    
+   
     protected Iterable<DetailType> availableDetailTypes;
 
     private final SelectionCheckboxColumn<LeaderboardRowDTO> selectionCheckboxColumn;
@@ -2136,6 +2140,45 @@ public abstract class LeaderboardPanel<LS extends LeaderboardSettings> extends A
         }
 
         @Override
+        public Header<?> getHeader() {
+            final CheckboxCell selectAllCell = new CheckboxCell();
+            final Header<Boolean> selectAllHeader = new Header<Boolean>(selectAllCell) {
+                @Override
+                public Boolean getValue() {
+                    return false;
+                }
+            };
+            selectAllHeader.setUpdater(value -> {
+                bulkSelectionInProgress = true;
+                try {
+                    if (leaderboardAsTableSelectionModelRegistration != null) {
+                        leaderboardAsTableSelectionModelRegistration.removeHandler();
+                        leaderboardAsTableSelectionModelRegistration = null;
+                    }
+                    for (LeaderboardRowDTO row : getData().getList()) {
+                        leaderboardSelectionModel.setSelected(row, value);
+                        competitorSelectionProvider.setSelected(row.competitor, value);
+                    }
+                } finally {
+                    bulkSelectionInProgress = false;
+                    leaderboardTable.flush();
+                    leaderboardTable.redraw();      
+                    leaderboardAsTableSelectionModelRegistration =
+                        leaderboardTable.getSelectionModel()
+                            .addSelectionChangeHandler(selectionChangeHandler);
+                }
+            });
+            getSelectionModel().addSelectionChangeHandler(e -> {
+                if (getSelectionModel().getSelectedSet().isEmpty()) {
+                    selectAllCell.setViewData(/* key */ selectAllHeader.getValue(), false);
+                } else if (getSelectionModel().getSelectedSet().size() == getListDataProvider().getList().size()) {
+                    selectAllCell.setViewData(/* key */ selectAllHeader.getValue(), true);
+                }
+            });
+            return selectAllHeader;
+        }
+        
+        @Override
         public Boolean getValue(LeaderboardRowDTO row) {
             return competitorSelectionProvider.isSelected(row.competitor);
         }
@@ -2705,6 +2748,9 @@ public abstract class LeaderboardPanel<LS extends LeaderboardSettings> extends A
      * {@link #competitorSelectionProvider}.
      */
     private void updateSelection(LeaderboardRowDTO row) {
+        if (bulkSelectionInProgress) {
+            return;
+        }
         final boolean shallBeSelected = competitorSelectionProvider.isSelected(row.competitor);
         if (leaderboardAsTableSelectionModelRegistration != null) {
             // suspend selection events while actively adjusting the leaderboardSelectionModel to match the
@@ -3178,6 +3224,7 @@ public abstract class LeaderboardPanel<LS extends LeaderboardSettings> extends A
             if (showSelectionCheckbox) {
                 if (getLeaderboardTable().getColumn(selectionCheckboxColumnIndex) != selectionCheckboxColumn) {
                     insertColumn(selectionCheckboxColumnIndex, selectionCheckboxColumn);
+                    selectionCheckboxColumn.setSortable(false);
                 } // else, the column is needed and is already in place
             } else {
                 if (getLeaderboardTable().getColumn(selectionCheckboxColumnIndex) == selectionCheckboxColumn) {
@@ -3187,6 +3234,7 @@ public abstract class LeaderboardPanel<LS extends LeaderboardSettings> extends A
         } else {
             if (showSelectionCheckbox) {
                 insertColumn(selectionCheckboxColumnIndex, selectionCheckboxColumn);
+                selectionCheckboxColumn.setSortable(false);
             }
         }
         return indexOfNextColumn;
