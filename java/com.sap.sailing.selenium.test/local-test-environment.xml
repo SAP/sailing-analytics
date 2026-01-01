@@ -19,7 +19,7 @@
   
   <!--
     In this section necessary system properties for the different web drivers can be provided if needed. For more
-    information about available properties see the following sides:
+    information about available properties see the following pages:
     
     - http://code.google.com/p/selenium/wiki/ChromeDriver
     - http://code.google.com/p/selenium/wiki/FirefoxDriver
@@ -27,9 +27,8 @@
     - http://code.google.com/p/selenium/wiki/OperaDriver
     - http://code.google.com/p/selenium/wiki/SafariDriver
     - http://code.google.com/p/selenium/wiki/RemoteWebDriverServer
-    
-    NOTE: For the Chrome, Firefox and InternetExplorer driver an additional "server", which acts as a bridge between the
-          browser and the driver, is needed.
+
+    Note: For the Chrome, Firefox and InternetExplorer driver an additional "server", which acts as a bridge between the browser and the driver, is needed.
   -->
   <system-properties>
      <!--
