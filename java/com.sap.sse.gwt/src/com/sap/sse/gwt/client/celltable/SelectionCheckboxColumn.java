@@ -96,10 +96,16 @@ public class SelectionCheckboxColumn<T> extends AbstractSortableColumnWithMinMax
              }
         };
         selectAllHeader.setUpdater(value -> {
-            for (final T mp : listDataProvider.getList()) {
-                if (selectionModel != null) {
-                    selectionModel.setSelected(mp, value);
+            onBeforeBulkSelection(value);
+            try {
+                for (final T item : listDataProvider.getList()) {
+                    if (selectionModel != null) {
+                        selectionModel.setSelected(item, value);
+                    }
+                    onAfterBulkSelectionItem(item, value);
                 }
+            } finally {
+                onAfterBulkSelection(value);
             }
         });
         selectionModel.addSelectionChangeHandler(e -> {
@@ -110,6 +116,18 @@ public class SelectionCheckboxColumn<T> extends AbstractSortableColumnWithMinMax
             }
         });
         return selectAllHeader;
+    }
+    
+    protected void onBeforeBulkSelection(boolean value) {
+        // default: no-op
+    }
+    
+    protected void onAfterBulkSelectionItem(T item, boolean value) {
+        // default: no-op
+    }
+    
+    protected void onAfterBulkSelection(boolean value) {
+        // default: no-op
     }
     
     /**

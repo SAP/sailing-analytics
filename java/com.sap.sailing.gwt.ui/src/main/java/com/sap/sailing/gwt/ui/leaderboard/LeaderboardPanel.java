@@ -17,7 +17,6 @@ import java.util.function.Function;
 import com.google.gwt.cell.client.AbstractSafeHtmlCell;
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.Cell.Context;
-import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.CompositeCell;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
@@ -2138,49 +2137,31 @@ public abstract class LeaderboardPanel<LS extends LeaderboardSettings> extends A
                     }, getData(), leaderboardTable);
             competitorSelectionProvider.addCompetitorSelectionChangeListener(this);
         }
-
-        @Override
-        public Header<?> getHeader() {
-            final CheckboxCell selectAllCell = new CheckboxCell();
-            final Header<Boolean> selectAllHeader = new Header<Boolean>(selectAllCell) {
-                @Override
-                public Boolean getValue() {
-                    return false;
-                }
-            };
-            selectAllHeader.setUpdater(value -> {
-                bulkSelectionInProgress = true;
-                try {
-                    if (leaderboardAsTableSelectionModelRegistration != null) {
-                        leaderboardAsTableSelectionModelRegistration.removeHandler();
-                        leaderboardAsTableSelectionModelRegistration = null;
-                    }
-                    for (LeaderboardRowDTO row : getData().getList()) {
-                        leaderboardSelectionModel.setSelected(row, value);
-                        competitorSelectionProvider.setSelected(row.competitor, value);
-                    }
-                } finally {
-                    bulkSelectionInProgress = false;
-                    leaderboardTable.flush();
-                    leaderboardTable.redraw();      
-                    leaderboardAsTableSelectionModelRegistration =
-                        leaderboardTable.getSelectionModel()
-                            .addSelectionChangeHandler(selectionChangeHandler);
-                }
-            });
-            getSelectionModel().addSelectionChangeHandler(e -> {
-                if (getSelectionModel().getSelectedSet().isEmpty()) {
-                    selectAllCell.setViewData(/* key */ selectAllHeader.getValue(), false);
-                } else if (getSelectionModel().getSelectedSet().size() == getListDataProvider().getList().size()) {
-                    selectAllCell.setViewData(/* key */ selectAllHeader.getValue(), true);
-                }
-            });
-            return selectAllHeader;
-        }
         
         @Override
-        public Boolean getValue(LeaderboardRowDTO row) {
-            return competitorSelectionProvider.isSelected(row.competitor);
+        protected void onBeforeBulkSelection(boolean value) {
+            bulkSelectionInProgress = true;
+            if (leaderboardAsTableSelectionModelRegistration != null) {
+                leaderboardAsTableSelectionModelRegistration.removeHandler();
+                leaderboardAsTableSelectionModelRegistration = null;
+            }
+        }
+
+        @Override
+        protected void onAfterBulkSelectionItem(LeaderboardRowDTO row, boolean value) {
+            competitorSelectionProvider.setSelected(row.competitor, value);
+        }
+
+        @Override
+        protected void onAfterBulkSelection(boolean value) {
+            bulkSelectionInProgress = false;
+            leaderboardTable.flush();
+            leaderboardTable.redraw();
+            leaderboardAsTableSelectionModelRegistration = leaderboardTable.getSelectionModel().addSelectionChangeHandler(selectionChangeHandler);
+        }
+        @Override
+        public Header<?> getHeader() {
+            return createHeader();
         }
 
         @Override
