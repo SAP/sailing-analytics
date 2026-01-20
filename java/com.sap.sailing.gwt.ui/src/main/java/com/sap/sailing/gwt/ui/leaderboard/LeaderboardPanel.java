@@ -2160,6 +2160,11 @@ public abstract class LeaderboardPanel<LS extends LeaderboardSettings> extends A
             leaderboardAsTableSelectionModelRegistration = leaderboardTable.getSelectionModel().addSelectionChangeHandler(selectionChangeHandler);
         }
         @Override
+        protected void notifyLeaderboardForRedraw() {
+            leaderboardTable.flush();
+            leaderboardTable.redraw();
+        }
+        @Override
         public Header<?> getHeader() {
             return createHeader();
         }
