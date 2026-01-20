@@ -109,10 +109,11 @@ public class SelectionCheckboxColumn<T> extends AbstractSortableColumnWithMinMax
             }
         });
         selectionModel.addSelectionChangeHandler(e -> {
-            final int total = listDataProvider.getList().size();
-            final int selected = selectionModel.getSelectedSet().size();
-            final boolean checked = (total > 0) && (selected == total);
-            selectAllCell.setViewData(/* key */ selectAllHeader.getValue(), checked);
+            if (selectionModel.getSelectedSet().isEmpty()) {
+                selectAllCell.setViewData(/* key */ selectAllHeader.getValue(), false);
+            } else if (selectionModel.getSelectedSet().size() == listDataProvider.getList().size()) {
+                selectAllCell.setViewData(/* key */ selectAllHeader.getValue(), true);
+            }
             if (display instanceof CellTable) {
                 display.flush();
                 ((CellTable<?>) display).redraw();
