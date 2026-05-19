@@ -76,4 +76,24 @@ public class MarkRoleDTO extends NamedDTO implements SecuredDTO {
         securityInformation.setOwnership(createOwnershipDTO);
     }
 
+    @Override
+    public int hashCode() {
+        return uuid != null ? uuid.hashCode() : System.identityHashCode(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof MarkRoleDTO)) {
+            return false;
+        }
+        final MarkRoleDTO other = (MarkRoleDTO) obj;
+        if (uuid == null || other.uuid == null) {
+            return false;
+        }
+        return uuid.equals(other.uuid);
+    }
+
 }
