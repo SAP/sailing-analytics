@@ -64,7 +64,7 @@ import com.sap.sse.util.impl.KnowsExecutorAndTracingGetImpl;
  * re-calculation and defer it until a {@link #get(Object, boolean)} request actually happens. For this purpose,
  * the {@link #suspend} and {@link #resume} methods can be used. No matter the suspend/resume state, the {@link #get(Object, boolean)}
  * method will always respond in line with the {@link #triggerUpdate(Object, UpdateInterval)} calls, only that re-calculations
- * are not immediately started when in suspended mode, and {@link #get(Object, boolean) get(key, false)} will no trigger a
+ * are not immediately started when in suspended mode, and {@link #get(Object, boolean) get(key, false)} will not trigger a
  * re-calculation at all. When resuming, any pending recalculations triggered so far are scheduled for immediate execution such
  * that subsequent {@link #get(Object, boolean) get(key, true)} calls will wait for their completion.
  * 
@@ -92,7 +92,20 @@ public class SmartFutureCache<K, V, U extends UpdateInterval<U>> {
      */
     private final ConcurrentMap<K, FutureTaskWithCancelBlocking> ongoingRecalculations;
     
+    /**
+     * The results cached by this {@link SmartFutureCache}. While a concurrent map, most access is guarded by
+     * {@link #locksForKeys}.
+     */
     private final ConcurrentMap<K, V> cache;
+    
+    /**
+     * Caches exceptions that occurred while computing an update for the respective key. If an exception is stored
+     * in here for a key, this takes precedence over any value in {@link #cache} for that same key, although ideally
+     * when putting an exception into this map, that key should be removed from {@link #cache} for consistency.<p>
+     * 
+     * Access synchronization/locking follows exactly the same principle as for {@link #cache}.
+     */
+    private final ConcurrentMap<K, Throwable> cachedExceptions;
     
     /**
      * Note that this needs to have more than one thread because there may be calculations used for cache updates that
@@ -299,84 +312,91 @@ public class SmartFutureCache<K, V, U extends UpdateInterval<U>> {
 
         @Override
         public V call() {
-            try {
-                final U updateInterval;
-                final Set<Thread> locksPropagatedFromGettingThreads;
-                synchronized (this) {
-                    updateInterval = getUpdateInterval();
-                    locksPropagatedFromGettingThreads = new HashSet<Thread>(gettingThreads);
-                    executingThread = Thread.currentThread();
-                    if (!locksPropagatedFromGettingThreads.isEmpty()) {
-                        // get() was called and cannot have returned yet because call() hasn't returned; propagate locks from getting thread
-                        for (Thread locksPropagatedFromGettingThread : locksPropagatedFromGettingThreads) {
-                            LockUtil.propagateLockSetFrom(locksPropagatedFromGettingThread);
-                            // Turn this logging on in case you need to debug the SmartFutureCache. Otherwise, log level detection is too expensive here.
-                            // logger.finest("propagating lock set from " + locksPropagatedFromGettingThread.getName()
-                            //        + " to " + executingThread.getName());
-                        }
-                    }
-                    // make sure we don't propagate from the same thread twice in case gettingThread == callerThread
-                    if (callerWaitsSynchronouslyForResult && !locksPropagatedFromGettingThreads.contains(callerThread)) {
+            final U updateInterval;
+            final Set<Thread> locksPropagatedFromGettingThreads;
+            synchronized (this) {
+                updateInterval = getUpdateInterval();
+                locksPropagatedFromGettingThreads = new HashSet<Thread>(gettingThreads);
+                executingThread = Thread.currentThread();
+                if (!locksPropagatedFromGettingThreads.isEmpty()) {
+                    // get() was called and cannot have returned yet because call() hasn't returned; propagate locks from getting thread
+                    for (Thread locksPropagatedFromGettingThread : locksPropagatedFromGettingThreads) {
+                        LockUtil.propagateLockSetFrom(locksPropagatedFromGettingThread);
                         // Turn this logging on in case you need to debug the SmartFutureCache. Otherwise, log level detection is too expensive here.
-                        // logger.finest("propagating lock set from "+callerThread.getName()+" to "+executingThread.getName()+
-                        //        " due to synchronous execution");
-                        LockUtil.propagateLockSetFrom(callerThread);
+                        // logger.finest("propagating lock set from " + locksPropagatedFromGettingThread.getName()
+                        //        + " to " + executingThread.getName());
                     }
-                    runningAndReadUpdateInterval = true;
                 }
+                // make sure we don't propagate from the same thread twice in case gettingThread == callerThread
+                if (callerWaitsSynchronouslyForResult && !locksPropagatedFromGettingThreads.contains(callerThread)) {
+                    // Turn this logging on in case you need to debug the SmartFutureCache. Otherwise, log level detection is too expensive here.
+                    // logger.finest("propagating lock set from "+callerThread.getName()+" to "+executingThread.getName()+
+                    //        " due to synchronous execution");
+                    LockUtil.propagateLockSetFrom(callerThread);
+                }
+                runningAndReadUpdateInterval = true;
+            }
+            try {
                 try {
+                    V preResult = cacheUpdateComputer.computeCacheUpdate(key, updateInterval);
+                    final NamedReentrantReadWriteLock lock = getOrCreateLockForKey(key);
+                    LockUtil.lockForWrite(lock);
                     try {
-                        V preResult = cacheUpdateComputer.computeCacheUpdate(key, updateInterval);
-                        final NamedReentrantReadWriteLock lock = getOrCreateLockForKey(key);
-                        LockUtil.lockForWrite(lock);
-                        try {
-                            V result = cacheUpdateComputer.provideNewCacheValue(key, cache.get(key), preResult,
-                                    updateInterval);
-                            cache(key, result);
-                            return result;
-                        } finally {
-                            LockUtil.unlockAfterWrite(lock);
-                        }
+                        V result = cacheUpdateComputer.provideNewCacheValue(key, cache.get(key), preResult,
+                                updateInterval);
+                        cache(key, result);
+                        return result;
                     } finally {
-                        synchronized (ongoingRecalculations) {
-                            boolean newTaskScheduled = false;
-                            Pair<U, Set<SettableFuture<Future<V>>>> queued = triggeredAndNotYetScheduled.get(key);
-                            if (!suspended || (queued != null && !queued.getB().isEmpty())) {
-                                if (queued != null) {
-                                    triggeredAndNotYetScheduled.remove(key);
-                                    Future<V> future = schedule(key, queued.getA(), /* callerWaitsSynchronouslyForResult */ false);
-                                    newTaskScheduled = true;
-                                    for (SettableFuture<Future<V>> futureToSet : queued.getB()) {
-                                        futureToSet.set(future);
-                                    }
+                        LockUtil.unlockAfterWrite(lock);
+                    }
+                } catch (Exception e) { // important to update cachedExceptions before removing key from ongoingRecalculations,
+                    // so that get(K, boolean) always either still finds the FutureTask which then throws an exception upon get(),
+                    // or finds the exception that was thrown in cachedExceptions.
+                    final NamedReentrantReadWriteLock lock = getOrCreateLockForKey(key);
+                    LockUtil.lockForWrite(lock);
+                    try {
+                        remove(key);
+                        cachedExceptions.put(key, e);
+                    } finally {
+                        LockUtil.unlockAfterWrite(lock);
+                    }
+                    logger.log(Level.SEVERE, "SmartFutureCache.FutureTaskWithCancelBlocking.call", e);
+                    throw new RuntimeException(e);
+                } finally {
+                    synchronized (ongoingRecalculations) {
+                        boolean newTaskScheduled = false;
+                        Pair<U, Set<SettableFuture<Future<V>>>> queued = triggeredAndNotYetScheduled.get(key);
+                        if (!suspended || (queued != null && !queued.getB().isEmpty())) {
+                            if (queued != null) {
+                                triggeredAndNotYetScheduled.remove(key);
+                                Future<V> future = schedule(key, queued.getA(), /* callerWaitsSynchronouslyForResult */ false);
+                                newTaskScheduled = true;
+                                for (SettableFuture<Future<V>> futureToSet : queued.getB()) {
+                                    futureToSet.set(future);
                                 }
                             }
-                            if (!newTaskScheduled) {
-                                ongoingRecalculations.remove(key);
-                            }
+                        }
+                        if (!newTaskScheduled) {
+                            ongoingRecalculations.remove(key);
                         }
                     }
-                } finally {
-                    synchronized (this) {
-                        for (Thread locksPropagatedFromGettingThread : gettingThreads) {
-                            // Turn this logging on in case you need to debug the SmartFutureCache. Otherwise, log level detection is too expensive here.
-                            // logger.finest("unpropagating lock set from "+locksPropagatedFromGettingThread.getName()+" to "+executingThread.getName());
-                            LockUtil.unpropagateLockSetFrom(locksPropagatedFromGettingThread);
-                        }
-                        executingThread = null;
-                    }
-                    if (callerWaitsSynchronouslyForResult && !gettingThreads.contains(callerThread)) {
-                        // Turn this logging on in case you need to debug the SmartFutureCache. Otherwise, log level detection is too expensive here.
-                        // logger.finest("unpropagating lock set from "+callerThread.getName()+" to "+Thread.currentThread().getName()+
-                        //        " due to synchronous execution");
-                        LockUtil.unpropagateLockSetFrom(callerThread);
-                    }
-                    gettingThreads.clear();
                 }
-            } catch (Exception e) {
-                // cache won't be updated
-                logger.log(Level.SEVERE, "SmartFutureCache.FutureTaskWithCancelBlocking.call", e);
-                throw new RuntimeException(e);
+            } finally {
+                synchronized (this) {
+                    for (Thread locksPropagatedFromGettingThread : gettingThreads) {
+                        // Turn this logging on in case you need to debug the SmartFutureCache. Otherwise, log level detection is too expensive here.
+                        // logger.finest("unpropagating lock set from "+locksPropagatedFromGettingThread.getName()+" to "+executingThread.getName());
+                        LockUtil.unpropagateLockSetFrom(locksPropagatedFromGettingThread);
+                    }
+                    executingThread = null;
+                }
+                if (callerWaitsSynchronouslyForResult && !gettingThreads.contains(callerThread)) {
+                    // Turn this logging on in case you need to debug the SmartFutureCache. Otherwise, log level detection is too expensive here.
+                    // logger.finest("unpropagating lock set from "+callerThread.getName()+" to "+Thread.currentThread().getName()+
+                    //        " due to synchronous execution");
+                    LockUtil.unpropagateLockSetFrom(callerThread);
+                }
+                gettingThreads.clear();
             }
         }
 
@@ -397,7 +417,8 @@ public class SmartFutureCache<K, V, U extends UpdateInterval<U>> {
     
     public SmartFutureCache(CacheUpdater<K, V, U> cacheUpdateComputer, String nameForLocks) {
         this.ongoingRecalculations = new ConcurrentHashMap<K, FutureTaskWithCancelBlocking>();
-        this.cache = new ConcurrentHashMap<K, V>();
+        this.cache = new ConcurrentHashMap<>();
+        this.cachedExceptions = new ConcurrentHashMap<>();
         this.cacheUpdateComputer = cacheUpdateComputer;
         this.locksForKeys = new ConcurrentHashMap<K, NamedReentrantReadWriteLock>();
         this.nameForLocks = nameForLocks;
@@ -687,8 +708,14 @@ public class SmartFutureCache<K, V, U extends UpdateInterval<U>> {
      *            which may contain many tasks during certain phases of the life cycle of the process; e.g., during
      *            start-up of the ARCHIVE server, several hundred thousand tasks may be enqueued with that background
      *            executor, so that it may take minutes or even hours until a task is actually picked up and run.
-     *            Therefore, no foreground / HTTP request thread should ever use {@code true} for this parameter. It
-     *            may otherwise block all of the HTTP request threads. See also bug 6223.
+     *            Therefore, no foreground / HTTP request thread should ever use {@code true} for this parameter. It may
+     *            otherwise block all of the HTTP request threads. See also bug 6223.
+     * 
+     * @throws a
+     *             {@link RuntimeException} with the {@link RuntimeException#getCause() cause} set to the exception that
+     *             occurred during the last {@link CacheUpdater#computeCacheUpdate(Object, UpdateInterval)} invocation,
+     *             if any; this happens regardless of whether the calculation was still ongoing and waited for, or if
+     *             not waiting for any current execution.
      */
     public V get(final K key, boolean waitForLatest) {
         final V value;
@@ -703,18 +730,35 @@ public class SmartFutureCache<K, V, U extends UpdateInterval<U>> {
                     future = ongoingRecalculations.get(key);
                 }
             }
-            try {
-                if (future != null) {
-                    value = future.get();
-                } else {
-                    value = readCache(key);
+            if (future != null) {
+                try {
+                    value = future.get(); // will throw an ExecutionException if re-calculation threw an exception
+                } catch (InterruptedException e) {
+                    logger.log(Level.SEVERE, "get", e);
+                    throw new RuntimeException(e);
+                } catch (ExecutionException e) {
+                    logger.log(Level.SEVERE, "get", e);
+                    if (e.getCause() instanceof RuntimeException) {
+                        throw (RuntimeException) e.getCause();
+                    } else {
+                        throw new RuntimeException(e);
+                    }
                 }
-            } catch (InterruptedException | ExecutionException e) {
-                logger.log(Level.SEVERE, "get", e);
-                throw new RuntimeException(e);
+            } else {
+                try {
+                    value = readCache(key);
+                } catch (RuntimeException e) {
+                    logger.log(Level.SEVERE, "get", e);
+                    throw e;
+                }
             }
         } else {
-            value = readCache(key);
+            try {
+                value = readCache(key);
+            } catch (RuntimeException e) {
+                logger.log(Level.SEVERE, "get", e);
+                throw e;
+            }
         }
         return value;
     }
@@ -724,6 +768,10 @@ public class SmartFutureCache<K, V, U extends UpdateInterval<U>> {
         final NamedReentrantReadWriteLock lock = getOrCreateLockForKey(key);
         LockUtil.lockForRead(lock);
         try {
+            final Throwable exception = cachedExceptions.get(key);
+            if (exception != null) {
+                throw new RuntimeException(exception);
+            }
             value = cache.get(key);
         } finally {
             LockUtil.unlockAfterRead(lock);
@@ -736,6 +784,7 @@ public class SmartFutureCache<K, V, U extends UpdateInterval<U>> {
     }
 
     protected void cache(final K key, V value) {
+        cachedExceptions.remove(key);
         if (value == null) {
             cache.remove(key);
             locksForKeys.remove(key);
@@ -760,5 +809,4 @@ public class SmartFutureCache<K, V, U extends UpdateInterval<U>> {
     public void remove(K key) {
         cache(key, null);
     }
-
 }
