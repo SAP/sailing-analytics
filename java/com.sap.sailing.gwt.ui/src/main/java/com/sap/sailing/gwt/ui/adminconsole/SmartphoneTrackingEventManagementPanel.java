@@ -38,7 +38,6 @@ import com.sap.sailing.domain.common.LeaderboardNameConstants;
 import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
 import com.sap.sailing.domain.common.RegattaIdentifier;
 import com.sap.sailing.domain.common.RegattaName;
-import com.sap.sailing.domain.common.TrackedRaceStatusEnum;
 import com.sap.sailing.domain.common.abstractlog.TimePointSpecificationFoundInLog;
 import com.sap.sailing.domain.common.dto.BoatDTO;
 import com.sap.sailing.domain.common.dto.CompetitorDTO;
@@ -289,19 +288,6 @@ public class SmartphoneTrackingEventManagementPanel extends AbstractLeaderboardC
     private RaceLogTrackingState getTrackingState(
             RaceColumnDTOAndFleetDTOWithNameBasedEquality race) {
         return race.getA().getRaceLogTrackingInfo(race.getB()).raceLogTrackingState;
-    }
-    
-    private boolean trackerExists(RaceColumnDTOAndFleetDTOWithNameBasedEquality race) {
-        return race.getA().getRaceLogTrackingInfo(race.getB()).raceLogTrackerExists;
-    }
-    
-    private boolean isFinished(RaceColumnDTOAndFleetDTOWithNameBasedEquality race) {
-        RaceDTO raceDTO = race.getA().getRace(race.getB());
-        boolean raceFinished = false;
-        if (raceDTO != null) {
-            raceFinished = raceDTO.status.status.equals(TrackedRaceStatusEnum.FINISHED);
-        }
-        return raceFinished;
     }
     
     private boolean doesTrackerExist(
@@ -560,12 +546,13 @@ public class SmartphoneTrackingEventManagementPanel extends AbstractLeaderboardC
         startStopTrackingButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                if (startStopTrackingButton.isDown()){
-                    startTracking(raceColumnTableSelectionModel.getSelectedSet(), trackWind.getValue(), correctWindDirectionForDeclination.getValue());
-                } else {
+                final boolean anyTrackerExists = raceColumnTableSelectionModel.getSelectedSet().stream()
+                        .anyMatch(race -> doesTrackerExist(race));
+                if (anyTrackerExists) {
                     stopTracking(raceColumnTableSelectionModel.getSelectedSet());
+                } else {
+                    startTracking(raceColumnTableSelectionModel.getSelectedSet(), trackWind.getValue(), correctWindDirectionForDeclination.getValue());
                 }
-                refreshTrackingActionButtons();
             }
         });
         raceColumnTableSelectionModel.addSelectionChangeHandler(new Handler() {
@@ -578,12 +565,14 @@ public class SmartphoneTrackingEventManagementPanel extends AbstractLeaderboardC
     
     private void stopTracking(
             final Set<RaceColumnDTOAndFleetDTOWithNameBasedEquality> selectedSet) {
-        final List<RegattaAndRaceIdentifier> racesToStopTracking = new ArrayList<RegattaAndRaceIdentifier>();        
+        final List<RegattaAndRaceIdentifier> racesToStopTracking = new ArrayList<RegattaAndRaceIdentifier>();
         for (RaceColumnDTOAndFleetDTOWithNameBasedEquality raceColumnDTOAndFleetDTOWithNameBasedEquality : selectedSet) {
-            RaceDTO race = raceColumnDTOAndFleetDTOWithNameBasedEquality.getA().getRace(raceColumnDTOAndFleetDTOWithNameBasedEquality.getB());
-            if (race != null && race.isTracked){
-                racesToStopTracking.add(race.getRaceIdentifier());
-            }   
+            if (doesTrackerExist(raceColumnDTOAndFleetDTOWithNameBasedEquality)) {
+                final RaceDTO race = raceColumnDTOAndFleetDTOWithNameBasedEquality.getA().getRace(raceColumnDTOAndFleetDTOWithNameBasedEquality.getB());
+                if (race != null) {
+                    racesToStopTracking.add(race.getRaceIdentifier());
+                }
+            }
         }
         sailingServiceWrite.stopTrackingRaces(racesToStopTracking, new MarkedAsyncCallback<Void>(
                 new AsyncCallback<Void>() {
@@ -604,40 +593,34 @@ public class SmartphoneTrackingEventManagementPanel extends AbstractLeaderboardC
     }
 
     private void enableStartTrackingButtonIfAppropriateRacesSelected() {
-        boolean onlyUntrackedRacesPresent = raceColumnTableSelectionModel.getSelectedSet().size() > 0;
-        boolean onlyTrackedRacesPresent = raceColumnTableSelectionModel.getSelectedSet().size() > 0;
-        boolean onlyRacesWithNonExistentTracker = raceColumnTableSelectionModel.getSelectedSet().size() > 0;
-        for (RaceColumnDTOAndFleetDTOWithNameBasedEquality race : raceColumnTableSelectionModel.getSelectedSet()) {
-            if (getTrackingState(race).isForTracking() && isFinished(race)) {
-                onlyUntrackedRacesPresent = false;
-                onlyTrackedRacesPresent = false;
-            }
-            if (!getTrackingState(race).isForTracking() || doesTrackerExist(race) || isFinished(race)) {
-                onlyUntrackedRacesPresent = false;
+        final Set<RaceColumnDTOAndFleetDTOWithNameBasedEquality> selected = raceColumnTableSelectionModel.getSelectedSet();
+        boolean allCanStart = selected.size() > 0;
+        boolean allCanStop = selected.size() > 0;
+        for (final RaceColumnDTOAndFleetDTOWithNameBasedEquality race : selected) {
+            if (doesTrackerExist(race)) {
+                allCanStart = false;
+            } else if (!getTrackingState(race).isForTracking()) {
+                allCanStart = false;
+                allCanStop = false;
             } else {
-                onlyTrackedRacesPresent = false;
-            }
-            if (trackerExists(race)) {
-                onlyRacesWithNonExistentTracker = false;
+                allCanStop = false;
             }
         }
-        boolean hasPermissionToChange = leaderboardSelectionModel.getSelectedSet().stream()
+        final boolean hasPermissionToChange = leaderboardSelectionModel.getSelectedSet().stream()
                 .filter(new Predicate<StrippedLeaderboardDTO>() {
                     @Override
                     public boolean test(StrippedLeaderboardDTO t) {
                         return userService.hasPermission(t, DefaultActions.UPDATE);
                     }
                 }).count() > 0;
-        if ((!onlyTrackedRacesPresent && !onlyUntrackedRacesPresent)) {
-            startStopTrackingButton.setEnabled(false);
-        }
-        if (onlyTrackedRacesPresent) {
-            startStopTrackingButton.setDown(true);
-            startStopTrackingButton.setEnabled(hasPermissionToChange);
-        }
-        if (onlyUntrackedRacesPresent || onlyRacesWithNonExistentTracker) {
+        if (allCanStart) {
             startStopTrackingButton.setDown(false);
             startStopTrackingButton.setEnabled(hasPermissionToChange);
+        } else if (allCanStop) {
+            startStopTrackingButton.setDown(true);
+            startStopTrackingButton.setEnabled(hasPermissionToChange);
+        } else {
+            startStopTrackingButton.setEnabled(false);
         }
     }
 
@@ -663,6 +646,12 @@ public class SmartphoneTrackingEventManagementPanel extends AbstractLeaderboardC
                     raceColumnsAndFleets.add(new Triple<String, String, String>(selectedLeaderboard.getName(), raceColumn.getName(), fleet.getName()));
                 }
             }
+            raceColumnTable.getDataProvider().getList().clear();
+            for (RaceColumnDTO raceColumn : selectedLeaderboard.getRaceList()) {
+                for (FleetDTO fleet : raceColumn.getFleets()) {
+                    raceColumnTable.getDataProvider().getList().add(new RaceColumnDTOAndFleetDTOWithNameBasedEquality(raceColumn, fleet, selectedLeaderboard));
+                }
+            }
             sailingServiceWrite.getTrackingTimes(raceColumnsAndFleets,
                     new AsyncCallback<Map<Triple<String, String, String>, Pair<TimePointSpecificationFoundInLog, TimePointSpecificationFoundInLog>>>() {
                 @Override
@@ -673,13 +662,6 @@ public class SmartphoneTrackingEventManagementPanel extends AbstractLeaderboardC
                 @Override
                 public void onSuccess(Map<Triple<String, String, String>, Pair<TimePointSpecificationFoundInLog, TimePointSpecificationFoundInLog>> result) {
                     raceWithStartAndEndOfTrackingTime = result;
-                    raceColumnTable.getDataProvider().getList().clear();
-                    for (RaceColumnDTO raceColumn : selectedLeaderboard.getRaceList()) {
-                        for (FleetDTO fleet : raceColumn.getFleets()) {
-                            RaceColumnDTOAndFleetDTOWithNameBasedEquality raceColumnDTOAndFleet2 = new RaceColumnDTOAndFleetDTOWithNameBasedEquality(raceColumn, fleet, getSelectedLeaderboard());
-                            raceColumnTable.getDataProvider().getList().add(raceColumnDTOAndFleet2);
-                        }
-                    }
                 }
             });
             selectedLeaderBoardPanel.setVisible(true);

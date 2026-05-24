@@ -25,6 +25,15 @@
           <div class="innerContent">
           <h2 class="articleSubheadline">May 2026</h2>
           <ul class="bulletList">
+                <li>The start/stop tracking buttons in the Smartphone Tracking panel now behave correctly.
+                    Per-race buttons show the right action based on actual tracker state: no buttons for
+                    non-tracked races, a green play button when tracking is not yet started or has been
+                    stopped, and a red stop button while a tracker is active. The global start/stop toggle
+                    button is now also consistently enabled or disabled depending on whether all selected
+                    races have an active tracker (showing "Stop Tracking") or none do (showing "Start
+                    Tracking"), and disabled for mixed selections. Stopping tracking now correctly uses
+                    the same truth source as the button visibility, fixing a case where the stop action
+                    silently did nothing.</li>
                 <li>Course templates, mark templates, mark roles, and mark properties are now correctly
                     identified by their unique ID rather than their name. This fixes an issue where two
                     entries sharing the same name were incorrectly treated as equal, and ensures stable
