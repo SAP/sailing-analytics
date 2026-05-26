@@ -1,6 +1,7 @@
 package com.sap.sailing.gwt.ui.adminconsole;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -56,7 +57,10 @@ public class ResultImportUrlsListComposite extends Composite {
         add.ensureDebugId("AddUrlButton");
         add.setEnabled(false);
         final Button remove = buttonPanel.addRemoveAction(stringMessages.remove(), table.getSelectionModel(),
-                /* withConfirmation */ true, () -> removeUrls(table.getSelectionModel().getSelectedSet()));
+                /* withConfirmation */ true, () -> {
+            final Set<UrlDTO> selected = new HashSet<>(table.getSelectionModel().getSelectedSet());
+            removeUrls(selected);
+        });
         remove.ensureDebugId("RemoveUrlButton");
         final Button refresh = buttonPanel.addUnsecuredAction(stringMessages.refresh(), this::updateTable);
         refresh.ensureDebugId("RefreshUrlButton");

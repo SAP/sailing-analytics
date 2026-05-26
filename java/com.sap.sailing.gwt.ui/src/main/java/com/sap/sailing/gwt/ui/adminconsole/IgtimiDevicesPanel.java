@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -183,17 +184,17 @@ public class IgtimiDevicesPanel extends FlowPanel implements FilterablePanelProv
         devicesControlsPanel.add(busyIndicator);
         buttonPanel.addUnsecuredAction(stringMessages.refresh(), () -> refreshDevices());
         // setup controls
-        final Button removeDeviceButton = buttonPanel.addRemoveAction(stringMessages.remove(), refreshableDevicesSelectionModel,
+        buttonPanel.addRemoveAction(stringMessages.remove(), refreshableDevicesSelectionModel,
                 /* with confirmation */ true, () -> {
             if (refreshableDevicesSelectionModel.getSelectedSet().size() > 0) {
                 if (Window.confirm(stringMessages.doYouReallyWantToRemoveTheSelectedIgtimiDevices())) {
-                    for (IgtimiDeviceWithSecurityDTO device : refreshableDevicesSelectionModel.getSelectedSet()) {
+                    final List<IgtimiDeviceWithSecurityDTO> selected = new ArrayList<>(refreshableDevicesSelectionModel.getSelectedSet());
+                    for (IgtimiDeviceWithSecurityDTO device : selected) {
                         removeDevice(device, filteredDevices);
                     }
                 }
             }
         });
-        removeDeviceButton.setEnabled(false);
         devicesCaptionPanelContents.add(devicesControlsPanel);
         devicesCaptionPanelContents.add(devicesTable);
         add(devicesCaptionPanel);
@@ -230,30 +231,25 @@ public class IgtimiDevicesPanel extends FlowPanel implements FilterablePanelProv
         dawControlsPanel.add(dawButtonPanel);
         dawButtonPanel.addUnsecuredAction(stringMessages.refresh(), () -> refreshDataAccessWindows());
         // setup controls
-        final Button removeDAWButton = dawButtonPanel.addRemoveAction(stringMessages.remove(), refreshableDataAccessWindowsSelectionModel,
+        dawButtonPanel.addRemoveAction(stringMessages.remove(), refreshableDataAccessWindowsSelectionModel,
                 /* with confirmation */ true, () -> {
             if (refreshableDataAccessWindowsSelectionModel.getSelectedSet().size() > 0) {
                 if (Window.confirm(stringMessages.doYouReallyWantToRemoveTheSelectedIgtimiDataAccessWindows())) {
-                    for (IgtimiDataAccessWindowWithSecurityDTO daw : refreshableDataAccessWindowsSelectionModel.getSelectedSet()) {
+                    final List<IgtimiDataAccessWindowWithSecurityDTO> selected = new ArrayList<>(refreshableDataAccessWindowsSelectionModel.getSelectedSet());
+                    for (IgtimiDataAccessWindowWithSecurityDTO daw : selected) {
                         removeDataAccessWindow(daw, filteredDAWs);
                     }
                 }
             }
         });
-        removeDAWButton.setEnabled(false);
         refreshableDevicesSelectionModel.addSelectionChangeHandler(
                 e -> {
-                    removeDeviceButton.setEnabled(refreshableDevicesSelectionModel.getSelectedSet().size() > 0);
                     final boolean exactlyOneDeviceSelected = refreshableDevicesSelectionModel.getSelectedSet().size() == 1;
                     dawTable.setVisible(exactlyOneDeviceSelected);
                     dawControlsPanel.setVisible(exactlyOneDeviceSelected);
                     if (exactlyOneDeviceSelected) {
                         filterDataAccessWindowPanel.search(refreshableDevicesSelectionModel.getSelectedSet().iterator().next().getSerialNumber());
                     }
-                });
-        refreshableDataAccessWindowsSelectionModel.addSelectionChangeHandler(
-                e -> {
-                    removeDAWButton.setEnabled(refreshableDataAccessWindowsSelectionModel.getSelectedSet().size() > 0);
                 });
         dataAccessWindowsCaptionPanelContents.add(dawControlsPanel);
         dataAccessWindowsCaptionPanelContents.add(dawTable);

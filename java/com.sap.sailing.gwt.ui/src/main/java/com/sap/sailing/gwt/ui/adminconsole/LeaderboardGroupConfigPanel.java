@@ -610,7 +610,10 @@ public class LeaderboardGroupConfigPanel extends AbstractRegattaPanel
         groupsTable.addColumnSortHandler(leaderboardGroupsListHandler);
         refreshableGroupsSelectionModel = leaderboardTableSelectionColumn.getSelectionModel();
         removeButton = buttonPanel.addRemoveAction(stringMessages.remove(), refreshableGroupsSelectionModel, true,
-                () -> removeLeaderboardGroups(refreshableGroupsSelectionModel.getSelectedSet()));
+                () -> {
+            final List<LeaderboardGroupDTO> selectedGroups = new ArrayList<>(refreshableGroupsSelectionModel.getSelectedSet());
+            removeLeaderboardGroups(selectedGroups);
+        });
         removeButton.ensureDebugId("RemoveLeaderboardButton");
         refreshableGroupsSelectionModel.addSelectionChangeHandler(event -> groupSelectionChanged());
         groupsTable.setSelectionModel(refreshableGroupsSelectionModel, leaderboardTableSelectionColumn.getSelectionManager());
@@ -835,15 +838,8 @@ public class LeaderboardGroupConfigPanel extends AbstractRegattaPanel
     }
 
     private void groupSelectionChanged() {
-        Set<LeaderboardGroupDTO> selectedLeaderboardGroups = refreshableGroupsSelectionModel.getSelectedSet();
+        final Set<LeaderboardGroupDTO> selectedLeaderboardGroups = refreshableGroupsSelectionModel.getSelectedSet();
         isSingleGroupSelected = selectedLeaderboardGroups.size() == 1;
-        boolean canDeleteAllSelected = true;
-        for (LeaderboardGroupDTO group : selectedLeaderboardGroups) {
-            if (!userService.hasPermission(group, DefaultActions.DELETE)) {
-                canDeleteAllSelected = false;
-            }
-        }
-        removeButton.setEnabled(!selectedLeaderboardGroups.isEmpty() && canDeleteAllSelected);
         splitPanel.setVisible(isSingleGroupSelected);
         if (isSingleGroupSelected) {
             LeaderboardGroupDTO selectedGroup = selectedLeaderboardGroups.iterator().next();

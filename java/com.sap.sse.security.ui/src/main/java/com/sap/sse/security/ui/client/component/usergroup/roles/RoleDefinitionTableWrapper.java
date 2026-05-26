@@ -17,7 +17,7 @@ import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.celltable.AbstractSortableTextColumn;
 import com.sap.sse.gwt.client.celltable.CellTableWithCheckboxResources;
 import com.sap.sse.gwt.client.celltable.EntityIdentityComparator;
-import com.sap.sse.gwt.client.celltable.RefreshableSingleSelectionModel;
+import com.sap.sse.gwt.client.celltable.RefreshableMultiSelectionModel;
 import com.sap.sse.gwt.client.celltable.TableWrapper;
 import com.sap.sse.gwt.client.panels.LabeledAbstractFilterablePanel;
 import com.sap.sse.security.shared.dto.StrippedRoleDefinitionDTO;
@@ -31,7 +31,7 @@ import com.sap.sse.security.ui.client.i18n.StringMessages;
  * Name and whether the role is enabled for all users. There is also an options to delete the group.
  */
 public class RoleDefinitionTableWrapper extends
-        TableWrapper<Pair<StrippedRoleDefinitionDTO, Boolean>, RefreshableSingleSelectionModel<Pair<StrippedRoleDefinitionDTO, Boolean>>, StringMessages, CellTableWithCheckboxResources> {
+        TableWrapper<Pair<StrippedRoleDefinitionDTO, Boolean>, RefreshableMultiSelectionModel<Pair<StrippedRoleDefinitionDTO, Boolean>>, StringMessages, CellTableWithCheckboxResources> {
 
     private final LabeledAbstractFilterablePanel<Pair<StrippedRoleDefinitionDTO, Boolean>> filterField;
     private final MultiSelectionModel<UserGroupDTO> userGroupSelectionModel;
@@ -39,7 +39,7 @@ public class RoleDefinitionTableWrapper extends
     public RoleDefinitionTableWrapper(UserService userService, StringMessages stringMessages,
             ErrorReporter errorReporter, boolean enablePager, CellTableWithCheckboxResources tableResources,
             Runnable refresher, MultiSelectionModel<UserGroupDTO> userGroupSelectionModel) {
-        super(stringMessages, errorReporter, false, enablePager,
+        super(stringMessages, errorReporter, /* multiSelection */ true, enablePager,
                 new EntityIdentityComparator<Pair<StrippedRoleDefinitionDTO, Boolean>>() {
                     @Override
                     public boolean representSameEntity(Pair<StrippedRoleDefinitionDTO, Boolean> dto1,

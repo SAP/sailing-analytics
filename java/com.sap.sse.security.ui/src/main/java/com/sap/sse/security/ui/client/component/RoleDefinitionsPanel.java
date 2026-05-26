@@ -30,6 +30,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.SetSelectionModel;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.util.NaturalComparator;
 import com.sap.sse.gwt.client.ErrorReporter;
@@ -101,18 +102,17 @@ public class RoleDefinitionsPanel extends VerticalPanel {
         roleDefinitionsTable.ensureDebugId("RolesCellTable");
         filterablePanelRoleDefinitions.getTextBox().ensureDebugId("RolesFilterTextBox");
         refreshableRoleDefinitionMultiSelectionModel = (RefreshableMultiSelectionModel<? super RoleDefinitionDTO>) roleDefinitionsTable.getSelectionModel();
-
+        @SuppressWarnings("unchecked")
+        final SetSelectionModel<RoleDefinitionDTO> roleSelectionModel = (SetSelectionModel<RoleDefinitionDTO>) roleDefinitionsTable.getSelectionModel();
         final AccessControlledButtonPanel buttonPanel = new AccessControlledButtonPanel(userService, ROLE_DEFINITION);
         buttonPanel.addUnsecuredAction(stringMessages.refresh(), this::updateRoleDefinitions);
         final Button createButton = buttonPanel.addCreateActionWithoutServerCreateObjectPermissionCheck(stringMessages.add(),
                 this::createRoleDefinition);
         createButton.ensureDebugId("CreateRoleButton");
-        final Button removeButton = buttonPanel.addRemoveAction(stringMessages.remove(), () -> {
-            final String roles = String.join(", ", Util.map(getSelectedRoleDefinitions(), RoleDefinitionDTO::getName));
-            if (Window.confirm(stringMessages.doYouReallyWantToRemoveRole(roles))) {
-                final Set<RoleDefinitionDTO> selectedRoles = new HashSet<>(getSelectedRoleDefinitions());
-                filterablePanelRoleDefinitions.removeAll(selectedRoles);
-            }
+        final Button removeButton = buttonPanel.addRemoveAction(stringMessages.remove(), roleSelectionModel, true,
+                () -> {
+            final Set<RoleDefinitionDTO> selectedRoles = new HashSet<>(getSelectedRoleDefinitions());
+            filterablePanelRoleDefinitions.removeAll(selectedRoles);
         });
         removeButton.ensureDebugId("RemoveRoleButton");
         add(buttonPanel);

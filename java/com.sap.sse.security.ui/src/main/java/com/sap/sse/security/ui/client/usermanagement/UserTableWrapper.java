@@ -84,11 +84,12 @@ extends TableWrapper<UserDTO, S, StringMessages, TR> {
                 new EntityIdentityComparator<UserDTO>() {
                     @Override
                     public boolean representSameEntity(UserDTO dto1, UserDTO dto2) {
-                        return dto1.getId().toString().equals(dto2.getId().toString());
+                        return Util.equalsWithNull(dto1.getId() != null ? dto1.getId().toString() : null,
+                                dto2.getId() != null ? dto2.getId().toString() : null);
                     }
                     @Override
                     public int hashCode(UserDTO t) {
-                        return t.getId().hashCode();
+                        return t.getId() != null ? t.getId().hashCode() : 0;
                     }
                 }, tableResources);
         this.userService = userService;

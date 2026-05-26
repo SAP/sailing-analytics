@@ -32,12 +32,9 @@ import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
 import com.sap.sailing.domain.common.media.MediaTrack;
 import com.sap.sailing.domain.common.media.MediaTrackWithSecurityDTO;
@@ -177,7 +174,7 @@ public class MediaPanel extends FlowPanel implements FilterablePanelProvider<Med
                 }).center();
             }
         });
-        final Button multiUrlChange = buttonAndFilterPanel.addUpdateAction(stringMessages.multiUrlChangeMediaTrack(),
+        buttonAndFilterPanel.addUpdateAction(stringMessages.multiUrlChangeMediaTrack(),
                 refreshableSelectionModel,
                 new Command() {
             @Override
@@ -195,31 +192,14 @@ public class MediaPanel extends FlowPanel implements FilterablePanelProvider<Med
                 }
             }
         });
-        final Button remove = buttonAndFilterPanel.addRemoveAction(stringMessages.remove(), refreshableSelectionModel,
+        buttonAndFilterPanel.addRemoveAction(stringMessages.remove(), refreshableSelectionModel,
                 /* with confirmation */ true, new Command() {
             @Override
             public void execute() {
-                for (final MediaTrackWithSecurityDTO track : refreshableSelectionModel.getSelectedSet()) {
+                final List<MediaTrackWithSecurityDTO> selected = new ArrayList<>(refreshableSelectionModel.getSelectedSet());
+                for (final MediaTrackWithSecurityDTO track : selected) {
                     removeMediaTrack(track);
                 }
-            }
-        });
-        refreshableSelectionModel.addSelectionChangeHandler(new Handler() {
-            @Override
-            public void onSelectionChange(final SelectionChangeEvent event) {
-                final Set<MediaTrackWithSecurityDTO> selected = refreshableSelectionModel.getSelectedSet();
-                boolean canDeleteAllSelected = true;
-                boolean canUpdateAllSelected = true;
-                for (final MediaTrackWithSecurityDTO track : selected) {
-                    if (!userService.hasPermission(track, DefaultActions.DELETE)) {
-                        canDeleteAllSelected = false;
-                    }
-                    if (!userService.hasPermission(track, DefaultActions.UPDATE)) {
-                        canUpdateAllSelected = false;
-                    }
-                }
-                remove.setEnabled(!selected.isEmpty() && canDeleteAllSelected);
-                multiUrlChange.setEnabled(!selected.isEmpty() && canUpdateAllSelected);
             }
         });
         buttonAndFilterPanel.addUnsecuredWidget(lblFilterRaces);

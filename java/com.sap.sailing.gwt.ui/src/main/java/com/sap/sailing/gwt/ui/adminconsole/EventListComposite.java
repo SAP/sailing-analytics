@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import com.google.gwt.cell.client.AbstractCell;
@@ -40,7 +39,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.SelectionChangeEvent;
 import com.sap.sailing.domain.common.dto.CourseAreaDTO;
 import com.sap.sailing.gwt.common.client.help.HelpButton;
 import com.sap.sailing.gwt.common.client.help.HelpButtonResources;
@@ -178,21 +176,11 @@ public class EventListComposite extends Composite {
         final Button create = buttonPanel.addCreateAction(stringMessages.actionAddEvent(), this::openCreateEventDialog);
         create.ensureDebugId("CreateEventButton");
         final Button remove = buttonPanel.addRemoveAction(stringMessages.remove(), refreshableEventSelectionModel, true,
-                () -> removeEvents(refreshableEventSelectionModel.getSelectedSet()));
-        remove.ensureDebugId("RemoveEventsButton");
-        this.refreshableEventSelectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-            @Override
-            public void onSelectionChange(SelectionChangeEvent event) {
-                final Set<EventDTO> selectedEvents = refreshableEventSelectionModel.getSelectedSet();
-                boolean canDeleteAll = true;
-                for (EventDTO eventDTO : selectedEvents) {
-                    if (!userService.hasPermission(eventDTO, DefaultActions.DELETE)) {
-                        canDeleteAll = false;
-                    }
-                }
-                remove.setEnabled(!selectedEvents.isEmpty() && canDeleteAll);
-            }
+                () -> {
+            final List<EventDTO> selected = new ArrayList<>(refreshableEventSelectionModel.getSelectedSet());
+            removeEvents(selected);
         });
+        remove.ensureDebugId("RemoveEventsButton");
         buttonPanel.addUnsecuredWidget(new HelpButton(HelpButtonResources.INSTANCE,
                 stringMessages.videoGuide(), "https://sapsailing-documentation.s3-eu-west-1.amazonaws.com/adminconsole/CreatingYourFirstEvent.mp4"));
         panel.add(filterTextbox);

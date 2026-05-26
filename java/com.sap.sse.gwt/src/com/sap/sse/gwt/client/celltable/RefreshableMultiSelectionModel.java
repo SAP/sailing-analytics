@@ -120,7 +120,12 @@ public class RefreshableMultiSelectionModel<T> extends MultiSelectionModelWithSe
      * {@link AbstractSelectionModel#fireEvent(com.google.gwt.event.shared.GwtEvent)}.
      * 
      * @param newObjects
-     *            the new objects to refresh the {@link RefreshableMultiSelectionModel selection model}
+     *            the new objects to refresh the {@link RefreshableMultiSelectionModel selection model}. When this
+     *            selection model is used together with {@link com.sap.sse.gwt.client.panels.AbstractFilterablePanel},
+     *            this must be the <em>unfiltered</em> list (i.e. the {@code all} {@link ListDataProvider}, not the
+     *            {@code filtered} one), so that items hidden by the current filter are not incorrectly deselected.
+     *            {@link HasDataAdapter} ensures this by passing {@code listDataProvider.getList()} — which is the
+     *            {@code all} provider registered in the {@code AbstractFilterablePanel} constructor.
      */
     @Override
     public void refreshSelectionModel(Iterable<T> newObjects) {
@@ -129,14 +134,26 @@ public class RefreshableMultiSelectionModel<T> extends MultiSelectionModelWithSe
             try {
                 if (!isEmpty()) {
                     for (T it : newObjects) {
-                        if (isSelected(it)) { 
+                        if (isSelected(it)) {
                             setSelected(it, true); // this updates matching elements in the selection model
                         }
                     }
-                    // elements that were selected before and that don't have a corresponding element in newObjects
-                    // will just be left alone; they will probably remain in selectedSet, and they were probably not in
-                    // newObjects because a filter removed them. But when they re-appear, e.g., because the filter is
-                    // removed, the elements will naturally be selected again.
+                    // Deselect items that are no longer present in newObjects (e.g. because they were deleted).
+                    // newObjects comes from getAllListDataProvider() (the unfiltered list), so absence here means
+                    // true deletion, not just a filter hiding the item.
+                    // getSelectedElements() already returns a snapshot copy, so no additional copy is needed here.
+                    for (final T selected : getSelectedElements()) {
+                        boolean foundInNew = false;
+                        for (final T candidate : newObjects) {
+                            if (comp != null ? comp.representSameEntity(selected, candidate) : selected.equals(candidate)) {
+                                foundInNew = true;
+                                break;
+                            }
+                        }
+                        if (!foundInNew) {
+                            super.setSelected(selected, false);
+                        }
+                    }
                     SelectionChangeEvent.fire(this);
                 }
             } finally {
