@@ -1,0 +1,32 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+ruby "3.2.8"
+
+gem "gollum", "5.3.2"
+
+gem "sinatra", "2.2.4"
+gem "sinatra-contrib", "2.2.4"
+
+gem "rack", "2.2.21"
+gem "rack-protection", "2.2.4"
+gem "rack-session", "~> 1.0"
+
+gem "webrick", "1.9.1"
+
+gem "redis", "5.4.1"
+gem "redis-store", "1.11.0"
+gem "redis-rack", "2.1.2"
+
+gem "rugged", "1.9.0"
+
+gem "github-markup", "4.0.2"
+gem "kramdown", "2.5.1"
+gem "kramdown-parser-gfm", "1.1.0"
+
+gem "mustache", "1.1.1"
+gem "mustache-sinatra", "2.0.0"
+
+gem "rest-client", "2.1.0"
+gem 'rufo'

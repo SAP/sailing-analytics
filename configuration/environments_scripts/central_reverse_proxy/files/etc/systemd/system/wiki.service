@@ -9,5 +9,5 @@ RequiredBy=multi-user.target
 [Service]
 Type=exec
 RemainAfterExit=true
-ExecStart=su - wiki -c "cd /home/wiki && rackup -p 4567 /home/wiki/config.ru"
+ExecStart=su - wiki -c "cd /home/wiki && ./serve.sh"
 ExecStop=/bin/kill -SIGTERM "$MAINPID"
