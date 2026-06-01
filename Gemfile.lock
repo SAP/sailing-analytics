@@ -141,7 +141,7 @@ GEM
       google-apis-core (>= 0.15.0, < 2.a)
     google-apis-playcustomapp_v1 (0.17.0)
       google-apis-core (>= 0.15.0, < 2.a)
-    google-apis-storage_v1 (0.62.0)
+    google-apis-storage_v1 (0.63.0)
       google-apis-core (>= 0.15.0, < 2.a)
     google-cloud-core (1.8.0)
       google-cloud-env (>= 1.0, < 3.a)
