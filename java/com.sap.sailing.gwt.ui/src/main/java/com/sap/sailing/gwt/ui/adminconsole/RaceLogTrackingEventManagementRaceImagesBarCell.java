@@ -61,7 +61,10 @@ public class RaceLogTrackingEventManagementRaceImagesBarCell extends ImagesBarCe
         result.add(new ImageSpec(ACTION_SET_TRACKING_TIMES, stringMessages.setTrackingTimes(), makeImagePrototype(resources.setTrackingTimes())));
         final boolean trackerExists = object.getA().getRaceLogTrackingInfo(object.getB()).raceLogTrackerExists;
         final RaceLogTrackingState trackingState = object.getA().getRaceLogTrackingInfo(object.getB()).raceLogTrackingState;
-        if (trackingState == RaceLogTrackingState.AWAITING_RACE_DEFINITION || (trackingState == RaceLogTrackingState.TRACKING && !trackerExists)) {
+        // bug6251: also suppress "Start Tracking" when a tracked race is already linked to the slot (e.g. FINISHED after
+        // stopping tracking) — starting would fail on the server because the tracked race would need to be removed first.
+        final boolean trackedRaceLinked = object.getA().isTrackedRace(object.getB());
+        if (!trackedRaceLinked && (trackingState == RaceLogTrackingState.AWAITING_RACE_DEFINITION || (trackingState == RaceLogTrackingState.TRACKING && !trackerExists))) {
             result.add(new ImageSpec(ACTION_START_TRACKING, stringMessages.startTracking(), makeImagePrototype(resources.startRaceLogTracking())));
         } else if (trackingState == RaceLogTrackingState.TRACKING && trackerExists) {
             result.add(new ImageSpec(ACTION_STOP_TRACKING, stringMessages.stopTracking(), makeImagePrototype(resources.stopRaceLogTracking())));

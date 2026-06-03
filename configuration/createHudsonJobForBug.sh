@@ -5,10 +5,7 @@ if [ $# -eq 0 ]; then
     echo
     echo "Constructs a Hudson job for the given bugid"
     echo "Example: $0 4221 [ {Bugzilla-API-Key} ]"
-    echo "Builds a Hudson job for bug branch bug4221, and linking to the Bugzilla bug."
-    echo "If a Bugzilla API Key is provided (may also be specified in the BUGZILLA_API_KEY environment"
-    echo "variable), it is used to add the bug summary to the build job's description."
-    echo "Get a Bugzilla API Key for your user account at https://bugzilla.sapsailing.com/bugzilla/userprefs.cgi?tab=apikey"
+    echo "Builds a Hudson job for bug branch bug4221, and linking to the Github Issue."
     exit 2
 fi
 
@@ -17,21 +14,15 @@ BUG_ID="$1"
 CONFIGFILE=$(mktemp mylocalconfigXXXX.xml)
 RESPONSE_HEADERS=$(mktemp responseheadersXXXX)
 HUDSON_BASE_URL=https://hudson.sapsailing.com
+GITHUB_ISSUES_BASE="https://github.com/eclipse-sailing-analytics/sailing-analytics/issues/"
 BUGZILLA_BASE=https://bugzilla.sapsailing.com/bugzilla
 COPY_TEMPLATE_JOB=CopyTemplate
 OS_FOR_GSED="darwin"
-if [ -n "$2" ]; then
-  BUGZILLA_API_KEY="$2"
-fi
-if [ -n "${BUGZILLA_API_KEY}" ]; then
-  echo "Trying to obtain bug summary/title from Bugzilla..."
-  BUG_SUMMARY="$( curl -s -H 'Content-Type: application/json' -H 'Accept: application/json' ${BUGZILLA_BASE}'/rest/bug/'${BUG_ID}'?Bugzilla_api_key='${BUGZILLA_API_KEY}'&include_fields=summary' | jq -r '.bugs[0].summary' )"
-  echo "Found: ${BUG_SUMMARY}"
-else
-  BUG_SUMMARY=""
-fi
-read -p "Username: " USERNAME
-read -s -p "Password: " PASSWORD
+echo "Trying to obtain bug summary/title from Github..."
+BUG_SUMMARY="$( curl -s -H 'Accept: application/vnd.github+json' https://api.github.com/repos/eclipse-sailing-analytics/sailing-analytics/issues/${BUG_ID} | jq -r '.title' )"
+echo "Found: ${BUG_SUMMARY}"
+read -p "Hudson Username: " USERNAME
+read -s -p "Hudson Password: " PASSWORD
 echo
 COPY_TEMPLATE_CONFIG_URL="$HUDSON_BASE_URL/job/$COPY_TEMPLATE_JOB/config.xml"
 curl -s -X GET $COPY_TEMPLATE_CONFIG_URL -u "$USERNAME:$PASSWORD" -o "$CONFIGFILE"
@@ -39,9 +30,9 @@ curl -s -X GET $COPY_TEMPLATE_CONFIG_URL -u "$USERNAME:$PASSWORD" -o "$CONFIGFIL
 # On macosx is gnu-sed needed
 if [[ "$OSTYPE" == *"$OS_FOR_GSED"* ]]; then
   echo "Using gsed"
-  gsed -i'' -e 's|<description>..*</description>|<description>This is the CI job for \&lt;a href=\&quot;'$BUGZILLA_BASE'/show_bug.cgi?id='$BUG_ID'\&quot;\&gt;Bug '$BUG_ID'\&lt;/a\&gt; ('"${BUG_SUMMARY}"'). See its latest \&lt;a href=\&quot;/userContent/measurements.html?job=bug'$BUG_ID'\&quot;\&gt;quality and performance measurements here.\&lt;/a\&gt;</description>|' -e 's|<disabled>true</disabled>|<disabled>false</disabled>|' "$CONFIGFILE"
+  gsed -i'' -e 's|<description>..*</description>|<description>This is the CI job for \&lt;a href=\&quot;'${GITHUB_ISSUES_BASE}${BUG_ID}'\&quot;\&gt;Bug '$BUG_ID'\&lt;/a\&gt; ('"${BUG_SUMMARY}"'). See its latest \&lt;a href=\&quot;/userContent/measurements.html?job=bug'$BUG_ID'\&quot;\&gt;quality and performance measurements here.\&lt;/a\&gt;</description>|' -e 's|<disabled>true</disabled>|<disabled>false</disabled>|' "$CONFIGFILE"
 else
-  sed -i -e 's|<description>..*</description>|<description>This is the CI job for \&lt;a href=\&quot;'$BUGZILLA_BASE'/show_bug.cgi?id='$BUG_ID'\&quot;\&gt;Bug '$BUG_ID'\&lt;/a\&gt; ('"${BUG_SUMMARY}"'). See its latest \&lt;a href=\&quot;/userContent/measurements.html?job=bug'$BUG_ID'\&quot;\&gt;quality and performance measurements here.\&lt;/a\&gt;</description>|' -e 's|<disabled>true</disabled>|<disabled>false</disabled>|' "$CONFIGFILE"
+  sed -i -e 's|<description>..*</description>|<description>This is the CI job for \&lt;a href=\&quot;'${GITHUB_ISSUES_BASE}${BUG_ID}'\&quot;\&gt;Bug '$BUG_ID'\&lt;/a\&gt; ('"${BUG_SUMMARY}"'). See its latest \&lt;a href=\&quot;/userContent/measurements.html?job=bug'$BUG_ID'\&quot;\&gt;quality and performance measurements here.\&lt;/a\&gt;</description>|' -e 's|<disabled>true</disabled>|<disabled>false</disabled>|' "$CONFIGFILE"
 fi
 
 # On macosx is gnu-sed needed

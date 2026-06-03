@@ -602,6 +602,11 @@ public class SmartphoneTrackingEventManagementPanel extends AbstractLeaderboardC
             } else if (!getTrackingState(race).isForTracking()) {
                 allCanStart = false;
                 allCanStop = false;
+            // bug6251: a linked tracked race (e.g. FINISHED) has no active tracker but cannot be tracked again
+            // until the existing tracked race is removed first — disable "Start Tracking" in that case.
+            } else if (race.getA().isTrackedRace(race.getB())) {
+                allCanStart = false;
+                allCanStop = false;
             } else {
                 allCanStop = false;
             }

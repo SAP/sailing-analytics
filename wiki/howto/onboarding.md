@@ -249,8 +249,7 @@ Install the GWT Browser Plugin for the GWT Development mode. As of 2016-08-31 Fi
 
 ### Create Hudson Job
 If you want a hudson job to run when you push your branch then you can run a script in `configuration` called `createHudsonJobForBug.sh`. For you bug branch titled `bug<bug number>`, create a build job, which will create a release, by running the script like so: `./createHudsonJobForBug.sh <bug number>`.
-If you'd like the script to include the bug's summary in its description, set your BUGZILLA_API_KEY environment variable to an API key you obtain from [https://bugzilla.sapsailing.com/bugzilla/userprefs.cgi?tab=apikey](https://bugzilla.sapsailing.com/bugzilla/userprefs.cgi?tab=apikey) or pass the API key as the second argument, after the bug ID, as in
-`./configuration/createHudsonJobForBug.sh <bug number> {Bugzilla-API-Key}`
+The script will include the issue's summary in its description.
 If on Windows, you may need to disable any web shields in antivirus software, to allow `curl` to function. If on Mac, you may need to install gnu-sed (``gsed``) via Homebrew.
 
 ### Issues when playing around with AWS
