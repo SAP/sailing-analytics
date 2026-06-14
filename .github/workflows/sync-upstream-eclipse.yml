@@ -1,0 +1,51 @@
+# Periodically merges the upstream Eclipse repo's main branch into our
+# downstream eclipse-main branch and opens (or reuses) a PR from eclipse-main
+# into main. The merge/push step uses GITHUB_TOKEN (so github-actions[bot] is
+# the last pusher), and the PR is opened by the eclipse-sailing-analytics-bot
+# user via ECLIPSE_BOT_PAT. Because neither identity is the human reviewer,
+# the "approval from someone other than the last pusher" branch protection
+# rule on main is satisfied by a maintainer's own approval.
+name: Merge upstream eclipse-sailing-analytics/sailing-analytics main into eclipse-main
+on:
+  schedule:
+    - cron: "37 5 * * *"   # daily at 05:37 UTC
+  workflow_dispatch: {}
+jobs:
+  merge-upstream-main:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout eclipse-main
+        uses: actions/checkout@v4
+        with:
+          ref: eclipse-main
+          fetch-depth: 0  # full history so the merge has a real base
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Fetch upstream
+        run: |
+          git remote add upstream https://github.com/eclipse-sailing-analytics/sailing-analytics.git
+          git fetch upstream main
+      - name: Merge upstream/main into eclipse-main
+        run: |
+          git merge --no-ff upstream/main -m "Auto-merge upstream eclipse-sailing-analytics/sailing-analytics main into eclipse-main"
+      - name: Push eclipse-main
+        run: git push origin eclipse-main
+      - name: Open PR eclipse-main -> main (as eclipse-sailing-analytics-bot)
+        env:
+          GH_TOKEN: ${{ secrets.ECLIPSE_BOT_PAT }}
+        run: |
+          existing=$(gh pr list --repo "$GITHUB_REPOSITORY" --head eclipse-main --base main --state open --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            echo "PR #$existing already open for eclipse-main -> main; skipping."
+            exit 0
+          fi
+          gh pr create \
+            --repo "$GITHUB_REPOSITORY" \
+            --base main \
+            --head eclipse-main \
+            --title "Merge upstream eclipse-sailing-analytics/sailing-analytics main into main" \
+            --body "Automated PR opened by the daily sync workflow. The eclipse-main branch has been updated with the latest changes from upstream eclipse-sailing-analytics/sailing-analytics main. Use 'Create a merge commit' when merging (do not squash or rebase) so any '-s ours' merges on eclipse-main are respected."

@@ -262,4 +262,5 @@ Solution: This was occurring because the website didn't have any content in the 
 
 ### Extra Reading
 Check out [refactoring patterns](https://refactoring.guru/) as a sort of cheatsheet for the aforementioned design patterns books.
+The [Pragmatic Programmer](https://en.wikipedia.org/wiki/The_Pragmatic_Programmer) is a great read too.
 We also have an [onboarding glossary](https://wiki.sapsailing.com/wiki/howto/glossary).

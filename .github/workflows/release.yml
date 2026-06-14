@@ -112,7 +112,7 @@ jobs:
           AWS_S3_TEST_S3ACCESSKEY: ${{ secrets.AWS_S3_TEST_S3ACCESSKEY }}
           GEONAMES_ORG_USERNAMES: ${{ secrets.GEONAMES_ORG_USERNAMES }}
           GOOGLE_MAPS_AUTHENTICATION_PARAMS: ${{ secrets.GOOGLE_MAPS_AUTHENTICATION_PARAMS }}
-          POLAR_DATA_BASE_URL: ${{ secrets.POLAR_DATA_BASE_URL }}
+          POLAR_DATA_BASE_URL: ${{ vars.POLAR_DATA_BASE_URL }}
           POLAR_DATA_BEARER_TOKEN: ${{ secrets.POLAR_DATA_BEARER_TOKEN }}
           APP_PARAMETERS: "-Daws.region=eu-west-1"
           JAVA8_HOME: ${{env.JAVA_HOME_8_X64}}
@@ -197,7 +197,7 @@ jobs:
           asset_content_type: text/plain
       - name: Trigger Hudson job
         env:
-          HUDSON_JOB_USERNAME: ${{ secrets.HUDSON_JOB_USERNAME }}
+          HUDSON_JOB_USERNAME: ${{ vars.HUDSON_JOB_USERNAME }}
           HUDSON_JOB_PASSWORD: ${{ secrets.HUDSON_JOB_PASSWORD }}
           HUDSON_JOB_TOKEN: ${{ secrets.HUDSON_JOB_TOKEN }}
         if: ${{ always() && env.HUDSON_JOB_USERNAME != '' && env.HUDSON_JOB_PASSWORD != '' && env.HUDSON_JOB_TOKEN != '' }}

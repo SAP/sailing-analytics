@@ -37,7 +37,6 @@ Based on the ``docker/docker-compose.yml`` definition you should end up with thr
 Try a request to [``http://127.0.0.1:8888/index.html``](http://127.0.0.1:8888/index.html) or [``http://127.0.0.1:8888/gwt/status``](http://127.0.0.1:8888/gwt/status) to see if things worked. The default login to your local administration console at [``http://127.0.0.1:8888/gwt/AdminConsole.html``](http://127.0.0.1:8888/gwt/AdminConsole.html) uses the user name ``admin`` with password ``admin``.
 
 To use Java 25, use the ``docker-compose-25.yml`` file instead:
-
 ```
     wget "https://github.com/SAP/sailing-analytics/raw/refs/heads/main/docker/docker-compose-25.yml"
     docker-compose -f docker-compose-25.yml up
@@ -156,7 +155,6 @@ The build runs integration tests against [geonames.org](https://geonames.org). U
 ### Get the GitHub Actions build to work in your forked repository
 
 Assign the IDs and secrets from the prerequisites to repository secrets in your forked repository as follows:
-
 ```
 AWS_S3_TEST_S3ACCESSID: {your-S3-test-bucket-upload-token-ID}
 AWS_S3_TEST_S3ACCESSKEY: {key-for-your-S3-token}
