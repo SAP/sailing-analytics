@@ -2125,9 +2125,9 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
     }
 
     @Override
-    public void removeIgtimiDevice(String serialNumber) {
+    public void removeIgtimiDevice(long deviceId) {
         final RiotServer riotServer = getRiotServer();
-        final Device existingDevice = riotServer.getDeviceBySerialNumber(serialNumber);
+        final Device existingDevice = riotServer.getDeviceById(deviceId);
         if (existingDevice != null) {
             getSecurityService().checkPermissionAndDeleteOwnershipForObjectRemoval(existingDevice, () -> {
                 riotServer.removeDevice(existingDevice.getId());

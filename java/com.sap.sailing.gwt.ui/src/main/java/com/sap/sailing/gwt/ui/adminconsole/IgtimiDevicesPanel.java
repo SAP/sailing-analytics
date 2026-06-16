@@ -653,7 +653,7 @@ public class IgtimiDevicesPanel extends FlowPanel implements FilterablePanelProv
 
     private void removeDevice(final IgtimiDeviceWithSecurityDTO device,
             final ListDataProvider<IgtimiDeviceWithSecurityDTO> removeFrom) {
-        sailingServiceWrite.removeIgtimiDevice(device.getSerialNumber(), new AsyncCallback<Void>() {
+        sailingServiceWrite.removeIgtimiDevice(device.getId(), new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
                 errorReporter.reportError(stringMessages.errorTryingToRemoveIgtimiDevice(device.getSerialNumber(), caught.getMessage()));

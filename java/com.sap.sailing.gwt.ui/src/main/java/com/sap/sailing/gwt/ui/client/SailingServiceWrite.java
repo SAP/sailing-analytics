@@ -252,7 +252,7 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
     
     void updateIgtimiDevice(IgtimiDeviceWithSecurityDTO editedObject);
 
-    void removeIgtimiDevice(String serialNumber);
+    void removeIgtimiDevice(long deviceId);
     
     boolean sendGPSOffCommandToIgtimiDevice(String serialNumber) throws IOException;
 

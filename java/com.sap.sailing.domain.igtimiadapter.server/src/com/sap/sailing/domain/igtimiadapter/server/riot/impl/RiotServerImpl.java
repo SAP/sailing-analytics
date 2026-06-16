@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -83,6 +84,7 @@ public class RiotServerImpl extends AbstractReplicableWithObjectInputStream<Repl
     private final ConcurrentMap<Long, DataAccessWindow> dataAccessWindows;
     private final ConcurrentMap<Long, Device> devices;
     private final ConcurrentMap<String, Device> devicesBySerialNumber;
+    private final Map<String, LinkedList<Msg>> bufferedMessages;
     private final Set<RiotMessageListener> listeners;
     private final Selector socketSelector;
     private final ServerSocketChannel serverSocketChannel;
@@ -135,6 +137,7 @@ public class RiotServerImpl extends AbstractReplicableWithObjectInputStream<Repl
         this.dataAccessWindows = new ConcurrentHashMap<>();
         this.devices = new ConcurrentHashMap<>();
         this.devicesBySerialNumber = new ConcurrentHashMap<>();
+        this.bufferedMessages = new HashMap<>();
         this.connections = new ConcurrentHashMap<>();
         this.domainObjectFactory = domainObjectFactory;
         this.mongoObjectFactory = mongoObjectFactory;
@@ -316,6 +319,18 @@ public class RiotServerImpl extends AbstractReplicableWithObjectInputStream<Repl
     }
 
     /**
+     * Forwards the {@code message} from the device with serial number {@code deviceSerialNumber} to all web socket
+     * clients whose {@link RiotWebsocketHandler#getAuthenticatedUser() authenticated user} is permitted to
+     * {@link DefaultActions#READ read} the {@link Device} and a {@link DataAccessWindow} containing the message's
+     * {@link #getTimeRange(Msg) time range}.
+     * <p>
+     * 
+     * If the device isn't known yet, it is created. If on a replica, this will only replicate a corresponding operation
+     * as a request to the primary/master, the {@code message} will get {@link #buffer(Msg, String) buffered}, and only
+     * upon receiving the {@link #internalDeviceCreated(long, String)} call the buffered operations will be
+     * {@link #forwardMessageToEligibleWebSocketClients(Msg, String, Device) forwarded}.
+     * <p>
+     * 
      * Requires the {@link SecurityService} to be available, at least when one or more {@link #liveWebSocketConnections}
      * are registered. This means that this method must not be invoked, e.g., when {@link #replicationServiceTracker the
      * replication service} is still {@link ReplicationService#isReplicationStarting() starting}.
@@ -324,41 +339,68 @@ public class RiotServerImpl extends AbstractReplicableWithObjectInputStream<Repl
      *            must not be {@code null}
      */
     private void forwardMessageToEligibleWebSocketClients(Msg message, String deviceSerialNumber) {
+        final Device theDevice;
         final Device device = getDeviceBySerialNumber(deviceSerialNumber);
         if (device == null) {
             logger.info("Received message from unknown devices "+deviceSerialNumber+"; creating Device");
-            final Device newDevice = createDevice(deviceSerialNumber);
-            getSecurityService().setOwnership(newDevice.getIdentifier(), /* user owner */ null,
-                    getSecurityService().getServerGroup(), newDevice.getName());
+            theDevice = createDevice(deviceSerialNumber);
+            // If newDevice is null, we're on a replica and need to buffer the message to apply it
+            // later, once we have received the correct ID from the primary through the
+            // internalDeviceCreated(id, deviceSerialNumber) method.
+            if (theDevice != null) {
+                getSecurityService().setOwnership(theDevice.getIdentifier(), /* user owner */ null,
+                        getSecurityService().getServerGroup(), theDevice.getName());
+            }
         } else {
-            final byte[] messageAsBytes = message.toByteArray();
-            final TimeRange messageDataTimeRange = getTimeRange(message);
-            final Iterable<DataAccessWindow> daws = getDataAccessWindows(Collections.singleton(deviceSerialNumber), MultiTimeRange.of(messageDataTimeRange));
-            // obtain the securityService only if connections exist; otherwise, we may still be in start-up mode
-            final SecurityService securityService = liveWebSocketConnections.isEmpty() ? null : getSecurityService();
-            for (final RiotWebsocketHandler webSocketClient : liveWebSocketConnections) {
-                if (webSocketClient.getDeviceSerialNumbers().contains(deviceSerialNumber)) {
-                    final User user = webSocketClient.getAuthenticatedUser();
-                    final OwnershipAnnotation deviceOwnership = securityService.getOwnership(device.getIdentifier());
-                    final AccessControlListAnnotation deviceAccessControlList = securityService.getAccessControlList(device.getIdentifier());
-                    if (!Util.isEmpty(Util.filter(daws, daw->{
-                        final OwnershipAnnotation dawOownership = securityService.getOwnership(daw.getIdentifier());
-                        final AccessControlListAnnotation dawAccessControlList = securityService.getAccessControlList(daw.getIdentifier());
-                        return PermissionChecker.isPermitted(
-                                daw.getIdentifier().getPermission(DefaultActions.READ),
-                                user, securityService.getAllUser(),
-                                dawOownership==null?null:dawOownership.getAnnotation(),
-                                dawAccessControlList==null?null:dawAccessControlList.getAnnotation());
-                    }))
-                    && PermissionChecker.isPermitted(
-                            device.getIdentifier().getPermission(DefaultActions.READ),
+            theDevice = device;
+        }
+        if (theDevice != null) {
+            forwardMessageToEligibleWebSocketClients(message, deviceSerialNumber, theDevice);
+        } else {
+            // on a replica, and the device wasn't found; need to queue the message until the device creation
+            // has been confirmed
+            buffer(message, deviceSerialNumber);
+        }
+    }
+
+    private void forwardMessageToEligibleWebSocketClients(Msg message, String deviceSerialNumber, final Device device) {
+        // can apply the message immediately
+        final byte[] messageAsBytes = message.toByteArray();
+        final TimeRange messageDataTimeRange = getTimeRange(message);
+        final Iterable<DataAccessWindow> daws = getDataAccessWindows(Collections.singleton(deviceSerialNumber), MultiTimeRange.of(messageDataTimeRange));
+        // obtain the securityService only if connections exist; otherwise, we may still be in start-up mode
+        final SecurityService securityService = liveWebSocketConnections.isEmpty() ? null : getSecurityService();
+        for (final RiotWebsocketHandler webSocketClient : liveWebSocketConnections) {
+            if (webSocketClient.getDeviceSerialNumbers().contains(deviceSerialNumber)) {
+                final User user = webSocketClient.getAuthenticatedUser();
+                final OwnershipAnnotation deviceOwnership = securityService.getOwnership(device.getIdentifier());
+                final AccessControlListAnnotation deviceAccessControlList = securityService.getAccessControlList(device.getIdentifier());
+                if (!Util.isEmpty(Util.filter(daws, daw->{
+                    final OwnershipAnnotation dawOownership = securityService.getOwnership(daw.getIdentifier());
+                    final AccessControlListAnnotation dawAccessControlList = securityService.getAccessControlList(daw.getIdentifier());
+                    return PermissionChecker.isPermitted(
+                            daw.getIdentifier().getPermission(DefaultActions.READ),
                             user, securityService.getAllUser(),
-                            deviceOwnership==null?null:deviceOwnership.getAnnotation(),
-                            deviceAccessControlList==null?null:deviceAccessControlList.getAnnotation()) ) {
-                        webSocketClient.sendBytesByFuture(ByteBuffer.wrap(messageAsBytes));
-                    }
+                            dawOownership==null?null:dawOownership.getAnnotation(),
+                            dawAccessControlList==null?null:dawAccessControlList.getAnnotation());
+                }))
+                && PermissionChecker.isPermitted(
+                        device.getIdentifier().getPermission(DefaultActions.READ),
+                        user, securityService.getAllUser(),
+                        deviceOwnership==null?null:deviceOwnership.getAnnotation(),
+                        deviceAccessControlList==null?null:deviceAccessControlList.getAnnotation()) ) {
+                    webSocketClient.sendBytesByFuture(ByteBuffer.wrap(messageAsBytes));
                 }
             }
+        }
+    }
+
+    private synchronized void buffer(Msg message, String deviceSerialNumber) {
+        final Device device = getDeviceBySerialNumber(deviceSerialNumber);
+        if (device == null) {
+            Util.addToValueSet(bufferedMessages, deviceSerialNumber, message, LinkedList::new);
+        } else {
+            forwardMessageToEligibleWebSocketClients(message, deviceSerialNumber, device);
         }
     }
 
@@ -425,13 +467,50 @@ public class RiotServerImpl extends AbstractReplicableWithObjectInputStream<Repl
     }
     
     @Override
-    public Device internalCreateDevice(String deviceSerialNumber) {
-        final long id = devices.isEmpty() ? 1 : Collections.max(devices.keySet()) + 1;
-        final Device device = Device.create(id, deviceSerialNumber);
-        devices.put(device.getId(), device);
-        devicesBySerialNumber.put(device.getSerialNumber(), device);
-        mongoObjectFactory.storeDevice(device, /* clientSessionOrNull */ null);
+    public synchronized Device internalCreateDevice(String deviceSerialNumber) {
+        final Device device; 
+        final Device existingDevice = devicesBySerialNumber.get(deviceSerialNumber);
+        if (existingDevice != null) {
+            device = existingDevice;
+        } else {
+            if (getMasterDescriptor() == null) { // this is a primary regarding this replicable; create the device!
+                final long id = devices.isEmpty() ? 1 : Collections.max(devices.keySet()) + 1;
+                logger.info("Creating new Igtimi device with id " + id + " for serial number " + deviceSerialNumber
+                        + " on primary " + getClass().getName() + " instance");
+                device = Device.create(id, deviceSerialNumber);
+                devices.put(device.getId(), device);
+                devicesBySerialNumber.put(device.getSerialNumber(), device);
+                mongoObjectFactory.storeDevice(device, /* clientSessionOrNull */ null);
+            } else {
+                logger.info("Not creating new Igtimi device for serial number "+deviceSerialNumber+" on replica "+this);
+                device = null;
+            }
+        }
+        if (getMasterDescriptor() == null && existingDevice == null) {
+            // this is a primary regarding this replicable, and the device was actually created;
+            // tell the replicas, but don't do so from within this thread; we're running an operation
+            // that we may have received from a replica, so ReplicableWithObjectInputStream.idOfOperationBeingExecuted
+            // may still hold an operation ID for that replica's operation; so sending a new operation under that ID
+            // would cause that replica to ignore the operation; therefore, do this in a new thread:
+            new Thread(()->replicate(s->s.internalDeviceCreated(device.getId(), device.getSerialNumber()))).start();
+        }
         return device;
+    }
+
+    @Override
+    public synchronized Void internalDeviceCreated(long id, String deviceSerialNumber) {
+        if (getMasterDescriptor() != null && !devices.containsKey(id)) { // this is a replica regarding this replicable; ensure the device is "known"
+            logger.info("Received ID for newly created device "+deviceSerialNumber+": "+id);
+            final Device device = Device.create(id, deviceSerialNumber);
+            devices.put(id, device);
+            devicesBySerialNumber.put(deviceSerialNumber, device);
+            // look for and apply any messages buffered since having seen the serial number first
+            final LinkedList<Msg> messagesBufferedForDevice = bufferedMessages.remove(deviceSerialNumber);
+            if (messagesBufferedForDevice != null) {
+                messagesBufferedForDevice.forEach(message->forwardMessageToEligibleWebSocketClients(message, deviceSerialNumber, device));
+            }
+        }
+        return null;
     }
 
     @Override

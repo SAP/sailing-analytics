@@ -586,7 +586,7 @@ public interface SailingServiceWriteAsync extends FileStorageManagementGwtServic
 
     void updateIgtimiDevice(IgtimiDeviceWithSecurityDTO editedObject, AsyncCallback<Void> asyncCallback);
 
-    void removeIgtimiDevice(String deviceSerialNumber, AsyncCallback<Void> asyncCallback);
+    void removeIgtimiDevice(long id, AsyncCallback<Void> asyncCallback);
 
     void importWindFromIgtimi(List<RaceDTO> selectedRaces, boolean correctByDeclination,
             String optionalBearerTokenOrNull, AsyncCallback<Map<RegattaAndRaceIdentifier, Integer>> asyncCallback);

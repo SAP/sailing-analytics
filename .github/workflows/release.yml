@@ -215,4 +215,4 @@ jobs:
             JOB=$( echo "${{ github.ref }}" | sed -e 's/^refs\/heads\///' )
           fi
           echo "Identified Hudson job: ${JOB}"
-          curl https://${{ secrets.HUDSON_JOB_USERNAME }}:${{ secrets.HUDSON_JOB_PASSWORD}}@hudson.sapsailing.com/job/${JOB}/build?token=${{ secrets.HUDSON_JOB_TOKEN }}
+          curl -u "${{ vars.HUDSON_JOB_USERNAME }}:${{ secrets.HUDSON_JOB_PASSWORD}}" https://hudson.sapsailing.com/job/${JOB}/build?token=${{ secrets.HUDSON_JOB_TOKEN }}
