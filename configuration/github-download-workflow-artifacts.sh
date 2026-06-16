@@ -51,7 +51,7 @@ check_run_and_previous_attempts() {
     local PREVIOUS_ATTEMPT_URL=$( echo "${CURRENT_RUN}" | jq -r '.previous_attempt_url // empty' )
     if [ -n "${PREVIOUS_ATTEMPT_URL}" ]; then
       echo "Checking previous attempt at ${PREVIOUS_ATTEMPT_URL} ..."
-      CURRENT_RUN=$( curl --silent -L -H 'Authorization: Bearer '${BEARER_TOKEN} "${PREVIOUS_ATTEMPT_URL}" 2>/dev/null )
+      CURRENT_RUN=$( curl --silent -L "${PREVIOUS_ATTEMPT_URL}" 2>/dev/null )
       # Validate we got a proper response
       if [ -z "${CURRENT_RUN}" ] || [ "$( echo "${CURRENT_RUN}" | jq -r '.id // empty' )" == "" ]; then
         echo "Could not fetch previous attempt, stopping chain"
@@ -67,7 +67,7 @@ check_run_and_previous_attempts() {
 while [ -n "${NEXT_PAGE}" ]; do
   echo "Trying page ${NEXT_PAGE} ..."
   # Get the artifacts URL of the last workflow run triggered by a branch push for ${BRANCH}:
-  NEXT_PAGE_CONTENTS=$( curl -D "${HEADERS_FILE}" --silent -L -H 'Authorization: Bearer '${BEARER_TOKEN} "${NEXT_PAGE}" 2>/dev/null )
+  NEXT_PAGE_CONTENTS=$( curl -D "${HEADERS_FILE}" --silent -L "${NEXT_PAGE}" 2>/dev/null )
   # Get all workflow runs that match our branch criteria (completed or not, we'll check status in the function)
   MATCHING_RUNS=$( echo "${NEXT_PAGE_CONTENTS}" | jq -c '.workflow_runs | map(select(.name == "release" and ((.head_branch | startswith("'${BRANCH}'")) or (.head_branch | startswith("releases/'${BRANCH}'"))))) | .[]' 2>/dev/null )
   if [ -n "${MATCHING_RUNS}" ]; then
@@ -85,7 +85,7 @@ while [ -n "${NEXT_PAGE}" ]; do
 done
 ARTIFACTS_URL=$( echo "${LAST_WORKFLOW_FOR_BRANCH}" | jq -r '.artifacts_url' )
 CONCLUSION=$( echo "${LAST_WORKFLOW_FOR_BRANCH}" | jq -r '.conclusion' )
-ARTIFACTS_JSON=$( curl --silent -H 'Authorization: Bearer '${BEARER_TOKEN} "${ARTIFACTS_URL}" )
+ARTIFACTS_JSON=$( curl --silent "${ARTIFACTS_URL}" )
 rm "${HEADERS_FILE}"
 if [ -z "${ARTIFACTS_JSON}" ]; then
   echo "Workflow run or artifacts not found"
@@ -98,14 +98,14 @@ if [ -z "${BUILD_LOG_URL}" ]; then
   exit 2
 fi
 echo "Downloading build.log ZIP from ${BUILD_LOG_URL}"
-curl --silent --output build.log.zip -L -H 'Authorization: Bearer '${BEARER_TOKEN} "${BUILD_LOG_URL}"
+curl --silent --output build.log.zip -L "${BUILD_LOG_URL}"
 TEST_RESULTS_URL=$( echo "${ARTIFACTS_JSON}" | jq -r '.artifacts | map(select(.name == "test-results"))[0].archive_download_url' )
 if [ -z "${TEST_RESULTS_URL}" ]; then
   echo "test-results artifact not found"
   exit 2
 fi
 echo "Downloading test-results ZIP from ${TEST_RESULTS_URL}"
-curl --silent --output test-results.zip -L -H 'Authorization: Bearer '${BEARER_TOKEN} "${TEST_RESULTS_URL}"
+curl --silent --output test-results.zip -L "${TEST_RESULTS_URL}"
 if [ "${CONCLUSION}" != "success" ]; then
   exit 1
 fi

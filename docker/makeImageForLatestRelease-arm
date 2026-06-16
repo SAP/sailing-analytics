@@ -14,7 +14,7 @@ if [ "${release_prefix}" = "" ]; then
   release_prefix="main-"
 fi
 pushd "${DOCKERDIR}"
-RELEASE_TAR_GZ_FILENAME=$( ${GITROOT}/configuration/github-download-release-assets.sh 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 "${release_prefix}" "${GITHUB_REPOSITORY}" )
+RELEASE_TAR_GZ_FILENAME=$( ${GITROOT}/configuration/github-download-release-assets.sh "${release_prefix}" "${GITHUB_REPOSITORY}" )
 if [ "${RELEASE_TAR_GZ_FILENAME}" = "" ]; then
   echo "No release with prefix ${release_prefix} found" >&2
 else
