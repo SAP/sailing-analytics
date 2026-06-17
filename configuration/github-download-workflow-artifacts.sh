@@ -12,7 +12,8 @@
 # an exit status of 1 is returned. If the downloads fail,
 # an exit status of 2 is returned.
 BRANCH="${1}"
-GITHUB_REPOSITORY="${2}"
+BEARER_TOKEN="${2}"
+GITHUB_REPOSITORY="${3}"
 UNIX_TIME=$( date +%s )
 UNIX_DATE=$( date --iso-8601=second )
 UNIX_TIME_YESTERDAY=$(( UNIX_TIME - 10*24*3600 )) # look back ten days in time, trying to catch even re-runs of older jobs
