@@ -4,6 +4,10 @@
 
 # Sailing Analytics
 
+You're looking at the "downstream" repository whose "upstream" lives as [Eclipse Azimuth Sailing Analytics](https://github.com/eclipse-sailing-analytics/sailing-analytics). For any usual development activity, issue reporting, or pull requests, please refer to the upstream project. This downstream repository only contains SAP-specific branding, naming, or interfacing with other SAP technology such as a HANA Cloud data extractor.
+
+Note, that this repository is not technically set up as a Github "fork" of the upstream repository. It does contain a branch ``eclipse-main`` which is obtained from the upstream's ``main`` branch after careful review. Such reviews are necessary in particular because pushing to branches in this repository will trigger builds which in turn have access to repository secrets. After such careful reviews and a successful build, pull requests can be created locally inside this downstream repository here to incorporate the upstream changes.
+
 ## About this Project
 
 The Sailing Analytics, formerly known as the "SAP Sailing Analytics," are a solution for portraying and analyzing sailing regattas, supporting training scenarios, and powering the vast archive at https://sapsailing.com. The solution consists of a cloud application with a web-based user interface, as well as three companion apps that integrate with the cloud application. This repository has the code for the cloud-based web application, and two of the three mobile apps (Buoy Pinger and Race Manager). The third companion app (Sail Insight) is found in [another repository](https://github.com/SAP/sailing-analytics-sail-insight).

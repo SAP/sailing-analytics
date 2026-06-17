@@ -11,7 +11,7 @@ First of all, make sure you've looked at [http://www.amazon.de/Patterns-Elements
 
 Note that the Github repository mentioned here is a "downstream" repository for the "upstream" repo at https://github.com/eclipse-sailing-analytics/sailing-analytics. The downstream repo contains a "friendly fork" that is not technically a fork in the Github sense but contains differences between its ``main`` branch and the upstream ``main`` branch. Those deviations mostly revolve around branding and naming aspects. If not working specifically on this kind of changes, please work with the upstream repo as a default and use this downstream repo only for such branding and SAP-specific changes.
 
-In particular, you must *never* merge this repo's ``main`` branch into the upstream repo's ``main`` branch; otherwise you would risk contaminating upstream with SAP specifics. Merging the upstream's ``main`` branch into this downstream repo's ``main`` branch, however, should work without problems and should happen on a regular basis after reviewing the upstream changes carefully.
+In particular, you must *never* merge or push this repo's ``main`` branch into the upstream repo's ``main`` branch; otherwise you would risk contaminating upstream with SAP specifics. Merging the upstream's ``main`` branch into this downstream repo's ``main`` branch, however, should work without problems and should happen on a regular basis after reviewing the upstream changes carefully.
 
    - The primary Git repository for the project is hosted on Github (see [https://github.com/SAP/sailing-analytics](https://github.com/SAP/sailing-analytics)). To clone, use ``git@github.com:SAP/sailing-analytics.git``.
    - If you are on Windows, keep in mind you may run into the following problem. By default, the filesystem in Windows enforces a 260 character limit on paths. The longest path length for a file in this project, if the drive name is included, is 263 characters. A possible solution is to pass a single character name for the project folder in the git clone command, and clone the project on drive root, which may bring the longest file path down to compatible length. Alternatively, Windows 10 and 11 offer settings to enable a much much longer maximum file path that requires additional configuration. You may check that out at your own will.
@@ -76,6 +76,17 @@ In particular, you must *never* merge this repo's ``main`` branch into the upstr
 4. Firebug (javascript & .css debugging, included in Firefox Developer Tools in newer versions of Firefox by default)
 
 ### Git repository configuration essentials
+
+When working with both, the upstream Eclipse project *and* this downstream SAP-specific version, consider naming your local branches such that accidentally merging downstream changes into upstream becomes unlikely. For example, consider using unique local branch names such as ``eclipse-main`` and ``sap-main`` that you may configure as tracking the correct remote branch. E.g.:
+
+```
+git remote add eclipse git@github.com:eclipse-sailing-analytics/sailing-analytics
+git remote add sap git@github.com:SAP/sailing-analytics
+git fetch eclipse
+git fetch sap
+git checkout -b sap-main sap/main
+git checkout -b eclipse-main eclipse/main
+```
 
 The project has some configuration of line endings for specific file types in ".gitattributes". To make this work as intended, you need to ensure that the git attribute "core.autocrlf" is set to "false". This can be done by navigating to your local repository in a Bash/Git Bash/Cygwin instance and executing the command `git config core.autocrlf false`.
 
