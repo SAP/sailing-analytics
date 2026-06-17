@@ -58,7 +58,6 @@ public class ReplicationPanel extends FlowPanel {
     private final StringMessages stringMessages;
     private final Button addButton;
     private final Button stopReplicationButton;
-    private final Button dropReplicasButton;
     
     private static class ReplicationData {
         private final String messagingHost;
@@ -154,14 +153,9 @@ public class ReplicationPanel extends FlowPanel {
         replicasTable = new ReplicaTableWrapper(tableResources, userService, stringMessages, errorReporter);
         replicaSelectionModel = replicasTable.getSelectionModel();
         final AccessControlledButtonPanel masterPanelButtons = new AccessControlledButtonPanel(userService, SecuredSecurityTypes.SERVER);
-        dropReplicasButton = masterPanelButtons.addAction(stringMessages.dropReplicas(),
-                () -> userService.hasServerPermission(ServerActions.REPLICATE), this::dropSelectedReplicas);
-        dropReplicasButton.setEnabled(false);
-        replicaSelectionModel.addSelectionChangeHandler(event -> {
-            final int count = replicaSelectionModel.getSelectedSet().size();
-            dropReplicasButton.setText(count > 0 ? stringMessages.dropReplicas() + " (" + count + ")" : stringMessages.dropReplicas());
-            dropReplicasButton.setEnabled(count > 0 && userService.hasServerPermission(ServerActions.REPLICATE));
-        });
+        masterPanelButtons.addCountingAction(stringMessages.dropReplicas(),
+                replicaSelectionModel, () -> userService.hasServerPermission(ServerActions.REPLICATE),
+                this::dropSelectedReplicas);
         masterpanel.add(replicasTable.asWidget());
         masterpanel.add(masterPanelButtons);
         mastergroup.add(masterpanel);
@@ -285,6 +279,7 @@ public class ReplicationPanel extends FlowPanel {
      */
     private void dropSelectedReplicas() {
         final Set<ReplicaDTO> selected = new HashSet<>(replicaSelectionModel.getSelectedSet());
+        replicaSelectionModel.clear();
         for (final ReplicaDTO replica : selected) {
             dropSingleReplica(replica);
         }
