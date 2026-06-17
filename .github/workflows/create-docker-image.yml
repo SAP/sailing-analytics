@@ -62,7 +62,7 @@ jobs:
       - name: Download release
         shell: bash
         run: |
-          RELEASE_TAR_GZ_FILENAME=$( configuration/github-download-release-assets.sh ${{ env.RELEASE_PREFIX }} ${{ github.repository }} )
+          RELEASE_TAR_GZ_FILENAME=$( configuration/github-download-release-assets.sh ${{ secrets.GITHUB_TOKEN }} ${{ env.RELEASE_PREFIX }} ${{ github.repository }} )
           RELEASE=$( echo ${RELEASE_TAR_GZ_FILENAME} | sed -e 's/\.tar\.gz$//' )
           if [ -n ${RELEASE_TAR_GZ_FILENAME} ]; then
             mv ${RELEASE_TAR_GZ_FILENAME} docker/
