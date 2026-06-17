@@ -3,16 +3,20 @@ This document describes the onboarding process for a new team member (developer)
 
 First of all, make sure you've looked at [http://www.amazon.de/Patterns-Elements-Reusable-Object-Oriented-Software/dp/0201633612](http://www.amazon.de/Patterns-Elements-Reusable-Object-Oriented-Software/dp/0201633612). That's a great book, and knowing at least some of it will help you a great deal finding your way around our solution.
 
-## Eclipse Azimuth Sailing Analytics Development Setup
+## SAP Sailing Analytics Development Setup
 
 ### Accounts
 
 1. Git Account
 
-   - The primary Git repository for the project is hosted on Github (see [https://github.com/eclipse-sailing-analytics/sailing-analytics](https://github.com/eclipse-sailing-analytics/sailing-analytics)). To clone, use ``git@github.com:eclipse-sailing-analytics/sailing-analytics.git``.
+Note that the Github repository mentioned here is a "downstream" repository for the "upstream" repo at https://github.com/eclipse-sailing-analytics/sailing-analytics. The downstream repo contains a "friendly fork" that is not technically a fork in the Github sense but contains differences between its ``main`` branch and the upstream ``main`` branch. Those deviations mostly revolve around branding and naming aspects. If not working specifically on this kind of changes, please work with the upstream repo as a default and use this downstream repo only for such branding and SAP-specific changes.
+
+In particular, you must *never* merge this repo's ``main`` branch into the upstream repo's ``main`` branch; otherwise you would risk contaminating upstream with SAP specifics. Merging the upstream's ``main`` branch into this downstream repo's ``main`` branch, however, should work without problems and should happen on a regular basis after reviewing the upstream changes carefully.
+
+   - The primary Git repository for the project is hosted on Github (see [https://github.com/SAP/sailing-analytics](https://github.com/SAP/sailing-analytics)). To clone, use ``git@github.com:SAP/sailing-analytics.git``.
    - If you are on Windows, keep in mind you may run into the following problem. By default, the filesystem in Windows enforces a 260 character limit on paths. The longest path length for a file in this project, if the drive name is included, is 263 characters. A possible solution is to pass a single character name for the project folder in the git clone command, and clone the project on drive root, which may bring the longest file path down to compatible length. Alternatively, Windows 10 and 11 offer settings to enable a much much longer maximum file path that requires additional configuration. You may check that out at your own will.
-   - To gain write access you have to become a committer on the [Eclipse Azimuth Sailing Analytics project](https://projects.eclipse.org/projects/technology.sailing-analytics). 
-   - Announcements relevant for developers are posted on [GitHub](https://github.com/eclipse-sailing-analytics/sailing-analytics) in the Discussions tab. In order to get notifications you can subscribe to discussions by clicking on "Watch" in the Repository, then "Custom". In the new Popup select "Discussions" and confirm by clicking "Apply".
+   - To gain write access you have to become member of the [sailing-analytics-team](https://github.com/orgs/SAP/teams/sailing-analytics-team) organization. For that you need to [link your Github user to the Github SAP organization](https://wiki.one.int.sap/wiki/display/ospodocs/Self-Service+for+Joining+an+SAP+GitHub+Organization). For that to work, your Github account needs to have your @sap.com e-mail address assigned and verified. We still have a shadow repository around that, e.g., powers our Wiki at [https://wiki.sapsailing.com](https://wiki.sapsailing.com) and which lives at ``ssh://trac@sapsailing.com/home/trac/git``. 
+   - Announcements relevant for developers are posted on [GitHub](https://github.com/SAP/sailing-analytics) in the Discussions tab. In order to get notifications you can subscribe to discussions by clicking on "Watch" in the Repository, then "Custom". In the new Popup select "Discussions" and confirm by clicking "Apply".
 
    <img src="/wiki/images/github/GitHubWatch.jpg" style="width: 50%"/>
    <img src="/wiki/images/github/GitHubSubscribe.jpg" style="width: 45%"/>
@@ -24,7 +28,8 @@ First of all, make sure you've looked at [http://www.amazon.de/Patterns-Elements
 
 2. Issues
 
-   - We use [Github Issues](https://github.com/eclipse-sailing-analytics/sailing-analytics/issues)
+   - By and large, the upstream repo's issue tracked at [https://github.com/eclipse-sailing-analytics/sailing-analytics/issues](https://github.com/eclipse-sailing-analytics/sailing-analytics/issues) shall be used.
+   - Use [https://github.com/SAP/sailing-analytics/issues](https://github.com/SAP/sailing-analytics/issues) only for issues and tasks that specifically refer to the SAP downstream repository and are of no relevance to the upstream versions.
 
 3. Wiki
 
@@ -45,7 +50,7 @@ First of all, make sure you've looked at [http://www.amazon.de/Patterns-Elements
 6. RabbitMQ, download from [http://www.rabbitmq.com](http://www.rabbitmq.com). Requires Erlang to be installed. RabbitMQ installer will assist in installing Erlang. Some sources report that there may be trouble with the latest versions of RabbitMQ. In some cases, McAffee seems to block the installation of the latest version on SAP hardware; in other cases connection problems to the newest versions have been reported. We know that version 3.6.8 works well. [https://github.com/rabbitmq/rabbitmq-server/releases/tag/rabbitmq_v3_6_8](https://github.com/rabbitmq/rabbitmq-server/releases/tag/rabbitmq_v3_6_8)
 7.  Maven 3.1.1 (or higher), [http://maven.apache.org](http://maven.apache.org)
     A setup guide for windows can be found on this webpage: [https://maven.apache.org/guides/getting-started/windows-prerequisites.html](https://maven.apache.org/guides/getting-started/windows-prerequisites.html)
-8.  Forked GWT SDK 2.12.4 release [https://github.com/eclipse-sailing-analytics/gwt-forward-serialization-rpc/releases/download/gwt-2.12.4/gwt-2.12.4.zip](https://github.com/SAP/gwt-forward-serialization-rpc/releases/download/gwt-2.12.4/gwt-2.12.4.zip)). The official releases can be found at [http://www.gwtproject.org/download.html](http://www.gwtproject.org/download.html)
+8.  Forked GWT SDK 2.12.4 release [https://github.com/SAP/gwt-forward-serialization-rpc/releases/download/gwt-2.12.4/gwt-2.12.4.zip](https://github.com/SAP/gwt-forward-serialization-rpc/releases/download/gwt-2.12.4/gwt-2.12.4.zip)). The official releases can be found at [http://www.gwtproject.org/download.html](http://www.gwtproject.org/download.html)
     but shouldn't be used unless we roll back the changes of branch ``bug5077`` or GWT has merged and released the [pull request 9779](https://github.com/gwtproject/gwt/pull/9779).
     Download the GWT SDK and extract it to a location of your preference (e.g. `C:\Program Files\gwt` on Windows or `/opt` on Linux or MacOS/X).
     You will see in section [Tuning the Eclipse Installation](#tuning-the-eclipse-installation)
@@ -53,7 +58,7 @@ First of all, make sure you've looked at [http://www.amazon.de/Patterns-Elements
 9. Standalone Android SDK (see section "Additional steps required for Android projects"). OPTIONALLY: You may additionally install Android Studio ([https://developer.android.com/tools/studio/index.html](https://developer.android.com/tools/studio/index.html)) or IntelliJ IDEA ([https://www.jetbrains.com/idea/download/](https://www.jetbrains.com/idea/download/)).
     Make sure that the environment variable `ANDROID_HOME` is set (e.g. Windows C:\Users\\**'user'**\AppData\Local\Android\Sdk )
 10. Get the content of the git repository
-    Clone the repository to your local file system from `git@github.com:eclipse-sailing-analytics/sailing-analytics.git` or `ssh://trac@sapsailing.com/home/trac/git` User "trac" has all public ssh keys.
+    Clone the repository to your local file system from `git@github.com:SAP/sailing-analytics.git` or `ssh://trac@sapsailing.com/home/trac/git` User "trac" has all public ssh keys.
 11. Install the eclipse plugins (see [Automatic Eclipse plugin installation](#automatic-eclipse-plugin-installation))
 12. Configure Eclipse (see [Tuning the Eclipse Installation](#tuning-the-eclipse-installation))
 13. Configure Maven to use the correct JRE by following the instructions in the paragraph [maven-setup](#maven-setup)
