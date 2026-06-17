@@ -9,6 +9,10 @@ First of all, make sure you've looked at [http://www.amazon.de/Patterns-Elements
 
 1. Git Account
 
+Note that the Github repository mentioned here is a "downstream" repository for the "upstream" repo at https://github.com/eclipse-sailing-analytics/sailing-analytics. The downstream repo contains a "friendly fork" that is not technically a fork in the Github sense but contains differences between its ``main`` branch and the upstream ``main`` branch. Those deviations mostly revolve around branding and naming aspects. If not working specifically on this kind of changes, please work with the upstream repo as a default and use this downstream repo only for such branding and SAP-specific changes.
+
+In particular, you must *never* merge this repo's ``main`` branch into the upstream repo's ``main`` branch; otherwise you would risk contaminating upstream with SAP specifics. Merging the upstream's ``main`` branch into this downstream repo's ``main`` branch, however, should work without problems and should happen on a regular basis after reviewing the upstream changes carefully.
+
    - The primary Git repository for the project is hosted on Github (see [https://github.com/SAP/sailing-analytics](https://github.com/SAP/sailing-analytics)). To clone, use ``git@github.com:SAP/sailing-analytics.git``.
    - If you are on Windows, keep in mind you may run into the following problem. By default, the filesystem in Windows enforces a 260 character limit on paths. The longest path length for a file in this project, if the drive name is included, is 263 characters. A possible solution is to pass a single character name for the project folder in the git clone command, and clone the project on drive root, which may bring the longest file path down to compatible length. Alternatively, Windows 10 and 11 offer settings to enable a much much longer maximum file path that requires additional configuration. You may check that out at your own will.
    - To gain write access you have to become member of the [sailing-analytics-team](https://github.com/orgs/SAP/teams/sailing-analytics-team) organization. For that you need to [link your Github user to the Github SAP organization](https://wiki.one.int.sap/wiki/display/ospodocs/Self-Service+for+Joining+an+SAP+GitHub+Organization). For that to work, your Github account needs to have your @sap.com e-mail address assigned and verified. We still have a shadow repository around that, e.g., powers our Wiki at [https://wiki.sapsailing.com](https://wiki.sapsailing.com) and which lives at ``ssh://trac@sapsailing.com/home/trac/git``. 
@@ -22,11 +26,10 @@ First of all, make sure you've looked at [http://www.amazon.de/Patterns-Elements
    Everytime you use your ssh key with encryption key you get prompted to provide the passphrase.
    To automate this process you can setup an ssh agent. On Linux your desktop environment will usually handle this for you. For macOS you can use this [guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
 
-2. Bugzilla
+2. Issues
 
-   - Create an account at https://bugzilla.sapsailing.com
-   - Ask a Bugzilla administrator (e.g., axel.uhl@sap.com) to enable your account for editing bugs
-   - Bugzilla URL: [https://bugzilla.sapsailing.com](https://bugzilla.sapsailing.com)
+   - By and large, the upstream repo's issue tracked at [https://github.com/eclipse-sailing-analytics/sailing-analytics/issues](https://github.com/eclipse-sailing-analytics/sailing-analytics/issues) shall be used.
+   - Use [https://github.com/SAP/sailing-analytics/issues](https://github.com/SAP/sailing-analytics/issues) only for issues and tasks that specifically refer to the SAP downstream repository and are of no relevance to the upstream versions.
 
 3. Wiki
 
