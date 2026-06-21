@@ -4,8 +4,9 @@ import java.util.Date;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import com.sap.sse.common.Named;
 
-public class ReplicaDTO implements IsSerializable {
+public class ReplicaDTO implements IsSerializable, Named {
     private String hostname;
     private String identifier;
     private Date registrationTime;
@@ -32,6 +33,10 @@ public class ReplicaDTO implements IsSerializable {
         this.numberOfMessagesSent = numberOfMessagesSent;
         this.averageMessageSizeInBytes = averageMessageSizeInBytes;
         this.totalNumberOfBytesSent = totalNumberOfBytesSent;
+    }
+    @Override
+    public String getName() {
+        return hostname;
     }
     public String getHostname() {
         return hostname;

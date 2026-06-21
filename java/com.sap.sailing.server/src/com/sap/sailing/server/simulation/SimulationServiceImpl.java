@@ -17,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.sap.sailing.domain.base.BoatClass;
@@ -398,9 +399,17 @@ public class SimulationServiceImpl implements SimulationService {
 
     @Override
     public SimulationResults getSimulationResults(LegIdentifier legIdentifier) {
-        SimulationResults result = cache.get(legIdentifier, false);
+        SimulationResults result = null;
+        try {
+            result = cache.get(legIdentifier, false);
+            if (result == null) {
+                logger.fine("Simulation Get: Cache Empty: \"" + legIdentifier.toString() + "\"");
+            }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception trying to get simulation results for "+legIdentifier+
+                    "; re-calculating", e);
+        }
         if (result == null) {
-            logger.fine("Simulation Get: Cache Empty: \"" + legIdentifier.toString() + "\"");
             if (!raceListeners.containsKey(legIdentifier.getRegattaName())) {
                 final Regatta regatta = racingEventService.getRegattaByName(legIdentifier.getRegattaName());
                 final DynamicTrackedRegatta trackedRegatta = racingEventService.getTrackedRegatta(regatta);

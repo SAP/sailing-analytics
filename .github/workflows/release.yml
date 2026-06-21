@@ -23,7 +23,28 @@ on:
         default: '140.0'
 
 jobs:
+  # The "changes" job will cause the "build" job to get skipped for trivial changes
+  changes:
+    permissions: {}
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.filter.outputs.code }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: filter
+        uses: dorny/paths-filter@d1c1ffe0248fe513906c8e24db8ea791d46f8590 # v3.0.3
+        with:
+          filters: |
+            code:
+              - '!wiki/**'
+              - '!.github/workflows/*'
+              - '!**/*.md'
+              - '!README.md'
+              - '!docs/**'
+
   build:
+    needs: changes
+    if: ${{ needs.changes.outputs.should_run == 'true' || github.event_name == 'workflow_dispatch' }}
     permissions:
       contents: write
       checks: write
@@ -216,3 +237,20 @@ jobs:
           fi
           echo "Identified Hudson job: ${JOB}"
           curl -u "${{ vars.HUDSON_JOB_USERNAME }}:${{ secrets.HUDSON_JOB_PASSWORD}}" https://hudson.sapsailing.com/job/${JOB}/build?token=${{ secrets.HUDSON_JOB_TOKEN }}
+
+  build-gate:
+    permissions: {}
+    needs: [changes, build]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          if [[ "${{ needs.build.result }}" == "success" ]]; then
+            echo "Build passed."
+          elif [[ "${{ needs.build.result }}" == "skipped" && "${{ needs.changes.outputs.should_run }}" == "false" ]]; then
+            echo "No relevant changes — skipping is OK."
+          else
+            echo "Build failed or was cancelled."
+            exit 1
+          fi
+

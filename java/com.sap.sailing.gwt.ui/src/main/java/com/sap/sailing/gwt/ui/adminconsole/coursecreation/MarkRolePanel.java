@@ -217,8 +217,8 @@ public class MarkRolePanel extends FlowPanel implements FilterablePanelProvider<
                 return markRole.getShortName();
             }
         };
-        nameColumn.setSortable(true);
-        sortHandler.setComparator(nameColumn, new Comparator<MarkRoleDTO>() {
+        shortNameColumn.setSortable(true);
+        sortHandler.setComparator(shortNameColumn, new Comparator<MarkRoleDTO>() {
             public int compare(MarkRoleDTO markRole1, MarkRoleDTO markRole2) {
                 return markRole1.getShortName().compareTo(markRole2.getShortName());
             }

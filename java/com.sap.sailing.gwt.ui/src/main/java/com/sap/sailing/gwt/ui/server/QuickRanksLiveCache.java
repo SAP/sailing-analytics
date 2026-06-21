@@ -126,7 +126,16 @@ public class QuickRanksLiveCache {
     }
 
     public QuickRanksDTO get(RegattaAndRaceIdentifier raceIdentifier) {
-        QuickRanksDTO result = cache.get(raceIdentifier, false);
+        // The following may throw an exception that was stored upon an earlier re-compute attempt;
+        // see also the changes of bug6245, so we need to recompute if we read null or if
+        // we get an exception
+        QuickRanksDTO result = null;
+        try {
+            result = cache.get(raceIdentifier, false);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception while reading QuickRanksCache for race "+raceIdentifier
+                    + "; re-computing");
+        }
         if (result == null) {
             final TrackedRace trackedRace = service.getExistingTrackedRace(raceIdentifier);
             if (trackedRace != null) {

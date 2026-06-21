@@ -48,7 +48,7 @@ To use Java 25, use the ``docker-compose-25.yml`` file instead:
 
 ## Requirements
 
-The software can be run on any Linux or Windows machine with ``bash`` installed; it has also been compiled successfully for the ARM platform and was deployed to a Raspberry Pi computer. As a database, MongoDB is required, tested with releases 4.4, 5.0, 6.0, and 7.0. For use in a replicated scenario (scale-out, high availability), RabbitMQ is required. A simple Docker Compose set-up can be used to tie these three components together, e.g., for a quick local test and to familiarize yourself with the application, as Docker images are produced on a regular basis.
+The software can be run on any Linux, MacOS or Windows machine with ``bash`` installed; it has also been compiled successfully for the ARM platform and was deployed to a Raspberry Pi computer. As a database, MongoDB is required, tested with releases 4.4, 5.0, 6.0, and 7.0. For use in a replicated scenario (scale-out, high availability), RabbitMQ is required. A simple Docker Compose set-up can be used to tie these three components together, e.g., for a quick local test and to familiarize yourself with the application, as Docker images are produced on a regular basis.
 
 Compute node and database sizing depends on several aspects of your workloads, such as whether live or replay data is to be served, how many different classes with separate leaderboard are racing concurrently, how many competitors are racing in each class, or how many concurrent viewers produce how many requests and which type (e.g., analytical, data mining, or watching a live race).
 
@@ -213,7 +213,6 @@ Or you create a release by running
 which produces a tarball under ``dist/{release-name}-{timestamp}/{release-name}-{timestamp}.tar.gz`` which can then be used for ``scp``-based downloads with the ``refreshInstance.sh`` script under ``java/target``.
 
 Run the ``buildAndUpdateProduct.sh`` without any arguments to see the sub-commands and options available.
-
 
 ## Downloading, Installing and Running an Official Release
 
