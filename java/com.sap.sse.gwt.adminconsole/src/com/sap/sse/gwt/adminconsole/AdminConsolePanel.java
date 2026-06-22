@@ -121,8 +121,7 @@ public class AdminConsolePanel<T extends Place & AdminConsolePlace> extends Head
     private class TabSelectionHandler implements SelectionHandler<Integer> {
         @Override
         public void onSelection(SelectionEvent<Integer> event) {
-
-            Object source = event.getSource();
+            final Object source = event.getSource();
             if (source != null) {
                 if (source instanceof HorizontalTabLayoutPanel) {
                     final HorizontalTabLayoutPanel tabPanel = ((HorizontalTabLayoutPanel) source);
@@ -208,7 +207,6 @@ public class AdminConsolePanel<T extends Place & AdminConsolePlace> extends Head
         topLevelTabPanel.addSelectionHandler(tabSelectionHandler);
         topLevelTabPanel.ensureDebugId("AdministrationTabs");
         topLevelTabPanelWrapper = new VerticalOrHorizontalTabLayoutPanel() {
-            
             @Override
             public void add(Widget child, String text, boolean asHtml, boolean fireEvents) {
                 child.setTitle(text);
@@ -301,7 +299,6 @@ public class AdminConsolePanel<T extends Place & AdminConsolePlace> extends Head
     }
 
     public static interface VerticalOrHorizontalTabLayoutPanel {
-        
         void add(Widget child, String text, boolean asHtml, boolean fireEvents);
 
         boolean remove(Widget child);

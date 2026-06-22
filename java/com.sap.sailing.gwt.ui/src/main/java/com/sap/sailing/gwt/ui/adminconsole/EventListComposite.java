@@ -99,6 +99,7 @@ public class EventListComposite extends Composite {
     private final Displayer<LeaderboardGroupDTO> leaderboardGroupsDisplayer;
     private final Displayer<EventDTO> eventsDisplayer;
     private Iterable<LeaderboardGroupDTO> availableLeaderboardGroups;
+    private final Map<UUID, LeaderboardGroupDTO> availableLeaderboardGroupsById;
     
     public static class AnchorCell extends AbstractCell<SafeHtml> {
         @Override
@@ -127,6 +128,7 @@ public class EventListComposite extends Composite {
         this.presenter = presenter;
         this.placeController = placeController;
         this.availableLeaderboardGroups = Collections.emptyList();
+        this.availableLeaderboardGroupsById = new HashMap<>();
         this.allEvents = new ArrayList<EventDTO>();
         final VerticalPanel panel = new VerticalPanel();
         final AccessControlledButtonPanel buttonPanel = new AccessControlledButtonPanel(userService, EVENT);
@@ -730,8 +732,22 @@ public class EventListComposite extends Composite {
         });
     }
 
+    /**
+     * Updates {@link #availableLeaderboardGroups} and {@link #availableLeaderboardGroupsById} from
+     * the {@code leaderboardGroups} iterable, filtered to those to which the user has {@link DefaultActions#UPDATE}
+     * permission. Then, these leaderboard groups are used to update {@link #allEvents all events} regarding the
+     * {@link LeaderboardGroupDTO}s they reference to ensure consistency for the {@link EventDTO}s and any
+     * other leaderboard group displayer.
+     */
     public void fillLeaderboardGroups(Iterable<LeaderboardGroupDTO> leaderboardGroups) {
         availableLeaderboardGroups = Util.filter(leaderboardGroups, lg->userService.hasPermission(lg, DefaultActions.UPDATE));
+        availableLeaderboardGroupsById.clear();
+        for (final LeaderboardGroupDTO lgDto : availableLeaderboardGroups) {
+            availableLeaderboardGroupsById.put(lgDto.getId(), lgDto);
+        }
+        for (final EventDTO event : allEvents) {
+            event.replaceLeaderboardGroupsWithSameId(availableLeaderboardGroupsById);
+        }
     }
 
     public void fillEvents(Iterable<EventDTO> events) {
@@ -743,7 +759,10 @@ public class EventListComposite extends Composite {
             noEventsLabel.setVisible(true);
         }
         allEvents.clear();
-        events.forEach(allEvents::add);
+        events.forEach(e->{
+            e.replaceLeaderboardGroupsWithSameId(availableLeaderboardGroupsById);
+            allEvents.add(e);
+        });
         filterTextbox.updateAll(allEvents);
         eventTable.redraw();
     }

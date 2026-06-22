@@ -23,6 +23,22 @@
         <div class="mainContent">
           <h2 class="releaseHeadline">Release Notes - Administration Console</h2>
           <div class="innerContent">
+          <h2 class="articleSubheadline">June 2026</h2>
+          <ul class="bulletList">
+                <li>Fixed a server issue occurring when computing maneuvers for races with a large number of competitors
+                    (e.g. 163 competitors in 505 Pre-Worlds 2014). All competitors' maneuvers were previously stored in a
+                    single MongoDB document, which exceeded MongoDB's 16MB BSON document size limit and caused the
+                    storage process to throw a <tt>BsonMaximumSizeExceededException</tt>. Maneuvers are now stored in one
+                    document per competitor, keeping each document well within the size limit regardless of fleet size
+                    for any typical even seen so far.
+                    See also <a href="https://bugzilla.sapsailing.com/bugzilla/show_bug.cgi?id=6226">bug 6226</a>.
+                </li>
+                <li>Bug fix: changes to leaderboard groups were not always synchronized across the
+                    different views of the Admin Console. For example, when using the "wizard"-like
+                    functionality to create regattas repeatedly, their leaderboards, and then link them to
+                    a leaderboard group of the event selected in the regatta creation dialog worked off
+                    a leaderboard group copy stored in the event list which wasn't updated properly.</li>
+          </ul>
           <h2 class="articleSubheadline">May 2026</h2>
           <ul class="bulletList">
                 <li>The start/stop tracking buttons in the Smartphone Tracking panel now behave correctly.

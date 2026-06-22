@@ -744,7 +744,7 @@ public class LeaderboardGroupConfigPanel extends AbstractRegattaPanel
                                         groupToUpdate.setOverallLeaderboardDiscardThresholds(updateDescriptor.getOverallLeaderboardDiscardThresholds());
                                         groupToUpdate.setOverallLeaderboardScoringSchemeType(updateDescriptor.getOverallLeaderboardScoringSchemeType());
                                         availableLeaderboardGroups.set(i, groupToUpdate);
-                                        int displayedIndex = groupsProvider.getList().indexOf(group);
+                                        final int displayedIndex = groupsProvider.getList().indexOf(group);
                                         if (displayedIndex != -1) {
                                             groupsProvider.getList().set(displayedIndex, groupToUpdate);
                                         }
@@ -782,6 +782,10 @@ public class LeaderboardGroupConfigPanel extends AbstractRegattaPanel
                             }
                             @Override
                             public void onSuccess(Void v) {
+                                // tell all other LeaderboardGroupsDisplayers the new full list
+                                // which was updated here in-place.
+                                presenter.getLeaderboardGroupsRefresher().updateAndCallFillForAll(
+                                        availableLeaderboardGroups, getLeaderboardGroupsDisplayer());
                             }
                         }));
     }
@@ -937,7 +941,6 @@ public class LeaderboardGroupConfigPanel extends AbstractRegattaPanel
             group.leaderboards.set(index, temp);
             groupDetailsProvider.getList().clear();
             groupDetailsProvider.getList().addAll(group.leaderboards);
-
             updateGroup(group);
         }
     }

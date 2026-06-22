@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 import java.util.UUID;
 
 import com.sap.sailing.domain.common.WindSource;
@@ -67,6 +69,29 @@ public class EventDTO extends EventBaseDTO implements SecuredDTO {
 
     public void addLeaderboardGroup(LeaderboardGroupDTO leaderboardGroup) {
         leaderboardGroups.add(leaderboardGroup);
+    }
+    
+    /**
+     * All {@link LeaderboardGroupDTO}s found {@link #getLeaderboardGroups() in this event} for which
+     * their {@link LeaderboardGroupDTO#getId() ID} exists in {@code newLeaderboardGroups}, the corresponding
+     * value in the {@code newLeaderboardGroups} is used to replace that {@link LeaderboardGroupDTO} in this
+     * event.<p>
+     * 
+     * As a result, all leaderboard group objects known by this event will be aligned with
+     * {@code newLeaderboardGroups}, except for those whose ID was not found in that map. Use this method
+     * to keep {@link LeaderboardGroupDTO}s consistent on a client such as the AdminConsole to ensure that
+     * edits to a {@link LeaderboardGroupDTO} reflect accordingly on all ends.
+     */
+    public void replaceLeaderboardGroupsWithSameId(final Map<UUID, LeaderboardGroupDTO> newLeaderboardGroups) {
+        final ListIterator<LeaderboardGroupDTO> i = leaderboardGroups.listIterator();
+        while (i.hasNext()) {
+            final LeaderboardGroupDTO next = i.next();
+            final LeaderboardGroupDTO replacement = newLeaderboardGroups.get(next.getId());
+            if (replacement != null) {
+                i.remove();
+                i.add(replacement);
+            }
+        }
     }
 
     public List<LeaderboardGroupDTO> getLeaderboardGroups() {
