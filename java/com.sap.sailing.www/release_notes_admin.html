@@ -33,6 +33,12 @@
                     for any typical even seen so far.
                     See also <a href="https://bugzilla.sapsailing.com/bugzilla/show_bug.cgi?id=6226">bug 6226</a>.
                 </li>
+                <li>Further fix for the same issue: a competitor tracked over an unusually long period could accumulate
+                    enough maneuvers to exceed the 16MB limit in their own document. Maneuver documents are now paginated —
+                    each document holds at most 1000 maneuvers, with additional pages stored as separate documents.
+                    A warning is logged when pagination kicks in.
+                    See also <a href="https://bugzilla.sapsailing.com/bugzilla/show_bug.cgi?id=6226">bug 6226</a>.
+                </li>
                 <li>Bug fix: changes to leaderboard groups were not always synchronized across the
                     different views of the Admin Console. For example, when using the "wizard"-like
                     functionality to create regattas repeatedly, their leaderboards, and then link them to

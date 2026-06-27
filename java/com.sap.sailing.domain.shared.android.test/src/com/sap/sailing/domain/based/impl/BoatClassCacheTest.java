@@ -1,4 +1,4 @@
-package com.sap.sailinig.domain.based.impl;
+package com.sap.sailing.domain.based.impl;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;

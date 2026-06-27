@@ -3309,18 +3309,30 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
     @Override
     public Map<RaceIdentifier, ManeuverRaceFingerprint> loadFingerprintsForManeuverHashes() {
         final MongoCollection<Document> maneuversCollection = database.getCollection(CollectionNames.MANEUVERS.name());
+        try {
+            maneuversCollection.dropIndex("maneuversbyeventandrace");
+        } catch (final Exception e) {
+            // index does not exist yet, nothing to drop
+        }
+        try {
+            maneuversCollection.dropIndex("maneuversbyeventraceandcompetitor");
+        } catch (final Exception e) {
+            // index does not exist yet, nothing to drop
+        }
         maneuversCollection.createIndex(new Document()
                 .append(FieldNames.EVENT_NAME.name(), 1)
-                .append(FieldNames.RACE_NAME.name(), 1),
+                .append(FieldNames.RACE_NAME.name(), 1)
+                .append(FieldNames.COMPETITOR_ID.name(), 1)
+                .append(FieldNames.MANEUVER_PAGE_INDEX.name(), 1),
             new IndexOptions()
                 .unique(true)
-                .name("maneuversbyeventandrace")
+                .name("maneuversbyeventracecompetitorandpage")
                 .background(false));
         final Map<RaceIdentifier, ManeuverRaceFingerprint> fingerprintHashMap = new HashMap<>();
         for (final Document currentDocument : maneuversCollection.find()) {
             final Pair<RaceIdentifier, ManeuverRaceFingerprint> fingerprint = loadManeuversFingerprint(currentDocument);
             if (fingerprint != null && fingerprint.getB() != null) {
-                fingerprintHashMap.put(fingerprint.getA(), fingerprint.getB());
+                fingerprintHashMap.putIfAbsent(fingerprint.getA(), fingerprint.getB());
             }
         }
         return fingerprintHashMap;
@@ -3328,27 +3340,53 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
     
     @Override
     public Map<Competitor, List<Maneuver>> loadManeuvers(TrackedRace trackedRace, Course course) {
-        final Map<Competitor, List<Maneuver>> result;
+        final Map<Competitor, List<Maneuver>> result = new HashMap<>();
         final Document query = new Document();
         final RaceIdentifier raceIdentifier = trackedRace.getRaceIdentifier();
         addRaceIdentifierToQuery(query, raceIdentifier);
         final MongoCollection<Document> maneuversCollection = database.getCollection(CollectionNames.MANEUVERS.name());
-        final Document doc = maneuversCollection.find(query).first();
-        if (doc != null) {
-            result = new HashMap<>();
-            final List<Document> maneuversDoc = doc.getList(FieldNames.MANEUVERS.name(), Document.class);
-            for (final Document maneuversForOneCompetitorDoc : maneuversDoc) {
-                final Serializable competitorId = maneuversForOneCompetitorDoc.get(FieldNames.COMPETITOR_ID.name(), Serializable.class);
+        for (final Document doc : maneuversCollection.find(query)) {
+            final Serializable competitorIdAtRoot = doc.get(FieldNames.COMPETITOR_ID.name(), Serializable.class);
+            if (competitorIdAtRoot != null) {
+                loadManeuversForCompetitorNewFormat(doc, result, course, trackedRace);
+            } else {
+                logger.warning("Found maneuver document in old format (all competitors in one document) for race "
+                        + raceIdentifier + ". Consider running migration to new per-competitor format to avoid BSON size limit issues on large races (bug 6226).");
+                loadManeuversForAllCompetitorsOldFormat(doc, result, course, trackedRace);
+            }
+        }
+        return result.isEmpty() ? null : result;
+    }
+
+    private void loadManeuversForCompetitorNewFormat(Document doc, Map<Competitor, List<Maneuver>> result,
+            Course course, TrackedRace trackedRace) {
+        final Serializable competitorId = doc.get(FieldNames.COMPETITOR_ID.name(), Serializable.class);
+        final Competitor competitor = baseDomainFactory.getExistingCompetitorById(competitorId);
+        final List<Document> maneuversDoc = doc.getList(FieldNames.MANEUVERS.name(), Document.class);
+        if (maneuversDoc != null) {
+            for (final Document maneuverDoc : maneuversDoc) {
+                final Maneuver maneuver = loadManeuver(competitor, maneuverDoc, course, trackedRace);
+                result.computeIfAbsent(competitor, c -> new ArrayList<>()).add(maneuver);
+            }
+        }
+    }
+
+    private void loadManeuversForAllCompetitorsOldFormat(Document doc, Map<Competitor, List<Maneuver>> result,
+            Course course, TrackedRace trackedRace) {
+        final List<Document> competitorManeuversArray = doc.getList(FieldNames.MANEUVERS.name(), Document.class);
+        if (competitorManeuversArray != null) {
+            for (final Document competitorDoc : competitorManeuversArray) {
+                final Serializable competitorId = competitorDoc.get(FieldNames.COMPETITOR_ID.name(), Serializable.class);
                 final Competitor competitor = baseDomainFactory.getExistingCompetitorById(competitorId);
-                for (final Document maneuverDoc : maneuversForOneCompetitorDoc.getList(FieldNames.MANEUVERS.name(), Document.class)) {
-                    final Maneuver maneuver = loadManeuver(competitor, maneuverDoc, course, trackedRace);
-                    result.computeIfAbsent(competitor, c -> new ArrayList<>()).add(maneuver);     
+                final List<Document> maneuversDoc = competitorDoc.getList(FieldNames.MANEUVERS.name(), Document.class);
+                if (maneuversDoc != null) {
+                    for (final Document maneuverDoc : maneuversDoc) {
+                        final Maneuver maneuver = loadManeuver(competitor, maneuverDoc, course, trackedRace);
+                        result.computeIfAbsent(competitor, c -> new ArrayList<>()).add(maneuver);
+                    }
                 }
             }
-        } else {
-            result = null;
         }
-        return result;
     }
     
     private Maneuver loadManeuver(Competitor competitor, Document maneuverDoc, Course course, TrackedRace trackedRace) {

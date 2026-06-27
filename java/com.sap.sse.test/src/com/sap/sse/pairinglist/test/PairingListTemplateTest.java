@@ -1,4 +1,4 @@
-package com.sap.see.pairinglist.test;
+package com.sap.sse.pairinglist.test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
