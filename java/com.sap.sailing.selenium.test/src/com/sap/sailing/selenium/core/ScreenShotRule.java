@@ -75,11 +75,21 @@ public class ScreenShotRule implements TestExecutionExceptionHandler {
                     try {
                         final File destinationDir = new File(screenshotFolder, context.getRequiredTestClass().getName());
                         destinationDir.mkdirs();
-                        final File destination = new File(destinationDir, filename + SCREENSHOT_FILE_EXTENSION); //$NON-NLS-1$
-                        final Path path = destination.toPath();
-                        Files.copy(source, path, StandardCopyOption.REPLACE_EXISTING);
-                        // ATTENTION: Do not remove this line because it is needed for the JUnit Attachment Plugin!
-                        System.out.println(String.format(ATTACHMENT_FORMAT, destination.getCanonicalFile().toURI()));
+                        final File destination = new File(destinationDir, filename + SCREENSHOT_FILE_EXTENSION);
+                        // copy screenshot
+                        Files.copy(source, destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        // base folder as Path (correct way)
+                        final Path base = screenshotFolder.toPath().toAbsolutePath().normalize();
+                        final Path file = destination.toPath().toAbsolutePath().normalize();
+                        // relative path for Jenkins attachment plugin
+                        final Path relative = base.relativize(file);
+                        // ATTENTION: required for JUnit Attachment Plugin
+                        final String attachmentLine = String.format(ATTACHMENT_FORMAT, relative.toString().replace("\\", "/"));
+                        System.out.println(attachmentLine);
+                        System.out.flush(); // replaced System.out may not auto-flush
+                        // duplicate to System.err because tycho-surefire may read test stuff from there
+                        System.err.println(attachmentLine);
+                        System.err.flush(); // replaced System.err may not auto-flush
                     } catch (IOException exception) {
                         throw new RuntimeException(exception);
                     }

@@ -22,7 +22,7 @@
     ./bin/surefire-reports/
   </screenshots-folder>
   <!--
-  <screenshots-folder>file://{user.dir}/bin/surefire-reports/</screenshots-folder>
+  <screenshots-folder>{user.dir}/bin/surefire-reports/</screenshots-folder>
   -->
   
   <!--
