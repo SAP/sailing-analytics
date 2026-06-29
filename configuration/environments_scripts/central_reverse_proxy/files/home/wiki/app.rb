@@ -2,11 +2,14 @@ require "gollum/app"
 require "digest/sha1"
 require "logger"
 require "rest-client"
-require "rack/session/redis"
 require "base64"
 
 class App < Precious::App
-    use Rack::Session::Pool, expire_after: 3600, httponly: true #, secure: true
+  use Rack::Session::Cookie,
+    secret: ENV["SESSION_SECRET"],
+    expire_after: 3600,
+    httponly: true,
+    same_site: :lax
 
 #   use Rack::Session::Redis,
 #       :redis_server => "redis://127.0.0.1:6379/0",
@@ -20,23 +23,35 @@ class App < Precious::App
 
   REPO_OWNER = "SAP"
   REPO_NAME = "sailing-analytics"
+  LOGIN_LINK = "<a href='/login'>Login (will redirect to GitHub)</a>".freeze
   before { check! }
-  before "/gollum/(edit|create|rename|delete)/*" do authorize_write end
-  before do
-    if session[:email] && session[:name]
-      session["gollum.author"] = {
-        :name => session[:name],
-        :email => session[:email],
-      }
+  before "/gollum/(edit|create|rename|delete|history)/*" do
+    authorize_write
+    session["gollum.author"] = {
+      :name => session[:name],
+      :email => session[:email],
+    }
+  end
+  before "/gollum/(overview|preview|latest_changes)" do
+    if !session[:logged_in]
+      halt 401, LOGIN_LINK
     end
   end
 
+  PUBLIC_STARTS = ["/Home", "/wiki", "/favicon.ico","/login","/callback","/logout"].freeze
+  NON_PAGE_PATTERNS = [%r{\A/gollum/(assets|commit)}, %r{\A/gollum/(last_commit_info|search)\z}].freeze
+  AUTH_PATHS = [%r{\A/gollum/(edit|create|rename|history|delete|latest_changes)}, %r{\A/gollum/(overview|preview)\z}].freeze # Require logged in.
+  LOGIN_PATHS = %r{\A/(login|callback|logout)}.freeze
+
+  START_TIME=Time.now.freeze
+  get '/robots.txt' do
+    content_type 'text/plain'
+    "User-agent: *\nDisallow: /"
+  end
+
   get "/logout" do
-    if session[:access_token]
-      revoke_access_token(token)
-    end
     session.clear()
-    "logged out"
+    "Logged out"
   end
 
   get "/login" do
@@ -62,7 +77,6 @@ class App < Precious::App
     if session[:logged_in]
       # Ensures cancel works in editor after login.
       if session[:prev]
-        LOGGER.debug(session[:prev])
         prev = session[:prev].dup
         stripped_prev = prev.sub("/gollum/edit", "")
         redirect stripped_prev
@@ -94,7 +108,8 @@ class App < Precious::App
     end
 
     if session[:prev]
-      redirect session[:prev].sub(/\/gollum\/(rename|delete)/, "")
+      target = session.delete(:prev)
+      redirect target.sub(/\/gollum\/(rename|delete)/, "")
     end
 
     redirect "/"
@@ -105,46 +120,40 @@ class App < Precious::App
       if path == "/"
         return true
       end
-      public_starts = ["/Home", "/wiki", "/favicon.ico"]
-      public_starts.any? { |link| path.start_with?(link) }
+      PUBLIC_STARTS.any? { |link| path.start_with?(link) }
     end
 
     def asset_path?(path)
-      non_page_patterns = [%r{\A/gollum/(assets|commit|history|last_commit_info).*}, %r{\A/gollum/search}, %r{\A/gollum/latest_changes\z}]
-      non_page_patterns.any? { |pattern| pattern.match(path) }
+      NON_PAGE_PATTERNS.any? {|link| link.match?(path)}
     end
 
     def auth_path?(path)
-      auth_paths = [%r{\A/gollum/(edit|create|rename|delete)/.*\z}, %r{\A/gollum/(overview|preview)}, %r{\A/gollum/create}]
-      auth_paths.any? { |pattern| pattern.match(path) }
+      AUTH_PATHS.any?{ |link| link.match?(path) }
     end
 
     def login_path?(path)
-      %r{\A/(login|callback|logout|cancel)\z}.match?(path)
+      LOGIN_PATHS.match?(path)
     end
 
     def check!
-      path = env["PATH_INFO"].dup
-      LOGGER.debug(path)
+      path = env["PATH_INFO"]
       return if login_path?(path)
+      return if path == "/robots.txt"
+      return if public_path?(path)
       return if asset_path?(path)
-      isPublicPath = public_path?(path)
-      isAuthPath = auth_path?(path)
-      if isPublicPath || isAuthPath
-        session[:prev] = path
-        return
-      end
-      halt 404, "You cannot access anything outside wiki/ path."
+      return if auth_path?(path)
+      halt 403, "You cannot access anything outside wiki/ path."
     end
 
     def authorize_write
       LOGGER.debug("Checking auth before writing")
 
       if !session[:logged_in]
-        if env["PATH_INFO"].dup.match(%r{/gollum/delete/.*})
-            halt 401, "Unauthorized"
+        if env["PATH_INFO"].start_with?("/gollum/delete")
+          halt 401, "Unauthorized"
         end
-        redirect "/login"
+        session[:prev] = env["PATH_INFO"]
+        halt 401, LOGIN_LINK
       end
       halt 403, "Forbidden" unless user_can_write()
     end
@@ -217,6 +226,8 @@ class App < Precious::App
           :Authorization => "Basic #{basicAuth}",
           :accept => "application/vnd.github.v3+json",
         },
+        timeout: 5,
+        open_timeout: 3,
       )
     end
   end
