@@ -347,10 +347,6 @@ public class RiotServerImpl extends AbstractReplicableWithObjectInputStream<Repl
             // If newDevice is null, we're on a replica and need to buffer the message to apply it
             // later, once we have received the correct ID from the primary through the
             // internalDeviceCreated(id, deviceSerialNumber) method.
-            if (theDevice != null) {
-                getSecurityService().setOwnership(theDevice.getIdentifier(), /* user owner */ null,
-                        getSecurityService().getServerGroup(), theDevice.getName());
-            }
         } else {
             theDevice = device;
         }
@@ -481,6 +477,8 @@ public class RiotServerImpl extends AbstractReplicableWithObjectInputStream<Repl
                 devices.put(device.getId(), device);
                 devicesBySerialNumber.put(device.getSerialNumber(), device);
                 mongoObjectFactory.storeDevice(device, /* clientSessionOrNull */ null);
+                getSecurityService().setOwnership(device.getIdentifier(), /* user owner */ null,
+                        getSecurityService().getServerGroup(), device.getName());
             } else {
                 logger.info("Not creating new Igtimi device for serial number "+deviceSerialNumber+" on replica "+this);
                 device = null;

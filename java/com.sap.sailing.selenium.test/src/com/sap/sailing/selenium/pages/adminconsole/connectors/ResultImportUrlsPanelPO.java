@@ -2,6 +2,8 @@ package com.sap.sailing.selenium.pages.adminconsole.connectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.logging.Logger;
+
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -16,6 +18,7 @@ import com.sap.sailing.selenium.pages.gwt.GenericCellTablePO;
 import com.sap.sailing.selenium.pages.gwt.ListBoxPO;
 
 public class ResultImportUrlsPanelPO extends PageArea {
+    private static final Logger logger = Logger.getLogger(ResultImportUrlsPanelPO.class.getName());
 
     @FindBy(how = BySeleniumId.class, using = "urlProviderListBox")
     private WebElement urlProviderListBox;
@@ -71,23 +74,27 @@ public class ResultImportUrlsPanelPO extends PageArea {
         waitUntil(() -> findUrl(url) == null);
     }
 
-    private CellTablePO<DataEntryPO> getUserTable() {
+    private CellTablePO<DataEntryPO> getUrlTable() {
         return new GenericCellTablePO<>(this.driver, this.urlTable, DataEntryPO.class);
     }
 
     public DataEntryPO findUrl(final String url) {
-        final CellTablePO<DataEntryPO> table = getUserTable();
-        for (DataEntryPO entry : table.getEntries()) {
-            String name;
-            try {
-                name = entry.getColumnContent("URL");
-            } catch (StaleElementReferenceException e) {
-                // entry is not existing any more but must not break iteration
-                name = null;
+        try {
+            final CellTablePO<DataEntryPO> table = getUrlTable();
+            for (DataEntryPO entry : table.getEntries()) {
+                String name;
+                try {
+                    name = entry.getColumnContent("URL");
+                } catch (StaleElementReferenceException e) {
+                    // entry is not existing any more but must not break iteration
+                    name = null;
+                }
+                if (url.equals(name)) {
+                    return entry;
+                }
             }
-            if (url.equals(name)) {
-                return entry;
-            }
+        } catch (StaleElementReferenceException e) {
+            logger.warning("Stale element when trying to find URL in result import source table: "+e.getMessage());
         }
         return null;
     }

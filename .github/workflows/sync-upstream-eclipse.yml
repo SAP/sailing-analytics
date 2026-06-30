@@ -34,18 +34,19 @@ jobs:
           git merge --no-ff upstream/main -m "Auto-merge upstream eclipse-sailing-analytics/sailing-analytics main into eclipse-main"
       - name: Push eclipse-main
         run: git push origin eclipse-main
-      - name: Open PR eclipse-main -> main (as eclipse-sailing-analytics-bot)
-        env:
-          GH_TOKEN: ${{ secrets.ECLIPSE_BOT_PAT }}
-        run: |
-          existing=$(gh pr list --repo "$GITHUB_REPOSITORY" --head eclipse-main --base main --state open --json number --jq '.[0].number')
-          if [ -n "$existing" ]; then
-            echo "PR #$existing already open for eclipse-main -> main; skipping."
-            exit 0
-          fi
-          gh pr create \
-            --repo "$GITHUB_REPOSITORY" \
-            --base main \
-            --head eclipse-main \
-            --title "Merge upstream eclipse-sailing-analytics/sailing-analytics main into main" \
-            --body "Automated PR opened by the daily sync workflow. The eclipse-main branch has been updated with the latest changes from upstream eclipse-sailing-analytics/sailing-analytics main. Use 'Create a merge commit' when merging (do not squash or rebase) so any '-s ours' merges on eclipse-main are respected."
+      # the following may require sap org support...
+      #- name: Open PR eclipse-main -> main (as eclipse-sailing-analytics-bot)
+      #  env:
+      #    GH_TOKEN: ${{ secrets.ECLIPSE_BOT_PAT }}
+      #  run: |
+      #    existing=$(gh pr list --repo "$GITHUB_REPOSITORY" --head eclipse-main --base main --state open --json number --jq '.[0].number')
+      #    if [ -n "$existing" ]; then
+      #      echo "PR #$existing already open for eclipse-main -> main; skipping."
+      #      exit 0
+      #    fi
+      #    gh pr create \
+      #      --repo "$GITHUB_REPOSITORY" \
+      #      --base main \
+      #      --head eclipse-main \
+      #      --title "Merge upstream eclipse-sailing-analytics/sailing-analytics main into main" \
+      #      --body "Automated PR opened by the daily sync workflow. The eclipse-main branch has been updated with the latest changes from upstream eclipse-sailing-analytics/sailing-analytics main. Use 'Create a merge commit' when merging (do not squash or rebase) so any '-s ours' merges on eclipse-main are respected."

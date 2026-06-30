@@ -135,9 +135,9 @@ public abstract class TableWrapper<T, S extends RefreshableSelectionModel<T>, SM
      * column}.
      */
     public void addColumn(Column<T, ?> column, String header, Comparator<T> comparator) {
-        ListHandler<T> boatColumnListHandler = getColumnSortHandler();
+        ListHandler<T> columnListHandler = getColumnSortHandler();
         column.setSortable(true);
-        boatColumnListHandler.setComparator(column, comparator);
+        columnListHandler.setComparator(column, comparator);
         addColumn(column, header);
     }
     

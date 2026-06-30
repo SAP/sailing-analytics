@@ -15,6 +15,7 @@ import com.sap.sailing.gwt.ui.client.SailingServiceWriteAsync;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.gwt.ui.shared.UrlDTO;
 import com.sap.sse.gwt.client.ErrorReporter;
+import com.sap.sse.gwt.client.async.MarkedAsyncCallback;
 import com.sap.sse.gwt.client.celltable.AbstractSortableTextColumn;
 import com.sap.sse.gwt.client.celltable.EntityIdentityComparator;
 import com.sap.sse.gwt.client.celltable.RefreshableSelectionModel;
@@ -77,7 +78,8 @@ public class ResultImportUrlsTableWrapper<S extends RefreshableSelectionModel<Ur
     public void update(String providerName) {
         lastUsedProviderName = providerName;
         if (providerName != null) {
-            sailingServiceWrite.getResultImportUrls(providerName, new AsyncCallback<List<UrlDTO>>() {
+            sailingServiceWrite.getResultImportUrls(providerName,
+                    new MarkedAsyncCallback<List<UrlDTO>>(new AsyncCallback<List<UrlDTO>>() {
                 @Override
                 public void onSuccess(List<UrlDTO> result) {
                     ResultImportUrlsTableWrapper.super.refresh(result);
@@ -90,7 +92,7 @@ public class ResultImportUrlsTableWrapper<S extends RefreshableSelectionModel<Ur
                             .reportError(ResultImportUrlsTableWrapper.super.getStringMessages()
                                     .errorRefreshingResultImportUrlList(caught.getMessage()));
                 }
-            });
+            }));
         } else {
             ResultImportUrlsTableWrapper.super.refresh(Collections.emptyList());
         }
