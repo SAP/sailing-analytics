@@ -6,7 +6,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -144,9 +148,16 @@ public class ReplicationPanel extends FlowPanel {
         }));
         // --- Replicas (master side) ---
         final CaptionPanel mastergroup = new CaptionPanel(stringMessages.explainReplicasRegistered());
+        mastergroup.setWidth("100%");
         final VerticalPanel masterpanel = new VerticalPanel();
         final AdminConsoleTableResources tableResources = GWT.create(AdminConsoleTableResources.class);
         replicasTable = new ReplicaTableWrapper(tableResources, userService, stringMessages, errorReporter);
+        replicasTable.asWidget().setWidth("100%");
+        // Keep the default table-layout: auto so each column claims its content's preferred width.
+        // Only the additional-information column is made shrinkable (via CSS in
+        // AdminConsoleTableResources), so when the container narrows that column shrinks and wraps
+        // first while date/numeric columns retain their full content width.
+        replicasTable.getTable().setWidth("100%");
         replicaSelectionModel = replicasTable.getSelectionModel();
         final AccessControlledButtonPanel masterPanelButtons = new AccessControlledButtonPanel(userService, SecuredSecurityTypes.SERVER);
         masterPanelButtons.addUnsecuredAction(stringMessages.refresh(), this::updateReplicaList);
@@ -217,7 +228,24 @@ public class ReplicationPanel extends FlowPanel {
                     /* filterCheckboxLabel */ stringMessages.hideElementsWithoutUpdateRights());
             addColumn(ReplicaDTO::getHostname, stringMessages.replicaColumnIp());
             addColumn(ReplicaDTO::getIdentifier, stringMessages.replicaColumnId());
-            addColumn(ReplicaDTO::getAdditionalInformation, stringMessages.additionalInformation());
+            final Column<ReplicaDTO, SafeHtml> additionalInformationColumn = new Column<ReplicaDTO, SafeHtml>(new SafeHtmlCell()) {
+                @Override
+                public SafeHtml getValue(ReplicaDTO replica) {
+                    final SafeHtmlBuilder builder = new SafeHtmlBuilder();
+                    builder.appendHtmlConstant("<p>");
+                    builder.appendHtmlConstant(replica.getAdditionalInformation());
+                    builder.appendHtmlConstant("</p>");
+                    return builder.toSafeHtml();
+                }
+            };
+            // The default CellTable cell style applies white-space: nowrap to every cell, which
+            // gives the table an intrinsic min-width that prevents it from shrinking with the
+            // viewport. The cellTableWrapText class (defined in AdminConsoleTable.css) flips this
+            // single column to white-space: normal + overflow-wrap, so it becomes the one column
+            // that can absorb the slack by wrapping while every other column keeps its content
+            // width under the default table-layout: auto.
+            additionalInformationColumn.setCellStyleNames(tableResources.cellTableStyle().cellTableWrapText());
+            addColumn(additionalInformationColumn, stringMessages.additionalInformation());
             addColumn(r -> r.getRegistrationTime().toString(), stringMessages.replicaColumnRegistered(),
                     (r1, r2) -> r1.getRegistrationTime().compareTo(r2.getRegistrationTime()));
             addColumn(r -> String.valueOf(Math.round(r.getAverageNumberOfOperationsPerMessage())),
