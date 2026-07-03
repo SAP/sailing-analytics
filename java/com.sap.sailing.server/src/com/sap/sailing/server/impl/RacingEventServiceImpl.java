@@ -1015,7 +1015,7 @@ Replicator {
     public void storeManeuvers(RaceIdentifier raceIdentifier, ManeuverRaceFingerprint fingerprint,
              Map<Competitor, List<Maneuver>> maneuvers, Course course) {
         maneuverRaceFingerprints.put(raceIdentifier, fingerprint);
-        mongoObjectFactory.storeManeuvers(raceIdentifier, fingerprint, course,  maneuvers );
+        mongoObjectFactory.storeManeuvers(raceIdentifier, fingerprint, course,  maneuvers);
     }
     
     @Override

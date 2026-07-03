@@ -2071,18 +2071,20 @@ public class MongoObjectFactoryImpl implements MongoObjectFactory {
         final MongoCollection<Document> maneuverCollection = database.getCollection(CollectionNames.MANEUVERS.name());
         final JSONObject fingerprintjson = fingerprint.toJson();
         final Document fingerprintDoc = Document.parse(fingerprintjson.toString());
-        for (final Entry<Competitor, List<Maneuver>> e : maneuvers.entrySet()) {
-            final List<Maneuver> competitorManeuvers = e.getValue() != null ? e.getValue() : new ArrayList<>();
-            final int pageCount = Math.max(1, (int) Math.ceil((double) competitorManeuvers.size() / MANEUVERS_PER_PAGE));
-            if (pageCount > 1) {
-                logger.warning("Competitor " + e.getKey().getName() + " in race " + raceIdentifier
-                        + " has " + competitorManeuvers.size() + " maneuvers, splitting into " + pageCount
-                        + " documents of up to " + MANEUVERS_PER_PAGE + " maneuvers each (bug 6226).");
-            }
-            for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
-                final int from = pageIndex * MANEUVERS_PER_PAGE;
-                final int to = Math.min(from + MANEUVERS_PER_PAGE, competitorManeuvers.size());
-                storeCompetitorManeuvers(maneuverCollection, raceIdentifier, fingerprintDoc, course, e.getKey(), competitorManeuvers.subList(from, to), pageIndex);
+        if (maneuvers != null) {
+            for (final Entry<Competitor, List<Maneuver>> e : maneuvers.entrySet()) {
+                final List<Maneuver> competitorManeuvers = e.getValue() != null ? e.getValue() : new ArrayList<>();
+                final int pageCount = Math.max(1, (int) Math.ceil((double) competitorManeuvers.size() / MANEUVERS_PER_PAGE));
+                if (pageCount > 1) {
+                    logger.warning("Competitor " + e.getKey().getName() + " in race " + raceIdentifier
+                            + " has " + competitorManeuvers.size() + " maneuvers, splitting into " + pageCount
+                            + " documents of up to " + MANEUVERS_PER_PAGE + " maneuvers each (bug 6226).");
+                }
+                for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+                    final int from = pageIndex * MANEUVERS_PER_PAGE;
+                    final int to = Math.min(from + MANEUVERS_PER_PAGE, competitorManeuvers.size());
+                    storeCompetitorManeuvers(maneuverCollection, raceIdentifier, fingerprintDoc, course, e.getKey(), competitorManeuvers.subList(from, to), pageIndex);
+                }
             }
         }
     }
