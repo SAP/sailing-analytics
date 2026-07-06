@@ -343,7 +343,6 @@ http://skitrac.traclive.dk/events/event_20160727_ESSHamburg/jsonservice.php
 http://skitrac.traclive.dk/events/event_20160921_ESSInstanb/jsonservice.php
 http://skitrac.traclive.dk/events/event_20161005_ESSLisbon/jsonservice.php
 http://traclive.dk/events/event_20120905_erEuropean/jsonservice.php
-http://traclive.dk/events/event_20130302_ESSMuscat/jsonservice.php
 http://traclive.dk/events/event_20130401_STGTrainin/jsonservice.php
 http://traclive.dk/events/event_20130405_ESSSingapo/jsonservice.php
 http://traclive.dk/events/event_20130424_IDMStarboo/jsonservice.php
@@ -361,6 +360,7 @@ https://club.tractrac.com/events/event_20200901_KielerWoch1/jsonservice.php
 https://club.tractrac.com/events/event_20200910_KielerWoch/jsonservice.php
 https://club.tractrac.com/events/event_20200914_ererFXNacr/jsonservice.php
 https://club.tractrac.com/events/event_20210902_KielerWoch/jsonservice.php
+https://event.tractrac.com/events/event_20130302_ESSMuscat/jsonservice.php
 https://event.tractrac.com/events/event_20130621_KielerWoch/jsonservice.php
 https://event.tractrac.com/events/event_20130626_KielerWoch/jsonservice.php
 https://event.tractrac.com/events/event_20130627_KielerWoch/jsonservice.php
@@ -594,5 +594,8 @@ https://liveserver1.tractrac.com/events/event_20240621_KielerWoch/jsonservice.ph
 https://liveserver1.tractrac.com/events/event_20241003_ClubeNaval/jsonservice.php
 https://liveserver1.tractrac.com/events/event_20250210_HongKongRa/jsonservice.php
 https://liveserver1.tractrac.com/events/event_20251204_WorldSaili/jsonservice.php
+https://liveserver1.tractrac.com/events/event_20251212_YouthWorld/jsonservice.php
+https://liveserver1.tractrac.com/events/event_20260609_HelgaCup/jsonservice.php
+https://liveserver1.tractrac.com/events/event_20260618_KielerWoch/jsonservice.php
 https://paris1.tractrac.com/events/event_20240312_TrofeoPrin/jsonservice.php
 https://paris1.tractrac.com/events/event_20240411_SemaineOly/jsonservice.php
