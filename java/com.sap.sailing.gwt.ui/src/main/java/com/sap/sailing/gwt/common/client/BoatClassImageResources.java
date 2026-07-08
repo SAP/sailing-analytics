@@ -504,6 +504,10 @@ public interface BoatClassImageResources extends ClientBundle {
     @ImageOptions(preventInlining = true)
     ImageResource RS500Icon();
     
+    @Source("com/sap/sailing/gwt/ui/client/images/boatclass/RS700.png")
+    @ImageOptions(preventInlining = true)
+    ImageResource RS700Icon();
+    
     @Source("com/sap/sailing/gwt/ui/client/images/boatclass/RS800.png")
     @ImageOptions(preventInlining = true)
     ImageResource RS800Icon();
