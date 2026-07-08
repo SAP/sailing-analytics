@@ -3,10 +3,11 @@ package com.sap.sse.gwt.shared.replication;
 import java.util.Date;
 import java.util.Map;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
 import com.sap.sse.common.Named;
 
-public class ReplicaDTO implements IsSerializable, Named {
+public class ReplicaDTO implements Named {
+    private static final long serialVersionUID = -4320350685483719258L;
+    
     private String hostname;
     private String identifier;
     private Date registrationTime;
