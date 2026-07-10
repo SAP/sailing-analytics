@@ -124,6 +124,8 @@
   "text_background_tracking_permission_title": "Allow Sail Insight to access this device's location even when closed or not in use.",
   "text_background_tracking_permission_message": "Sail Insight requires background location access, to be able to track you. The permission is only used during tracking and is only used to evaluate the data.",
   "text_background_tracking_permission_allow": "Change to Allow all the time",
+  "text_background_tracking_disclosure_title": "Background Location Access",
+  "text_background_tracking_disclosure_content": "Sail Insight collects location data to enable boat tracking in races even when the app is closed or not in use.\n\nThis data will be uploaded to SAP Sailing Analytics for live tracking of all competitors.",
   "text_tracking_maneuvers": "Maneuvers",
   "text_tracking_alert_already_running_title": "Start and Dismiss?",
   "text_tracking_alert_already_running_message": "A tracking event is running already. Do you really want to start tracking?",
@@ -319,8 +321,8 @@
   "error_field_invalid_handicap": "Handicap can not be 0.",
   "error_device_already_exists": "This device is already registered to this regatta",
 
-  "url_eula": "http://www.sailyachtresearch.org/sail-insight-eula/",
-  "url_privacy_policy": "http://www.sailyachtresearch.org/sail-insights-privacy-policy/",
+  "url_eula": "https://www.sapsailing.com/EULA_Android_SailingBoatTracker.html",
+  "url_privacy_policy": "https://wiki.sapsailing.com/wiki/info/mobile/sailinsight-privacy-policy",
 
   "JIBE": "Jibe",
   "HEAD_UP": "Heading Up",
@@ -421,7 +423,6 @@
   "caption_course_creation_edit_position": "Define Position On Map",
 
   "caption_course_creator_bind_with_tracker": "Bind with Tracker",
-  "text_course_creator_explain_qr": "Scan this...",
   "caption_course_creator_use_this_device": "Use this Device",
 
   "caption_course_creator_passing_line": "Passing line",

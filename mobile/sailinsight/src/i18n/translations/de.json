@@ -315,8 +315,8 @@
   "error_field_invalid_handicap": "Handicap kann nicht 0 sein.",
   "error_device_already_exists": "Dieses Gerät ist bereits für diese Regatta registriert",
 
-  "url_eula": "http://www.sailyachtresearch.org/sail-insight-eula/",
-  "url_privacy_policy": "http://www.sailyachtresearch.org/sail-insights-privacy-policy/",
+  "url_eula": "https://www.sapsailing.com/EULA_Android_SailingBoatTracker.html",
+  "url_privacy_policy": "https://wiki.sapsailing.com/wiki/info/mobile/sailinsight-privacy-policy",
 
   "JIBE": "Halse",
   "HEAD_UP": "Anluven",
@@ -362,6 +362,8 @@
   "text_background_tracking_permission_title": "Erlauben Sie Sail Insight den Zugriff auf den Standort dieses Geräts, auch wenn es geschlossen oder nicht in Gebrauch ist.",
   "text_background_tracking_permission_message": "Sail Insight erfordert Zugriff auf den Hintergrundstandort, um Sie verfolgen zu können. Die Erlaubnis wird nur während der Verfolgung verwendet und dient nur zur Auswertung der Daten.",
   "text_background_tracking_permission_allow": "Wechseln Sie zu Allow all the time",
+  "text_background_tracking_disclosure_title": "Standortermittlung im Hintergrund",
+  "text_background_tracking_disclosure_content": "Sail Insight sammelt Standortdaten, um die Verfolgung von Booten in Rennen zu ermöglichen, auch wenn die App geschlossen oder nicht in Gebrauch ist. Diese Daten werden in SAP Sailing Analytics hochgeladen, um alle Teilnehmer live zu verfolgen.",
   "text_alert_event_time": "Diese Startzeit liegt außerhalb des Datumsbereichs der Regatta / Veranstaltung. Möchten Sie die Veranstaltungstermine ändern?",
   "text_user_is_competitor": "Sie sind ein Teilnehmer an dieser Veranstaltung",
   "caption_see_course": "Kurs ansehen",
@@ -421,7 +423,6 @@
   "caption_course_creation_edit_position": "Verorte Bahnmarke auf Luftbild",
 
   "caption_course_creator_bind_with_tracker": "Mit Tracker verknüpfen",
-  "text_course_creator_explain_qr": "Scannen Sie diesen ...",
   "caption_course_creator_use_this_device": "Mein Gerät nutzen",
 
   "caption_course_creator_passing_line": "Passing line[DE]",
