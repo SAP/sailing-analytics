@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde version="3.8"?>
-<target name="Race Analysis Target" sequenceNumber="227">
+<target name="Race Analysis Target" sequenceNumber="228">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="javax.ws.rs" version="1.1.1.v20130318-1750"/>
@@ -88,7 +88,7 @@
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.jetty.bundles.f.feature.group" version="9.4.58.v20250814"/>
 <unit id="org.eclipse.jetty.bundles.f.source.feature.group" version="9.4.58.v20250814"/>
-<repository location="https://p2.sapsailing.com/p2/jetty-9.4.58.v20250814"/>
+<repository location="https://download.eclipse.org/sailing-analytics/p2/jetty-9.4.58.v20250814"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="org.apache.felix.gogo.command" version="1.1.0.v20201023-1558"/>
@@ -182,7 +182,7 @@
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="com.amazon.aws.aws-java-api.feature.group" version="2.32.25"/>
-<repository location="https://p2.sapsailing.com/p2/aws-sdk/"/>
+<repository location="https://download.eclipse.org/sailing-analytics/p2/aws-sdk/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="com.sap.sailing.target.base.feature.group" version="1.0.0"/>
@@ -191,7 +191,7 @@
 <unit id="com.sap.sailing.target.shiro.feature.group" version="1.0.0"/>
 <unit id="com.sap.sailing.target.smile.feature.group" version="1.0.0"/>
 <unit id="com.sap.sailing.target.test.feature.group" version="1.0.0"/>
-<repository location="https://p2.sapsailing.com/p2/sailing/"/>
+<repository location="https://download.eclipse.org/sailing-analytics/p2/sailing/"/>
 </location>
 <!-- local update site -->
 <!-- location path="C:\repository\java\com.sap.sailing.targetplatform.base\target\repository" type="Directory"/ -->

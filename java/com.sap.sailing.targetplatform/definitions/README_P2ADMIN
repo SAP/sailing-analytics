@@ -1,3 +1,3 @@
 The former "p2admin" target definition is not tracked in the repository anymore.
 Instead, it can be generated from the existing target definition via ``../scripts/createLocalTargetDef.sh``.
-This script copies the existing target definition and replaces the remote URL ``https://p2.sapsailing.com/p2/sailing/`` with a local ``file://`` URL.
+This script copies the existing target definition and replaces the remote URL ``https://download.eclipse.org/sailing-analytics/p2/sailing/`` with a local ``file://`` URL.

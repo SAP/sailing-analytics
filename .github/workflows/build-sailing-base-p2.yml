@@ -1,0 +1,77 @@
+name: build-sailing-base-p2
+on:
+  push:
+    branches: [main, bug6269]
+    paths:
+      - 'java/com.sap.sailing.targetplatform.base/**'
+  workflow_dispatch: {}
+
+jobs:
+  build-sailing-base-p2:
+    permissions:
+      contents: write
+      checks: write
+      actions: read
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Check out the repository to the runner
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: '500'
+      - name: Install JDK 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin' # See 'Supported distributions' for available options
+          java-version: '8'
+          mvn-toolchain-id: 'JavaSE-1.8'
+      - name: Install JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin' # See 'Supported distributions' for available options
+          java-version: '17'
+          mvn-toolchain-id: 'JavaSE-17'
+      - shell: bash
+        env: # Or as an environment variable
+          TMP: /mnt/tmp
+          JAVA8_HOME: ${{env.JAVA_HOME_8_X64}}
+          JAVA17_HOME: ${{env.JAVA_HOME_17_X64}}
+        run: |
+            configuration/install-gwt-from-fork-releases https://github.com/eclipse-sailing-analytics/gwt-forward-serialization-rpc https://github.com/eclipse-sailing-analytics/gwt-maven-plugin-forward-serialization-rpc 2.12.4 .
+            cd java/com.sap.sailing.targetplatform.base
+            mvn clean compile 2>&1 | tee build.log
+            echo "BUILD_TIME=$(date -u +"%Y%m%dT%H%M%S")" >> "$GITHUB_ENV"
+      - name: Upload build log
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+            name: build.log
+            path: build.log
+            retention-days: 90
+      - name: Upload p2 site as artifact
+        uses: actions/upload-artifact@v4
+        with:
+            name: aws-sdk-p2
+            path: java/com.sap.sailing.targetplatform.base/target/repository/**/*
+            retention-days: 90
+      - name: SCP artifacts to download.eclipse.org to version-specific folder
+        uses: appleboy/scp-action@ff85246acaad7bdce478db94a363cd2bf7c90345 # v1
+        with:
+          host: projects-storage.eclipse.org
+          username: ${{ secrets.SCP_USERNAME }}
+          key: ${{ secrets.SCP_KEY }}
+          passphrase: ${{ secrets.SCP_PASSPHRASE }}
+          source: "java/com.sap.sailing.targetplatform.base/target/repository"
+          target: "/home/data/httpd/download.eclipse.org/sailing-analytics/p2/sailing-${{env.BUILD_TIME}}"
+          strip_components: 4
+          rm: true
+      - name: SCP artifacts to download.eclipse.org to default folder
+        uses: appleboy/scp-action@ff85246acaad7bdce478db94a363cd2bf7c90345 # v1
+        with:
+          host: projects-storage.eclipse.org
+          username: ${{ secrets.SCP_USERNAME }}
+          key: ${{ secrets.SCP_KEY }}
+          passphrase: ${{ secrets.SCP_PASSPHRASE }}
+          source: "java/com.sap.sailing.targetplatform.base/target/repository"
+          target: "/home/data/httpd/download.eclipse.org/sailing-analytics/p2/sailing"
+          strip_components: 4
+          rm: true

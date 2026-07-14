@@ -1,0 +1,27 @@
+#!/bin/bash
+# Determines the latest Jetty 9.4 version from the official Jetty p2 repository, assuming that's what we will also find
+# at https://download.eclipse.org/sailing-analytics/p2/jetty-9.4.* and updates all references in the workspace.
+# The upload should have taken place before by running the .github/workflow/build-jetty-p2.yml workflow.
+# Specific components such as apache-jsp and jetty-osgi-boot-jsp are updated to the new version, too, but not from the p2 repo but directly from Maven Central, as the p2 repo does not contain the source bundles.
+VERSION=$( curl https://download.eclipse.org/jetty/updates/jetty-bundles-9.x/ | grep "/jetty/updates/jetty-bundles-9.x" | sed -e 's/^.*> \?\(9\.4\.[0-9]*\.v[0-9]*\)<.*$/\1/' )
+echo "Found version ${VERSION}"
+OLD_VERSION=$( cat ../definitions/race-analysis-p2-remote.target | grep '\(<unit id="org\.eclipse\.jetty\.bundles\.f\.feature\.group" version="\)\([^"]*\)\("\/>\)' | sed -e 's/\(<unit id="org\.eclipse\.jetty\.bundles\.f\.feature\.group" version="\)\([^"]*\)\("\/>\).*$/\2/' )
+echo "Found old version ${OLD_VERSION}"
+echo "Updating com.sap.sse.feature.runtime/feature.xml from Jetty bundles version ${OLD_VERSION} to ${VERSION} ..."
+sed -i -e 's/version="'${OLD_VERSION}'"/version="'${VERSION}'"/' ../../com.sap.sse.feature.runtime/feature.xml
+echo "Updating com.sap.sailing.targetplatform.base/features/target-base/feature.xml from Jetty bundles version ${OLD_VERSION} to ${VERSION} ..."
+sed -i -e 's/version="'${OLD_VERSION}'"/version="'${VERSION}'"/' ../../com.sap.sailing.targetplatform.base/features/target-base/feature.xml
+echo "Removing old versions of apache-jsp and osgi.boot.jsp from target-base..."
+rm "${TARGET_BASE_PLUGINS_DIR}/apache-jsp-9.4*.jar"
+rm "${TARGET_BASE_PLUGINS_DIR}/jetty-osgi-boot-jsp-9.4*.jar"
+echo "Downloading new versions..."
+wget -O "${TARGET_BASE_PLUGINS_DIR}/apache-jsp-${VERSION}.jar" https://repo1.maven.org/maven2/org/eclipse/jetty/apache-jsp/${VERSION}/apache-jsp-${VERSION}.jar
+wget -O "${TARGET_BASE_PLUGINS_DIR}/apache-jsp-${VERSION}-sources.jar" https://repo1.maven.org/maven2/org/eclipse/jetty/apache-jsp/${VERSION}/apache-jsp-${VERSION}-sources.jar
+wget -O "${TARGET_BASE_PLUGINS_DIR}/jetty-osgi-boot-jsp-${VERSION}.jar" https://repo1.maven.org/maven2/org/eclipse/jetty/osgi/jetty-osgi-boot-jsp/${VERSION}/jetty-osgi-boot-jsp-${VERSION}.jar
+wget -O "${TARGET_BASE_PLUGINS_DIR}/jetty-osgi-boot-jsp-${VERSION}-sources.jar" https://repo1.maven.org/maven2/org/eclipse/jetty/osgi/jetty-osgi-boot-jsp/${VERSION}/jetty-osgi-boot-jsp-${VERSION}-sources.jar
+echo "Adding new versions to git..."
+git add "${TARGET_BASE_PLUGINS_DIR}/*.jar"
+echo "Updating target platform definition..."
+sed -i -e 's/\(<unit id="org\.eclipse\.jetty\.bundles\.f\.\(source\.\)\?feature\.group" version="\)[^"]*\("\/>\)/\1'${VERSION}'\3/' -e 's/\(<repository location="https:\/\/download\.eclipse\.org\/sailing-analytics\/p2\/\)jetty.*\(\/"\/>\)/\1jetty-'${VERSION}'\2/' ../definitions/race-analysis-p2-remote.target
+echo "Your target platform definition now points to https://download.eclipse.org/sailing-analytics/p2/jetty-${VERSION} for the Jetty bundles. Now please update the org.eclipse.jetty.osgi.boot.jsp[.source] and org.eclipse.jetty.apache-jsp[.source] bundles in java/com.sap.sailing.targetplatform.base/plugins/target-base and try a build with the -v parameter, using a local target platform. If this works, run the createLocalBaseP2repository.sh and uploadRepositoryToServer.sh scripts to produce an updated p2 sailing repository. Check for the new versions of apache-jsp and osgi.boot.jsp here https://repo1.maven.org/maven2/org/eclipse/jetty/apache-jsp/ and here https://repo1.maven.org/maven2/org/eclipse/jetty/osgi/jetty-osgi-boot/, respectively."
+rm -rf "${TMP_FOLDER}"
