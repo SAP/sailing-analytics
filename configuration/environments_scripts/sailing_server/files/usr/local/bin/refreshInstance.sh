@@ -136,8 +136,8 @@ install_environment ()
 	    mkdir -p ./environment
             scp ${SCP_PORT_OPTION} ${SCP_HOST}:/home/trac/releases/environments/${USE_ENVIRONMENT} ./environment
         else
-	    echo "Using environment https://releases.sapsailing.com/environments/$USE_ENVIRONMENT"
-	    wget -P environment https://releases.sapsailing.com/environments/$USE_ENVIRONMENT
+	    echo "Using environment https://raw.githubusercontent.com/SAP/sailing-analytics/refs/heads/main/configuration/environments/${USE_ENVIRONMENT}"
+	    wget -P environment https://raw.githubusercontent.com/SAP/sailing-analytics/refs/heads/main/configuration/environments/${USE_ENVIRONMENT}
 	fi
         echo "
 # Environment ($USE_ENVIRONMENT): START ($DATE_OF_EXECUTION)" >> $SERVER_HOME/env.sh
@@ -357,7 +357,7 @@ elif [[ $OPERATION == "install-local-release" ]]; then
 elif [[ $OPERATION == "install-env" ]]; then
     USE_ENVIRONMENT=$PARAM
     if [[ $USE_ENVIRONMENT == "" ]]; then
-        echo "You need to provide the name of an environment from https://releases.sapsailing.com/environments"
+        echo "You need to provide the name of an environment from https://raw.githubusercontent.com/SAP/sailing-analytics/refs/heads/main/configuration/environments/"
         exit 1
     fi
 
