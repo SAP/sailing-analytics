@@ -327,11 +327,9 @@ public class TrackedLegOfCompetitorImpl implements TrackedLegOfCompetitor {
                 projectToBearing = cache.getLegBearing(getTrackedLeg(), at);
             }
             if (speed.getBearing() != null && projectToBearing != null) {
-                double cos = Math.cos(speed.getBearing().getRadians() - projectToBearing.getRadians());
-                if (cos < 0) {
-                    projectToBearing = projectToBearing.reverse();
-                }
-                result = new KnotSpeedWithBearingImpl(Math.abs(speed.getKnots() * cos), projectToBearing);
+                // cos becomes negative after > 90 from leg direction
+                final double cos = Math.cos(speed.getBearing().getRadians() - projectToBearing.getRadians());
+                result = new KnotSpeedWithBearingImpl(speed.getKnots() * cos, projectToBearing);
             } else {
                 result = null;
             }
@@ -816,7 +814,8 @@ public class TrackedLegOfCompetitorImpl implements TrackedLegOfCompetitor {
             if (hasStartedLeg(timePoint)) {
                 Distance windwardDistanceToGo = getWindwardDistanceToGo(timePoint, windPositionMode);
                 Speed vmg = getVelocityMadeGood(timePoint, windPositionMode, cache);
-                result = vmg == null ? null : vmg.getDuration(windwardDistanceToGo);
+                //return null if boat standing still or going backwards
+                result = vmg == null || vmg.getKnots() <= 0 ? null : vmg.getDuration(windwardDistanceToGo);
             } else {
                 result = null;
             }

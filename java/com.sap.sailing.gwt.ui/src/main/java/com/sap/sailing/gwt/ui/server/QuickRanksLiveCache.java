@@ -79,7 +79,7 @@ public class QuickRanksLiveCache {
                     @Override
                     public QuickRanksDTO computeCacheUpdate(RegattaAndRaceIdentifier key,
                             CalculateOrPurge updateInterval) throws Exception {
-                        final TrackedRegatta cpuMeter = service.getTrackedRace(key).getTrackedRegatta();
+                        final TrackedRegatta cpuMeter = service.getService().getTrackedRace(key).getTrackedRegatta();
                         return cpuMeter.callWithCPUMeterWithException(()->{
                             logger.fine("Computing cache update for live QuickRanks of race "+key);
                             final QuickRanksDTO quickRanks;
@@ -137,7 +137,7 @@ public class QuickRanksLiveCache {
                     + "; re-computing");
         }
         if (result == null) {
-            final TrackedRace trackedRace = service.getExistingTrackedRace(raceIdentifier);
+            final TrackedRace trackedRace = service.getService().getExistingTrackedRace(raceIdentifier);
             if (trackedRace != null) {
                 trackedRace.addListener(new Listener(raceIdentifier)); // register for all changes that may affect the quick ranks
                 cache.triggerUpdate(raceIdentifier, CalculateOrPurge.CALCULATE);
