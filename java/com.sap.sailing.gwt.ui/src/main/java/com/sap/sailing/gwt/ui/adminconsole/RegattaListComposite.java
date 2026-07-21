@@ -227,22 +227,7 @@ public class RegattaListComposite extends Composite {
             }
         };
         startEndDateColumn.setSortable(true);
-        columnSortHandler.setComparator(startEndDateColumn, new Comparator<RegattaDTO>() {
-            @Override
-            public int compare(RegattaDTO r1, RegattaDTO r2) {
-                int result;
-                if(r1.startDate != null && r2.startDate != null) {
-                    result = r2.startDate.compareTo(r1.startDate);
-                } else if(r1.startDate == null && r2.startDate != null) {
-                    result = 1;
-                } else if(r1.startDate != null && r2.startDate == null) {
-                    result = -1;
-                } else {
-                    result = 0;
-                }
-                return result;
-            }
-        });
+        columnSortHandler.setComparator(startEndDateColumn, (r1, r2)->Util.compareToWithNull(r1.startDate, r2.startDate, /* nullIsLess */ true));
         TextColumn<RegattaDTO> regattaBoatClassColumn = new TextColumn<RegattaDTO>() {
             @Override
             public String getValue(RegattaDTO regatta) {
