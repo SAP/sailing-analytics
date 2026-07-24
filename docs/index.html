@@ -1608,7 +1608,16 @@
           body.appendChild(div);
         })
         .catch(function() {
-          body.innerHTML = '<div class="accordion-loading">Could not load changelog — <a href="' + body.dataset.src + '" target="_blank">view source file</a></div>';
+          var div = document.createElement('div');
+          div.className = 'accordion-loading';
+          div.appendChild(document.createTextNode('Could not load changelog — '));
+          var a = document.createElement('a');
+          a.href = body.dataset.src;
+          a.target = '_blank';
+          a.textContent = 'view source file';
+          div.appendChild(a);
+          body.innerHTML = '';
+          body.appendChild(div);
         });
     }
   }

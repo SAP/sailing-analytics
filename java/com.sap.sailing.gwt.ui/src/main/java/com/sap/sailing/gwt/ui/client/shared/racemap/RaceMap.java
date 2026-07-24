@@ -2399,6 +2399,8 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
         final LineInfoProvider lineInfoProvider = new LineInfoProvider() {
             @Override
             public String getLineInfo() {
+                final Position position1DTO = courseDTO.waypointPositions.get(zeroBasedIndexOfStartWaypoint);
+                final Position position2DTO = courseDTO.waypointPositions.get(zeroBasedIndexOfStartWaypoint+1);
                 final StringBuilder sb = new StringBuilder();
                 sb.append(stringMessages.courseMiddleLine());
                 sb.append('\n');
