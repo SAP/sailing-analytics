@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.sap.sailing.gwt.ui.client.Displayer;
 import com.sap.sailing.gwt.ui.client.Refresher;
+import com.sap.sse.gwt.client.async.MarkedAsyncCallback;
 import com.sap.sse.gwt.client.celltable.EntityIdentityComparator;
 
 public abstract class AbstractRefresher<T> implements Refresher<T> {
@@ -74,7 +75,7 @@ public abstract class AbstractRefresher<T> implements Refresher<T> {
         if (!loading) {
             logger.fine("Start loading data from service.");
             loading = true;
-            reload(callback);
+            reload(new MarkedAsyncCallback<>(callback));
         } else {
             logger.fine("Data is already loading. Skip reload.");
         }

@@ -15,6 +15,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * <p>Note: Since the counter for pending Ajax requests is incremented as soon as an instance of this class is created
  *   you must not create instances of this class which are not used or assigned to an field for multiple uses!</p>
  * 
+ * <p>See {@code com.sap.sailing.selenium.pages.PageObject} and its {@code waitForAjaxRequests...} methods for
+ * the consuming side of this.</p>
+ * 
  * @param <T>
  *   The type of the return value for the asynchronous remote procedure call.
  * @author
