@@ -2265,6 +2265,10 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
 
     private final StringBuilder startLineAdvantageText = new StringBuilder();
     private final StringBuilder finishLineAdvantageText = new StringBuilder();
+    /**
+     * tooltip textx for the course middle lines, using the same key type as {@link #courseMiddleLines}.
+     */
+    private final Map<Set<ControlPointDTO>, StringBuilder> courseMiddleLineTexts = new HashMap<>();
     final LineInfoProvider startLineInfoProvider = new LineInfoProvider() {
         @Override
         public String getLineInfo() {
@@ -2356,7 +2360,9 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                         keysAlreadyHandled.get(key).getB() : 0; // if not handled, the line will be removed, so the waypoint index doesn't matter
                 final Pair<Boolean, Integer> showLineAndZeroBasedIndexOfStartWaypoint = keysAlreadyHandled.get(key);
                 final boolean showCourseMiddleLine = showLineAndZeroBasedIndexOfStartWaypoint != null && showLineAndZeroBasedIndexOfStartWaypoint.getA();
-                courseMiddleLines.put(key, showOrRemoveCourseMiddleLine(courseDTO, courseMiddleLines.get(key), zeroBasedIndexOfStartWaypoint, showCourseMiddleLine));
+                courseMiddleLines.put(key, showOrRemoveCourseMiddleLine(courseDTO, courseMiddleLines.get(key),
+                        courseMiddleLineTexts.computeIfAbsent(key, k->new StringBuilder()),
+                        zeroBasedIndexOfStartWaypoint, showCourseMiddleLine));
             }
         }
     }
@@ -2392,38 +2398,38 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
      * @return <code>null</code> if the line is not shown; the polyline object representing the line being displayed
      *         otherwise
      */
-    private Polyline showOrRemoveCourseMiddleLine(final CoursePositionsDTO courseDTO, Polyline lineToShowOrRemoveOrUpdate,
+    private Polyline showOrRemoveCourseMiddleLine(final CoursePositionsDTO courseDTO,
+            Polyline lineToShowOrRemoveOrUpdate,
+            final StringBuilder courseMiddleLineText,
             final int zeroBasedIndexOfStartWaypoint, final boolean showLine) {
         final Position position1DTO = courseDTO.waypointPositions.get(zeroBasedIndexOfStartWaypoint);
         final Position position2DTO = courseDTO.waypointPositions.get(zeroBasedIndexOfStartWaypoint+1);
+        courseMiddleLineText.replace(0, courseMiddleLineText.length(), stringMessages.courseMiddleLine());
+        courseMiddleLineText.append('\n');
+        courseMiddleLineText.append(numberFormatNoDecimal.format(
+                Math.abs(position1DTO.getDistance(position2DTO).getMeters()))+stringMessages.metersUnit());
+        courseMiddleLineText.append(" (");
+        courseMiddleLineText.append(numberFormatTwoDecimals.format(
+                Math.abs(position1DTO.getDistance(position2DTO).getNauticalMiles()))+"NM");
+        courseMiddleLineText.append(")\n");
+        final double legBearingDeg = position1DTO.getBearingGreatCircle(position2DTO).getDegrees();
+        courseMiddleLineText.append(NumberFormatterFactory.getThreeDigitDecimalFormat(0).format(legBearingDeg)+stringMessages.degreesUnit());
+        if (lastCombinedWindTrackInfoDTO != null) {
+            final WindTrackInfoDTO windTrackAtLegMiddle = lastCombinedWindTrackInfoDTO.getCombinedWindOnLegMiddle(zeroBasedIndexOfStartWaypoint);
+            if (windTrackAtLegMiddle != null && windTrackAtLegMiddle.windFixes != null && !windTrackAtLegMiddle.windFixes.isEmpty()) {
+                WindDTO windAtLegMiddle = windTrackAtLegMiddle.windFixes.get(0);
+                final String diff = numberFormatOneDecimal.format(
+                        Math.min(Math.abs(windAtLegMiddle.dampenedTrueWindBearingDeg-legBearingDeg),
+                                             Math.abs(windAtLegMiddle.dampenedTrueWindFromDeg-legBearingDeg)));
+                courseMiddleLineText.append(", ");
+                courseMiddleLineText.append(stringMessages.degreesToWind(diff));
+            }
+        }
+
         final LineInfoProvider lineInfoProvider = new LineInfoProvider() {
             @Override
             public String getLineInfo() {
-                final Position position1DTO = courseDTO.waypointPositions.get(zeroBasedIndexOfStartWaypoint);
-                final Position position2DTO = courseDTO.waypointPositions.get(zeroBasedIndexOfStartWaypoint+1);
-                final StringBuilder sb = new StringBuilder();
-                sb.append(stringMessages.courseMiddleLine());
-                sb.append('\n');
-                sb.append(numberFormatNoDecimal.format(
-                        Math.abs(position1DTO.getDistance(position2DTO).getMeters()))+stringMessages.metersUnit());
-                sb.append(" (");
-                sb.append(numberFormatTwoDecimals.format(
-                        Math.abs(position1DTO.getDistance(position2DTO).getNauticalMiles()))+"NM");
-                sb.append(")\n");
-                final double legBearingDeg = position1DTO.getBearingGreatCircle(position2DTO).getDegrees();
-                sb.append(NumberFormatterFactory.getThreeDigitDecimalFormat(0).format(legBearingDeg)+stringMessages.degreesUnit());
-                if (lastCombinedWindTrackInfoDTO != null) {
-                    final WindTrackInfoDTO windTrackAtLegMiddle = lastCombinedWindTrackInfoDTO.getCombinedWindOnLegMiddle(zeroBasedIndexOfStartWaypoint);
-                    if (windTrackAtLegMiddle != null && windTrackAtLegMiddle.windFixes != null && !windTrackAtLegMiddle.windFixes.isEmpty()) {
-                        WindDTO windAtLegMiddle = windTrackAtLegMiddle.windFixes.get(0);
-                        final String diff = numberFormatOneDecimal.format(
-                                Math.min(Math.abs(windAtLegMiddle.dampenedTrueWindBearingDeg-legBearingDeg),
-                                                     Math.abs(windAtLegMiddle.dampenedTrueWindFromDeg-legBearingDeg)));
-                        sb.append(", ");
-                        sb.append(stringMessages.degreesToWind(diff));
-                    }
-                }
-                return sb.toString();
+                return courseMiddleLineText.toString();
             }
         };
         return showOrRemoveOrUpdateLine(lineToShowOrRemoveOrUpdate, showLine, position1DTO, position2DTO,

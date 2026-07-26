@@ -147,7 +147,7 @@ public interface SharedLandscapeConstants {
 
     String DEFAULT_DEDICATED_INSTANCE_TYPE_NAME = "C5_2_XLARGE";
     
-    String DEFAULT_SHARED_INSTANCE_TYPE_NAME = "I3_2_XLARGE";
+    String DEFAULT_SHARED_INSTANCE_TYPE_NAME = "I4_I_2_XLARGE";
 
     /**
      * Tells how to size process heaps on shared instances by default, based on the instance's physical memory.
