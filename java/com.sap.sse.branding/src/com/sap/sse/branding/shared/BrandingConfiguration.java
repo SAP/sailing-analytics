@@ -260,4 +260,13 @@ public interface BrandingConfiguration {
      * @return absolute URL. Empty to hide the icon/link.
      */
     String getGitHubLink();
+
+    
+    /**
+     * Brand’s GitHub Pages URL, if it exists; contains a brand-specific version of a
+     * project presentation.
+     *
+     * @return absolute URL. Empty to hide the icon/link.
+     */
+    String getGitHubPagesLink();
 }

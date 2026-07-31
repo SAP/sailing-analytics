@@ -311,14 +311,15 @@ public class TrackedLegOfCompetitorImpl implements TrackedLegOfCompetitor {
         if (speed != null) {
             Bearing projectToBearing;
             try {
-                if (cache.getLegType(getTrackedLeg(), at) != LegType.REACHING) {
+                final LegType legType = cache.getLegType(getTrackedLeg(), at);
+                if (legType != LegType.REACHING) {
                     final Wind wind = getTrackedRace().getWind(windPositionMode, getTrackedLeg(), getCompetitor(), at, cache);
                     if (wind == null) {
                         // This is not really likely to happen because wind==null would have let the call
                         // to cache.getLegType(...) fail with a NoWindException
                         throw new NoWindException("Need at least wind direction to determine windward speed");
                     }
-                    projectToBearing = wind.getBearing();
+                    projectToBearing = legType == LegType.UPWIND ? wind.getFrom() : wind.getBearing();
                 } else {
                     projectToBearing = cache.getLegBearing(getTrackedLeg(), at);
                 }

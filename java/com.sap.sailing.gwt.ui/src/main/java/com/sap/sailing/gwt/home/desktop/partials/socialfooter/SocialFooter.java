@@ -43,12 +43,12 @@ public class SocialFooter extends Composite {
         ClientConfiguration cfg = ClientConfiguration.getInstance();
         SocialFooterResources.INSTANCE.css().ensureInjected();
         initWidget(uiBinder.createAndBindUi(this));
+        setHrefOrHide(gitHubItem, gitHubLink, gitHubTopText, cfg.getGitHubPagesLink(), cfg.getFollowGitHub(Optional.empty()));
         if (!cfg.isBrandingActive() || !Util.hasLength(cfg.getFollowSports(Optional.empty()))) {
             htmlPanel.getElement().getStyle().setDisplay(Display.NONE);
         } else {
             socialHeading.setInnerText(cfg.getFollowSports(Optional.empty()));
             setHrefOrHide(xItem, xLink, xTopText, cfg.getxLink(), cfg.getSportsOn(Optional.empty()));
-            setHrefOrHide(gitHubItem, gitHubLink, gitHubTopText, cfg.getGitHubLink(), cfg.getFollowGitHub(Optional.empty()));
             setHrefOrHide(facebookItem, facebookLink, facebookTopText, cfg.getFacebookLink(), cfg.getSportsOn(Optional.empty()));
             setHrefOrHide(instagramItem, instagramLink, instagramTopText, cfg.getInstagramLink(), cfg.getSportsOn(Optional.empty()));
         }
