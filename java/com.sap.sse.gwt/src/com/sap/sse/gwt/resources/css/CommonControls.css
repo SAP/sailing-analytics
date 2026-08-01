@@ -569,8 +569,7 @@ body ::-webkit-scrollbar-track {
 	padding: 0 0 0 0;
 }
 
-.timePanel-controls-time .dateLabel, .timePanel-controls-time .timeLabel
-	{
+.timePanel-controls-time .dateLabel, .timePanel-controls-time .timeLabel {
 	padding: 4px 20px 0 0;
 	float: left;
 }
@@ -579,6 +578,15 @@ body ::-webkit-scrollbar-track {
 	float: left;
 	padding: 0 0 0 0;
 	border-left: 1px solid #fcbb22;
+}
+
+.timePanel-controls-pendingServerOperationsCounter {
+    float: left;
+    padding: 4px 20px 0 20px;
+    border-left: 1px solid #fcbb22;
+    background-image: url(images/yellowBar.png);
+    background-position: 15px center;
+    background-repeat: no-repeat;
 }
 
 .timePanel-controls-timeToStart .timeToStartLabel {

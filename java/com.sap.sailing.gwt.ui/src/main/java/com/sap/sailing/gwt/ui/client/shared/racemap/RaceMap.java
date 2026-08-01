@@ -3928,5 +3928,9 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
             }
         }.schedule(500);
     }
+    
+    public TimeRangeActionsExecutor<CompactBoatPositionsDTO, GPSFixDTOWithSpeedWindTackAndLegTypeIterable, Pair<String, DetailType>> getTimeRangeActionsExecutor() {
+        return timeRangeActionsExecutor;
+    }
 }
 

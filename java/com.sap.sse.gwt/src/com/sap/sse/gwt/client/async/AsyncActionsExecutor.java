@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
@@ -26,7 +27,7 @@ import com.sap.sse.common.impl.MillisecondsTimePoint;
  * 
  * @author c5163874, Simon Marcel Pamies
  */
-public class AsyncActionsExecutor {
+public class AsyncActionsExecutor extends AbstractActionsExecutor {
     private final static Logger logger = Logger.getLogger(AsyncActionsExecutor.class.getName());
     
     private class ExecutionJob<T> implements AsyncCallback<T> {
@@ -76,7 +77,7 @@ public class AsyncActionsExecutor {
         }
     }
     
-    private static final int DEFAULT_MAX_PENDING_CALLS = 10;
+    public static final int DEFAULT_MAX_PENDING_CALLS = 10;
     private static final int DEFAULT_MAX_PENDING_CALLS_PER_TYPE = 4;
     
     /**
@@ -99,7 +100,6 @@ public class AsyncActionsExecutor {
     private final Map<String, Set<Runnable>> runAfterLastActionForCategoryReturned;
     private final Set<Runnable> runAfterLastActionReturned;
     
-    private int numPendingCalls = 0;
     private TimePoint timePointOfFirstExecutorInit = null;
 
     public AsyncActionsExecutor() {
@@ -163,19 +163,20 @@ public class AsyncActionsExecutor {
     }
     
     public int getNumberOfPendingActions() {
-        return numPendingCalls;
+        return numberOfPendingActions;
     }
     
     private void execute(ExecutionJob<?> job) {
         Integer numActionsOfType = actionsPerTypeCounter.computeIfAbsent(job.getType(), j->Integer.valueOf(0));
-        if (numPendingCalls >= maxPendingCalls || (numActionsOfType >= maxPendingCallsPerType)) {
+        if (numberOfPendingActions >= maxPendingCalls || (numActionsOfType >= maxPendingCallsPerType)) {
             final TimePoint now = MillisecondsTimePoint.now();
             final TimePoint timePointToInspectForResetDecision = timePointOfTypeLastBeingExecuted.get(job.getType()) != null ?
                     timePointOfTypeLastBeingExecuted.get(job.getType()) : timePointOfFirstExecutorInit;
             if (timePointToInspectForResetDecision != null &&
                     now.minus(durationAfterToResetQueue).after(timePointToInspectForResetDecision)) {
+                logger.info("Resetting number of pending calls after "+durationAfterToResetQueue+" of no response");
                 // reset the number of pending calls
-                numPendingCalls = 0;
+                numberOfPendingActions = 0;
                 // reset number of pending actions per type - 0 is fine as checkForEmptyCallQueue
                 // will check for a number less than maxPendingCallsPerType to send out the
                 // last job pending for a given type
@@ -200,8 +201,9 @@ public class AsyncActionsExecutor {
             }
         }
         actionsPerTypeCounter.put(job.getType(), numActionsOfType+1);
-        numPendingCalls++;
+        numberOfPendingActions++;
         job.execute();
+        notifyListeners();
     }
 
     private void callCompleted(ExecutionJob<?> job) {
@@ -217,8 +219,12 @@ public class AsyncActionsExecutor {
             }
 
         }
-        numPendingCalls--;
-        if (numPendingCalls == 0) {
+        if (numberOfPendingActions > 0) { // don't let it go negative; we may have reset the queue
+            // and then one or more pending requests may have returned late
+            numberOfPendingActions--;
+        }
+        notifyListeners();
+        if (numberOfPendingActions == 0) {
             runAfterLastActionReturned.forEach(callback->callback.run());
         }
         timePointOfTypeLastBeingExecuted.put(type, MillisecondsTimePoint.now());

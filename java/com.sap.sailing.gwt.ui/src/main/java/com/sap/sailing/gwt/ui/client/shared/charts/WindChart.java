@@ -37,7 +37,6 @@ import org.moxieapps.gwt.highcharts.client.labels.YAxisLabels;
 import org.moxieapps.gwt.highcharts.client.plotOptions.LinePlotOptions;
 import org.moxieapps.gwt.highcharts.client.plotOptions.Marker;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.text.client.DateTimeFormatRenderer;
@@ -56,10 +55,10 @@ import com.sap.sailing.gwt.ui.client.WindSourceTypeFormatter;
 import com.sap.sailing.gwt.ui.shared.WindDTO;
 import com.sap.sailing.gwt.ui.shared.WindInfoForRaceDTO;
 import com.sap.sailing.gwt.ui.shared.WindTrackInfoDTO;
-import com.sap.sse.common.Util;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.DoublePair;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.DegreeBearingImpl;
 import com.sap.sse.common.impl.KnotSpeedImpl;
 import com.sap.sse.common.scalablevalue.ScalableValue;
@@ -696,7 +695,6 @@ public class WindChart extends AbstractRaceChart<WindChartSettings> implements R
                 result.put(StatKind.AVG, getDoubleValue(computeAvg()));
                 result.put(StatKind.MIN, min);
                 result.put(StatKind.MAX, max);
-                GWT.log("Stats of "+this+": "+result);
             }
             return result;
         }

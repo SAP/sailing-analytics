@@ -2596,4 +2596,5 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     String noRegattaLeaderboard(String leaderboardName);
     String noAutomatedTrackingTimes(String leaderboardName);
     String unknownError(String name);
+    String pendingServerOperations(Integer numberOfPendingServerOperations);
 }
