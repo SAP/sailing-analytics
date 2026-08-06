@@ -2546,17 +2546,14 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     String contentSailingAnalytics2(String brandName);
     String sailingRaceManager(String brandName);
     String contentSailingRaceManager(String brandName);
-    String sailingRaceManagerReadMore();
     String sailInSight(String brandName);
     String sailInSightName();
     String contentSailInSight(String brandName);
-    String sailInSightReadMore();
     String sailingBuoyPinger(String brandName);
     String contentSailingBuoyPinger(String brandName);
-    String sailingBuoyPingerReadMore();
     String strategySimulator();
     String contentStrategySimulator();
-    String strategySimulatorReadMore();
+    String readMore();
     String testConnection();
     String tracTracConnectionTestFailed(String message);
     String ipsLockedForBearerTokenAbuse();
