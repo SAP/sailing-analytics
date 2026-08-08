@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -596,6 +597,18 @@ Replicator {
 
     private final AtomicInteger numberOfTrackedRacesStillLoading;
 
+    /**
+     * Counts down when {@link #setPolarDataService(PolarDataService)} first receives a non-null
+     * polar-data service. Restoring tracked races (see {@link #restoreTrackedRaces()}) waits on
+     * this latch on a background thread so that every {@link TrackedRace} produced by restore
+     * has a non-null polar-data service already installed when it is added, per the invariant
+     * that a maneuver-based wind estimation should never be built for a race whose polar data
+     * hasn't at least started to become available. See bug6241 and
+     * {@link com.sap.sailing.windestimation.integration.WindEstimationFactoryServiceImpl#createIncrementalWindEstimationTrack}
+     * for the corresponding check on the other end.
+     */
+    private final CountDownLatch polarDataServiceArrived = new CountDownLatch(1);
+
     private final ServiceTracker<ResultUrlRegistry, ResultUrlRegistry> resultUrlRegistryServiceTracker;
 
     private final ServiceTracker<ScoreCorrectionProvider, ScoreCorrectionProvider> scoreCorrectionProviderServiceTracker;
@@ -961,7 +974,28 @@ Replicator {
             }
         }
         if (restoreTrackedRaces) {
-            restoreTrackedRaces();
+            // bug6241: defer restoration to a background thread that awaits polarDataService
+            // arrival. This way every tracked race added by the restore has a non-null polar
+            // service from the start, matching the invariant that a maneuver-based wind
+            // estimator should only ever be built for a race whose polar service is available.
+            // The alternative -- restoring synchronously in the constructor -- would race
+            // with the OSGi service tracker that installs the PolarDataService, which opens
+            // AFTER RacingEventServiceImpl is constructed (see Activator.start ordering).
+            final Thread deferredRestoreThread = new Thread(() -> {
+                try {
+                    polarDataServiceArrived.await();
+                    restoreTrackedRaces();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    logger.log(Level.WARNING,
+                            "Deferred restoreTrackedRaces was interrupted before PolarDataService arrived; no races restored",
+                            e);
+                } catch (Throwable e) {
+                    logger.log(Level.SEVERE, "Deferred restoreTrackedRaces failed", e);
+                }
+            }, "RacingEventServiceImpl-deferred-restoreTrackedRaces");
+            deferredRestoreThread.setDaemon(true);
+            deferredRestoreThread.start();
         } else {
             getMongoObjectFactory().removeAllConnectivityParametersForRacesToRestore();
         }
@@ -1142,6 +1176,15 @@ Replicator {
                 }
             }
         }).getNumberOfParametersToLoad();
+        // Enumeration complete: every race to restore has had its loading triggered (some may
+        // still be in LOADING state and some may never leave it; that's fine). Announce this to
+        // the polar data service, which if constructed in gated mode will now release any
+        // drain-callback waiters (see bug6241). Announcing to a non-gated instance is a harmless
+        // no-op. Since restoreTrackedRaces() only starts after the polarDataServiceArrived latch
+        // has counted down (see the deferred task in the constructor), and the polars bundle now
+        // registers its service exactly once and only after full initialization, polarDataService
+        // is guaranteed non-null at this point.
+        polarDataService.markLoadingOfAllRacesToRestoreStarted();
     }
 
     @Override
@@ -2328,6 +2371,15 @@ Replicator {
             if (polarFixCacheUpdater != null) {
                 trackedRace.removeListener(polarFixCacheUpdater);
             }
+            // bug6241: let the polar data service forget any wind-estimation-install callbacks it
+            // still has parked for this race (see PolarDataService.raceRemoved). Without this the
+            // parked callback -- which strongly captures trackedRace -- would pin the race and all
+            // of its tracks for the lifetime of the service if the race is removed before its
+            // polar loading completed. polarDataService may still be null if it has not been
+            // registered via its OSGi ServiceTracker yet.
+            if (polarDataService != null) {
+                polarDataService.raceRemoved(trackedRace);
+            }
             trackedRace.runSynchronizedOnStatus(()->{
                 if (!trackedRace.hasFinishedLoading()) {
                     numberOfTrackedRacesStillLoading.decrementAndGet();
@@ -2338,23 +2390,37 @@ Replicator {
         @Override
         public void raceAdded(TrackedRace trackedRace) {
             // replicate the addition of the tracked race:
-            CreateTrackedRace op = new CreateTrackedRace(trackedRace.getRaceIdentifier(), trackedRace.getWindStore(),
+            final CreateTrackedRace op = new CreateTrackedRace(trackedRace.getRaceIdentifier(), trackedRace.getWindStore(),
                     trackedRace.getDelayToLiveInMillis(), trackedRace.getMillisecondsOverWhichToAverageWind(),
                     trackedRace.getMillisecondsOverWhichToAverageSpeed(), trackedRace.getTrackingConnectorInfo());
             replicate(op);
             linkRaceToConfiguredLeaderboardColumns(trackedRace);
-            TrackedRaceReplicatorAndNotifier trackedRaceReplicator = new TrackedRaceReplicatorAndNotifier(trackedRace);
+            final TrackedRaceReplicatorAndNotifier trackedRaceReplicator = new TrackedRaceReplicatorAndNotifier(trackedRace);
             trackedRaceReplicators.put(trackedRace, trackedRaceReplicator);
-            trackedRace.addListener(trackedRaceReplicator, /* fire wind already loaded */true, /* notifyAboutGPSFixesAlreadyLoaded */ true);
-            PolarFixCacheUpdater polarFixCacheUpdater = new PolarFixCacheUpdater(trackedRace);
+            trackedRace.addListener(trackedRaceReplicator, /* fire wind already loaded */ true, /* notifyAboutGPSFixesAlreadyLoaded */ true);
+            // The PolarFixCacheUpdater's only responsibility is to feed newly-arriving
+            // competitor positions to the polar-data service and, on the first status
+            // transition past LOADING, to trigger ingestion of the race's loaded fixes into
+            // the polar-mining loading pipeline. Installation of the maneuver-based wind
+            // estimation is a separate concern handled by
+            // scheduleWindEstimationInstallation below and by setWindEstimationFactoryService
+            // if the factory arrives later.
+            final PolarFixCacheUpdater polarFixCacheUpdater = new PolarFixCacheUpdater(trackedRace);
             polarFixCacheUpdaters.put(trackedRace, polarFixCacheUpdater);
             trackedRace.addListener(polarFixCacheUpdater);
-            if (polarDataService != null) {
+            if (polarDataService != null) { // this shouldn't really be necessary after the bug6241 changes as we now
+                                            // require a valid PolarDataService prior to restoring/loading any races
                 trackedRace.setPolarDataService(polarDataService);
             }
+            // Schedule installation of the maneuver-based wind estimation on this race.
+            // The installation waits for (a) the race to reach a status strictly past
+            // LOADING (so that whatever loading was to happen has finished) and (b) the
+            // polar-data mining pipeline to have fully drained this race's loaded fixes.
+            // If the wind-factory service is not registered yet, the install is deferred to
+            // setWindEstimationFactoryService, which then iterates all existing races and
+            // schedules an install for each. See bug6241.
             if (windEstimationFactoryService != null) {
-                trackedRace.setWindEstimation(
-                        windEstimationFactoryService.createIncrementalWindEstimationTrack(trackedRace));
+                scheduleWindEstimationInstallation(trackedRace, windEstimationFactoryService);
             }
             numberOfTrackedRacesStillLoading.incrementAndGet();
             trackedRace.runWhenDoneLoading(()->numberOfTrackedRacesStillLoading.decrementAndGet());
@@ -2462,6 +2528,7 @@ Replicator {
     private class PolarFixCacheUpdater extends AbstractRaceChangeListener {
 
         private final TrackedRace race;
+        private boolean ingestionTriggered;
 
         public PolarFixCacheUpdater(TrackedRace race) {
             this.race = race;
@@ -2476,14 +2543,22 @@ Replicator {
 
         @Override
         public void statusChanged(TrackedRaceStatus newStatus, TrackedRaceStatus oldStatus) {
-            if (oldStatus.getStatus() == TrackedRaceStatusEnum.LOADING
-                    && newStatus.getStatus() != TrackedRaceStatusEnum.LOADING && newStatus.getStatus() != TrackedRaceStatusEnum.REMOVED) {
-                if (polarDataService != null) {
-                    polarDataService.raceFinishedLoading(race);
-                }
+            // Trigger ingestion of the race's loaded fixes into the polar-data mining loading
+            // pipeline exactly once, on the first transition to a status past LOADING. This
+            // fires both for the normal LOADING -> TRACKING/FINISHED path and for races that
+            // move directly from PREPARED to TRACKING (e.g., RaceLogRaceTracker-tracked races
+            // without loadable data); in the latter case the ingestion loop iterates over
+            // empty tracks and the pipeline drains immediately, but the "gate" inside
+            // PolarDataMiner still opens so any pending
+            // runWhenPolarLoadingFinishedFor(...) callbacks (e.g., from
+            // scheduleWindEstimationInstallation) can proceed. See bug6241.
+            if (!ingestionTriggered && newStatus.getStatus().getOrder() > TrackedRaceStatusEnum.LOADING.getOrder()
+                    && newStatus.getStatus() != TrackedRaceStatusEnum.REMOVED
+                    && polarDataService != null) {
+                ingestionTriggered = true;
+                polarDataService.raceFinishedLoading(race, /* callback */ null);
             }
         }
-
     }
 
     /**
@@ -4690,8 +4765,17 @@ Replicator {
     public void setPolarDataService(PolarDataService service) {
         if (this.polarDataService == null && service != null) {
             polarDataService = service;
+            // The polars bundle now registers its service only after it has already obtained the
+            // DomainFactory from the RacingEventService itself (see
+            // com.sap.sailing.polars.impl.Activator), so registering it back here is only kept
+            // as a defensive no-op for services registered by other paths (e.g. test harnesses).
             polarDataService.registerDomainFactory(baseDomainFactory);
             setPolarDataServiceOnAllTrackedRaces(service);
+            // bug6241: unblock the deferred restoreTrackedRaces() background task so it can
+            // now proceed with adding tracked races. Every race added after this point will
+            // observe a non-null polarDataService in this RacingEventServiceImpl and will have
+            // it installed by RaceAdditionListener.raceAdded.
+            polarDataServiceArrived.countDown();
         }
     }
 
@@ -4711,8 +4795,23 @@ Replicator {
                 try {
                     final Iterable<DynamicTrackedRace> trackedRaces = trackedRegatta.getTrackedRaces();
                     for (final TrackedRace trackedRace : trackedRaces) {
-                        trackedRace.setWindEstimation(
-                                service == null ? null : service.createIncrementalWindEstimationTrack(trackedRace));
+                        if (service == null) {
+                            // Tearing down the estimator: setWindEstimation(null) drops the current
+                            // estimator from the race and removes its wind track from the
+                            // MANEUVER_BASED_ESTIMATION source. Any per-race install task that was
+                            // still waiting on runWhenPastLoading / runWhenPolarLoadingFinishedFor
+                            // will observe on its final check that windEstimationFactoryService no
+                            // longer matches the service it was scheduled with (see
+                            // scheduleWindEstimationInstallation) and skip its install.
+                            trackedRace.setWindEstimation(null);
+                        } else {
+                            // Bringing the estimator up: for each race that already exists, schedule
+                            // an install through the per-race primitive so we wait for the race to
+                            // reach past LOADING and for its polar-mining fixes to drain before
+                            // constructing the estimator. This is the "wind-factory arrived after
+                            // races were added" side of the coordination; see bug6241.
+                            scheduleWindEstimationInstallation(trackedRace, service);
+                        }
                     }
                 } catch (Throwable e) {
                     logger.log(Level.SEVERE, "Error reconstructing the wind estimation models for tracked races", e);
@@ -4723,7 +4822,92 @@ Replicator {
         }
     }
 
+    /**
+     * Schedules installation of the maneuver-based wind estimation on {@code trackedRace}.
+     * Waits for two conditions before actually constructing and installing the estimator:
+     * <ul>
+     *   <li>the race has reached a status strictly past
+     *       {@link TrackedRaceStatusEnum#LOADING} (see
+     *       {@link TrackedRace#runWhenPastLoading(Runnable)}). This covers the normal
+     *       LOADING -> TRACKING/FINISHED transition and the direct PREPARED -> TRACKING transition
+     *       used by, e.g., RaceLogRaceTracker-tracked races without loadable data. If the
+     *       race is removed from its regatta before the transition, the install is silently
+     *       cancelled.</li>
+     *   <li>the polar-data mining pipeline has drained (see
+     *       {@link PolarDataService#runWhenPolarLoadingFinishedFor(TrackedRace, Runnable)}).
+     *       Note that this is a <em>global</em> drain of the shared loading pipeline, gated so
+     *       it does not fire before this race's own fixes have been ingested; it waits for the
+     *       fixes of all races loaded so far, not just this one. That is essential because the
+     *       estimator captures the polar service at construction time and uses it for
+     *       classification and wind-speed inference; installing the estimator before the polars
+     *       had been fully mined would leave it permanently using a polar model that reflects an
+     *       incomplete data set. Waiting for the global drain is deliberate and accepts some
+     *       startup sequentiality in exchange for a complete polar model.</li>
+     * </ul>
+     * <p>
+     *
+     * The install is guarded against being obsoleted by a subsequent
+     * {@code setWindEstimationFactoryService(...)} call replacing the factory: at
+     * install time it re-checks that {@link #windEstimationFactoryService} is still the
+     * {@code service} it was scheduled with, and that no other estimator has been installed
+     * on the race in the meantime. It is also guarded against races that reached ERROR
+     * status, on which installing the estimator is pointless.
+     * <p>
+     *
+     * Safe to call multiple times for the same race and/or the same service; the install
+     * itself is guarded against duplicate installation.
+     * <p>
+     *
+     * The method returns immediately after scheduling; the actual install runs on the
+     * shared background executor once both conditions above are satisfied. See bug6241.
+     */
+    private void scheduleWindEstimationInstallation(final TrackedRace trackedRace,
+            final WindEstimationFactoryService service) {
+        trackedRace.runWhenPastLoading(() -> {
+            final TrackedRaceStatusEnum status = trackedRace.getStatus().getStatus();
+            if (status != TrackedRaceStatusEnum.ERROR && polarDataService != null
+                    && windEstimationFactoryService == service) {
+                polarDataService.runWhenPolarLoadingFinishedFor(trackedRace, new Runnable() {
+                    @Override
+                    public void run() {
+                        synchronized (trackedRace) {
+                            if (trackedRace.getWindEstimation() == null
+                                    && windEstimationFactoryService == service
+                                    && trackedRace.getStatus().getStatus() != TrackedRaceStatusEnum.REMOVED
+                                    && trackedRace.getStatus().getStatus() != TrackedRaceStatusEnum.ERROR) {
+                                trackedRace.setWindEstimation(
+                                        service.createIncrementalWindEstimationTrack(trackedRace));
+                            }
+                        }
+                    }
+                    
+                    @Override
+                    public String toString() {
+                        return "Installing wind estimation for race "+trackedRace.getRaceIdentifier().toString();
+                    }
+                });
+            }
+        });
+    }
+
     private void setPolarDataServiceOnAllTrackedRaces(PolarDataService service) {
+        // Capture the wind factory at method entry: on replicas, initiallyFillFromInternal
+        // deserializes each DynamicTrackedRegatta with its trackedRaces map already populated
+        // and then invokes ensureRegattaHasRaceAdditionListener(...), which calls
+        // TrackedRegatta.addRaceListener(...) -- and that in turn synchronously replays
+        // raceAdded(...) for every pre-existing tracked race. At that moment
+        // polarDataService and windEstimationFactoryService may both still be null (their
+        // OSGi trackers have not fired yet). If the wind factory arrives before the polar
+        // service, setWindEstimationFactoryService -> setWindEstimationOnAllTrackedRaces
+        // schedules an install per race, and scheduleWindEstimationInstallation's inner
+        // callback (past-LOADING guard) fires immediately because replicated races typically
+        // arrive already past LOADING; it then sees polarDataService == null and drops out
+        // silently, without registering a runWhenPolarLoadingFinishedFor callback.
+        // We compensate here: once the polar service actually arrives, if the wind factory
+        // is already available, reschedule the install per race. scheduleWindEstimationInstallation
+        // is idempotent, guarded against duplicate installation, so this is a safe no-op
+        // for races that already got their estimator through another code path. See bug6241.
+        final WindEstimationFactoryService factoryAtMethodEntry = windEstimationFactoryService;
         Iterable<Regatta> allRegattas = getAllRegattas();
         for (Regatta regatta : allRegattas) {
             DynamicTrackedRegatta trackedRegatta = getTrackedRegatta(regatta);
@@ -4735,6 +4919,9 @@ Replicator {
                         trackedRace.setPolarDataService(service);
                         if (service != null) {
                             service.insertExistingFixes(trackedRace);
+                            if (factoryAtMethodEntry != null) {
+                                scheduleWindEstimationInstallation(trackedRace, factoryAtMethodEntry);
+                            }
                         }
                     }
                 } catch (Throwable e) {
@@ -4748,6 +4935,16 @@ Replicator {
 
     public void unsetPolarDataService(PolarDataService service) {
         if (polarDataService == service) {
+            // bug6241: losing the PolarDataService is a serious event -- the maneuver-based
+            // wind estimation depends on it and cannot be usefully constructed while it is
+            // absent (see WindEstimationFactoryServiceImpl.createIncrementalWindEstimationTrack).
+            // With the polars bundle now registering its service exactly once after full
+            // initialization (see com.sap.sailing.polars.impl.Activator), this call should only
+            // happen at bundle shutdown or on catastrophic OSGi framework events. Existing
+            // tracked-race estimators are torn down via setPolarDataServiceOnAllTrackedRaces(null)
+            // which invokes TrackedRace.setPolarDataService(null) on each race.
+            logger.log(Level.SEVERE, "PolarDataService has been unregistered from RacingEventService. "
+                    + "Maneuver-based wind estimation is now unavailable until it is re-registered.");
             polarDataService = null;
             setPolarDataServiceOnAllTrackedRaces(null);
         }

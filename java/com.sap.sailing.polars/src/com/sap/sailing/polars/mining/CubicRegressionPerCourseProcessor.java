@@ -47,6 +47,10 @@ public class CubicRegressionPerCourseProcessor implements
      */
     private transient ConcurrentMap<BoatClass, Set<PolarsChangedListener>> listeners;
 
+    private boolean isFinished;
+
+    private boolean isAborted;
+
     public CubicRegressionPerCourseProcessor filterToBoatClasses(Iterable<BoatClass> boatClasses) {
         final Set<BoatClass> allowedBoatClasses = Util.asSet(boatClasses);
         final CubicRegressionPerCourseProcessor filteredProcessor = new CubicRegressionPerCourseProcessor();
@@ -219,41 +223,40 @@ public class CubicRegressionPerCourseProcessor implements
 
     @Override
     public Class<GroupedDataEntry<GPSFixMovingWithPolarContext>> getInputType() {
-        // TODO Auto-generated method stub
-        return null;
+        @SuppressWarnings("unchecked")
+        final Class<GroupedDataEntry<GPSFixMovingWithPolarContext>> result = (Class<GroupedDataEntry<GPSFixMovingWithPolarContext>>) (Class<?>) GroupedDataEntry.class;
+        return result;
     }
 
     @Override
     public Class<Void> getResultType() {
         // No result type here, since this is a special case of a processor. It's the end of the pipe so to say.
-        return null;
+        return Void.class;
     }
 
     @Override
     public void finish() throws InterruptedException {
-        // Nothing to do here
+        isFinished = true;
     }
 
     @Override
     public boolean isFinished() {
-        return false;
+        return isFinished;
     }
 
     @Override
     public void abort() {
-        // TODO Auto-generated method stub
+        isAborted = true;
     }
 
     @Override
     public boolean isAborted() {
-        // TODO Auto-generated method stub
-        return false;
+        return isAborted;
     }
 
     @Override
     public AdditionalResultDataBuilder getAdditionalResultData(AdditionalResultDataBuilder additionalDataBuilder) {
-        // TODO Auto-generated method stub
-        return null;
+        return additionalDataBuilder;
     }
 
     public Map<GroupKey, AngleAndSpeedRegression> getRegressions() {

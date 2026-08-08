@@ -1400,12 +1400,21 @@ public class MockedTrackedRace implements DynamicTrackedRace {
     }
 
     @Override
+    public IncrementalWindEstimation getWindEstimation() {
+        return null;
+    }
+
+    @Override
     public TrackingConnectorInfo getTrackingConnectorInfo() {
         return null;
     }
 
     @Override
     public void runWhenDoneLoading(Runnable runnable) {
+    }
+
+    @Override
+    public void runWhenPastLoading(Runnable callback) {
     }
 
     @Override

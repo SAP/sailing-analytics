@@ -1,8 +1,8 @@
 package com.sap.sailing.windestimation.windinference;
 
-import com.sap.sailing.windestimation.data.ManeuverForEstimation;
 import com.sap.sailing.windestimation.data.ManeuverTypeForClassification;
-import com.sap.sailing.windestimation.data.ManeuverWithEstimatedType;
+import com.sap.sailing.windestimation.data.SimpleManeuverForEstimation;
+import com.sap.sailing.windestimation.data.SimpleManeuverWithEstimatedType;
 import com.sap.sse.common.Bearing;
 
 /**
@@ -17,11 +17,11 @@ public class MiddleCourseBasedTwdCalculatorImpl implements TwdFromManeuverCalcul
     private static final long serialVersionUID = -7920503233105279148L;
 
     @Override
-    public Bearing getTwd(ManeuverWithEstimatedType maneuverWithEstimatedType) {
+    public Bearing getTwd(SimpleManeuverWithEstimatedType<? extends SimpleManeuverForEstimation> maneuverWithEstimatedType) {
         Bearing twd = null;
         if (maneuverWithEstimatedType.getManeuverType() == ManeuverTypeForClassification.TACK
                 || maneuverWithEstimatedType.getManeuverType() == ManeuverTypeForClassification.JIBE) {
-            ManeuverForEstimation maneuver = maneuverWithEstimatedType.getManeuver();
+            SimpleManeuverForEstimation maneuver = maneuverWithEstimatedType.getManeuver();
             twd = maneuver.getMiddleCourse();
             if (maneuverWithEstimatedType.getManeuverType() == ManeuverTypeForClassification.JIBE) {
                 twd = twd.reverse();

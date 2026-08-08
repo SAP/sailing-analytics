@@ -4,19 +4,14 @@ import com.sap.sse.common.AbstractSpeedImpl;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.CourseChange;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Duration;
 import com.sap.sse.common.Position;
 import com.sap.sse.common.Speed;
 import com.sap.sse.common.SpeedWithBearing;
-import com.sap.sse.common.TimePoint;
 
 public abstract class AbstractSpeedWithAbstractBearingImpl extends AbstractSpeedImpl implements SpeedWithBearing {
     private static final long serialVersionUID = 6136100417593538013L;
 
-    @Override
-    public Position travelTo(Position pos, TimePoint from, TimePoint to) {
-        return pos.translateGreatCircle(getBearing(), this.travel(from, to));
-    }
-    
     @Override
     public String toString() {
         return super.toString()+" to "+getBearing().getDegrees()+"°";
@@ -71,14 +66,11 @@ public abstract class AbstractSpeedWithAbstractBearingImpl extends AbstractSpeed
         return new KnotSpeedWithBearingImpl(newSpeedInKnots, newBearing);
     }
 
-    private final static TimePoint start = new MillisecondsTimePoint(0);
-    private final static TimePoint end = start.plus(60000);
-
     public static Speed projectTo(SpeedWithBearing speedWithBearing, Position position, Bearing projectTo) {
-        Position traveledOneMinute = speedWithBearing.travelTo(position, start, end);
+        Position traveledOneMinute = speedWithBearing.travelTo(position, Duration.ONE_MINUTE);
         Position traveledToProjected = traveledOneMinute.projectToLineThrough(position, projectTo);
         Distance projectedDistance = position.getDistance(traveledToProjected);
-        return projectedDistance.inTime(end.asMillis() - start.asMillis());
+        return projectedDistance.inTime(Duration.ONE_MINUTE);
     }
 
     @Override
