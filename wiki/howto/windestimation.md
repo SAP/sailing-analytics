@@ -71,10 +71,10 @@ For your account that is equipped with the ``TRACKED_RACE:EXPORT`` permission yo
 
 ```
    docker run --mount type=bind,source=/tmp/windEstimationModels.dat,target=/home/sailing/windEstimationModels.dat \
-              -m 10g --rm -d \
+              -m 12g --rm -d \
               -e MONGODB_URI="mongodb://172.17.0.1/windestimation?retryWrites=true" \
               -e BEARER_TOKEN="{your-bearer-token-here}" \
-              -e MEMORY=-Xmx6g \
+              -e MEMORY=-Xmx8g \
               ghcr.io/eclipse-sailing-analytics/windestimationtraining:latest
 ```
 If successful (and you may want to remove the ``--rm`` option otherwise to allow you to inspect logs after unsuccessful execution) you will find the output under ``/tmp/windEstimationModels.dat`` which you can upload as usual, e.g., as in
