@@ -25,13 +25,19 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
+import com.sap.sailing.domain.base.EventBase;
 import com.sap.sailing.domain.base.RemoteSailingServerReference;
 import com.sap.sailing.domain.common.DataImportProgress;
 import com.sap.sailing.domain.common.sharding.ShardingType;
 import com.sap.sailing.server.gateway.deserialization.impl.CompareServersResultJsonDeserializer;
+import com.sap.sailing.server.gateway.deserialization.impl.CourseAreaJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.DataImportProgressJsonDeserializer;
+import com.sap.sailing.server.gateway.deserialization.impl.EventBaseJsonDeserializer;
+import com.sap.sailing.server.gateway.deserialization.impl.LeaderboardGroupBaseJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.MasterDataImportResultJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.RemoteSailingServerReferenceJsonDeserializer;
+import com.sap.sailing.server.gateway.deserialization.impl.TrackingConnectorInfoJsonDeserializer;
+import com.sap.sailing.server.gateway.deserialization.impl.VenueJsonDeserializer;
 import com.sap.sailing.server.gateway.interfaces.CompareServersResult;
 import com.sap.sailing.server.gateway.interfaces.MasterDataImportResult;
 import com.sap.sailing.server.gateway.interfaces.SailingServer;
@@ -102,6 +108,22 @@ public class SailingServerImpl extends SecuredServerImpl implements SailingServe
         final HttpGet getEvents = new HttpGet(eventsUrl.toString());
         final JSONArray jsonResponse = (JSONArray) getJsonParsedResponse(getEvents).getA();
         return Util.map(jsonResponse, o->UUID.fromString(((JSONObject) o).get(EventBaseJsonSerializer.FIELD_ID).toString()));
+    }
+
+    @Override
+    public Iterable<EventBase> getEvents() throws ClientProtocolException, IOException, ParseException, JsonDeserializationException {
+        final URL eventsUrl = new URL(getBaseUrl(), GATEWAY_URL_PREFIX+EventsResource.V1_EVENTS);
+        final HttpGet getEvents = new HttpGet(eventsUrl.toString());
+        final JSONArray jsonResponse = (JSONArray) getJsonParsedResponse(getEvents).getA();
+        final EventBaseJsonDeserializer deserializer = new EventBaseJsonDeserializer(
+                new VenueJsonDeserializer(new CourseAreaJsonDeserializer(com.sap.sailing.domain.base.DomainFactory.INSTANCE)),
+                new LeaderboardGroupBaseJsonDeserializer(),
+                new TrackingConnectorInfoJsonDeserializer());
+        final List<EventBase> result = new ArrayList<>();
+        for (final Object o : jsonResponse) {
+            result.add(deserializer.deserialize((JSONObject) o));
+        }
+        return result;
     }
 
     @Override

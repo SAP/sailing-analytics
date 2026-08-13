@@ -272,6 +272,8 @@ import com.sap.sailing.server.gateway.deserialization.impl.LeaderboardSearchResu
 import com.sap.sailing.server.gateway.deserialization.impl.TrackingConnectorInfoJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.VenueJsonDeserializer;
 import com.sap.sailing.server.gateway.interfaces.MasterDataImportConstants;
+import com.sap.sailing.server.gateway.interfaces.SailingServer;
+import com.sap.sailing.server.gateway.interfaces.SailingServerFactory;
 import com.sap.sailing.server.impl.preferences.model.CompetitorNotificationPreference;
 import com.sap.sailing.server.impl.preferences.model.CompetitorNotificationPreferences;
 import com.sap.sailing.server.interfaces.CourseAndMarkConfigurationFactory;
@@ -615,6 +617,8 @@ Replicator {
 
     private final ServiceTracker<CompetitorProvider, CompetitorProvider> competitorProviderServiceTracker;
 
+    private final ServiceTracker<SailingServerFactory, SailingServerFactory> sailingServerFactoryTracker;
+
     private transient final ConcurrentHashMap<Leaderboard, ScoreCorrectionListener> scoreCorrectionListenersByLeaderboard;
 
     private transient final ConcurrentHashMap<RaceDefinition, RaceTrackingConnectivityParameters> connectivityParametersByRace;
@@ -682,7 +686,7 @@ Replicator {
                 restoreTrackedRaces, /* securityServiceTracker */ null, /* sharedSailingDataTracker */ null,
                 /* replicationServiceTracker */ null, /* scoreCorrectionProviderServiceTracker */ null,
                 /* competitorProviderServiceTracker */ null, /* resultUrlRegistryServiceTracker */ null,
-                /* brandingConfigurationServiceTracker */ null);
+                /* brandingConfigurationServiceTracker */ null, /* sailingServerFactoryTracker */ null);
     }
 
     /**
@@ -714,7 +718,8 @@ Replicator {
             ServiceTracker<ScoreCorrectionProvider, ScoreCorrectionProvider> scoreCorrectionProviderServiceTracker,
             ServiceTracker<CompetitorProvider, CompetitorProvider> competitorProviderServiceTracker,
             ServiceTracker<ResultUrlRegistry, ResultUrlRegistry> resultUrlRegistryServiceTracker,
-            ServiceTracker<BrandingConfigurationService, BrandingConfigurationService> brandingConfigurationServiceTracker) {
+            ServiceTracker<BrandingConfigurationService, BrandingConfigurationService> brandingConfigurationServiceTracker,
+            ServiceTracker<SailingServerFactory, SailingServerFactory> sailingServerFactoryTracker) {
         this((final RaceLogAndTrackedRaceResolver raceLogResolver) -> {
             return new ConstructorParameters() {
                 private final MongoObjectFactory mongoObjectFactory = PersistenceFactory.INSTANCE
@@ -743,10 +748,11 @@ Replicator {
                     return competitorStore;
                 }
             };
-        }, MediaDBFactory.INSTANCE.getDefaultMediaDB(), null, sensorFixStore, serviceFinderFactory, trackedRegattaListener,
-                sailingNotificationService, trackedRaceStatisticsCache, restoreTrackedRaces,
+        }, MediaDBFactory.INSTANCE.getDefaultMediaDB(), null, sensorFixStore, serviceFinderFactory,
+                trackedRegattaListener, sailingNotificationService, trackedRaceStatisticsCache, restoreTrackedRaces,
                 securityServiceTracker, sharedSailingDataTracker, /* replicationServiceTracker */ null,
-                scoreCorrectionProviderServiceTracker, competitorProviderServiceTracker, resultUrlRegistryServiceTracker);
+                scoreCorrectionProviderServiceTracker,
+                competitorProviderServiceTracker, resultUrlRegistryServiceTracker, sailingServerFactoryTracker);
     }
 
     private RacingEventServiceImpl(final boolean clearPersistentCompetitorStore, WindStore windStore,
@@ -784,7 +790,7 @@ Replicator {
                 sailingNotificationService, /* trackedRaceStatisticsCache */ null, restoreTrackedRaces,
                 /* security service tracker */ null, /* sharedSailingDataTracker */ null, /* replicationServiceTracker */ null,
                 /* scoreCorrectionProviderServiceTracker */ null, /* competitorProviderServiceTracker */ null,
-                /* resultUrlRegistryServiceTracker */ null);
+                /* resultUrlRegistryServiceTracker */ null, /* sailingServerFactoryTracker */ null);
     }
  
     public RacingEventServiceImpl(final DomainObjectFactory domainObjectFactory, MongoObjectFactory mongoObjectFactory,
@@ -816,7 +822,7 @@ Replicator {
                 /* trackedRaceStatisticsCache */ null, restoreTrackedRaces, /* security service tracker */ null,
                 /* sharedSailingDataTracker */ null, /* replicationServiceTracker */ null,
                 /* scoreCorrectionProviderServiceTracker */ null, /* competitorProviderServiceTracker */ null,
-                /* resultUrlRegistryServiceTracker */ null);
+                /* resultUrlRegistryServiceTracker */ null, /* sailingServerFactoryTracker */ null);
     }
 
     /**
@@ -857,7 +863,8 @@ Replicator {
             ServiceTracker<ReplicationService, ReplicationService> replicationServiceTracker,
             ServiceTracker<ScoreCorrectionProvider, ScoreCorrectionProvider> scoreCorrectionProviderServiceTracker,
             ServiceTracker<CompetitorProvider, CompetitorProvider> competitorProviderServiceTracker,
-            ServiceTracker<ResultUrlRegistry, ResultUrlRegistry> resultUrlRegistryServiceTracker) {
+            ServiceTracker<ResultUrlRegistry, ResultUrlRegistry> resultUrlRegistryServiceTracker,
+            ServiceTracker<SailingServerFactory, SailingServerFactory> sailingServerFactoryTracker) {
         logger.info("Created " + this);
         this.eventResolverListeners = Collections.newSetFromMap(new ConcurrentHashMap<>());
         this.securityServiceTracker = securityServiceTracker;
@@ -868,6 +875,7 @@ Replicator {
         this.scoreCorrectionProviderServiceTracker = scoreCorrectionProviderServiceTracker;
         this.competitorProviderServiceTracker = competitorProviderServiceTracker;
         this.scoreCorrectionListenersByLeaderboard = new ConcurrentHashMap<>();
+        this.sailingServerFactoryTracker = sailingServerFactoryTracker;
         this.connectivityParametersByRace = new ConcurrentHashMap<>();
         this.notificationService = sailingNotificationService;
         final ConstructorParameters constructorParameters = constructorParametersProvider.apply(this);
@@ -1878,6 +1886,16 @@ Replicator {
     public com.sap.sse.common.Util.Pair<Iterable<EventBase>, Exception> getCompleteRemoteServerReference(
             RemoteSailingServerReference ref) {
         return remoteSailingServerSet.getEventsComplete(ref);
+    }
+
+    @Override
+    public Iterable<EventBase> getRemoteEvents(final String baseUrl, final String bearerTokenOrNull) throws Exception {
+        final SailingServerFactory factory = sailingServerFactoryTracker == null ? null : sailingServerFactoryTracker.getService();
+        if (factory == null) {
+            throw new IllegalStateException("SailingServerFactory not available");
+        }
+        final SailingServer sailingServer = factory.getSailingServer(new URL(baseUrl), bearerTokenOrNull);
+        return sailingServer.getEvents();
     }
 
     @Override
