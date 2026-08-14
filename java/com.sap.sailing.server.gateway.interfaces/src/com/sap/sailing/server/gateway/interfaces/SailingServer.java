@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.apache.http.client.ClientProtocolException;
 import org.json.simple.parser.ParseException;
 
+import com.sap.sailing.domain.base.EventBase;
 import com.sap.sailing.domain.base.RemoteSailingServerReference;
 import com.sap.sailing.domain.common.DataImportProgress;
 import com.sap.sse.security.util.SecuredServer;
@@ -47,6 +48,12 @@ public interface SailingServer extends SecuredServer {
     String getLeaderboardFromShardingKey(String shardingKey) throws Exception;
 
     Iterable<UUID> getEventIds() throws Exception;
+
+    /**
+     * Fetches all public events from the remote server, reusing the {@code /v1/events} endpoint which serializes
+     * venue and course areas.
+     */
+    Iterable<EventBase> getEvents() throws Exception;
 
     MasterDataImportResult importMasterData(SailingServer from, Iterable<UUID> leaderboardGroupIds, boolean override,
             boolean compress, boolean exportWind, boolean exportDeviceConfigs,

@@ -12,8 +12,9 @@ import com.sap.sailing.domain.tracking.impl.WindWithConfidenceImpl;
 import com.sap.sailing.windestimation.aggregator.ManeuverClassificationsAggregator;
 import com.sap.sailing.windestimation.aggregator.polarsfitting.PolarsFittingWindEstimation;
 import com.sap.sailing.windestimation.data.ManeuverForEstimation;
-import com.sap.sailing.windestimation.data.ManeuverWithEstimatedType;
 import com.sap.sailing.windestimation.data.RaceWithEstimationData;
+import com.sap.sailing.windestimation.data.SimpleManeuverForEstimation;
+import com.sap.sailing.windestimation.data.SimpleManeuverWithEstimatedType;
 import com.sap.sailing.windestimation.model.classifier.maneuver.ManeuverClassifiersCache;
 import com.sap.sailing.windestimation.model.classifier.maneuver.ManeuverWithProbabilisticTypeClassification;
 import com.sap.sailing.windestimation.preprocessing.PreprocessingPipeline;
@@ -90,7 +91,7 @@ public class PolarsFittingBasedWindEstimationComponentImpl<InputType>
 
     @Override
     public List<WindWithConfidence<Pair<Position, TimePoint>>> estimateWindTrackAfterManeuverClassificationsAggregation(
-            List<ManeuverWithEstimatedType> improvedManeuverClassifications) {
+            List<? extends SimpleManeuverWithEstimatedType<? extends SimpleManeuverForEstimation>> improvedManeuverClassifications) {
         throw new UnsupportedOperationException();
     }
 

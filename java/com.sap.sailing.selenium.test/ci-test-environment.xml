@@ -27,7 +27,7 @@
   
   <!--
     In this section necessary system properties for the different web drivers can be provided if needed. For more
-    informations about available properties see the following sides:
+    information about available properties see the following sites:
     
     - http://code.google.com/p/selenium/wiki/ChromeDriver
     - http://code.google.com/p/selenium/wiki/FirefoxDriver

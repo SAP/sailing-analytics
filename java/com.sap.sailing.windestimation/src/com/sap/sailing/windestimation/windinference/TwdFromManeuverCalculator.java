@@ -2,7 +2,8 @@ package com.sap.sailing.windestimation.windinference;
 
 import java.io.Serializable;
 
-import com.sap.sailing.windestimation.data.ManeuverWithEstimatedType;
+import com.sap.sailing.windestimation.data.SimpleManeuverForEstimation;
+import com.sap.sailing.windestimation.data.SimpleManeuverWithEstimatedType;
 import com.sap.sse.common.Bearing;
 
 /**
@@ -20,6 +21,6 @@ public interface TwdFromManeuverCalculator extends Serializable {
      *            The maneuver with its estimated type from which TWD will be derived
      * @return Inverted TWD or {@code null} if no TWD could be determined
      */
-    Bearing getTwd(ManeuverWithEstimatedType maneuverWithEstimatedType);
+    Bearing getTwd(SimpleManeuverWithEstimatedType<? extends SimpleManeuverForEstimation> maneuverWithEstimatedType);
 
 }

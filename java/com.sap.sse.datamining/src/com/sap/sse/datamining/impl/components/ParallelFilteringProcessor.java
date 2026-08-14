@@ -50,5 +50,4 @@ public class ParallelFilteringProcessor<InputType> extends AbstractParallelProce
         int retrievedDataAmount = additionalDataBuilder.getRetrievedDataAmount();
         additionalDataBuilder.setRetrievedDataAmount(retrievedDataAmount - filteredDataAmount.get());
     }
-
 }

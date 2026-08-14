@@ -1,16 +1,31 @@
-ARG SAPJVM_VERSION=8.1.108
-FROM docker.sapsailing.com/sapjvm8:${SAPJVM_VERSION}
+FROM eclipse-temurin:8-jdk
 LABEL maintainer=axel.uhl@sap.com
 # Download and extract the release
 WORKDIR /home/sailing
 RUN chmod 777 /home/sailing
-RUN curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | apt-key add -
-RUN echo "deb [arch=amd64,arm64] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/7.0 multiverse" >/etc/apt/sources.list.d/mongodb-org-7.0.list
 RUN apt-get update \
- && apt-get install -y vim mongodb-org-shell
+ && apt-get install -y --no-install-recommends curl gnupg ca-certificates \
+ && curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc \
+      | gpg --dearmor -o /usr/share/keyrings/mongodb-server-7.0.gpg \
+ && echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/7.0 multiverse" \
+      > /etc/apt/sources.list.d/mongodb-org-7.0.list \
+ && apt-get update \
+ && apt-get install -y --no-install-recommends \
+      vim mongodb-mongosh \
+ && rm -rf /var/lib/apt/lists/*
 COPY vimrc /root/.vimrc
-RUN wget -O /tmp/rds.pem https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem \
- && /opt/sapjvm_8/bin/keytool -importcert -alias AWSRDS -file /tmp/rds.pem -keystore /opt/sapjvm_8/jre/lib/security/cacerts -noprompt -storepass changeit \
- && rm /tmp/rds.pem
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends wget ca-certificates \
+ && wget -O /tmp/rds.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
+ && cd /tmp && csplit -z -f rds-cert- rds.pem '/-----BEGIN CERTIFICATE-----/' '{*}' \
+ && for cert in /tmp/rds-cert-*; do \
+      keytool -importcert -noprompt \
+        -alias "AWSRDS-$(basename "$cert")" \
+        -file "$cert" \
+        -keystore "$JAVA_HOME/lib/security/cacerts" \
+        -storepass changeit; \
+    done \
+ && rm /tmp/rds.pem /tmp/rds-cert-* \
+ && rm -rf /var/lib/apt/lists/*
 RUN wget -O /home/sailing/WindEstimationModelsTraining.jar https://static.sapsailing.com/WindEstimationModelsTraining.jar
 CMD exec java "${MEMORY}" -Dmongo.uri="${MONGODB_URI}" -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dump/ -XX:+PrintAdaptiveSizePolicy -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -Xloggc:logs/gc.log -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=100M -jar WindEstimationModelsTraining.jar "${BEARER_TOKEN}" ${TRAINING_DATA_PERCENT}
