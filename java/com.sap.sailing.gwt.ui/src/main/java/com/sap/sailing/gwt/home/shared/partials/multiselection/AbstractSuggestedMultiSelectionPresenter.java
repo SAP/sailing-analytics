@@ -51,15 +51,17 @@ public abstract class AbstractSuggestedMultiSelectionPresenter<T, D extends Disp
         selectedItemsMap.clear();
         persist();
     }
+
+    @Override
+    public Collection<T> getSelection() {
+        return new HashSet<>(selectedItemsMap.values());
+    }
     
     @Override
-    public final void initSelectedItems(Collection<T> selectedItems) {
+    public final void initSelectedItems(Iterable<T> selectedItems) {
         selectedItemsMap.clear();
         for (T item : selectedItems) {
             selectedItemsMap.put(getKey(item), item);
-        }
-        for (D display : displays) {
-            display.setSelectedItems(selectedItems);
         }
     }
     

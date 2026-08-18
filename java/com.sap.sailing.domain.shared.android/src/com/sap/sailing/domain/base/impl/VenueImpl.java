@@ -5,15 +5,19 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.sap.sailing.domain.base.CourseArea;
 import com.sap.sailing.domain.base.Venue;
+import com.sap.sailing.domain.base.VenueListener;
 import com.sap.sse.concurrent.LockUtil;
 import com.sap.sse.concurrent.NamedReentrantReadWriteLock;
 
 public class VenueImpl implements Venue {
     private static final long serialVersionUID = 6854152040737643290L;
     private String name;
+    private transient Set<VenueListener> listeners;
     
     /**
      * The course areas are ordered because they typically follow an ordered naming pattern borrowed from the
@@ -25,8 +29,19 @@ public class VenueImpl implements Venue {
 
     public VenueImpl(String name) {
         this.name = name;
+        this.listeners = Collections.newSetFromMap(new ConcurrentHashMap<>());
         courseAreas = new ArrayList<CourseArea>();
         courseAreasLock = createCourseAreasLock(name);
+    }
+
+    @Override
+    public void addListener(VenueListener listener) {
+        listeners.add(listener);
+    }
+
+    @Override
+    public void removeListener(VenueListener listener) {
+        listeners.remove(listener);
     }
 
     private NamedReentrantReadWriteLock createCourseAreasLock(String name) {
@@ -38,6 +53,7 @@ public class VenueImpl implements Venue {
         if (courseAreasLock == null) {
             courseAreasLock = createCourseAreasLock(getName());
         }
+        this.listeners = Collections.newSetFromMap(new ConcurrentHashMap<>());
     }
 
     @Override
@@ -58,6 +74,9 @@ public class VenueImpl implements Venue {
         } finally {
             LockUtil.unlockAfterWrite(courseAreasLock);
         }
+        for (VenueListener listener : listeners) {
+            listener.courseAreaAdded(this, courseArea);
+        }
     }
 
     @Override
@@ -67,6 +86,9 @@ public class VenueImpl implements Venue {
             courseAreas.remove(courseArea);
         } finally {
             LockUtil.unlockAfterWrite(courseAreasLock);
+        }
+        for (VenueListener listener : listeners) {
+            listener.courseAreaRemoved(this, courseArea);
         }
     }
     

@@ -37,7 +37,8 @@ public class BoatClassVectorGraphicsResolver {
                 BoatClassMasterdata.STAR, BoatClassMasterdata.TECHNO_293, BoatClassMasterdata.TECHNO_293_PLUS,
                 BoatClassMasterdata.WINGFOIL, BoatClassMasterdata.ZOOM8);
         BoatClassVectorGraphics _49er = new _49erVectorGraphics(BoatClassMasterdata._49ER, BoatClassMasterdata._49ERFX,
-                BoatClassMasterdata._29ER, BoatClassMasterdata._18Footer, BoatClassMasterdata.WASZP);
+                BoatClassMasterdata._29ER, BoatClassMasterdata._18Footer, BoatClassMasterdata.WASZP, BoatClassMasterdata.RS700,
+                BoatClassMasterdata.RS800);
         BoatClassVectorGraphics extreme40 = new Extreme40VectorGraphics(BoatClassMasterdata.EXTREME_40,
                 BoatClassMasterdata.D_35, BoatClassMasterdata.SKUD_18, BoatClassMasterdata.MOCRA, BoatClassMasterdata.WETA);
         BoatClassVectorGraphics gc32 = new GC32VectorGraphics(BoatClassMasterdata.GC_32, BoatClassMasterdata.M32);
@@ -66,7 +67,7 @@ public class BoatClassVectorGraphicsResolver {
                 BoatClassMasterdata.ELLIOTT_6M, BoatClassMasterdata.H_BOAT, BoatClassMasterdata.ALBIN_EXPRESS,
                 BoatClassMasterdata.FARR_30, BoatClassMasterdata.JK_20, BoatClassMasterdata.J24, BoatClassMasterdata.PLATU_25,
                 BoatClassMasterdata.TOM_28_MAX, BoatClassMasterdata.DELPHIA_24, BoatClassMasterdata.RS200,
-                BoatClassMasterdata.RS400, BoatClassMasterdata.RS500, BoatClassMasterdata.RS800,
+                BoatClassMasterdata.RS400, BoatClassMasterdata.RS500,
                 BoatClassMasterdata.SK_22, BoatClassMasterdata.STREAMLINE, BoatClassMasterdata.SWAN_45,
                 BoatClassMasterdata.TEENY, BoatClassMasterdata.TEMPEST, BoatClassMasterdata.X_99, BoatClassMasterdata.TRIAS,
                 BoatClassMasterdata.VENT_D_OUEST, BoatClassMasterdata.FLYING_JUNIOR, BoatClassMasterdata.VAURIEN,

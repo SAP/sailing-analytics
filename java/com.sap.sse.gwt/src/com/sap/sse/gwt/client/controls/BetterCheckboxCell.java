@@ -46,12 +46,10 @@ public class BetterCheckboxCell extends AbstractEditableCell<Boolean, Boolean> {
     public void onBrowserEvent(Context context, Element parent, Boolean value, NativeEvent event,
             ValueUpdater<Boolean> valueUpdater) {
         String type = event.getType();
-
         boolean enterPressed = BrowserEvents.KEYDOWN.equals(type) && event.getKeyCode() == KeyCodes.KEY_ENTER;
         if (BrowserEvents.CLICK.equals(type) || BrowserEvents.CHANGE.equals(type) || enterPressed) {
             InputElement input = parent.getFirstChild().cast();
             Boolean isChecked = input.isChecked();
-
             /*
              * Toggle the value if the enter key was pressed and the cell handles selection or doesn't depend on
              * selection. If the cell depends on selection but doesn't handle selection, then ignore the enter key and

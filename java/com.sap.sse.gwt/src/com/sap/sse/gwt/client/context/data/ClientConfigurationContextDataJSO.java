@@ -127,4 +127,7 @@ public class ClientConfigurationContextDataJSO extends JavaScriptObject {
     public final native String getGitHubLink() /*-{
         return this.gitHubLink;
     }-*/;
+    public final native String getGitHubPagesLink() /*-{
+        return this.gitHubPagesLink;
+    }-*/;
 }

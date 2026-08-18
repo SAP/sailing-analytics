@@ -52,6 +52,7 @@ import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
 import com.sap.sailing.domain.common.RegattaIdentifier;
 import com.sap.sailing.domain.common.RegattaName;
 import com.sap.sailing.domain.common.RegattaNameAndRaceName;
+import com.sap.sailing.domain.leaderboard.HasCourseAreasListener;
 import com.sap.sailing.domain.leaderboard.ResultDiscardingRule;
 import com.sap.sailing.domain.leaderboard.ScoringScheme;
 import com.sap.sailing.domain.leaderboard.impl.AbstractLeaderboardImpl;
@@ -176,6 +177,7 @@ public class RegattaImpl extends NamedImpl implements Regatta, RaceColumnListene
             AbstractLeaderboardImpl.class.getName(), 0);
 
     private transient CPUMeter cpuMeter;
+    private transient Set<HasCourseAreasListener> courseAreaChangeListeners;
     
     /**
      * Constructs a regatta with an empty {@link RaceLogStore} and with
@@ -267,6 +269,7 @@ public class RegattaImpl extends NamedImpl implements Regatta, RaceColumnListene
             boolean controlTrackingFromStartAndFinishTimes, boolean autoRestartTrackingUponCompetitorSetChange,
             RankingMetricConstructor rankingMetricConstructor, String registrationLinkSecret) {
         super(name);
+        this.courseAreaChangeListeners = Collections.newSetFromMap(new ConcurrentHashMap<>());
         this.cpuMeter = CPUMeter.create();
         this.registrationLinkSecret = registrationLinkSecret;
         this.rankingMetricConstructor = rankingMetricConstructor;
@@ -371,6 +374,7 @@ public class RegattaImpl extends NamedImpl implements Regatta, RaceColumnListene
         ois.defaultReadObject();
         this.cpuMeter = CPUMeter.create();
         regattaListeners = new HashSet<RegattaListener>();
+        this.courseAreaChangeListeners = Collections.newSetFromMap(new ConcurrentHashMap<>());
         MasterDataImportInformation masterDataImportInformation = ongoingMasterDataImportInformation.get();
         if (masterDataImportInformation != null) {
             raceLogStore = masterDataImportInformation.getRaceLogStore();
@@ -717,10 +721,24 @@ public class RegattaImpl extends NamedImpl implements Regatta, RaceColumnListene
 
     @Override
     public void setCourseAreas(Iterable<CourseArea> newCourseAreas) {
+        final Iterable<CourseArea> oldCourseAreas = this.courseAreas;
         synchronized (this.courseAreas) {
             this.courseAreas.clear();
             Util.addAll(newCourseAreas, this.courseAreas);
         }
+        for (HasCourseAreasListener listener : courseAreaChangeListeners) {
+            listener.courseAreasChanged(this, oldCourseAreas, newCourseAreas);
+        }
+    }
+
+    @Override
+    public void addCourseAreaChangeListener(HasCourseAreasListener listener) {
+        courseAreaChangeListeners.add(listener);
+    }
+
+    @Override
+    public void removeCourseAreaChangeListener(HasCourseAreasListener listener) {
+        courseAreaChangeListeners.remove(listener);        
     }
 
     @Override

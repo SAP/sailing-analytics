@@ -23,7 +23,7 @@ class SuggestedMultiSelectionNotificationToggle extends Composite implements Has
     @UiField Label labelUi;
     @UiField CheckBox toggleButtonUi;
     
-    SuggestedMultiSelectionNotificationToggle(String label) {
+    public SuggestedMultiSelectionNotificationToggle(String label) {
         initWidget(uiBinder.createAndBindUi(this));
         labelUi.setText(label);
     }

@@ -18,7 +18,7 @@ public class ChartUtil {
      * added to the chart and hence visible. Otherwise, the checkbox won't initially be in sync with the series'
      * visibility state.
      */
-    static protected void useCheckboxesToShowAndHide(final Chart chart) {
+    static protected void useCheckboxesToShowAndHide(final Chart chart, final Runnable onVisibilityChanged) {
         chart.setLegend(new Legend().setEnabled(true).setBorderWidth(0).setSymbolPadding(25)); // make room for checkbox
         chart.setSeriesPlotOptions(new SeriesPlotOptions().setShowCheckbox(true)
                 .setSeriesCheckboxClickEventHandler(new SeriesCheckboxClickEventHandler() {
@@ -27,6 +27,7 @@ public class ChartUtil {
                         // we want to change the visiblity not the selection state, so own handler is necessary
                         Series series = chart.getSeries(seriesCheckboxClickEvent.getSeriesId());
                         series.setVisible(seriesCheckboxClickEvent.isChecked());
+                        onVisibilityChanged.run();
                         return false; // don't toggle the select state of the series
                     }
                 }).setSeriesLegendItemClickEventHandler(new SeriesLegendItemClickEventHandler() {
@@ -35,6 +36,7 @@ public class ChartUtil {
                 Series series = chart.getSeries(seriesLegendItemClickEvent.getSeriesId());
                 series.setVisible(!series.isVisible());
                 series.select(series.isVisible());
+                onVisibilityChanged.run();
                 return false;
             }
         }));

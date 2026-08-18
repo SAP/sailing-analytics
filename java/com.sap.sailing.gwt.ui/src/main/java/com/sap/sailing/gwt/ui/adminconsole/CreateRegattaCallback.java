@@ -204,6 +204,10 @@ public class CreateRegattaCallback implements DialogCallback<RegattaDTO>{
 
                                     @Override
                                     public void onSuccess(Void result) {
+                                        // based on synchronization of the LeaderboardGroupDTO objects across all
+                                        // LeaderboardGroupDisplayer instances we may hope that the following change
+                                        // is reflected by all displayers. See also bug6256.
+                                        selectedLeaderboardGroup.leaderboards.add(newRegattaLeaderboard);
                                     }
                                 }));
                     }

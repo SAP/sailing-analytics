@@ -43,7 +43,15 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages {
 
     String registeredAt(String string);
 
+    String registrationTime();
+
     String dropReplicaConnection();
+
+    String dropReplicas();
+
+    String replicaIdentifier();
+
+    String numberOfOperations();
 
     String replicables();
 
@@ -113,10 +121,28 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages {
     String serverInformation();
 
     String serverName(String buildVersion);
-    
+
     String validPassphrase();
-    
+
     String invalidPassphrase();
-    
+
     String passphraseCheckError();
+
+    String replicaColumnIp();
+
+    String replicaColumnId();
+
+    String replicaColumnRegistered();
+
+    String replicaColumnOpsPerMsg();
+
+    String replicaColumnMessages();
+
+    String replicaColumnAvgMsgSize();
+
+    String replicaColumnTotalSize();
+
+    String replicaColumnTotalOps();
+
+    String reallyDropReplica(String additionalInformation, String name);
 }

@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -332,8 +333,9 @@ public class TracTracEventManagementPanel extends AbstractEventManagementPanel i
                     public int hashCode(TracTracRaceRecordDTO t) {
                         return t.id.hashCode();
                     }
-                }, racesFilterablePanel.getAllListDataProvider(), racesTable);
-        racesTable.addColumn(selectionCheckboxColumn, selectionCheckboxColumn.getHeader());
+                }, racesFilterablePanel.getAllListDataProvider());
+        final Header<Boolean> selectAllHeader = selectionCheckboxColumn.createHeader();
+        racesTable.addColumn(selectionCheckboxColumn, selectAllHeader);
         racesTable.addColumn(regattaNameColumn, stringMessages.event());
         racesTable.addColumn(raceNameColumn, stringMessages.race());
         racesTable.addColumn(boatClassColumn, stringMessages.boatClass());

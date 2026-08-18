@@ -18,18 +18,11 @@ public class SimulatorResultsDTO implements IsSerializable {
 
     @Deprecated
     SimulatorResultsDTO() { // for GWT RPC serialization only
-        this.version = 0;
-        this.leg = 0;
-        this.startTime = null;
-        this.timeStep = null;
-        this.legDuration = null;
-        this.raceCourse = null;
-        this.windField = null;
-        this.paths = null;
-        this.notificationMessage = "";
     }
 
-    public SimulatorResultsDTO(final long version, final int leg, final TimePoint startTime, final Duration timeStep, final Duration legDuration, final RaceMapDataDTO raceCourse, final PathDTO[] paths, final WindFieldDTO windField, final String notificationMessage) {
+    public SimulatorResultsDTO(final long version, final int leg, final TimePoint startTime, final Duration timeStep,
+            final Duration legDuration, final RaceMapDataDTO raceCourse, final PathDTO[] paths,
+            final WindFieldDTO windField, final String notificationMessage) {
         this.version = version;
         this.leg = leg;
         this.startTime = startTime;

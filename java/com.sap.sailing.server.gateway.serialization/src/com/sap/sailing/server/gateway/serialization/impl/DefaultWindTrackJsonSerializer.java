@@ -44,7 +44,7 @@ public class DefaultWindTrackJsonSerializer implements WindTrackJsonSerializer {
         try {
             Iterator<Wind> windIter = windTrack.getFixesIterator(fromTime, /* inclusive */true, toTime, /* inclusive */ false);
             int count = 0;
-            while ((maxNumberOfFixes == -1 || count<maxNumberOfFixes) && windIter.hasNext()) {
+            while ((maxNumberOfFixes == -1 || count++<maxNumberOfFixes) && windIter.hasNext()) {
                 fixes.add(windIter.next());
             }
         } finally {

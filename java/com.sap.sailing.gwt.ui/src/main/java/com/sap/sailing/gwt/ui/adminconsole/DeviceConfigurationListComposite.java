@@ -25,9 +25,10 @@ import com.sap.sse.common.Util;
 import com.sap.sse.gwt.adminconsole.AdminConsoleTableResources;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.celltable.AbstractSortableTextColumn;
-import com.sap.sse.gwt.client.celltable.BaseCelltable;
 import com.sap.sse.gwt.client.celltable.EntityIdentityComparator;
+import com.sap.sse.gwt.client.celltable.FlushableCellTable;
 import com.sap.sse.gwt.client.celltable.RefreshableMultiSelectionModel;
+import com.sap.sse.gwt.client.celltable.SelectionCheckboxColumn;
 import com.sap.sse.security.shared.HasPermissions;
 import com.sap.sse.security.shared.HasPermissions.DefaultActions;
 import com.sap.sse.security.shared.impl.SecuredSecurityTypes;
@@ -37,11 +38,12 @@ import com.sap.sse.security.ui.client.component.DefaultActionsImagesBarCell;
 import com.sap.sse.security.ui.client.component.EditOwnershipDialog;
 import com.sap.sse.security.ui.client.component.SecuredDTOOwnerColumn;
 import com.sap.sse.security.ui.client.component.editacl.EditACLDialog;
+import com.google.gwt.user.cellview.client.Header;
 
 public class DeviceConfigurationListComposite extends Composite  {
     protected static AdminConsoleTableResources tableResource = GWT.create(AdminConsoleTableResources.class);
     
-    private final RefreshableMultiSelectionModel<DeviceConfigurationWithSecurityDTO> refreshableConfigurationSelectionModel;
+    private RefreshableMultiSelectionModel<DeviceConfigurationWithSecurityDTO> refreshableConfigurationSelectionModel;
     private final CellTable<DeviceConfigurationWithSecurityDTO> configurationTable;
     protected ListDataProvider<DeviceConfigurationWithSecurityDTO> configurationsDataProvider;
     
@@ -66,23 +68,9 @@ public class DeviceConfigurationListComposite extends Composite  {
         noConfigurationsLabel.setWordWrap(false);
         panel.add(noConfigurationsLabel);
         configurationsDataProvider = new ListDataProvider<DeviceConfigurationWithSecurityDTO>();
-        refreshTable();
         configurationTable = createConfigurationTable(userService);
         configurationTable.setVisible(true);
-        refreshableConfigurationSelectionModel = new RefreshableMultiSelectionModel<>(
-                new EntityIdentityComparator<DeviceConfigurationWithSecurityDTO>() {
-                    @Override
-                    public boolean representSameEntity(DeviceConfigurationWithSecurityDTO dto1,
-                            DeviceConfigurationWithSecurityDTO dto2) {
-                        return Util.equalsWithNull(dto1.id, dto2.id);
-                    }
-
-                    @Override
-                    public int hashCode(DeviceConfigurationWithSecurityDTO t) {
-                        return t.id == null ? 0 : t.id.hashCode();
-                    }
-                }, configurationsDataProvider);
-        configurationTable.setSelectionModel(refreshableConfigurationSelectionModel);
+        refreshTable();
         panel.add(configurationTable);
         initWidget(mainPanel);
     }
@@ -117,14 +105,31 @@ public class DeviceConfigurationListComposite extends Composite  {
     }
 
     private CellTable<DeviceConfigurationWithSecurityDTO> createConfigurationTable(final UserService userService) {
-        CellTable<DeviceConfigurationWithSecurityDTO> table = new BaseCelltable<DeviceConfigurationWithSecurityDTO>(
-                /* pageSize */10000, tableResource);
+        final FlushableCellTable<DeviceConfigurationWithSecurityDTO> table = new FlushableCellTable<>(10000, tableResource);
         configurationsDataProvider.addDataDisplay(table);
         table.ensureDebugId("DeviceConfigurationList");
         table.setWidth("100%");
         ListHandler<DeviceConfigurationWithSecurityDTO> columnSortHandler = new ListHandler<DeviceConfigurationWithSecurityDTO>(
                 configurationsDataProvider.getList());
         table.addColumnSortHandler(columnSortHandler);
+        final SelectionCheckboxColumn<DeviceConfigurationWithSecurityDTO> checkColumn = new SelectionCheckboxColumn<DeviceConfigurationWithSecurityDTO>(
+                        tableResource.cellTableStyle().cellTableCheckboxSelected(),
+                        tableResource.cellTableStyle().cellTableCheckboxDeselected(),
+                        tableResource.cellTableStyle().cellTableCheckboxColumnCell(),
+                        new EntityIdentityComparator<DeviceConfigurationWithSecurityDTO>() {
+                            @Override
+                            public boolean representSameEntity(DeviceConfigurationWithSecurityDTO a, DeviceConfigurationWithSecurityDTO b) {
+                                return Util.equalsWithNull(a.id, b.id);
+                            }
+                            @Override
+                            public int hashCode(DeviceConfigurationWithSecurityDTO t) {
+                                return t.id == null ? 0 : t.id.hashCode();
+                            }
+                        }, configurationsDataProvider);
+        final Header<Boolean> selectAllHeader = checkColumn.createHeader();
+        table.addColumn(checkColumn, selectAllHeader);
+        refreshableConfigurationSelectionModel = checkColumn.getSelectionModel();
+        table.setSelectionModel(refreshableConfigurationSelectionModel, checkColumn.getSelectionManager());
         TextColumn<DeviceConfigurationWithSecurityDTO> identifierNameColumn = new TextColumn<DeviceConfigurationWithSecurityDTO>() {
             @Override
             public String getValue(DeviceConfigurationWithSecurityDTO config) {

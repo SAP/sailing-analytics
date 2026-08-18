@@ -47,7 +47,7 @@ public class TagInputPanel extends FlowPanel {
             // set empty values for parameters which are not shown to the user. okayButtonText will be set by the using
             // components.
             super(/* title */ "", /* message */ "", /* okayButtonText */ "", stringMessages.cancel(), null,
-                    /* animationEnabled */ true, callback);
+                  /* animationEnabled */ true, callback);
             this.setValidator(this::validate);
             this.stringMessages = stringMessages;
             this.taggingComponent = taggingComponent;

@@ -20,6 +20,7 @@ import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.AbstractCellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
@@ -83,11 +84,12 @@ extends TableWrapper<UserDTO, S, StringMessages, TR> {
                 new EntityIdentityComparator<UserDTO>() {
                     @Override
                     public boolean representSameEntity(UserDTO dto1, UserDTO dto2) {
-                        return dto1.getId().toString().equals(dto2.getId().toString());
+                        return Util.equalsWithNull(dto1.getId() != null ? dto1.getId().toString() : null,
+                                dto2.getId() != null ? dto2.getId().toString() : null);
                     }
                     @Override
                     public int hashCode(UserDTO t) {
-                        return t.getId().hashCode();
+                        return t.getId() != null ? t.getId().hashCode() : 0;
                     }
                 }, tableResources);
         this.userService = userService;
@@ -97,6 +99,14 @@ extends TableWrapper<UserDTO, S, StringMessages, TR> {
         TextColumn<UserDTO> fullNameColumn = new AbstractSortableTextColumn<UserDTO>(user->user.getFullName(), userColumnListHandler);
         TextColumn<UserDTO> emailColumn = new AbstractSortableTextColumn<UserDTO>(user->user.getEmail(), userColumnListHandler);
         TextColumn<UserDTO> emailValidatedColumn = new AbstractSortableTextColumn<UserDTO>(user->user.isEmailValidated() ? stringMessages.yes() : stringMessages.no(), userColumnListHandler);
+        TextColumn<UserDTO> optOutColumn = new AbstractSortableTextColumn<UserDTO>(user->user.getDidOptOutOfFeatureAndCommunityEmails() ? stringMessages.yes() : stringMessages.no(), userColumnListHandler);
+        optOutColumn.setSortable(true);
+        userColumnListHandler.setComparator(optOutColumn, new Comparator<UserDTO>() {
+            @Override
+            public int compare(UserDTO r1, UserDTO r2) {
+                return Boolean.compare(r1.getDidOptOutOfFeatureAndCommunityEmails(), r2.getDidOptOutOfFeatureAndCommunityEmails());
+            }
+        });
         TextColumn<UserDTO> companyColumn = new AbstractSortableTextColumn<UserDTO>(user->user.getCompany(), userColumnListHandler);
         Column<UserDTO, SafeHtml> groupsColumn = new Column<UserDTO, SafeHtml>(new SafeHtmlCell()) {
             @Override
@@ -177,6 +187,9 @@ extends TableWrapper<UserDTO, S, StringMessages, TR> {
                 strings.add(t.getFullName());
                 strings.add(t.getEmail());
                 strings.add(t.getCompany());
+                if (t.getDidOptOutOfFeatureAndCommunityEmails()) {
+                    strings.add(stringMessages.optOutOfFeatureAndCommunityEmails());
+                }
                 Util.addAll(Util.map(t.getRoles(), RoleWithSecurityDTO::getName), strings);
                 Util.addAll(Util.map(t.getUserGroups(), StrippedUserGroupDTO::getName), strings);
                 return strings;
@@ -195,6 +208,7 @@ extends TableWrapper<UserDTO, S, StringMessages, TR> {
         table.addColumn(fullNameColumn, stringMessages.name());
         table.addColumn(emailColumn, stringMessages.email());
         table.addColumn(emailValidatedColumn, stringMessages.validated());
+        table.addColumn(optOutColumn, composeOptOutColumnHeaderWithTooltipOnHover(stringMessages));
         table.addColumn(companyColumn, stringMessages.company());
         table.addColumn(groupsColumn, stringMessages.groups());
         table.addColumn(rolesColumn, stringMessages.roles());
@@ -203,6 +217,16 @@ extends TableWrapper<UserDTO, S, StringMessages, TR> {
         SecuredDTOOwnerColumn.configureOwnerColumns(table, userColumnListHandler, stringMessages);
         table.addColumn(userActionColumn, stringMessages.actions());
         table.ensureDebugId("UsersTable");
+    }
+
+    private SafeHtml composeOptOutColumnHeaderWithTooltipOnHover(StringMessages stringMessages) {
+        final String fullTitle = stringMessages.optOutOfFeatureAndCommunityEmails();
+        final String tooltip = new SafeHtmlBuilder().appendEscaped(fullTitle).toSafeHtml().asString();
+        final SafeHtml baseHtml = SafeHtmlUtils.fromString(fullTitle.substring(0, 10) + "...");
+        return new SafeHtmlBuilder()
+                .appendHtmlConstant("<span title=\"" + tooltip + "\">")
+                .append(baseHtml)
+                .appendHtmlConstant("</ span>").toSafeHtml();
     }
 
     private AccessControlledActionsColumn<UserDTO, DefaultActionsImagesBarCell> composeUserActionColumn(
@@ -338,8 +362,8 @@ extends TableWrapper<UserDTO, S, StringMessages, TR> {
         final UserEditDialog dialog = new UserEditDialog(originalUser, new DialogCallback<UserDTO>() {
             @Override
             public void ok(final UserDTO user) {
-                getUserManagementWriteService().updateUserProperties(user.getName(), user.getFullName(), user.getCompany(),
-                        user.getLocale(),
+                getUserManagementWriteService().updateUserProperties(user.getName(), user.getFullName(),
+                        user.getCompany(), user.getLocale(), user.getDidOptOutOfFeatureAndCommunityEmails(),
                         user.getDefaultTenant() != null ? user.getDefaultTenant().getId().toString() : null,
                         new AsyncCallback<UserDTO>() {
                             @Override

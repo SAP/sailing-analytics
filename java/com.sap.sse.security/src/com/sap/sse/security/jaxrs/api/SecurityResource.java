@@ -67,6 +67,7 @@ public class SecurityResource extends AbstractSecurityResource {
     public static final String COMPANY = "company";
     public static final String FULL_NAME = "fullName";
     public static final String EMAIL = "email";
+    public static final String OPT_OUT_OF_FEATURE_AND_COMMUNITY_EMAILS = "opt_out_of_feature_and_community_emails";
     private static final String SECURITY_UI_URL_PATH = "/security/ui/";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
@@ -366,8 +367,8 @@ public class SecurityResource extends AbstractSecurityResource {
     @Path(USER_METHOD)
     @Produces("text/plain;charset=UTF-8")
     public Response updateUser(@Context UriInfo uriInfo, @QueryParam(USERNAME) String username,
-            @QueryParam(EMAIL) String email, @QueryParam(FULL_NAME) String fullName,
-            @QueryParam(COMPANY) String company) {
+            @QueryParam(EMAIL) String email, @QueryParam(OPT_OUT_OF_FEATURE_AND_COMMUNITY_EMAILS) Boolean optOutOfFeatureAndCommunityEmails,
+            @QueryParam(FULL_NAME) String fullName, @QueryParam(COMPANY) String company) {
         if (!getSecurityService().hasCurrentUserUpdatePermission(getSecurityService().getUserByName(username))) {
             return Response.status(Status.UNAUTHORIZED).build();
         } else {
@@ -376,7 +377,8 @@ public class SecurityResource extends AbstractSecurityResource {
                 if (user == null) {
                     return Response.status(Status.PRECONDITION_FAILED).entity("User "+username+" not known").build();
                 } else {
-                    getSecurityService().updateUserProperties(username, fullName, company, user.getLocale());
+                    getSecurityService().updateUserProperties(username, fullName, company, user.getLocale(),
+                            optOutOfFeatureAndCommunityEmails);
                     if (!Util.equalsWithNull(user.getEmail(), email)) {
                         getSecurityService().updateSimpleUserEmail(username, email, getEmailValidationBaseURL(uriInfo));
                     }

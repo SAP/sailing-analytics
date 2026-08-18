@@ -16,6 +16,7 @@ import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.cellview.client.AbstractCellTable;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
@@ -390,20 +391,18 @@ public abstract class AbstractLeaderboardConfigPanel extends FormPanel
 
     protected abstract void addColumnsToRacesTable(CellTable<RaceColumnDTOAndFleetDTOWithNameBasedEquality> racesTable);
 
-    protected SelectionCheckboxColumn<StrippedLeaderboardDTO> createSortableSelectionCheckboxColumn(
+    protected SelectionCheckboxColumn<StrippedLeaderboardDTO> createSelectionCheckboxColumn(
             final FlushableCellTable<StrippedLeaderboardDTO> leaderboardTable,
             AdminConsoleTableResources tableResources,
             ListHandler<StrippedLeaderboardDTO> leaderboardColumnListHandler,
             ListDataProvider<StrippedLeaderboardDTO> listDataProvider) {
-        SelectionCheckboxColumn<StrippedLeaderboardDTO> selectionCheckboxColumn = new SelectionCheckboxColumn<StrippedLeaderboardDTO>(
+        final SelectionCheckboxColumn<StrippedLeaderboardDTO> selectionCheckboxColumn = new SelectionCheckboxColumn<StrippedLeaderboardDTO>(
                 tableResources.cellTableStyle().cellTableCheckboxSelected(),
                 tableResources.cellTableStyle().cellTableCheckboxDeselected(),
                 tableResources.cellTableStyle().cellTableCheckboxColumnCell(),
-                new NameBasedStrippedLeaderboardDTOEntityIdentityComparator(), listDataProvider, leaderboardTable);
-        selectionCheckboxColumn.setSortable(true);
-        leaderboardColumnListHandler.setComparator(selectionCheckboxColumn,
-                (o1, o2) -> (leaderboardTable.getSelectionModel().isSelected(o1) ? 1 : 0)
-                        - (leaderboardTable.getSelectionModel().isSelected(o2) ? 1 : 0));
+                new NameBasedStrippedLeaderboardDTOEntityIdentityComparator(), listDataProvider);
+        final Header<Boolean> selectAllHeader = selectionCheckboxColumn.createHeader();
+        leaderboardTable.addColumn(selectionCheckboxColumn, selectAllHeader);
         return selectionCheckboxColumn;
     }
 

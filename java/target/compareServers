@@ -68,15 +68,15 @@ if [ "${useRestApi}" = "1" ]; then
     shift
   done
   CURL_OUTPUT=$( curl -sL --dump-header "${HEADERS}" -H 'Content-Type: multipart/form-data' "${NEWSERVER}/sailingserver/api/v1/compareservers" -d "server2=${OLDSERVER}" ${AUTH} ${LEADERBOARD_GROUPS} 2>${WGET_ERR} )
-  echo "${CURL_OUTPUT}" | jq
+  echo "${CURL_OUTPUT}"
   HTTP_STATUS=$( cat "${HEADERS}" | grep "^HTTP\/[0-9.]* [0-9]\{3\}" | tail -1 | sed -e 's/^HTTP\/[0-9.]* \([0-9]\{3\}\).*$/\1/' )
   rm -f "${HEADERS}"
   MESSAGE_SUFFIX=". HTTP_STATUS was ${HTTP_STATUS}."
   if [[ "${HTTP_STATUS}" =~ 2.. ]]; then
-    echo "Success${MESSAGE_SUFFIX}"
+    echo "Success${MESSAGE_SUFFIX}" >&2
     exit 0
   else
-    echo "Failed${MESSAGE_SUFFIX}"
+    echo "Failed${MESSAGE_SUFFIX}" >&2
     exit ${HTTP_STATUS}
   fi
 else

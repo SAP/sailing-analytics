@@ -1,0 +1,25 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+ruby "3.2.8"
+
+gem "gollum", "5.3.2"
+
+gem "sinatra", "2.2.4"
+gem "sinatra-contrib", "2.2.4"
+
+gem "rack", "2.2.9"
+gem "rack-protection", "2.2.4"
+
+gem "webrick", "1.8.1"
+
+gem "rugged", "1.7.2"
+
+gem "mustache", "1.1.1"
+gem "mustache-sinatra", "2.0.0"
+
+gem "rest-client", "2.1.0"
+group :development do
+  gem 'rufo'
+end

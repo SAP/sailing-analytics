@@ -29,16 +29,36 @@ cannot be used to update the password. See <a href="change_password.html"><code>
 	<tr>
 		<td>Mandatory parameters:</td>
 		<td>
-			<div>username</div>
-			<div>email</div>
-			<div>fullName</div>
-			<div>company</div>
+			<div>username - The username of the user to update (required)</div>
 		</td>
 	</tr>
 	<tr>
-		<td>Example:</td>
-		<td><code>curl -X PUT "http://127.0.0.1:8888/security/api/restsecurity/user?username=uhl&email=axel.uhl@sap.com&fullName=Axel%20Uhl&company=SAP%20SE"</code><br>
-	            Will provide a JSON document as explained above.</td>
+		<td>Optional parameters:</td>
+		<td>
+			<div>email - The user's email address</div>
+			<div>fullName - The user's full name</div>
+			<div>company - The user's company name</div>
+			<div>opt_out_of_feature_and_community_emails - Boolean flag to opt out of feature and community emails</div>
+			<br>
+			<strong>Important:</strong> If a parameter is omitted or passed as null, that property will <strong>not be updated</strong>.
+			Only parameters explicitly provided with non-null values will be updated. This allows for partial updates
+			where you can update only specific fields without affecting others.
+		</td>
+	</tr>
+	<tr>
+		<td>Examples:</td>
+		<td>
+			<div><strong>Update all properties:</strong></div>
+			<code>curl -X PUT "http://127.0.0.1:8888/security/api/restsecurity/user?username=uhl&email=axel.uhl@sap.com&fullName=Axel%20Uhl&company=SAP%20SE"</code><br>
+			<br>
+			<div><strong>Update only email (other properties remain unchanged):</strong></div>
+			<code>curl -X PUT "http://127.0.0.1:8888/security/api/restsecurity/user?username=uhl&email=newemail@sap.com"</code><br>
+			<br>
+			<div><strong>Update only company and opt-out flag:</strong></div>
+			<code>curl -X PUT "http://127.0.0.1:8888/security/api/restsecurity/user?username=uhl&company=New%20Company&opt_out_of_feature_and_community_emails=true"</code><br>
+			<br>
+			Will provide a JSON document as explained above.
+		</td>
 	</tr>
 </table>
 <table>

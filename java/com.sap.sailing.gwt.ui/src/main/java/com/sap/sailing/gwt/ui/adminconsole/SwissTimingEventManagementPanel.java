@@ -11,6 +11,7 @@ import com.google.gwt.user.cellview.client.AbstractCellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.Handler;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
+import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -234,10 +235,10 @@ public class SwissTimingEventManagementPanel extends AbstractEventManagementPane
                 return object.regattaName;
             }
         };
-        SelectionCheckboxColumn<SwissTimingRaceRecordDTO> selectionColumn = new SelectionCheckboxColumn<SwissTimingRaceRecordDTO>(
+        SelectionCheckboxColumn<SwissTimingRaceRecordDTO> raceTableSelectionColumn = new SelectionCheckboxColumn<SwissTimingRaceRecordDTO>(
                 tableRes.cellTableStyle().cellTableCheckboxSelected(),
                 tableRes.cellTableStyle().cellTableCheckboxDeselected(),
-                tableRes.cellTableStyle().cellTableCheckboxColumnCell(), entityIdentityComparator, raceList, raceTable);
+                tableRes.cellTableStyle().cellTableCheckboxColumnCell(), entityIdentityComparator, raceList);
 
         TextColumn<SwissTimingRaceRecordDTO> seriesNameColumn = new TextColumn<SwissTimingRaceRecordDTO>() {
             @Override
@@ -283,7 +284,9 @@ public class SwissTimingEventManagementPanel extends AbstractEventManagementPane
         raceStatusColumn.setSortable(true);
         regattaNameColumn.setSortable(true);
         seriesNameColumn.setSortable(true);
-        raceTable.addColumn(selectionColumn, selectionColumn.getHeader());
+        raceTable.setSelectionModel(raceTableSelectionColumn.getSelectionModel(), raceTableSelectionColumn.getSelectionManager());
+        final Header<Boolean> selectAllHeader = raceTableSelectionColumn.createHeader();
+        raceTable.addColumn(raceTableSelectionColumn, selectAllHeader);
         raceTable.addColumn(regattaNameColumn, stringConstants.regatta());
         raceTable.addColumn(seriesNameColumn, stringConstants.series());
         raceTable.addColumn(raceNameColumn, stringConstants.name());
@@ -291,7 +294,6 @@ public class SwissTimingEventManagementPanel extends AbstractEventManagementPane
         raceTable.addColumn(boatClassColumn, stringConstants.boatClass());
         raceTable.addColumn(genderColumn, stringConstants.gender());
         raceTable.addColumn(raceStartTimeColumn, stringConstants.startTime());
-        raceTable.setSelectionModel(selectionColumn.getSelectionModel(), selectionColumn.getSelectionManager());
         trackableRacesPanel.add(raceTable);
         raceList.addDataDisplay(raceTable);
         Handler columnSortHandler = getRaceTableColumnSortHandler(raceList.getList(), regattaNameColumn, seriesNameColumn,

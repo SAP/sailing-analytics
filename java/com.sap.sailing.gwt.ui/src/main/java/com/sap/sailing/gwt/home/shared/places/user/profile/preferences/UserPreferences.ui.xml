@@ -1,7 +1,9 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
             xmlns:um="urn:import:com.sap.sailing.gwt.home.shared.usermanagement.decorator"
-            xmlns:ms="urn:import:com.sap.sailing.gwt.home.shared.partials.multiselection">
+            xmlns:ms="urn:import:com.sap.sailing.gwt.home.shared.partials.multiselection"
+            xmlns:cbt="urn:import:com.sap.sailing.gwt.home.shared.partials.checkboxtile"
+            xmlns:lb="urn:import:com.sap.sailing.gwt.home.shared.partials.labeledbox">
     <ui:with field="i18n" type="com.sap.sailing.gwt.ui.client.StringMessages" />
     <ui:with field="res" type="com.sap.sailing.gwt.common.client.SharedResources" />
     <ui:style type="com.sap.sailing.gwt.home.shared.places.user.profile.preferences.UserPreferences.Style">
@@ -16,10 +18,13 @@
             <ui:text from="{i18n.userNotificationsOnlyIfMailAddressIsVerified}" />
         </div>
         <div class="{res.mediaCss.column} {res.mediaCss.small12} {res.mediaCss.medium6} {res.mainCss.spacermargintopmediumsmall}">
-            <ms:SuggestedMultiSelection ui:field="favoriteCompetitorsSelctionUi"/>
+            <lb:LabeledBox ui:field="miscUi"/>
         </div>
         <div class="{res.mediaCss.column} {res.mediaCss.small12} {res.mediaCss.medium6} {res.mainCss.spacermargintopmediumsmall}">
-            <ms:SuggestedMultiSelection ui:field="favoriteBoatClassesSelctionUi"/>
+            <lb:LabeledBox ui:field="favoriteCompetitorsSelctionUi"/>
+        </div>
+        <div class="{res.mediaCss.column} {res.mediaCss.small12} {res.mediaCss.medium6} {res.mainCss.spacermargintopmediumsmall}">
+            <lb:LabeledBox ui:field="favoriteBoatClassesSelctionUi"/>
         </div>
     </g:HTMLPanel>
 </ui:UiBinder> 

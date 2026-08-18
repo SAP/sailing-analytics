@@ -4,6 +4,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.SpanElement;
+import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -24,8 +25,10 @@ public class SuggestedMultiSelectionCompetitorItemDescription extends Widget {
     public SuggestedMultiSelectionCompetitorItemDescription(SimpleCompetitorDTO competitor,
             FlagImageResolver flagImageResolver) {
         setElement(uiBinder.createAndBindUi(this));
-        flagImageUi.getStyle().setBackgroundImage("url('" + flagImageResolver.getFlagImageUri(
-                competitor.getFlagImageURL(), competitor.getTwoLetterIsoCountryCode()).asString() + "')");
+        final String countryCode = competitor.getTwoLetterIsoCountryCode();
+        final SafeUri flagImageUri = flagImageResolver.getFlagImageUri(competitor.getFlagImageURL(), countryCode);
+        final String bgUrl = "url('" + flagImageUri.asString() + "')";
+        flagImageUi.getStyle().setBackgroundImage(bgUrl);
         sailIdUi.setInnerText(competitor.getShortInfo());
         nameUi.setInnerText(competitor.getName());
     }

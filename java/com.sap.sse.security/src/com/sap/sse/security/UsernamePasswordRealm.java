@@ -55,7 +55,7 @@ public class UsernamePasswordRealm extends AbstractCompositeAuthorizingRealm {
             throw new LockedAccountException("Password authentication for user "+username+" is currently locked");
         }
         final UsernamePasswordAccount upa = (UsernamePasswordAccount) user.getAccount(AccountType.USERNAME_PASSWORD);
-        if (upa == null){
+        if (upa == null) {
             return null;
         }
         saltedPassword = upa.getSaltedPassword();

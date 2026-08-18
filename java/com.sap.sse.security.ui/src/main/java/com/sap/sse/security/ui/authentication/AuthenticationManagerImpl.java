@@ -203,27 +203,27 @@ public class AuthenticationManagerImpl implements AuthenticationManager {
     }
     
     @Override
-    public void updateUserProperties(String fullName, String company, String localeName, String defaultTenantIdAsString,
-            final AsyncCallback<UserDTO> callback) {
+    public void updateUserProperties(String fullName, String company, String localeName,
+            Boolean didOptOutFeatureAndCommunityEmails, String defaultTenantIdAsString, final AsyncCallback<UserDTO> callback) {
         final UserDTO currentUser = getAuthenticationContext().getCurrentUser();
         final String username = currentUser.getName();
         final String locale = currentUser.getLocale();
-        userManagementWriteService.updateUserProperties(username, fullName, company, localeName, defaultTenantIdAsString,
-                new AsyncCallback<UserDTO>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                callback.onFailure(caught);
-            }
+        userManagementWriteService.updateUserProperties(username, fullName, company, localeName,
+                didOptOutFeatureAndCommunityEmails, defaultTenantIdAsString, new AsyncCallback<UserDTO>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        callback.onFailure(caught);
+                    }
 
-            @Override
-            public void onSuccess(UserDTO result) {
-                refreshUserInfo();
-                callback.onSuccess(result);
-                if (!Util.equalsWithNull(locale, localeName)) {
-                    redirectIfLocaleIsSetAndLocaleIsNotGivenInTheURL(localeName);
-                }
-            }
-        });
+                    @Override
+                    public void onSuccess(UserDTO result) {
+                        refreshUserInfo();
+                        callback.onSuccess(result);
+                        if (!Util.equalsWithNull(locale, localeName)) {
+                            redirectIfLocaleIsSetAndLocaleIsNotGivenInTheURL(localeName);
+                        }
+                    }
+                });
     }
 
     /**

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -153,51 +154,59 @@ public class TestORCPublicCertificateDatabase {
     @Test
     public void testGetCertificate() throws Exception {
         Collection<ORCCertificate> certificates = FailIfNoValidOrcCertificateRule.getAvailableCerts();
-        final ORCCertificate cert = certificates.stream().findFirst().get();
-        Iterable<CertificateHandle> certHandles = db.search(/* country */ null, LocalDate.now().getYear(), /* referenceNumber */ null, cert.getBoatName(),
-                cert.getSailNumber(), /*
-                                       * boat class name; could be set to cert.getBoatClassName() but there are
-                                       * deviations in ORC DBs and query API, so leaving null:
-                                       */ null, /* includeInvalid */ false);
-        if (Util.isEmpty(certHandles)) {
-            // there were certs; get one from the previous year
-            certHandles = db.search(null, LocalDate.now().getYear()-1, null, cert.getBoatName(),
-                    cert.getSailNumber(), /*
-                                           * boat class name; could be set to cert.getBoatClassName() but there are
-                                           * deviations in ORC DBs and query API, so leaving null:
-                                           */ null, /* includeInvalid */ false);
+        // some certificates seem to be lacking a GPH value; can't use those for this test; we're explicitly excluding LITE certificates already...
+        for (final ORCCertificate cert : certificates) {
+            if (cert.getGPH() != null) {
+                Iterable<CertificateHandle> certHandles = db.search(/* country */ null, LocalDate.now().getYear(), /* referenceNumber */ null, cert.getBoatName(),
+                        cert.getSailNumber(), /*
+                                               * boat class name; could be set to cert.getBoatClassName() but there are
+                                               * deviations in ORC DBs and query API, so leaving null:
+                                               */ null, /* includeInvalid */ false);
+                if (Util.isEmpty(certHandles)) {
+                    // there were certs; get one from the previous year
+                    certHandles = db.search(null, LocalDate.now().getYear()-1, null, cert.getBoatName(),
+                            cert.getSailNumber(), /*
+                                                   * boat class name; could be set to cert.getBoatClassName() but there are
+                                                   * deviations in ORC DBs and query API, so leaving null:
+                                                   */ null, /* includeInvalid */ false);
+                }
+                if (Util.isEmpty(certHandles)) {
+                    // there were certs; try searching by reference number
+                    certHandles = db.search(null, LocalDate.now().getYear(), cert.getReferenceNumber(), /* boat name may have deviated due to special characters */ null,
+                            cert.getSailNumber(), /*
+                                                   * boat class name; could be set to cert.getBoatClassName() but there are
+                                                   * deviations in ORC DBs and query API, so leaving null:
+                                                   */ null, /* includeInvalid */ false);
+                }
+                if (Util.isEmpty(certHandles)) {
+                    // still nothing? Then try by reference number in previous year:
+                    certHandles = db.search(null, LocalDate.now().getYear()-1, cert.getReferenceNumber(), /* boat name may have deviated due to special characters */ null,
+                            cert.getSailNumber(), /*
+                                                   * boat class name; could be set to cert.getBoatClassName() but there are
+                                                   * deviations in ORC DBs and query API, so leaving null:
+                                                   */ null, /* includeInvalid */ false);
+                }
+                Optional<CertificateHandle> certificateHandle = Optional.ofNullable(certHandles.iterator().hasNext() ? certHandles.iterator().next() : null);
+                assertTrue(certificateHandle.isPresent(), "No certificate found for handle "+certificateHandle+
+                                " extracted from certificates "+certificates);
+                final String referenceNumber = certificateHandle.get().getReferenceNumber();
+                final CertificateHandle handle = db.getCertificateHandle(referenceNumber);
+                final ORCCertificate result = db.getCertificate(referenceNumber, handle.getFamily());
+                assertNotNull(result, "Unable to load certificate for reference number "+referenceNumber+" from handle "+certificateHandle);
+                assertEquals(handle.getGPH(), result.getGPH().asSeconds(), 0.00001);
+                // Use some tolerance as we found differences as much as 5s between the dxtDate in the handle coming from the XML search result
+                // and the IssueDate field in the JSON. Both suggest to report millisecond accuracy, but dxtDate always seems to have the
+                // milliseconds as "000" explaining many sub-second differences. But in some cases differences were significantly bigger.
+                assertEquals(handle.getIssueDate().asMillis(), result.getIssueDate().asMillis(), 10000.0, "Issue dates of certificate with reference number "+referenceNumber+
+                                " varies between current year result handle ("+handle.getIssueDate()+") and certificate ("+
+                                result.getIssueDate()+").");
+                assertEquals(handle.getSailNumber(), result.getSailNumber());
+                return;
+            } else {
+                logger.info("No valid GPH found in certificate "+cert.getBoatName()+" with sail number "+cert.getSailNumber());
+            }
         }
-        if (Util.isEmpty(certHandles)) {
-            // there were certs; try searching by reference number
-            certHandles = db.search(null, LocalDate.now().getYear(), cert.getReferenceNumber(), /* boat name may have deviated due to special characters */ null,
-                    cert.getSailNumber(), /*
-                                           * boat class name; could be set to cert.getBoatClassName() but there are
-                                           * deviations in ORC DBs and query API, so leaving null:
-                                           */ null, /* includeInvalid */ false);
-        }
-        if (Util.isEmpty(certHandles)) {
-            // still nothing? Then try by reference number in previous year:
-            certHandles = db.search(null, LocalDate.now().getYear()-1, cert.getReferenceNumber(), /* boat name may have deviated due to special characters */ null,
-                    cert.getSailNumber(), /*
-                                           * boat class name; could be set to cert.getBoatClassName() but there are
-                                           * deviations in ORC DBs and query API, so leaving null:
-                                           */ null, /* includeInvalid */ false);
-        }
-        Optional<CertificateHandle> certificateHandle = Optional.ofNullable(certHandles.iterator().hasNext() ? certHandles.iterator().next() : null);
-        assertTrue(certificateHandle.isPresent(), "No certificate found for handle "+certificateHandle+
-                        " extracted from certificates "+certificates);
-        final String referenceNumber = certificateHandle.get().getReferenceNumber();
-        final CertificateHandle handle = db.getCertificateHandle(referenceNumber);
-        final ORCCertificate result = db.getCertificate(referenceNumber, handle.getFamily());
-        assertNotNull(result, "Unable to load certificate for reference number "+referenceNumber+" from handle "+certificateHandle);
-        assertEquals(handle.getGPH(), result.getGPH().asSeconds(), 0.00001);
-        // Use some tolerance as we found differences as much as 5s between the dxtDate in the handle coming from the XML search result
-        // and the IssueDate field in the JSON. Both suggest to report millisecond accuracy, but dxtDate always seems to have the
-        // milliseconds as "000" explaining many sub-second differences. But in some cases differences were significantly bigger.
-        assertEquals(handle.getIssueDate().asMillis(), result.getIssueDate().asMillis(), 10000.0, "Issue dates of certificate with reference number "+referenceNumber+
-                        " varies between current year result handle ("+handle.getIssueDate()+") and certificate ("+
-                        result.getIssueDate()+").");
-        assertEquals(handle.getSailNumber(), result.getSailNumber());
+        fail("No certificate found with a valid GPH; that seems very suspicious and lets this test case fail.");
     }
     
     @FailIfNoValidOrcCertificates

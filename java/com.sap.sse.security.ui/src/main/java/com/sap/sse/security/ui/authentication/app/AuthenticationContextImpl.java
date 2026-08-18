@@ -18,10 +18,9 @@ import com.sap.sse.security.ui.client.premium.PaywallResolver;
 public class AuthenticationContextImpl implements AuthenticationContext {
 
     private final UserDTO currentUser;
-    private final static UserDTO ANONYMOUS = new UserDTO("Anonymous", "", "", "", null, false, new ArrayList<AccountDTO>(),
-            new ArrayList<RoleWithSecurityDTO>(), /* default tenant */ null,
-            new ArrayList<WildcardPermissionWithSecurityDTO>(),
-            /* groups */ null, /* lockedUntil */ null);
+    private final static UserDTO ANONYMOUS = new UserDTO("Anonymous", "", "", "", null, false, false,
+            new ArrayList<AccountDTO>(), new ArrayList<RoleWithSecurityDTO>(), /* default tenant */ null,
+            new ArrayList<WildcardPermissionWithSecurityDTO>(), /* groups */ null, /* lockedUntil */ null);
     private final UserService userService;
     private final PaywallResolver paywallResolver;
 

@@ -168,7 +168,10 @@ public class LeaderboardConfigPanel extends AbstractLeaderboardConfigPanel
                 leaderboardCreateAndRegattaReadPermission, this::createRegattaLeaderboardWithOtherTieBreakingLeaderboard);
         createRegattaLeaderboardWithOtherTieBreakingLeaderboardBtn.ensureDebugId("CreateRegattaLeaderboardWithOtherTieBreakingLeaderboardButton");
         leaderboardRemoveButton = buttonPanel.addRemoveAction(stringMessages.remove(), leaderboardSelectionModel, true,
-                () -> removeLeaderboards(leaderboardSelectionModel.getSelectedSet()));
+                () -> {
+            final List<StrippedLeaderboardDTO> selectedLeaderboards = new ArrayList<>(leaderboardSelectionModel.getSelectedSet());
+            removeLeaderboards(selectedLeaderboards);
+        });
         leaderboardRemoveButton.ensureDebugId("LeaderboardsRemoveButton");
         buttonPanel.addUnsecuredWidget(new HelpButton(HelpButtonResources.INSTANCE,
                 stringMessages.videoGuide(), "https://sapsailing-documentation.s3-eu-west-1.amazonaws.com/adminconsole/Advanced+Topics/Leaderboard+Group+explained.mp4"));
@@ -181,7 +184,7 @@ public class LeaderboardConfigPanel extends AbstractLeaderboardConfigPanel
             ListDataProvider<StrippedLeaderboardDTO> listDataProvider) {
         ListHandler<StrippedLeaderboardDTO> leaderboardColumnListHandler = new ListHandler<StrippedLeaderboardDTO>(
                 filteredLeaderboardList.getList());
-        SelectionCheckboxColumn<StrippedLeaderboardDTO> selectionCheckboxColumn = createSortableSelectionCheckboxColumn(
+        SelectionCheckboxColumn<StrippedLeaderboardDTO> selectionCheckboxColumn = createSelectionCheckboxColumn(
                 leaderboardTable, tableResources, leaderboardColumnListHandler, listDataProvider);
         AnchorCell anchorCell = new AnchorCell();
         Column<StrippedLeaderboardDTO, SafeHtml> linkColumn = new Column<StrippedLeaderboardDTO, SafeHtml>(
@@ -379,7 +382,6 @@ public class LeaderboardConfigPanel extends AbstractLeaderboardConfigPanel
                         configACL.openDialog(t);
                     }
         });
-        leaderboardTable.addColumn(selectionCheckboxColumn, selectionCheckboxColumn.getHeader());
         leaderboardTable.addColumn(linkColumn, stringMessages.name());
         leaderboardTable.addColumn(leaderboardDisplayNameColumn, stringMessages.displayName());
         leaderboardTable.addColumn(leaderboardCanBoatsOfCompetitorsChangePerRaceColumn,
@@ -866,14 +868,6 @@ public class LeaderboardConfigPanel extends AbstractLeaderboardConfigPanel
 
     @Override
     protected void leaderboardSelectionChanged() {
-        Set<StrippedLeaderboardDTO> selectedLeaderboards = leaderboardSelectionModel.getSelectedSet();
-        boolean canDeleteAllSelected = true;
-        for (StrippedLeaderboardDTO leaderboard : selectedLeaderboards) {
-            if (!userService.hasPermission(leaderboard, DefaultActions.DELETE)) {
-                canDeleteAllSelected = false;
-            }
-        }
-        leaderboardRemoveButton.setEnabled(!selectedLeaderboards.isEmpty() && canDeleteAllSelected);
         final StrippedLeaderboardDTO selectedLeaderboard = getSelectedLeaderboard();
         if (leaderboardSelectionModel.getSelectedSet().size() == 1 && selectedLeaderboard != null) {
             raceColumnTable.getDataProvider().getList().clear();

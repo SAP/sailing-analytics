@@ -75,8 +75,8 @@ jobs:
           tags: ghcr.io/${{steps.ghcr.outputs.PACKAGE}}:${{ env.RELEASE }}${{ env.BRANCH == 'main' && github.event.inputs.release == '' && format(',ghcr.io/{0}:latest', steps.ghcr.outputs.PACKAGE) || env.BRANCH == 'docker-17' && github.event.inputs.release == '' && format(',ghcr.io/{0}:latest-17', steps.ghcr.outputs.PACKAGE) || env.BRANCH == 'docker-21' && github.event.inputs.release == '' && format(',ghcr.io/{0}:latest-21', steps.ghcr.outputs.PACKAGE) || env.BRANCH == 'docker-24' && github.event.inputs.release == '' && format(',ghcr.io/{0}:latest-24', steps.ghcr.outputs.PACKAGE) || env.BRANCH == 'docker-25' && github.event.inputs.release == '' && format(',ghcr.io/{0}:latest-25', steps.ghcr.outputs.PACKAGE) || '' }}
           annotations: |
             maintainer=axel.uhl@sap.com
-            index:org.opencontainers.image.title=Sailing Analytics
-            index:org.opencontainers.image.description=The Sailing Analytics Web Application
+            index:org.opencontainers.image.title=Eclipse Azimuth Sailing Analytics
+            index:org.opencontainers.image.description=The Eclipse Azimuth Sailing Analytics Web Application
           file: ${{ env.BRANCH == 'docker-17' && 'docker/Dockerfile_sapsailing_on_sapmachine17' || env.BRANCH == 'docker-21' && 'docker/Dockerfile_sapsailing_on_sapmachine21' || env.BRANCH == 'docker-24' && 'docker/Dockerfile_sapsailing_on_sapmachine24' || env.BRANCH == 'docker-25' && 'docker/Dockerfile_sapsailing_on_sapmachine25' || 'docker/Dockerfile' }}
           context: docker/
           platforms: linux/amd64,linux/arm64

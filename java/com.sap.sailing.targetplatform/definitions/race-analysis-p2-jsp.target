@@ -116,7 +116,7 @@
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="com.amazon.aws.aws-java-api.feature.group" version="2.15.57"/>
-<repository location="https://p2.sapsailing.com/p2/aws-sdk/"/>
+<repository location="https://download.eclipse.org/sailing-analytics/p2/aws-sdk/"/>
 </location>
 <!-- location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="com.sap.sailing.target.base.feature.group" version="1.0.0"/>

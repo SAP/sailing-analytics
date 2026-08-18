@@ -26,6 +26,7 @@ public class UserDTO extends
     private String locale;
     private List<AccountDTO> accounts;
     private boolean emailValidated;
+    private boolean didOptOutOfFeatureAndCommunityEmails;
     private List<StrippedUserGroupDTO> groups;
     private TimePoint lockedUntil;
     private SecurityInformationDTO securityInformation = new SecurityInformationDTO();
@@ -42,8 +43,8 @@ public class UserDTO extends
      * @param groups may be {@code null} which is equivalent to passing an empty groups collection
      */
     public UserDTO(String name, String email, String fullName, String company, String locale, boolean emailValidated,
-            List<AccountDTO> accounts, Iterable<RoleWithSecurityDTO> roles, StrippedUserGroupDTO defaultTenant,
-            Iterable<WildcardPermissionWithSecurityDTO> permissions,
+            boolean didOptOutOfFeatureAndCommunityEmails, List<AccountDTO> accounts, Iterable<RoleWithSecurityDTO> roles,
+            StrippedUserGroupDTO defaultTenant, Iterable<WildcardPermissionWithSecurityDTO> permissions,
             Iterable<StrippedUserGroupDTO> groups, TimePoint lockedUntil) {
         super(name, permissions);
         this.defaultTenantForCurrentServer = defaultTenant;
@@ -52,6 +53,7 @@ public class UserDTO extends
         this.company = company;
         this.locale = locale;
         this.emailValidated = emailValidated;
+        this.didOptOutOfFeatureAndCommunityEmails = didOptOutOfFeatureAndCommunityEmails;
         this.accounts = accounts;
         this.groups = new ArrayList<>();
         Util.addAll(groups, this.groups);
@@ -72,7 +74,8 @@ public class UserDTO extends
         final List<StrippedUserGroupDTO> groupsCopy = new ArrayList<StrippedUserGroupDTO>();
         Util.addAll(this.groups, groupsCopy);
         return new UserDTO(this.getName(), this.email, this.fullName, this.company, this.locale, this.emailValidated,
-                accountsCopy, rolesCopy, this.defaultTenantForCurrentServer, permissionsCopy, groupsCopy, lockedUntil);
+                this.didOptOutOfFeatureAndCommunityEmails, accountsCopy, rolesCopy, this.defaultTenantForCurrentServer,
+                permissionsCopy, groupsCopy, lockedUntil);
     }
 
     @Override
@@ -138,6 +141,10 @@ public class UserDTO extends
 
     public boolean isEmailValidated() {
         return emailValidated;
+    }
+
+    public boolean getDidOptOutOfFeatureAndCommunityEmails() {
+        return didOptOutOfFeatureAndCommunityEmails;
     }
 
     @Override

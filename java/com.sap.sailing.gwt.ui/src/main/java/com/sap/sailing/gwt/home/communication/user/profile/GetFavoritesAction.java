@@ -25,7 +25,13 @@ public class GetFavoritesAction implements SailingAction<FavoritesResult> {
     @Override
     @GwtIncompatible
     public FavoritesResult execute(SailingDispatchContext ctx) throws DispatchException {
-        return new FavoritesResult(getFavoriteBoatClasses(ctx), getFavoriteCompetitors(ctx));
+        return new FavoritesResult(getFavoriteBoatClasses(ctx), getFavoriteCompetitors(ctx),
+                getDidOptOutOfFeatureAndCommunityEmails(ctx));
+    }
+
+    @GwtIncompatible
+    private boolean getDidOptOutOfFeatureAndCommunityEmails(SailingDispatchContext ctx) {
+        return ctx.getSecurityService().getCurrentUser().getDidOptOutOfFeatureAndCommunityEmails();
     }
 
     @GwtIncompatible

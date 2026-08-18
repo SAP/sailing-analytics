@@ -3,10 +3,7 @@ package com.sap.sailing.gwt.ui.adminconsole;
 import static com.sap.sse.security.ui.client.component.DefaultActionsImagesBarCell.ACTION_DELETE;
 import static com.sap.sse.security.ui.client.component.DefaultActionsImagesBarCell.ACTION_UPDATE;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -15,9 +12,7 @@ import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.cellview.client.AbstractCellTable;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -27,7 +22,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.MultiSelectionModel;
 import com.sap.sailing.gwt.ui.adminconsole.places.AdminConsoleView.Presenter;
 import com.sap.sailing.gwt.ui.client.SailingServiceWriteAsync;
@@ -40,10 +34,8 @@ import com.sap.sse.gwt.client.IconResources;
 import com.sap.sse.gwt.client.Notification;
 import com.sap.sse.gwt.client.Notification.NotificationType;
 import com.sap.sse.gwt.client.celltable.CellTableWithCheckboxResources;
-import com.sap.sse.gwt.client.celltable.FlushableCellTable;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog.DialogCallback;
 import com.sap.sse.gwt.client.panels.AbstractFilterablePanel;
-import com.sap.sse.gwt.client.panels.LabeledAbstractFilterablePanel;
 import com.sap.sse.security.shared.impl.SecuredSecurityTypes.ServerActions;
 import com.sap.sse.security.ui.client.UserService;
 import com.sap.sse.security.ui.client.component.DefaultActionsImagesBarCell;
@@ -54,10 +46,8 @@ public class RemoteServerInstancesManagementPanel extends SimplePanel implements
     private final UserService userService;
     private final ErrorReporter errorReporter;
     private final StringMessages stringMessages;
-    private FlushableCellTable<RemoteSailingServerReferenceDTO> remoteServersTable;
-    private final ListDataProvider<RemoteSailingServerReferenceDTO> serverDataProvider;
+    private RemoteServerInstancesManagementTableWrapper remoteServersTable;
     private MultiSelectionModel<RemoteSailingServerReferenceDTO> refreshableServerSelectionModel;
-    private LabeledAbstractFilterablePanel<RemoteSailingServerReferenceDTO> filteredServerTablePanel;
     private final CaptionPanel remoteServersPanel;
 
     public RemoteServerInstancesManagementPanel(final Presenter presenter, StringMessages stringMessages, CellTableWithCheckboxResources tableResources) {
@@ -72,38 +62,10 @@ public class RemoteServerInstancesManagementPanel extends SimplePanel implements
         mainPanel.add(remoteServersPanel);
         VerticalPanel remoteServersContentPanel = new VerticalPanel();
         remoteServersPanel.setContentWidget(remoteServersContentPanel);
-        serverDataProvider = new ListDataProvider<>();
-        filteredServerTablePanel = createFilteredServerTablePanel();
         remoteServersTable = createRemoteServersTable(tableResources);
-        serverDataProvider.addDataDisplay(remoteServersTable);
-        remoteServersContentPanel.add(filteredServerTablePanel);
         remoteServersContentPanel.add(remoteServersTable);
         remoteServersContentPanel.add(createButtonToolbar());
         refreshSailingServerList();
-    }
-
-    private LabeledAbstractFilterablePanel<RemoteSailingServerReferenceDTO> createFilteredServerTablePanel() {
-        return new LabeledAbstractFilterablePanel<RemoteSailingServerReferenceDTO>(
-                new Label(stringMessages.filterBy() + ":"), Collections.<RemoteSailingServerReferenceDTO> emptyList(),
-                serverDataProvider, stringMessages) {
-            @Override
-            public List<String> getSearchableStrings(RemoteSailingServerReferenceDTO t) {
-                List<String> strings = new ArrayList<String>();
-                strings.add(t.getName());
-                strings.add(t.getUrl());
-                if (t.getEvents() != null) {
-                    for (EventBaseDTO e : t.getEvents()) {
-                        strings.add(e.getName());
-                    }
-                }
-                return strings;
-            }
-
-            @Override
-            public AbstractCellTable<RemoteSailingServerReferenceDTO> getCellTable() {
-                return remoteServersTable;
-            }
-        };
     }
 
     private Panel createButtonToolbar() {
@@ -121,27 +83,17 @@ public class RemoteServerInstancesManagementPanel extends SimplePanel implements
                 (ClickHandler) event -> removeSelectedSailingServers());
     }
 
-    private FlushableCellTable<RemoteSailingServerReferenceDTO> createRemoteServersTable(
+    private RemoteServerInstancesManagementTableWrapper createRemoteServersTable(
             CellTableWithCheckboxResources tableResources) {
         RemoteServerInstancesManagementTableWrapper wrapper = new RemoteServerInstancesManagementTableWrapper(
-                stringMessages, errorReporter, filteredServerTablePanel.getAllListDataProvider(), tableResources);
-        wrapper.addColumn(createTextColumn(RemoteSailingServerReferenceDTO::getName), stringMessages.name());
-        wrapper.addColumn(createTextColumn(RemoteSailingServerReferenceDTO::getUrl), stringMessages.url());
+                stringMessages, errorReporter, tableResources);
+        wrapper.addColumn(RemoteSailingServerReferenceDTO::getName, stringMessages.name());
+        wrapper.addColumn(RemoteSailingServerReferenceDTO::getUrl, stringMessages.url());
         wrapper.addColumn(createEventsColumn(), stringMessages.events());
         wrapper.addColumn(createActionsColumn(), stringMessages.actions());
         wrapper.setEmptyTableWidget(new Label(stringMessages.noSailingServerInstancesYet()));
         refreshableServerSelectionModel = wrapper.getSelectionModel();
-        return wrapper.getTable();
-    }
-
-    private TextColumn<RemoteSailingServerReferenceDTO> createTextColumn(
-            Function<RemoteSailingServerReferenceDTO, String> getter) {
-        return new TextColumn<RemoteSailingServerReferenceDTO>() {
-            @Override
-            public String getValue(RemoteSailingServerReferenceDTO server) {
-                return getter.apply(server) != null ? getter.apply(server) : "";
-            }
-        };
+        return wrapper;
     }
 
     private Column<RemoteSailingServerReferenceDTO, SafeHtml> createEventsColumn() {
@@ -224,7 +176,7 @@ public class RemoteServerInstancesManagementPanel extends SimplePanel implements
 
     private void refreshSailingServerList() {
         sailingService.getRemoteSailingServerReferences(createCallback(stringMessages::errorRefreshingSailingServers,
-                filteredServerTablePanel::updateAll, false));
+                remoteServersTable.getFilterPanel()::updateAll, false));
     }
 
     private void removeSelectedSailingServers() {
@@ -241,7 +193,7 @@ public class RemoteServerInstancesManagementPanel extends SimplePanel implements
     }
 
     private void addRemoteSailingServerReference() {
-        new SailingServerCreateOrEditDialog(filteredServerTablePanel.getAll(), stringMessages,
+        new SailingServerCreateOrEditDialog(remoteServersTable.getFilterPanel().getAll(), stringMessages,
                 new DialogCallback<RemoteSailingServerReferenceDTO>() {
                     @Override
                     public void cancel() {
@@ -249,8 +201,9 @@ public class RemoteServerInstancesManagementPanel extends SimplePanel implements
 
                     @Override
                     public void ok(final RemoteSailingServerReferenceDTO server) {
-                        sailingService.addRemoteSailingServerReference(server, createCallback(
-                                stringMessages::errorAddingSailingServer, filteredServerTablePanel::add, true));
+                        sailingService.addRemoteSailingServerReference(server,
+                                createCallback(stringMessages::errorAddingSailingServer,
+                                        remoteServersTable.getFilterPanel()::add, true));
                     }
                 }).show();
     }
@@ -275,6 +228,6 @@ public class RemoteServerInstancesManagementPanel extends SimplePanel implements
 
     @Override
     public AbstractFilterablePanel<RemoteSailingServerReferenceDTO> getFilterablePanel() {
-        return filteredServerTablePanel;
+        return remoteServersTable.getFilterPanel();
     }
 }

@@ -98,11 +98,11 @@ public class ClientConfiguration implements BrandingConfiguration {
     private String inSailingContent;
     private String followGitHub;
     private String gitHubLink;
+    private String gitHubPagesLink;
 
     public ClientConfiguration() {
         try {
             ClientConfigurationContextDataJSO dataJso = new ClientConfigurationContextDataFactoryImpl().getInstance();
-            
             id = dataJso.getId();
             brandTitle = dataJso.getBrandTitle();
             defaultBrandingLogoURL = dataJso.getDefaultBrandingLogoURL();
@@ -135,9 +135,8 @@ public class ClientConfiguration implements BrandingConfiguration {
             moreLoginInformationSailorProfilesURL = dataJso.getMoreLoginInformationSailorProfilesURL();
             moreLoginInformationSimulatorURL = dataJso.getMoreLoginInformationSimulatorURL();
             gitHubLink = dataJso.getGitHubLink();
+            gitHubPagesLink = dataJso.getGitHubPagesLink();
             followGitHub = dataJso.getFollowGitHub();
-            
-
         } catch (RuntimeException e) {
             GWT.log("no branding information found.");
         }
@@ -150,6 +149,7 @@ public class ClientConfiguration implements BrandingConfiguration {
 
     /**
      * Access whitelabeling information.
+     * 
      * @return true when branding information shall be shown
      */
     public boolean isBrandingActive() {
@@ -185,7 +185,8 @@ public class ClientConfiguration implements BrandingConfiguration {
     public String getSailingRaceManagerAppTrimmedImageURL() {
         return sailingRaceManagerAppTrimmedImageURL;
     }
-    
+
+    @Override
     public String getSailInSightAppImageURL() {
         return sailInSightAppImageURL;
     }
@@ -209,75 +210,113 @@ public class ClientConfiguration implements BrandingConfiguration {
         return buoyPingerAppImageURL;
     }
 
+    @Override
     public String getSailingAnalyticsImageURL() {
         return sailingAnalyticsImageURL;
     }
 
+    @Override
     public String getSailingAnalyticsReadMoreText(Optional<String> locale) {
         return sailingAnalyticsReadMoreText;
     }
+
+    @Override
     public String getSailingAnalyticsSailing(Optional<String> locale) {
         return sailingAnalyticsSailing;
     }
+
+    @Override
     public String getFooterCopyright() {
         return footerCopyright;
     }
+
+    @Override
     public String getFooterPrivacyLink() {
         return footerPrivacyLink;
     }
+
+    @Override
     public String getFooterJobsLink() {
         return footerJobsLink;
     }
+
+    @Override
     public String getFooterSupportLink() {
         return footerSupportLink;
     }
+
+    @Override
     public String getSportsOn(Optional<String> locale) {
         return sportsOn;
     }
+
+    @Override
     public String getFollowSports(Optional<String> locale) {
         return followSports;
     }
+
+    @Override
     public String getFacebookLink() {
         return facebookLink;
     }
+
+    @Override
     public String getxLink() {
         return xLink;
     }
+
+    @Override
     public String getInstagramLink() {
         return instagramLink;
     }
+
+    @Override
     public String getWelcomeToSailingAnalytics(Optional<String> locale) {
         return welcomeToSailingAnalytics;
     }
+
+    @Override
     public String getWelcomeToSailingAnalyticsBody(Optional<String> locale) {
         return welcomeToSailingAnalyticsBody;
     }
-    
+
+    @Override
     public String getMoreLoginInformationNotificationsURL() {
         return moreLoginInformationNotificationsURL;
     }
 
+    @Override
     public String getMoreLoginInformationSettingsURL() {
         return moreLoginInformationSettingsURL;
     }
 
+    @Override
     public String getMoreLoginInformationSailorProfilesURL() {
         return moreLoginInformationSailorProfilesURL;
     }
 
+    @Override
     public String getMoreLoginInformationSimulatorURL() {
         return moreLoginInformationSimulatorURL;
     }
-    
+
+    @Override
     public String getInSailingContent(Optional<String> locale) {
         return inSailingContent;
     }
-    
+
+    @Override
     public String getFollowGitHub(Optional<String> locale) {
         return followGitHub;
     }
-    
+
+    @Override
     public String getGitHubLink() {
         return gitHubLink;
+    }
+
+    @Override
+    public String getGitHubPagesLink() {
+        return gitHubPagesLink;
     }
 }

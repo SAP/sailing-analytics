@@ -132,4 +132,24 @@ public class CourseTemplateDTO extends NamedDTO implements SecuredDTO {
     public Integer getDefaultNumberOfLaps() {
         return defaultNumberOfLaps;
     }
+
+    @Override
+    public int hashCode() {
+        return uuid != null ? uuid.hashCode() : System.identityHashCode(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof CourseTemplateDTO)) {
+            return false;
+        }
+        final CourseTemplateDTO other = (CourseTemplateDTO) obj;
+        if (uuid == null || other.uuid == null) {
+            return false;
+        }
+        return uuid.equals(other.uuid);
+    }
 }

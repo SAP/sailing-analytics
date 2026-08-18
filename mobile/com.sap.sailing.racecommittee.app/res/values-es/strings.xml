@@ -10,8 +10,8 @@
     <string name="running_on_course">"(En regata %s)"</string>
     <string name="course_design_number_waypoints">"La regata tiene %d puntos de ruta"</string>
     
-    <string name="service_text_no_races">"Esperando a las carreras para supervisar..."</string>
-    <string name="service_text_num_races">"Actualmente supervisando %d carreras."</string>
+    <string name="service_text_no_races">"Esperando a las pruebas para supervisar..."</string>
+    <string name="service_text_num_races">"Actualmente supervisando %d pruebas."</string>
     
     <string name="set_time">"Salida"</string>
     <string name="reset_time">"Reiniciar"</string>
@@ -20,9 +20,9 @@
     <string name="race_finished_template">"%s ha finalizado"</string>
     <string name="race_first_boat_finished">"La primera embarcación finalizó a las:"</string>
     <string name="race_first_finisher">"Primer finalista a %1$s"</string>
-    <string name="race_first_finisher_and_time_limit">"Primer finalista a %1$s, el límite de finalización de carrera es de %2$s"</string>
-    <string name="race_time_limit">"Límite de finalización de carrera es de %s"</string>
-    <string name="choose_startmode">"Seleccione el modo de salida para esta carrera "</string>
+    <string name="race_first_finisher_and_time_limit">"Primer finalista a %1$s, el límite de finalización de prueba es de %2$s"</string>
+    <string name="race_time_limit">"Límite de finalización de prueba es de %s"</string>
+    <string name="choose_startmode">"Seleccione el modo de salida para esta prueba "</string>
     <string name="choose_abort_mode">"Seleccione las indicadores que desea visualizar "</string>
     <string name="choose_abort_flag_mode">"Seleccione el modo de indicador de anulación "</string>
     <string name="flags_up">"ARRIBA"</string>
@@ -30,7 +30,7 @@
     <string name="ap_or_november">"Seleccione el indicador de anulación "</string>
     <string name="choose_start_mode_flag">"Seleccione un indicador de modo de salida "</string>
     <string name="abort_starting_phase">"Anule la fase de salida "</string>
-    <string name="abort_running_race">"Anule la carrera "</string>
+    <string name="abort_running_race">"Anule la prueba"</string>
     <string name="choose_xray_flag_up">"Visualice el recordatorio individual"</string>
     <string name="choose_xray_flag_down">"Elimine el recordatorio individual"</string>
     <string name="choose_first_substitute_flag">"Recordatorio general"</string>
@@ -45,7 +45,7 @@
     <string name="label_login_course_area">"Área"</string>
     <string name="label_login_position">"Posición"</string>
     <string name="login_type_superuser">"Inicie sesión como superusuario"</string>
-    <string name="login_type_officer_on_vessel">"Inicie sesión como oficial de regata de una embarcación"</string>
+    <string name="login_type_officer_on_vessel">"Inicie sesión como oficial de pruebas de una embarcación"</string>
     <string name="login_type_shore_control">"Inicie sesión como control de costas."</string>
     <string name="login_type_viewer">"Inicie sesión como usuario de solo lectura (modo demo)."</string>
     <string name="racelist_unscheduled">"Todavía sin programar"</string>
@@ -57,25 +57,25 @@
     <string name="racelist_finished">"Finalizado"</string>
     <string name="racelist_unknown">"Desconocido"</string>
     <string name="currentlyLoading">"Actualmente cargándose..."</string>
-    <string name="racingview_header">"Carreras en zona de regata %s\'"</string>
+    <string name="racingview_header">"Pruebas en zona de regata %s\'"</string>
     <string name="running_on_unknown">"(Clic para configurar regata)"</string>
     <string name="updateIndicator">"Actualizar indicador"</string>
-    <string name="reset_race">"Reinicializar carrera"</string>
+    <string name="reset_race">"Reinicializar prueba"</string>
     <string name="postpone">"Posponer"</string>
     <string name="race_running_since_template">"%1$s En ejecución desde %2$s"</string>
-    <string name="race_reset_confirmation_header">"Está a punto de reinicializar la carrera"</string>
-    <string name="race_reset_confirmation_warning">"Al reinicializar la carrera, se eliminan de forma permanente todos los datos guardados. Toda la información relativa al estado de la carrera se tendrá que volver a introducir. Solo se mantendrá la información de la regata que se haya introducido. Le recomendamos encarecidamente que no reinicialice la carrera."</string>
-    <string name="race_reset_confirmation_title">"¿Reinicializar esta carrera?"</string>
+    <string name="race_reset_confirmation_header">"Está a punto de reinicializar la prueba"</string>
+    <string name="race_reset_confirmation_warning">"Al reinicializar la prueba, se eliminan de forma permanente todos los datos guardados. Toda la información relativa al estado de la prueba se tendrá que volver a introducir. Solo se mantendrá la información de la regata que se haya introducido. Le recomendamos encarecidamente que no reinicialice la prueba."</string>
+    <string name="race_reset_confirmation_title">"¿Reinicializar esta prueba?"</string>
     <string name="race_reset_reset_button">"Reinicializar de todos modos"</string>
-    <string name="race_finished_start_time">"Carrera se inició a las:"</string>
-    <string name="race_finished_end_time">"Carrera finalizó a las:"</string>
+    <string name="race_finished_start_time">"Carrera iniciada a las:"</string>
+    <string name="race_finished_end_time">"Prueba finalizada a las:"</string>
     <string name="race_startphase_countdown_mode_remove">"%1$s hasta %2$s se ha eliminado"</string>
     <string name="race_startphase_countdown_mode_display">"%1$s hasta %2$s se visualiza"</string>
     <string name="race_startphase_countdown_start">"%1$s hasta %2$s salidas"</string>
     <string name="set_pathfinder">"Explorador"</string>
     <string name="set_pathfinder_title">"Seleccione explorador"</string>
     <string name="protest_dialog_title">"Hora de salida de objeción"</string>
-    <string name="finished_dialog_title">"Configurar la hora en la que terminó la carrera"</string>
+    <string name="finished_dialog_title">"Configurar la hora en la que terminó la prueba"</string>
     <string name="protest_start_time">"Hora de salida de objeción: %s"</string>
     <string name="protest_duration">"Duración objeción: %d min."</string>
     <string name="protest_end_time">"Hora finalización objeción: %s"</string>
@@ -113,20 +113,20 @@
     <string name="tracking_list_01">"Lista de competidores"</string>
     <string name="tracking_list_02">"Lista de resultados"</string>
     <string name="availableFinishingCompetitors">"Competidores"</string>
-    <string name="choose_blue_flag_finishing">"Finalizar carrera"</string>
+    <string name="choose_blue_flag_finishing">"Finalizar prueba"</string>
     <string name="drag_handle_description">"Arrastrar controlador"</string>
     <string name="options_menu_settings">"Opciones"</string>
-    <string name="results_capturing_title">"Resultados de la carrera"</string>
+    <string name="results_capturing_title">"Resultados de la prueba"</string>
     <string name="results_capturing_view_subject">"Asunto de correo"</string>
     <string name="results_capturing_view_body">"Cuerpo del correo"</string>
     <string name="results_capturing_view_send">"Enviar resultados"</string>
     <string name="results_capturing_view_add_photo">"Añadir foto"</string>
     <string name="results_capturing_view_list_header">"Fotos adjuntas"</string>
     <string name="results_capturing_view_list_empty">"Sin fotos todavía"</string>
-    <string name="results_mail_subject">"[Comité de carrera - %1$s] %2$s"</string>
-    <string name="results_mail_body">"Los resultado para la carrera \'%s\' están adjuntos.\n\n"</string>
+    <string name="results_mail_subject">"[Comité de prueba - %1$s] %2$s"</string>
+    <string name="results_mail_body">"Los resultado para la prueba \'%s\' están adjuntos.\n\n"</string>
     <string name="results_mail_body_boat_class">"Clase de bote: %s\n"</string>
-    <string name="results_mail_body_race_group">"Grupo de carrera: %s\n"</string>
+    <string name="results_mail_body_race_group">"Grupo de prueba: %s\n"</string>
     <string name="results_mail_body_start">"Hora de inicio: %s\n"</string>
     <string name="results_mail_body_finish">"Hora de fin: %s\n"</string>
 
@@ -156,7 +156,7 @@
     <string name="settings_general_language_header">"Seleccionar idioma"</string>
     <string name="settings_general_language_description">"Seleccione el idioma. Es posible que tenga que reinicializar la aplicación para que los cambios se apliquen."</string>
     <string name="override_default_start_procedure_type_select_header">"Tipo de procedimiento de salida estándar cuando se sustituya"</string>
-    <string name="override_default_start_procedure_type_select_description">"Las carreras utilizarán el tipo de procedimiento de salida como estándar. Para que esta opción esté activa, la casilla de sustitución debe estar habilitada."</string>
+    <string name="override_default_start_procedure_type_select_description">"Las pruebas utilizarán el tipo de procedimiento de salida como estándar. Para que esta opción esté activa, la casilla de sustitución debe estar habilitada."</string>
     <string name="settings_please_reload">"Ejecute la acción \"Recargar\" para aplicar los cambios."</string>
     <string name="settings_advanced_service_header">"URL del servicio web"</string>
     <string name="settings_advanced_mail_header">"Destinatario del mail de resultados"</string>
@@ -168,7 +168,7 @@
     <string name="compass_view_compass">"Brújula"</string>
     <string name="compass_view_needle">"Aguja"</string>
     <string name="racing_course_area_missing">"La zona de regata no se ha podido cargar. Vuelva a la página de inicio de sesión."</string>
-    <string name="racing_load_success">"Carreras cargadas con éxito %d"</string>
+    <string name="racing_load_success">"Pruebas cargadas correctamente %d"</string>
     <string name="generic_load_failure">"Se ha producido un error cargando los datos solicitados:\n\n\"%s\"\n\n¿Desea volver a intentarlo?"</string>
     <string name="set_course_layout">"Configurar la disposición de la regata"</string>
     <string name="loading_failure">"Error al cargar"</string>
@@ -178,7 +178,7 @@
     <string name="please_select_a_login_type">"Seleccione un tipo de inicio de sesión."</string>
     <string name="race_list_filter_show_all">"Mostrar todo"</string>
     <string name="race_list_filter_show_active">"Mostrar activos"</string>
-    <string name="race_reset_time_schedule_race">"Carrera programada"</string>
+    <string name="race_reset_time_schedule_race">"Prueba programada"</string>
     <string name="race_reset_time_startmode_starttime">"Seleccionar modo de salida y hora de salida"</string>
     <string name="start">"Fijar hora de salida"</string>
     <string name="nationality">"Nacionalidad"</string>
@@ -189,7 +189,7 @@
     <string name="logout_dialog_title">@string/logout</string>
     <string name="logout_dialog_message">"¿Desea cerrar la sesión y volver a iniciarla con un usuario nuevo?"</string>
     <string name="change_dialog_title">"Modificar regata"</string>
-    <string name="change_dialog_message">"¿Desea modificar una regata y/o la zona? Las carreras que estén monitorizándose ahora se desconectarán."</string>
+    <string name="change_dialog_message">"¿Desea modificar una regata y/o la zona? Las pruebas que estén monitorizándose ahora se desconectarán."</string>
     <string name="logout">"Cerrar sesión"</string>
     <string name="loading_configuration">"Cargando configuración..."</string>
     <string name="loading_configuration_failed">"Se ha producido un error al cargar la configuración"</string>
@@ -206,7 +206,7 @@
     <string name="preference_racing_procedure_hasxray_header">"Recordatorio individual"</string>
     <string name="preference_racing_procedure_hasxray_description">"Active esta opción para habilitar el recordatorio individual"</string>
     <string name="preference_racing_procedure_resultentryenabled_header">"Entrada de resultados"</string>
-    <string name="preference_racing_procedure_resultentryenabled_description">"Active esta opción para habilitar la entrada de resultados durante y después de la carrera"</string>
+    <string name="preference_racing_procedure_resultentryenabled_description">"Active esta opción para habilitar la entrada de resultados durante y después de la prueba"</string>
     <string name="preference_racing_procedure_gatestart_haspathfinder_description">"Active esta opción para habilitar la selección del explorador"</string>
     <string name="preference_racing_procedure_gatestart_haspathfinder_header">"Explorador"</string>
     <string name="preference_racing_procedure_gatestart_hasadditionalgolfdowntime_description">"Active esta opción para habilitar la selección del tiempo adicional de la bandera Golf semiarriada"</string>
@@ -221,7 +221,7 @@
     <string name="preference_offline_header">"Modo fuera de línea"</string>
     <string name="preference_offline_summary">"Deshabilita la conexión al servidor y utiliza los datos estáticos"</string>
     <string name="preference_allow_demo_header">"Permitir inicio de sesión como Visualizador"</string>
-    <string name="preference_allow_demo_summary">"Si está fijado, puede iniciar sesión como Visualizador. No se devolverá ningún cambio en la carrera al servidor."</string>
+    <string name="preference_allow_demo_summary">"Si está fijado, puede iniciar sesión como Visualizador. No se devolverá ningún cambio en la prueba al servidor."</string>
     <string name="options_menu_info">"Información de experto"</string>
     <string name="options_menu_refresh">"Actualizar datos"</string>
     <string name="auto_update_install">"Instalar"</string>
@@ -230,7 +230,7 @@
     <string name="golf_down">"Golf medio arriada"</string>
     <string name="preference_regatta_specific_title">"Configuración de regata - %1$s"</string>
     <string name="preference_regatta_specific_save_title">"Guardar %1$s configuraciones"</string>
-    <string name="preference_regatta_specific_save_description">"Esto guardará la configuración que se muestra para todas las carreras de %1$s."</string>
+    <string name="preference_regatta_specific_save_description">"Esto guardará la configuración que se muestra para todas las pruebas de %1$s."</string>
     <string name="auto_update">"Actualización automática"</string>
     <string name="auto_update_checking_version">"Comprobando información de versión en el servidor..."</string>
     <string name="auto_update_downloading_version">"Intentando descargar la información de actualización automática desde %1$s"</string>
@@ -257,10 +257,10 @@
     <string name="race_set_time">"Fijar hora"</string>
     <string name="race_reset_course">"Reinicializar regata"</string>
     <string name="no_course_active">"Ninguna regata activa"</string>
-    <string name="toggle_group_race_mode">"¿Carrera de grupo?"</string>
+    <string name="toggle_group_race_mode">"¿Prueba de grupo?"</string>
     <string name="toggle_group_race_mode_off">"Sin carrera de grupo"</string>
     <string name="toggle_group_race_mode_on">"Carrera de grupo"</string>
-    <string name="the_selected_time_is_before_the_race_start_">"La hora seleccionada es anterior al inicio de la carrera."</string>
+    <string name="the_selected_time_is_before_the_race_start_">"La hora seleccionada es anterior al inicio de la prueba."</string>
 
     <string name="confirm_start_time">"Confirmar hora de salida"</string>
     <string name="confirm_start_mode">"Confirmar modo de salida"</string>
@@ -274,7 +274,7 @@
     <string name="nav_drawer_open">"Abrir cajón de navegación"</string>
     <string name="nav_drawer_close">"Cerrar cajón de navegación"</string>
 
-    <string name="available_races">"Carreras disponibles"</string>
+    <string name="available_races">"Pruebas disponibles"</string>
 
     <string name="race_started">"Salida %s"</string>
     <string name="race_finished">"Finalizada %s"</string>
@@ -284,8 +284,8 @@
     <string name="race_show_all">"Mostrar todos"</string>
     <string name="race_show_less">"Mostrar menos"</string>
 
-    <string name="races_current">"CARRERAS ACTUALES"</string>
-    <string name="races_all">"TODAS LAS CARRERAS"</string>
+    <string name="races_current">"PRUEBAS ACTUALES"</string>
+    <string name="races_all">"TODAS LAS PRUEBAS"</string>
 
     <string name="welcome">"BIENVVENIDO/A"</string>
     <string name="change">"Cambio"</string>
@@ -306,7 +306,7 @@
     <string name="flags_course">"Regata"</string>
     <string name="flags_more">"Finalizar"</string>
     <string name="flags_postpone">"Posponer"</string>
-    <string name="race_select">"Seleccionar una carrera"</string>
+    <string name="race_select">"Seleccionar una prueba"</string>
 
     <string name="gate_start_pathfinder">"Explorador"</string>
     <string name="gate_start_nationality">"Nación"</string>
@@ -340,7 +340,7 @@
     <string name="time_finish">"Finalizado N/A"</string>
     <string name="time">"#TIME#"</string>
     <string name="set_signal">"Configurar señal"</string>
-    <string name="flag_ap_desc">"Posponer carreras futuras"</string>
+    <string name="flag_ap_desc">"Posponer pruebas futuras"</string>
     <string name="flag_ap_alpha_desc">"Posponer, no hay más carreras por hoy"</string>
     <string name="flag_ap_hotel_desc">"Posponer, más información en tierra"</string>
     <string name="flag_ap_alpha">"AP &amp; Alfa"</string>
@@ -351,22 +351,22 @@
     <string name="flag_first_subst_desc">"Recordatorio general"</string>
     <string name="flag_blue">"Azul"</string>
     <string name="flag_blue_desc">"Iniciar fase final"</string>
-    <string name="flag_november_desc">"Abandonar todas las carreras iniciadas"</string>
+    <string name="flag_november_desc">"Abandonar todas las pruebas iniciadas"</string>
     <string name="flag_november_alpha">"Noviembre &amp; Alfa"</string>
     <string name="flag_november_hotel">"Noviembre &amp; Hotel"</string>
     <string name="flag_november_alpha_desc">"Abandonar, no hay más carreras por hoy"</string>
     <string name="flag_november_hotel_desc">"Abandonar, más información en tierra"</string>
-    <string name="race_reset_confirm">"Reinicializar carrera"</string>
+    <string name="race_reset_confirm">"Reinicializar prueba"</string>
     <string name="race_reset_cancel">"No, gracias"</string>
-    <string name="race_reset_message">"¿Desea realmente reinicializar esta carrera incluidas todas las configuraciones y acciones que se han realizado? Esto no se puede deshacer."</string>
+    <string name="race_reset_message">"¿Desea realmente reinicializar esta prueba incluidas todas las configuraciones y acciones que se han realizado? Esto no se puede deshacer."</string>
     <string name="race_begin_finish_header">"Iniciar finalización"</string>
     <string name="race_end_finish_header">"Finalizar finalización\n(Iniciar finalización: %s)"</string>
     <string name="race_begin_finish_current">"Hora actual"</string>
     <string name="race_begin_finish_custom">"Hora personalizada"</string>
     <string name="race_setup_confirm">"Confirmar configuración"</string>
 
-    <string name="race_summary_title">"Resumen de la carrera"</string>
-    <string name="race_summary_start">"Salida de la carrera"</string>
+    <string name="race_summary_title">"Resumen de la prueba"</string>
+    <string name="race_summary_start">"Salida de la prueba"</string>
     <string name="race_summary_finish_begin">"Iniciar meta"</string>
     <string name="race_summary_finish_end">"Finalizar meta"</string>
     <string name="race_summary_finish_duration">"Duración meta"</string>
@@ -390,7 +390,7 @@
     <string name="finished_submit">"Entregar"</string>
     <string name="finished_duration">"#TIME# min"</string>
 
-    <string name="finished_text_01">"Evalúe y entregue este resumen de la carrera."</string>
+    <string name="finished_text_01">"Evalúe y entregue este resumen de la prueba."</string>
     <string name="finished_text_02">"Su evaluación se ha publicado. Es necesario volver a entregar los cambios para que surtan efecto."</string>
 
     <string name="protest_time">"Tiempo para protestar"</string>
@@ -406,14 +406,14 @@
 
     <!--Extracted locales -->
     <string name="selected_course_area_lost">"La zona de regata seleccionada se ha perdido."</string>
-    <string name="no_fitting_race_group_found">"No existe un grupo de carrera que se ajuste."</string>
+    <string name="no_fitting_race_group_found">"No existe un grupo de prueba que se ajuste."</string>
     <string name="loading_of_course_area_succeeded">"Carga con éxito de los datos de regata"</string>
     <string name="scores">"Puntuaciones"</string>
     <string name="no_text">"Sin texto"</string>
     <string name="error_picture_callback">"Error al escribir el archivo de imagen."</string>
     <string name="competitor_load_error">"Competidores: %s"</string>
     <string name="error_announced_finish_time">"La hora de meta indicada es anterior al tiempo del primer finalista. Vuelva a comprobar la hora."</string>
-    <string name="error_time_before_finish">"La hora seleccionada es anterior al inicio de la carrera."</string>
+    <string name="error_time_before_finish">"La hora seleccionada es anterior al inicio de la prueba."</string>
     <string name="error_set_wind">"Configurar la información del viento"</string>
     <string name="use_previous_course_dialog_title">"Utilizar diseño de regata anterior"</string>
     <string name="use_previous_course_dialog_message">"¿Utilizar diseño de regata publicado anteriormente?"</string>
@@ -439,27 +439,27 @@
     <string name="error_wrong_degree_value_title">"Error"</string>
     <string name="error_wrong_degree_value_message">"Introduzca un valor entre 0 y 360"</string>
 
-    <string name="author_type_officer_vessel">"Oficial de regata en embarcación"</string>
+    <string name="author_type_officer_vessel">"Oficial de pruebas en embarcación"</string>
     <string name="author_type_shore_control">"Control de costa"</string>
     <string name="author_viewer">"Modo demo"</string>
     <string name="author_type_superuser">"Superusuario"</string>
     <string name="change_proceed">"Proceder"</string>
     <string name="change_cancel">"Cancelar"</string>
-    <string name="change_message">"Según las normas de la carrera, este dato no se puede modificar en el\nestado actual de la carrera. De todos modos, puede corregir las entradas erróneas."</string>
+    <string name="change_message">"Según las normas de la prueba, este dato no se puede modificar en el\nestado actual de la prueba. De todos modos, puede corregir las entradas erróneas."</string>
     <string name="change_title">"Advertencia"</string>
     <string name="send_mail">"Enviar correo electrónico...."</string>
     <string name="data_reload_title">"Los datos se han modificado externamente"</string>
     <string name="data_reload_message">"Los datos se tienen que volver a cargar. Es posible que se pierdan datos."</string>
     <string name="preference_allow_dependent_races_header">"Hora de salida relativa (minutos)"</string>
-    <string name="preference_allow_dependent_races_description">"Habilitar hora de salida relativa entre carreras"</string>
+    <string name="preference_allow_dependent_races_description">"Habilitar hora de salida relativa entre pruebas"</string>
     <string name="preference_dependent_races_offset_header">"Offset de hora de salida relativa predeterminada (minutos9"</string>
-    <string name="preference_allow_edit_race_factor_header">"Modificación del factor de la carrera"</string>
+    <string name="preference_allow_edit_race_factor_header">"Modificación del factor de la prueba"</string>
     <string name="preference_protest_time_header">"Duración del tiempo para protestar (minutos9"</string>
-    <string name="preference_allow_edit_race_factor_description">"Los gestores de la carrera pueden modificar el factor de la carrera por cada carrera"</string>
+    <string name="preference_allow_edit_race_factor_description">"Los gestores de la prueba pueden modificar el factor de la prueba por cada prueba"</string>
     <string name="error_finished_time">"La hora de meta indicada es anterior al tiempo del primer finalista. Vuelva a comprobar la hora."</string>
-    <string name="error_finishing_time">"La hora seleccionada es anterior al inicio de la carrera."</string>
+    <string name="error_finishing_time">"La hora seleccionada es anterior al inicio de la prueba."</string>
     <string name="error_time_in_future">"La hora indicada es futura. Vuelva a comprobar la hora."</string>
-    <string name="error_wrong_race_state">"El estado de la carrera no tiene el estado correcto (necesario: %1$s - actual: %2$s)"</string>
+    <string name="error_wrong_race_state">"El estado de la prueba no tiene el estado correcto (necesario: %1$s - actual: %2$s)"</string>
     <string name="wind_map_button_show">"Mapa eólico"</string>
     <string name="wind_map_button_hide">"Ocultar"</string>
     <string name="wind_latitude">"Latitud:"</string>
@@ -467,7 +467,7 @@
     <string name="wind_accuracy">"Precisión:"</string>
     <string name="dependent_races_absolute">"Hora de salida absoluta"</string>
     <string name="dependent_races_relative">"Hora de salida relativa"</string>
-    <string name="dependent_races_prompt">"Seleccione la carrera"</string>
+    <string name="dependent_races_prompt">"Seleccione la prueba"</string>
     <string name="minutes_after">"Minutos después"</string>
     <string name="minutes_after_long">"%1$.0f min. después %2$s"</string>
     <string name="wind_accuracy_ago">"Hace "</string>
@@ -491,7 +491,7 @@
     <string name="onboarding_scan">"Escanear código QR"</string>
     <string name="onboarding_input">"Entrada manual"</string>
     <string name="race_group">"Carrera de grupo"</string>
-    <string name="wind_select_race">"Seleccionar carrera"</string>
+    <string name="wind_select_race">"Seleccionar prueba"</string>
     <string name="added_to_result_list">"Añadido \'%1$s\' a la lista de resultados en la posición %2$d"</string>
     <string name="get_started">"Iniciar"</string>
     <string name="position">"Posición"</string>
@@ -526,8 +526,8 @@
     <string name="race_factor">"Factor"</string>
     <string name="options_menu_role">"Modificar regata"</string>
     <string name="reload_config">"Volver a cargar la configuración desde el servidor"</string>
-    <string name="abort_title">"Abortar carreras"</string>
-    <string name="abort_hint">"¿Qué carreras en ejecución desea abortar?"</string>
+    <string name="abort_title">"Cancelar pruebas"</string>
+    <string name="abort_hint">"¿Qué pruebas en ejecución desea abortar?"</string>
     <string name="abort_dismiss">"Descartar"</string>
     
     <string name="set_column_factor">"Configurar factor"</string>

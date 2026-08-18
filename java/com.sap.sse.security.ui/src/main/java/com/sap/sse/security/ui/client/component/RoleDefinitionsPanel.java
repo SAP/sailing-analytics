@@ -22,6 +22,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.AbstractCellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
+import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -29,6 +30,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.SetSelectionModel;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.util.NaturalComparator;
 import com.sap.sse.gwt.client.ErrorReporter;
@@ -100,18 +102,17 @@ public class RoleDefinitionsPanel extends VerticalPanel {
         roleDefinitionsTable.ensureDebugId("RolesCellTable");
         filterablePanelRoleDefinitions.getTextBox().ensureDebugId("RolesFilterTextBox");
         refreshableRoleDefinitionMultiSelectionModel = (RefreshableMultiSelectionModel<? super RoleDefinitionDTO>) roleDefinitionsTable.getSelectionModel();
-
+        @SuppressWarnings("unchecked")
+        final SetSelectionModel<RoleDefinitionDTO> roleSelectionModel = (SetSelectionModel<RoleDefinitionDTO>) roleDefinitionsTable.getSelectionModel();
         final AccessControlledButtonPanel buttonPanel = new AccessControlledButtonPanel(userService, ROLE_DEFINITION);
         buttonPanel.addUnsecuredAction(stringMessages.refresh(), this::updateRoleDefinitions);
         final Button createButton = buttonPanel.addCreateActionWithoutServerCreateObjectPermissionCheck(stringMessages.add(),
                 this::createRoleDefinition);
         createButton.ensureDebugId("CreateRoleButton");
-        final Button removeButton = buttonPanel.addRemoveAction(stringMessages.remove(), () -> {
-            final String roles = String.join(", ", Util.map(getSelectedRoleDefinitions(), RoleDefinitionDTO::getName));
-            if (Window.confirm(stringMessages.doYouReallyWantToRemoveRole(roles))) {
-                final Set<RoleDefinitionDTO> selectedRoles = new HashSet<>(getSelectedRoleDefinitions());
-                filterablePanelRoleDefinitions.removeAll(selectedRoles);
-            }
+        final Button removeButton = buttonPanel.addRemoveAction(stringMessages.remove(), roleSelectionModel, true,
+                () -> {
+            final Set<RoleDefinitionDTO> selectedRoles = new HashSet<>(getSelectedRoleDefinitions());
+            filterablePanelRoleDefinitions.removeAll(selectedRoles);
         });
         removeButton.ensureDebugId("RemoveRoleButton");
         add(buttonPanel);
@@ -164,7 +165,7 @@ public class RoleDefinitionsPanel extends VerticalPanel {
     private FlushableCellTable<RoleDefinitionDTO> createRoleDefinitionsTable(CellTableWithCheckboxResources tableResources) {
         final FlushableCellTable<RoleDefinitionDTO> table = new FlushableCellTable<>(/* pageSize */ 50, tableResources);
         rolesListDataProvider.addDataDisplay(table);
-        SelectionCheckboxColumn<RoleDefinitionDTO> roleSelectionCheckboxColumn = new SelectionCheckboxColumn<RoleDefinitionDTO>(
+        final SelectionCheckboxColumn<RoleDefinitionDTO> roleSelectionCheckboxColumn = new SelectionCheckboxColumn<RoleDefinitionDTO>(
                 tableResources.cellTableStyle().cellTableCheckboxSelected(),
                 tableResources.cellTableStyle().cellTableCheckboxDeselected(),
                 tableResources.cellTableStyle().cellTableCheckboxColumnCell(), new EntityIdentityComparator<RoleDefinitionDTO>() {
@@ -176,14 +177,13 @@ public class RoleDefinitionsPanel extends VerticalPanel {
                     public int hashCode(RoleDefinitionDTO t) {
                         return t.getId().hashCode();
                     }
-                }, filterablePanelRoleDefinitions.getAllListDataProvider(), table);
-        ListHandler<RoleDefinitionDTO> columnSortHandler = new ListHandler<>(rolesListDataProvider.getList());
+                }, filterablePanelRoleDefinitions.getAllListDataProvider());
+        final ListHandler<RoleDefinitionDTO> columnSortHandler = new ListHandler<>(rolesListDataProvider.getList());
         table.addColumnSortHandler(columnSortHandler);
-        columnSortHandler.setComparator(roleSelectionCheckboxColumn, roleSelectionCheckboxColumn.getComparator());
         final TextColumn<RoleDefinitionDTO> roleDefinitionUUidColumn = new AbstractSortableTextColumn<RoleDefinitionDTO>(
                 role -> role.getId() == null ? "<null>" : role.getId().toString(), columnSortHandler);
-        TextColumn<RoleDefinitionDTO> roleDefinitionNameColumn = new AbstractSortableTextColumn<RoleDefinitionDTO>(role->role.getName(), columnSortHandler);
-        Column<RoleDefinitionDTO, SafeHtml> permissionsColumn = new Column<RoleDefinitionDTO, SafeHtml>(new SafeHtmlCell()) {
+        final TextColumn<RoleDefinitionDTO> roleDefinitionNameColumn = new AbstractSortableTextColumn<RoleDefinitionDTO>(role->role.getName(), columnSortHandler);
+        final Column<RoleDefinitionDTO, SafeHtml> permissionsColumn = new Column<RoleDefinitionDTO, SafeHtml>(new SafeHtmlCell()) {
             @Override
             public SafeHtml getValue(RoleDefinitionDTO role) {
                 SafeHtmlBuilder builder = new SafeHtmlBuilder();
@@ -204,7 +204,6 @@ public class RoleDefinitionsPanel extends VerticalPanel {
                 return new NaturalComparator().compare(r1.getPermissions().toString(), r2.getPermissions().toString());
             }
         });
-        
         final HasPermissions type = SecuredSecurityTypes.ROLE_DEFINITION;
         final AccessControlledActionsColumn<RoleDefinitionDTO, DefaultActionsImagesBarCell> roleActionColumn = create(
                 new DefaultActionsImagesBarCell(stringMessages), userService);
@@ -222,8 +221,8 @@ public class RoleDefinitionsPanel extends VerticalPanel {
                 stringMessages);
         roleActionColumn.addAction(DefaultActionsImagesBarCell.ACTION_CHANGE_ACL, DefaultActions.CHANGE_ACL,
                 configACL::openDialog);
-
-        table.addColumn(roleSelectionCheckboxColumn, roleSelectionCheckboxColumn.getHeader());
+        final Header<Boolean> selectAllHeader = roleSelectionCheckboxColumn.createHeader();
+        table.addColumn(roleSelectionCheckboxColumn, selectAllHeader);
         table.addColumn(roleDefinitionNameColumn, stringMessages.name());
         table.addColumn(permissionsColumn, stringMessages.permissions());
         SecuredDTOOwnerColumn.configureOwnerColumns(table, columnSortHandler, stringMessages);

@@ -107,6 +107,7 @@ import com.sap.sse.common.Util.Triple;
 import com.sap.sse.common.impl.KilometersPerHourSpeedImpl;
 import com.sap.sse.common.impl.KnotSpeedImpl;
 import com.sap.sse.common.impl.SecondsDurationImpl;
+import com.sap.sse.gwt.client.async.RetryableActionResult;
 import com.sap.sse.gwt.client.replication.RemoteReplicationServiceAsync;
 import com.sap.sse.pairinglist.PairingList;
 import com.sap.sse.pairinglist.PairingListTemplate;
@@ -180,7 +181,7 @@ public interface SailingServiceAsync extends RemoteReplicationServiceAsync {
     void getManeuverAngle(BoatClassDTO boatClass, ManeuverType maneuverType, Speed windSpeed,
             AsyncCallback<BearingWithConfidenceDTO> callback);
 
-    void getSimulatorResults(LegIdentifier legIdentifier, AsyncCallback<SimulatorResultsDTO> callback);
+    void getSimulatorResults(LegIdentifier legIdentifier, AsyncCallback<RetryableActionResult<SimulatorResultsDTO>> callback);
 
     void getRaceTimesInfo(RegattaAndRaceIdentifier raceIdentifier, AsyncCallback<RaceTimesInfoDTO> callback);
 
@@ -223,11 +224,14 @@ public interface SailingServiceAsync extends RemoteReplicationServiceAsync {
 
     void getRacesOfSwissTimingEvent(String eventJsonUrl, AsyncCallback<SwissTimingEventRecordDTO> asyncCallback);
 
-    void getDouglasPoints(RegattaAndRaceIdentifier raceIdentifier, Map<CompetitorDTO, TimeRange> competitorTimeRanges,
+    void getDouglasPoints(RegattaAndRaceIdentifier raceIdentifier, Map<String, TimeRange> competitorIdsAsStringsAndTimeRanges,
             AsyncCallback<Map<CompetitorDTO, List<GPSFixDTOWithSpeedWindTackAndLegType>>> callback);
 
-    void getManeuvers(RegattaAndRaceIdentifier raceIdentifier, Map<CompetitorDTO, TimeRange> competitorTimeRanges,
-            AsyncCallback<Map<CompetitorDTO, List<ManeuverDTO>>> callback);
+    /**
+     * @param callback the {@link String} used as map key is the competitor ID as string
+     */
+    void getManeuvers(RegattaAndRaceIdentifier raceIdentifier, Map<String, TimeRange> competitorIdsAsStringsAndTimeRanges,
+            AsyncCallback<Map<String, List<ManeuverDTO>>> callback);
 
     void getLeaderboardGroups(boolean withGeoLocationData, AsyncCallback<List<LeaderboardGroupDTO>> callback);
 
@@ -281,6 +285,8 @@ public interface SailingServiceAsync extends RemoteReplicationServiceAsync {
     void getServerConfiguration(AsyncCallback<ServerConfigurationDTO> callback);
     
     void getRemoteSailingServerReferences(AsyncCallback<List<RemoteSailingServerReferenceDTO>> callback);
+
+    void getRemoteEvents(String baseUrl, String bearerTokenOrNull, AsyncCallback<List<EventDTO>> callback);
 
     void getResultImportUrls(String resultProviderName, AsyncCallback<List<UrlDTO>> callback);
 

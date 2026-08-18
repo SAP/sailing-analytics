@@ -766,7 +766,7 @@ if [[ "$@" == "build" ]] || [[ "$@" == "all" ]]; then
 	    JAVA_HOME="${JAVA8_HOME}" `dirname $0`/install-gwt "${PROJECT_HOME}"
           else
             echo "Downloading and installing forked GWT version..."
-            `dirname $0`/install-gwt-from-fork-releases https://github.com/SAP/gwt-forward-serialization-rpc https://github.com/SAP/gwt-maven-plugin-forward-serialization-rpc 2.12.4 .
+            `dirname $0`/install-gwt-from-fork-releases https://github.com/eclipse-sailing-analytics/gwt-forward-serialization-rpc https://github.com/eclipse-sailing-analytics/gwt-maven-plugin-forward-serialization-rpc 2.12.4 .
           fi
         fi
         echo "Using following command: mvn $extra -DargLine=\"$APP_PARAMETERS\" -fae -s $MAVEN_SETTINGS $clean install"

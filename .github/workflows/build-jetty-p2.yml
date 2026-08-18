@@ -1,0 +1,60 @@
+name: build-jetty-p2
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build-jetty-p2:
+    permissions:
+      contents: write
+      checks: write
+      actions: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Check out the repository to the runner
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: '500'
+      - name: Download Eclipse Platform Runtime
+        run: |
+          curl -fsSL \
+            'https://www.eclipse.org/downloads/download.php?file=/eclipse/downloads/drops4/R-4.38-202512010920/eclipse-platform-4.38-linux-gtk-x86_64.tar.gz&r=1' \
+            -o eclipse.tar.gz
+          tar -xzf eclipse.tar.gz
+          ln -s ${PWD}/eclipse/eclipse /usr/local/bin
+      - name: Select Jetty Version
+        run: |
+          echo "VERSION=9.4.58.v20250814" >>"${GITHUB_ENV}"
+      - name: Mirror Jetty p2 repository
+        shell: bash
+        run: |
+          ./java/com.sap.sailing.targetplatform/scripts/createJettyP2RepoFromMavenCentral.sh "${VERSION}"
+      - name: Upload build log
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build.log
+          path: build.log
+          retention-days: 90
+      - name: Upload p2 site as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jetty-p2
+          path: /tmp/jetty-p2-repo-${{ env.VERSION }}/repository/**/*
+          retention-days: 90
+      - name: SCP artifacts to download.eclipse.org to version-specific folder
+        uses: appleboy/scp-action@ff85246acaad7bdce478db94a363cd2bf7c90345 # v1
+        with:
+          host: projects-storage.eclipse.org
+          username: ${{ secrets.SCP_USERNAME }}
+          key: ${{ secrets.SCP_KEY }}
+          passphrase: ${{ secrets.SCP_PASSPHRASE }}
+          source: "/tmp/jetty-p2-repo-${{ env.VERSION }}/repository"
+          target: "/home/data/httpd/download.eclipse.org/sailing-analytics/p2/jetty-${{ env.VERSION }}"
+          strip_components: 3
+          rm: true

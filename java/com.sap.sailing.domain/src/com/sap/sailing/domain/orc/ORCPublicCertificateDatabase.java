@@ -105,7 +105,7 @@ public interface ORCPublicCertificateDatabase {
     ORCPublicCertificateDatabase INSTANCE = new ORCPublicCertificateDatabaseImpl();
     
     public enum CertificateFamily {
-        UNKNOWN(0, ""), ORC(1, "ORC"), SUPER_YACHT(2, "SY"), DOUBLE_HANDED(3, "DH"), MULTI_HULL(4, "Mu");
+        UNKNOWN(0, ""), ORC(1, "ORC"), SUPER_YACHT(2, "SY"), DOUBLE_HANDED(3, "DH"), MULTI_HULL(4, "Mu"), NON_SPINNAKER(5, "NS"), ORC_LIGHT(6, "LITE");
         
         private final int familyId;
         private final String familyQueryParamValue;
@@ -137,8 +137,8 @@ public interface ORCPublicCertificateDatabase {
     }
     
     /**
-     * Data about valid certificates in a country, as obtained, e.g., from http://data.orc.org/public/WPub.dll/RMS. Such a
-     * record, in its original XML representation, looks like this:
+     * Data about valid certificates in a country, as obtained, e.g., from http://data.orc.org/public/WPub.dll/RMS. Such
+     * a record, in its original XML representation, looks like this:
      * 
      * <pre>
       &lt;CountryId&gt;AUS&lt;/CountryId&gt;
@@ -151,6 +151,87 @@ public interface ORCPublicCertificateDatabase {
       &lt;CertName&gt;Club&lt;/CertName&gt;
       &lt;RMSCode&gt;CLUB&lt;/RMSCode&gt;
      * </pre>
+     * 
+     * Mappings of family and type work as follows:
+     * 
+     * Used for parsing the ORC public API (WPub.dll) RMS/JSON outputs. Note: Family 6 (ORC Light) certificates
+     * generally lack GPH and Performance Curve data required for PCS calculations.
+     *
+     * <table border="1">
+     * <caption>ORC Family and Certificate Type Codes</caption>
+     * <tr>
+     * <th>Family ID</th>
+     * <th>Family Name</th>
+     * <th>certType</th>
+     * <th>Certificate Name</th>
+     * </tr>
+     * <tr>
+     * <td>1</td>
+     * <td>ORC Standard</td>
+     * <td>2</td>
+     * <td>International (ORCi)</td>
+     * </tr>
+     * <tr>
+     * <td>1</td>
+     * <td>ORC Standard</td>
+     * <td>3</td>
+     * <td>Club</td>
+     * </tr>
+     * <tr>
+     * <td>2</td>
+     * <td>Super Yacht</td>
+     * <td>7</td>
+     * <td>ORCsy</td>
+     * </tr>
+     * <tr>
+     * <td>3</td>
+     * <td>Double Handed</td>
+     * <td>8</td>
+     * <td>DH International</td>
+     * </tr>
+     * <tr>
+     * <td>3</td>
+     * <td>Double Handed</td>
+     * <td>9</td>
+     * <td>DH Club</td>
+     * </tr>
+     * <tr>
+     * <td>4</td>
+     * <td>Multihull</td>
+     * <td>15</td>
+     * <td>Multihull International</td>
+     * </tr>
+     * <tr>
+     * <td>4</td>
+     * <td>Multihull</td>
+     * <td>16</td>
+     * <td>Multihull Club</td>
+     * </tr>
+     * <tr>
+     * <td>5</td>
+     * <td>Non Spinnaker</td>
+     * <td>10</td>
+     * <td>NS International</td>
+     * </tr>
+     * <tr>
+     * <td>5</td>
+     * <td>Non Spinnaker</td>
+     * <td>11</td>
+     * <td>NS Club</td>
+     * </tr>
+     * <tr>
+     * <td>6</td>
+     * <td>ORC Light</td>
+     * <td>13</td>
+     * <td>Light (Standard)</td>
+     * </tr>
+     * <tr>
+     * <td>6</td>
+     * <td>ORC Light</td>
+     * <td>14</td>
+     * <td>Light (Double Handed)</td>
+     * </tr>
+     * </table>
      * 
      * @author Axel Uhl (D043530)
      */

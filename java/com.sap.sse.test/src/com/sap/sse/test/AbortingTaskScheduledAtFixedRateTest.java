@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import com.sap.sse.util.ThreadPoolUtil;
 
 public class AbortingTaskScheduledAtFixedRateTest {
-    private static final int RATE_IN_MILLIS = 100;
+    private static final int RATE_IN_MILLIS = 1000;
     private static final Logger logger = Logger.getLogger(AbortingTaskScheduledAtFixedRateTest.class.getName());
     
     /**

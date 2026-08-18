@@ -23,6 +23,79 @@
         <div class="mainContent">
           <h2 class="releaseHeadline">Release Notes - Administration Console</h2>
           <div class="innerContent">
+          <h2 class="articleSubheadline">July 2026</h2>
+          <ul class="bulletList">
+                <li>The default instance type for MongoDB scale-out instances as well as
+                    shared sailing server nodes now is I4_I_2XLARGE.</li>
+          </ul>
+          <h2 class="articleSubheadline">June 2026</h2>
+          <ul class="bulletList">
+                <li>Fixed a server issue occurring when computing maneuvers for races with a large number of competitors
+                    (e.g. 163 competitors in 505 Pre-Worlds 2014). All competitors' maneuvers were previously stored in a
+                    single MongoDB document, which exceeded MongoDB's 16MB BSON document size limit and caused the
+                    storage process to throw a <tt>BsonMaximumSizeExceededException</tt>. Maneuvers are now stored in one
+                    document per competitor, keeping each document well within the size limit regardless of fleet size
+                    for any typical even seen so far.
+                    See also <a href="https://bugzilla.sapsailing.com/bugzilla/show_bug.cgi?id=6226">bug 6226</a>.
+                </li>
+                <li>Further fix for the same issue: a competitor tracked over an unusually long period could accumulate
+                    enough maneuvers to exceed the 16MB limit in their own document. Maneuver documents are now paginated —
+                    each document holds at most 1000 maneuvers, with additional pages stored as separate documents.
+                    A warning is logged when pagination kicks in.
+                    See also <a href="https://bugzilla.sapsailing.com/bugzilla/show_bug.cgi?id=6226">bug 6226</a>.
+                </li>
+                <li>Bug fix: changes to leaderboard groups were not always synchronized across the
+                    different views of the Admin Console. For example, when using the "wizard"-like
+                    functionality to create regattas repeatedly, their leaderboards, and then link them to
+                    a leaderboard group of the event selected in the regatta creation dialog worked off
+                    a leaderboard group copy stored in the event list which wasn't updated properly.</li>
+          </ul>
+          <h2 class="articleSubheadline">May 2026</h2>
+          <ul class="bulletList">
+                <li>The start/stop tracking buttons in the Smartphone Tracking panel now behave correctly.
+                    Per-race buttons show the right action based on actual tracker state: no buttons for
+                    non-tracked races, a green play button when tracking is not yet started or has been
+                    stopped, and a red stop button while a tracker is active. The global start/stop toggle
+                    button is now also consistently enabled or disabled depending on whether all selected
+                    races have an active tracker (showing "Stop Tracking") or none do (showing "Start
+                    Tracking"), and disabled for mixed selections. Stopping tracking now correctly uses
+                    the same truth source as the button visibility, fixing a case where the stop action
+                    silently did nothing.</li>
+                <li>Course templates, mark templates, mark roles, and mark properties are now correctly
+                    identified by their unique ID rather than their name. This fixes an issue where two
+                    entries sharing the same name were incorrectly treated as equal, and ensures stable
+                    ordering and deduplication in course creation.</li>
+          </ul>
+          <h2 class="articleSubheadline">April 2026</h2>
+          <ul class="bulletList">
+                <li>Tables with multi-selection support now have a select/de-select all checkbox in the table header.
+                    This comes with general improvements in table selection/de-selection handling.</li>
+                <li>Users can now opt out of feature and community e-mails. This flag is available in
+                    Data Mining as a dimension for filtering and grouping.</li>
+                <ii>When updates to user accounts are carried out using the API, not passing a property (such as
+                    company affiliation or preferred locale) will no longer reset that value to <tt>null</tt>
+                    but instead leave it unchanged.</li>
+                <li>A new "Eraser" action has been added to the leaderboards table at the top of the
+                    Connectors / Smartphone Tracking panel. If the leaderboard is a "Regatta" leaderboard
+                    and the corresponding Regatta is configured to control tracking times from race
+                    start/finish times, using the eraser action will remove any explicit start/end of tracking
+                    time specifications of the race logs of all races in the leaderboard that have valid
+                    race start/finished times. This way, overly long or open tracking intervals can be
+                    avoided.</li>
+                <li>Refreshing of bundles such as <tt>com.sap.sailing.datamining</tt> and <tt>com.sap.sailing.gwt.ui</tt>
+                    now is possible again at runtime (intended, e.g., for development environments with large loaded
+                    context of races), thanks to upgrading our Equinox OSGi runtime and adjusting how the
+                    <tt>org.osgi.service.tracker</tt> bundle's packages are obtained.</li>
+          </ul>
+          <h2 class="articleSubheadline">March 2026</h2>
+          <ul class="bulletList">
+                <li>When a server is re-started, e.g., for an upgrade or when switching to larger
+                    or smaller infrastructure, ongoing smartphone-tracked races will no longer have
+                    an "end-of-tracking" time set to the time point of server re-start. This should
+                    help in leaving live races running.
+                    See also <a href="https://bugzilla.sapsailing.com/bugzilla/show_bug.cgi?id=6228">bug 6228</a>
+                </li>
+          </ul>
           <h2 class="articleSubheadline">February 2026</h2>
           <ul class="bulletList">
                 <li>Implemented an automated procedure for upgrading the ARCHIVE server. This is now available

@@ -51,6 +51,7 @@ public class UserStoreWithPersistenceTest {
     private final String fullName = "Arno Nym";
     private final String company = "SAP SE";
     private final String email = "anonymous@sapsailing.com";
+    private final boolean didOptOutOfFeatureAndCommunityEmails = false;
     private final String serverName = "dummyServer";
     private final String prefKey = "pk";
     private final String prefValue = "pv";
@@ -107,8 +108,9 @@ public class UserStoreWithPersistenceTest {
         UserGroupImpl defaultTenant = createUserGroup();
         HashMap<String, UserGroup> defaultTenantForServers = new HashMap<>();
         defaultTenantForServers.put(serverName, defaultTenant);
-        store.updateUser(new UserImpl(username, email, fullName, company, Locale.GERMAN, false, null, null,
-                defaultTenantForServers, Collections.emptySet(), /* userGroupProvider */ null, new TimedLockImpl()));
+        store.updateUser(new UserImpl(username, email, fullName, company, Locale.GERMAN, false,
+                didOptOutOfFeatureAndCommunityEmails, null, null, defaultTenantForServers, Collections.emptySet(),
+                /* userGroupProvider */ null, new TimedLockImpl()));
         newStore();
         User savedUser = store.getUserByName(username);
         assertEquals(username, savedUser.getName());

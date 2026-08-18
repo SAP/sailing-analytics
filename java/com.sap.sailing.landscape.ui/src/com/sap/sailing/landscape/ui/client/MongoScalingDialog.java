@@ -32,7 +32,7 @@ public class MongoScalingDialog extends DataEntryDialog<MongoScalingInstructions
     private final ListBox instanceTypeBox;
     private final String replicaSetPrimary;
     private final String replicaSetName;
-    private final String DEFAULT_INSTANCE_TYPE = "I3_2_XLARGE";
+    private final String DEFAULT_INSTANCE_TYPE = "I4_I_2_XLARGE";
     
     private static class MongoScalingInstructionsValidator implements Validator<MongoScalingInstructionsDTO> {
         private final StringMessages stringMessages;

@@ -3,19 +3,21 @@ package com.sap.sse.gwt.adminconsole;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
+import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CaptionPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Grid;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.TextBox;
@@ -24,7 +26,14 @@ import com.google.gwt.user.client.ui.Widget;
 import com.sap.sse.common.Util;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.async.MarkedAsyncCallback;
+import com.sap.sse.gwt.client.celltable.ActionsColumn;
+import com.sap.sse.gwt.client.celltable.EntityIdentityComparator;
+import com.sap.sse.gwt.client.celltable.RefreshableMultiSelectionModel;
+import com.sap.sse.gwt.client.celltable.TableWrapper;
+import com.sap.sse.gwt.client.celltable.TableWrapperWithFilter;
 import com.sap.sse.gwt.client.controls.IntegerBox;
+import com.sap.sse.gwt.client.controls.busyindicator.BusyIndicator;
+import com.sap.sse.gwt.client.controls.busyindicator.SimpleBusyIndicator;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog.DialogCallback;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog.Validator;
@@ -45,16 +54,17 @@ import com.sap.sse.security.ui.client.component.AccessControlledButtonPanel;
  *
  */
 public class ReplicationPanel extends FlowPanel {
-    private final Grid registeredReplicas;
+    private final ReplicaTableWrapper replicasTable;
+    private final RefreshableMultiSelectionModel<ReplicaDTO> replicaSelectionModel;
     private final Grid registeredMasters;
-    
+    private final CaptionPanel replicaDetailPanel;
+    private final Grid replicaDetailGrid;
     private final RemoteReplicationServiceAsync replicationServiceAsync;
     private final ErrorReporter errorReporter;
     private final StringMessages stringMessages;
-    
     private final Button addButton;
     private final Button stopReplicationButton;
-    private final Button removeAllReplicas;
+    private final BusyIndicator progressIndicator;
     
     private static class ReplicationData {
         private final String messagingHost;
@@ -104,7 +114,6 @@ public class ReplicationPanel extends FlowPanel {
         public String getPassword() {
             return password;
         }
-
     }
 
     /**
@@ -122,6 +131,7 @@ public class ReplicationPanel extends FlowPanel {
         this.replicationServiceAsync = replicationService;
         this.stringMessages = stringMessages;
         this.errorReporter = errorReporter;
+        this.progressIndicator = new SimpleBusyIndicator();
         this.replicableIdsAsStringThatShallLeadToWarningAboutInstanceBeingReplica = new HashSet<>();
         replicationService.getReplicableIdsAsStringThatShallLeadToWarningAboutInstanceBeingReplica(new MarkedAsyncCallback<>(new AsyncCallback<String[]>() {
             @Override
@@ -136,26 +146,36 @@ public class ReplicationPanel extends FlowPanel {
                 }
             }
         }));
-        Button refreshButton = new Button(stringMessages.refresh());
-        refreshButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                updateReplicaList();
-            }
-        });
-        add(refreshButton);
+        // --- Replicas (master side) ---
         final CaptionPanel mastergroup = new CaptionPanel(stringMessages.explainReplicasRegistered());
+        mastergroup.setWidth("100%");
         final VerticalPanel masterpanel = new VerticalPanel();
+        final AdminConsoleTableResources tableResources = GWT.create(AdminConsoleTableResources.class);
+        replicasTable = new ReplicaTableWrapper(tableResources, userService, stringMessages, errorReporter);
+        replicasTable.asWidget().setWidth("100%");
+        // Keep the default table-layout: auto so each column claims its content's preferred width.
+        // Only the additional-information column is made shrinkable (via CSS in
+        // AdminConsoleTableResources), so when the container narrows that column shrinks and wraps
+        // first while date/numeric columns retain their full content width.
+        replicasTable.getTable().setWidth("100%");
+        replicaSelectionModel = replicasTable.getSelectionModel();
         final AccessControlledButtonPanel masterPanelButtons = new AccessControlledButtonPanel(userService, SecuredSecurityTypes.SERVER);
-        registeredReplicas = new Grid();
-        registeredReplicas.resizeColumns(3);
-        masterpanel.add(registeredReplicas);
-        removeAllReplicas = masterPanelButtons.addAction(stringMessages.stopAllReplicas(),
-                () -> userService.hasServerPermission(ServerActions.REPLICATE), this::stopAllReplicas);
-        removeAllReplicas.setEnabled(false);
+        masterPanelButtons.addUnsecuredAction(stringMessages.refresh(), this::updateReplicaList);
+        masterPanelButtons.addCountingAction(stringMessages.dropReplicas(),
+                replicaSelectionModel, () -> userService.hasServerPermission(ServerActions.REPLICATE),
+                this::dropSelectedReplicas);
+        masterpanel.add(replicasTable.asWidget());
+        masterpanel.add(progressIndicator);
         masterpanel.add(masterPanelButtons);
         mastergroup.add(masterpanel);
         add(mastergroup);
+        // --- Details caption panel (below replicas table, shown for single selection) ---
+        replicaDetailPanel = new CaptionPanel();
+        replicaDetailGrid = new Grid(10, 2);
+        replicaDetailPanel.setContentWidget(replicaDetailGrid);
+        replicaDetailPanel.setVisible(false);
+        add(replicaDetailPanel);
+        // --- Masters (replica side) ---
         final CaptionPanel replicagroup = new CaptionPanel(stringMessages.explainConnectionsToMaster());
         final VerticalPanel replicapanel = new VerticalPanel();
         final AccessControlledButtonPanel replicapanelbuttons = new AccessControlledButtonPanel(userService, SecuredSecurityTypes.SERVER);
@@ -170,26 +190,153 @@ public class ReplicationPanel extends FlowPanel {
         replicapanel.add(replicapanelbuttons);
         replicagroup.add(replicapanel);
         add(replicagroup);
+        replicaSelectionModel.addSelectionChangeHandler(event -> {
+            final Set<ReplicaDTO> selected = replicaSelectionModel.getSelectedSet();
+            if (selected.size() == 1) {
+                refreshReplicaDetail(selected.iterator().next());
+            } else {
+                replicaDetailPanel.setVisible(false);
+            }
+        });
         if (userService.hasServerPermission(ServerActions.READ_REPLICATOR)) {
             updateReplicaList();
         }
     }
 
-    protected void stopAllReplicas() {
-        replicationServiceAsync.stopAllReplicas(new AsyncCallback<Void>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                errorReporter.reportError(caught.getMessage());
-                updateReplicaList();
-            }
-            @Override
-            public void onSuccess(Void result) {
-                removeAllReplicas.setEnabled(false);
-                updateReplicaList();
-            }
-        });
-    }
+    /**
+     * A {@link TableWrapper} for {@link ReplicaDTO} rows, with sortable text columns and an actions column
+     * for dropping individual replica connections. Multi-selection is enabled via a checkbox column managed
+     * by the base class.
+     */
+    private class ReplicaTableWrapper
+            extends TableWrapperWithFilter<ReplicaDTO, RefreshableMultiSelectionModel<ReplicaDTO>, StringMessages, AdminConsoleTableResources> {
+        ReplicaTableWrapper(final AdminConsoleTableResources tableResources, final UserService userService,
+                final StringMessages stringMessages, final ErrorReporter errorReporter) {
+            super(stringMessages, errorReporter, /* multiSelection */ true, /* enablePager */ false,
+                    Optional.of(new EntityIdentityComparator<ReplicaDTO>() {
+                        @Override
+                        public boolean representSameEntity(final ReplicaDTO r1, final ReplicaDTO r2) {
+                            return r1.getIdentifier().equals(r2.getIdentifier());
+                        }
+                        @Override
+                        public int hashCode(final ReplicaDTO t) {
+                            return t.getIdentifier().hashCode();
+                        }
+                    }), tableResources,
+                    /* updatePermissionFilterForCheckbox */ Optional.of(r->userService.hasServerPermission(ServerActions.REPLICATE)),
+                    /* filterLabel */ Optional.of(stringMessages.filterBy()),
+                    /* filterCheckboxLabel */ stringMessages.hideElementsWithoutUpdateRights());
+            addColumn(ReplicaDTO::getHostname, stringMessages.replicaColumnIp());
+            addColumn(ReplicaDTO::getIdentifier, stringMessages.replicaColumnId());
+            final Column<ReplicaDTO, SafeHtml> additionalInformationColumn = new Column<ReplicaDTO, SafeHtml>(new SafeHtmlCell()) {
+                @Override
+                public SafeHtml getValue(ReplicaDTO replica) {
+                    final SafeHtmlBuilder builder = new SafeHtmlBuilder();
+                    builder.appendHtmlConstant("<p>");
+                    builder.appendHtmlConstant(replica.getAdditionalInformation());
+                    builder.appendHtmlConstant("</p>");
+                    return builder.toSafeHtml();
+                }
+            };
+            // The default CellTable cell style applies white-space: nowrap to every cell, which
+            // gives the table an intrinsic min-width that prevents it from shrinking with the
+            // viewport. The cellTableWrapText class (defined in AdminConsoleTable.css) flips this
+            // single column to white-space: normal + overflow-wrap, so it becomes the one column
+            // that can absorb the slack by wrapping while every other column keeps its content
+            // width under the default table-layout: auto.
+            additionalInformationColumn.setCellStyleNames(tableResources.cellTableStyle().cellTableWrapText());
+            addColumn(additionalInformationColumn, stringMessages.additionalInformation());
+            addColumn(r -> r.getRegistrationTime().toString(), stringMessages.replicaColumnRegistered(),
+                    (r1, r2) -> r1.getRegistrationTime().compareTo(r2.getRegistrationTime()));
+            addColumn(r -> String.valueOf(Math.round(r.getAverageNumberOfOperationsPerMessage())),
+                    stringMessages.replicaColumnOpsPerMsg());
+            addColumn(r -> String.valueOf(r.getNumberOfMessagesSent()), stringMessages.replicaColumnMessages());
+            addColumn(r -> String.valueOf(Math.round(r.getAverageMessageSizeInBytes())), stringMessages.replicaColumnAvgMsgSize());
+            addColumn(r -> r.getNumberOfBytesSent() + "B (" + (r.getNumberOfBytesSent() / 1024 / 1024) + "MB)",
+                    stringMessages.replicaColumnTotalSize(),
+                    (r1, r2) -> Long.compare(r1.getNumberOfBytesSent(), r2.getNumberOfBytesSent()));
+            addColumn(r -> String.valueOf(r.getOperationCountByOperationClassName().values().stream().mapToLong(Integer::longValue).sum()),
+                    stringMessages.replicaColumnTotalOps(),
+                    (r1, r2) -> Long.compare(
+                            r1.getOperationCountByOperationClassName().values().stream().mapToLong(Integer::longValue).sum(),
+                            r2.getOperationCountByOperationClassName().values().stream().mapToLong(Integer::longValue).sum()));
+            final ActionsColumn<ReplicaDTO, ReplicaImagesBarCell> actionsColumn = new ActionsColumn<>(
+                    new ReplicaImagesBarCell(stringMessages),
+                    (replica, action) -> userService.hasServerPermission(ServerActions.REPLICATE));
+            actionsColumn.addAction(ReplicaImagesBarCell.ACTION_DROP, replica -> dropSingleReplica(replica));
+            addColumn(actionsColumn, stringMessages.additionalInformation());
+        }
 
+        @Override
+        protected Iterable<String> getSearchableStrings(ReplicaDTO t) {
+            return Arrays.asList(t.getAdditionalInformation(), t.getHostname(), t.getIdentifier());
+        }
+    }
+    
+    /**
+     * Populates {@link #replicaDetailPanel} with the details of the given replica and makes it visible.
+     * Called when exactly one row is selected in {@link #replicasTable}. The {@link #replicaDetailGrid}
+     * is resized to the required number of rows.
+     */
+    private void refreshReplicaDetail(final ReplicaDTO replica) {
+        replicaDetailPanel.setCaptionText(replica.getHostname() + " (" + replica.getIdentifier() + ")");
+        int row = 0;
+        replicaDetailGrid.resize(6 + replica.getOperationCountByOperationClassName().size(), 2);
+        replicaDetailGrid.setWidget(row, 0, new Label(stringMessages.registrationTime()));
+        replicaDetailGrid.setWidget(row, 1, new Label(replica.getRegistrationTime().toString()));
+        row++;
+        replicaDetailGrid.setWidget(row, 0, new Label(stringMessages.replicables()));
+        replicaDetailGrid.setWidget(row, 1, new Label(Arrays.toString(replica.getReplicableIdsAsStrings()).replaceAll(",", "\n")));
+        row++;
+        replicaDetailGrid.setWidget(row, 0, new Label(stringMessages.additionalInformation()));
+        replicaDetailGrid.setWidget(row, 1, new Label(replica.getAdditionalInformation()));
+        row++;
+        long totalNumberOfOperations = 0;
+        for (final Map.Entry<String, Integer> e : replica.getOperationCountByOperationClassName().entrySet()) {
+            replicaDetailGrid.setWidget(row, 0, new Label(e.getKey()));
+            replicaDetailGrid.setWidget(row, 1, new Label(e.getValue().toString()));
+            totalNumberOfOperations += e.getValue();
+            row++;
+        }
+        replicaDetailGrid.setWidget(row, 0, new Label(stringMessages.totalNumberOfOperations()));
+        replicaDetailGrid.setWidget(row, 1, new Label(String.valueOf(totalNumberOfOperations)));
+        row++;
+        replicaDetailGrid.setWidget(row, 0, new Label(stringMessages.totalSize()));
+        replicaDetailGrid.setWidget(row, 1, new Label(replica.getNumberOfBytesSent() + "B (" + (replica.getNumberOfBytesSent() / 1024 / 1024) + "MB)"));
+        replicaDetailPanel.setVisible(true);
+    }
+    
+    /**
+     * Drops the replication connection for every replica currently selected in {@link #replicasTable}.
+     */
+    private void dropSelectedReplicas() {
+        final Set<ReplicaDTO> selected = new HashSet<>(replicaSelectionModel.getSelectedSet());
+        replicaSelectionModel.clear();
+        for (final ReplicaDTO replica : selected) {
+            dropSingleReplica(replica);
+        }
+    }
+    
+    /**
+     * Calls {@link RemoteReplicationServiceAsync#stopSingleReplicaInstance} for the given replica and
+     * refreshes the list on both success and failure.
+     */
+    private void dropSingleReplica(final ReplicaDTO replica) {
+        if (Window.confirm(stringMessages.reallyDropReplica(replica.getAdditionalInformation(), replica.getName()))) {
+            replicationServiceAsync.stopSingleReplicaInstance(replica.getIdentifier(), new AsyncCallback<Void>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                    errorReporter.reportError(caught.getMessage());
+                    updateReplicaList();
+                }
+                @Override
+                public void onSuccess(Void result) {
+                    updateReplicaList();
+                }
+            });
+        }
+    }
+    
     private void stopReplication() {
         stopReplicationButton.setEnabled(false);
         replicationServiceAsync.stopReplicatingFromMaster(new AsyncCallback<Void>() {
@@ -208,27 +355,16 @@ public class ReplicationPanel extends FlowPanel {
     }
     
     private void addReplication() {
-        AddReplicationDialog dialog = new AddReplicationDialog(new Validator<ReplicationData>() {
-
+        new AddReplicationDialog(new Validator<ReplicationData>() {
             @Override
             public String getErrorMessage(ReplicationData valueToValidate) {
-                boolean userNameUnset = valueToValidate.getUserName() == null
-                        || valueToValidate.getUserName().isEmpty();
-                boolean passWordUnset = valueToValidate.getPassword() == null
-                        || valueToValidate.getPassword().isEmpty();
+                final boolean userNameUnset = valueToValidate.getUserName() == null || valueToValidate.getUserName().isEmpty();
+                final boolean passWordUnset = valueToValidate.getPassword() == null || valueToValidate.getPassword().isEmpty();
                 return userNameUnset == passWordUnset ? null : stringMessages.usernameAndPasswordMustBothBeSet();
             }
         }, new DialogCallback<ReplicationData>() {
             @Override
-            /**
-             * @param masterNameAndExchangeNameAndMessagingPortNumberAndServletPortNumber
-             *            a triple containing the RabbitMQ exchange hostname, the servlet hostname and the RabbitMQ
-             *            exchange name, followed by the RabbitMQ messaging port and the servlet port
-             */
             public void ok(final ReplicationData state) {
-                registeredMasters.removeRow(0);
-                registeredMasters.insertRow(0);
-                registeredMasters.setWidget(0, 0, new Label(stringMessages.loading()));
                 addButton.setEnabled(false);
                 stopReplicationButton.setEnabled(false);
                 replicationServiceAsync.startReplicatingFromMaster(state.getMessagingHost(), state.getMasterHostName(),
@@ -255,96 +391,20 @@ public class ReplicationPanel extends FlowPanel {
             public void cancel() {
                 // simply don't add replication
             }
-        });
-        dialog.show();
+        }).show();
     }
 
     public void updateReplicaList() {
+        progressIndicator.setBusy(true);
         replicationServiceAsync.getReplicaInfo(new AsyncCallback<ReplicationStateDTO>() {
             @Override
             public void onSuccess(ReplicationStateDTO replicas) {
-                int i=0;
-                int replicaCount = 0;
-                registeredReplicas.clear();
-                boolean replicaRegistered = false;
-                for (final ReplicaDTO replica : replicas.getReplicas()) {
-                    replicaCount++;
-                    insertRowIfNeeded(registeredReplicas, i);
-                    registeredReplicas.setWidget(i, 0, new Label(replicaCount + ". " + replica.getHostname() + " (" + replica.getIdentifier() + ")"));
-                    registeredReplicas.setWidget(i, 1, new Label(stringMessages.registeredAt(replica.getRegistrationTime().toString())));
-                    final Button removeReplicaButton = new Button(stringMessages.dropReplicaConnection());
-                    removeReplicaButton.addClickHandler(new ClickHandler() {
-                        @Override
-                        public void onClick(ClickEvent event) {
-                            replicationServiceAsync.stopSingleReplicaInstance(replica.getIdentifier(), new AsyncCallback<Void>() {
-                                @Override
-                                public void onFailure(Throwable caught) {
-                                    errorReporter.reportError(caught.getMessage());
-                                    updateReplicaList();
-                                }
-                                @Override
-                                public void onSuccess(Void result) {
-                                    updateReplicaList();
-                                }
-                            });
-                        }
-                    });
-                    registeredReplicas.setWidget(i, 2, removeReplicaButton);
-                    i++;
-                    insertRowIfNeeded(registeredReplicas, i);
-                    registeredReplicas.setWidget(i, 1, new Label(stringMessages.replicables()));
-                    HTML replicablesLabel = new HTML(new SafeHtmlBuilder().appendEscapedLines(Arrays.toString(replica.getReplicableIdsAsStrings()).replaceAll(",", "\n")).toSafeHtml());
-                    registeredReplicas.setWidget(i, 2, replicablesLabel);
-                    i++;
-                    insertRowIfNeeded(registeredReplicas, i);
-                    registeredReplicas.setWidget(i, 1, new Label(stringMessages.averageNumberOfOperationsPerMessage()));
-                    registeredReplicas.setWidget(i, 2, new Label(""+replica.getAverageNumberOfOperationsPerMessage()));
-                    i++;
-                    insertRowIfNeeded(registeredReplicas, i);
-                    registeredReplicas.setWidget(i, 1, new Label(stringMessages.additionalInformation()));
-                    registeredReplicas.setWidget(i, 2, new Label(""+replica.getAdditionalInformation()));
-                    i++;
-                    insertRowIfNeeded(registeredReplicas, i);
-                    registeredReplicas.setWidget(i, 1, new Label(stringMessages.numberOfQueueMessagesSent()));
-                    registeredReplicas.setWidget(i, 2, new Label(""+replica.getNumberOfMessagesSent()));
-                    i++;
-                    insertRowIfNeeded(registeredReplicas, i);
-                    registeredReplicas.setWidget(i, 1, new Label(stringMessages.averageMessageSize()));
-                    registeredReplicas.setWidget(i, 2, new Label(""+replica.getAverageMessageSizeInBytes()));
-                    i++;
-                    insertRowIfNeeded(registeredReplicas, i);
-                    registeredReplicas.setWidget(i, 1, new Label(stringMessages.totalSize()));
-                    registeredReplicas.setWidget(i, 2, new Label(""+replica.getNumberOfBytesSent()+"B ("+replica.getNumberOfBytesSent()/1024.0/1024.0+"MB)"));
-                    i++;
-                    long totalNumberOfOperations = 0;
-                    for (Map.Entry<String, Integer> e : replica.getOperationCountByOperationClassName().entrySet()) {
-                        insertRowIfNeeded(registeredReplicas, i);
-                        registeredReplicas.setWidget(i, 1, new Label(e.getKey()));
-                        registeredReplicas.setWidget(i, 2, new Label(e.getValue().toString()));
-                        totalNumberOfOperations += e.getValue();
-                        i++;
-                    }
-                    insertRowIfNeeded(registeredReplicas, i);
-                    registeredReplicas.setWidget(i, 1, new Label(stringMessages.totalNumberOfOperations()));
-                    registeredReplicas.setWidget(i, 2, new Label(""+totalNumberOfOperations));
-                    i++;
-                    replicaRegistered = true;
-                }
-                if (!replicaRegistered) {
-                    insertRowIfNeeded(registeredReplicas, i);
-                    registeredReplicas.setWidget(i, 0, new Label(stringMessages.explainNoConnectionsFromReplicas()));
-                    removeAllReplicas.setEnabled(false);
-                    i++;
-                } else {
-                    removeAllReplicas.setEnabled(true);
-                }
-                while (registeredReplicas.getRowCount() > i) {
-                    registeredReplicas.removeRow(registeredReplicas.getRowCount()-1);
-                }
+                progressIndicator.setBusy(false);
+                replicasTable.getFilterPanel().updateAll(replicas.getReplicas());
                 while (registeredMasters.getRowCount() > 0) {
                     registeredMasters.removeRow(0);
                 }
-                i = 0;
+                int i = 0;
                 registeredMasters.insertRow(i);
                 registeredMasters.setWidget(i, 0, new Label("Client UUID: " + replicas.getServerIdentifier()));
                 i++;
@@ -372,18 +432,12 @@ public class ReplicationPanel extends FlowPanel {
                     stopReplicationButton.setEnabled(false);
                 }
             }
-            
             @Override
             public void onFailure(Throwable e) {
+                progressIndicator.setBusy(false);
                 errorReporter.reportError(stringMessages.errorFetchingReplicaData(e.getMessage()));
             }
         });
-    }
-    
-    private void insertRowIfNeeded(Grid grid, int zeroBasedRowNumber) {
-        if (grid.getRowCount() <= zeroBasedRowNumber) {
-            grid.insertRow(zeroBasedRowNumber);
-        }
     }
 
     /**
@@ -416,14 +470,13 @@ public class ReplicationPanel extends FlowPanel {
             usernameEntryField = createTextBox("admin");
             passwordEntryField = createPasswordTextBox("admin");
         }
-        
         /**
          * Can contribute an additional widget to be displayed underneath the text entry field. If <code>null</code> is
          * returned, no additional widget will be displayed. This is the default behavior of this default implementation.
          */
         @Override
         protected Widget getAdditionalWidget() {
-            Grid grid = new Grid(14, 2);
+            final Grid grid = new Grid(14, 2);
             grid.setWidget(0, 0, new Label(stringMessages.hostname()));
             grid.setWidget(0, 1, hostnameEntryField);
             grid.setWidget(1, 0, new Label(stringMessages.explainReplicationHostname()));
@@ -443,11 +496,11 @@ public class ReplicationPanel extends FlowPanel {
             grid.setWidget(8, 0, new Label(stringMessages.servletPortNumber()));
             grid.setWidget(8, 1, servletPortField);
             grid.setWidget(9, 0, new Label(stringMessages.explainReplicationServletPort()));
-
+            
             grid.setWidget(10, 0, new Label(stringMessages.username()));
             grid.setWidget(10, 1, usernameEntryField);
             grid.setWidget(11, 0, new Label(stringMessages.explainUserName()));
-
+            
             grid.setWidget(12, 0, new Label(stringMessages.password()));
             grid.setWidget(12, 1, passwordEntryField);
             grid.setWidget(13, 0, new Label(stringMessages.explainPassword()));
@@ -458,7 +511,7 @@ public class ReplicationPanel extends FlowPanel {
         protected Focusable getInitialFocusWidget() {
             return hostnameEntryField;
         }
-
+        
         @Override
         protected ReplicationData getResult() {
             return new ReplicationData(exchangeHostnameEntryField.getValue(), hostnameEntryField.getValue(),
@@ -466,5 +519,4 @@ public class ReplicationPanel extends FlowPanel {
                     usernameEntryField.getValue(), passwordEntryField.getValue());
         }
     }
-
 }

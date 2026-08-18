@@ -29,7 +29,7 @@ Displays designs displaying the login pages for the management-console.
 The View is already implemented. Overall Authorization and related event propagation is missing.
 
 ![Image not found](https://static.sapsailing.com/management-console/login/Login%20-%20Mobile.png)
-See https://static.sapsailing.com/management-console/login for a full list of designs.
+See [https://static.sapsailing.com/management-console/login](https://static.sapsailing.com/management-console/login) for a full list of designs.
 
 ### Event
 

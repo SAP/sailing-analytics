@@ -136,6 +136,7 @@ public class BoatClassImageResolver {
         boatClassIconsMap.put(BoatClassMasterdata.RS21.getDisplayName(), imageResources.RS21Icon());
         boatClassIconsMap.put(BoatClassMasterdata.RS400.getDisplayName(), imageResources.RS400Icon());
         boatClassIconsMap.put(BoatClassMasterdata.RS500.getDisplayName(), imageResources.RS500Icon());
+        boatClassIconsMap.put(BoatClassMasterdata.RS700.getDisplayName(), imageResources.RS700Icon());
         boatClassIconsMap.put(BoatClassMasterdata.RS800.getDisplayName(), imageResources.RS800Icon());
         boatClassIconsMap.put(BoatClassMasterdata.RS_AERO.getDisplayName(), imageResources.RSAEROIcon());
         boatClassIconsMap.put(BoatClassMasterdata.RS_X.getDisplayName(), imageResources.RSXIcon());

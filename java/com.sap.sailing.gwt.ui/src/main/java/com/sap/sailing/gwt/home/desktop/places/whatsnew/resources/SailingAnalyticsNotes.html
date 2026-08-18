@@ -6,6 +6,33 @@
 <div id="mainContent">
     <h4 class="articleHeadline" id="sailingAnalyticsHeadline">What's New - Sailing Analytics</h4>
       <div class="innerContent">
+         <h5 class="articleSubheadline">August 2026</h5>
+         <ul class="bulletList">
+            <li>An event's course area configuration dialog now can copy course areas from other local
+                and remote events. This can be convenient if an event uses the same course area
+                configuration, including their geometries, as another event, e.g., the previous
+                year's episode of that event.</li>
+            <li>Show one decimal place in wind chart tool-tips, so, e.g., a wind speed series tool-tip
+                may read "16.6kts" now.</li>
+         </ul>
+         <h5 class="articleSubheadline">July 2026</h5>
+         <ul class="bulletList">
+            <li>Introduced configurable average/min/max lines in wind chart</li>
+            <li>Added RS700 boat class data.</li>
+            <li>Improved performance and smoothness of boat animation on map.</li>
+            <li>VMG can now become negative.</li>
+            <li>Fixed dynamic update of tooltip for course middle line.</li>
+         </ul>
+         <h5 class="articleSubheadline">April 2026</h5>
+         <ul class="bulletList">
+            <li>Tables with multi-selection support now have a select/de-select all checkbox in the table header.
+                This comes with general improvements in table selection/de-selection handling.</li>
+            <li>Adding the "Race Rank" column to the leaderboard now consistently adds it after the selection
+                checkbox column and displays it immediately when the settings dialog is confirmed.</li>
+            <li>Users can now opt out of e-mail communication regarding features and community
+                information. This will be honored when sending out such general information about
+                the Sailing Analytics solution.</li>
+         </ul>
          <h5 class="articleSubheadline">March 2026</h5>
          <ul class="bulletList">
             <li>Maneuver analysis now identifies track segments worth looking at with consistency.
@@ -28,6 +55,14 @@
                 not break the tie (meaning the two competitors scored equal total points and equal medal
                 race score sums), tie breaking resorts to the regular A8 scheme which will break the
                 tie based on the scores of all races.</li>
+            <li>The simulator overlay in the "Race Board" will no longer wait synchronously for a simulation
+                result to be available as this may be a long-running calculation. However, if no calculation
+                for the respective leg has been started on the server yet, this will get triggered.
+                Time ticks on the race board's time line will attempt loading the simulation results again.
+                This way, the simulation overlay will show when ready while in playing mode or while moving
+                the time slider. Note, though, that compared to earlier versions the simulation results will
+                not be shown automatically when it was not available initially, unless the time slider is
+                touched or the simulation display is toggled.</li>
          </ul>
          <h5 class="articleSubheadline">December 2025</h5>
          <ul class="bulletList">

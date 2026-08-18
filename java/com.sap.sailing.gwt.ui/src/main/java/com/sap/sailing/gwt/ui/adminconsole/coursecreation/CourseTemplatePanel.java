@@ -19,10 +19,10 @@ import java.util.stream.Collectors;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.AbstractCellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
+import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -100,14 +100,13 @@ public class CourseTemplatePanel extends FlowPanel implements FilterablePanelPro
         buttonAndFilterPanel.addCreateAction(stringMessages.add(),
                 () -> openEditCourseTemplateDialog(new CourseTemplateDTO(), userService, true));
         buttonAndFilterPanel.addRemoveAction(stringMessages.remove(), refreshableSelectionModel, true,
-                () -> removeCourseTemplates(refreshableSelectionModel.getSelectedSet().stream()
-                        .map(courseTemplateDTO -> courseTemplateDTO.getUuid()).collect(Collectors.toList())));
-
+                () -> {final List<UUID> uuids = refreshableSelectionModel.getSelectedSet().stream().map(courseTemplateDTO -> courseTemplateDTO.getUuid()).collect(Collectors.toList());
+            removeCourseTemplates(uuids);
+        });
         buttonAndFilterPanel.addUnsecuredWidget(lblFilterRaces);
         buttonAndFilterPanel.addUnsecuredWidget(filterableCourseTemplatePanel);
         filterableCourseTemplatePanel
                 .setUpdatePermissionFilterForCheckbox(event -> userService.hasPermission(event, DefaultActions.UPDATE));
-
     }
 
     private void removeCourseTemplates(Collection<UUID> courseTemplatesUuids) {
@@ -175,7 +174,6 @@ public class CourseTemplatePanel extends FlowPanel implements FilterablePanelPro
     private void createCourseTemplateTable(final UserService userService) {
         courseTemplateTable = new FlushableCellTable<>(1000, tableResources);
         courseTemplateTable.setWidth("100%");
-
         // Attach a column sort handler to the ListDataProvider to sort the list.
         ListHandler<CourseTemplateDTO> sortHandler = new ListHandler<>(courseTemplateListDataProvider.getList());
         courseTemplateTable.addColumnSortHandler(sortHandler);
@@ -203,9 +201,9 @@ public class CourseTemplatePanel extends FlowPanel implements FilterablePanelPro
                     public int hashCode(CourseTemplateDTO t) {
                         return t.getUuid().hashCode();
                     }
-                }, filterableCourseTemplatePanel.getAllListDataProvider(), courseTemplateTable);
-
-        courseTemplateTable.addColumn(checkColumn, SafeHtmlUtils.fromSafeConstant("<br/>"));
+                }, filterableCourseTemplatePanel.getAllListDataProvider());
+        final Header<Boolean> selectAllHeader = checkColumn.createHeader();
+        courseTemplateTable.addColumn(checkColumn, selectAllHeader);
         courseTemplateTable.setColumnWidth(checkColumn, 40, Unit.PX);
         // id
         Column<CourseTemplateDTO, String> idColumn = new Column<CourseTemplateDTO, String>(new TextCell()) {

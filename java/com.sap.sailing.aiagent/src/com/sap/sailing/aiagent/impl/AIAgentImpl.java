@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.authz.AuthorizationException;
 import org.json.simple.parser.ParseException;
 import org.osgi.util.tracker.ServiceTracker;
@@ -312,7 +313,13 @@ public class AIAgentImpl implements AIAgent {
         for (final Leaderboard leaderboard : event.getLeaderboards()) {
             addNewRaceColumnListenerToLeaderboard(leaderboard);
         }
-        logger.info("User "+SecurityUtils.getSubject().getPrincipal()+" activated AI comments for event "+event.getName()+" with ID "+event.getId());
+        Object principal;
+        try {
+            principal = SecurityUtils.getSubject().getPrincipal();
+        } catch (UnavailableSecurityManagerException e) {
+            principal = "null";
+        }
+        logger.info("User "+principal+" activated AI comments for event "+event.getName()+" with ID "+event.getId());
         listeners.forEach(l->l.startedCommentingOnEvent(event));
     }
 

@@ -29,6 +29,8 @@ public interface UserPreferencesView extends IsWidget {
         BoatClassSelectionPresenter getFavoriteBoatClassesDataProvider();
 
         CompetitorSelectionPresenter getFavoriteCompetitorsDataProvider();
+
+        MiscPreferencesPresenter getMiscPresenter();
     }
 
 }

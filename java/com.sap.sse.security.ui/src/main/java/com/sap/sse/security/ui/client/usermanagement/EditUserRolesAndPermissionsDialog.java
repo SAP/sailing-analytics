@@ -66,7 +66,7 @@ public class EditUserRolesAndPermissionsDialog extends DataEntryDialog<Void> {
     }
 
     private UserDTO createUserAdapter(final String selectedUsername, final RolesAndPermissionsForUserDTO dto) {
-        return new UserDTO(selectedUsername, null, null, null, null, false, null, dto.getRoles(), null,
+        return new UserDTO(selectedUsername, null, null, null, null, false, false, null, dto.getRoles(), null,
                 dto.getPermissions(), null, null);
     }
 

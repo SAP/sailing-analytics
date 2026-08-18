@@ -575,6 +575,20 @@
          install-size="0"
          version="1.4.200.v20200828-1034"
          unpack="false"/>
+         
+   <plugin
+         id="org.eclipse.equinox.http.service.api"
+         download-size="0"
+         install-size="0"
+         version="1.2.2.v20231218-2126"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.http.service.api.source"
+         download-size="0"
+         install-size="0"
+         version="1.2.2.v20231218-2126"
+         unpack="false"/>
 
    <plugin
          id="org.eclipse.equinox.launcher"
@@ -594,28 +608,28 @@
          id="org.eclipse.osgi"
          download-size="0"
          install-size="0"
-         version="3.18.0.v20220516-2155"
+         version="3.19.0.v20240213-1246"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.osgi.source"
          download-size="0"
          install-size="0"
-         version="3.18.0.v20220516-2155"
+         version="3.19.0.v20240213-1246"
          unpack="false"/>
 
    <plugin
          id="org.osgi.util.promise"
          download-size="0"
          install-size="0"
-         version="1.2.0.202109301733"
+         version="1.3.0.202212101352"
          unpack="false"/>
 
    <plugin
          id="org.osgi.util.promise.source"
          download-size="0"
          install-size="0"
-         version="1.2.0.202109301733"
+         version="1.3.0.202212101352"
          unpack="false"/>
 
    <plugin
@@ -678,14 +692,14 @@
          id="org.eclipse.osgi.services"
          download-size="0"
          install-size="0"
-         version="3.10.200.v20210723-0643"
+         version="3.12.0.v20231218-2126"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.osgi.services.source"
          download-size="0"
          install-size="0"
-         version="3.10.200.v20210723-0643"
+         version="3.12.0.v20231218-2126"
          unpack="false"/>
 
    <plugin
@@ -733,14 +747,14 @@
          id="org.eclipse.osgi.util"
          download-size="0"
          install-size="0"
-         version="3.7.0.v20220427-2144"
+         version="3.7.300.v20231104-1118"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.osgi.util.source"
          download-size="0"
          install-size="0"
-         version="3.7.0.v20220427-2144"
+         version="3.7.300.v20231104-1118"
          unpack="false"/>
 
    <plugin
@@ -1053,13 +1067,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.osgi.util.tracker"
-         download-size="0"
-         install-size="0"
-         version="1.5.4.202109301733"
-         unpack="false"/>
-
-   <plugin
          id="org.osgi.service.event"
          download-size="0"
          install-size="0"
@@ -1067,10 +1074,108 @@
          unpack="false"/>
 
    <plugin
+         id="org.osgi.service.metatype"
+         download-size="0"
+         install-size="0"
+         version="1.4.1.202109301733"
+         unpack="false"/>
+
+   <plugin
+         id="org.osgi.service.metatype.source"
+         download-size="0"
+         install-size="0"
+         version="1.4.1.202109301733"
+         unpack="false"/>
+         
+   <plugin
          id="org.osgi.service.packageadmin"
          download-size="0"
          install-size="0"
          version="1.2.1.202007221806"
+         unpack="false"/>
+
+   <plugin
+         id="org.osgi.service.provisioning"
+         download-size="0"
+         install-size="0"
+         version="1.2.0.201505202024"
+         unpack="false"/>
+
+   <plugin
+         id="org.osgi.service.provisioning.source"
+         download-size="0"
+         install-size="0"
+         version="1.2.0.201505202024"
+         unpack="false"/>
+         
+   <plugin
+         id="org.osgi.service.upnp"
+         download-size="0"
+         install-size="0"
+         version="1.2.1.202109301733"
+         unpack="false"/>
+
+   <plugin
+         id="org.osgi.service.upnp.source"
+         download-size="0"
+         install-size="0"
+         version="1.2.1.202109301733"
+         unpack="false"/>
+         
+   <plugin
+         id="org.osgi.service.useradmin"
+         download-size="0"
+         install-size="0"
+         version="1.1.1.202109301733"
+         unpack="false"/>
+
+   <plugin
+         id="org.osgi.service.useradmin.source"
+         download-size="0"
+         install-size="0"
+         version="1.1.1.202109301733"
+         unpack="false"/>
+
+   <plugin
+         id="org.osgi.service.wireadmin"
+         download-size="0"
+         install-size="0"
+         version="1.0.2.202109301733"
+         unpack="false"/>
+
+   <plugin
+         id="org.osgi.service.wireadmin.source"
+         download-size="0"
+         install-size="0"
+         version="1.0.2.202109301733"
+         unpack="false"/>
+
+   <plugin
+         id="org.osgi.service.device"
+         download-size="0"
+         install-size="0"
+         version="1.1.1.202109301733"
+         unpack="false"/>
+
+   <plugin
+         id="org.osgi.service.device.source"
+         download-size="0"
+         install-size="0"
+         version="1.1.1.202109301733"
+         unpack="false"/>
+
+   <plugin
+         id="org.osgi.service.http.whiteboard"
+         download-size="0"
+         install-size="0"
+         version="1.1.1.202109301733"
+         unpack="false"/>
+
+   <plugin
+         id="org.osgi.service.http.whiteboard.source"
+         download-size="0"
+         install-size="0"
+         version="1.1.1.202109301733"
          unpack="false"/>
 
    <plugin

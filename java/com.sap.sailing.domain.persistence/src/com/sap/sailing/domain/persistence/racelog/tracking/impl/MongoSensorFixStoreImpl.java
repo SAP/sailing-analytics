@@ -132,7 +132,8 @@ public class MongoSensorFixStoreImpl extends MongoFixHandler implements MongoSen
     public <FixT extends Timed> void loadFixes(Consumer<FixT> consumer, DeviceIdentifier device, TimePoint from,
             TimePoint to, boolean inclusive, BooleanSupplier isPreemptiveStopped, Consumer<Double> progressConsumer)
                     throws NoCorrespondingServiceRegisteredException, TransformationException {
-        loadFixes(consumer, device, from, to, inclusive, isPreemptiveStopped, progressConsumer, true, false);
+        loadFixes(consumer, device, from, to, inclusive, isPreemptiveStopped, progressConsumer,
+                /* ascending */ true, /* only one result */ false);
     }
 
     private <FixT extends Timed> boolean loadFixes(Consumer<FixT> consumer, DeviceIdentifier device, TimePoint from,
@@ -191,7 +192,6 @@ public class MongoSensorFixStoreImpl extends MongoFixHandler implements MongoSen
             }
         }
         progressConsumer.accept(1d);
-        
         return fixLoaded;
     }
 
@@ -256,7 +256,8 @@ public class MongoSensorFixStoreImpl extends MongoFixHandler implements MongoSen
         });
         for (FixT fix : fixes) {
             for (FixReceivedListener<FixT> listener : listenersToInform) {
-                final Iterable<Triple<RegattaAndRaceIdentifier, Boolean, Duration>> racesWithManeuverChangeFromListener = listener.fixReceived(device, fix, returnManeuverChanges, returnLiveDelay);
+                final Iterable<Triple<RegattaAndRaceIdentifier, Boolean, Duration>> racesWithManeuverChangeFromListener =
+                        listener.fixReceived(device, fix, returnManeuverChanges, returnLiveDelay);
                 Util.addAll(racesWithManeuverChangeFromListener, raceWithChangedManeuver);
             }
         }

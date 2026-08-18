@@ -441,7 +441,7 @@ public class RaceBoardPanel
                 timeRangeWithZoomModel,
                 stringMessages, raceTimesInfoProvider, parsedPerspectiveOwnSettings.isCanReplayDuringLiveRaces(),
                 showChartMarkEditMediaButtonsAndVideo, selectedRaceIdentifier,
-                parsedPerspectiveOwnSettings.getInitialDurationAfterRaceStartInReplay(), raceDTO);
+                parsedPerspectiveOwnSettings.getInitialDurationAfterRaceStartInReplay(), raceDTO, asyncActionsExecutor, raceMap.getTimeRangeActionsExecutor());
         racetimePanel.updateSettings(raceTimePanelSettings);
         timeRangeWithZoomModel.addTimeZoomChangeListener(racetimePanel);
         raceTimesInfoProvider.addRaceTimesInfoProviderListener(racetimePanel);

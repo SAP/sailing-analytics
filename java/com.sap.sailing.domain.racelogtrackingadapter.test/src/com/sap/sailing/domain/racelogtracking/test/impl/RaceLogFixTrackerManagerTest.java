@@ -76,7 +76,7 @@ public class RaceLogFixTrackerManagerTest {
 
     protected final AbstractLogEventAuthor author = new LogEventAuthorImpl("author", 0);
     private DynamicTrackedRace trackedRace;
-
+    
     @BeforeEach
     public void setUp() throws UnknownHostException, MongoException {
         raceLog = new RaceLogImpl("racelog");

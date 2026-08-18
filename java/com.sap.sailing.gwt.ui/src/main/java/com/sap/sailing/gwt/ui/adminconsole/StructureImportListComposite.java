@@ -14,6 +14,7 @@ import com.sap.sse.gwt.client.celltable.EntityIdentityComparator;
 import com.sap.sse.gwt.client.celltable.FlushableCellTable;
 import com.sap.sse.gwt.client.celltable.SelectionCheckboxColumn;
 import com.sap.sse.security.ui.client.UserService;
+import com.google.gwt.user.cellview.client.Header;
 
 public class StructureImportListComposite extends RegattaListComposite {
 
@@ -57,7 +58,7 @@ public class StructureImportListComposite extends RegattaListComposite {
                     public int hashCode(RegattaDTO t) {
                         return t.getRegattaIdentifier().hashCode();
                     }
-                }, regattaListDataProvider, table);
+                }, regattaListDataProvider);
 
         ListHandler<RegattaDTO> columnSortHandler = new ListHandler<RegattaDTO>(regattaListDataProvider.getList());
         table.addColumnSortHandler(columnSortHandler);
@@ -91,7 +92,8 @@ public class StructureImportListComposite extends RegattaListComposite {
         });
 
         columnSortHandler.setComparator(selectionCheckboxColumn, selectionCheckboxColumn.getComparator());
-        table.addColumn(selectionCheckboxColumn, selectionCheckboxColumn.getHeader());
+        final Header<Boolean> selectAllHeader = selectionCheckboxColumn.createHeader();
+        table.addColumn(selectionCheckboxColumn, selectAllHeader);
         table.addColumn(regattaNameColumn, stringMessages.regattaName());
         table.addColumn(regattaStructureColumn, stringMessages.series());
         table.setSelectionModel(selectionCheckboxColumn.getSelectionModel(), selectionCheckboxColumn.getSelectionManager());

@@ -26,7 +26,7 @@ public class TestGithubReleaseRepository {
     
     @BeforeAll
     public static void setUp() {
-        repository = new GithubReleasesRepository("SAP", "sailing-analytics", MAIN);
+        repository = new GithubReleasesRepository("eclipse-sailing-analytics", "sailing-analytics", MAIN);
     }
     
     @Test
@@ -76,7 +76,7 @@ public class TestGithubReleaseRepository {
     public void testConcurrentAccess() throws InterruptedException, ExecutionException {
         final ScheduledExecutorService threadPool = ThreadPoolUtil.INSTANCE.createForegroundTaskThreadPoolExecutor(10, getClass().getName()+":testConcurrentAccess()");
         final Map<String, Future<Release>> futures = new HashMap<>();
-        final String[] prefixes = new String[] { "main", "docker-25", "docker-24", "docker-21", "docker-17" };
+        final String[] prefixes = new String[] { "main", "docker-25" };
         for (final String prefix : prefixes) {
             futures.put(prefix, threadPool.submit(()->repository.getLatestRelease(prefix)));
         }

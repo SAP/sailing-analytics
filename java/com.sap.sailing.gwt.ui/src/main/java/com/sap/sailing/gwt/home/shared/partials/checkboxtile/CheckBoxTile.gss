@@ -1,0 +1,59 @@
+.container {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5em;
+	padding: 0.333333333333333em;
+}
+
+.checkbox {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2em;
+	height: 2em;
+}
+
+.checkbox input {
+	width: 1.333333333333333em;
+	height: 2em;
+}
+
+.label {
+	flex: auto;
+	font-weight: 600;
+	padding-right: 2.666666666666667em;
+	line-height: 2em;
+	min-width: 0;
+	text-align: left;
+}
+
+.loadingOverlay {
+	position: absolute;
+	inset: 0;
+	pointer-events: all;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(255, 255, 255, 0.3);
+	z-index: 10;
+}
+
+.spinner {
+	width: 60%;
+	aspect-ratio: 1/1;
+	border: 2px solid #ccc;
+	border-top-color: #1976d2;
+	border-radius: 50%;
+	animation: spin 0.8s linear infinite;
+}
+
+@keyframes
+spin {
+	from {
+        transform:rotate(0deg);
+    } to {
+	   transform: rotate(360deg);
+    }
+}

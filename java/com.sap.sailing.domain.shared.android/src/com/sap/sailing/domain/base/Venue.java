@@ -10,6 +10,10 @@ import com.sap.sse.common.Renamable;
  *
  */
 public interface Venue extends Named, Renamable {
+    void addListener(VenueListener listener);
+    
+    void removeListener(VenueListener listener);
+    
     Iterable<CourseArea> getCourseAreas();
     
     void addCourseArea(CourseArea courseArea);

@@ -19,6 +19,7 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.AbstractCellTable;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Window;
@@ -185,7 +186,7 @@ public class RegattaListComposite extends Composite {
                     public int hashCode(RegattaDTO t) {
                         return t.getRegattaIdentifier().hashCode();
                     }
-                }, filterablePanelRegattas.getAllListDataProvider(), table);
+                }, filterablePanelRegattas.getAllListDataProvider());
         ListHandler<RegattaDTO> columnSortHandler = new ListHandler<RegattaDTO>(regattaListDataProvider.getList());
         table.addColumnSortHandler(columnSortHandler);
         columnSortHandler.setComparator(regattaSelectionCheckboxColumn, regattaSelectionCheckboxColumn.getComparator());
@@ -226,22 +227,7 @@ public class RegattaListComposite extends Composite {
             }
         };
         startEndDateColumn.setSortable(true);
-        columnSortHandler.setComparator(startEndDateColumn, new Comparator<RegattaDTO>() {
-            @Override
-            public int compare(RegattaDTO r1, RegattaDTO r2) {
-                int result;
-                if(r1.startDate != null && r2.startDate != null) {
-                    result = r2.startDate.compareTo(r1.startDate);
-                } else if(r1.startDate == null && r2.startDate != null) {
-                    result = 1;
-                } else if(r1.startDate != null && r2.startDate == null) {
-                    result = -1;
-                } else {
-                    result = 0;
-                }
-                return result;
-            }
-        });
+        columnSortHandler.setComparator(startEndDateColumn, (r1, r2)->Util.compareToWithNull(r1.startDate, r2.startDate, /* nullIsLess */ true));
         TextColumn<RegattaDTO> regattaBoatClassColumn = new TextColumn<RegattaDTO>() {
             @Override
             public String getValue(RegattaDTO regatta) {
@@ -304,7 +290,8 @@ public class RegattaListComposite extends Composite {
                 stringMessages);
         actionsColumn.addAction(RegattaConfigImagesBarCell.ACTION_CHANGE_ACL, DefaultActions.CHANGE_ACL,
                 regattaDTO -> configACL.openDialog(regattaDTO));
-        table.addColumn(regattaSelectionCheckboxColumn, regattaSelectionCheckboxColumn.getHeader());
+        final Header<Boolean> selectAllHeader = regattaSelectionCheckboxColumn.createHeader();
+        table.addColumn(regattaSelectionCheckboxColumn, selectAllHeader);
         table.addColumn(regattaNameColumn, stringMessages.regattaName());
         table.addColumn(regattaCanBoatsOfCompetitorsChangePerRaceColumn, stringMessages.canBoatsChange());
         table.addColumn(competitorRegistrationTypeColumn, stringMessages.competitorRegistrationTypeShort());

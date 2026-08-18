@@ -150,7 +150,7 @@ public class TrackedRaceStatisticsCacheImpl extends AbstractTrackedRegattaAndRac
                         + trackedRace.getRaceIdentifier());
             }
         }
-        // We can be sure that either a cache update was triggered or no further updated will be triggered
+        // We can be sure that either a cache update was triggered or no further update will be triggered
         // We now wait for any result to be updated so that no new entry is generated after removing the entry.
         // The triggerUpdate will at least have been called once.
         final Thread t = new Thread(()->{

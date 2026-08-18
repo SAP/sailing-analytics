@@ -61,11 +61,6 @@ public class BoatPanel extends SimplePanel implements FilterablePanelProvider<Bo
         allowReloadButton.setEnabled(!refreshableBoatSelectionModel.getSelectedSet().isEmpty());
         final Button addBoatButton = buttonPanel.addCreateAction(stringMessages.add(), this::openAddBoatDialog);
         addBoatButton.ensureDebugId("AddBoatButton");
-        buttonPanel.addUnsecuredAction(stringMessages.selectAll(), () -> {
-            for (BoatDTO b : boatTable.getDataProvider().getList()) {
-                refreshableBoatSelectionModel.setSelected(b, true);
-            }
-        });
         mainPanel.add(boatTable);
     }
     

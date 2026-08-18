@@ -340,8 +340,8 @@ public class RaceSimulationOverlay extends FullCanvasOverlay {
     }
     
     public void simulate(int leg) {
-        LegIdentifier legIdentifier = new LegIdentifierImpl(raceIdentifier, leg);
-        GetSimulationAction getSimulation = new GetSimulationAction(sailingService, legIdentifier);
+        final LegIdentifier legIdentifier = new LegIdentifierImpl(raceIdentifier, leg);
+        final GetSimulationAction getSimulation = new GetSimulationAction(sailingService, legIdentifier);
         asyncActionsExecutor.execute(getSimulation, GET_SIMULATION_CATEGORY,
                 new MarkedAsyncCallback<>(new AsyncCallback<SimulatorResultsDTO>() {
                     @Override

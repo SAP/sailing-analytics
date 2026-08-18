@@ -1,2 +1,3 @@
-place these under https://releases.sapsailing.com/environments which is usually
-served by trac@sapsailing.com:releases/environments
+The environments provided here, on the "main" branch, are used
+to resolve the USE_ENVIRONMENTS environment variable in
+java/target/refreshInstance.sh for downloading default environments.

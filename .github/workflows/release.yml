@@ -23,7 +23,28 @@ on:
         default: '140.0'
 
 jobs:
+  # The "changes" job will cause the "build" job to get skipped for trivial changes
+  changes:
+    permissions: {}
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.filter.outputs.code }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: filter
+        uses: dorny/paths-filter@d1c1ffe0248fe513906c8e24db8ea791d46f8590 # v3.0.3
+        with:
+          filters: |
+            code:
+              - '!wiki/**'
+              - '!.github/workflows/*'
+              - '!**/*.md'
+              - '!README.md'
+              - '!docs/**'
+
   build:
+    needs: changes
+    if: ${{ needs.changes.outputs.should_run == 'true' || github.event_name == 'workflow_dispatch' }}
     permissions:
       contents: write
       checks: write
@@ -112,7 +133,7 @@ jobs:
           AWS_S3_TEST_S3ACCESSKEY: ${{ secrets.AWS_S3_TEST_S3ACCESSKEY }}
           GEONAMES_ORG_USERNAMES: ${{ secrets.GEONAMES_ORG_USERNAMES }}
           GOOGLE_MAPS_AUTHENTICATION_PARAMS: ${{ secrets.GOOGLE_MAPS_AUTHENTICATION_PARAMS }}
-          POLAR_DATA_BASE_URL: ${{ secrets.POLAR_DATA_BASE_URL }}
+          POLAR_DATA_BASE_URL: ${{ vars.POLAR_DATA_BASE_URL }}
           POLAR_DATA_BEARER_TOKEN: ${{ secrets.POLAR_DATA_BEARER_TOKEN }}
           APP_PARAMETERS: "-Daws.region=eu-west-1"
           JAVA8_HOME: ${{env.JAVA_HOME_8_X64}}
@@ -195,24 +216,35 @@ jobs:
           asset_path: ./dist/${{ env.SIMPLE_VERSION_INFO }}/release-notes.txt
           asset_name: release-notes.txt
           asset_content_type: text/plain
-      - name: Trigger Hudson job
+      - name: Trigger CI job
         env:
-          HUDSON_JOB_USERNAME: ${{ secrets.HUDSON_JOB_USERNAME }}
-          HUDSON_JOB_PASSWORD: ${{ secrets.HUDSON_JOB_PASSWORD }}
-          HUDSON_JOB_TOKEN: ${{ secrets.HUDSON_JOB_TOKEN }}
-        if: ${{ always() && env.HUDSON_JOB_USERNAME != '' && env.HUDSON_JOB_PASSWORD != '' && env.HUDSON_JOB_TOKEN != '' }}
+          CI_JOB_USERNAME: ${{ vars.CI_JOB_USERNAME }}
+          CI_JOB_PASSWORD: ${{ secrets.CI_JOB_PASSWORD }}
+          CI_JOB_TOKEN: ${{ secrets.CI_JOB_TOKEN }}
+        if: ${{ always() && env.CI_JOB_USERNAME != '' && env.CI_JOB_PASSWORD != '' && env.CI_JOB_TOKEN != '' }}
         shell: bash
         run: |
-          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            if [ "${{ github.event.inputs.skip_tests }}" = "true" ]; then
-              JOB=SAPSailingAnalytics-master-fasttrack-no-tests
-            else
-              JOB=SAPSailingAnalytics-master
-            fi
-          elif [[ "${{ github.ref }}" =~ refs/heads/releases/.* ]]; then
+          if [[ "${{ github.ref }}" =~ refs/heads/releases/.* ]]; then
             JOB=$( echo "${{ github.ref }}" | sed -e 's/^refs\/heads\/releases\///' )
           else
             JOB=$( echo "${{ github.ref }}" | sed -e 's/^refs\/heads\///' )
           fi
-          echo "Identified Hudson job: ${JOB}"
-          curl https://${{ secrets.HUDSON_JOB_USERNAME }}:${{ secrets.HUDSON_JOB_PASSWORD}}@hudson.sapsailing.com/job/${JOB}/build?token=${{ secrets.HUDSON_JOB_TOKEN }}
+          echo "Identified CI job: ${JOB}"
+          curl -u "${{ vars.CI_JOB_USERNAME }}:${{ secrets.CI_JOB_PASSWORD}}" ${{ vars.CI_BASE_URL }}/job/${JOB}/build?token=${{ secrets.CI_JOB_TOKEN }}
+
+  build-gate:
+    permissions: {}
+    needs: [changes, build]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          if [[ "${{ needs.build.result }}" == "success" ]]; then
+            echo "Build passed."
+          elif [[ "${{ needs.build.result }}" == "skipped" && "${{ needs.changes.outputs.should_run }}" == "false" ]]; then
+            echo "No relevant changes — skipping is OK."
+          else
+            echo "Build failed or was cancelled."
+            exit 1
+          fi
+

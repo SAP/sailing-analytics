@@ -22,9 +22,11 @@ import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 import com.sap.sse.common.Util;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.celltable.CellTableWithCheckboxResources;
+import com.sap.sse.gwt.client.celltable.RefreshableMultiSelectionModel;
 import com.sap.sse.gwt.client.celltable.TableWrapper;
 import com.sap.sse.security.shared.dto.StrippedUserDTO;
 import com.sap.sse.security.shared.dto.UserGroupDTO;
+import com.sap.sse.security.shared.dto.SecuredDTO;
 import com.sap.sse.security.ui.client.UserManagementWriteServiceAsync;
 import com.sap.sse.security.ui.client.UserService;
 import com.sap.sse.security.ui.client.component.AccessControlledButtonPanel;
@@ -97,16 +99,15 @@ public class UserGroupDetailPanel extends Composite
         });
         addButton.ensureDebugId("AddUserButton");
         // add remove button
-        final Button removeButton = buttonPanel.addUpdateAction(stringMessages.actionRemove(), () -> {
+        // Removing a user from a group is semantically an UPDATE to the UserGroup, not a per-user DELETE.
+        buttonPanel.addCountingActionWithParentPermission(stringMessages.actionRemove(),
+                tenantUsersTable.getSelectionModel(),
+                () -> (SecuredDTO) TableWrapper.getSingleSelectedObjectOrNull(userGroupSelectionModel), UPDATE, () -> {
             final Set<UserGroupDTO> selectedUserGroups = userGroupSelectionModel.getSelectedSet();
             if (selectedUserGroups != null && selectedUserGroups.size() == 1) {
                 final UserGroupDTO selectedUserGroup = selectedUserGroups.iterator().next();
-                Set<StrippedUserDTO> users = tenantUsersTable.getSelectionModel().getSelectedSet();
-                if (selectedUserGroups == null || selectedUserGroups.isEmpty()) {
-                    Window.alert(stringMessages.youHaveToSelectAUserGroup());
-                    return;
-                }
-                for (StrippedUserDTO user : users) {
+                final RefreshableMultiSelectionModel<StrippedUserDTO> usersSelectionModel = tenantUsersTable.getSelectionModel();
+                for (final StrippedUserDTO user : usersSelectionModel.getSelectedElements()) {
                     final String username = user.getName();
                     userManagementService.removeUserFromUserGroup(selectedUserGroup.getId().toString(), username,
                             new AsyncCallback<Void>() {
@@ -134,9 +135,6 @@ public class UserGroupDetailPanel extends Composite
                 }
             }
         });
-        tenantUsersTable.getSelectionModel().addSelectionChangeHandler(
-                event -> removeButton.setEnabled(!tenantUsersTable.getSelectionModel().getSelectedSet().isEmpty()));
-        removeButton.setEnabled(false);
         return buttonPanel;
     }
 

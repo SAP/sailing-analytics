@@ -22,10 +22,10 @@ import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.AbstractCellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
+import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
@@ -110,8 +110,9 @@ public class MarkPropertiesPanel extends FlowPanel implements FilterablePanelPro
         buttonAndFilterPanel.addCreateAction(stringMessages.add(),
                 () -> openEditMarkPropertiesDialog(new MarkPropertiesDTO()));
         buttonAndFilterPanel.addRemoveAction(stringMessages.remove(), refreshableSelectionModel, true,
-                () -> removeMarkProperties(refreshableSelectionModel.getSelectedSet().stream()
-                        .map(markPropertiesDTO -> markPropertiesDTO.getUuid()).collect(Collectors.toList())));
+                () -> { final List<UUID> uuids = refreshableSelectionModel.getSelectedSet().stream().map(markPropertiesDTO -> markPropertiesDTO.getUuid()).collect(Collectors.toList());
+            removeMarkProperties(uuids);
+        });
         buttonAndFilterPanel.addUnsecuredWidget(lblFilterRaces);
         filterableMarkProperties.getTextBox().ensureDebugId("MarkPropertiesFilterTextBox");
         buttonAndFilterPanel.addUnsecuredWidget(filterableMarkProperties);
@@ -183,8 +184,9 @@ public class MarkPropertiesPanel extends FlowPanel implements FilterablePanelPro
                     public int hashCode(MarkPropertiesDTO t) {
                         return t.getUuid().hashCode();
                     }
-                }, filterableMarkProperties.getAllListDataProvider(), markPropertiesTable);
-        markPropertiesTable.addColumn(checkColumn, SafeHtmlUtils.fromSafeConstant("<br/>"));
+                }, filterableMarkProperties.getAllListDataProvider());
+        final Header<Boolean> selectAllHeader = checkColumn.createHeader();
+        markPropertiesTable.addColumn(checkColumn, selectAllHeader);
         markPropertiesTable.setColumnWidth(checkColumn, 40, Unit.PX);
         // id
         Column<MarkPropertiesDTO, String> idColumn = new Column<MarkPropertiesDTO, String>(new TextCell()) {

@@ -3,6 +3,7 @@ package com.sap.sse.landscape.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -24,6 +25,7 @@ import org.json.simple.parser.ParseException;
 
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.landscape.Release;
 import com.sap.sse.landscape.ReleaseRepository;
@@ -153,8 +155,8 @@ public class GithubReleasesRepository extends AbstractReleaseRepository implemen
                 } else {
                     logger.fine(()->"Need to fetch page with newest releases because last request was at "+
                             (lastFetchOfNewestReleases==null?"<never>":lastFetchOfNewestReleases));
-                    lastFetchOfNewestReleases = now;
                     fillCacheWithNewestReleases();
+                    lastFetchOfNewestReleases = now;
                 }
                 cachedReleasesIterator = releasesByPublishingTimePoint.descendingMap().values().iterator();
             }
@@ -215,6 +217,11 @@ public class GithubReleasesRepository extends AbstractReleaseRepository implemen
      * cache when this method is invoked.
      * <p>
      * 
+     * If the {@code GITHUB_TOKEN} environment variable is set, it is used as a bearer token forthe Github requests,
+     * resulting in a higher rate limit. If no token is set, or if using the token results in a 401 response code
+     * (authentication failed), an unauthenticated request is tried instead.
+     * <p>
+     * 
      * The method makes no changes to the cache or any other state of this instance.
      * 
      * @return the link to the next page in the returned pair's {@link Pair#getA() A component}, and the sequence of
@@ -222,7 +229,24 @@ public class GithubReleasesRepository extends AbstractReleaseRepository implemen
      */
     private synchronized Pair<String, Iterable<Pair<TimePoint, GithubRelease>>> getReleasesFromPage(String pageURL) throws IOException, ParseException {
         logger.info("Requesting releases page "+pageURL);
-        final URLConnection connection = HttpUrlConnectionHelper.redirectConnection(new URL(pageURL));
+        final URLConnection connection;
+        final String githubToken = System.getenv("GITHUB_TOKEN");
+        if (Util.hasLength(githubToken)) {
+            final HttpURLConnection authenticatedConnectionAttempt = (HttpURLConnection) HttpUrlConnectionHelper
+                    .redirectConnectionWithBearerToken(new URL(pageURL), githubToken);
+            if (authenticatedConnectionAttempt.getResponseCode() == 401) {
+                try {
+                    authenticatedConnectionAttempt.disconnect();
+                } catch (Exception e) {
+                    logger.warning("Couldn't disconnect from Github: "+e.getMessage());
+                }
+                connection = HttpUrlConnectionHelper.redirectConnection(new URL(pageURL));
+            } else {
+                connection = authenticatedConnectionAttempt;
+            }
+        } else {
+            connection = HttpUrlConnectionHelper.redirectConnection(new URL(pageURL));
+        }
         final InputStream index = (InputStream) connection.getContent();
         final String xRatelimitRemaining = connection.getHeaderField("x-ratelimit-remaining");
         logger.fine(()->""+xRatelimitRemaining+" requests left in this hour");
@@ -230,7 +254,7 @@ public class GithubReleasesRepository extends AbstractReleaseRepository implemen
             throw new RuntimeException("You hit the rate limit of "+connection.getHeaderField("x-ratelimit-limit"));
         }
         final String linkHeader = connection.getHeaderField("link");
-        final String nextPageURL = getNextPageURL(linkHeader);
+        final String nextPageURL = linkHeader == null ? null : getNextPageURL(linkHeader);
         logger.fine(()->nextPageURL==null?"This was the last page":("Next page will be "+nextPageURL));
         final List<Pair<TimePoint, GithubRelease>> publishingTimePointsAndReleases = new LinkedList<>();
         final JSONArray releasesJson = (JSONArray) new JSONParser().parse(new InputStreamReader(index));

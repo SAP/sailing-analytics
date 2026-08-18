@@ -136,8 +136,8 @@ install_environment ()
 	    mkdir -p ./environment
             scp ${SCP_PORT_OPTION} ${SCP_HOST}:/home/trac/releases/environments/${USE_ENVIRONMENT} ./environment
         else
-	    echo "Using environment https://releases.sapsailing.com/environments/$USE_ENVIRONMENT"
-	    wget -P environment https://releases.sapsailing.com/environments/$USE_ENVIRONMENT
+	    echo "Using environment https://raw.githubusercontent.com/eclipse-sailing-analytics/sailing-analytics/refs/heads/main/configuration/environments/${USE_ENVIRONMENT}"
+	    wget -P environment https://raw.githubusercontent.com/eclipse-sailing-analytics/sailing-analytics/refs/heads/main/configuration/environments/${USE_ENVIRONMENT}
 	fi
         echo "
 # Environment ($USE_ENVIRONMENT): START ($DATE_OF_EXECUTION)" >> $SERVER_HOME/env.sh
@@ -153,11 +153,11 @@ install_environment ()
 load_from_release_file ()
 {
     if [[ ${INSTALL_FROM_RELEASE} == "" ]]; then
-        GITHUB_RELEASE=$( curl -L "https://api.github.com/repos/SAP/sailing-analytics/releases?per_page=100" 2>/dev/null | jq -r 'sort_by(.created_at) | reverse | map(select(.name | startswith("main-")))[0].assets[] | select(.content_type=="application/x-tar")' )
+        GITHUB_RELEASE=$( curl -L "https://api.github.com/repos/eclipse-sailing-analytics/sailing-analytics/releases?per_page=100" 2>/dev/null | jq -r 'map(select(.name | startswith("main-")) | .assets[] | select(.content_type=="application/x-tar")) | sort_by(.created_at) | reverse | first' )
         INSTALL_FROM_RELEASE=$( echo "${GITHUB_RELEASE}" | jq -r '.name' | sed -e 's/\.tar\.gz$//' )
         echo "You didn't provide a release. Defaulting to latest main branch build ${INSTALL_FROM_RELEASE}"
     else
-        GITHUB_RELEASE=$( curl -L "https://api.github.com/repos/SAP/sailing-analytics/releases?per_page=100" 2>/dev/null | jq -r 'sort_by(.created_at) | reverse | map(select(.name=="'${INSTALL_FROM_RELEASE}'"))[0].assets[] | select(.content_type=="application/x-tar")' )
+        GITHUB_RELEASE=$( curl -L "https://api.github.com/repos/eclipse-sailing-analytics/sailing-analytics/releases?per_page=100" 2>/dev/null | jq -r 'map(select(.name=="'${INSTALL_FROM_RELEASE}'") | .assets[] | select(.content_type=="application/x-tar")) | sort_by(.created_at) | reverse | first' )
     fi
     if which mail; then
         if [ -n "${BUILD_COMPLETE_NOTIFY}" ]; then
@@ -357,7 +357,7 @@ elif [[ $OPERATION == "install-local-release" ]]; then
 elif [[ $OPERATION == "install-env" ]]; then
     USE_ENVIRONMENT=$PARAM
     if [[ $USE_ENVIRONMENT == "" ]]; then
-        echo "You need to provide the name of an environment from https://releases.sapsailing.com/environments"
+        echo "You need to provide the name of an environment from https://raw.githubusercontent.com/eclipse-sailing-analytics/sailing-analytics/refs/heads/main/configuration/environments/"
         exit 1
     fi
 

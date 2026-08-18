@@ -169,7 +169,7 @@ public class ArchiveCandidateMonitoringBackgroundTask implements Runnable {
             } else {
                 rescheduleCurrentCheckAfterFailureOrTimeout();
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.warning("Exception while running check \"" + currentCheck + "\" for candidate " + replicaSet.getMaster().getHost().getHostname() + ": " + e.getMessage());
             currentCheck.setLastFailureMessage(e.getMessage()==null?e.getClass().getSimpleName():e.getMessage());
             try {

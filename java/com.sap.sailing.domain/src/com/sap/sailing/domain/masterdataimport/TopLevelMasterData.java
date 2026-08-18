@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -56,7 +57,7 @@ public class TopLevelMasterData implements Serializable {
     private final Set<LeaderboardGroup> leaderboardGroups;
     private final Set<WindTrackMasterData> windTrackMasterData;
     private final Map<LeaderboardGroup, Set<Event>> eventForLeaderboardGroup;
-    private final Map<DeviceIdentifier, Set<Timed>> raceLogTrackingFixes;
+    private final Map<DeviceIdentifier, ? extends Iterable<Timed>> raceLogTrackingFixes;
     private final Iterable<DeviceConfiguration> deviceConfigurations;
     private final Set<RaceTrackingConnectivityParameters> connectivityParametersToRestore;
 
@@ -73,8 +74,9 @@ public class TopLevelMasterData implements Serializable {
     
     private TopLevelMasterData(final Set<LeaderboardGroup> leaderboardGroups,
             Map<LeaderboardGroup, Set<Event>> eventForLeaderboardGroup,
-            final Map<RegattaIdentifier, Set<String>> raceIdStringsForRegatta, final Set<MediaTrack> filteredMediaTracks,
-            Map<DeviceIdentifier, Set<Timed>> raceLogTrackingFixes,
+            final Map<RegattaIdentifier, Set<String>> raceIdStringsForRegatta,
+            final Set<MediaTrack> filteredMediaTracks,
+            Map<DeviceIdentifier, ? extends Iterable<Timed>> raceLogTrackingFixes,
             Set<WindTrackMasterData> windTrackMasterData,
             Iterable<DeviceConfiguration> deviceConfigurations,
             final Set<RaceTrackingConnectivityParameters> connectivityParametersToRestore) {
@@ -96,8 +98,8 @@ public class TopLevelMasterData implements Serializable {
                 /* strip off connectivity params */ Collections.emptySet());
     }
 
-    private static Map<DeviceIdentifier, Set<Timed>> getAllRelevantRaceLogTrackingFixes(SensorFixStore sensorFixStore, Set<LeaderboardGroup> groupsToExport) {
-        Map<DeviceIdentifier, Set<Timed>> relevantFixes = new HashMap<>();
+    private static Map<DeviceIdentifier, ? extends Iterable<Timed>> getAllRelevantRaceLogTrackingFixes(SensorFixStore sensorFixStore, Set<LeaderboardGroup> groupsToExport) {
+        final Map<DeviceIdentifier, Collection<Timed>> relevantFixes = new HashMap<>();
         // Add fixes for regatta log mappings
         for (Regatta regatta : getAllRegattas(groupsToExport)) {
             final RegattaLog regattaLog = regatta.getRegattaLog();
@@ -132,7 +134,7 @@ public class TopLevelMasterData implements Serializable {
     }
 
     private static void addAllFixesIfMappingEvent(SensorFixStore sensorFixStore,
-            Map<DeviceIdentifier, Set<Timed>> relevantFixes,
+            Map<DeviceIdentifier, Collection<Timed>> relevantFixes,
             AbstractLogEvent<?> logEvent) {
         if (logEvent instanceof RegattaLogDeviceMappingEvent<?>) {
             RegattaLogDeviceMappingEvent<?> mappingEvent = (RegattaLogDeviceMappingEvent<?>) logEvent;
@@ -146,13 +148,13 @@ public class TopLevelMasterData implements Serializable {
     }
 
     private static void addAllFixesForMappingEvent(SensorFixStore sensorFixStore,
-            Map<DeviceIdentifier, Set<Timed>> relevantFixes,
+            Map<DeviceIdentifier, Collection<Timed>> relevantFixes,
             RegattaLogDeviceMappingEvent<?> mappingEvent) throws NoCorrespondingServiceRegisteredException, TransformationException {
-        DeviceIdentifier device = mappingEvent.getDevice();
+        final DeviceIdentifier device = mappingEvent.getDevice();
         if (!relevantFixes.containsKey(device)) {
-            relevantFixes.put(device, new HashSet<>());
+            relevantFixes.put(device, new LinkedList<>());
         }
-        Set<Timed> fixes = relevantFixes.get(device);
+        final Collection<Timed> fixes = relevantFixes.get(device);
         sensorFixStore.loadFixes(fixes::add, mappingEvent.getDevice(), mappingEvent.getFrom(), mappingEvent.getToInclusive(),
                 true);
     }
@@ -336,7 +338,7 @@ public class TopLevelMasterData implements Serializable {
         return raceIdentifiers;
     }
 
-    public Map<DeviceIdentifier, Set<Timed>> getRaceLogTrackingFixes() {
+    public Map<DeviceIdentifier, ? extends Iterable<Timed>> getRaceLogTrackingFixes() {
         return raceLogTrackingFixes;
     }
 

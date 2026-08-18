@@ -7,7 +7,7 @@
 # Usage:
 #   ./github-download-release-assets.sh {BEARER_TOKEN} {release-name-prefix} {repository-name}
 # For example:
-#  ./github-download-release-assets.sh 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 main- SAP/sailing-analytics
+#  ./github-download-release-assets.sh main- eclipse-sailing-analytics/sailing-analytics
 # which will download the latest release tar.gz and release-notes.txt of the main branch (main-xxxxxxxxxxx).
 # Note the "-" at the end of the "main-" prefix specifier; this way we're making name
 # clashes with releases whose name happens to start with "main" unlikely. This

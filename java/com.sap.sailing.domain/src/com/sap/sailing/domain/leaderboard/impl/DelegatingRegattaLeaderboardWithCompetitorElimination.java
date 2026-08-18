@@ -26,6 +26,7 @@ import com.sap.sailing.domain.common.LeaderboardType;
 import com.sap.sailing.domain.common.MaxPointsReason;
 import com.sap.sailing.domain.common.NoWindException;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
+import com.sap.sailing.domain.leaderboard.HasCourseAreasListener;
 import com.sap.sailing.domain.leaderboard.NumberOfCompetitorsInLeaderboardFetcher;
 import com.sap.sailing.domain.leaderboard.RegattaLeaderboard;
 import com.sap.sailing.domain.leaderboard.RegattaLeaderboardWithEliminations;
@@ -466,6 +467,16 @@ public class DelegatingRegattaLeaderboardWithCompetitorElimination extends Abstr
     @Override
     public Iterable<CourseArea> getCourseAreas() {
         return getDelegateLeaderboard().getCourseAreas();
+    }
+
+    @Override
+    public void addCourseAreaChangeListener(HasCourseAreasListener listener) {
+        getDelegateLeaderboard().addCourseAreaChangeListener(listener);
+    }
+
+    @Override
+    public void removeCourseAreaChangeListener(HasCourseAreasListener listener) {
+        getDelegateLeaderboard().removeCourseAreaChangeListener(listener);
     }
 
     @Override

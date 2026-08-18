@@ -14,6 +14,9 @@
     <setAttribute key="deselected_workspace_bundles"/>
     <booleanAttribute key="includeOptional" value="false"/>
     <booleanAttribute key="org.eclipse.debug.core.ATTR_FORCE_SYSTEM_CONSOLE_ENCODING" value="false"/>
+    <mapAttribute key="org.eclipse.debug.core.environmentVariables">
+        <mapEntry key="GITHUB_TOKEN" value="${GITHUB_TOKEN}"/>
+    </mapAttribute>
     <stringAttribute key="org.eclipse.debug.core.source_locator_id" value="org.eclipse.pde.ui.launcher.PDESourceLookupDirector"/>
     <stringAttribute key="org.eclipse.debug.core.source_locator_memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;sourceLookupDirector&gt;&#13;&#10;    &lt;sourceContainers duplicates=&quot;false&quot;&gt;&#13;&#10;        &lt;container memento=&quot;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot; standalone=&amp;quot;no&amp;quot;?&amp;gt;&amp;#13;&amp;#10;&amp;lt;directory nest=&amp;quot;false&amp;quot; path=&amp;quot;C:\Users\georg\Documents\Business\Kunden\OIO\SAPsailing\jetty.project\apache-jsp\src\main\java&amp;quot;/&amp;gt;&amp;#13;&amp;#10;&quot; typeId=&quot;org.eclipse.debug.core.containerType.directory&quot;/&gt;&#13;&#10;        &lt;container memento=&quot;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot; standalone=&amp;quot;no&amp;quot;?&amp;gt;&amp;#13;&amp;#10;&amp;lt;classpathContainer path=&amp;quot;com.google.gwt.eclipse.core.GWT_CONTAINER&amp;quot;/&amp;gt;&amp;#13;&amp;#10;&quot; typeId=&quot;org.eclipse.jdt.launching.sourceContainer.classpathContainer&quot;/&gt;&#13;&#10;        &lt;container memento=&quot;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot; standalone=&amp;quot;no&amp;quot;?&amp;gt;&amp;#13;&amp;#10;&amp;lt;default/&amp;gt;&amp;#13;&amp;#10;&quot; typeId=&quot;org.eclipse.debug.core.containerType.default&quot;/&gt;&#13;&#10;    &lt;/sourceContainers&gt;&#13;&#10;&lt;/sourceLookupDirector&gt;&#13;&#10;"/>
     <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
@@ -136,6 +139,8 @@
 <setEntry value="com.sun.activation.javax.activation@default:default"/>
 <setEntry value="org.eclipse.equinox.common@2:true"/>
 <setEntry value="org.eclipse.equinox.console@default:default"/>
+<setEntry value="org.eclipse.equinox.http.service.api@default:default"/>
+<setEntry value="org.eclipse.equinox.http.service.api.source@default:default"/>
 <setEntry value="org.eclipse.equinox.launcher@default:default"/>
 <setEntry value="org.eclipse.equinox.simpleconfigurator@2:true"/>
 <setEntry value="org.eclipse.osgi@-1:true"/>
@@ -204,9 +209,22 @@
 <setEntry value="com.sap.db.jdbc.source@default:default"/>
 <setEntry value="org.osgi.service.component@default:default"/>
 <setEntry value="org.osgi.service.cm@default:default"/>
-<setEntry value="org.osgi.util.tracker@default:default"/>
 <setEntry value="org.osgi.service.event@default:default"/>
+<setEntry value="org.osgi.service.metatype@default:default"/>
+<setEntry value="org.osgi.service.metatype.source@default:default"/>
 <setEntry value="org.osgi.service.packageadmin@default:default"/>
+<setEntry value="org.osgi.service.provisioning@default:default"/>
+<setEntry value="org.osgi.service.provisioning.source@default:default"/>
+<setEntry value="org.osgi.service.upnp@default:default"/>
+<setEntry value="org.osgi.service.upnp.source@default:default"/>
+<setEntry value="org.osgi.service.useradmin@default:default"/>
+<setEntry value="org.osgi.service.useradmin.source@default:default"/>
+<setEntry value="org.osgi.service.wireadmin@default:default"/>
+<setEntry value="org.osgi.service.wireadmin.source@default:default"/>
+<setEntry value="org.osgi.service.device@default:default"/>
+<setEntry value="org.osgi.service.device.source@default:default"/>
+<setEntry value="org.osgi.service.http.whiteboard@default:default"/>
+<setEntry value="org.osgi.service.http.whiteboard.source@default:default"/>
 <setEntry value="org.osgi.service.url@default:default"/>
 <setEntry value="redisson@default:default"/>
 <setEntry value="com.esotericsoftware.kryo@default:default"/>

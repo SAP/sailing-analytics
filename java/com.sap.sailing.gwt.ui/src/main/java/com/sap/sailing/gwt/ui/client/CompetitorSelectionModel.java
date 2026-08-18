@@ -51,6 +51,16 @@ public class CompetitorSelectionModel implements CompetitorSelectionProvider {
         this.listeners = new HashSet<CompetitorSelectionChangeListener>();
     }
     
+    @Override
+    public CompetitorDTO getSelectedCompetitor(String competitorIdAsString) {
+        return selectedCompetitors.get(competitorIdAsString);
+    }
+    
+    @Override
+    public Iterable<String> getSelectedCompetitorIdsAsStrings() {
+        return selectedCompetitors.keySet();
+    }
+
     /**
      * Adds a competitor to the {@link #getAllCompetitors() set of all competitors}. If the competitor was not yet
      * contained, it will be deselected.

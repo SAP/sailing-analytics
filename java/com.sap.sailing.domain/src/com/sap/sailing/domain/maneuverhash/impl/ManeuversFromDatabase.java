@@ -24,6 +24,9 @@ public class ManeuversFromDatabase implements SerializableManeuverCache {
     private static final Logger logger = Logger.getLogger(ManeuversFromDatabase.class.getName());
     private final Map<Competitor, List<Maneuver>> maneuvers;
 
+    /**
+     * @param maneuvers may be {@code null}
+     */
     public ManeuversFromDatabase(Map<Competitor, List<Maneuver>> maneuvers) {
         super();
         this.maneuvers = maneuvers;
@@ -49,7 +52,7 @@ public class ManeuversFromDatabase implements SerializableManeuverCache {
     }
 
     public List<Maneuver> get(Competitor competitor, boolean waitForLatest) {
-        return maneuvers.get(competitor);
+        return maneuvers == null ? null : maneuvers.get(competitor);
     }
 
     @Override

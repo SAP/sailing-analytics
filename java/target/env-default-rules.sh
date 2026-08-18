@@ -140,3 +140,4 @@ fi
 if [ -n "${GEONAMES_ORG_USERNAMES}" ]; then
   ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -Dgeonames.org.usernames=${GEONAMES_ORG_USERNAMES}"
 fi
+export GITHUB_TOKEN

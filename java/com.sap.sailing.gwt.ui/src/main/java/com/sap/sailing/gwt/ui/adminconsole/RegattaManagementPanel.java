@@ -15,7 +15,6 @@ import com.google.gwt.user.client.ui.CaptionPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 import com.sap.sailing.domain.common.RegattaIdentifier;
 import com.sap.sailing.gwt.common.client.help.HelpButton;
 import com.sap.sailing.gwt.common.client.help.HelpButtonResources;
@@ -29,7 +28,6 @@ import com.sap.sse.gwt.adminconsole.FilterablePanelProvider;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.celltable.RefreshableMultiSelectionModel;
 import com.sap.sse.gwt.client.panels.AbstractFilterablePanel;
-import com.sap.sse.security.shared.HasPermissions.DefaultActions;
 import com.sap.sse.security.ui.client.UserService;
 import com.sap.sse.security.ui.client.component.AccessControlledButtonPanel;
 
@@ -79,7 +77,7 @@ public class RegattaManagementPanel extends SimplePanel implements FilterablePan
         update.ensureDebugId("UpdateRegattaButton");
         final Button create = buttonPanel.addCreateAction(stringMessages.addRegatta(), this::openCreateRegattaDialog);
         create.ensureDebugId("AddRegattaButton");
-        final Button remove = buttonPanel.addRemoveAction(stringMessages.remove(),
+        buttonPanel.addRemoveAction(stringMessages.remove(),
                 refreshableRegattaMultiSelectionModel, true, () -> {
                     // unmodifiable collection can't be sent to the server.
                     final Collection<RegattaIdentifier> regattas = createModifiableCollection();
@@ -88,10 +86,10 @@ public class RegattaManagementPanel extends SimplePanel implements FilterablePan
         buttonPanel.addUnsecuredWidget(new HelpButton(HelpButtonResources.INSTANCE,
                 stringMessages.videoGuide(), "https://sapsailing-documentation.s3-eu-west-1.amazonaws.com/adminconsole/Advanced+Topics/Setting+up+Events+with+multiple+Regattas+or+Classes.mp4"));
         regattasContentPanel.add(buttonPanel);
-        refreshableRegattaMultiSelectionModel.addSelectionChangeHandler(new Handler() {
+        refreshableRegattaMultiSelectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
-                List<RegattaDTO> selectedRegattas = new ArrayList<>(
+                final List<RegattaDTO> selectedRegattas = new ArrayList<>(
                         refreshableRegattaMultiSelectionModel.getSelectedSet());
                 final RegattaIdentifier selectedRegatta;
                 if (selectedRegattas.size() == 1) {
@@ -109,13 +107,6 @@ public class RegattaManagementPanel extends SimplePanel implements FilterablePan
                     regattaDetailsComposite.setRegatta(null);
                     regattaDetailsComposite.setVisible(false);
                 }
-                boolean canDeleteAllSelected = true;
-                for (RegattaDTO regatta : refreshableRegattaMultiSelectionModel.getSelectedSet()) {
-                    if (!userService.hasPermission(regatta, DefaultActions.DELETE)) {
-                        canDeleteAllSelected = false;
-                    }
-                }
-                remove.setEnabled(!selectedRegattas.isEmpty() && canDeleteAllSelected);
             }
         });
         regattasContentPanel.add(regattaListComposite);

@@ -61,6 +61,7 @@ import com.sap.sailing.server.security.EventManagerRole;
 import com.sap.sailing.server.security.SailingViewerRole;
 import com.sap.sailing.server.statistics.TrackedRaceStatisticsCache;
 import com.sap.sailing.server.statistics.TrackedRaceStatisticsCacheImpl;
+import com.sap.sailing.server.gateway.interfaces.SailingServerFactory;
 import com.sap.sailing.shared.server.SharedSailingData;
 import com.sap.sse.branding.BrandingConfigurationService;
 import com.sap.sse.classloading.ServiceTrackerCustomizerForClassLoaderSupplierRegistrations;
@@ -130,6 +131,8 @@ public class Activator implements BundleActivator {
     private FullyInitializedReplicableTracker<SharedSailingData> sharedSailingDataTracker;
     
     private ServiceTracker<ReplicationService, ReplicationService> replicationServiceTracker;
+
+    private ServiceTracker<SailingServerFactory, SailingServerFactory> sailingServerFactoryTracker;
     
     public Activator() {
         clearPersistentCompetitors = Boolean
@@ -147,6 +150,7 @@ public class Activator implements BundleActivator {
         extenderBundleTracker.open();
         mailServiceTracker = ServiceTrackerFactory.createAndOpen(context, MailService.class);
         replicationServiceTracker = ServiceTrackerFactory.createAndOpen(context, ReplicationService.class);
+        sailingServerFactoryTracker = ServiceTrackerFactory.createAndOpen(context, SailingServerFactory.class);
         sharedSailingDataTracker = FullyInitializedReplicableTracker.createAndOpen(context, SharedSailingData.class);
         securityServiceTracker = FullyInitializedReplicableTracker.createAndOpen(context, SecurityService.class);
         new Thread(""+this+" initializing RacingEventService in the background") {
@@ -224,6 +228,7 @@ public class Activator implements BundleActivator {
         sharedSailingDataTracker.close();
         replicationServiceTracker.close();
         securityServiceTracker.close();
+        sailingServerFactoryTracker.close();
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         mbs.unregisterMBean(mBeanName);
     }
@@ -296,7 +301,7 @@ public class Activator implements BundleActivator {
                 /* sensorFixStore */ null, serviceFinderFactory, trackedRegattaListener,
                 notificationService, trackedRaceStatisticsCache, restoreTrackedRaces, securityServiceTracker,
                 sharedSailingDataTracker, replicationServiceTracker, scoreCorrectionProviderServiceTracker, competitorProviderServiceTracker,
-                resultUrlRegistryServiceTracker, brandingConfigurationServiceTracker);
+                resultUrlRegistryServiceTracker, brandingConfigurationServiceTracker, sailingServerFactoryTracker);
         notificationService.setRacingEventService(racingEventService);
         // start watching out for MasterDataImportClassLoaderService instances in the OSGi service registry and manage
         // the combined class loader accordingly:

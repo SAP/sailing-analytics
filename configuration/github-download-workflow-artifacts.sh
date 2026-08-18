@@ -3,7 +3,7 @@
 #  - the name of the branch for which you would like
 #    to download the latest workflow run's build artifacts
 #  - the Github PAT (personal access token)
-#  - the Github repository {owner}/{repo}, such as SAP/sailing-analytics
+#  - the Github repository {owner}/{repo}, such as eclipse-sailing-analytics/sailing-analytics
 # If found, the build.log.zip and test-result.zip files
 # will be downloaded to the current working directory.
 # The script will exit with status 0 if the workflow's

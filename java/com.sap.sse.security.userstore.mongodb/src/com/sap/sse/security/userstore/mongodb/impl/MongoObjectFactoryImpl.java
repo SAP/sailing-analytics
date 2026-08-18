@@ -212,6 +212,7 @@ public class MongoObjectFactoryImpl implements MongoObjectFactory {
         dbUser.put(FieldNames.User.FULLNAME.name(), user.getFullName());
         dbUser.put(FieldNames.User.COMPANY.name(), user.getCompany());
         dbUser.put(FieldNames.User.LOCALE.name(), user.getLocale() != null ? user.getLocale().toLanguageTag() : null);
+        dbUser.put(FieldNames.User.DID_OPT_OUT_OF_FEATURE_AND_COMMUNITY_EMAILS.name(), user.getDidOptOutOfFeatureAndCommunityEmails());
         dbUser.put(FieldNames.User.EMAIL_VALIDATED.name(), user.isEmailValidated());
         dbUser.put(FieldNames.User.PASSWORD_RESET_SECRET.name(), user.getPasswordResetSecret());
         dbUser.put(FieldNames.User.VALIDATION_SECRET.name(), user.getValidationSecret());

@@ -141,4 +141,15 @@ public class ThreadPoolUtilImpl implements ThreadPoolUtil {
         return Util.map(Util.filter(executor.getQueue(), task->((ScheduledFuture<?>) task).getDelay(TimeUnit.MILLISECONDS) < delayLessThan.asMillis()),
                 task->(ScheduledFuture<?>) task);
     }
+
+    @Override
+    public Optional<Integer> getQueueLength(ScheduledExecutorService executor) {
+        final Optional<Integer> result;
+        if (executor instanceof ThreadPoolExecutor) {
+            result = Optional.of(((ThreadPoolExecutor) executor).getQueue().size());
+        } else {
+            result = Optional.empty();
+        }
+        return result;
+    }
 }

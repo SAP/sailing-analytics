@@ -1,4 +1,4 @@
-FROM sapmachine:25.0.1
+FROM sapmachine:25.0.3
 # This Dockerfile assumes that the release to use is provided as
 # ${RELEASE}.tar.gz in the current Docker workspace. Use, e.g.,
 # the configuration/github-download-release-assets.sh script to

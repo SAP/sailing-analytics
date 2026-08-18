@@ -130,7 +130,8 @@ public class FullyInitializedReplicableTracker<R extends Replicable<?, ?>> exten
      * {@link #waitForService(long)}). If no such service object can be found before timing out, {@code null}
      * is returned. Once a service object has been retrieved and a non-{@code null} {@link #replicationServiceTracker}
      * has been provided at construction time, the {@link ReplicationService} is obtained from that tracker by
-     * waiting for it at least {@code timeoutInMillis} milliseconds and then 
+     * waiting for it at least {@code timeoutInMillis} milliseconds and then is asked to wait for the replication
+     * to be fully initialized, so in particular having received and incorporated the initial load.
      * 
      * @param timeoutInMillis
      *            0 means indefinite wait time

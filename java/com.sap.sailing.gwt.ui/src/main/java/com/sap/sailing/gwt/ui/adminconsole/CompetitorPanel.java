@@ -84,11 +84,6 @@ public class CompetitorPanel extends SimplePanel implements BusyDisplay, Filtera
         final Button addCompetitorButton = buttonPanel.addCreateAction(stringMessages.add(),
                 ()->openAddCompetitorDialog(createWithBoatByDefault));
         addCompetitorButton.ensureDebugId("AddCompetitorButton");
-        buttonPanel.addUnsecuredAction(stringMessages.selectAll(), () -> {
-            for (CompetitorDTO c : competitorTable.getDataProvider().getList()) {
-                refreshableCompetitorSelectionModel.setSelected(c, true);
-            }
-        });
         buttonPanel.addCreateAction(stringMessages.importCompetitors(), () -> {
             sailingServiceWrite.getCompetitorProviderNames(new AsyncCallback<Iterable<String>>() {
                 @Override

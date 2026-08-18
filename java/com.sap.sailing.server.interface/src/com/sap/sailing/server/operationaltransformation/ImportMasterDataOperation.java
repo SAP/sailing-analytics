@@ -513,12 +513,12 @@ public class ImportMasterDataOperation extends
     
     private void importRaceLogTrackingGPSFixes(RacingEventService toState) {
         if (toState.getMasterDescriptor() == null) { // don't do this on a replica's RacingEventService; tracking data will be received through the tracked race loading replication
-            Map<DeviceIdentifier, Set<Timed>> raceLogTrackingFixes = masterData.getRaceLogTrackingFixes();
+            final Map<DeviceIdentifier, ? extends Iterable<Timed>> raceLogTrackingFixes = masterData.getRaceLogTrackingFixes();
             if (raceLogTrackingFixes != null) {
                 SensorFixStore store = toState.getSensorFixStore();
                 int i = 0;
                 final int numberOfDevices = raceLogTrackingFixes.size();
-                for (Entry<DeviceIdentifier, Set<Timed>> entry : raceLogTrackingFixes.entrySet()) {
+                for (Entry<DeviceIdentifier, ? extends Iterable<Timed>> entry : raceLogTrackingFixes.entrySet()) {
                     DeviceIdentifier device = entry.getKey();
                     final Collection<Timed> fixesToAddAsBatch = new ArrayList<>(BATCH_SIZE_FOR_IMPORTING_FIXES);
                     for (Timed fixToAdd : entry.getValue()) {

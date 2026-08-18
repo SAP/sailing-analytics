@@ -7,7 +7,12 @@ After=-.mount
 RequiredBy=multi-user.target
 
 [Service]
-Type=exec
+Type=simple
+User=wiki
 RemainAfterExit=true
-ExecStart=su - wiki -c "cd /home/wiki && rackup -p 4567 /home/wiki/config.ru"
-ExecStop=/bin/kill -SIGTERM "$MAINPID"
+WorkingDirectory=/home/wiki
+ExecStart=/home/wiki/serve.sh
+Restart=on-failure
+StartLimitIntervalSec=30
+StartLimitBurst=2
+MemoryMax=7G

@@ -1,6 +1,7 @@
 package com.sap.sailing.gwt.ui.adminconsole;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ import com.sap.sse.common.Util.Pair;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.Notification;
 import com.sap.sse.gwt.client.Notification.NotificationType;
+import com.sap.sse.gwt.client.async.MarkedAsyncCallback;
 import com.sap.sse.gwt.client.celltable.RefreshableMultiSelectionModel;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog;
 import com.sap.sse.security.ui.client.component.AccessControlledButtonPanel;
@@ -55,7 +57,10 @@ public class ResultImportUrlsListComposite extends Composite {
         add.ensureDebugId("AddUrlButton");
         add.setEnabled(false);
         final Button remove = buttonPanel.addRemoveAction(stringMessages.remove(), table.getSelectionModel(),
-                /* withConfirmation */ true, () -> removeUrls(table.getSelectionModel().getSelectedSet()));
+                /* withConfirmation */ true, () -> {
+            final Set<UrlDTO> selected = new HashSet<>(table.getSelectionModel().getSelectedSet());
+            removeUrls(selected);
+        });
         remove.ensureDebugId("RemoveUrlButton");
         final Button refresh = buttonPanel.addUnsecuredAction(stringMessages.refresh(), this::updateTable);
         refresh.ensureDebugId("RefreshUrlButton");
@@ -112,7 +117,8 @@ public class ResultImportUrlsListComposite extends Composite {
                 new DataEntryDialog.DialogCallback<UrlDTO>() {
                     @Override
                     public void ok(UrlDTO url) {
-                        sailingServiceWrite.addResultImportUrl(getSelectedProviderName(), url, new AsyncCallback<Void>() {
+                        sailingServiceWrite.addResultImportUrl(getSelectedProviderName(), url,
+                                new MarkedAsyncCallback<>(new AsyncCallback<Void>() {
                             @Override
                             public void onSuccess(Void result) {
                                 Notification.notify(stringMessages.successfullyUpdatedResultImportUrls(),
@@ -124,7 +130,7 @@ public class ResultImportUrlsListComposite extends Composite {
                                 errorReporter
                                         .reportError(stringMessages.errorAddingResultImportUrl(caught.getMessage()));
                             }
-                        });
+                        }));
                     }
                     @Override
                     public void cancel() {

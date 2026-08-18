@@ -108,4 +108,9 @@ public interface HasUserContext {
         final Session session = getSession();
         return session == null ? null : TimePoint.now().until(TimePoint.of(session.getLastAccessTime()).plus(Duration.ofMillis(session.getTimeout())));
     }
+    
+    @Dimension(messageKey="DidOptOutOfFeatureAndCommunityEmails")
+    default boolean didOptOutOfFeatureAndCommunityEmails() {
+        return getUser().getDidOptOutOfFeatureAndCommunityEmails();
+    }
 }
