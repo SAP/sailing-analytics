@@ -5050,10 +5050,10 @@ public class SailingServiceImpl extends ResultCachingProxiedRemoteServiceServlet
 
     @Override
     public PairingListTemplateDTO calculatePairingListTemplate(final int flightCount, final int groupCount,
-            final int competitorCount, final int flightMultiplier, final int tolerance) {
+            final int competitorCount, final int flightMultiplier, final int boatChangeFactor) {
         PairingListTemplate template = getService().createPairingListTemplate(flightCount, groupCount, competitorCount,
-                flightMultiplier, tolerance);
-        return new PairingListTemplateDTO(flightCount, groupCount, competitorCount, flightMultiplier, tolerance,
+                flightMultiplier, boatChangeFactor);
+        return new PairingListTemplateDTO(flightCount, groupCount, competitorCount, flightMultiplier, boatChangeFactor,
                 template.getBoatChanges(), template.getPairingListTemplate(), template.getQuality(), template.getBoatAssignmentsQuality());
     }
 

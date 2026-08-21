@@ -443,7 +443,7 @@ public interface SailingService extends RemoteService, RemoteReplicationService 
      *             is thrown if the leaderboard is not found by name
      */
     PairingListTemplateDTO calculatePairingListTemplate(final int flightCount, final int groupCount,
-            final int competitorCount, final int flightMultiplier, final int tolerance)
+            final int competitorCount, final int flightMultiplier, final int boatChangeFactor)
             throws UnauthorizedException, NotFoundException, IllegalArgumentException;
 
     PairingListDTO getPairingListFromTemplate(String leaderboardName, int flightMultiplier,

@@ -13,8 +13,6 @@ import com.sap.sse.common.scalablevalue.impl.ScalableSpeedWithBearing;
  * Wind values are scaled by separately scaling their speed and bearing, and separately scaling their time point, and
  * separately scaling their position. For the separate speed/bearing scaling see also {@link ScalableSpeedWithBearing}.<p>
  * 
- * Internally, the 
- * 
  * @author Axel Uhl (d043530)
  *
  */

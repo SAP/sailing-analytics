@@ -10,12 +10,14 @@ import java.util.Optional;
 
 import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.yellowbrickadapter.YellowBrickRace;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 
+@Disabled("Under investigation; yb.tl responds with error messages, probably since they installed an upgrade local / master-SNAPSHOT / master-latest / 19/08/2026 09:58")
 public class YellowBrickAdapterTest {
     private static final String RMSR2019 = "rmsr2019";
     private YellowBrickTrackingAdapterImpl adapter;

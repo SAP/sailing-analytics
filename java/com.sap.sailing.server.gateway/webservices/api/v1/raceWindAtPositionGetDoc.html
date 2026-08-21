@@ -9,10 +9,10 @@
 </head>
 <body>
 <h1>SAP Sailing Analytics Webservices API Version 1.0</h1>
-<h2>URL: /api/v1/regattas/{regattaname}/races/{racename}/wind</h2>
+<h2>URL: /api/v1/regattas/{regattaname}/races/{racename}/wind_at_position</h2>
 
 <b>Description:</b>
-<p>Gets all GPS positions and data values for the wind of a race.<br/>
+<p>Gets interpolated, averaged and dampened wind data for a race for one or more positions specified in the query parameters.<br/>
 All slashes contained within the {regattaname} and {racename} parameters must be replaced by "__" (double underscore).</p>
 The request must be authenticated with a user who has the <tt>TRACKED_RACE:EXPORT</tt> permission for the race for
 which the data is requested.
@@ -30,12 +30,23 @@ which the data is requested.
 		<td>Mandatory parameters:</td>
 		<td>
 			<div>fromtime (ISO format, such as 2014-02-14T10:12:03Z) or fromtimeasmillis (time in milliseconds)</div>
-			<div>totime (ISO format, such as 2014-02-14T10:12:03Z) or totimeasmillis (time in milliseconds)</div>
+            <div>intervalasmillis (milliseconds to add for each next set of wind fixes to return, starting at fromtime/fromtimeasmillis);
+                 must be a positive value</div>
+            <div>latDeg[] can occur one or more times and specifies the latitudes in degrees (WGS84/GPS) for which to request wind data;
+                 typically, these positions will be on or near the race course area, so clients should first figure out, e.g., where the
+                 course marks of that race are. The number of occurrences of this parameter must equal the number of occurrences of the
+                 <tt>lngDeg[]</tt> parameter.</div>
+            <div>lngDeg[] can occur one or more times and specifies the longitude in degrees (WGS84/GPS) for which to request wind data;
+                 typically, these positions will be on or near the race course area, so clients should first figure out, e.g., where the
+                 course marks of that race are. The number of occurrences of this parameter must equal the number of occurrences of the
+                 <tt>latDeg[]</tt> parameter.</div>
 		</td>
 	</tr>
 	<tr>
 		<td>Optional parameters:</td>
 		<td>
+            <div>totime (ISO format, such as 2014-02-14T10:12:03Z) or totimeasmillis (time in milliseconds); if not provided,
+                 an open-ended interval is assumed, limited by the maximum number of wind fixes of currently 10,000 per request.</div>
 			<div>windsource [COMBINED = Default, WEB, EXPEDITION, TRACK_BASED_ESTIMATION, COURSE_BASED, RACECOMMITTEE]</div>
 			<div>windsourceid (Id of a wind source. For example Igtimi wind sources will have the type=EXPEDITION but each of them has unique ids. If you want to filter by these then you can use this parameter)</div>
 		</td>
@@ -54,7 +65,7 @@ which the data is requested.
 	</tr>
 	<tr>
 		<td>Example:</td>
-        <td><a href="https://www.sapsailing.com/sailingserver/api/v1/regattas/TW2026 - Hobie 16/races/R2 Hobie 16/wind?fromtime=2026-07-18T11:12:00Z&totime=2026-07-18T11:30:00Z">https://www.sapsailing.com/sailingserver/api/v1/regattas/TW2026 - Hobie 16/races/R2 Hobie 16/wind?fromtime=2026-07-18T11:12:00Z&totime=2026-07-18T11:30:00Z</a></td>
+		<td><a href="https://www.sapsailing.com/sailingserver/api/v1/regattas/TW2026 - Hobie 16/races/R2 Hobie 16/wind_at_position?fromtime=2026-07-18T11:12:00Z&totime=2026-07-18T11:30:00Z&intervalasmillis=1000&latDeg[]=53.98174911502983&lngDeg[]=10.888688817322443&latDeg[]=54.1&lngDeg[]=9.2">https://www.sapsailing.com/sailingserver/api/v1/regattas/TW2026 - Hobie 16/races/R2 Hobie 16/wind_at_position?fromtime=2026-07-18T11:12:00Z&totime=2026-07-18T11:30:00Z&intervalasmillis=1000&latDeg[]=53.98174911502983&lngDeg[]=10.888688817322443&latDeg[]=54.1&lngDeg[]=9.2</a></td>
 	</tr>
 </table>
 <div style="height: 1em;"></div>
