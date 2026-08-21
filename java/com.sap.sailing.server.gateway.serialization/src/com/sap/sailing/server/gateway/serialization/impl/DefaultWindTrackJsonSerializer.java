@@ -1,7 +1,6 @@
 package com.sap.sailing.server.gateway.serialization.impl;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.function.Function;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -36,39 +35,48 @@ public class DefaultWindTrackJsonSerializer implements WindTrackJsonSerializer {
     }
     
     public JSONObject serialize(final WindTrack windTrack) {
-        JSONObject result = new JSONObject();
-        JSONArray jsonWindFixes = new JSONArray();
-        // quickly extract relevant fixes to hold locks as shortly as possible; process later
-        ArrayList<Wind> fixes = new ArrayList<>();
         windTrack.lockForRead();
         try {
-            Iterator<Wind> windIter = windTrack.getFixesIterator(fromTime, /* inclusive */true, toTime, /* inclusive */ false);
-            int count = 0;
-            while ((maxNumberOfFixes == -1 || count++<maxNumberOfFixes) && windIter.hasNext()) {
-                fixes.add(windIter.next());
-            }
+            return serializeFixesFromWindSource(windSource, ()->windTrack.getFixesIterator(fromTime, /* inclusive */true, toTime, /* inclusive */ false),
+                    /* averager */ wind->windTrack.getAveragedWind(wind.getPosition(), wind.getTimePoint()), maxNumberOfFixes);
         } finally {
             windTrack.unlockAfterRead();
         }
-        for (Wind wind : fixes) {
-            JSONObject jsonWind = new JSONObject();
-            jsonWind.put("trueBearing-deg", RoundingUtil.bearingDecimalFormatter.format(wind.getBearing().getDegrees()));
-            jsonWind.put("speed-kts", RoundingUtil.speedDecimalFormatter.format(wind.getKnots()));
-            jsonWind.put("speed-m/s", RoundingUtil.speedDecimalFormatter.format(wind.getMetersPerSecond()));
-            if (wind.getTimePoint() != null) {
-                jsonWind.put("timepoint-ms", wind.getTimePoint().asMillis());
-                final Wind averagedWind = windTrack.getAveragedWind(wind.getPosition(), wind.getTimePoint());
-                jsonWind.put("dampenedTrueBearing-deg", RoundingUtil.bearingDecimalFormatter.format(averagedWind.getBearing().getDegrees()));
-                jsonWind.put("dampenedSpeed-kts", RoundingUtil.speedDecimalFormatter.format(averagedWind.getKnots()));
-                jsonWind.put("dampenedSpeed-m/s", RoundingUtil.speedDecimalFormatter.format(averagedWind.getMetersPerSecond()));
+    }
+
+    public static JSONObject serializeFixesFromWindSource(final WindSource windSource, final Iterable<Wind> fixes, final Function<Wind, Wind> averager, int maxNumberOfFixes) {
+        final JSONObject result = new JSONObject();
+        final JSONArray jsonWindFixes = new JSONArray();
+        int count = 0;
+        for (final Wind wind : fixes) {
+            if (maxNumberOfFixes == 1 || count++ >= maxNumberOfFixes) {
+                break;
             }
-            if (wind.getPosition() != null) {
-                jsonWind.put("lat-deg", RoundingUtil.latLngDecimalFormatter.format(wind.getPosition().getLatDeg()));
-                jsonWind.put("lng-deg", RoundingUtil.latLngDecimalFormatter.format(wind.getPosition().getLngDeg()));
-            }
+            final Wind averagedWind = wind.getTimePoint() == null ? null : averager.apply(wind);
+            JSONObject jsonWind = getWindAsJson(wind, averagedWind);
             jsonWindFixes.add(jsonWind);
         }
         result.put(windSource.getType() + (windSource.getId() != null ? "-"+windSource.getId().toString() : ""), jsonWindFixes);
         return result;
+    }
+
+    public static JSONObject getWindAsJson(Wind wind, final Wind averagedWind) {
+        final JSONObject jsonWind = new JSONObject();
+        jsonWind.put("trueBearing-deg", RoundingUtil.bearingDecimalFormatter.format(wind.getBearing().getDegrees()));
+        jsonWind.put("speed-kts", RoundingUtil.speedDecimalFormatter.format(wind.getKnots()));
+        jsonWind.put("speed-m/s", RoundingUtil.speedDecimalFormatter.format(wind.getMetersPerSecond()));
+        if (wind.getTimePoint() != null) {
+            jsonWind.put("timepoint-ms", wind.getTimePoint().asMillis());
+        }
+        if (averagedWind != null) {
+            jsonWind.put("dampenedTrueBearing-deg", RoundingUtil.bearingDecimalFormatter.format(averagedWind.getBearing().getDegrees()));
+            jsonWind.put("dampenedSpeed-kts", RoundingUtil.speedDecimalFormatter.format(averagedWind.getKnots()));
+            jsonWind.put("dampenedSpeed-m/s", RoundingUtil.speedDecimalFormatter.format(averagedWind.getMetersPerSecond()));
+        }
+        if (wind.getPosition() != null) {
+            jsonWind.put("lat-deg", RoundingUtil.latLngDecimalFormatter.format(wind.getPosition().getLatDeg()));
+            jsonWind.put("lng-deg", RoundingUtil.latLngDecimalFormatter.format(wind.getPosition().getLngDeg()));
+        }
+        return jsonWind;
     }
 }
