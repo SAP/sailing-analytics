@@ -42,3 +42,4 @@ public void processItem(Item item) {  // Missing final
 ## Git Commit Messages
 - Follow existing repository convention: start with bug/issue number (e.g., "bug6214: description")
 - Use descriptive commit messages explaining what changed and why
+- add an "Assisted-By: " line at the end of the commit when you were involved, citing the name of the LLM currently used

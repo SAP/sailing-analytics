@@ -14,6 +14,11 @@
                 year's episode of that event.</li>
             <li>Show one decimal place in wind chart tool-tips, so, e.g., a wind speed series tool-tip
                 may read "16.6kts" now.</li>
+            <li>New API method on end point /sailingserver/api/v1/regattas/{regattaname}/races/{racename}/wind_at_position
+                allows clients with the <tt>TRACKED_RACE:EXPORT</tt> permission for the race in question
+                to obtain position-based interpolated wind data taking all non-excluded wind sources available
+                for that race into account, computing a weighted average that matches what is being used for
+                competitor-specific VMG and TWA calculations alike.</li>
          </ul>
          <h5 class="articleSubheadline">July 2026</h5>
          <ul class="bulletList">

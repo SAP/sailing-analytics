@@ -171,11 +171,19 @@ public class Colorline {
             polylines.add(createPolyline(path, 0));
             break;
         case POLYCHROMATIC:
-            for (int i = 0; i < path.getLength() - 1; i++) {
-                MVCArray<LatLng> subPath = MVCArray.newInstance();
-                subPath.push(path.get(i));
-                subPath.push(path.get(i + 1));
-                polylines.add(createPolyline(subPath, i));
+            if (path.getLength() == 1) {
+                // A single vertex cannot form a segment; represent it as one Polyline holding just that vertex,
+                // mirroring the interim single-vertex representation insertAt builds up and getLength's case 1 expects
+                final MVCArray<LatLng> subPath = MVCArray.newInstance();
+                subPath.push(path.get(/* i */ 0));
+                polylines.add(createPolyline(subPath, /* fixIndexInTail */ 0));
+            } else {
+                for (int i = 0; i < path.getLength() - 1; i++) {
+                    final MVCArray<LatLng> subPath = MVCArray.newInstance();
+                    subPath.push(path.get(i));
+                    subPath.push(path.get(i + 1));
+                    polylines.add(createPolyline(subPath, i));
+                }
             }
             break;
         }
