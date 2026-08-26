@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -132,6 +131,13 @@ public class CandidateChooserImpl implements CandidateChooser {
      * with the dynamic (re-)calculations triggered by fixes and other data popping in.
      */
     private Map<Competitor, Map<Candidate, Set<Edge>>> allEdges = new HashMap<>();
+
+    /**
+     * Reverse index of {@link #allEdges}: for each candidate, the set of edges whose {@link Edge#getEnd()} is that
+     * candidate. Kept in sync with {@link #allEdges} so that {@link #removeEdgesForCandidate} can remove all edges
+     * touching a candidate in O(in-degree + out-degree) instead of O(total graph size).
+     */
+    private Map<Competitor, Map<Candidate, Set<Edge>>> incomingEdges = new HashMap<>();
     
     /**
      * The candidates found, keyed by the {@link Competitor} to whose track they belong.
@@ -399,6 +405,7 @@ public class CandidateChooserImpl implements CandidateChooser {
             });
             fixedPassings.put(c, fixedPasses);
             allEdges.put(c, new HashMap<Candidate, Set<Edge>>());
+            incomingEdges.put(c, new HashMap<Candidate, Set<Edge>>());
             fixedPasses.addAll(startAndEnd);
             addCandidates(c, startAndEnd);
         }
@@ -444,9 +451,27 @@ public class CandidateChooserImpl implements CandidateChooser {
                 }
             }
         }
+        final TimePoint updateStationarySequencesStartedAt = TimePoint.now();
+        logger.info("DIAG START updateStationarySequences for "+c);
+        updateStationarySequences(c, newFixes, fixesReplacingExistingOnes);
+        logger.info("DIAG END updateStationarySequences for "+c+": "+ updateStationarySequencesStartedAt.until(TimePoint.now()));
+        final TimePoint removeCandidatesStartedAt = TimePoint.now();
+        logger.info("DIAG START removeCandidates for "+c);
         removeCandidates(c, oldCans);
+        logger.info("DIAG END removeCandidates for "+c+": "+
+                removeCandidatesStartedAt.until(TimePoint.now()));
+
+        final TimePoint addCandidatesStartedAt = TimePoint.now();
+        logger.info("DIAG START addCandidates for "+c);
         addCandidates(c, newCans);
+        logger.info("DIAG END addCandidates for "+c+": "+
+                addCandidatesStartedAt.until(TimePoint.now()));
+
+        final TimePoint findShortestPathStartedAt = TimePoint.now();
+        logger.info("DIAG START findShortestPath for "+c);
         findShortestPath(c);
+        logger.info("DIAG END findShortestPath for "+c+": "+
+                findShortestPathStartedAt.until(TimePoint.now()));
     }
 
     /**
@@ -554,7 +579,8 @@ public class CandidateChooserImpl implements CandidateChooser {
     private void createNewEdges(Competitor c, Iterable<Candidate> newCandidates) {
         assert perCompetitorLocks.get(c).isWriteLocked();
         final Boolean isGateStart = race.isGateStart();
-        Map<Candidate, Set<Edge>> edgesForCompetitor = allEdges.get(c);
+        final Map<Candidate, Set<Edge>> edgesForCompetitor = allEdges.get(c);
+        final Map<Candidate, Set<Edge>> incomingEdgesForCompetitor = incomingEdges.get(c);
         final Iterable<Candidate> competitorCandidates = getFilteredCandidates(c);
         for (Candidate newCan : newCandidates) {
             synchronized (competitorCandidates) {
@@ -646,7 +672,7 @@ public class CandidateChooserImpl implements CandidateChooser {
                             edge = new Edge(early, late,
                                     startTimingProbability * estimatedDistanceProbability, race.getRace().getCourse().getNumberOfWaypoints());
                         }
-                        addEdge(edgesForCompetitor, edge);
+                        addEdge(edgesForCompetitor, incomingEdgesForCompetitor, edge);
                     }
                 }
             }
@@ -665,7 +691,7 @@ public class CandidateChooserImpl implements CandidateChooser {
         return early.getTimePoint() == null || late.getTimePoint() == null || early.getTimePoint().before(late.getTimePoint());
     }
 
-    private void addEdge(Map<Candidate, Set<Edge>> edgesForCompetitor, Edge e) {
+    private void addEdge(Map<Candidate, Set<Edge>> edgesForCompetitor, Map<Candidate, Set<Edge>> incomingEdgesForCompetitor, Edge e) {
         logger.finest(()->"Adding "+ e.toString());
         Set<Edge> edgeSet = edgesForCompetitor.get(e.getStart());
         if (edgeSet == null) {
@@ -673,6 +699,12 @@ public class CandidateChooserImpl implements CandidateChooser {
             edgesForCompetitor.put(e.getStart(), edgeSet);
         }
         edgeSet.add(e); // FIXME what about edges that should replace an edge between the same two candidates? Will those edges somehow be removed?
+        Set<Edge> incomingEdgeSet = incomingEdgesForCompetitor.get(e.getEnd());
+        if (incomingEdgeSet == null) {
+            incomingEdgeSet = new HashSet<>();
+            incomingEdgesForCompetitor.put(e.getEnd(), incomingEdgeSet);
+        }
+        incomingEdgeSet.add(e);
     }
 
     /**
@@ -995,22 +1027,67 @@ public class CandidateChooserImpl implements CandidateChooser {
      * path analysis is triggered yet.
      */
     private void updateFilteredCandidatesAndAdjustGraph(Competitor c, Iterable<Candidate> newCandidates, Iterable<Candidate> removedCandidates) {
-        Pair<Iterable<Candidate>, Iterable<Candidate>> filteredCandidatesAddedAndRemoved = updateFilteredCandidates(c, newCandidates, removedCandidates);
+        final TimePoint filteringStartedAt = TimePoint.now();
+        logger.info("DIAG START updateFilteredCandidates for "+c);
+        Pair<Iterable<Candidate>, Iterable<Candidate>> filteredCandidatesAddedAndRemoved =
+                updateFilteredCandidates(c, newCandidates, removedCandidates);
+        logger.info("DIAG END updateFilteredCandidates for "+c+": "+
+                filteringStartedAt.until(TimePoint.now()));
+
+        final TimePoint adjustGraphStartedAt = TimePoint.now();
+        logger.info("DIAG START adjustGraph for "+c);
         adjustGraph(c, filteredCandidatesAddedAndRemoved);
+        logger.info("DIAG END adjustGraph for "+c+": "+
+                adjustGraphStartedAt.until(TimePoint.now()));
     }
 
     /**
      * Adjusts the {@link #allEdges graph} based on the nodes added and removed. No {@link #findShortestPath(Competitor)
      * path analysis} is performed yet.
      */
-    private void adjustGraph(Competitor c,
+    private void adjustGraph(
+            Competitor c,
             Pair<Iterable<Candidate>, Iterable<Candidate>> filteredCandidatesAddedAndRemoved) {
+
         final Map<Candidate, Set<Edge>> competitorEdges = allEdges.get(c);
-        for (final Candidate candidateRemoved : filteredCandidatesAddedAndRemoved.getB()) {
-            logger.finest(()->"Removing all edges containing " + candidateRemoved + "of "+ c);
-            removeEdgesForCandidate(candidateRemoved, competitorEdges);
+        final Map<Candidate, Set<Edge>> competitorIncomingEdges = incomingEdges.get(c);
+
+        int removedCandidates = 0;
+        for (@SuppressWarnings("unused") final Candidate candidate :
+                filteredCandidatesAddedAndRemoved.getB()) {
+            removedCandidates++;
         }
+
+        long edgesBeforeRemoval = 0;
+        for (final Set<Edge> edgeSet : competitorEdges.values()) {
+            edgesBeforeRemoval += edgeSet.size();
+        }
+
+        logger.info("DIAG REMOVE WORKLOAD for " + c
+                + ": removedCandidates=" + removedCandidates
+                + ", edgeSets=" + competitorEdges.size()
+                + ", edgesBeforeRemoval=" + edgesBeforeRemoval);
+
+        final TimePoint removeEdgesStartedAt = TimePoint.now();
+        logger.info("DIAG START removeEdgesForCandidates for " + c);
+
+        for (final Candidate candidateRemoved :
+                filteredCandidatesAddedAndRemoved.getB()) {
+            logger.finest(() -> "Removing all edges containing "
+                    + candidateRemoved + "of " + c);
+            removeEdgesForCandidate(candidateRemoved, competitorEdges, competitorIncomingEdges);
+        }
+
+        logger.info("DIAG END removeEdgesForCandidates for " + c + ": "
+                + removeEdgesStartedAt.until(TimePoint.now()));
+
+        final TimePoint createNewEdgesStartedAt = TimePoint.now();
+        logger.info("DIAG START createNewEdges for " + c);
+
         createNewEdges(c, filteredCandidatesAddedAndRemoved.getA());
+
+        logger.info("DIAG END createNewEdges for " + c + ": "
+                + createNewEdgesStartedAt.until(TimePoint.now()));
     }
     
     /**
@@ -1079,13 +1156,22 @@ public class CandidateChooserImpl implements CandidateChooser {
         }
     }
 
-    private void removeEdgesForCandidate(Candidate can, Map<Candidate, Set<Edge>> edges) {
-        edges.remove(can);
-        for (Set<Edge> set : edges.values()) {
-            for (Iterator<Edge> i = set.iterator(); i.hasNext();) {
-                final Edge e = i.next();
-                if (e.getStart() == can || e.getEnd() == can) {
-                    i.remove();
+    private void removeEdgesForCandidate(Candidate can, Map<Candidate, Set<Edge>> edges, Map<Candidate, Set<Edge>> incoming) {
+        final Set<Edge> outgoing = edges.remove(can);
+        if (outgoing != null) {
+            for (final Edge e : outgoing) {
+                final Set<Edge> inSet = incoming.get(e.getEnd());
+                if (inSet != null) {
+                    inSet.remove(e);
+                }
+            }
+        }
+        final Set<Edge> incomingForCan = incoming.remove(can);
+        if (incomingForCan != null) {
+            for (final Edge e : incomingForCan) {
+                final Set<Edge> outSet = edges.get(e.getStart());
+                if (outSet != null) {
+                    outSet.remove(e);
                 }
             }
         }
