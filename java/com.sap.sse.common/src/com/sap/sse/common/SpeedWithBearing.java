@@ -3,8 +3,6 @@ package com.sap.sse.common;
 import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sse.datamining.annotations.Statistic;
 
-
-
 public interface SpeedWithBearing extends Speed {
     @Statistic(messageKey="bearing", resultDecimals=1)
     Bearing getBearing();
@@ -14,7 +12,9 @@ public interface SpeedWithBearing extends Speed {
      * </code>to</code>, how far have we traveled? If <code>to</code> is before </code>from</code>, the speed will be
      * applied in reverse.
      */
-    Position travelTo(Position pos, TimePoint from, TimePoint to);
+    default Position travelTo(Position pos, TimePoint from, TimePoint to) {
+        return travelTo(pos, from.until(to));
+    }
     
     default Position travelTo(Position from, Duration duration) {
         return from.translateGreatCircle(getBearing(), travel(duration));

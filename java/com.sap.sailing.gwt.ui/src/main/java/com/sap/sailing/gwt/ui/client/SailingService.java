@@ -254,6 +254,8 @@ public interface SailingService extends RemoteService, RemoteReplicationService 
 
     List<RemoteSailingServerReferenceDTO> getRemoteSailingServerReferences() throws UnauthorizedException;
 
+    List<EventDTO> getRemoteEvents(String baseUrl, String bearerTokenOrNull) throws Exception;
+
     List<UrlDTO> getResultImportUrls(String resultProviderName) throws UnauthorizedException;
 
     String validateResultImportUrl(String resultProviderName, UrlDTO urlDTO);
@@ -441,7 +443,7 @@ public interface SailingService extends RemoteService, RemoteReplicationService 
      *             is thrown if the leaderboard is not found by name
      */
     PairingListTemplateDTO calculatePairingListTemplate(final int flightCount, final int groupCount,
-            final int competitorCount, final int flightMultiplier, final int tolerance)
+            final int competitorCount, final int flightMultiplier, final int boatChangeFactor)
             throws UnauthorizedException, NotFoundException, IllegalArgumentException;
 
     PairingListDTO getPairingListFromTemplate(String leaderboardName, int flightMultiplier,

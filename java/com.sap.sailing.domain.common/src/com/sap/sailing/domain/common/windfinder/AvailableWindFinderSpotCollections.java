@@ -29,7 +29,8 @@ public enum AvailableWindFinderSpotCollections {
     BALATON("balaton"),
     SANFRANCISCO("sanfrancisco"),
     LAGO_MAGGIORE("lago_maggiore"),
-    MARSEILLE("marseille");
+    MARSEILLE("marseille"),
+    ZUERICHSEE("zuerichsee");
 
     private final String name;
 

@@ -20,7 +20,7 @@ public class EventCreateDialog extends EventDialog {
     public EventCreateDialog(Collection<EventDTO> existingEvents, List<LeaderboardGroupDTO> availableLeaderboardGroups, 
             SailingServiceWriteAsync sailingServiceWrite, StringMessages stringMessages, DialogCallback<EventDTO> callback) {
         super(new EventParameterValidator(stringMessages, existingEvents), sailingServiceWrite, stringMessages,
-                availableLeaderboardGroups, /* leaderboardGroups */ Collections.<LeaderboardGroupDTO>emptyList(), callback);
+                availableLeaderboardGroups, /* leaderboardGroups */ Collections.<LeaderboardGroupDTO>emptyList(), existingEvents, callback);
         nameEntryField = createTextBox(null);
         nameEntryField.setVisibleLength(50);
         nameEntryField.ensureDebugId("NameTextBox");
@@ -45,6 +45,6 @@ public class EventCreateDialog extends EventDialog {
         imagesListComposite.fillImages(Collections.<ImageDTO>emptyList());
         videosListComposite.fillVideos(Collections.<VideoDTO>emptyList());
         // add default course area
-        courseAreaNameList.setValue(Collections.singletonList(new CourseAreaDTO(UUID.randomUUID(), "Default")));
+        courseAreaList.setValue(Collections.singletonList(new CourseAreaDTO(UUID.randomUUID(), "Default")));
     }
 }

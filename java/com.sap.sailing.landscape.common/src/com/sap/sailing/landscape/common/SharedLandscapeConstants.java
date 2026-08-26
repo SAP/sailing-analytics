@@ -13,6 +13,10 @@ public interface SharedLandscapeConstants {
      */
     String DEFAULT_DOMAIN_NAME = "sapsailing.com";
 
+    String DEFAULT_SAILING_SERVER = "www." + DEFAULT_DOMAIN_NAME;
+
+    String DEFAULT_SAILING_SERVER_URL = "https://" + DEFAULT_SAILING_SERVER;
+
     /**
      * Servers in any of these domains we want to trust. This can and shall be used, e.g., to guard server-side requests
      * to URLs that may have been provided through an API or UI by some potentially untrusted client or user.

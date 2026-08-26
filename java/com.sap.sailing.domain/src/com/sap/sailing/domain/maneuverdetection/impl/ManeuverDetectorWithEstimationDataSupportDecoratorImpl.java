@@ -454,17 +454,18 @@ public class ManeuverDetectorWithEstimationDataSupportDecoratorImpl
             Waypoint nextWaypoint = legAfter.getLeg().getTo();
             for (Mark mark : nextWaypoint.getMarks()) {
                 Position nextMarkPosition = markPositionAtTimePointCache.getEstimatedPosition(mark);
-                Bearing absoluteBearing = maneuverEndPosition.getBearingGreatCircle(nextMarkPosition);
-                Bearing resultCandidate = absoluteBearing.getDifferenceTo(boatCourse);
-                if (result == null) {
-                    result = resultCandidate;
-                } else if (Math.signum(result.getDegrees()) != Math.signum(resultCandidate.getDegrees())) {
-                    result = new DegreeBearingImpl(0);
-                    break;
-                } else if (Math.abs(result.getDegrees()) > Math.abs(resultCandidate.getDegrees())) {
-                    result = resultCandidate;
+                if (nextMarkPosition != null) {
+                    Bearing absoluteBearing = maneuverEndPosition.getBearingGreatCircle(nextMarkPosition);
+                    Bearing resultCandidate = absoluteBearing.getDifferenceTo(boatCourse);
+                    if (result == null) {
+                        result = resultCandidate;
+                    } else if (Math.signum(result.getDegrees()) != Math.signum(resultCandidate.getDegrees())) {
+                        result = new DegreeBearingImpl(0);
+                        break;
+                    } else if (Math.abs(result.getDegrees()) > Math.abs(resultCandidate.getDegrees())) {
+                        result = resultCandidate;
+                    }
                 }
-
             }
         }
         return result;

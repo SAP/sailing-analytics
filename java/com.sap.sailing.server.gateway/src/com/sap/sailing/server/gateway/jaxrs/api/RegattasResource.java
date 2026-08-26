@@ -91,7 +91,9 @@ import com.sap.sailing.domain.common.RegattaName;
 import com.sap.sailing.domain.common.RegattaNameAndRaceName;
 import com.sap.sailing.domain.common.Tack;
 import com.sap.sailing.domain.common.TargetTimeInfo;
+import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.WindSource;
+import com.sap.sailing.domain.common.WindSourceType;
 import com.sap.sailing.domain.common.abstractlog.NotRevokableException;
 import com.sap.sailing.domain.common.dto.CompetitorDTO;
 import com.sap.sailing.domain.common.dto.FleetDTO;
@@ -99,6 +101,7 @@ import com.sap.sailing.domain.common.dto.LeaderboardDTO;
 import com.sap.sailing.domain.common.dto.LeaderboardEntryDTO;
 import com.sap.sailing.domain.common.dto.LeaderboardRowDTO;
 import com.sap.sailing.domain.common.dto.LegEntryDTO;
+import com.sap.sailing.domain.common.impl.WindImpl;
 import com.sap.sailing.domain.common.polars.NotEnoughDataHasBeenAddedException;
 import com.sap.sailing.domain.common.security.SecuredDomainType;
 import com.sap.sailing.domain.common.security.SecuredDomainType.LeaderboardActions;
@@ -178,6 +181,7 @@ import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Color;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Speed;
 import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
@@ -186,6 +190,7 @@ import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.Util.Triple;
 import com.sap.sse.common.WithID;
+import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sse.common.impl.MillisecondsDurationImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.common.impl.RGBColor;
@@ -209,7 +214,7 @@ import com.sap.sse.util.ThreadPoolUtil;
 @Path("/v1/regattas")
 public class RegattasResource extends AbstractSailingServerResource {
     private static final String SECONDARY_USER_BEARER_TOKEN = "secondaryuserbearertoken";
-
+    private static final int MAX_NUMBER_OF_WIND_FIXES_PER_REQUEST = 10000;
     private static final Logger logger = Logger.getLogger(RegattasResource.class.getName());
 
     private DataMiningResource dataMiningResource;
@@ -1775,6 +1780,11 @@ public class RegattasResource extends AbstractSailingServerResource {
         return response;
     }
 
+    @FunctionalInterface
+    private static interface WindForTrackedRaceSerializerFactory {
+        JsonSerializer<TrackedRace> getSerializer(TimePoint finalFrom, TimePoint finalTo);
+    }
+
     @GET
     @Produces("application/json;charset=UTF-8")
     @Path("{regattaname}/races/{racename}/wind")
@@ -1785,6 +1795,93 @@ public class RegattasResource extends AbstractSailingServerResource {
             @QueryParam("totimeasmillis") Long totimeasmillis,
             @HeaderParam(SECONDARY_USER_BEARER_TOKEN) String secondaryUserBearerToken,
             @Context HttpServletRequest request) {
+        return getWindWithSerializer(regattaName, raceName, fromtime, fromtimeasmillis, totime, totimeasmillis, secondaryUserBearerToken, request,
+                (finalFrom, finalTo)->new TrackedRaceJsonSerializer(
+                        ws -> new DefaultWindTrackJsonSerializer(MAX_NUMBER_OF_WIND_FIXES_PER_REQUEST, finalFrom, finalTo,ws), windSource, windSourceId));
+    }
+
+    @GET
+    @Produces("application/json;charset=UTF-8")
+    @Path("{regattaname}/races/{racename}/wind_at_position")
+    public Response getWindAtPosition(@PathParam("regattaname") String regattaName, @PathParam("racename") String raceName,
+            @QueryParam("fromtime") String fromtime,
+            @QueryParam("fromtimeasmillis") Long fromtimeasmillis, @QueryParam("totime") String totime,
+            @QueryParam("totimeasmillis") Long totimeasmillis,
+            @QueryParam("intervalasmillis") Long intervalasmillis,
+            @QueryParam("latDeg[]") List<Double> latitudesInDegrees,
+            @QueryParam("lngDeg[]") List<Double> longitudesInDegrees,
+            @HeaderParam(SECONDARY_USER_BEARER_TOKEN) String secondaryUserBearerToken,
+            @Context HttpServletRequest request) {
+        final Response response;
+        if (latitudesInDegrees == null || longitudesInDegrees == null) {
+            response = Response.serverError().entity("Latitudes and longitudes must be provided as query parameters latDeg[] and lngDeg[]").build();
+        } else if (latitudesInDegrees.size() != longitudesInDegrees.size()) {
+            response = Response.serverError().entity("Latitudes and longitudes arrays in query parameters latDeg[] and lngDeg[] must have equal count").build();
+        } else if (intervalasmillis == null) {
+            response = Response.serverError().entity("intervalasmillis query parameter is missing").build();
+        } else if (intervalasmillis <= 0) {
+            response = Response.serverError().entity("intervalasmillis query parameter must be a positive value").build();
+        } else {
+            response = getWindWithSerializer(regattaName, raceName, fromtime, fromtimeasmillis, totime, totimeasmillis, secondaryUserBearerToken, request,
+                new WindForTrackedRaceSerializerFactory() {
+                    @Override
+                    public JsonSerializer<TrackedRace> getSerializer(TimePoint finalFrom, TimePoint finalTo) {
+                        return new JsonSerializer<TrackedRace>() {
+                            @Override
+                            public JSONObject serialize(TrackedRace trackedRace) {
+                                return serializeWindAtPositionsAndTimePoints(trackedRace, finalFrom, finalTo,
+                                        new MillisecondsDurationImpl(intervalasmillis), latitudesInDegrees,
+                                        longitudesInDegrees);
+                            }
+                        };
+                    }
+                });
+        }
+        return response;
+    }
+    
+    private JSONObject serializeWindAtPositionsAndTimePoints(TrackedRace trackedRace, TimePoint from,
+            TimePoint to, Duration interval, List<Double> latitudesInDegrees, List<Double> longitudesInDegrees) {
+        final Iterable<Wind> windIterable = new Iterable<Wind>() {
+            @Override
+            public Iterator<Wind> iterator() {
+                return new Iterator<Wind>() {
+                    private TimePoint timePoint = from;
+                    private int count = 0;
+                    
+                    @Override
+                    public boolean hasNext() {
+                        return timePoint != null && (to == null || !timePoint.after(to));
+                    }
+
+                    @Override
+                    public Wind next() {
+                        final Position position = new DegreePosition(latitudesInDegrees.get(count), longitudesInDegrees.get(count));
+                        // TODO bug6281: the position gets lost when asking the tracked race for wind at that position because we get an average from all wind sources,
+                        // including the averaged position. We may want to pass the requested position into the response, too, but how?
+                        final Wind windFromRace = trackedRace.getWind(position, timePoint);
+                        final Wind result = new WindImpl(position, timePoint, windFromRace);
+                        count++;
+                        if (count >= latitudesInDegrees.size()) {
+                            timePoint = timePoint.plus(interval);
+                            count = 0;
+                        }
+                        return result;
+                    }
+                };
+            }
+        };
+        return DefaultWindTrackJsonSerializer.serializeFixesFromWindSource(trackedRace.getWindSources(WindSourceType.COMBINED).iterator().next(),
+                windIterable, wind->wind, MAX_NUMBER_OF_WIND_FIXES_PER_REQUEST);
+    }
+
+    private Response getWindWithSerializer(final String regattaName, final String raceName,
+            final String fromtime,
+            final Long fromtimeasmillis, final String totime,
+            final Long totimeasmillis,
+            final String secondaryUserBearerToken,
+            final HttpServletRequest request,
+            final WindForTrackedRaceSerializerFactory serializerFactory) {
         Response response;
         final String clientIP = HttpRequestUtils.getClientIP(request);
         final String userAgent = HttpRequestUtils.getUserAgent(request);
@@ -1830,12 +1927,7 @@ public class RegattasResource extends AbstractSailingServerResource {
                     final TimePoint finalFrom = Util.getLatestOfTimePoints(from, trackedRace.getStartOfTracking());
                     final TimePoint finalTo = Util.getEarliestOfTimePoints(to, Util.getEarliestOfTimePoints(
                             trackedRace.getEndOfTracking(), trackedRace.getTimePointOfNewestEvent()));
-                    final TrackedRaceJsonSerializer serializer = new TrackedRaceJsonSerializer(
-                            ws -> new DefaultWindTrackJsonSerializer(/* maxNumberOfFixes */ 10000, finalFrom, finalTo,
-                                    ws),
-                            windSource, windSourceId);
-
-                    final JSONObject jsonWindTracks = serializer.serialize(trackedRace);
+                    final JSONObject jsonWindTracks = serializerFactory.getSerializer(finalFrom, finalTo).serialize(trackedRace);
                     response = Response.ok(streamingOutput(jsonWindTracks)).build();
                 }
             }
