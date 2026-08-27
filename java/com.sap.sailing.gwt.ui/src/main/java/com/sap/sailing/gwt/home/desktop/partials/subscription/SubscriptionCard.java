@@ -113,6 +113,10 @@ public class SubscriptionCard extends Composite {
                         }
                         currentPrice = subscriptionPrice;
                         price.addStyleName(SELECTED_STYLE);
+                        final boolean isButtonAvailable = button.isVisible();
+                        if (isButtonAvailable) {
+                            triggerSubscription();
+                        }
                     }
                 });
                 if (!subscriptionPrice.getDisablePlan()) {
@@ -210,6 +214,10 @@ public class SubscriptionCard extends Composite {
 
     @UiHandler("button")
     void onClick(ClickEvent e) {
+        triggerSubscription();
+    }
+
+    private void triggerSubscription() {
         subscriptionCallback.accept(currentPrice);
     }
 
