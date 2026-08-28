@@ -173,6 +173,13 @@ public class JumpyTrackSmootheningTest {
     
     @Test
     public void testMarkPassingCalculatorForAdjusted() throws Exception {
+//        final java.util.logging.FileHandler fileHandler =
+//                new java.util.logging.FileHandler(
+//                        System.getProperty("user.home") + "/Desktop/jumpy-markpassing.log",
+//                        false);
+//        fileHandler.setFormatter(new java.util.logging.SimpleFormatter());
+//        java.util.logging.Logger.getLogger("").addHandler(fileHandler);
+        try {
         final DynamicGPSFixTrack<Competitor, GPSFixMoving> track = readTrack("GallagherZelenka.gpx.gz");
         final Duration durationForAdjustedTrack;
         final Duration durationForOriginalTrack;
@@ -201,6 +208,11 @@ public class JumpyTrackSmootheningTest {
         assertTrue(durationForAdjustedTrack.times(2).compareTo(durationForOriginalTrack) < 0,
                 "Expected duration for mark passing analysis on adjusted track to be at least two times less than for original track: "+
                 durationForAdjustedTrack+" vs. "+durationForOriginalTrack);
+        } finally {
+//            java.util.logging.Logger.getLogger("").removeHandler(fileHandler);
+//            fileHandler.close();
+        }
+        
     }
     
     private DynamicGPSFixTrack<Competitor, GPSFixMoving> readTrack(String filename) throws Exception {
