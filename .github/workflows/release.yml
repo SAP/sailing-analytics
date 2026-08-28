@@ -305,37 +305,40 @@ jobs:
           echo "Identified CI job: ${JOB}"
           curl -u "${{ vars.CI_JOB_USERNAME }}:${{ secrets.CI_JOB_PASSWORD}}" ${{ vars.CI_BASE_URL }}/job/${JOB}/build?token=${{ secrets.CI_JOB_TOKEN }}
 
-  # build-gate is the REQUIRED status check in branch protection. It must go
-  # green ONLY for a genuine full build (tests actually ran) or a legitimate
-  # trivial-change skip.
+  # build-gate is the REQUIRED status check in branch protection. It must be
+  # SATISFIED (pass) ONLY for a genuine full build (tests actually ran) or a
+  # legitimate trivial-change skip; in every other case it must FAIL (red).
   #
-  # A SUCCESSFUL compile-only run (build succeeded AND skip_tests true — e.g. a
-  # fork pull_request, a *-reviewed-for-compile tag, or a workflow_dispatch with
-  # skip_tests=true) must NOT qualify a PR for merge, but should also NOT show as
-  # a failed/red run. So for that one case this job is SKIPPED via its if:. A
-  # required check whose job never starts is left "Expected — waiting" (pending):
-  # the PR stays un-mergeable WITHOUT a red X, and the workflow run is not marked
-  # failed. Merge qualification for fork code then comes only from a maintainer
-  # pushing a *-reviewed-for-build tag (full trusted build with tests).
+  # CRITICAL — why this job runs unconditionally (if: always()) and never skips
+  # itself: GitHub branch protection / rulesets treat a required check whose
+  # conclusion is "skipped" as SATISFIED (the PR becomes mergeable). This is true
+  # BOTH for a job that runs and reports "skipped" AND for a job skipped by its
+  # own if: — a skipped job still MATERIALIZES a check run with conclusion
+  # "skipped". There is NO "job never starts -> pending" state for a job that is
+  # part of a triggered workflow: an if:-false job reports "skipped", which
+  # counts as PASSED. (This exact mistake let fork PRs #53/#54 become mergeable
+  # on a compile-only build: the old if: skipped build-gate on a successful
+  # compile-only run, GitHub read that as passed, and the PR merged WITHOUT the
+  # secret-bearing test build ever running.)
   #
-  # IMPORTANT: this must be a job-level skip (job never starts), NOT run-then-
-  # report-skipped — a job that runs and reports conclusion "skipped" counts as
-  # PASSED for branch protection and would let the PR merge. Also note the guard
-  # is deliberately narrow: it fires ONLY for a *successful* compile-only build.
-  # A compile-only build that FAILED (build.result != success) still runs the
-  # gate below and goes red, and the trivial-change skip still runs and goes
-  # green — so docs-only PRs are not left pending forever.
+  # Therefore the ONLY conclusion that keeps a PR un-mergeable is FAILURE. A
+  # SUCCESSFUL compile-only run (build succeeded AND skip_tests true — a fork
+  # pull_request, a *-reviewed-for-compile tag, or workflow_dispatch with
+  # skip_tests=true) must NOT qualify a PR for merge, so this gate RUNS for that
+  # case and EXITS 1 (red). It is accurate: compile-only validation has not been
+  # met. Merge qualification for fork code comes only from a maintainer pushing a
+  # *-reviewed-for-build tag (full trusted build with tests), which turns this
+  # gate green. compile-gate (advisory) still goes green to show the compile
+  # itself succeeded.
   #
-  # The always() is REQUIRED: without it, a FAILED build (a job listed in needs:)
-  # would cascade-skip this gate by GitHub's default rule, leaving the required
-  # check quietly pending instead of red. always() forces the gate to run for
-  # every build outcome so the guard alone — not the needs: cascade — decides
-  # whether it runs; the sole non-run case is the narrow successful-compile-only
-  # one above. (A real build failure then runs the gate and it exits 1 → red.)
+  # always() also ensures a FAILED build (a job in needs:) does not cascade-skip
+  # this gate by GitHub's default rule; the gate runs and the else-branch exits 1
+  # -> red. The trivial-change skip (build skipped, no relevant changes) is the
+  # one legitimate green-without-tests path.
   build-gate:
     permissions: {}
     needs: [changes, build]
-    if: ${{ always() && !(needs.build.result == 'success' && needs.build.outputs.skip_tests == 'true') }}
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - run: |
@@ -343,6 +346,11 @@ jobs:
             echo "Full build with tests passed."
           elif [[ "${{ needs.build.result }}" == "skipped" && "${{ needs.changes.outputs.should_run }}" == "false" ]]; then
             echo "No relevant changes — skipping is OK."
+          elif [[ "${{ needs.build.result }}" == "success" && "${{ needs.build.outputs.skip_tests }}" == "true" ]]; then
+            echo "Compile-only build succeeded but tests did NOT run — this does not"
+            echo "satisfy the required check. Push a *-reviewed-for-build tag at the"
+            echo "reviewed SHA to run the full build with tests."
+            exit 1
           else
             echo "Build failed or was cancelled."
             exit 1
