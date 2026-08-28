@@ -11,7 +11,7 @@ First of all, make sure you've looked at [http://www.amazon.de/Patterns-Elements
 
 Note that the Github repository mentioned here is a "downstream" repository for the "upstream" repo at https://github.com/eclipse-sailing-analytics/sailing-analytics. The downstream repo contains a "friendly fork" that is not technically a fork in the Github sense but contains differences between its ``main`` branch and the upstream ``main`` branch. Those deviations mostly revolve around branding and naming aspects. If not working specifically on this kind of changes, please work with the upstream repo as a default and use this downstream repo only for such branding and SAP-specific changes.
 
-In particular, you must *never* merge or push this repo's ``main`` branch into the upstream repo's ``main`` branch; otherwise you would risk contaminating upstream with SAP specifics. Merging the upstream's ``main`` branch into this downstream repo's ``main`` branch, however, should work without problems and should happen on a regular basis after reviewing the upstream changes carefully.
+In particular, you must *never* merge or push this repo's ``main`` branch into the upstream repo's ``main`` branch; otherwise you would risk contaminating upstream with SAP specifics. Merging the upstream's ``main`` branch into this downstream repo's ``main`` branch, however, should work without problems and should happen on a regular basis after reviewing the upstream changes carefully. To make this routine safe and repeatable, there is a helper script that opens the downstream merge as a reviewable pull request; see [Syncing upstream into downstream](#syncing-upstream-into-downstream-via-a-pull-request) below.
 
    - The primary Git repository for the project is hosted on Github (see [https://github.com/SAP/sailing-analytics](https://github.com/SAP/sailing-analytics)). To clone, use ``git@github.com:SAP/sailing-analytics.git``.
    - If you are on Windows, keep in mind you may run into the following problem. By default, the filesystem in Windows enforces a 260 character limit on paths. The longest path length for a file in this project, if the drive name is included, is 263 characters. A possible solution is to pass a single character name for the project folder in the git clone command, and clone the project on drive root, which may bring the longest file path down to compatible length. Alternatively, Windows 10 and 11 offer settings to enable a much much longer maximum file path that requires additional configuration. You may check that out at your own will.
@@ -93,6 +93,29 @@ The project has some configuration of line endings for specific file types in ".
 If you are first time git user, don't forget to specify your user metadata. Use the commands `git config user.name "My Name"` and `git config user.email my.email@sap.com` to tell git your name and email address.
 
 Depending on the location of your local repository, it's filepaths might be too long for the default settings to handle. Excecute the command `git config --system core.longpaths true` to enable your system wide git installation to handle long file paths.
+
+### Syncing upstream into downstream via a pull request
+
+Regularly merging the upstream Eclipse ``main`` into the SAP downstream ``main`` (see the note under [Git Account](#accounts) above) is automated by `configuration/merge-upstream-to-downstream.sh`. It performs the whole routine as a **reviewable pull request** rather than a direct push, so the downstream branch-protection rules are honoured: the merge PR is authored from a *secondary* GitHub account's fork, which leaves your primary account free to review and approve it (the rules forbid approving your own last push).
+
+The script fetches upstream and downstream fast-forward-only, aborts early if upstream has nothing new to contribute (so it never opens an empty PR), merges downstream then upstream into the fork branch, pushes, and opens (or, idempotently, updates) the PR with the incoming commit subjects in its body.
+
+Prerequisites (on top of the `eclipse` and `sap` remotes and the `eclipse-main` / `sap-main` local branches from above):
+
+- A secondary GitHub account that owns a fork of the downstream repository, added as a remote whose URL embeds that account's personal access token, e.g. ``git remote add myfork https://<TOKEN>@github.com/<secondary-account>/sailing-analytics``. The script reads the token from this remote URL at runtime and never prints it; after rotating the token, update only this remote's URL.
+- A local branch tracking that fork's ``main`` (by default named ``<fork-remote>-sap-main``), e.g. ``git checkout -b myfork-sap-main myfork/main``.
+- The [`gh` CLI](https://cli.github.com/) installed and on your `PATH`.
+
+Every option can also be supplied through a ``MERGE_U2D_*`` environment variable, with precedence *command-line option > environment variable > built-in default*. The only value without a default is the fork remote, so exporting it in your ``~/.bashrc`` lets you run the script with no arguments at all:
+
+```
+export MERGE_U2D_FORK_REMOTE=myfork
+configuration/merge-upstream-to-downstream.sh
+```
+
+Run ``configuration/merge-upstream-to-downstream.sh -h`` for the full list of options and their live resolved defaults.
+
+**Tab completion (optional but nice):** `configuration/merge-upstream-to-downstream.bash-completion` adds Bash completion for the script — it completes option names, completes remote-name options against your actual git remotes, and completes the branch options against the branches *of the resolved remote* (respecting the same option/env/default precedence). Enable it by sourcing it from your ``~/.bashrc`` (``source /path/to/configuration/merge-upstream-to-downstream.bash-completion``) or by symlinking it into a Bash-completion directory under the command's basename, e.g. ``ln -s "$PWD/configuration/merge-upstream-to-downstream.bash-completion" ~/.local/share/bash-completion/completions/merge-upstream-to-downstream.sh``.
 
 ### Maven Setup
 
