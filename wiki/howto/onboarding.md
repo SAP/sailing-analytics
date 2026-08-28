@@ -102,8 +102,7 @@ The script fetches upstream and downstream fast-forward-only, aborts early if up
 
 Prerequisites (on top of the `eclipse` and `sap` remotes and the `eclipse-main` / `sap-main` local branches from above):
 
-- A secondary GitHub account that owns a fork of the downstream repository, added as a remote whose URL embeds that account's personal access token, e.g. ``git remote add myfork https://<TOKEN>@github.com/<secondary-account>/sailing-analytics``. The script reads the token from this remote URL at runtime and never prints it; after rotating the token, update only this remote's URL.
-- A local branch tracking that fork's ``main`` (by default named ``<fork-remote>-sap-main``), e.g. ``git checkout -b myfork-sap-main myfork/main``.
+- A **secondary GitHub account with a fork** of the downstream repository, added as a remote whose URL embeds that account's personal access token, plus a local branch tracking that fork's ``main`` (by default named ``<fork-remote>-sap-main``). This one-time setup — including the parts that need a browser and 2FA — is written up separately in [[Setting up a fork account for the merge script|wiki/howto/development/fork-account-setup]] (optional; only needed if you actually run the script).
 - The [`gh` CLI](https://cli.github.com/) installed and on your `PATH`.
 
 Every option can also be supplied through a ``MERGE_U2D_*`` environment variable, with precedence *command-line option > environment variable > built-in default*. The only value without a default is the fork remote, so exporting it in your ``~/.bashrc`` lets you run the script with no arguments at all:
