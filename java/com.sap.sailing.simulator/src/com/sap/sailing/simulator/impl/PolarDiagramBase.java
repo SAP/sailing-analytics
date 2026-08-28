@@ -538,7 +538,7 @@ public class PolarDiagramBase implements PolarDiagram, Serializable {
         Bearing diffWindTarget = windBearing.getDifferenceTo(targetDirection);
         if (diffWindTarget.equals(new DegreeBearingImpl(0))) {
             //
-            // target is aligned with wind, i.e. target bearing = 0�
+            // target is aligned with wind, i.e. target bearing = 0°
             //
             Bearing floorBeatAngle;
             if (beatAngles.floorEntry(wind) == null) {
@@ -586,7 +586,7 @@ public class PolarDiagramBase implements PolarDiagram, Serializable {
             return new SpeedWithBearing[] { optVMGLeft, optVMGRight };
         } else {
             //
-            // target is not aligned with wind, i.e. target bearing != 0�
+            // target is not aligned with wind, i.e. target bearing != 0°
             //
             Set<Bearing> allKeys = new TreeSet<Bearing>(bearingComparator);
             /*
