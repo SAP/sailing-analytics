@@ -78,11 +78,11 @@ _merge_upstream_to_downstream() {
         --local-upstream-branch|--local-downstream-branch|--local-fork-branch)
             COMPREPLY=( $(compgen -W "$(__m2d_local_branches)" -- "$cur") ); return 0 ;;
     esac
-    # Otherwise complete an option NAME (only when the user is typing one, so a
-    # bare Tab in value position doesn't spam every flag).
-    if [[ "$cur" == -* ]]; then
-        COMPREPLY=( $(compgen -W "$opts" -- "$cur") )
-    fi
+    # Otherwise complete an option NAME. compgen -W filters by "$cur", so an
+    # empty cur (bare Tab right after the command) lists every option, while a
+    # partial like "--fork" narrows it — and a stray non-option word yields the
+    # options too rather than nothing.
+    COMPREPLY=( $(compgen -W "$opts" -- "$cur") )
     return 0
 }
 
