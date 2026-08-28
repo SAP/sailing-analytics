@@ -329,14 +329,16 @@ jobs:
   # auto check-run carries a context the ruleset ignores. Its single step POSTs a
   # commit status context=build-gate ONLY when: the change was trivial (build
   # skipped, no relevant changes) OR a full build ran WITH tests and succeeded
-  # -> state=success; OR a full build ran WITH tests and FAILED (build.result not
-  # success/skipped, skip_tests==false) -> state=failure (red X, so a committer's
-  # own broken build is loud). In every OTHER case — a compile-only run, whether
-  # it succeeded OR failed (fork PR, *-reviewed-for-compile, workflow_dispatch
-  # skip_tests) — it posts NOTHING, so no build-gate context exists for the head
-  # SHA and the PR stays blocked at "Expected" with no red X. (A compile-only run
-  # ran no tests, so there is nothing meaningful to fail on; it simply hasn't met
-  # the gate.) Merge qualification for fork code comes only from a maintainer
+  # -> state=success; OR a full build ran WITH tests and FAILED
+  # (build.result==failure, skip_tests==false) -> state=failure (red X, so a
+  # committer's own broken build is loud). In every OTHER case it posts NOTHING,
+  # so no build-gate context exists for the head SHA and the PR stays blocked at
+  # "Expected" with no red X. That "nothing" covers: any compile-only run,
+  # succeeded OR failed (fork PR, *-reviewed-for-compile, workflow_dispatch
+  # skip_tests) — no tests ran, so there is nothing meaningful to fail on; AND a
+  # CANCELLED trusted build — cancellation is indeterminate (tests might have
+  # passed had it finished), so "failure" would be misleading; re-run to get a
+  # real verdict. Merge qualification for fork code comes only from a maintainer
   # pushing a *-reviewed-for-build tag (full trusted build with tests), which
   # posts success/failure. compile-gate (advisory) still shows compile pass/fail.
   #
@@ -365,7 +367,7 @@ jobs:
             STATE=success; REASON="Full build with tests passed."
           elif [[ "$BUILD_RESULT" == "skipped" && "$SHOULD_RUN" == "false" ]]; then
             STATE=success; REASON="No relevant changes — nothing to build."
-          elif [[ "$BUILD_RESULT" != "success" && "$BUILD_RESULT" != "skipped" && "$SKIP_TESTS" != "true" ]]; then
+          elif [[ "$BUILD_RESULT" == "failure" && "$SKIP_TESTS" != "true" ]]; then
             STATE=failure; REASON="Full build with tests failed."
           fi
           if [[ -n "$STATE" ]]; then
