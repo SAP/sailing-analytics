@@ -1048,21 +1048,13 @@ public class CandidateChooserImpl implements CandidateChooser {
     private void adjustGraph(
             Competitor c,
             Pair<Iterable<Candidate>, Iterable<Candidate>> filteredCandidatesAddedAndRemoved) {
-
         final Map<Candidate, Set<Edge>> competitorEdges = allEdges.get(c);
         final Map<Candidate, Set<Edge>> competitorIncomingEdges = incomingEdges.get(c);
-
-        int removedCandidates = 0;
-        for (@SuppressWarnings("unused") final Candidate candidate :
-                filteredCandidatesAddedAndRemoved.getB()) {
-            removedCandidates++;
-        }
-
+        final int removedCandidates = Util.size(filteredCandidatesAddedAndRemoved.getB());
         long edgesBeforeRemoval = 0;
         for (final Set<Edge> edgeSet : competitorEdges.values()) {
             edgesBeforeRemoval += edgeSet.size();
         }
-
         logger.info("DIAG REMOVE WORKLOAD for " + c
                 + ": removedCandidates=" + removedCandidates
                 + ", edgeSets=" + competitorEdges.size()
@@ -1070,22 +1062,15 @@ public class CandidateChooserImpl implements CandidateChooser {
 
         final TimePoint removeEdgesStartedAt = TimePoint.now();
         logger.info("DIAG START removeEdgesForCandidates for " + c);
-
-        for (final Candidate candidateRemoved :
-                filteredCandidatesAddedAndRemoved.getB()) {
-            logger.finest(() -> "Removing all edges containing "
-                    + candidateRemoved + "of " + c);
+        for (final Candidate candidateRemoved : filteredCandidatesAddedAndRemoved.getB()) {
+            logger.finest(() -> "Removing all edges containing " + candidateRemoved + "of " + c);
             removeEdgesForCandidate(candidateRemoved, competitorEdges, competitorIncomingEdges);
         }
-
         logger.info("DIAG END removeEdgesForCandidates for " + c + ": "
                 + removeEdgesStartedAt.until(TimePoint.now()));
-
         final TimePoint createNewEdgesStartedAt = TimePoint.now();
         logger.info("DIAG START createNewEdges for " + c);
-
         createNewEdges(c, filteredCandidatesAddedAndRemoved.getA());
-
         logger.info("DIAG END createNewEdges for " + c + ": "
                 + createNewEdgesStartedAt.until(TimePoint.now()));
     }
