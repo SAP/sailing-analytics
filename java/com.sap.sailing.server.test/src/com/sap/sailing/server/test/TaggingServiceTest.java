@@ -244,7 +244,7 @@ public class TaggingServiceTest {
         final String hiddenInfo = "Hidden info To Update";
         final String imageURL = "localhost";
         final TimePoint raceTimepoint = new MillisecondsTimePoint(1000);
-        final String updatedTag = "Upd/ated %Ta!g!���";
+        final String updatedTag = "Upd/ated %Ta!g!äöü";
         final String updatedComment = "New comment...";
         final String updatedHiddenInfo = "New hidden info...";
         final String updatedImageURL = "";
