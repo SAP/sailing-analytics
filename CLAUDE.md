@@ -4,6 +4,10 @@ Your WebSearch tool is broken, don't use it. Instead fetch https://duckduckgo.co
 
 # Claude Code Instructions for sailing-analytics
 
+## Research before Answering
+
+Make sure to research the topic/question well and thoroughly instead of just answering quickly and superficially.
+
 ## Java Coding Style Preferences
 
 ### Variable Declarations

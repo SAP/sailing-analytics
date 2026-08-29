@@ -21,8 +21,16 @@ OS_FOR_GSED="darwin"
 echo "Trying to obtain bug summary/title from Github..."
 BUG_SUMMARY="$( curl -s -H 'Accept: application/vnd.github+json' https://api.github.com/repos/eclipse-sailing-analytics/sailing-analytics/issues/${BUG_ID} | jq -r '.title' )"
 echo "Found: ${BUG_SUMMARY}"
-read -p "Hudson Username: " USERNAME
-read -s -p "Hudson Password: " PASSWORD
+if [ -z "${USERNAME}" ]; then
+  if [[ "$OSTYPE" == *"$OS_FOR_GSED"* ]]; then
+    read -e -p "Hudson Username: " USERNAME
+  else
+    read -p "Hudson Username: " USERNAME
+fi
+fi
+if [ -z "${PASSWORD}" ]; then
+  read -s -p "Hudson Password: " PASSWORD
+fi
 echo
 COPY_TEMPLATE_CONFIG_URL="$HUDSON_BASE_URL/job/$COPY_TEMPLATE_JOB/config.xml"
 curl -s -X GET $COPY_TEMPLATE_CONFIG_URL -u "$USERNAME:$PASSWORD" -o "$CONFIGFILE"

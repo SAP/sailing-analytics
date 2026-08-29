@@ -1,6 +1,42 @@
 name: release
 on:
   push:
+    # NOTE: introducing a "tags:" filter makes GitHub treat any Git ref kind that
+    # is NOT filtered as "undefined", and the workflow then stops running for it.
+    # So branches MUST be listed explicitly here; without "branches: ['**']" the
+    # tag filter below would silently disable all branch-push builds. '**' (not
+    # '*') is required to match branch names containing slashes (e.g. releases/x).
+    branches:
+      - '**'
+    # Reviewed-fork-PR tags. A maintainer fetches a fork PR head, reviews the
+    # exact SHA, then pushes one of these tags at that SHA. Because a tag push is
+    # a push event in this (base) repo, the run executes in trusted context WITH
+    # secrets — the only way to run secret-bearing validation on fork-authored
+    # code. '*-reviewed-for-compile' runs a compile-only build with NO secrets
+    # (cheap sanity check); '*-reviewed-for-build' runs the full build with tests
+    # and secrets. Safety rests on the maintainer having read that exact SHA
+    # before pushing the tag. See the "Determine build mode" step below.
+    tags:
+      - '*-reviewed-for-compile'
+      - '*-reviewed-for-build'
+    # paths-ignore is not evaluated for tag pushes (GitHub rule), so it only
+    # scopes branch pushes, exactly as before.
+    paths-ignore:
+      - 'wiki/**'
+      - '.github/workflows/*'
+      - '**/*.md'
+      - 'README.md'
+      - 'docs/**'
+  # Auto-build submitted PRs. A same-repo PR (branch pushed by a committer) runs
+  # the full build with tests and secrets — same trust as a direct branch push.
+  # A fork PR runs compile-only with NO secrets (GitHub withholds secrets from
+  # fork pull_request runs at the event level); the secret-bearing full build of
+  # fork code stays gated behind a maintainer pushing a *-reviewed-for-build tag.
+  # No branches: filter here — for pull_request that would filter by BASE branch;
+  # omitting it targets PRs into any branch. Draft PRs are excluded by the build
+  # job's if:. See the "Determine build mode" step for the fork/same-repo split.
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths-ignore:
       - 'wiki/**'
       - '.github/workflows/*'
@@ -25,17 +61,28 @@ on:
 jobs:
   # The "changes" job will cause the "build" job to get skipped for trivial changes
   changes:
-    permissions: {}
+    # pull-requests: read lets dorny/paths-filter diff via the REST API on the
+    # PR path; the empty default would make it treat everything as changed.
+    permissions:
+      pull-requests: read
     runs-on: ubuntu-latest
     outputs:
       should_run: ${{ steps.filter.outputs.code }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - id: filter
-        uses: dorny/paths-filter@d1c1ffe0248fe513906c8e24db8ea791d46f8590 # v3.0.3
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         with:
+          # Under the default 'some' quantifier a negated rule still counts as a
+          # match (picomatch treats '!README.md' as "anything but README.md"),
+          # so a changed README.md would set code=true. 'some-with-excludes'
+          # (v4+) makes the '!' rules act as real exclusions: code is true only
+          # when a changed file matches the positive '**' rule AND none of the
+          # excludes.
+          predicate-quantifier: 'some-with-excludes'
           filters: |
             code:
+              - '**'
               - '!wiki/**'
               - '!.github/workflows/*'
               - '!**/*.md'
@@ -44,13 +91,36 @@ jobs:
 
   build:
     needs: changes
-    if: ${{ needs.changes.outputs.should_run == 'true' || github.event_name == 'workflow_dispatch' }}
+    if: >-
+      ${{ (needs.changes.outputs.should_run == 'true' || github.event_name == 'workflow_dispatch')
+          && (github.event_name != 'pull_request' || github.event.pull_request.draft == false) }}
     permissions:
       contents: write
       checks: write
       actions: read
     runs-on: ${{ github.event.inputs.runner_cpus != '' && format('ubuntu-latest-{0}cpu', github.event.inputs.runner_cpus) || 'ubuntu-latest' }}
+    outputs:
+      skip_tests: ${{ steps.mode.outputs.skip_tests }}
     steps:
+      - name: Determine build mode
+        id: mode
+        shell: bash
+        # skip_tests=true means "compile only, no tests, no secrets". It is true
+        # for a workflow_dispatch with skip_tests=true, for a push of a
+        # *-reviewed-for-compile tag, OR for a fork-originated pull_request (fork
+        # runs get no secrets, so we compile without tests; the secret-bearing
+        # full build of fork code is gated behind a *-reviewed-for-build tag).
+        # Everything else (branches, same-repo PRs, *-reviewed-for-build tags)
+        # runs the full build with tests and secrets.
+        run: |
+          skip=false
+          if [[ "${{ github.event.inputs.skip_tests }}" == "true" ]]; then skip=true; fi
+          if [[ "${{ github.ref }}" == refs/tags/*-reviewed-for-compile ]]; then skip=true; fi
+          if [[ "${{ github.event_name }}" == "pull_request" \
+             && "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]]; then
+            skip=true
+          fi
+          echo "skip_tests=$skip" >> "$GITHUB_OUTPUT"
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@v1.3.1
         with:
@@ -91,23 +161,23 @@ jobs:
           echo Installed firefox versions: ${{ steps.setup-firefox.outputs.firefox-version }}
           ${{ steps.setup-firefox.outputs.firefox-path }} --version
       - name: Check out the repository to the runner
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: '500'
       - name: Install JDK 8
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
         with:
           distribution: 'temurin' # See 'Supported distributions' for available options
           java-version: '8'
           mvn-toolchain-id: 'JavaSE-1.8'
       - name: Install JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
         with:
           distribution: 'temurin' # See 'Supported distributions' for available options
           java-version: '17'
           mvn-toolchain-id: 'JavaSE-17'
       - name: Install JDK 25
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
         with:
           distribution: 'temurin' # See 'Supported distributions' for available options
           java-version: '25'
@@ -129,30 +199,36 @@ jobs:
       - shell: bash
         env: # Or as an environment variable
           TMP: /mnt/tmp
-          AWS_S3_TEST_S3ACCESSID: ${{ secrets.AWS_S3_TEST_S3ACCESSID }}
-          AWS_S3_TEST_S3ACCESSKEY: ${{ secrets.AWS_S3_TEST_S3ACCESSKEY }}
-          GEONAMES_ORG_USERNAMES: ${{ secrets.GEONAMES_ORG_USERNAMES }}
-          GOOGLE_MAPS_AUTHENTICATION_PARAMS: ${{ secrets.GOOGLE_MAPS_AUTHENTICATION_PARAMS }}
+          # These five are consumed only at TEST runtime. For a compile-only run
+          # (skip_tests) they resolve to '' so the real secret values are never
+          # placed in the process environment where reviewed-but-fork-authored
+          # code could read them. The full build (skip_tests false) gets them all.
+          AWS_S3_TEST_S3ACCESSID: ${{ steps.mode.outputs.skip_tests == 'true' && '' || secrets.AWS_S3_TEST_S3ACCESSID }}
+          AWS_S3_TEST_S3ACCESSKEY: ${{ steps.mode.outputs.skip_tests == 'true' && '' || secrets.AWS_S3_TEST_S3ACCESSKEY }}
+          GEONAMES_ORG_USERNAMES: ${{ steps.mode.outputs.skip_tests == 'true' && '' || secrets.GEONAMES_ORG_USERNAMES }}
+          GOOGLE_MAPS_AUTHENTICATION_PARAMS: ${{ steps.mode.outputs.skip_tests == 'true' && '' || secrets.GOOGLE_MAPS_AUTHENTICATION_PARAMS }}
           POLAR_DATA_BASE_URL: ${{ vars.POLAR_DATA_BASE_URL }}
-          POLAR_DATA_BEARER_TOKEN: ${{ secrets.POLAR_DATA_BEARER_TOKEN }}
+          POLAR_DATA_BEARER_TOKEN: ${{ steps.mode.outputs.skip_tests == 'true' && '' || secrets.POLAR_DATA_BEARER_TOKEN }}
           APP_PARAMETERS: "-Daws.region=eu-west-1"
           JAVA8_HOME: ${{env.JAVA_HOME_8_X64}}
           JAVA17_HOME: ${{env.JAVA_HOME_17_X64}}
         run: |
-            ./configuration/buildAndUpdateProduct.sh -x ${{ github.event.inputs.runner_cpus == '' && '4' || github.event.inputs.runner_cpus }} ${{ github.event.inputs.skip_tests == 'true' && '-t' || '' }} ${{ github.event.inputs.local_target_platform == 'true' && '-v' || '' }} build 2>&1
+            ./configuration/buildAndUpdateProduct.sh -x ${{ github.event.inputs.runner_cpus == '' && '4' || github.event.inputs.runner_cpus }} ${{ steps.mode.outputs.skip_tests == 'true' && '-t' || '' }} ${{ github.event.inputs.local_target_platform == 'true' && '-v' || '' }} build 2>&1
       - name: show disk stats
         if: always()
         run: df -h
       - name: Upload build log
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
             name: build.log
             path: build.log
             retention-days: 90
       - name: Collect Test Reports
-        uses: dorny/test-reporter@31a54ee7ebcacc03a09ea97a7e5465a47b84aea5 # v1.9.1
-        if: always()
+        uses: dorny/test-reporter@a6ddd83ac95ff4586f5d3aceeb314d9a1841db95 # v3.0.0
+        # Skip for compile-only runs: no tests ran, so there are no TEST-*.xml
+        # and fail-on-error would otherwise error on zero matches.
+        if: ${{ always() && steps.mode.outputs.skip_tests != 'true' }}
         with:
           name: Maven Tests
           path: '**/TEST-*.xml' 
@@ -170,7 +246,7 @@ jobs:
         run: |
           echo "SIMPLE_VERSION_INFO=$( basename dist/* )" >>${GITHUB_ENV}
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
             name: test-results
@@ -178,7 +254,7 @@ jobs:
                 **/surefire-reports/**
             retention-days: 90
       - name: Upload distribution artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/docker-24' || github.ref == 'refs/heads/docker-25' || startsWith(github.ref, 'refs/heads/releases/') }}
         with:
             name: ${{ env.SIMPLE_VERSION_INFO }}
@@ -232,7 +308,54 @@ jobs:
           echo "Identified CI job: ${JOB}"
           curl -u "${{ vars.CI_JOB_USERNAME }}:${{ secrets.CI_JOB_PASSWORD}}" ${{ vars.CI_BASE_URL }}/job/${JOB}/build?token=${{ secrets.CI_JOB_TOKEN }}
 
+  # build-gate is the REQUIRED status check in branch protection. It must go
+  # green ONLY for a genuine full build (tests actually ran) or a legitimate
+  # trivial-change skip.
+  #
+  # A SUCCESSFUL compile-only run (build succeeded AND skip_tests true — e.g. a
+  # fork pull_request, a *-reviewed-for-compile tag, or a workflow_dispatch with
+  # skip_tests=true) must NOT qualify a PR for merge, but should also NOT show as
+  # a failed/red run. So for that one case this job is SKIPPED via its if:. A
+  # required check whose job never starts is left "Expected — waiting" (pending):
+  # the PR stays un-mergeable WITHOUT a red X, and the workflow run is not marked
+  # failed. Merge qualification for fork code then comes only from a maintainer
+  # pushing a *-reviewed-for-build tag (full trusted build with tests).
+  #
+  # IMPORTANT: this must be a job-level skip (job never starts), NOT run-then-
+  # report-skipped — a job that runs and reports conclusion "skipped" counts as
+  # PASSED for branch protection and would let the PR merge. Also note the guard
+  # is deliberately narrow: it fires ONLY for a *successful* compile-only build.
+  # A compile-only build that FAILED (build.result != success) still runs the
+  # gate below and goes red, and the trivial-change skip still runs and goes
+  # green — so docs-only PRs are not left pending forever.
+  #
+  # The always() is REQUIRED: without it, a FAILED build (a job listed in needs:)
+  # would cascade-skip this gate by GitHub's default rule, leaving the required
+  # check quietly pending instead of red. always() forces the gate to run for
+  # every build outcome so the guard alone — not the needs: cascade — decides
+  # whether it runs; the sole non-run case is the narrow successful-compile-only
+  # one above. (A real build failure then runs the gate and it exits 1 → red.)
   build-gate:
+    permissions: {}
+    needs: [changes, build]
+    if: ${{ always() && !(needs.build.result == 'success' && needs.build.outputs.skip_tests == 'true') }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          if [[ "${{ needs.build.result }}" == "success" && "${{ needs.build.outputs.skip_tests }}" != "true" ]]; then
+            echo "Full build with tests passed."
+          elif [[ "${{ needs.build.result }}" == "skipped" && "${{ needs.changes.outputs.should_run }}" == "false" ]]; then
+            echo "No relevant changes — skipping is OK."
+          else
+            echo "Build failed or was cancelled."
+            exit 1
+          fi
+
+  # compile-gate is an ADVISORY (non-required) check. It reflects only whether
+  # the build job compiled successfully, regardless of whether tests ran — a full
+  # build implies compilation succeeded. It gives *-reviewed-for-compile runs a
+  # distinct green/red on the PR without touching the required build-gate check.
+  compile-gate:
     permissions: {}
     needs: [changes, build]
     if: always()
@@ -240,11 +363,11 @@ jobs:
     steps:
       - run: |
           if [[ "${{ needs.build.result }}" == "success" ]]; then
-            echo "Build passed."
+            echo "Compilation succeeded."
           elif [[ "${{ needs.build.result }}" == "skipped" && "${{ needs.changes.outputs.should_run }}" == "false" ]]; then
-            echo "No relevant changes — skipping is OK."
+            echo "No relevant changes — nothing to compile."
           else
-            echo "Build failed or was cancelled."
+            echo "Compilation failed or was cancelled."
             exit 1
           fi
 

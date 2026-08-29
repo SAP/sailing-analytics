@@ -1,3 +1,5 @@
+[![REUSE status](https://api.reuse.software/badge/github.com/SAP/sailing-analytics)](https://api.reuse.software/info/github.com/SAP/sailing-analytics)
+
 <p align="center">
   <img src="azimuth_logo.png" alt="Sailing Analytics">
 </p>
@@ -275,7 +277,7 @@ to connect to the server's OSGi console.
 
 Alternatively, use an "environment" definition that sets useful defaults, e.g., like this:
 ```
-    docker run -P -it --rm -e "SERVER_NAME=test77" -e "USE_ENVIRONMENT=live-master-server" -e "REPLICATE_MASTER_BEARER_TOKEN=BRxGpF0nr68Z4m/f13/MgiYhdRB3xoDCYd+rLc17rTs=" ghcr.io/sap/sailing-analytics:latest \
+    docker run -P -it --rm -e "SERVER_NAME=test77" -e "USE_ENVIRONMENT=live-master-server" -e "REPLICATE_MASTER_BEARER_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" ghcr.io/sap/sailing-analytics:latest \
         bash -c "rm env.sh; echo \"
 SERVER_NAME=test77
 USE_ENVIRONMENT=live-master-server
