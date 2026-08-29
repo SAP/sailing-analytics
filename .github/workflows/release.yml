@@ -308,47 +308,85 @@ jobs:
           echo "Identified CI job: ${JOB}"
           curl -u "${{ vars.CI_JOB_USERNAME }}:${{ secrets.CI_JOB_PASSWORD}}" ${{ vars.CI_BASE_URL }}/job/${JOB}/build?token=${{ secrets.CI_JOB_TOKEN }}
 
-  # build-gate is the REQUIRED status check in branch protection. It must go
-  # green ONLY for a genuine full build (tests actually ran) or a legitimate
-  # trivial-change skip.
+  # build-gate is the REQUIRED status check in the branch ruleset (context
+  # "build-gate"). It must be SATISFIED only for a genuine full build (tests
+  # actually ran and passed) or a legitimate trivial-change skip; every other
+  # case — most importantly a compile-only fork PR — must leave the PR
+  # un-mergeable WITHOUT a red X.
   #
-  # A SUCCESSFUL compile-only run (build succeeded AND skip_tests true — e.g. a
-  # fork pull_request, a *-reviewed-for-compile tag, or a workflow_dispatch with
-  # skip_tests=true) must NOT qualify a PR for merge, but should also NOT show as
-  # a failed/red run. So for that one case this job is SKIPPED via its if:. A
-  # required check whose job never starts is left "Expected — waiting" (pending):
-  # the PR stays un-mergeable WITHOUT a red X, and the workflow run is not marked
-  # failed. Merge qualification for fork code then comes only from a maintainer
-  # pushing a *-reviewed-for-build tag (full trusted build with tests).
+  # WHY THIS IS A POSTED COMMIT STATUS, NOT A JOB NAMED build-gate:
+  # GitHub Actions auto-creates a check-run for every JOB, and fills its
+  # conclusion from the job's fate — including "skipped" when the job's if: is
+  # false. A rule set / branch protection treats a "skipped" required check as
+  # SATISFIED (mergeable). So a job named build-gate can NEVER represent "absent"
+  # — a skipped job still materializes a skipped=passed check-run. That is the
+  # exact bug that let compile-only fork PRs #53/#54 merge without tests.
   #
-  # IMPORTANT: this must be a job-level skip (job never starts), NOT run-then-
-  # report-skipped — a job that runs and reports conclusion "skipped" counts as
-  # PASSED for branch protection and would let the PR merge. Also note the guard
-  # is deliberately narrow: it fires ONLY for a *successful* compile-only build.
-  # A compile-only build that FAILED (build.result != success) still runs the
-  # gate below and goes red, and the trivial-change skip still runs and goes
-  # green — so docs-only PRs are not left pending forever.
+  # A COMMIT STATUS (legacy Statuses API) is different: it exists only if we
+  # explicitly POST it. A skipped STEP posts nothing (steps are not check-runs).
+  # The ruleset matches the required context "build-gate" by NAME across both
+  # APIs, so a posted commit status with context=build-gate satisfies it exactly
+  # as the old check-run did — no ruleset change needed.
   #
-  # The always() is REQUIRED: without it, a FAILED build (a job listed in needs:)
-  # would cascade-skip this gate by GitHub's default rule, leaving the required
-  # check quietly pending instead of red. always() forces the gate to run for
-  # every build outcome so the guard alone — not the needs: cascade — decides
-  # whether it runs; the sole non-run case is the narrow successful-compile-only
-  # one above. (A real build failure then runs the gate and it exits 1 → red.)
-  build-gate:
-    permissions: {}
+  # Hence: this job is named post-build-gate-status (NOT build-gate) so its own
+  # auto check-run carries a context the ruleset ignores. Its single step POSTs a
+  # commit status context=build-gate ONLY when: the change was trivial (build
+  # skipped, no relevant changes) OR a full build ran WITH tests and succeeded
+  # -> state=success; OR a full build ran WITH tests and FAILED
+  # (build.result==failure, skip_tests==false) -> state=failure (red X, so a
+  # committer's own broken build is loud). In every OTHER case it posts NOTHING,
+  # so no build-gate context exists for the head SHA and the PR stays blocked at
+  # "Expected" with no red X. That "nothing" covers: any compile-only run,
+  # succeeded OR failed (fork PR, *-reviewed-for-compile, workflow_dispatch
+  # skip_tests) — no tests ran, so there is nothing meaningful to fail on; AND a
+  # CANCELLED trusted build — cancellation is indeterminate (tests might have
+  # passed had it finished), so "failure" would be misleading; re-run to get a
+  # real verdict. Merge qualification for fork code comes only from a maintainer
+  # pushing a *-reviewed-for-build tag (full trusted build with tests), which
+  # posts success/failure. compile-gate (advisory) still shows compile pass/fail.
+  #
+  # The status is posted against the PR HEAD sha on pull_request events
+  # (github.sha there is the ephemeral refs/pull/N/merge commit, which the
+  # ruleset does not evaluate) and github.sha otherwise. needs:[changes, build]
+  # + if: always() so the trivial-change path (build skipped) is still evaluated.
+  post-build-gate-status:
+    permissions:
+      statuses: write
     needs: [changes, build]
-    if: ${{ always() && !(needs.build.result == 'success' && needs.build.outputs.skip_tests == 'true') }}
+    if: always()
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          if [[ "${{ needs.build.result }}" == "success" && "${{ needs.build.outputs.skip_tests }}" != "true" ]]; then
-            echo "Full build with tests passed."
-          elif [[ "${{ needs.build.result }}" == "skipped" && "${{ needs.changes.outputs.should_run }}" == "false" ]]; then
-            echo "No relevant changes — skipping is OK."
+      - name: Post build-gate commit status
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUILD_RESULT: ${{ needs.build.result }}
+          SKIP_TESTS: ${{ needs.build.outputs.skip_tests }}
+          SHOULD_RUN: ${{ needs.changes.outputs.should_run }}
+          GATE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          STATE=""
+          if [[ "$BUILD_RESULT" == "success" && "$SKIP_TESTS" != "true" ]]; then
+            STATE=success; REASON="Full build with tests passed."
+          elif [[ "$BUILD_RESULT" == "skipped" && "$SHOULD_RUN" == "false" ]]; then
+            STATE=success; REASON="No relevant changes — nothing to build."
+          elif [[ "$BUILD_RESULT" == "failure" && "$SKIP_TESTS" != "true" ]]; then
+            STATE=failure; REASON="Full build with tests failed."
+          fi
+          if [[ -n "$STATE" ]]; then
+            echo "Posting build-gate=$STATE on $GATE_SHA: $REASON"
+            gh api "repos/${GITHUB_REPOSITORY}/statuses/${GATE_SHA}" \
+              -f state="$STATE" \
+              -f context=build-gate \
+              -f description="$REASON" \
+              -f target_url="$RUN_URL"
           else
-            echo "Build failed or was cancelled."
-            exit 1
+            echo "Not posting build-gate: build.result=$BUILD_RESULT skip_tests=$SKIP_TESTS should_run=$SHOULD_RUN"
+            echo "The build-gate context stays absent, so the PR remains un-mergeable"
+            echo "at 'Expected' without a red X — this covers a successful OR failed"
+            echo "compile-only run (e.g. a fork PR, where no tests ran so there is"
+            echo "nothing to fail on). A *-reviewed-for-build tag runs the full build"
+            echo "with tests and posts success (or failure) to the build-gate context."
           fi
 
   # compile-gate is an ADVISORY (non-required) check. It reflects only whether
