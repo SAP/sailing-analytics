@@ -64,7 +64,6 @@ The project welcomes contributions in the form of pull requests, for example, en
 
 The issue tracker at [https://bugzilla.sapsailing.com](https://bugzilla.sapsailing.com) is currently used for any sort of issue and enhancement request tracking. Help to migrate this smoothly to Github Issues would be much appreciated, ideally keeping issue numbers stable due to many references to those Bugzilla bug numbers, be it in the source code, the Wiki, or the build infrastructure.
 
-
 ## Code of Conduct
 
 We as members, contributors, and leaders pledge to make participation in our community a harassment-free experience for everyone. By participating in this project, you agree to abide by its [Code of Conduct](https://github.com/SAP/.github/blob/main/CODE_OF_CONDUCT.md) at all times.
@@ -271,7 +270,7 @@ to connect to the server's OSGi console.
 
 Alternatively, use an "environment" definition that sets useful defaults, e.g., like this:
 ```
-    docker run -P -it --rm -e "SERVER_NAME=test77" -e "USE_ENVIRONMENT=live-master-server" -e "REPLICATE_MASTER_BEARER_TOKEN=BRxGpF0nr68Z4m/f13/MgiYhdRB3xoDCYd+rLc17rTs=" ghcr.io/eclipse-sailing-analytics/sailing-analytics:latest \
+    docker run -P -it --rm -e "SERVER_NAME=test77" -e "USE_ENVIRONMENT=live-master-server" -e "REPLICATE_MASTER_BEARER_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" ghcr.io/eclipse-sailing-analytics/sailing-analytics:latest \
         bash -c "rm env.sh; echo \"
 SERVER_NAME=test77
 USE_ENVIRONMENT=live-master-server

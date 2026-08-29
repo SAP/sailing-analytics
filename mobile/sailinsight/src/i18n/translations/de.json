@@ -287,6 +287,7 @@
 
   "error_title": "Ein Fehler ist aufgetreten",
   "error_unknown" : "Ups, da ist was schief gegangen.\nBitte versuche es nochmal!",
+  "error_event_settings_not_saved" : "Das Event wurde angelegt, aber die Einstellungen konnten nicht gespeichert werden. Bitte erstelle es nicht noch einmal – öffne es stattdessen aus der Liste.",
   "error_with_code" : "Ups, da ist was schief gegangen.\nBitte versuche es nochmal! ({{code}})",
   "error_field_required": "Feld ist erforderlich.",
   "error_field_already_exists": "Existiert bereits.",
