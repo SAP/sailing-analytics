@@ -7,7 +7,7 @@ import com.google.gwt.i18n.client.LocalizableResource.DefaultLocale;
 /**
  * Defines the text strings for i18n that are used by the Datamining GWT bundle. 
  * 
- * @author Maximilian Gro� (D064866)
+ * @author Maximilian Groß (D064866)
  */
 @DefaultLocale("en")
 public interface StringMessages extends com.sap.sse.gwt.client.StringMessages {

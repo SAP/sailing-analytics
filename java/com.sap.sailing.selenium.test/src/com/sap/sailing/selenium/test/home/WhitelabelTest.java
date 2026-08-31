@@ -45,7 +45,7 @@ public class WhitelabelTest extends AbstractSeleniumTest {
     private static final String RACE_N_49ER = "R%d (49er)"; //$NON-NLS-1$
     private static final String MEDAL_RACE_49ER = "R12-M Medal (49er)"; //$NON-NLS-1$
     private static final String EVENT_DESC = "Kieler Woche 2015"; //$NON-NLS-1$
-    private static final String VENUE = "Kieler F�rde"; //$NON-NLS-1$
+    private static final String VENUE = "Kieler Förde"; //$NON-NLS-1$
     private static final Date EVENT_START_TIME = DatatypeConverter.parseDateTime("2015-06-20T08:00:00-00:00")
             .getTime();
     private static final Date EVENT_END_TIME = DatatypeConverter.parseDateTime("2015-06-28T20:00:00-00:00")
