@@ -81,7 +81,7 @@ public class ReachingLegTest extends TrackBasedTest {
         competitorsAndBoats.put(hunger, hunger.getBoat());
         plattner = createCompetitorWithBoat("Dr. Hasso Plattner");
         competitorsAndBoats.put(plattner, plattner.getBoat());
-        schomaeker = createCompetitorWithBoat("Meike Schom�ker");
+        schomaeker = createCompetitorWithBoat("Meike Schomäker");
         competitorsAndBoats.put(schomaeker, schomaeker.getBoat());
         start = new MillisecondsTimePoint(new GregorianCalendar(2011, 05, 23).getTime());
         setTrackedRace(createTrackedRace("Kieler Woche", "505 Race 2", "505", competitorsAndBoats, start));
