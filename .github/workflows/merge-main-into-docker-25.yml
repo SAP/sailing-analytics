@@ -17,6 +17,7 @@ jobs:
         with:
           ref: docker-25
           fetch-depth: 0  # fetch the whole thing to make sure the histories merge
+          token: ${{ secrets.REPO_TOKEN_FOR_MERGE_AND_PUSH }}  # only a dedicated token triggers follow-up workflows!
       - name: Determine merge commit
         id: merge-source
         run: |
