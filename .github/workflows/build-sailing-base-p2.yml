@@ -1,7 +1,7 @@
 name: build-sailing-base-p2
 on:
   push:
-    branches: [main, bug6269]
+    branches: [main]
     paths:
       - 'java/com.sap.sailing.targetplatform.base/**'
   workflow_dispatch: {}
