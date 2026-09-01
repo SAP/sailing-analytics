@@ -67,10 +67,17 @@ jobs:
       pull-requests: read
     runs-on: ubuntu-latest
     outputs:
-      should_run: ${{ steps.filter.outputs.code }}
+      # On workflow_dispatch there is no 'before' field in the event payload, so
+      # paths-filter cannot compute a meaningful diff (it would warn and fall back
+      # to the last commit only). A manual dispatch is an explicit request to build,
+      # so we skip the filter step entirely and force should_run=true. On push/PR the
+      # filter runs and its 'code' output decides. (The build job also short-circuits
+      # its own if-condition on workflow_dispatch, so this keeps both in agreement.)
+      should_run: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.filter.outputs.code }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - id: filter
+        if: github.event_name != 'workflow_dispatch'
         uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         with:
           # Under the default 'some' quantifier a negated rule still counts as a
@@ -149,12 +156,14 @@ jobs:
           sudo mkdir /mnt/tmp
           sudo chmod 777 /mnt/tmp
       - name: Collect Workflow Telemetry
-        uses: catchpoint/workflow-telemetry-action@94c3c3d9567a0205de6da68a76c428ce4e769af1 # v2.0.0
+        uses: ycfreeman/workflow-telemetry-action@72ec425db8a31670fdc4419966940a6d980a0b49 # v3.0.2
         with:
           comment_on_pr: false
+          proc_trace_min_duration: 5000        # only chart processes running >= 5s
+          proc_trace_chart_max_count: 40       # cap Gantt bars to keep mermaid source under 50k
       - name: Setup firefox
         id: setup-firefox
-        uses: browser-actions/setup-firefox@5914774dda97099441f02628f8d46411fcfbd208 # v1.7.0
+        uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795 # v1.7.2
         with:
           firefox-version: ${{  github.event.inputs.firefox_version == '' && '140.0' || github.event.inputs.firefox_version }}
       - run: |
@@ -183,7 +192,7 @@ jobs:
           java-version: '25'
           mvn-toolchain-id: 'JavaSE-25'
       - name: Setup Android SDK
-        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3.2.2
+        uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
         with:
           log-accepted-android-sdk-licenses: 'false'
           cmdline-tools-version: 9123335  # This corresponds to human-friendly version number 8.0
@@ -263,35 +272,18 @@ jobs:
       - name: Create Release
         id: create_release
         if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/docker-24' || github.ref == 'refs/heads/docker-25' || startsWith(github.ref, 'refs/heads/releases/') }}
-        uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2.2.1
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           tag_name: ${{ env.SIMPLE_VERSION_INFO }}
           target_commitish: ${{ github.ref_name }}
           name: ${{ env.SIMPLE_VERSION_INFO }}
           draft: false
           prerelease: false
-      - name: Upload Release Asset tar.gz
-        id: upload-release-asset-tar-gz
-        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/docker-24' || github.ref == 'refs/heads/docker-25' || startsWith(github.ref, 'refs/heads/releases/') }}
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./dist/${{ env.SIMPLE_VERSION_INFO }}/${{ env.SIMPLE_VERSION_INFO }}.tar.gz
-          asset_name: ${{ env.SIMPLE_VERSION_INFO }}.tar.gz
-          asset_content_type: application/x-tar
-      - name: Upload Release Asset release_notes.txt
-        id: upload-release-asset-release-notes-txt
-        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/docker-24' || github.ref == 'refs/heads/docker-25' || startsWith(github.ref, 'refs/heads/releases/') }}
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./dist/${{ env.SIMPLE_VERSION_INFO }}/release-notes.txt
-          asset_name: release-notes.txt
-          asset_content_type: text/plain
+          # Upload the release assets in this same step (newline-separated globs).
+          # action-gh-release infers the content type from each file's extension.
+          files: |
+            ./dist/${{ env.SIMPLE_VERSION_INFO }}/${{ env.SIMPLE_VERSION_INFO }}.tar.gz
+            ./dist/${{ env.SIMPLE_VERSION_INFO }}/release-notes.txt
       - name: Trigger CI job
         env:
           CI_JOB_USERNAME: ${{ vars.CI_JOB_USERNAME }}
