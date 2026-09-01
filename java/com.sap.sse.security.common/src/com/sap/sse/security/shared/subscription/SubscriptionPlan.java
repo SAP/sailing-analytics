@@ -2,7 +2,6 @@ package com.sap.sse.security.shared.subscription;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,17 +37,20 @@ public abstract class SubscriptionPlan implements Serializable {
      * BASIC is a dummy category used to define the features in the feature list.
      */
     public enum PlanCategory {
+        NOT_LOGGED_IN("not_logged_in",
+                "features_limited_live_analytics"),
         BASIC("free_subscription_plan",
+                "features_notifications",
                 "features_organize_events",
                 "features_events_with_more_regatta",
                 "features_connect_to_tractrac",
                 "features_imports",
                 "features_media_management",
                 "features_limited_live_analytics",
-                "features_media_tags", 
                 "features_media_tags",
                 "features_scoring"),
-        PREMIUM("premium", 
+        PREMIUM("premium",
+                "features_notifications",
                 "features_organize_events",
                 "features_events_with_more_regatta",
                 "features_connect_to_tractrac",
@@ -64,6 +66,7 @@ public abstract class SubscriptionPlan implements Serializable {
                 "features_simulator",
                 "features_map_analytics"),
         DATA_MINING_ARCHIVE("data_mining_archive",
+                "features_notifications",
                 "features_organize_events",
                 "features_events_with_more_regatta",
                 "features_connect_to_tractrac",
@@ -80,6 +83,7 @@ public abstract class SubscriptionPlan implements Serializable {
                 "features_map_analytics",
                 "features_data_mining"),
         DATA_MINING_ALL("data_mining_all",
+                "features_notifications",
                 "features_organize_events",
                 "features_events_with_more_regatta",
                 "features_connect_to_tractrac",
@@ -104,7 +108,7 @@ public abstract class SubscriptionPlan implements Serializable {
         
         PlanCategory(String id, String...featureIds) {
             this.id = id;
-            this.featureIds = new HashSet<>(Arrays.asList(featureIds));
+            this.featureIds = new LinkedHashSet<>(Arrays.asList(featureIds));
         }
         
         public String getId() {
