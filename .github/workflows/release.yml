@@ -146,7 +146,7 @@ jobs:
           sudo mkdir /mnt/tmp
           sudo chmod 777 /mnt/tmp
       - name: Collect Workflow Telemetry
-        uses: catchpoint/workflow-telemetry-action@94c3c3d9567a0205de6da68a76c428ce4e769af1 # v2.0.0
+        uses: ycfreeman/workflow-telemetry-action@72ec425db8a31670fdc4419966940a6d980a0b49 # v3.0.2
         with:
           comment_on_pr: false
       - name: Setup firefox
