@@ -156,6 +156,8 @@ jobs:
         uses: ycfreeman/workflow-telemetry-action@72ec425db8a31670fdc4419966940a6d980a0b49 # v3.0.2
         with:
           comment_on_pr: false
+          proc_trace_min_duration: 5000        # only chart processes running >= 5s
+          proc_trace_chart_max_count: 40       # cap Gantt bars to keep mermaid source under 50k
       - name: Setup firefox
         id: setup-firefox
         uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795 # v1.7.2
