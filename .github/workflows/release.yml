@@ -151,7 +151,7 @@ jobs:
           comment_on_pr: false
       - name: Setup firefox
         id: setup-firefox
-        uses: browser-actions/setup-firefox@5914774dda97099441f02628f8d46411fcfbd208 # v1.7.0
+        uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795 # v1.7.2
         with:
           firefox-version: ${{  github.event.inputs.firefox_version == '' && '140.0' || github.event.inputs.firefox_version }}
       - run: |
@@ -180,7 +180,7 @@ jobs:
           java-version: '25'
           mvn-toolchain-id: 'JavaSE-25'
       - name: Setup Android SDK
-        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3.2.2
+        uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
         with:
           log-accepted-android-sdk-licenses: 'false'
           cmdline-tools-version: 9123335  # This corresponds to human-friendly version number 8.0
