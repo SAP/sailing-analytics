@@ -479,7 +479,7 @@ public class MarkPassingCalculator {
                         newCompetitorFixes.get(competitorAndFixesFinderConsidersAffected.getKey()),
                         competitorFixesThatReplacedExistingOnes
                                 .get(competitorAndFixesFinderConsidersAffected.getKey()));
-                tasks.add((race.getTrackedRegatta().cpuMeterCallable(new Callable<Void>() {
+                tasks.add(race.getTrackedRegatta().cpuMeterCallable(new Callable<Void>() {
                     @Override
                     public Void call() throws Exception {
                         runnable.run();
@@ -496,7 +496,7 @@ public class MarkPassingCalculator {
                                 + competitorAndFixesFinderConsidersAffected.getKey() + " with "
                                 + competitorAndFixesFinderConsidersAffected.getValue().size() + " fixes";
                     }
-                }, CPUMeteringType.MARK_PASSINGS.name())));
+                }, CPUMeteringType.MARK_PASSINGS.name()));
             }
             ThreadPoolUtil.INSTANCE.invokeAllAndLogExceptions(executor, Level.INFO,
                     "Error during mark passing calculation: %s", tasks);
