@@ -15,6 +15,8 @@ Require-Bundle: com.sap.sailing.domain.common,
  redisson;bundle-version="3.27.1",
  com.amazonaws.aws-lambda-java-core;bundle-version="1.2.1"
 Bundle-ActivationPolicy: lazy
-Import-Package: javax.servlet;version="3.1.0"
+Import-Package: com.sap.sse.common,
+ com.sap.sse.common.impl,
+ javax.servlet;version="3.1.0"
 Bundle-ClassPath: target/classes/
 Automatic-Module-Name: com.sap.sailing.ingestion
