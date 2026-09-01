@@ -37,4 +37,5 @@ public interface Candidate extends Comparable<CandidateImpl>, Timed {
 
     int compareTo(Candidate other);
     
+    long getTimePointAsMillis();
 }

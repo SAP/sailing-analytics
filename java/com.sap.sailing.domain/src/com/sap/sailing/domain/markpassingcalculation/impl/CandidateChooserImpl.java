@@ -39,7 +39,6 @@ import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.Speed;
 import com.sap.sse.common.TimePoint;
-import com.sap.sse.common.Timed;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.impl.KnotSpeedImpl;
@@ -231,8 +230,6 @@ public class CandidateChooserImpl implements CandidateChooser {
      *
      */
     private class StartAndEndAwareTimeBasedCandidateComparator implements Comparator<Candidate> {
-        private final Comparator<Timed> timedComparator = TimedComparator.INSTANCE;
-        
         @Override
         public int compare(Candidate o1, Candidate o2) {
             int result;
@@ -243,7 +240,7 @@ public class CandidateChooserImpl implements CandidateChooser {
             } else if (o1 == end || o2 == start) {
                 result = 1;
             } else {
-                result = timedComparator.compare(o1, o2);
+                result = (int) (o1.getTimePointAsMillis() - o2.getTimePointAsMillis());
                 if (result == 0) {
                     result = Integer.compare(o1.getOneBasedIndexOfWaypoint(), o2.getOneBasedIndexOfWaypoint());
                     if (result == 0) {
