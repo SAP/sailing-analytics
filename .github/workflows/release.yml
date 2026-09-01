@@ -64,10 +64,17 @@ jobs:
     permissions: {}
     runs-on: ubuntu-latest
     outputs:
-      should_run: ${{ steps.filter.outputs.code }}
+      # On workflow_dispatch there is no 'before' field in the event payload, so
+      # paths-filter cannot compute a meaningful diff (it would warn and fall back
+      # to the last commit only). A manual dispatch is an explicit request to build,
+      # so we skip the filter step entirely and force should_run=true. On push/PR the
+      # filter runs and its 'code' output decides. (The build job also short-circuits
+      # its own if-condition on workflow_dispatch, so this keeps both in agreement.)
+      should_run: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.filter.outputs.code }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - id: filter
+        if: github.event_name != 'workflow_dispatch'
         uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         with:
           # Under the default 'some' quantifier a negated rule still counts as a
