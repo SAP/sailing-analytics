@@ -283,9 +283,9 @@ public class WindTest {
         /*
            Imagine the following wind measurements:
            
-        2009-07-11T13:45:00.000+0200@null: 10.0kn from 278.0� avg(30000ms): 2009-07-11T13:45:00.000+0200@null: 10.0kn from 278.0°
-        2009-07-11T13:45:05.000+0200@null: 10.0kn from 265.0� avg(30000ms): 2009-07-11T13:45:05.000+0200@null: 10.0kn from 265.0°
-        2009-07-12T17:31:40.000+0200@null: 10.0kn from 260.0� avg(30000ms): 2009-07-12T17:31:40.000+0200@null: 10.0kn from 260.0°
+        2009-07-11T13:45:00.000+0200@null: 10.0kn from 278.0° avg(30000ms): 2009-07-11T13:45:00.000+0200@null: 10.0kn from 278.0°
+        2009-07-11T13:45:05.000+0200@null: 10.0kn from 265.0° avg(30000ms): 2009-07-11T13:45:05.000+0200@null: 10.0kn from 265.0°
+        2009-07-12T17:31:40.000+0200@null: 10.0kn from 260.0° avg(30000ms): 2009-07-12T17:31:40.000+0200@null: 10.0kn from 260.0°
         
            Now assume a query for 2009-07-12T17:31:38 which is closest to the newest entry but (much) more than
            the averaging interval after the previous entry (2009-07-11T13:45:05.000). This test ensures that
