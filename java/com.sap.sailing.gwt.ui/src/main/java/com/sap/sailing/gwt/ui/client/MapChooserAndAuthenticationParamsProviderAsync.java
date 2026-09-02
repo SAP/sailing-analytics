@@ -2,6 +2,7 @@ package com.sap.sailing.gwt.ui.client;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.sap.sailing.gwt.ui.shared.racemap.MapProviderTypes;
+import com.sap.sailing.gwt.ui.shared.racemap.MapTileAccessTokenDTO;
 
 /**
  * Shared async GWT-RPC super-interface for services that can supply the authentication parameters needed to load a
@@ -25,4 +26,10 @@ public interface MapChooserAndAuthenticationParamsProviderAsync {
      * {@link MapProviderTypes#MAPLIBRE} provider is selected.
      */
     void getMapTileServerStyleUrl(AsyncCallback<String> callback);
+
+    /**
+     * Asynchronously mints (or returns a cached, bucket-shared) short-lived tile-server access token; see
+     * {@link MapChooserAndAuthenticationParamsProvider#getMapTileAccessToken()}.
+     */
+    void getMapTileAccessToken(AsyncCallback<MapTileAccessTokenDTO> callback);
 }

@@ -148,4 +148,16 @@ if [ -n "${MAP_PROVIDER_TILESERVER}" ]; then
   # defaults to https://tiles.openfreemap.org/styles/liberty
   ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -Dmap.provider.tileserver=${MAP_PROVIDER_TILESERVER}"
 fi
+if [ -n "${MAP_PROVIDER_TILESERVER_AUTH_SECRETS}" ]; then
+  # comma-separated kid:secret list (e.g. k1:secretA,k2:secretB) matching the tile server's NGINX secure_link secrets
+  ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -Dmap.provider.tileserver.auth.secrets=${MAP_PROVIDER_TILESERVER_AUTH_SECRETS}"
+fi
+if [ -n "${MAP_PROVIDER_TILESERVER_AUTH_KID}" ]; then
+  # id of the secret (a key from MAP_PROVIDER_TILESERVER_AUTH_SECRETS) that new tile tokens are currently signed with
+  ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -Dmap.provider.tileserver.auth.kid=${MAP_PROVIDER_TILESERVER_AUTH_KID}"
+fi
+if [ -n "${MAP_PROVIDER_TILESERVER_AUTH_TTL}" ]; then
+  # tile-token TTL / bucket length in seconds; the client refreshes at half of it; defaults to 120
+  ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -Dmap.provider.tileserver.auth.ttl=${MAP_PROVIDER_TILESERVER_AUTH_TTL}"
+fi
 export GITHUB_TOKEN

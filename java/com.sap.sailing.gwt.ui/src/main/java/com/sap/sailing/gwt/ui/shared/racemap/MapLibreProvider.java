@@ -77,7 +77,7 @@ public class MapLibreProvider implements MapProvider {
                 logger.log(Level.WARNING, "Could not retrieve the configured MapLibre tile-server style URL from the "
                         + "server; falling back to the client-side default style. The map will load, but the "
                         + "'map.provider.tileserver' configuration will not take effect for this page load.", caught);
-                injectMapLibre();
+                startTokenRefreshThenInject();
             }
 
             @Override
@@ -85,9 +85,18 @@ public class MapLibreProvider implements MapProvider {
                 if (styleUrl != null && !styleUrl.isEmpty()) {
                     setTileServerStyleUrl(styleUrl);
                 }
-                injectMapLibre();
+                startTokenRefreshThenInject();
             }
         });
+    }
+
+    /**
+     * Starts the {@link MapTileTokenRefresher} (which mints and publishes the first tile-server access token) and only
+     * once that first mint attempt has completed injects MapLibre, so the very first tile requests already carry a token
+     * and do not race into a {@code 401}. The refresher then keeps the token fresh for the lifetime of the page.
+     */
+    private void startTokenRefreshThenInject() {
+        MapTileTokenRefresher.get().start(authProvider, /* onFirstAttempt */ () -> injectMapLibre());
     }
 
     /**

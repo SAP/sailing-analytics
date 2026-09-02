@@ -28,6 +28,50 @@ export function createRaceStyle() {
     return (typeof window !== 'undefined' && window.__sapMapTileServerStyleUrl) || DEFAULT_RACE_VECTOR_STYLE_URL;
 }
 
+// Returns true iff `url` is same-origin as the configured tile-server style URL, so we only ever attach the tile-server
+// access-token headers to requests actually going to the (self-hosted) tile server - never to third parties such as the
+// Esri satellite tiles or the OpenSeaMap overlay. Anything unparseable is treated as not same-origin (fail closed).
+function sameOrigin(url, styleUrl) {
+    try {
+        const base = (typeof window !== 'undefined' && window.location) ? window.location.href : undefined;
+        return new URL(url, base).origin === new URL(styleUrl, base).origin;
+    } catch (e) {
+        return false;
+    }
+}
+
+// MapLibre `transformRequest` hook: attaches the short-lived tile-server access token as the X-OFM-Md5 / X-OFM-Expires /
+// X-OFM-Kid request headers, but only for requests going to the configured tile server and only while a token is
+// published (window.__sapMapTileTokenMd5, kept fresh by MapTileTokenRefresher). Keeping the token in headers rather than
+// the URL preserves tile URL cacheability. When authentication is disabled or no token is available yet, the request is
+// passed through unchanged.
+export function mapTileServerTransformRequest(url, resourceType) {
+    const md5 = typeof window !== 'undefined' ? window.__sapMapTileTokenMd5 : null;
+    const styleUrl = (typeof window !== 'undefined' && window.__sapMapTileServerStyleUrl) || '';
+    if (!md5 || !styleUrl || !sameOrigin(url, styleUrl)) {
+        return { url };
+    }
+    return {
+        url,
+        headers: {
+            'X-OFM-Md5': md5,
+            'X-OFM-Expires': String(window.__sapMapTileTokenExpires),
+            'X-OFM-Kid': window.__sapMapTileTokenKid || ''
+        }
+    };
+}
+
+// MapLibre `error` handler: when a tile-server request is rejected because the token is missing/expired (HTTP 401/403),
+// force an out-of-schedule token refresh via the global installed by MapTileTokenRefresher so access recovers without
+// waiting for the next scheduled refresh. Other errors are ignored here (MapLibre still logs them to the console).
+function onMapTileServerError(event) {
+    const status = event && event.error && event.error.status;
+    if ((status === 401 || status === 403) && typeof window !== 'undefined'
+            && typeof window.__sapMapTileTokenRefresh === 'function') {
+        window.__sapMapTileTokenRefresh();
+    }
+}
+
 export function applyRaceStyle(map, seaMarksVisible = false) {
     const apply = () => {
         for (const layer of map.getStyle().layers || []) {
@@ -117,8 +161,10 @@ export function createRaceMap(containerId, options = {}) {
         zoom: toMapLibreZoom(options.zoom ?? 15),
         bearing: options.bearing ?? 0,
         pitch: 0,
-        attributionControl: false
+        attributionControl: false,
+        transformRequest: mapTileServerTransformRequest
     });
+    map.on('error', onMapTileServerError);
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: false }), 'top-right');
     addCollapsedAttributionControl(map, 'bottom-right');
     applyRaceStyle(map, options.seaMarksVisible);
