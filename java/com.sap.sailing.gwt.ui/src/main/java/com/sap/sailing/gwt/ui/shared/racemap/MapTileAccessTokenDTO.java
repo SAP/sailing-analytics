@@ -2,6 +2,7 @@ package com.sap.sailing.gwt.ui.shared.racemap;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.sap.sse.common.CacheableRPCResult;
+import com.sap.sse.common.Util;
 
 /**
  * Short-lived, bucket-shared access token that the browser attaches (as {@code X-OFM-Md5} / {@code X-OFM-Expires} /
@@ -79,6 +80,6 @@ public class MapTileAccessTokenDTO implements IsSerializable, CacheableRPCResult
      * client should attach the token headers to tile-server requests.
      */
     public boolean isAuthenticationEnabled() {
-        return md5 != null && !md5.isEmpty();
+        return Util.hasLength(md5);
     }
 }
