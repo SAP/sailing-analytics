@@ -8,6 +8,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -78,8 +80,8 @@ public class GithubReleasesRepository extends AbstractReleaseRepository implemen
      * types are commonly seen in the wild for a gzip-compressed tar. We accept all of them so the archive asset is found
      * regardless of which producer variant published the release.
      */
-    private final static Set<String> ARCHIVE_ASSET_CONTENT_TYPES = Set.of("application/x-tar", "application/gzip",
-            "application/x-gzip", "application/x-compressed-tar");
+    private final static Set<String> ARCHIVE_ASSET_CONTENT_TYPES = new HashSet<>(Arrays.asList("application/x-tar", "application/gzip",
+            "application/x-gzip", "application/x-compressed-tar"));
     private final String owner;
     private final String repositoryName;
     
