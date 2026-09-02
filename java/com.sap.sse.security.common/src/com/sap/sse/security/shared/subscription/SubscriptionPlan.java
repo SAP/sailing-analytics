@@ -108,6 +108,10 @@ public abstract class SubscriptionPlan implements Serializable {
         
         PlanCategory(String id, String...featureIds) {
             this.id = id;
+            // Use LinkedHashSet to preserve the declaration order of the feature ids. This order is relied upon
+            // when rendering the feature list in the UI. A plain HashSet happened to yield the same order due to
+            // how GWT translates it to JavaScript, but that was coincidental; LinkedHashSet makes it explicit and
+            // robust against changes in GWT's HashSet implementation.
             this.featureIds = new LinkedHashSet<>(Arrays.asList(featureIds));
         }
         
