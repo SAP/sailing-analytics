@@ -37,7 +37,7 @@ First of all, make sure you've looked at [http://www.amazon.de/Patterns-Elements
    - Request a [Hudson](https://hudson.sapsailing.com) user by sending e-mail to Axel Uhl or Simon Marcel Pamies.
 
 ### Installations
-1. Eclipse IDE for Eclipse Committers, version ["2026-03"](https://www.eclipse.org/downloads/packages/release/2026-03/r/eclipse-ide-eclipse-committers). If you are using a Mac and want to use SAPJVM, this has to be the 64 bit version. This is because SAPJVM is not available for Apple Silicon Macs, and Eclipse's OS architecture must match the JVM architecture. Mac users can install SDKMAN! to manage and install different JDKs. For example Amazon Corretto 8: `sdk install java 8.0.472-amzn`.
+1. Eclipse IDE for Eclipse Committers, version ["2026-06"](https://www.eclipse.org/downloads/packages/release/2026-06/r/eclipse-ide-eclipse-committers). If you are using a Mac and want to use SAPJVM, this has to be the 64 bit version. This is because SAPJVM is not available for Apple Silicon Macs, and Eclipse's OS architecture must match the JVM architecture. Mac users can install SDKMAN! to manage and install different JDKs. For example Amazon Corretto 8: `sdk install java 8.0.472-amzn`.
 2. JDK 1.8 (Java SE 8), ideal is the SAPJVM 1.8: Go to [https://tools.eu1.hana.ondemand.com/#cloud](https://tools.eu1.hana.ondemand.com/#cloud), scroll down to `SAP JVM` select your operating System, extract the downloaded .zip into desired location (e.g. Windows `C:\Program Files\Java`. If you want to make this your default JDK, set the `JAVA_HOME` variable to it. In any case, set the `JAVA8_HOME` variable to it which is required by a few build scripts where certain steps currently are not yet compatible with newer JDK releases. For Gradle builds (currently using Gradle 7.6), such as our Android build process, also install Java 17 and set the `JAVA17_HOME` variable to it.
 3. Git (e.g. Git for Windows v2.18), [http://git-scm.com](http://git-scm.com) / [https://git-for-windows.github.io](https://git-for-windows.github.io) still
 4. Configure git (see [Git repository configuration essentials](#git-repository-configuration-essentials))
@@ -83,10 +83,12 @@ Depending on the location of your local repository, it's filepaths might be too 
 Copy the settings.xml (may be in $GIT_HOME/configuration/maven-settings.xml and $GIT_HOME/configuration/maven-settings-proxy.xml) **and** the toolchains.xml from the top-level git folder to your ~/.m2 directory. Adjust the proxy settings in settings.xml accordingly (suggested settings for inside a corporate network requiring a HTTP proxy for access to external web). Set the paths inside of toolchains.xml to your JDKs depending on where you installed them (this is like setting the compiler for your IDE, but for Maven; This makes it possible to build with the same Maven configuration on every system). Make sure the mvn executable you installed above is in your path. 
 
 ### Automatic Eclipse plugin installation
-The necessary Eclipse plugins can be automatically installed into a newly unzipped version of ["2025-12"](https://www.eclipse.org/downloads/packages/release/2025-12/r/eclipse-ide-eclipse-committers) by using the `./configuration/pluginsForEclipse2026-03.p2f` file, found in the git repository cloned in _step 11_. To install the plugins open Eclipse and install Software Items from File. (File ⇒ Import ⇒ Install ⇒ Install Software from File). The description file is located at `/configuration/pluginsForEclipse2026-03.p2f`. 
+The necessary Eclipse plugins can be automatically installed into a newly unzipped version of ["2026-06"](https://www.eclipse.org/downloads/packages/release/2026-06/r/eclipse-ide-eclipse-committers) by using the `pluginsForEclipse2026-06.p2f` file, found in the git repository cloned in _step 11_. To install the plugins open Eclipse and install Software Items from File. (File ⇒ Import ⇒ Install ⇒ Install Software from File). The description file is located at `/configuration/pluginsForEclipse2026-06.p2f`. 
 Make sure to select all Plugins (it might not be possible to select Lucene ignore that) and click next. In the pop-up dialog shown next, select the top radio button ("Update my installation to be compatible with the items being installed"). Skip the `Installation details`, accept the licence agreements and click finish. While Eclipse is installing the plugins a pop-up will appear in the background where you need to trust all plugins. Be aware that the installation may take several minutes depending on your Internet connection. 
 
 Be also aware that with this p2f-file it's not possible to update the plugins to newer versions. 
+
+To use the AssistAI Plugin the MCP Server configuration needs to be add to your coding assistant (e.g Claude Code in ~/.claude.json). For configuration look into ([https://github.com/gradusnikov/eclipse-chatgpt-plugin]).
 
 The p2f-file includes the following plugins for your convenience:
 
@@ -96,13 +98,23 @@ The p2f-file includes the following plugins for your convenience:
 - Memory Analyzer ([https://www.eclipse.org/mat/](https://www.eclipse.org/mat/))
 - SAP JVM Profiler ([https://tools.hana.ondemand.com](https://tools.hana.ondemand.com))
 - UMLet ([https://www.umlet.com/](https://www.umlet.com/))
+- AssistAI ([https://marketplace.eclipse.org/content/assistai-eclipse-ide-mcp-server-ai-agents])
 - various updates to preinstalled plugins
 
 ### Tuning the Eclipse Installation
 
-Out of the box, multiple settings in Eclipse need to be changed. You can either import the configurations from the ``configuration/eclipse-preferences.epf`` file or follow the given instructions;
+Out of the box, multiple settings in Eclipse need to be changed. You can either import the configurations and change only user-specific settings (A) or follow all given instructions (B);
 
-Go to Window ⇒ Preferences and change the following two settings:
+A. Go to File ⇒ Import ⇒ General ⇒ Preferences and use ``configuration/eclipse-preferences.epf`` file. Then Go to Window ⇒ Preferences and change the following settings:
+
+- In "GWT ⇒ GWT Settings ⇒ Add..." add the GWT SDK you downloaded and unpacked earlier
+- In "Java ⇒ Build Path ⇒ Classpath Variables" create a new classpath variable called `ANDROID_HOME`. Set its value to the installation location of your Android SDK, e.g., `C:\Users\'user'\AppData\Local\Android\Sdk` or `/usr/local/android-sdk-linux`.
+- In "Java ⇒ Code Style ⇒ Formatter" import the CodeFormatter.xml from $GIT_HOME/java (where$GIT_HOME is the directory cloned in _step 11_).
+- In "Java ⇒ Compiler" set the Compiler compliance level to 1.8
+- In "Java ⇒ Installed JREs" add the Java 8 sdk and activate it. 
+- In "Java ⇒ Installed JREs ⇒ Execution Environments" make sure that the Java 8 JRE is selected for JavaSE-1.8 (if the jre is not listed open and close the preference Window once) 
+
+B. Go to Window ⇒ Preferences and change the following settings:
 
 - In "General ⇒ Content Types" select on CSS (Text ⇒ CSS) and add \*.gss in the lower file association list to get limited syntax highlighting and content assist in GSS files
 - In "General ⇒ Editors ⇒ Text Editors" check Insert Spaces for Tabs
