@@ -47,6 +47,7 @@ public interface SubscriptionStringConstants extends ConstantsWithLookup {
     String not_logged_in_name();
     String features_notifications_title();
     String features_notifications_description();
+    String features_notifications_url();
     String features_map_analytics_title();
     String features_map_analytics_description();
     String features_simulator_title();
