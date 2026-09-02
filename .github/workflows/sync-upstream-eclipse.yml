@@ -7,8 +7,8 @@
 # rule on main is satisfied by a maintainer's own approval.
 name: Merge upstream eclipse-sailing-analytics/sailing-analytics main into eclipse-main
 on:
-  schedule:
-    - cron: "37 5 * * *"   # daily at 05:37 UTC
+  #schedule:
+  #  - cron: "37 5 * * *"   # daily at 05:37 UTC
   workflow_dispatch: {}
 jobs:
   merge-upstream-main:
