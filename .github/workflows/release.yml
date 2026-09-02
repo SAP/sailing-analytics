@@ -158,7 +158,7 @@ jobs:
           comment_on_pr: false
           proc_trace_min_duration: 5000        # only chart processes running >= 5s
           proc_trace_chart_max_count: 40       # cap Gantt bars to keep mermaid source under 50k
-          metric_frequency: 15                 # coarser sampling so CPU/memory xychart source stays under mermaid's 50k maxTextSize
+          metric_frequency: 30                 # ~3h+ builds: coarser sampling so the per-sample CPU/memory xychart source stays well under mermaid's 50k maxTextSize (~390 points/3h15m)
       - name: Setup firefox
         id: setup-firefox
         uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795 # v1.7.2
