@@ -88,7 +88,7 @@ Make sure to select all Plugins (it might not be possible to select Lucene ignor
 
 Be also aware that with this p2f-file it's not possible to update the plugins to newer versions. 
 
-To use the AssistAI Plugin the MCP Server configuration need to be add to your coding assistant (e.g Claude Code in ~/.claude.json). For configuration look into ([https://github.com/gradusnikov/eclipse-chatgpt-plugin]).
+To use the AssistAI Plugin the MCP Server configuration needs to be add to your coding assistant (e.g Claude Code in ~/.claude.json). For configuration look into ([https://github.com/gradusnikov/eclipse-chatgpt-plugin]).
 
 The p2f-file includes the following plugins for your convenience:
 
