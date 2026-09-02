@@ -149,7 +149,8 @@ if [ -n "${MAP_PROVIDER_TILESERVER}" ]; then
   ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -Dmap.provider.tileserver=${MAP_PROVIDER_TILESERVER}"
 fi
 if [ -n "${MAP_PROVIDER_TILESERVER_AUTH_SECRETS}" ]; then
-  # comma-separated kid:secret list (e.g. k1:secretA,k2:secretB) matching the tile server's NGINX secure_link secrets
+  # comma-separated kid:secret list (e.g. k1:AbC-123_xyz,k2:Def-456_uvw) matching the tile server's NGINX secure_link
+  # secrets (its TILE_AUTH_SECRETS). kids and secrets must match [A-Za-z0-9_-] (no commas, colons, spaces or quotes).
   ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -Dmap.provider.tileserver.auth.secrets=${MAP_PROVIDER_TILESERVER_AUTH_SECRETS}"
 fi
 if [ -n "${MAP_PROVIDER_TILESERVER_AUTH_KID}" ]; then
