@@ -99,7 +99,7 @@ public class Activator implements BundleActivator {
      * {@code start} with one configured from the tile-server auth properties.
      */
     private AccessTokenMinter mapTileAccessTokenMinter = new AccessTokenMinter(/* secretsConfig */ null,
-            /* kidConfig */ null, /* ttlConfig */ null);
+            /* kidConfig */ null, /* ttlConfigInSeconds */ null);
 
     public Activator() {
         INSTANCE = this;

@@ -85,15 +85,15 @@ public class AccessTokenMinter {
      * @param kidConfig
      *            the id of the secret to sign new tokens with (a key from {@code secretsConfig}), or {@code null}/blank
      *            to disable authentication.
-     * @param ttlConfig
+     * @param ttlConfigInSeconds
      *            the token TTL / bucket length in seconds as a decimal string, or {@code null}/blank to use
      *            {@link #DEFAULT_TTL_SECONDS}.
      */
-    public AccessTokenMinter(final String secretsConfig, final String kidConfig, final String ttlConfig) {
+    public AccessTokenMinter(final String secretsConfig, final String kidConfig, final String ttlConfigInSeconds) {
         secretsByKid = parseSecrets(secretsConfig);
         currentKid = Optional.ofNullable(kidConfig).map(String::trim).filter(kid -> !kid.isEmpty())
                 .orElse(/* other */ null);
-        ttlSeconds = Optional.ofNullable(ttlConfig).map(String::trim).filter(ttl -> !ttl.isEmpty())
+        ttlSeconds = Optional.ofNullable(ttlConfigInSeconds).map(String::trim).filter(ttl -> !ttl.isEmpty())
                 .map(Long::parseLong).orElse(DEFAULT_TTL_SECONDS);
         disabledToken = new AccessTokenDTO(/* md5 */ null, /* expiresEpochSecond */ 0L, /* kid */ null,
                 (ttlSeconds * 1000L) / 2L);

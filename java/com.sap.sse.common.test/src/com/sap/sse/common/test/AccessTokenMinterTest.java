@@ -2,6 +2,8 @@ package com.sap.sse.common.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -55,7 +57,7 @@ public class AccessTokenMinterTest {
     @Test
     public void disabledWhenSecretsConfigNull() {
         final AccessTokenMinter minter = new AccessTokenMinter(/* secretsConfig */ null, /* kidConfig */ "k1",
-                /* ttlConfig */ null);
+                /* ttlConfigInSeconds */ null);
         final AccessTokenDTO token = minter.getAccessToken();
         assertFalse(token.isAuthenticationEnabled());
         assertNull(token.getMd5());
@@ -65,28 +67,28 @@ public class AccessTokenMinterTest {
     @Test
     public void disabledWhenSecretsConfigBlank() {
         final AccessTokenMinter minter = new AccessTokenMinter(/* secretsConfig */ "   ", /* kidConfig */ "k1",
-                /* ttlConfig */ null);
+                /* ttlConfigInSeconds */ null);
         assertFalse(minter.getAccessToken().isAuthenticationEnabled());
     }
 
     @Test
     public void disabledWhenKidConfigNull() {
         final AccessTokenMinter minter = new AccessTokenMinter(/* secretsConfig */ "k1:good_secret",
-                /* kidConfig */ null, /* ttlConfig */ null);
+                /* kidConfig */ null, /* ttlConfigInSeconds */ null);
         assertFalse(minter.getAccessToken().isAuthenticationEnabled());
     }
 
     @Test
     public void disabledWhenKidConfigBlank() {
         final AccessTokenMinter minter = new AccessTokenMinter(/* secretsConfig */ "k1:good_secret",
-                /* kidConfig */ "  ", /* ttlConfig */ null);
+                /* kidConfig */ "  ", /* ttlConfigInSeconds */ null);
         assertFalse(minter.getAccessToken().isAuthenticationEnabled());
     }
 
     @Test
     public void disabledWhenCurrentKidNotAmongSecrets() {
         final AccessTokenMinter minter = new AccessTokenMinter(/* secretsConfig */ "k1:good_secret",
-                /* kidConfig */ "k2", /* ttlConfig */ null);
+                /* kidConfig */ "k2", /* ttlConfigInSeconds */ null);
         assertFalse(minter.getAccessToken().isAuthenticationEnabled());
     }
 
@@ -94,7 +96,7 @@ public class AccessTokenMinterTest {
     public void disabledTokenStillCarriesConfiguredRefreshDelay() {
         // A disabled minter must still tell the client when to poll again, using half the configured TTL.
         final AccessTokenMinter minter = new AccessTokenMinter(/* secretsConfig */ null, /* kidConfig */ null,
-                /* ttlConfig */ "60");
+                /* ttlConfigInSeconds */ "60");
         assertEquals(/* expected */ 30000L, minter.getAccessToken().getRefreshAfterMillis());
     }
 
@@ -102,7 +104,7 @@ public class AccessTokenMinterTest {
     public void mintsEnabledTokenForValidConfig() {
         final String secret = "good_secret-123";
         final AccessTokenMinter minter = new AccessTokenMinter(/* secretsConfig */ "k1:" + secret,
-                /* kidConfig */ "k1", /* ttlConfig */ null);
+                /* kidConfig */ "k1", /* ttlConfigInSeconds */ null);
         final AccessTokenDTO token = minter.getAccessToken();
         assertTrue(token.isAuthenticationEnabled());
         assertEquals(/* expected */ "k1", token.getKid());
@@ -114,7 +116,7 @@ public class AccessTokenMinterTest {
         final long ttl = AccessTokenMinter.DEFAULT_TTL_SECONDS;
         final long nowBefore = System.currentTimeMillis() / 1000L;
         final AccessTokenMinter minter = new AccessTokenMinter(/* secretsConfig */ "k1:good_secret",
-                /* kidConfig */ "k1", /* ttlConfig */ null);
+                /* kidConfig */ "k1", /* ttlConfigInSeconds */ null);
         final AccessTokenDTO token = minter.getAccessToken();
         final long nowAfter = System.currentTimeMillis() / 1000L;
         // The token is signed to expire between one and two bucket lengths ahead, and always on a bucket boundary.
@@ -126,7 +128,7 @@ public class AccessTokenMinterTest {
     @Test
     public void usesDefaultTtlWhenTtlConfigNull() {
         final AccessTokenMinter minter = new AccessTokenMinter(/* secretsConfig */ "k1:good_secret",
-                /* kidConfig */ "k1", /* ttlConfig */ null);
+                /* kidConfig */ "k1", /* ttlConfigInSeconds */ null);
         final long expectedRefreshMillis = (AccessTokenMinter.DEFAULT_TTL_SECONDS * 1000L) / 2L;
         assertEquals(expectedRefreshMillis, minter.getAccessToken().getRefreshAfterMillis());
     }
@@ -134,7 +136,7 @@ public class AccessTokenMinterTest {
     @Test
     public void usesDefaultTtlWhenTtlConfigBlank() {
         final AccessTokenMinter minter = new AccessTokenMinter(/* secretsConfig */ "k1:good_secret",
-                /* kidConfig */ "k1", /* ttlConfig */ "  ");
+                /* kidConfig */ "k1", /* ttlConfigInSeconds */ "  ");
         final long expectedRefreshMillis = (AccessTokenMinter.DEFAULT_TTL_SECONDS * 1000L) / 2L;
         assertEquals(expectedRefreshMillis, minter.getAccessToken().getRefreshAfterMillis());
     }
@@ -144,7 +146,7 @@ public class AccessTokenMinterTest {
         final long ttl = 60L;
         final long nowBefore = System.currentTimeMillis() / 1000L;
         final AccessTokenMinter minter = new AccessTokenMinter(/* secretsConfig */ "k1:good_secret",
-                /* kidConfig */ "k1", /* ttlConfig */ Long.toString(ttl));
+                /* kidConfig */ "k1", /* ttlConfigInSeconds */ Long.toString(ttl));
         final AccessTokenDTO token = minter.getAccessToken();
         final long nowAfter = System.currentTimeMillis() / 1000L;
         assertEquals(/* expected */ (ttl * 1000L) / 2L, token.getRefreshAfterMillis());
@@ -157,17 +159,17 @@ public class AccessTokenMinterTest {
     public void skipsSecretViolatingAlphabetButKeepsValidEntries() {
         // The second entry's secret contains a space and must be dropped, while the first stays usable.
         final AccessTokenMinter minter = new AccessTokenMinter(/* secretsConfig */ "k1:good_secret,k2:bad secret",
-                /* kidConfig */ "k2", /* ttlConfig */ null);
+                /* kidConfig */ "k2", /* ttlConfigInSeconds */ null);
         assertFalse(minter.getAccessToken().isAuthenticationEnabled());
         final AccessTokenMinter usingValid = new AccessTokenMinter(/* secretsConfig */ "k1:good_secret,k2:bad secret",
-                /* kidConfig */ "k1", /* ttlConfig */ null);
+                /* kidConfig */ "k1", /* ttlConfigInSeconds */ null);
         assertTrue(usingValid.getAccessToken().isAuthenticationEnabled());
     }
 
     @Test
     public void skipsEntryWithIllegalKid() {
         final AccessTokenMinter minter = new AccessTokenMinter(/* secretsConfig */ "k 1:good_secret",
-                /* kidConfig */ "k 1", /* ttlConfig */ null);
+                /* kidConfig */ "k 1", /* ttlConfigInSeconds */ null);
         assertFalse(minter.getAccessToken().isAuthenticationEnabled());
     }
 
@@ -175,7 +177,7 @@ public class AccessTokenMinterTest {
     public void trimsSurroundingWhitespaceAroundEntries() {
         final String secret = "secret_one-2";
         final AccessTokenMinter minter = new AccessTokenMinter(
-                /* secretsConfig */ "  k1:" + secret + " , k2:secrettwo ", /* kidConfig */ "k1", /* ttlConfig */ null);
+                /* secretsConfig */ "  k1:" + secret + " , k2:secrettwo ", /* kidConfig */ "k1", /* ttlConfigInSeconds */ null);
         final AccessTokenDTO token = minter.getAccessToken();
         assertTrue(token.isAuthenticationEnabled());
         assertEquals(expectedMd5(token.getExpiresEpochSecond(), secret), token.getMd5());
@@ -185,15 +187,40 @@ public class AccessTokenMinterTest {
     public void lastDuplicateKidWins() {
         final String winningSecret = "secrettwo";
         final AccessTokenMinter minter = new AccessTokenMinter(
-                /* secretsConfig */ "k1:secretone,k1:" + winningSecret, /* kidConfig */ "k1", /* ttlConfig */ null);
+                /* secretsConfig */ "k1:secretone,k1:" + winningSecret, /* kidConfig */ "k1", /* ttlConfigInSeconds */ null);
         final AccessTokenDTO token = minter.getAccessToken();
         assertEquals(expectedMd5(token.getExpiresEpochSecond(), winningSecret), token.getMd5());
     }
 
     @Test
-    public void returnsSameInstanceWithinOneBucket() {
+    public void mintsIdenticalTokenTwiceWithinSameBucket() {
+        // Two mints a moment apart fall in the same (default 120s) bucket, so the minter must hand back the very same
+        // instance, and hence the same expiry and signature, letting the result-caching RPC servlet serialize it once.
         final AccessTokenMinter minter = new AccessTokenMinter(/* secretsConfig */ "k1:good_secret",
-                /* kidConfig */ "k1", /* ttlConfig */ null);
-        assertSame(minter.getAccessToken(), minter.getAccessToken());
+                /* kidConfig */ "k1", /* ttlConfigInSeconds */ null);
+        final AccessTokenDTO first = minter.getAccessToken();
+        final AccessTokenDTO second = minter.getAccessToken();
+        assertSame(first, second);
+        assertEquals(first.getExpiresEpochSecond(), second.getExpiresEpochSecond());
+        assertEquals(first.getMd5(), second.getMd5());
+    }
+
+    @Test
+    public void mintsFreshTokenAfterBucketRollover() throws InterruptedException {
+        // With a one-second bucket, waiting until the wall clock has entered the next bucket must yield a brand-new
+        // token instance whose expiry has advanced by at least one bucket length, proving the cache keys on the bucket.
+        final long ttl = 1L;
+        final AccessTokenMinter minter = new AccessTokenMinter(/* secretsConfig */ "k1:good_secret",
+                /* kidConfig */ "k1", /* ttlConfigInSeconds */ Long.toString(ttl));
+        final AccessTokenDTO firstBucketToken = minter.getAccessToken();
+        final long firstBucketEndEpochSecond = firstBucketToken.getExpiresEpochSecond() - ttl;
+        // Sleep in short steps only until the current second reaches the next bucket boundary, i.e. at most one TTL.
+        while (System.currentTimeMillis() / 1000L < firstBucketEndEpochSecond) {
+            Thread.sleep(/* millis */ 25L);
+        }
+        final AccessTokenDTO secondBucketToken = minter.getAccessToken();
+        assertNotSame(firstBucketToken, secondBucketToken);
+        assertTrue(secondBucketToken.getExpiresEpochSecond() >= firstBucketToken.getExpiresEpochSecond() + ttl);
+        assertNotEquals(firstBucketToken.getMd5(), secondBucketToken.getMd5());
     }
 }
