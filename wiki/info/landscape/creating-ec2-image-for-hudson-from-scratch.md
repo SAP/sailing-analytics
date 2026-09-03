@@ -1,6 +1,6 @@
 # Setting up an image for the hudson.sapsailing.com server
 
-Like when setting up a regular sailing application server instance, start with a fresh Amazon Linux 2 image and create an instance with a 32GB root volume. Use the "Sailing Analytics Server" security group and something like a ``t3.medium`` instance type. Then, invoke the script
+Like when setting up a regular sailing application server instance, start with a fresh Amazon Linux 2 image and create an instance with a 32GB root volume. Use the "Sailing Analytics Server" and "Hudson" security groups and something like a ``t3.medium`` instance type. Then, invoke the script
 ```
     configuration/hudson_instance_setup/setup-hudson-server.sh {external-IP-of-new-instance}
 ```
