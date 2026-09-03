@@ -153,11 +153,11 @@ install_environment ()
 load_from_release_file ()
 {
     if [[ ${INSTALL_FROM_RELEASE} == "" ]]; then
-        GITHUB_RELEASE=$( curl -L "https://api.github.com/repos/eclipse-sailing-analytics/sailing-analytics/releases?per_page=100" 2>/dev/null | jq -r 'map(select(.name | startswith("main-")) | .assets[] | select(.content_type=="application/x-tar")) | sort_by(.created_at) | reverse | first' )
+        GITHUB_RELEASE=$( curl -L "https://api.github.com/repos/eclipse-sailing-analytics/sailing-analytics/releases?per_page=100" 2>/dev/null | jq -r 'map(select(.name | startswith("main-")) | .assets[] | select(.content_type as $ct | ["application/x-tar","application/gzip","application/x-gzip","application/x-compressed-tar"] | index($ct))) | sort_by(.created_at) | reverse | first' )
         INSTALL_FROM_RELEASE=$( echo "${GITHUB_RELEASE}" | jq -r '.name' | sed -e 's/\.tar\.gz$//' )
         echo "You didn't provide a release. Defaulting to latest main branch build ${INSTALL_FROM_RELEASE}"
     else
-        GITHUB_RELEASE=$( curl -L "https://api.github.com/repos/eclipse-sailing-analytics/sailing-analytics/releases?per_page=100" 2>/dev/null | jq -r 'map(select(.name=="'${INSTALL_FROM_RELEASE}'") | .assets[] | select(.content_type=="application/x-tar")) | sort_by(.created_at) | reverse | first' )
+        GITHUB_RELEASE=$( curl -L "https://api.github.com/repos/eclipse-sailing-analytics/sailing-analytics/releases?per_page=100" 2>/dev/null | jq -r 'map(select(.name=="'${INSTALL_FROM_RELEASE}'") | .assets[] | select(.content_type as $ct | ["application/x-tar","application/gzip","application/x-gzip","application/x-compressed-tar"] | index($ct))) | sort_by(.created_at) | reverse | first' )
     fi
     if which mail; then
         if [ -n "${BUILD_COMPLETE_NOTIFY}" ]; then

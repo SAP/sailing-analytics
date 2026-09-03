@@ -158,6 +158,7 @@ jobs:
           comment_on_pr: false
           proc_trace_min_duration: 5000        # only chart processes running >= 5s
           proc_trace_chart_max_count: 40       # cap Gantt bars to keep mermaid source under 50k
+          metric_frequency: 30                 # ~3h+ builds: coarser sampling so the per-sample CPU/memory xychart source stays well under mermaid's 50k maxTextSize (~390 points/3h15m)
       - name: Setup firefox
         id: setup-firefox
         uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795 # v1.7.2
@@ -276,11 +277,33 @@ jobs:
           name: ${{ env.SIMPLE_VERSION_INFO }}
           draft: false
           prerelease: false
-          # Upload the release assets in this same step (newline-separated globs).
-          # action-gh-release infers the content type from each file's extension.
-          files: |
-            ./dist/${{ env.SIMPLE_VERSION_INFO }}/${{ env.SIMPLE_VERSION_INFO }}.tar.gz
-            ./dist/${{ env.SIMPLE_VERSION_INFO }}/release-notes.txt
+      - name: Upload Release Asset tar.gz
+        id: upload-release-asset-tar-gz
+        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/docker-24' || github.ref == 'refs/heads/docker-25' || startsWith(github.ref, 'refs/heads/releases/') }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Do NOT fold this into action-gh-release's files: input: that action derives the
+          # content type via the mime-types library, which maps .tar.gz to application/gzip.
+          # Production installers (refreshInstance.sh, github-download-release-assets.sh) select
+          # the tarball with select(.content_type=="application/x-tar"), so the type must be set
+          # explicitly here.
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./dist/${{ env.SIMPLE_VERSION_INFO }}/${{ env.SIMPLE_VERSION_INFO }}.tar.gz
+          asset_name: ${{ env.SIMPLE_VERSION_INFO }}.tar.gz
+          asset_content_type: application/x-tar
+      - name: Upload Release Asset release_notes.txt
+        id: upload-release-asset-release-notes-txt
+        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/docker-24' || github.ref == 'refs/heads/docker-25' || startsWith(github.ref, 'refs/heads/releases/') }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./dist/${{ env.SIMPLE_VERSION_INFO }}/release-notes.txt
+          asset_name: release-notes.txt
+          asset_content_type: text/plain
       - name: Trigger CI job
         env:
           CI_JOB_USERNAME: ${{ vars.CI_JOB_USERNAME }}
