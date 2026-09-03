@@ -6,8 +6,9 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 import com.sap.sailing.gwt.ui.shared.racemap.MapProviderTypes;
-import com.sap.sailing.gwt.ui.shared.racemap.MapTileAccessTokenDTO;
 import com.sap.sailing.gwt.ui.shared.racemap.MapsLoader;
+import com.sap.sse.common.util.AccessTokenDTO;
+import com.sap.sse.common.util.AccessTokenMinter;
 
 public class Activator implements BundleActivator {
     private static BundleContext context;
@@ -36,7 +37,7 @@ public class Activator implements BundleActivator {
      * Name of the system property carrying the tile-server auth secrets as a comma-separated {@code kid:secret} list
      * (e.g. {@code k1:AbC-123_xyz,k2:Def-456_uvw}). The same string is configured on the tile server's NGINX
      * {@code secure_link} side (its {@code TILE_AUTH_SECRETS} {@code .env} value). Parsing, alphabet validation and
-     * everything else about the tokens is handled by {@link MapTileAccessTokenMinter}; this activator only reads the raw
+     * everything else about the tokens is handled by {@link AccessTokenMinter}; this activator only reads the raw
      * value and hands it over. When unset or blank, tile-server authentication is disabled and the client sends no
      * token headers.
      */
@@ -51,7 +52,7 @@ public class Activator implements BundleActivator {
 
     /**
      * Name of the system property carrying the tile-token TTL / bucket length in seconds; the client refreshes at half
-     * of it. Defaults to {@link MapTileAccessTokenMinter#DEFAULT_TTL_SECONDS}.
+     * of it. Defaults to {@link AccessTokenMinter#DEFAULT_TTL_SECONDS}.
      */
     private final static String MAP_TILESERVER_AUTH_TTL_PROPERTY_NAME = "map.provider.tileserver.auth.ttl";
     /**
@@ -97,7 +98,7 @@ public class Activator implements BundleActivator {
      * {@link #getMapTileAccessToken()} is safe even before {@link #start(BundleContext)} has run, and replaced in
      * {@code start} with one configured from the tile-server auth properties.
      */
-    private MapTileAccessTokenMinter mapTileAccessTokenMinter = new MapTileAccessTokenMinter(/* secretsConfig */ null,
+    private AccessTokenMinter mapTileAccessTokenMinter = new AccessTokenMinter(/* secretsConfig */ null,
             /* kidConfig */ null, /* ttlConfig */ null);
 
     public Activator() {
@@ -117,7 +118,7 @@ public class Activator implements BundleActivator {
         // TTL properties to the minter, which owns all parsing, validation, bucketing and signing. When no secrets or no
         // current kid are configured, the minter stays disabled and getMapTileAccessToken() hands out the auth-disabled
         // token so tile requests remain unauthenticated.
-        mapTileAccessTokenMinter = new MapTileAccessTokenMinter(
+        mapTileAccessTokenMinter = new AccessTokenMinter(
                 context.getProperty(MAP_TILESERVER_AUTH_SECRETS_PROPERTY_NAME),
                 context.getProperty(MAP_TILESERVER_AUTH_KID_PROPERTY_NAME),
                 context.getProperty(MAP_TILESERVER_AUTH_TTL_PROPERTY_NAME));
@@ -175,10 +176,10 @@ public class Activator implements BundleActivator {
 
     /**
      * Mints (or returns the cached, bucket-shared) short-lived tile-server access token by delegating to the
-     * {@link MapTileAccessTokenMinter}. When authentication is disabled, the auth-disabled token is returned and the
+     * {@link AccessTokenMinter}. When authentication is disabled, the auth-disabled token is returned and the
      * client sends no headers.
      */
-    public MapTileAccessTokenDTO getMapTileAccessToken() {
-        return mapTileAccessTokenMinter.getMapTileAccessToken();
+    public AccessTokenDTO getMapTileAccessToken() {
+        return mapTileAccessTokenMinter.getAccessToken();
     }
 }

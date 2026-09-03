@@ -1,6 +1,7 @@
-package com.sap.sailing.gwt.ui.shared.racemap;
+package com.sap.sse.common.util;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import java.io.Serializable;
+
 import com.sap.sse.common.CacheableRPCResult;
 import com.sap.sse.common.Util;
 
@@ -9,7 +10,7 @@ import com.sap.sse.common.Util;
  * {@code X-OFM-Kid} request headers) to every request against a self-hosted MapLibre tile server, so the tile server's
  * NGINX {@code secure_link} check can authenticate the request. The token is minted on the server (see the
  * {@code com.sap.sailing.gwt.ui.server.Activator}) and refreshed on the client by
- * {@link MapTileTokenRefresher}.
+ * {@code MapTileTokenRefresher}.
  * <p>
  * The token is deliberately identical for every client within one time bucket, which lets the server return the same
  * instance for all callers in that bucket; because this class is a {@link CacheableRPCResult}, the serialized payload is
@@ -22,7 +23,8 @@ import com.sap.sse.common.Util;
  * The fields are intentionally non-{@code final}: GWT-RPC deserialization assigns them directly and cannot populate
  * {@code final} fields.
  */
-public class MapTileAccessTokenDTO implements IsSerializable, CacheableRPCResult {
+public class AccessTokenDTO implements Serializable, CacheableRPCResult {
+    private static final long serialVersionUID = -2575005545027591982L;
     private String md5;
     private long expiresEpochSecond;
     private String kid;
@@ -30,12 +32,12 @@ public class MapTileAccessTokenDTO implements IsSerializable, CacheableRPCResult
 
     /**
      * For GWT-RPC serialization only; application code uses
-     * {@link #MapTileAccessTokenDTO(String, long, String, long)}.
+     * {@link #AccessTokenDTO(String, long, String, long)}.
      */
-    MapTileAccessTokenDTO() {
+    AccessTokenDTO() {
     }
 
-    public MapTileAccessTokenDTO(final String md5, final long expiresEpochSecond, final String kid,
+    public AccessTokenDTO(final String md5, final long expiresEpochSecond, final String kid,
             final long refreshAfterMillis) {
         this.md5 = md5;
         this.expiresEpochSecond = expiresEpochSecond;

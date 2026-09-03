@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.sap.sailing.gwt.ui.client.MapChooserAndAuthenticationParamsProviderAsync;
+import com.sap.sse.common.util.AccessTokenDTO;
 
 /**
  * Client-side singleton that keeps a fresh, short-lived tile-server access token published to the {@code window} so the
@@ -108,7 +109,7 @@ public class MapTileTokenRefresher {
      * result means authentication is disabled, in which case the globals are cleared so no headers are sent.
      */
     private void refresh(final Runnable onAttemptComplete) {
-        authProvider.getMapTileAccessToken(new AsyncCallback<MapTileAccessTokenDTO>() {
+        authProvider.getMapTileAccessToken(new AsyncCallback<AccessTokenDTO>() {
             @Override
             public void onFailure(final Throwable caught) {
                 // Keep any previously published token in place (it may still be valid) and retry shortly; log so that a
@@ -120,7 +121,7 @@ public class MapTileTokenRefresher {
             }
 
             @Override
-            public void onSuccess(final MapTileAccessTokenDTO token) {
+            public void onSuccess(final AccessTokenDTO token) {
                 if (token != null && token.isAuthenticationEnabled()) {
                     publishToken(token.getMd5(), Long.toString(token.getExpiresEpochSecond()), token.getKid());
                 } else {

@@ -2,7 +2,7 @@ package com.sap.sailing.gwt.ui.server;
 
 import com.sap.sailing.gwt.ui.client.MapChooserAndAuthenticationParamsProvider;
 import com.sap.sailing.gwt.ui.shared.racemap.MapProviderTypes;
-import com.sap.sailing.gwt.ui.shared.racemap.MapTileAccessTokenDTO;
+import com.sap.sse.common.util.AccessTokenDTO;
 
 /**
  * Server-only mixin that supplies the shared implementation of the map authentication-params getter. Both
@@ -34,7 +34,7 @@ public interface MapChooserAndAuthenticationParamsSupport extends MapChooserAndA
     }
 
     @Override
-    default MapTileAccessTokenDTO getMapTileAccessToken() {
+    default AccessTokenDTO getMapTileAccessToken() {
         return Activator.getInstance().getMapTileAccessToken();
     }
 }
