@@ -1,6 +1,6 @@
 // Core facade: implements the Google Maps JavaScript API surface on MapLibre GL JS.
 // Keep GWT wrapper conventions in gwt-maps-maplibre-compat.js.
-import { addCollapsedAttributionControl, applyRaceStyle, createArrowSvg, createRaceStyle, lngLat, setSatelliteVisible } from './maplibre-test-utils.js?v=race-map-feedback-18';
+import { addCollapsedAttributionControl, applyRaceStyle, createArrowSvg, createRaceStyle, lngLat, mapTileServerTransformRequest, onMapTileServerError, setSatelliteVisible } from './maplibre-test-utils.js?v=race-map-feedback-19';
 
 function asLngLatLiteral(value) {
     if (Array.isArray(value)) return { lat: value[1], lng: value[0] };
@@ -200,8 +200,10 @@ class CompatMap {
             zoom: toMapLibreZoom(options.zoom ?? 0),
             bearing: options.heading || 0,
             pitch: 0,
-            attributionControl: false
+            attributionControl: false,
+            transformRequest: mapTileServerTransformRequest
         });
+        this.map.on('error', onMapTileServerError);
         addCollapsedAttributionControl(this.map, 'bottom-right');
         // MapLibre listens for gestures on this container, so interactive panes must be descendants.
         this.map.getCanvasContainer().append(this.overlayLayer, this.markerLayer, this.overlayMouseTarget, this.floatPane);

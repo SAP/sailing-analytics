@@ -64,7 +64,7 @@ export function mapTileServerTransformRequest(url, resourceType) {
 // MapLibre `error` handler: when a tile-server request is rejected because the token is missing/expired (HTTP 401/403),
 // force an out-of-schedule token refresh via the global installed by MapTileTokenRefresher so access recovers without
 // waiting for the next scheduled refresh. Other errors are ignored here (MapLibre still logs them to the console).
-function onMapTileServerError(event) {
+export function onMapTileServerError(event) {
     const status = event && event.error && event.error.status;
     if ((status === 401 || status === 403) && typeof window !== 'undefined'
             && typeof window.__sapMapTileTokenRefresh === 'function') {

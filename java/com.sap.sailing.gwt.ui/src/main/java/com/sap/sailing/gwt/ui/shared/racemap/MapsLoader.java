@@ -44,7 +44,7 @@ public class MapsLoader {
      * The relative URL of the Google-Maps-compatibility facade ES module. The query parameter is a cache-busting
      * marker that is bumped whenever the facade changes. Package-private so {@link MapLibreProvider} can read it.
      */
-    final static String MAPS_COMPAT_MODULE_URL = "./js/maps/gwt-maps-maplibre-compat.js?v=race-map-feedback-18";
+    final static String MAPS_COMPAT_MODULE_URL = "./js/maps/gwt-maps-maplibre-compat.js?v=race-map-feedback-19";
 
     /**
      * The name of the {@code window} global through which both the Google Maps API and the compatibility ES module
