@@ -291,6 +291,7 @@
   "caption_overwrite_courses": "Kopírovat dráhu",
   "error_title": "Došlo k chybě",
   "error_unknown": "Ouha, něco se pokazilo.\nZkuste to znovu!",
+  "error_event_settings_not_saved": "Událost byla vytvořena, ale její nastavení nebylo možné uložit. Nevytvářejte ji znovu – otevřete ji ze seznamu.",
   "error_with_code": "Ouha, něco se pokazilo.\nZkuste to znovu! ({{code}})",
   "error_field_required": "Pole je povinné.",
   "error_field_already_exists": "Již existuje.",
