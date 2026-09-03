@@ -22,7 +22,11 @@ echo "Trying to obtain bug summary/title from Github..."
 BUG_SUMMARY="$( curl -s -H 'Accept: application/vnd.github+json' https://api.github.com/repos/eclipse-sailing-analytics/sailing-analytics/issues/${BUG_ID} | jq -r '.title' )"
 echo "Found: ${BUG_SUMMARY}"
 if [ -z "${USERNAME}" ]; then
-  read -p "Jenkins Username (e-mail): " USERNAME
+  if [[ "$OSTYPE" == *"$OS_FOR_GSED"* ]]; then
+    read -e -p "Jenkins Username (e-mail): " USERNAME
+  else
+    read -p "Jenkins Username (e-mail): " USERNAME
+fi
 fi
 if [ -z "${PASSWORD}" ]; then
   read -s -p "Jenkins Password (API Token): " PASSWORD

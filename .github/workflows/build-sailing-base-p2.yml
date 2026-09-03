@@ -1,7 +1,7 @@
 name: build-sailing-base-p2
 on:
   push:
-    branches: [main, bug6269]
+    branches: [main]
     paths:
       - 'java/com.sap.sailing.targetplatform.base/**'
   workflow_dispatch: {}
@@ -15,7 +15,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
       - name: Check out the repository to the runner
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: '500'
       - name: Install JDK 8

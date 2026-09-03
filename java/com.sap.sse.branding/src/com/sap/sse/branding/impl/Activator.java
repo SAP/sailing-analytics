@@ -2,7 +2,6 @@ package com.sap.sse.branding.impl;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-
 import com.sap.sse.branding.BrandingConfigurationService;
 
 public class Activator implements BundleActivator {

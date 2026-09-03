@@ -60,7 +60,7 @@ public class WindEstimationOnKielerWoche505Race2DataTest extends OnlineTracTracB
      */
     @Test
     public void testSimpleWindEstimationThroughEstimationTrack() throws NoWindException {
-        // at this point in time, most boats are already going upwind again, and K�chlin, Neulen and Findel are tacking,
+        // at this point in time, most boats are already going upwind again, and Küchlin, Neulen and Findel are tacking,
         // hence have a direction change.
         TimePoint middle = new MillisecondsTimePoint(1308839492322l);
         TrackBasedEstimationWindTrackImpl estimatedWindTrack = new TrackBasedEstimationWindTrackImpl(getTrackedRace(),
@@ -97,10 +97,10 @@ public class WindEstimationOnKielerWoche505Race2DataTest extends OnlineTracTracB
     
     @Test
     public void testAnotherSimpleWindEstimation() throws NoWindException {
-        // at this point in time, most boats are already going upwind again, and K�chlin, Neulen and Findel are tacking,
+        // at this point in time, most boats are already going upwind again, and Küchlin, Neulen and Findel are tacking,
         // hence have a direction change.
         TimePoint middle = new MillisecondsTimePoint(1308839492322l);
-        assertTrue(getTrackedRace().getTrack(getCompetitorByName("K.chlin")).hasDirectionChange(middle, /* minimumDegreeDifference */ 15.));
+        assertTrue(getTrackedRace().getTrack(getCompetitorByName("K.chlin")).hasDirectionChange(middle, /* minimumDegreeDifference */ 15.)); // Küchlin??
         assertTrue(getTrackedRace().getTrack(getCompetitorByName("Neulen")).hasDirectionChange(middle, /* minimumDegreeDifference */ 15.));
         assertTrue(getTrackedRace().getTrack(getCompetitorByName("Findel")).hasDirectionChange(middle, /* minimumDegreeDifference */ 15.));
         Wind estimatedWindDirection = getTrackedRace().getEstimatedWindDirection(middle);
