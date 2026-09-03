@@ -4,8 +4,8 @@
 # shall be synchronized to the Github repo at github.com/SAP/sailing-analytics
 name: Merge main from trac@sapsailing.com:/home/trac/git
 on:
-  schedule:
-    - cron: "53 * * * *"   # every hour, at :53 minutes
+  #schedule:
+  #  - cron: "53 * * * *"   # every hour, at :53 minutes
   workflow_dispatch: {}
 jobs:
   merge-master-from-sapsailing-com:
