@@ -164,7 +164,7 @@ B. Go to Window ⇒ Preferences and change the following settings:
    - Choose "GWT Sailing SDM" in the "Development Mode" Tab and open "...AdminConsole.html...". This should open [http://127.0.0.1:8888/gwt/AdminConsole](http://127.0.0.1:8888/gwt/AdminConsole). (It is normal that the first try fails. Reload the page after the first try)
    - Default Login: user "admin", password "admin"
    - In the list on the left, click on "Connectors"
-   - For TracTrac Events: In the "TracTrac Connections" Form, fill in the JSON URL [http://germanmaster.traclive.dk/events/event_20120905_erEuropean/jsonservice.php](http://germanmaster.traclive.dk/events/event_20120905_erEuropean/jsonservice.php)(all other required information will be filled in automatically)
+   - Click "Add TracTrac Connection": In the "TracTrac Connections" Form, fill in the JSON URL [http://event.tractrac.com/events/event_20170922_DeutscheJu/jsonservice.php](http://event.tractrac.com/events/event_20170922_DeutscheJu/jsonservice.php) and TracTrac API token "e1c8618d5da19eb97a08aafe93ccf11374d83c92". For more test events look into [bug#6170](https://github.com/eclipse-sailing-analytics/sailing-analytics/issues/6170?id=6170#c8).
    - Press "List Races"
 6. Further useful launch configurations
    - Use SAP JVM Profiler. If you used the script above and installed the SAPJVM instead of the jdk, you can now open the profiling perspective by clicking on Window ⇒ Perspective ⇒ Open Perspective ⇒ Profiling)
