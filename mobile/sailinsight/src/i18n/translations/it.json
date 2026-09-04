@@ -291,6 +291,7 @@
   "caption_overwrite_courses": "Copia rotta",
   "error_title": "Si è verificato un errore",
   "error_unknown": "Si è verificato un problema.\nRiprova.",
+  "error_event_settings_not_saved": "L'evento è stato creato, ma non è stato possibile salvare le sue impostazioni. Non ricrearlo, ma aprirlo dalla lista.",
   "error_with_code": "Si è verificato un problema.\nRiprova. ({{code}})",
   "error_field_required": "Campo obbligatorio.",
   "error_field_already_exists": "Già esistente.",
