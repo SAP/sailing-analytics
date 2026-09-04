@@ -1,3 +1,5 @@
+[![REUSE status](https://api.reuse.software/badge/github.com/eclipse-sailing-analytics/sailing-analytics)](https://api.reuse.software/info/github.com/eclipse-sailing-analytics/sailing-analytics)
+
 <p align="center">
   <img src="azimuth_logo.png" alt="Sailing Analytics">
 </p>
