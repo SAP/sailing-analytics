@@ -291,6 +291,7 @@
   "caption_overwrite_courses": "Kopier bane",
   "error_title": "Der opstod en fejl",
   "error_unknown": "Ups, der gik noget galt her.\nPrøv igen!",
+  "error_event_settings_not_saved": "Begivenheden blev oprettet, men dens indstillinger kunne ikke gemmes. Opret den ikke igen – åbn den fra listen i stedet.",
   "error_with_code": "Ups, der gik noget galt her.\nPrøv igen! ({{code}})",
   "error_field_required": "Feltet er obligatorisk.",
   "error_field_already_exists": "Findes allerede.",

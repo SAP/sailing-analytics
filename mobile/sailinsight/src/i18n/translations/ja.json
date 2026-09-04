@@ -291,6 +291,7 @@
   "caption_overwrite_courses": "コースのコピー",
   "error_title": "エラーが発生しました",
   "error_unknown": "ここで何かがうまくいきませんでした。\n再試行してください。",
+  "error_event_settings_not_saved": "イベントが作成されましたが、その設定を保存できませんでした。再度作成しないでください。代わりに一覧からイベントを開いてください。",
   "error_with_code": "ここで何かがうまくいきませんでした。\n再試行してください ({{code}})。",
   "error_field_required": "フィールドが必要です。",
   "error_field_already_exists": "すでに存在します。",

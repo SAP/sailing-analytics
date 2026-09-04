@@ -291,6 +291,7 @@
   "caption_overwrite_courses": "复制场地",
   "error_title": "发生错误",
   "error_unknown": "糟糕，此处出现问题。\n请重试！",
+  "error_event_settings_not_saved": "活动已创建，但无法保存其设置。请不要再次创建，而是从清单中将其打开。",
   "error_with_code": "糟糕，此处出现问题。\n请重试！({{code}})",
   "error_field_required": "字段为必填字段。",
   "error_field_already_exists": "已存在。",

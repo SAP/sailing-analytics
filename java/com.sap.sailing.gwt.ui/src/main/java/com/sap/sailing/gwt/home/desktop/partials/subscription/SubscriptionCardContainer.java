@@ -54,7 +54,7 @@ public class SubscriptionCardContainer extends Composite {
 
     public SubscriptionCardContainer() {
         initWidget(uiBinder.createAndBindUi(this));
-        featureGrid = new Grid(2, 5);
+        featureGrid = new Grid(2, SubscriptionPlan.PlanCategory.getCategoriesWithFeature().size() + 1);
         int rowIndex = 0;
         for (final SubscriptionPlan.PlanCategory category : SubscriptionPlan.PlanCategory.getCategoriesWithFeature()) {
             rowIndex++;

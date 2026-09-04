@@ -291,6 +291,7 @@
   "caption_overwrite_courses": "Kopiraj kurz",
   "error_title": "Prišlo je do napake",
   "error_unknown": "Prišlo je do napake.\nPoskusite znova.",
+  "error_event_settings_not_saved": "Dogodek je bil ustvarjen, vendar njegovih nastavitev ni mogoče shraniti. Ne ustvarite ga znova – namesto tega ga odprite s seznama.",
   "error_with_code": "Prišlo je do napake.\nPoskusite znova. ({{code}})",
   "error_field_required": "Polje je obvezno.",
   "error_field_already_exists": "Že obstaja.",

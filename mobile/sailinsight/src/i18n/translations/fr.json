@@ -291,6 +291,7 @@
   "caption_overwrite_courses": "Copier le parcours",
   "error_title": "Une erreur s'est produite.",
   "error_unknown": "Une erreur s'est produite.\nVeuillez réessayer.",
+  "error_event_settings_not_saved": "La manifestation a été créée, mais ses options n'ont pas pu être sauvegardées. Ne la recréez pas, ouvrez-la plutôt à partir de la liste.",
   "error_with_code": "Une erreur s'est produite.\nVeuillez réessayer. ({{code}})",
   "error_field_required": "Cette zone est obligatoire.",
   "error_field_already_exists": "Existe déjà.",

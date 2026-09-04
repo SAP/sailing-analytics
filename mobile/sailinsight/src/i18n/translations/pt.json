@@ -291,6 +291,7 @@
   "caption_overwrite_courses": "Copiar percurso",
   "error_title": "Ocorreu um erro",
   "error_unknown": "Ocorreu um erro aqui. Tente novamente!",
+  "error_event_settings_not_saved": "O evento foi criado, mas não foi possível gravar suas configurações. Não o crie novamente – abra-o a partir da lista.",
   "error_with_code": "Ocorreu um erro aqui. Tente novamente! ({{code}})",
   "error_field_required": "O campo é obrigatório.",
   "error_field_already_exists": "Já existe.",
