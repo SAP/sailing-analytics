@@ -1,7 +1,7 @@
 package com.sap.sailing.selenium.pages.adminconsole.usergroups;
 
 import org.openqa.selenium.By.ByName;
-import org.openqa.selenium.ElementNotSelectableException;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -71,7 +71,7 @@ public class UserGroupRoleDefinitionPanelPO extends PageArea {
     
     public void clickAddButtonOrThrow() {
         if (!addRoleButton.isEnabled()) {
-            throw new ElementNotSelectableException("Add Button was disabled");
+            throw new ElementNotInteractableException("Add Button was disabled");
         } else {
             addRoleButton.click();
         }
@@ -79,7 +79,7 @@ public class UserGroupRoleDefinitionPanelPO extends PageArea {
     
     public void clickAddButtonAndExpectPermissionError() {
         if (!addRoleButton.isEnabled()) {
-            throw new ElementNotSelectableException("Add Button was disabled");
+            throw new ElementNotInteractableException("Add Button was disabled");
         } else {
             addRoleButton.click();
         }

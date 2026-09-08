@@ -1,6 +1,7 @@
 package com.sap.sailing.selenium.pages.autoplay;
 
 import java.io.UnsupportedEncodingException;
+import java.time.Duration;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -75,7 +76,7 @@ public class AutoPlayPage extends HostPage {
 
     public AutoPlayLeaderboardView goToAutoPlayClassicUrl(WebDriver driver, String url) {
         driver.get(url); //$NON-NLS-1$
-        final WebElement leaderboardViewElement = new WebDriverWait(driver, 30).until(new Function<WebDriver, WebElement>() {
+        final WebElement leaderboardViewElement = new WebDriverWait(driver, Duration.ofSeconds(30)).until(new Function<WebDriver, WebElement>() {
             @Override
             public WebElement apply(WebDriver driver) {
                 final WebElement leaderboardViewElement = findElementOrNullBySeleniumId("LeaderboardView");

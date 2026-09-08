@@ -55,8 +55,8 @@ on:
         description: Empty means ubuntu-latest, usually 4 CPUs with little disk/memory, but if you have runners named ubuntu-latest-Xcpu, it can be 4, 8, 16, and 64 as well, using, e.g., ubuntu-latest-16cpu; default is ubuntu-latest
         default: ''
       firefox_version:
-        description: Version to use for Selenium tests; default is 137.0, but could, e.g., be "141.0" or "latest"
-        default: '140.0'
+        description: Version to use for Selenium tests; default is "latest", but could, e.g., be "141.0" or a specific pin like "140.0"
+        default: 'latest'
 
 jobs:
   # The "changes" job will cause the "build" job to get skipped for trivial changes
@@ -166,7 +166,7 @@ jobs:
         id: setup-firefox
         uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795 # v1.7.2
         with:
-          firefox-version: ${{  github.event.inputs.firefox_version == '' && '140.0' || github.event.inputs.firefox_version }}
+          firefox-version: ${{  github.event.inputs.firefox_version == '' && 'latest' || github.event.inputs.firefox_version }}
       - run: |
           echo Installed firefox versions: ${{ steps.setup-firefox.outputs.firefox-version }}
           ${{ steps.setup-firefox.outputs.firefox-path }} --version
