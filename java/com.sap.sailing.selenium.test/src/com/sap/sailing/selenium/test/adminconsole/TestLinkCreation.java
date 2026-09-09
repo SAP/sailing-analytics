@@ -2,6 +2,7 @@ package com.sap.sailing.selenium.test.adminconsole;
 
 import java.net.SocketException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.Date;
 
 import javax.xml.bind.DatatypeConverter;
@@ -151,7 +152,7 @@ public class TestLinkCreation extends AbstractSeleniumTest {
         final String nonLocalhostCreatedInvitationUrl = createdInvitationUrl.replace("localhost", localNonLoopbackAddress);
         registrationLinkWithQRCode.clickOkButtonOrThrow();
         HomePage.goToHomeUrl(getWebDriver(), nonLocalhostCreatedInvitationUrl);
-        Wait<WebDriver> wait = new WebDriverWait(getWebDriver(), 30);
+        Wait<WebDriver> wait = new WebDriverWait(getWebDriver(), Duration.ofSeconds(30));
         // Confirm dialog will be shown on sapsailing.com to redirect back to localhost or non-default domain
 //      wait.until(ExpectedConditions.numberOfElementsToBe(
 //              By.xpath("//button[contains(text(), 'Yes')] | //button[contains(text(), 'Ja')]"), 1)).get(0).click();
@@ -195,7 +196,7 @@ public class TestLinkCreation extends AbstractSeleniumTest {
         final String localNonLoopbackAddress = getNonLoopbackLocalhostAddress();
         final String nonLocalhostCreatedInvitationUrl = createdInvitationUrl.replace("localhost", localNonLoopbackAddress);
         HomePage.goToHomeUrl(getWebDriver(), nonLocalhostCreatedInvitationUrl);
-        Wait<WebDriver> wait = new WebDriverWait(getWebDriver(), 30);
+        Wait<WebDriver> wait = new WebDriverWait(getWebDriver(), Duration.ofSeconds(30));
         // Confirm dialog will be shown on sapsailing.com to redirect back to localhost or non-default domain
 //      wait.until(ExpectedConditions.numberOfElementsToBe(
 //              By.xpath("//button[contains(text(), 'Yes')] | //button[contains(text(), 'Ja')]"), 1)).get(0).click();
@@ -231,7 +232,7 @@ public class TestLinkCreation extends AbstractSeleniumTest {
         AddCompetitorWithBoatDialogPO addCompetitorWithBoatDialogPO = registerCompetitorsDialogPO
                 .openAddCompetitorWithBoatDialog();
         addCompetitorWithBoatDialogPO.addCompetitorWithBoat();
-        Wait<WebDriver> wait = new WebDriverWait(getWebDriver(), 30);
+        Wait<WebDriver> wait = new WebDriverWait(getWebDriver(), Duration.ofSeconds(30));
         // wait until competitor is shown in the table. Sometimes test breaks here if dialog was closed to early
         wait.until((s) -> registerCompetitorsDialogPO.getCompetitorTable().getEntries().size() > 0);
         // now close the dialog

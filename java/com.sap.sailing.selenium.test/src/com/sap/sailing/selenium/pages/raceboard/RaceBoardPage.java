@@ -71,8 +71,7 @@ public class RaceBoardPage extends HostPageWithAuthentication {
     public MapSettingsPO openMapSettings() {
         waitUntil(() -> moreOptionsButton.isDisplayed());
         moreOptionsButton.click();
-        waitUntil(() -> raceMapSettingsButton.isDisplayed() && raceMapSettingsButton.getLocation().y > 100);
-        raceMapSettingsButton.click();
+        clickWhenInteractable(() -> findElementBySeleniumId("raceMapSettingsButton"));
         waitUntil(new BooleanSupplier() {
             @Override
             public boolean getAsBoolean() {

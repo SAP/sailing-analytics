@@ -17,6 +17,7 @@ import com.sap.sse.gwt.client.DefaultErrorReporter;
 import com.sap.sse.gwt.client.EntryPointHelper;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.StringMessages;
+import com.sap.sse.gwt.client.async.MarkedAsyncCallback;
 import com.sap.sse.security.shared.dto.StrippedUserGroupDTO;
 import com.sap.sse.security.shared.dto.UserDTO;
 import com.sap.sse.security.ui.client.DefaultWithSecurityImpl;
@@ -78,7 +79,8 @@ public class ManagementConsoleClientFactoryImpl implements ManagementConsoleClie
     }
 
     protected void checkPublicServerNonPublicUserWarning() {
-        sailingService.getServerConfiguration(new AsyncCallback<ServerConfigurationDTO>() {
+        sailingService.getServerConfiguration(new MarkedAsyncCallback<ServerConfigurationDTO>(
+                new AsyncCallback<ServerConfigurationDTO>() {
             @Override
             public void onFailure(Throwable caught) {
             }
@@ -123,7 +125,7 @@ public class ManagementConsoleClientFactoryImpl implements ManagementConsoleClie
                             }
                         });
             }
-        });
+        }));
     }
 
     @Override

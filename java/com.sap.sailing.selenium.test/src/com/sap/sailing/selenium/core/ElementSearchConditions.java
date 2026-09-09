@@ -1,6 +1,7 @@
 package com.sap.sailing.selenium.core;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
@@ -27,7 +28,7 @@ public class ElementSearchConditions {
             public WebElement apply(SearchContext context) {
                 try {
                     return elementIfVisible(findElement(context, locator));
-                } catch (StaleElementReferenceException exception) {
+                } catch (final NoSuchElementException | StaleElementReferenceException exception) {
                     return null;
                 }
             }

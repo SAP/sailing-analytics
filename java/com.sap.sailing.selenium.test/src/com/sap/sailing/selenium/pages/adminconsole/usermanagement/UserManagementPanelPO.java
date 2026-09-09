@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.openqa.selenium.ElementNotSelectableException;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -138,7 +138,7 @@ public class UserManagementPanelPO extends PageArea {
                 userTableEntry.select();
             }
         } catch (StaleElementReferenceException e) {
-            throw new ElementNotSelectableException("Cannot select user any more. Entry has already been removed from DOM.", e);
+            throw new ElementNotInteractableException("Cannot select user any more. Entry has already been removed from DOM.", e);
         }
     }
     

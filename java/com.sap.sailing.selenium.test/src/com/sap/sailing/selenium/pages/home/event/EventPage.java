@@ -58,7 +58,7 @@ public class EventPage extends HostPageWithAuthentication {
     public MediaPO selectMedia() {
         WebElement eventTabBar = waitForElementBySeleniumId(driver, "eventTabBar", 1);
         eventTabBar.findElement(By.linkText("Media")).click();
-        return getPO(MediaPO::new, "tabContentPanelUi");
+        return waitForPO(MediaPO::new, "tabContentPanelUi");
     }
 
 }

@@ -20,9 +20,18 @@ public class AuthenticationMenuPO extends PageArea {
         return AttributeHelper.isEnabled(getWebElement(), "data-auth");
     }
 
-    public boolean attemptLogin(String username, String password) {
-        AuthenticationViewPO authenticationView = showAuthenticationView();
+    public boolean attemptLogin(final String username, final String password) {
+        final AuthenticationViewPO authenticationView = showAuthenticationView();
         authenticationView.getSignInView().doLogin(username, password);
+        waitForAjaxRequests();
+        return isLoggedIn();
+    }
+
+    public boolean attemptLoginExpectingAlertContainingMessage(final String username, final String password,
+            final String expectedAlertMessage) {
+        final AuthenticationViewPO authenticationView = showAuthenticationView();
+        authenticationView.getSignInView().doLogin(username, password);
+        waitForAlertContainingMessageAndAccept(expectedAlertMessage);
         waitForAjaxRequests();
         return isLoggedIn();
     }
