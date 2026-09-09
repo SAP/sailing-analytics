@@ -8,6 +8,7 @@
 [![CodeQL](https://github.com/SAP/sailing-analytics/workflows/CodeQL/badge.svg)](https://github.com/SAP/sailing-analytics/security/code-scanning)
 [![GitHub license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://raw.githubusercontent.com/SAP/sailing-analytics/main/LICENSE)
 [![Downloads](https://img.shields.io/badge/download-all%20releases-brightgreen.svg)](https://github.com/SAP/sailing-analytics/releases/)
+[![Container image](https://img.shields.io/badge/container-ghcr.io%2FSAP%2Fsailing--analytics-2496ED?logo=docker&logoColor=white)](https://github.com/SAP/sailing-analytics/pkgs/container/sailing-analytics)
 
 You're looking at the "downstream" repository whose "upstream" lives as [Eclipse Azimuth Sailing Analytics](https://github.com/eclipse-sailing-analytics/sailing-analytics). For any usual development activity, issue reporting, or pull requests, please refer to the upstream project. This downstream repository only contains SAP-specific branding, naming, or interfacing with other SAP technology such as a HANA Cloud data extractor.
 
