@@ -5,10 +5,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import com.sap.sailing.domain.common.DataImportProgress;
+import com.sap.sailing.landscape.common.LiveContentCheckResult;
 import com.sap.sailing.landscape.common.SharedLandscapeConstants;
 import com.sap.sailing.landscape.procedures.DeployProcessOnMultiServer;
 import com.sap.sailing.landscape.procedures.SailingAnalyticsMasterConfiguration;
@@ -221,12 +223,15 @@ public interface LandscapeService {
     /**
      * @return the reports on the master data import and content comparison; 
      */
+    LiveContentCheckResult checkForLiveContent(Iterable<AwsApplicationReplicaSet<String, SailingAnalyticsMetrics,
+            SailingAnalyticsProcess<String>>> applicationReplicaSets, String bearerToken) throws Exception;
+
     Triple<DataImportProgress, CompareServersResult, String> archiveReplicaSet(String regionId,
             AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> applicationReplicaSetToArchive,
             String bearerTokenOrNullForApplicationReplicaSetToArchive, String bearerTokenOrNullForArchive,
             Duration durationToWaitBeforeCompareServers, int maxNumberOfCompareServerAttempts,
             boolean removeApplicationReplicaSet, MongoEndpoint moveDatabaseHere, String optionalKeyName,
-            byte[] passphraseForPrivateKeyDecryption) throws Exception;
+            byte[] passphraseForPrivateKeyDecryption, boolean force) throws Exception;
     
     /**
      * If the replica set is mapped through DNS, the DNS record is removed first, before any attempts are made to shut
@@ -244,7 +249,8 @@ public interface LandscapeService {
      */
     String removeApplicationReplicaSet(String regionId,
             AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> applicationReplicaSetToRemove,
-            MongoEndpoint moveDatabaseHere, String optionalKeyName, byte[] passphraseForPrivateKeyDecryption) throws Exception;
+            MongoEndpoint moveDatabaseHere, String optionalKeyName, byte[] passphraseForPrivateKeyDecryption,
+            boolean force) throws Exception;
 
     Release getRelease(String releaseNameOrNullForLatestMaster);
 
@@ -289,7 +295,7 @@ public interface LandscapeService {
     AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> upgradeApplicationReplicaSet(AwsRegion region,
             AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet,
             String releaseOrNullForLatestMaster, String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
-            String replicaReplicationBearerToken) throws InterruptedException, ExecutionException,
+            String replicaReplicationBearerToken, boolean force) throws InterruptedException, ExecutionException,
             MalformedURLException, IOException, TimeoutException, Exception;
 
     /**
@@ -299,8 +305,8 @@ public interface LandscapeService {
     SailingAnalyticsProcess<String> ensureAtLeastOneReplicaExistsStopReplicatingAndRemoveMasterFromTargetGroups(
             AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet,
             String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
-            String effectiveReplicaReplicationBearerToken) throws Exception, MalformedURLException, IOException,
-            TimeoutException, InterruptedException, ExecutionException;
+            String effectiveReplicaReplicationBearerToken, boolean force) throws Exception, MalformedURLException,
+            IOException, TimeoutException, InterruptedException, ExecutionException;
 
     /**
      * For an existing replica set deploys a new replica onto an existing host. The host may be shared by multiple
@@ -443,8 +449,8 @@ public interface LandscapeService {
             Optional<SailingAnalyticsHost<String>> optionalPreferredInstanceToDeployTo, String optionalKeyName,
             byte[] privateKeyEncryptionPassphrase, String optionalMasterReplicationBearerTokenOrNull,
             String optionalReplicaReplicationBearerTokenOrNull, Integer optionalMemoryInMegabytesOrNull,
-            Integer optionalMemoryTotalSizeFactorOrNull) throws MalformedURLException, IOException, TimeoutException,
-            InterruptedException, ExecutionException, Exception;
+            Integer optionalMemoryTotalSizeFactorOrNull, boolean force) throws MalformedURLException, IOException,
+            TimeoutException, InterruptedException, ExecutionException, Exception;
 
     /**
      * If the {@code replicaSet} provided has one or more auto-scaling groups, their default launch template version is
@@ -517,7 +523,8 @@ public interface LandscapeService {
     Triple<SailingAnalyticsHost<String>, Map<String, SailingAnalyticsProcess<String>>, Map<String, SailingAnalyticsProcess<String>>>
     moveAllApplicationProcessesAwayFrom(SailingAnalyticsHost<String> host,
             Optional<InstanceType> optionalInstanceTypeForNewInstance,
-            String optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception;
+            String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
+            Set<String> forceMasterReplicaSetNames) throws Exception;
 
     String getHostname(String replicaSetName, String optionalDomainName);
 

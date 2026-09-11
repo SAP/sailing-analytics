@@ -116,6 +116,9 @@ com.sap.sse.gwt.adminconsole.StringMessages {
     String ensureAtLeastOneReplicaExistsStopReplicatingAndRemoveMasterFromTargetGroups();
     String successfullyStoppedReplicatingAndRemovedMasterFromTargetGroups(String replicaSetName);
     String stopReplicating();
+    String liveContentWarningTitle();
+    String liveContentWarning(String liveContentDetails);
+    String proceedDespiteLiveContent();
     String sameAsMaster();
     String firstReplicaOnSharedInstance();
     String machineImageId();

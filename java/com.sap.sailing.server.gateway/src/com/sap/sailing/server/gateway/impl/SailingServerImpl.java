@@ -29,11 +29,13 @@ import com.sap.sailing.domain.base.EventBase;
 import com.sap.sailing.domain.base.RemoteSailingServerReference;
 import com.sap.sailing.domain.common.DataImportProgress;
 import com.sap.sailing.domain.common.sharding.ShardingType;
+import com.sap.sailing.landscape.common.LiveContentCheckResult;
 import com.sap.sailing.server.gateway.deserialization.impl.CompareServersResultJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.CourseAreaJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.DataImportProgressJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.EventBaseJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.LeaderboardGroupBaseJsonDeserializer;
+import com.sap.sailing.server.gateway.deserialization.impl.LiveContentCheckResultJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.MasterDataImportResultJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.RemoteSailingServerReferenceJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.TrackingConnectorInfoJsonDeserializer;
@@ -45,6 +47,7 @@ import com.sap.sailing.server.gateway.jaxrs.api.CompareServersResource;
 import com.sap.sailing.server.gateway.jaxrs.api.EventsResource;
 import com.sap.sailing.server.gateway.jaxrs.api.LeaderboardGroupsResource;
 import com.sap.sailing.server.gateway.jaxrs.api.LeaderboardsResource;
+import com.sap.sailing.server.gateway.jaxrs.api.LiveContentResource;
 import com.sap.sailing.server.gateway.jaxrs.api.MasterDataImportResource;
 import com.sap.sailing.server.gateway.jaxrs.api.RemoteServerReferenceResource;
 import com.sap.sailing.server.gateway.serialization.LeaderboardGroupConstants;
@@ -124,6 +127,16 @@ public class SailingServerImpl extends SecuredServerImpl implements SailingServe
             result.add(deserializer.deserialize((JSONObject) o));
         }
         return result;
+    }
+
+    @Override
+    public LiveContentCheckResult getLiveContent(final long checkedAtMillis) throws ClientProtocolException, IOException,
+            ParseException, JsonDeserializationException {
+        final URL liveContentUrl = new URL(getBaseUrl(), GATEWAY_URL_PREFIX + LiveContentResource.V1_LIVE_CONTENT +
+                "?" + LiveContentResource.CHECKED_AT_MILLIS_QUERY_PARAM + "=" + checkedAtMillis);
+        final HttpGet getLiveContent = new HttpGet(liveContentUrl.toString());
+        final JSONObject jsonResponse = (JSONObject) getJsonParsedResponse(getLiveContent).getA();
+        return new LiveContentCheckResultJsonDeserializer().deserialize(jsonResponse);
     }
 
     @Override

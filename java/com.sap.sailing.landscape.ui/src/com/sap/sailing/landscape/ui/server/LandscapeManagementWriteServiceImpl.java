@@ -35,10 +35,13 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.sap.sailing.domain.common.DataImportProgress;
 import com.sap.sailing.landscape.LandscapeService;
+import com.sap.sailing.landscape.LiveContentConflictException;
 import com.sap.sailing.landscape.SailingAnalyticsHost;
 import com.sap.sailing.landscape.SailingAnalyticsMetrics;
 import com.sap.sailing.landscape.SailingAnalyticsProcess;
 import com.sap.sailing.landscape.SailingReleaseRepository;
+import com.sap.sailing.landscape.common.LiveContentAwareOperationResult;
+import com.sap.sailing.landscape.common.LiveContentCheckResult;
 import com.sap.sailing.landscape.common.RemoteServiceMappingConstants;
 import com.sap.sailing.landscape.common.SharedLandscapeConstants;
 import com.sap.sailing.landscape.impl.SailingAnalyticsHostImpl;
@@ -59,6 +62,7 @@ import com.sap.sailing.landscape.ui.shared.LeaderboardNameDTO;
 import com.sap.sailing.landscape.ui.shared.MongoEndpointDTO;
 import com.sap.sailing.landscape.ui.shared.MongoProcessDTO;
 import com.sap.sailing.landscape.ui.shared.MongoScalingInstructionsDTO;
+import com.sap.sailing.landscape.ui.shared.MoveAllApplicationProcessesResultDTO;
 import com.sap.sailing.landscape.ui.shared.ProcessDTO;
 import com.sap.sailing.landscape.ui.shared.ReleaseDTO;
 import com.sap.sailing.landscape.ui.shared.ReverseProxyDTO;
@@ -798,26 +802,33 @@ public class LandscapeManagementWriteServiceImpl extends ResultCachingProxiedRem
     }
     
     @Override
-    public Triple<DataImportProgress, CompareServersResultDTO, String> archiveReplicaSet(String regionId, SailingApplicationReplicaSetDTO<String> applicationReplicaSetToArchive,
-            String bearerTokenOrNullForApplicationReplicaSetToArchive,
-            String bearerTokenOrNullForArchive,
-            Duration durationToWaitBeforeCompareServers,
-            int maxNumberOfCompareServerAttempts, boolean removeApplicationReplicaSet, MongoEndpointDTO moveDatabaseHere,
-            String optionalKeyName, byte[] passphraseForPrivateKeyDecryption)
-            throws Exception {
+    public LiveContentAwareOperationResult<Triple<DataImportProgress, CompareServersResultDTO, String>> archiveReplicaSet(
+            String regionId, SailingApplicationReplicaSetDTO<String> applicationReplicaSetToArchive,
+            String bearerTokenOrNullForApplicationReplicaSetToArchive, String bearerTokenOrNullForArchive,
+            Duration durationToWaitBeforeCompareServers, int maxNumberOfCompareServerAttempts,
+            boolean removeApplicationReplicaSet, MongoEndpointDTO moveDatabaseHere, String optionalKeyName,
+            byte[] passphraseForPrivateKeyDecryption, boolean force) throws Exception {
         checkLandscapeManageAwsPermission();
         if (removeApplicationReplicaSet) {
             getSecurityService().checkCurrentUserDeletePermission(SecuredSecurityTypes.SERVER.getQualifiedObjectIdentifier(
                     new TypeRelativeObjectIdentifier(applicationReplicaSetToArchive.getReplicaSetName())));
         }
-        final Triple<DataImportProgress, CompareServersResult, String> result = getLandscapeService().archiveReplicaSet(regionId,
-                convertFromApplicationReplicaSetDTO(new AwsRegion(regionId, getLandscape()), applicationReplicaSetToArchive, optionalKeyName, passphraseForPrivateKeyDecryption),
-                bearerTokenOrNullForApplicationReplicaSetToArchive, bearerTokenOrNullForArchive,
-                durationToWaitBeforeCompareServers, maxNumberOfCompareServerAttempts, removeApplicationReplicaSet,
-                getMongoEndpoint(moveDatabaseHere), optionalKeyName, passphraseForPrivateKeyDecryption);
-        final String mongoDBArchivingFailureReason = result.getC();
-        final CompareServersResultDTO compareServersResultDTO = createCompareServersResultDTO(result);
-        return new Triple<>(result.getA(), compareServersResultDTO, mongoDBArchivingFailureReason);
+        LiveContentAwareOperationResult<Triple<DataImportProgress, CompareServersResultDTO, String>> result;
+        try {
+            final Triple<DataImportProgress, CompareServersResult, String> archiveResult = getLandscapeService()
+                    .archiveReplicaSet(regionId,
+                            convertFromApplicationReplicaSetDTO(new AwsRegion(regionId, getLandscape()),
+                                    applicationReplicaSetToArchive, optionalKeyName, passphraseForPrivateKeyDecryption),
+                            bearerTokenOrNullForApplicationReplicaSetToArchive, bearerTokenOrNullForArchive,
+                            durationToWaitBeforeCompareServers, maxNumberOfCompareServerAttempts,
+                            removeApplicationReplicaSet, getMongoEndpoint(moveDatabaseHere), optionalKeyName,
+                            passphraseForPrivateKeyDecryption, force);
+            result = LiveContentAwareOperationResult.success(new Triple<>(archiveResult.getA(),
+                    createCompareServersResultDTO(archiveResult), archiveResult.getC()));
+        } catch (LiveContentConflictException e) {
+            result = LiveContentAwareOperationResult.liveContentConflict(e.getLiveContentCheckResult());
+        }
+        return result;
     }
 
     private CompareServersResultDTO createCompareServersResultDTO(
@@ -831,17 +842,23 @@ public class LandscapeManagementWriteServiceImpl extends ResultCachingProxiedRem
     }
     
     @Override
-    public String removeApplicationReplicaSet(String regionId,
+    public LiveContentAwareOperationResult<String> removeApplicationReplicaSet(String regionId,
             SailingApplicationReplicaSetDTO<String> applicationReplicaSetToRemove, MongoEndpointDTO moveDatabaseHere,
-            String optionalKeyName, byte[] passphraseForPrivateKeyDecryption)
-            throws Exception {
+            String optionalKeyName, byte[] passphraseForPrivateKeyDecryption, boolean force) throws Exception {
         checkLandscapeManageAwsPermission();
         getSecurityService().checkCurrentUserDeletePermission(SecuredSecurityTypes.SERVER.getQualifiedObjectIdentifier(
                 new TypeRelativeObjectIdentifier(applicationReplicaSetToRemove.getReplicaSetName())));
-        final String mongoDbArchivingErrorMessage = getLandscapeService().removeApplicationReplicaSet(regionId, convertFromApplicationReplicaSetDTO(
-                new AwsRegion(regionId, getLandscape()), applicationReplicaSetToRemove, optionalKeyName, passphraseForPrivateKeyDecryption), getMongoEndpoint(moveDatabaseHere),
-                optionalKeyName, passphraseForPrivateKeyDecryption);
-        return mongoDbArchivingErrorMessage;
+        LiveContentAwareOperationResult<String> result;
+        try {
+            final String mongoDbArchivingErrorMessage = getLandscapeService().removeApplicationReplicaSet(regionId,
+                    convertFromApplicationReplicaSetDTO(new AwsRegion(regionId, getLandscape()),
+                            applicationReplicaSetToRemove, optionalKeyName, passphraseForPrivateKeyDecryption),
+                    getMongoEndpoint(moveDatabaseHere), optionalKeyName, passphraseForPrivateKeyDecryption, force);
+            result = LiveContentAwareOperationResult.success(mongoDbArchivingErrorMessage);
+        } catch (LiveContentConflictException e) {
+            result = LiveContentAwareOperationResult.liveContentConflict(e.getLiveContentCheckResult());
+        }
+        return result;
     }
 
     private AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> convertFromApplicationReplicaSetDTO(
@@ -911,18 +928,44 @@ public class LandscapeManagementWriteServiceImpl extends ResultCachingProxiedRem
     }
 
     @Override
-    public Boolean ensureAtLeastOneReplicaExistsStopReplicatingAndRemoveMasterFromTargetGroups(String regionId,
-            SailingApplicationReplicaSetDTO<String> applicationReplicaSet,
-            String optionalKeyName, byte[] privateKeyEncryptionPassphrase, String replicaReplicationBearerToken) throws Exception {
+    public LiveContentAwareOperationResult<Boolean>
+            ensureAtLeastOneReplicaExistsStopReplicatingAndRemoveMasterFromTargetGroups(String regionId,
+                    SailingApplicationReplicaSetDTO<String> applicationReplicaSet, String optionalKeyName,
+                    byte[] privateKeyEncryptionPassphrase, String replicaReplicationBearerToken, boolean force)
+                    throws Exception {
         checkLandscapeManageAwsPermission();
         final AwsRegion region = new AwsRegion(regionId, getLandscape());
         final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet =
-                convertFromApplicationReplicaSetDTO(region, applicationReplicaSet, optionalKeyName, privateKeyEncryptionPassphrase);
-        final String effectiveReplicaReplicationBearerToken = getLandscapeService().getEffectiveBearerToken(replicaReplicationBearerToken);
-        final SailingAnalyticsProcess<String> additionalReplicaStarted = getLandscapeService()
-                .ensureAtLeastOneReplicaExistsStopReplicatingAndRemoveMasterFromTargetGroups(replicaSet,
-                        optionalKeyName, privateKeyEncryptionPassphrase, effectiveReplicaReplicationBearerToken);
-        return additionalReplicaStarted != null;
+                convertFromApplicationReplicaSetDTO(region, applicationReplicaSet, optionalKeyName,
+                        privateKeyEncryptionPassphrase);
+        final String effectiveReplicaReplicationBearerToken = getLandscapeService()
+                .getEffectiveBearerToken(replicaReplicationBearerToken);
+        LiveContentAwareOperationResult<Boolean> result;
+        try {
+            final SailingAnalyticsProcess<String> additionalReplicaStarted = getLandscapeService()
+                    .ensureAtLeastOneReplicaExistsStopReplicatingAndRemoveMasterFromTargetGroups(replicaSet,
+                            optionalKeyName, privateKeyEncryptionPassphrase, effectiveReplicaReplicationBearerToken,
+                            force);
+            result = LiveContentAwareOperationResult.success(additionalReplicaStarted != null);
+        } catch (LiveContentConflictException e) {
+            result = LiveContentAwareOperationResult.liveContentConflict(e.getLiveContentCheckResult());
+        }
+        return result;
+    }
+
+    @Override
+    public LiveContentCheckResult checkForLiveContent(final String regionId,
+            final Iterable<SailingApplicationReplicaSetDTO<String>> applicationReplicaSets, final String bearerToken,
+            final String optionalKeyName, final byte[] privateKeyEncryptionPassphrase) throws Exception {
+        checkLandscapeManageAwsPermission();
+        final AwsRegion region = new AwsRegion(regionId, getLandscape());
+        final List<AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>>> replicaSets =
+                new ArrayList<>();
+        for (final SailingApplicationReplicaSetDTO<String> applicationReplicaSet : applicationReplicaSets) {
+            replicaSets.add(convertFromApplicationReplicaSetDTO(region, applicationReplicaSet, optionalKeyName,
+                    privateKeyEncryptionPassphrase));
+        }
+        return getLandscapeService().checkForLiveContent(replicaSets, bearerToken);
     }
 
     /**
@@ -932,30 +975,44 @@ public class LandscapeManagementWriteServiceImpl extends ResultCachingProxiedRem
      * for details.
      */
     @Override
-    public SailingApplicationReplicaSetDTO<String> upgradeApplicationReplicaSet(String regionId,
-            SailingApplicationReplicaSetDTO<String> applicationReplicaSetToUpgrade, String releaseOrNullForLatestMaster,
-            String optionalKeyName, byte[] privateKeyEncryptionPassphrase, String replicaReplicationBearerToken) throws Exception {
+    public LiveContentAwareOperationResult<SailingApplicationReplicaSetDTO<String>> upgradeApplicationReplicaSet(
+            String regionId, SailingApplicationReplicaSetDTO<String> applicationReplicaSetToUpgrade,
+            String releaseOrNullForLatestMaster, String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
+            String replicaReplicationBearerToken, boolean force) throws Exception {
         checkLandscapeManageAwsPermission();
         final AwsRegion region = new AwsRegion(regionId, getLandscape());
         final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet =
-                convertFromApplicationReplicaSetDTO(region, applicationReplicaSetToUpgrade, optionalKeyName, privateKeyEncryptionPassphrase);
-        final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> upgradedReplicaSet =
-                getLandscapeService().upgradeApplicationReplicaSet(region, replicaSet,
-                    releaseOrNullForLatestMaster, optionalKeyName, privateKeyEncryptionPassphrase,
-                    replicaReplicationBearerToken);
-        final SailingAnalyticsProcess<String> oldMaster = replicaSet.getMaster();
-        final Release release = upgradedReplicaSet.getVersion(Landscape.WAIT_FOR_PROCESS_TIMEOUT, Optional.ofNullable(optionalKeyName), privateKeyEncryptionPassphrase);
-        return new SailingApplicationReplicaSetDTO<String>(applicationReplicaSetToUpgrade.getName(),
-                convertToSailingAnalyticsProcessDTO(oldMaster, Optional.ofNullable(optionalKeyName), privateKeyEncryptionPassphrase),
-                Util.map(upgradedReplicaSet.getReplicas(), r->{
-                    try {
-                        return convertToSailingAnalyticsProcessDTO(r, Optional.ofNullable(optionalKeyName), privateKeyEncryptionPassphrase);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }),
-                release.getName(), release.getReleaseNotesURL().toString(),
-                applicationReplicaSetToUpgrade.getHostname(), applicationReplicaSetToUpgrade.getDefaultRedirectPath(), applicationReplicaSetToUpgrade.getAutoScalingGroupAmiId());
+                convertFromApplicationReplicaSetDTO(region, applicationReplicaSetToUpgrade, optionalKeyName,
+                        privateKeyEncryptionPassphrase);
+        LiveContentAwareOperationResult<SailingApplicationReplicaSetDTO<String>> result;
+        try {
+            final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> upgradedReplicaSet =
+                    getLandscapeService().upgradeApplicationReplicaSet(region, replicaSet,
+                            releaseOrNullForLatestMaster, optionalKeyName, privateKeyEncryptionPassphrase,
+                            replicaReplicationBearerToken, force);
+            final SailingAnalyticsProcess<String> oldMaster = replicaSet.getMaster();
+            final Release release = upgradedReplicaSet.getVersion(Landscape.WAIT_FOR_PROCESS_TIMEOUT,
+                    Optional.ofNullable(optionalKeyName), privateKeyEncryptionPassphrase);
+            final SailingApplicationReplicaSetDTO<String> upgradedReplicaSetDTO =
+                    new SailingApplicationReplicaSetDTO<String>(applicationReplicaSetToUpgrade.getName(),
+                            convertToSailingAnalyticsProcessDTO(oldMaster, Optional.ofNullable(optionalKeyName),
+                                    privateKeyEncryptionPassphrase),
+                            Util.map(upgradedReplicaSet.getReplicas(), r->{
+                                try {
+                                    return convertToSailingAnalyticsProcessDTO(r, Optional.ofNullable(optionalKeyName),
+                                            privateKeyEncryptionPassphrase);
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }), release.getName(), release.getReleaseNotesURL().toString(),
+                            applicationReplicaSetToUpgrade.getHostname(),
+                            applicationReplicaSetToUpgrade.getDefaultRedirectPath(),
+                            applicationReplicaSetToUpgrade.getAutoScalingGroupAmiId());
+            result = LiveContentAwareOperationResult.success(upgradedReplicaSetDTO);
+        } catch (LiveContentConflictException e) {
+            result = LiveContentAwareOperationResult.liveContentConflict(e.getLiveContentCheckResult());
+        }
+        return result;
     }
 
     @Override
@@ -1021,22 +1078,33 @@ public class LandscapeManagementWriteServiceImpl extends ResultCachingProxiedRem
     }    
     
     @Override
-    public SailingApplicationReplicaSetDTO<String> moveMasterToOtherInstance(
+    public LiveContentAwareOperationResult<SailingApplicationReplicaSetDTO<String>> moveMasterToOtherInstance(
             SailingApplicationReplicaSetDTO<String> applicationReplicaSetDTO, boolean useSharedInstance,
-            String optionalInstanceTypeOrNull,
-            String optionalKeyName, byte[] privateKeyEncryptionPassphrase, String optionalMasterReplicationBearerTokenOrNull,
-            String optionalReplicaReplicationBearerTokenOrNull, Integer optionalMemoryInMegabytesOrNull,
-            Integer optionalMemoryTotalSizeFactorOrNull) throws Exception {
+            String optionalInstanceTypeOrNull, String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
+            String optionalMasterReplicationBearerTokenOrNull, String optionalReplicaReplicationBearerTokenOrNull,
+            Integer optionalMemoryInMegabytesOrNull, Integer optionalMemoryTotalSizeFactorOrNull, boolean force)
+            throws Exception {
         checkLandscapeManageAwsPermission();
         final AwsRegion region = new AwsRegion(applicationReplicaSetDTO.getMaster().getHost().getRegion(), getLandscape());
         final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet =
-                convertFromApplicationReplicaSetDTO(region, applicationReplicaSetDTO, optionalKeyName, privateKeyEncryptionPassphrase);
-        return convertToSailingApplicationReplicaSetDTO(
-                getLandscapeService().moveMasterToOtherInstance(replicaSet, useSharedInstance,
-                        optionalInstanceTypeOrNull==null?Optional.empty():Optional.of(InstanceType.valueOf(optionalInstanceTypeOrNull)),
-                        /* optionalPreferredInstanceToDeployTo */ Optional.empty(), optionalKeyName,
-                        privateKeyEncryptionPassphrase, optionalMasterReplicationBearerTokenOrNull, optionalReplicaReplicationBearerTokenOrNull,
-                        optionalMemoryInMegabytesOrNull, optionalMemoryTotalSizeFactorOrNull), Optional.ofNullable(optionalKeyName), privateKeyEncryptionPassphrase);
+                convertFromApplicationReplicaSetDTO(region, applicationReplicaSetDTO, optionalKeyName,
+                        privateKeyEncryptionPassphrase);
+        LiveContentAwareOperationResult<SailingApplicationReplicaSetDTO<String>> result;
+        try {
+            final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> movedReplicaSet =
+                    getLandscapeService().moveMasterToOtherInstance(replicaSet, useSharedInstance,
+                            optionalInstanceTypeOrNull == null ? Optional.empty()
+                                    : Optional.of(InstanceType.valueOf(optionalInstanceTypeOrNull)),
+                            /* optionalPreferredInstanceToDeployTo */ Optional.empty(), optionalKeyName,
+                            privateKeyEncryptionPassphrase, optionalMasterReplicationBearerTokenOrNull,
+                            optionalReplicaReplicationBearerTokenOrNull, optionalMemoryInMegabytesOrNull,
+                            optionalMemoryTotalSizeFactorOrNull, force);
+            result = LiveContentAwareOperationResult.success(convertToSailingApplicationReplicaSetDTO(movedReplicaSet,
+                    Optional.ofNullable(optionalKeyName), privateKeyEncryptionPassphrase));
+        } catch (LiveContentConflictException e) {
+            result = LiveContentAwareOperationResult.liveContentConflict(e.getLiveContentCheckResult());
+        }
+        return result;
     }
 
     @Override
@@ -1141,14 +1209,24 @@ public class LandscapeManagementWriteServiceImpl extends ResultCachingProxiedRem
     }
     
     @Override
-    public void moveAllApplicationProcessesAwayFrom(AwsInstanceDTO host, String optionalInstanceTypeForNewInstance,
-            String optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception {
+    public LiveContentAwareOperationResult<MoveAllApplicationProcessesResultDTO> moveAllApplicationProcessesAwayFrom(
+            AwsInstanceDTO host, String optionalInstanceTypeForNewInstance, String optionalKeyName,
+            byte[] privateKeyEncryptionPassphrase, Set<String> forceMasterReplicaSetNames) throws Exception {
         checkLandscapeManageAwsPermission();
         final SailingAnalyticsHost<String> sailingAnalyticsHost = getHostFromInstanceDTO(host);
-        getLandscapeService().moveAllApplicationProcessesAwayFrom(sailingAnalyticsHost,
-                Optional.ofNullable(optionalInstanceTypeForNewInstance == null ? null
-                        : InstanceType.valueOf(optionalInstanceTypeForNewInstance)),
-                optionalKeyName, privateKeyEncryptionPassphrase);
+        LiveContentAwareOperationResult<MoveAllApplicationProcessesResultDTO> result;
+        try {
+            final Triple<SailingAnalyticsHost<String>, Map<String, SailingAnalyticsProcess<String>>, Map<String, SailingAnalyticsProcess<String>>> moveResult =
+                    getLandscapeService().moveAllApplicationProcessesAwayFrom(sailingAnalyticsHost,
+                            Optional.ofNullable(optionalInstanceTypeForNewInstance == null ? null
+                                    : InstanceType.valueOf(optionalInstanceTypeForNewInstance)), optionalKeyName,
+                            privateKeyEncryptionPassphrase, forceMasterReplicaSetNames);
+            result = LiveContentAwareOperationResult.success(
+                    new MoveAllApplicationProcessesResultDTO(moveResult.getA().getId()));
+        } catch (LiveContentConflictException e) {
+            result = LiveContentAwareOperationResult.liveContentConflict(e.getLiveContentCheckResult());
+        }
+        return result;
     }
     
     @Override

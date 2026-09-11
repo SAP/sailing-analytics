@@ -2,10 +2,13 @@ package com.sap.sailing.landscape.ui.client;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.sap.sailing.domain.common.DataImportProgress;
 import com.sap.sailing.landscape.SailingAnalyticsHost;
+import com.sap.sailing.landscape.common.LiveContentAwareOperationResult;
+import com.sap.sailing.landscape.common.LiveContentCheckResult;
 import com.sap.sailing.landscape.common.SharedLandscapeConstants;
 import com.sap.sailing.landscape.ui.shared.AmazonMachineImageDTO;
 import com.sap.sailing.landscape.ui.shared.AvailabilityZoneDTO;
@@ -15,6 +18,7 @@ import com.sap.sailing.landscape.ui.shared.CompareServersResultDTO;
 import com.sap.sailing.landscape.ui.shared.LeaderboardNameDTO;
 import com.sap.sailing.landscape.ui.shared.MongoEndpointDTO;
 import com.sap.sailing.landscape.ui.shared.MongoScalingInstructionsDTO;
+import com.sap.sailing.landscape.ui.shared.MoveAllApplicationProcessesResultDTO;
 import com.sap.sailing.landscape.ui.shared.ProcessDTO;
 import com.sap.sailing.landscape.ui.shared.ReleaseDTO;
 import com.sap.sailing.landscape.ui.shared.ReverseProxyDTO;
@@ -27,7 +31,7 @@ import com.sap.sse.landscape.aws.common.shared.RedirectDTO;
 
 public interface LandscapeManagementWriteServiceAsync {
     void getRegions(AsyncCallback<ArrayList<String>> callback);
-    
+
     /**
      * @param canBeDeployedInNlbInstanceBasedTargetGroup
      *            A boolean indicating, if true, that the list of available instance types should not contain those,
@@ -39,15 +43,15 @@ public interface LandscapeManagementWriteServiceAsync {
 
     void getMongoEndpoint(String region, String replicaSetName,
             AsyncCallback<MongoEndpointDTO> callback);
-    
+
     void getReverseProxies(String regionId, AsyncCallback<ArrayList<ReverseProxyDTO>> callback);
-    
+
     /**
      * Removes a reverse proxy from the given cluster and terminates it.
      * @return Returns true if a success.
      */
     void removeReverseProxy(ReverseProxyDTO instance, String region, String optionalKeyName, byte[] privateKeyEncryptionPassphrase, AsyncCallback<Void> callback);
-    
+
     /**
      * Rotates the httpd logs on a proxy instance.
      * @param optionalKeyName Name of key used to connect to the instance to restart
@@ -55,18 +59,18 @@ public interface LandscapeManagementWriteServiceAsync {
      */
     void rotateHttpdLogs(ReverseProxyDTO proxy, String region, String optionalKeyName,
             byte[] passphraseForPrivateKeyDecryption, AsyncCallback<Void> callback);
-    
+
     /**
      * Adds a reverse proxy to the cluster and the right load balancer's target group.
      */
     void addReverseProxy(String instanceName, String instanceType, String region, String launchKey, AvailabilityZoneDTO availabilityZoneDTO, AsyncCallback<Void> callback);
-    
-    
+
+
     /**
      * Gets all availability zones in a region.
      */
     void describeAvailabilityZones(String region,AsyncCallback<ArrayList<AvailabilityZoneDTO>> asyncCallback);
-    
+
     /**
      * The calling subject will see only those keys for which it has the {@code READ} permission.
      */
@@ -82,7 +86,7 @@ public interface LandscapeManagementWriteServiceAsync {
      * {@link CREATE_OBJECT} permission on the server on which this is called.
      */
     void generateSshKeyPair(String regionId, String keyName, String privateKeyEncryptionPassphrase, AsyncCallback<SSHKeyPairDTO> callback);
-    
+
     /**
      * Verifies a passphrase for an SSH private key. Returns {@code true} if the passphrase can decipher the private key
      * and {@code false} if this does not work or the key is invalid, or the key is {@code null}.
@@ -114,7 +118,7 @@ public interface LandscapeManagementWriteServiceAsync {
      * credentials.
      */
     void hasValidSessionCredentials(AsyncCallback<Boolean> callback);
-    
+
     /**
      * For a combination of an AWS access key ID, the corresponding secret plus an MFA token code produces new session
      * credentials and stores them in the user's preference store from where they can be obtained again using
@@ -139,7 +143,7 @@ public interface LandscapeManagementWriteServiceAsync {
      * {@link #createMfaSessionCredentials(String, String, String)}.
      */
     void clearSessionCredentials(AsyncCallback<Void> callback);
-    
+
     void getApplicationReplicaSets(String regionId, String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
             AsyncCallback<ArrayList<SailingApplicationReplicaSetDTO<String>>> callback);
 
@@ -160,17 +164,23 @@ public interface LandscapeManagementWriteServiceAsync {
 
     void removeApplicationReplicaSet(String regionId,
             SailingApplicationReplicaSetDTO<String> applicationReplicaSetToRemove, MongoEndpointDTO moveDatabaseHere,
-            String optionalKeyName, byte[] passphraseForPrivateKeyDescryption, AsyncCallback<String> callback);
+            String optionalKeyName, byte[] passphraseForPrivateKeyDescryption, boolean force,
+            AsyncCallback<LiveContentAwareOperationResult<String>> callback);
 
     void createDefaultLoadBalancerMappings(String regionId,
             SailingApplicationReplicaSetDTO<String> applicationReplicaSetToCreateLoadBalancerMappingFor,
             boolean useDynamicLoadBalancer, String optionalDomainName, boolean forceDNSUpdate,
             AsyncCallback<SailingApplicationReplicaSetDTO<String>> callback);
 
+    void checkForLiveContent(String regionId,
+            Iterable<SailingApplicationReplicaSetDTO<String>> applicationReplicaSets, String bearerToken,
+            String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
+            AsyncCallback<LiveContentCheckResult> callback);
+
     void upgradeApplicationReplicaSet(String regionId,
             SailingApplicationReplicaSetDTO<String> applicationReplicaSetToUpgrade, String releaseOrNullForLatestMaster,
             String optionalKeyName, byte[] privateKeyEncryptionPassphrase, String replicationBearerToken,
-            AsyncCallback<SailingApplicationReplicaSetDTO<String>> callback);
+            boolean force, AsyncCallback<LiveContentAwareOperationResult<SailingApplicationReplicaSetDTO<String>>> callback);
 
     void getReleases(AsyncCallback<ArrayList<ReleaseDTO>> asyncCallback);
 
@@ -178,8 +188,8 @@ public interface LandscapeManagementWriteServiceAsync {
             String bearerTokenOrNullForApplicationReplicaSetToArchive, String bearerTokenOrNullForArchive,
             Duration durationToWaitBeforeCompareServers, int maxNumberOfCompareServerAttempts,
             boolean removeApplicationReplicaSet, MongoEndpointDTO moveDatabaseHere, String optionalKeyName,
-            byte[] passphraseForPrivateKeyDecryption,
-            AsyncCallback<Triple<DataImportProgress, CompareServersResultDTO, String>> callback);
+            byte[] passphraseForPrivateKeyDecryption, boolean force,
+            AsyncCallback<LiveContentAwareOperationResult<Triple<DataImportProgress, CompareServersResultDTO, String>>> callback);
 
     void deployApplicationToExistingHost(String replicaSetName, AwsInstanceDTO hostToDeployTo,
             String replicaInstanceType, boolean dynamicLoadBalancerMapping, String releaseNameOrNullForLatestMaster,
@@ -189,7 +199,7 @@ public interface LandscapeManagementWriteServiceAsync {
             Integer optionalMemoryInMegabytesOrNull, Integer optionalMemoryTotalSizeFactorOrNull, Integer optionalIgtimiRiotPort,
             AwsInstanceDTO optionalPreferredInstanceToDeployUnmanagedReplicaTo,
             AsyncCallback<SailingApplicationReplicaSetDTO<String>> callback);
-    
+
     void createArchiveReplicaSet(String regionId, SailingApplicationReplicaSetDTO<String> applicationReplicaSetToUpgrade,
             String optionalSharedInstanceType, String releaseOrNullForLatestMaster, String optionalKeyName,
             byte[] privateKeyEncryptionPassphrase, String securityReplicationBearerToken, String replicaReplicationBearerToken,
@@ -198,6 +208,7 @@ public interface LandscapeManagementWriteServiceAsync {
     void makeCandidateArchiveServerGoLive(String regionId,
             SailingApplicationReplicaSetDTO<String> archiveReplicaSetToUpgrade, String optionalKeyName,
             byte[] privateKeyEncryptionPassphrase, AsyncCallback<Void> callback);
+
     /**
      * For the given replica set ensures there is at least one healthy replica, then stops replicating on all replicas and
      * removes the master from the public and master target groups. This can be used as a preparatory action for upgrading
@@ -208,8 +219,8 @@ public interface LandscapeManagementWriteServiceAsync {
      */
     void ensureAtLeastOneReplicaExistsStopReplicatingAndRemoveMasterFromTargetGroups(String regionId,
             SailingApplicationReplicaSetDTO<String> applicationReplicaSet, String optionalKeyName,
-            byte[] privateKeyEncryptionPassphrase, String replicaReplicationBearerToken,
-            AsyncCallback<Boolean> callback);
+            byte[] privateKeyEncryptionPassphrase, String replicaReplicationBearerToken, boolean force,
+            AsyncCallback<LiveContentAwareOperationResult<Boolean>> callback);
 
     /**
      * Updates the AMI to use in the launch template version of those of the {@code replicaSets} that have an auto-scaling group.
@@ -242,8 +253,8 @@ public interface LandscapeManagementWriteServiceAsync {
             boolean useSharedInstance, String optionalInstanceTypeOrNull, String optionalKeyName,
             byte[] privateKeyEncryptionPassphrase, String optionalMasterReplicationBearerTokenOrNull,
             String optionalReplicaReplicationBearerTokenOrNull, Integer optionalMemoryInMegabytesOrNull,
-            Integer optionalMemoryTotalSizeFactorOrNull,
-            AsyncCallback<SailingApplicationReplicaSetDTO<String>> callback);
+            Integer optionalMemoryTotalSizeFactorOrNull, boolean force,
+            AsyncCallback<LiveContentAwareOperationResult<SailingApplicationReplicaSetDTO<String>>> callback);
 
     void changeAutoScalingReplicasInstanceType(SailingApplicationReplicaSetDTO<String> replicaSet,
             String instanceTypeName, String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
@@ -354,7 +365,8 @@ public interface LandscapeManagementWriteServiceAsync {
      *            where the processes are moved away ({@code host})
      */
     void moveAllApplicationProcessesAwayFrom(AwsInstanceDTO host, String optionalInstanceTypeForNewInstance,
-            String optionalKeyName, byte[] privateKeyEncryptionPassphrase, AsyncCallback<Void> callback);
+            String optionalKeyName, byte[] privateKeyEncryptionPassphrase, Set<String> forceMasterReplicaSetNames,
+            AsyncCallback<LiveContentAwareOperationResult<MoveAllApplicationProcessesResultDTO>> callback);
 
     void hasDNSResourceRecordsForReplicaSet(String replicaSetName, String optionalDomainName, AsyncCallback<Boolean> callback);
 }
