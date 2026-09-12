@@ -293,6 +293,12 @@ log "Opening PR $HEAD_SPEC -> $BASE_REPO:$DOWNSTREAM_BRANCH (authored by the for
 # NOTE: `gh pr create --head` takes owner:branch (cross-fork form), but
 # `gh pr list --head` (the fallback below) takes the BRANCH NAME ONLY — hence we
 # filter the list by head-fork owner separately, matching the early check above.
+echo "gh pr create 
+       --repo \"$BASE_REPO\"
+       --base \"$DOWNSTREAM_BRANCH\"
+       --head \"$HEAD_SPEC\"
+       --title \"$PR_TITLE\"
+       --body-file \"$PR_BODY_FILE\""
 if ! GH_TOKEN="$FORK_PAT" GH_HOST="$FORK_HOST" \
      gh pr create \
        --repo "$BASE_REPO" \
