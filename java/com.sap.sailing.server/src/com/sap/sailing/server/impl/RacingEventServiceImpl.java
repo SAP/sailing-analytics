@@ -2159,16 +2159,23 @@ Replicator {
                             raceTrackingHandler, /* markPassingRaceFingerprintRegistry */ this, /*maneuverRaceFingerprintRegistry*/ this);
                     assert tracker.getRegatta() == regatta;
                 }
+                final Set<Consumer<RaceTracker>> claimedCallbacks;
                 LockUtil.lockForWrite(raceTrackersByRegattaLock);
                 try {
                     raceTrackersByID.put(tracker.getID(), tracker);
                     final Set<RaceTracker> trackers = raceTrackersByRegatta.computeIfAbsent(tracker.getRegatta(),
                             r->Collections.newSetFromMap(new ConcurrentHashMap<>()));
                     trackers.add(tracker);
-                    notifyListenersForNewRaceTracker(tracker);
+                    // Claim the callbacks under the write lock, atomically with publishing the tracker, so that a
+                    // concurrent getRaceTrackerByRegattaAndRaceIdentifier(...) can never miss it. Invoking them,
+                    // however, is deferred until after the lock is released because a callback may block (e.g. tracker
+                    // startup waiting for race logs to attach) and holding the global lock across such a wait would
+                    // stall all other readers and writers of raceTrackersByRegatta.
+                    claimedCallbacks = removeListenersForNewRaceTracker(tracker);
                 } finally {
                     LockUtil.unlockAfterWrite(raceTrackersByRegattaLock);
                 }
+                invokeRaceTrackerCallbacks(tracker, claimedCallbacks);
                 // TODO we assume here that the regatta name is unique which necessitates adding the boat class name to
                 // it in RegattaImpl constructor
                 String regattaName = tracker.getRegatta().getName();
@@ -2220,6 +2227,40 @@ Replicator {
             return tracker.getRaceHandle();
         } finally {
             unlockRaceTrackersById(trackerID, raceTrackersByIdLock);
+        }
+    }
+
+    /**
+     * Claims (removes and returns) the callbacks registered for the {@code tracker}'s
+     * {@link RaceTracker#getRaceIdentifier() race identifier}. This must run under the
+     * {@link #raceTrackersByRegattaLock} write lock, atomically with the insertion of the tracker into
+     * {@link #raceTrackersByRegatta}, so that a concurrent {@link #getRaceTrackerByRegattaAndRaceIdentifier} (which
+     * under the read lock either finds the tracker or enqueues its callback) can never end up with a callback that is
+     * neither invoked directly nor picked up here. The returned callbacks are meant to be
+     * {@link #invokeRaceTrackerCallbacks(RaceTracker, Set) invoked afterwards}, outside the lock, because invoking them
+     * may block (e.g. tracker startup waiting for race logs to attach) and must not hold the global
+     * {@link #raceTrackersByRegattaLock} while doing so.
+     */
+    private Set<Consumer<RaceTracker>> removeListenersForNewRaceTracker(RaceTracker tracker) {
+        final RaceIdentifier raceIdentifier = tracker.getRaceIdentifier();
+        final Set<Consumer<RaceTracker>> result;
+        if (raceIdentifier != null) {
+            result = getRaceTrackerCallbacks().remove(raceIdentifier);
+        } else {
+            result = null;
+        }
+        return result;
+    }
+
+    /**
+     * Invokes the callbacks {@link #removeListenersForNewRaceTracker(RaceTracker) claimed} for a newly added
+     * {@code tracker}. Intended to be called <em>after</em> the {@link #raceTrackersByRegattaLock} write lock has been
+     * released, as a callback may block (e.g. waiting for race logs to attach) and holding the global lock across such
+     * a wait would stall all other readers and writers of {@link #raceTrackersByRegatta}.
+     */
+    private void invokeRaceTrackerCallbacks(RaceTracker tracker, Set<Consumer<RaceTracker>> callbacks) {
+        if (callbacks != null) {
+            callbacks.forEach((callback) -> callback.accept(tracker));
         }
     }
 
@@ -5055,9 +5096,13 @@ Replicator {
             LockUtil.unlockAfterRead(regattasByNameLock);
         }
         if (regatta != null) {
-            // it's important to obtain the read lock here to make sure that while deciding which callbacks to invoke
-            // and which callbacks to enqueue no concurrent insertions take place which could lead to trackers ending
-            // up not invoking their callback. See the write-locking in addRace(...).
+            // It's important to obtain the read lock here so that deciding whether a matching tracker already exists
+            // and, if not, enqueueing the callback happens atomically against addRace(...): under its write lock
+            // addRace(...) publishes the tracker into raceTrackersByRegatta and, in the same critical section, claims
+            // (removes) the callbacks registered here. Without this locking a tracker could be published between our
+            // lookup and our enqueue, leaving the callback neither found here nor claimed there. Note that addRace(...)
+            // only *claims* the callbacks under the lock and *invokes* them after releasing it; the enqueue below is
+            // therefore guaranteed to be either observed by that claim or preceded by a tracker we already found.
             LockUtil.lockForRead(raceTrackersByRegattaLock);
             try {
                 final Set<RaceTracker> raceTrackersForRegatta = raceTrackersByRegatta.get(regatta);
@@ -5086,16 +5131,6 @@ Replicator {
             }
         }
         return raceTrackerCallbacks;
-    }
-
-    private void notifyListenersForNewRaceTracker(RaceTracker tracker) {
-        final RaceIdentifier raceIdentifier = tracker.getRaceIdentifier();
-        if (raceIdentifier != null) {
-            Set<Consumer<RaceTracker>> callbacks = getRaceTrackerCallbacks().remove(raceIdentifier);
-            if (callbacks != null) {
-                callbacks.forEach((callback) -> callback.accept(tracker));
-            }
-        }
     }
 
     @Override
