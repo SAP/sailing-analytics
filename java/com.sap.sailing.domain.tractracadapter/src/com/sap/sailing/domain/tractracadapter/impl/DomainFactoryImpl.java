@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -396,7 +397,10 @@ public class DomainFactoryImpl implements DomainFactory {
         return domainBoat;
     }
 
-    private DynamicTeam createTeam(String name, Nationality nationality, UUID competitorId) {
+    /**
+     * public only for testing purposes
+     */
+    public DynamicTeam createTeam(String name, Nationality nationality, UUID competitorId) {
         DynamicTeam result;
         String[] sailorNames = name==null?new String[] { "" } : name.split("\\b*\\+\\b*");
         List<DynamicPerson> sailors = new ArrayList<DynamicPerson>();
@@ -415,6 +419,8 @@ public class DomainFactoryImpl implements DomainFactory {
             if (result == null) {
                 result = new PersonImpl(name, nationality, /* date of birth unknown */null, /* description */"");
                 personCache.put(key, result);
+            } else if (!Objects.equals(nationality, result.getNationality())) {
+                result.setNationality(nationality);
             }
             return result;
         }
