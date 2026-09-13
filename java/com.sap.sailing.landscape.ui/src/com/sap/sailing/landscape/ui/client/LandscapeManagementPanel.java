@@ -706,6 +706,9 @@ public class LandscapeManagementPanel extends SimplePanel {
                                                 applicationReplicaSetsBusy.setBusy(false);
                                             }
                                         } else {
+                                            // The operation was refused because one or more affected replica sets are
+                                            // currently serving live content (a live-content conflict); offer the user
+                                            // the chance to proceed and force the operation anyway.
                                             applicationReplicaSetsBusy.setBusy(false);
                                             showLiveContentWarning(result.getLiveContentCheckResult(), confirmed -> {
                                                 if (confirmed) {
@@ -1204,6 +1207,9 @@ public class LandscapeManagementPanel extends SimplePanel {
                                                     fromHost.getInstanceId()), NotificationType.SUCCESS);
                                             refreshApplicationReplicaSetsTable();
                                         } else {
+                                            // The operation was refused because one or more affected replica sets are
+                                            // currently serving live content (a live-content conflict); offer the user
+                                            // the chance to proceed and force the operation on the conflicting sets.
                                             showLiveContentWarning(result.getLiveContentCheckResult(), confirmed -> {
                                                 if (confirmed) {
                                                     applicationReplicaSetsBusy.setBusy(true);
@@ -1333,6 +1339,9 @@ public class LandscapeManagementPanel extends SimplePanel {
                                                 mongoDbArchivingErrorMessage));
                                     }
                                 } else {
+                                    // The operation was refused because one or more affected replica sets are
+                                    // currently serving live content (a live-content conflict); offer the user
+                                    // the chance to proceed and force the operation anyway.
                                     applicationReplicaSetsBusy.setBusy(false);
                                     showLiveContentWarning(result.getLiveContentCheckResult(), confirmed -> {
                                         if (confirmed) {
@@ -1411,6 +1420,9 @@ public class LandscapeManagementPanel extends SimplePanel {
                             public void onSuccess(final LiveContentAwareOperationResult<Triple<DataImportProgress, CompareServersResultDTO, String>> operationResult) {
                                 applicationReplicaSetsBusy.setBusy(false);
                                 if (!operationResult.isSuccessful()) {
+                                    // The operation was refused because one or more affected replica sets are
+                                    // currently serving live content (a live-content conflict); offer the user
+                                    // the chance to proceed and force the operation anyway.
                                     showLiveContentWarning(operationResult.getLiveContentCheckResult(), confirmed -> {
                                         if (confirmed) {
                                             applicationReplicaSetsBusy.setBusy(true);
@@ -1635,6 +1647,9 @@ public class LandscapeManagementPanel extends SimplePanel {
                                                                 applicationReplicaSetsTable.replaceBasedOnEntityIdentityComparator(result);
                                                                 applicationReplicaSetsTable.refresh();
                                                             } else {
+                                                                // The operation was refused because one or more affected replica sets
+                                                                // are currently serving live content (a live-content conflict); offer
+                                                                // the user the chance to proceed and force the operation anyway.
                                                                 showLiveContentWarning(operationResult.getLiveContentCheckResult(), confirmed -> {
                                                                     if (confirmed) {
                                                                         howManyMoreToGo[0]++;
