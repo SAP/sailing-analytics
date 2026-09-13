@@ -53,7 +53,6 @@ import com.sap.sailing.landscape.ui.shared.AwsInstanceDTO;
 import com.sap.sailing.landscape.ui.shared.CompareServersResultDTO;
 import com.sap.sailing.landscape.ui.shared.MongoEndpointDTO;
 import com.sap.sailing.landscape.ui.shared.MongoScalingInstructionsDTO;
-import com.sap.sailing.landscape.ui.shared.MoveAllApplicationProcessesResultDTO;
 import com.sap.sailing.landscape.ui.shared.ProcessDTO;
 import com.sap.sailing.landscape.ui.shared.ReleaseDTO;
 import com.sap.sailing.landscape.ui.shared.ReverseProxyDTO;
@@ -1161,7 +1160,7 @@ public class LandscapeManagementPanel extends SimplePanel {
                                 sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null
                                 ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
                                 Collections.emptySet(),
-                                new AsyncCallback<LiveContentAwareOperationResult<MoveAllApplicationProcessesResultDTO>>() {
+                                new AsyncCallback<LiveContentAwareOperationResult<String>>() {
                                     @Override
                                     public void onFailure(Throwable caught) {
                                         applicationReplicaSetsBusy.setBusy(false);
@@ -1169,7 +1168,7 @@ public class LandscapeManagementPanel extends SimplePanel {
                                     }
 
                                     @Override
-                                    public void onSuccess(final LiveContentAwareOperationResult<MoveAllApplicationProcessesResultDTO> result) {
+                                    public void onSuccess(final LiveContentAwareOperationResult<String> result) {
                                         applicationReplicaSetsBusy.setBusy(false);
                                         if (result.isSuccessful()) {
                                             Notification.notify(stringMessages.successfullyMovedAllProcessesAwayFromHost(

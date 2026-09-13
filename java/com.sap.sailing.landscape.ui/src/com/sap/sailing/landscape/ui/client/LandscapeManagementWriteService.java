@@ -16,7 +16,6 @@ import com.sap.sailing.landscape.ui.shared.CompareServersResultDTO;
 import com.sap.sailing.landscape.ui.shared.LeaderboardNameDTO;
 import com.sap.sailing.landscape.ui.shared.MongoEndpointDTO;
 import com.sap.sailing.landscape.ui.shared.MongoScalingInstructionsDTO;
-import com.sap.sailing.landscape.ui.shared.MoveAllApplicationProcessesResultDTO;
 import com.sap.sailing.landscape.ui.shared.ProcessDTO;
 import com.sap.sailing.landscape.ui.shared.ReleaseDTO;
 import com.sap.sailing.landscape.ui.shared.ReverseProxyDTO;
@@ -194,7 +193,7 @@ public interface LandscapeManagementWriteService extends RemoteService {
     
     void removeShardingKeysFromShard(Iterable<LeaderboardNameDTO> shardingKeysToRemove, String region, String shardName, SailingApplicationReplicaSetDTO<String> replicaSet, String bearerToken, String optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception;
 
-    LiveContentAwareOperationResult<MoveAllApplicationProcessesResultDTO> moveAllApplicationProcessesAwayFrom(
+    LiveContentAwareOperationResult<String> moveAllApplicationProcessesAwayFrom(
             AwsInstanceDTO host, String optionalInstanceTypeForNewInstance, String optionalKeyName,
             byte[] privateKeyEncryptionPassphrase, Set<String> forceMasterReplicaSetNames) throws Exception;
 

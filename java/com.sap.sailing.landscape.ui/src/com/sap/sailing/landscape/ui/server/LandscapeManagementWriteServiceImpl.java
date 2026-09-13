@@ -62,7 +62,6 @@ import com.sap.sailing.landscape.ui.shared.LeaderboardNameDTO;
 import com.sap.sailing.landscape.ui.shared.MongoEndpointDTO;
 import com.sap.sailing.landscape.ui.shared.MongoProcessDTO;
 import com.sap.sailing.landscape.ui.shared.MongoScalingInstructionsDTO;
-import com.sap.sailing.landscape.ui.shared.MoveAllApplicationProcessesResultDTO;
 import com.sap.sailing.landscape.ui.shared.ProcessDTO;
 import com.sap.sailing.landscape.ui.shared.ReleaseDTO;
 import com.sap.sailing.landscape.ui.shared.ReverseProxyDTO;
@@ -1209,12 +1208,12 @@ public class LandscapeManagementWriteServiceImpl extends ResultCachingProxiedRem
     }
     
     @Override
-    public LiveContentAwareOperationResult<MoveAllApplicationProcessesResultDTO> moveAllApplicationProcessesAwayFrom(
+    public LiveContentAwareOperationResult<String> moveAllApplicationProcessesAwayFrom(
             AwsInstanceDTO host, String optionalInstanceTypeForNewInstance, String optionalKeyName,
             byte[] privateKeyEncryptionPassphrase, Set<String> forceMasterReplicaSetNames) throws Exception {
         checkLandscapeManageAwsPermission();
         final SailingAnalyticsHost<String> sailingAnalyticsHost = getHostFromInstanceDTO(host);
-        LiveContentAwareOperationResult<MoveAllApplicationProcessesResultDTO> result;
+        LiveContentAwareOperationResult<String> result;
         try {
             final Triple<SailingAnalyticsHost<String>, Map<String, SailingAnalyticsProcess<String>>, Map<String, SailingAnalyticsProcess<String>>> moveResult =
                     getLandscapeService().moveAllApplicationProcessesAwayFrom(sailingAnalyticsHost,
@@ -1222,7 +1221,7 @@ public class LandscapeManagementWriteServiceImpl extends ResultCachingProxiedRem
                                     : InstanceType.valueOf(optionalInstanceTypeForNewInstance)), optionalKeyName,
                             privateKeyEncryptionPassphrase, forceMasterReplicaSetNames);
             result = LiveContentAwareOperationResult.success(
-                    new MoveAllApplicationProcessesResultDTO(moveResult.getA().getId()));
+                    moveResult.getA().getId());
         } catch (LiveContentConflictException e) {
             result = LiveContentAwareOperationResult.liveContentConflict(e.getLiveContentCheckResult());
         }

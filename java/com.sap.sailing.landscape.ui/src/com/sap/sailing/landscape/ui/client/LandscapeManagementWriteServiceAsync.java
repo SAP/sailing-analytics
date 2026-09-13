@@ -18,7 +18,6 @@ import com.sap.sailing.landscape.ui.shared.CompareServersResultDTO;
 import com.sap.sailing.landscape.ui.shared.LeaderboardNameDTO;
 import com.sap.sailing.landscape.ui.shared.MongoEndpointDTO;
 import com.sap.sailing.landscape.ui.shared.MongoScalingInstructionsDTO;
-import com.sap.sailing.landscape.ui.shared.MoveAllApplicationProcessesResultDTO;
 import com.sap.sailing.landscape.ui.shared.ProcessDTO;
 import com.sap.sailing.landscape.ui.shared.ReleaseDTO;
 import com.sap.sailing.landscape.ui.shared.ReverseProxyDTO;
@@ -427,10 +426,19 @@ public interface LandscapeManagementWriteServiceAsync {
      *            check result} lists the detected live content, so the user can decide whether to proceed anyway.
      *            Listing a replica set name here skips that safety check for it and forces its master to be moved
      *            regardless of any live content, potentially disrupting a live race.
+     * @param callback
+     *            on success, receives a {@link LiveContentAwareOperationResult} that is
+     *            {@link LiveContentAwareOperationResult#isSuccessful() successful} and whose
+     *            {@link LiveContentAwareOperationResult#getSuccessfulResult() successful result} is the ID of the new
+     *            host to which all application processes have been moved. If the operation was blocked because one or
+     *            more affected primaries not listed in {@code forceMasterReplicaSetNames} were found to be serving live
+     *            content, it instead receives a result that is not
+     *            {@link LiveContentAwareOperationResult#isSuccessful() successful} and that carries the
+     *            {@link LiveContentAwareOperationResult#getLiveContentCheckResult() live-content check result}.
      */
     void moveAllApplicationProcessesAwayFrom(AwsInstanceDTO host, String optionalInstanceTypeForNewInstance,
             String optionalKeyName, byte[] privateKeyEncryptionPassphrase, Set<String> forceMasterReplicaSetNames,
-            AsyncCallback<LiveContentAwareOperationResult<MoveAllApplicationProcessesResultDTO>> callback);
+            AsyncCallback<LiveContentAwareOperationResult<String>> callback);
 
     void hasDNSResourceRecordsForReplicaSet(String replicaSetName, String optionalDomainName, AsyncCallback<Boolean> callback);
 }
