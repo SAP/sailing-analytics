@@ -63,6 +63,7 @@ import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Triple;
+import com.sap.sse.common.util.Holder;
 import com.sap.sse.common.util.NaturalComparator;
 import com.sap.sse.gwt.adminconsole.AdminConsoleTableResources;
 import com.sap.sse.gwt.client.EntryPointHelper;
@@ -677,9 +678,8 @@ public class LandscapeManagementPanel extends SimplePanel {
                             final Iterator<SailingApplicationReplicaSetDTO<String>> replicaSetIterator, StringMessages stringMessages) {
                         assert replicaSetIterator.hasNext();
                         final SailingApplicationReplicaSetDTO<String> replicaSet = replicaSetIterator.next();
-                        @SuppressWarnings("unchecked")
-                        final Consumer<Boolean>[] issueRequest = new Consumer[1];
-                        issueRequest[0] = force -> landscapeManagementService.moveMasterToOtherInstance(replicaSet,
+                        final Holder<Consumer<Boolean>> issueRequest = new Holder<>();
+                        issueRequest.value = force -> landscapeManagementService.moveMasterToOtherInstance(replicaSet,
                                 instructions.isSharedMasterInstance(), instructions.getInstanceTypeOrNull(),
                                 sshKeyManagementPanel.getSelectedKeyPair() == null ? null : sshKeyManagementPanel.getSelectedKeyPair().getName(),
                                 sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
@@ -713,13 +713,13 @@ public class LandscapeManagementPanel extends SimplePanel {
                                             showLiveContentWarning(result.getLiveContentCheckResult(), confirmed -> {
                                                 if (confirmed) {
                                                     applicationReplicaSetsBusy.setBusy(true);
-                                                    issueRequest[0].accept(/* force */ true);
+                                                    issueRequest.value.accept(/* force */ true);
                                                 }
                                             });
                                         }
                                     }
                                 });
-                        issueRequest[0].accept(/* force */ false);
+                        issueRequest.value.accept(/* force */ false);
                     }
 
                     @Override
@@ -1185,9 +1185,8 @@ public class LandscapeManagementPanel extends SimplePanel {
                     @Override
                     public void ok(String optionalInstanceTypeName) {
                         applicationReplicaSetsBusy.setBusy(true);
-                        @SuppressWarnings("unchecked")
-                        final Consumer<Set<String>>[] issueRequest = new Consumer[1];
-                        issueRequest[0] = forceMasterReplicaSetNames -> landscapeManagementService.moveAllApplicationProcessesAwayFrom(fromHost, optionalInstanceTypeName,
+                        final Holder<Consumer<Set<String>>> issueRequest = new Holder<>();
+                        issueRequest.value = forceMasterReplicaSetNames -> landscapeManagementService.moveAllApplicationProcessesAwayFrom(fromHost, optionalInstanceTypeName,
                                 sshKeyManagementPanel.getSelectedKeyPair()==null?null:sshKeyManagementPanel.getSelectedKeyPair().getName(),
                                 sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null
                                 ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
@@ -1213,13 +1212,13 @@ public class LandscapeManagementPanel extends SimplePanel {
                                             showLiveContentWarning(result.getLiveContentCheckResult(), confirmed -> {
                                                 if (confirmed) {
                                                     applicationReplicaSetsBusy.setBusy(true);
-                                                    issueRequest[0].accept(getConflictingReplicaSetNames(result.getLiveContentCheckResult()));
+                                                    issueRequest.value.accept(getConflictingReplicaSetNames(result.getLiveContentCheckResult()));
                                                 }
                                             });
                                         }
                                     }
                                 });
-                        issueRequest[0].accept(Collections.emptySet());
+                        issueRequest.value.accept(Collections.emptySet());
                     }
 
                     @Override
@@ -1315,9 +1314,8 @@ public class LandscapeManagementPanel extends SimplePanel {
         final ApplicationReplicaSetActionChainingCallback<String> applicationReplicaSetActionChainingCallback = new ApplicationReplicaSetActionChainingCallback<String>(replicaSetIterator, applicationReplicaSetToRemove,
                 (rId, rsi)->removeApplicationReplicaSet(rId, rsi, stringMessages), regionId,
                 replicaSetName->stringMessages.successfullyRemovedApplicationReplicaSet(replicaSetName));
-        @SuppressWarnings("unchecked")
-        final Consumer<Boolean>[] issueRequest = new Consumer[1];
-        issueRequest[0] = force -> landscapeManagementService.removeApplicationReplicaSet(regionId, applicationReplicaSetToRemove, selectedMongoEndpointForDBArchiving,
+        final Holder<Consumer<Boolean>> issueRequest = new Holder<>();
+        issueRequest.value = force -> landscapeManagementService.removeApplicationReplicaSet(regionId, applicationReplicaSetToRemove, selectedMongoEndpointForDBArchiving,
                 sshKeyManagementPanel.getSelectedKeyPair()==null?null:sshKeyManagementPanel.getSelectedKeyPair().getName(),
                         sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null
                         ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
@@ -1346,13 +1344,13 @@ public class LandscapeManagementPanel extends SimplePanel {
                                     showLiveContentWarning(result.getLiveContentCheckResult(), confirmed -> {
                                         if (confirmed) {
                                             applicationReplicaSetsBusy.setBusy(true);
-                                            issueRequest[0].accept(/* force */ true);
+                                            issueRequest.value.accept(/* force */ true);
                                         }
                                     });
                                 }
                             }
                         });
-        issueRequest[0].accept(/* force */ false);
+        issueRequest.value.accept(/* force */ false);
     }
     
     private static class ReplicaSetArchivingParameters {
@@ -1397,9 +1395,8 @@ public class LandscapeManagementPanel extends SimplePanel {
                     @Override
                     public void ok(ReplicaSetArchivingParameters bearerTokensAndWhetherToRemoveReplicaSet) {
                         applicationReplicaSetsBusy.setBusy(true);
-                        @SuppressWarnings("unchecked")
-                        final Consumer<Boolean>[] issueRequest = new Consumer[1];
-                        issueRequest[0] = force -> landscapeManagementService.archiveReplicaSet(regionId, applicationReplicaSetToArchive,
+                        final Holder<Consumer<Boolean>> issueRequest = new Holder<>();
+                        issueRequest.value = force -> landscapeManagementService.archiveReplicaSet(regionId, applicationReplicaSetToArchive,
                                 bearerTokensAndWhetherToRemoveReplicaSet.getBearerTokenOrNullForApplicationReplicaSetToArchive(),
                                 bearerTokensAndWhetherToRemoveReplicaSet.getBearerTokenOrNullForArchive(),
                                 bearerTokensAndWhetherToRemoveReplicaSet.getDurationToWaitBeforeAndBetweenCompareServerAttempts(),
@@ -1426,7 +1423,7 @@ public class LandscapeManagementPanel extends SimplePanel {
                                     showLiveContentWarning(operationResult.getLiveContentCheckResult(), confirmed -> {
                                         if (confirmed) {
                                             applicationReplicaSetsBusy.setBusy(true);
-                                            issueRequest[0].accept(/* force */ true);
+                                            issueRequest.value.accept(/* force */ true);
                                         }
                                     });
                                 } else {
@@ -1457,7 +1454,7 @@ public class LandscapeManagementPanel extends SimplePanel {
                                 }
                             }
                         });
-                        issueRequest[0].accept(/* force */ false);
+                        issueRequest.value.accept(/* force */ false);
                     }
 
                     @Override
@@ -1620,9 +1617,8 @@ public class LandscapeManagementPanel extends SimplePanel {
                                     new Timer() {
                                         @Override
                                         public void run() {
-                                            @SuppressWarnings("unchecked")
-                                            final Consumer<Boolean>[] issueRequest = new Consumer[1];
-                                            issueRequest[0] = force -> landscapeManagementService.upgradeApplicationReplicaSet(regionId, replicaSet,
+                                            final Holder<Consumer<Boolean>> issueRequest = new Holder<>();
+                                            issueRequest.value = force -> landscapeManagementService.upgradeApplicationReplicaSet(regionId, replicaSet,
                                                     upgradeInstructions.getReleaseNameOrNullForLatestMaster(),
                                                     sshKeyManagementPanel.getSelectedKeyPair()==null?null:sshKeyManagementPanel.getSelectedKeyPair().getName(),
                                                             sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null
@@ -1654,13 +1650,13 @@ public class LandscapeManagementPanel extends SimplePanel {
                                                                     if (confirmed) {
                                                                         howManyMoreToGo[0]++;
                                                                         applicationReplicaSetsBusy.setBusy(true);
-                                                                        issueRequest[0].accept(/* force */ true);
+                                                                        issueRequest.value.accept(/* force */ true);
                                                                     }
                                                                 });
                                                             }
                                                         }
                                                     });
-                                            issueRequest[0].accept(/* force */ false);
+                                            issueRequest.value.accept(/* force */ false);
                                         }
                                     }.schedule((int) timeToWaitUntilUpgradingNextReplicaSet.asMillis());
                                     timeToWaitUntilUpgradingNextReplicaSet = timeToWaitUntilUpgradingNextReplicaSet.plus(

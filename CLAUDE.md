@@ -10,6 +10,8 @@ Make sure to research the topic/question well and thoroughly instead of just ans
 
 ## Java Coding Style Preferences
 
+### When using any form of auto-formatting, keep it to the actual change and make sure not to apply any auto-formatting to otherwise unchanged code. This would make reviewing a pain.
+
 ### Variable Declarations
 - **Always use `final` where possible** for local variables, parameters, and fields
 - Prefer immutability
