@@ -226,6 +226,14 @@ public interface LandscapeService {
     LiveContentCheckResult checkForLiveContent(Iterable<AwsApplicationReplicaSet<String, SailingAnalyticsMetrics,
             SailingAnalyticsProcess<String>>> applicationReplicaSets, String bearerToken) throws Exception;
 
+    /**
+     * @param force
+     *            when {@code false} (the recommended default), the affected replica set is first checked for live
+     *            content (e.g., a race that is being tracked live). If live content is found, archiving is not carried
+     *            out and a {@link LiveContentConflictException} carrying the {@link LiveContentCheckResult} is thrown so
+     *            the caller can decide whether to proceed anyway. When {@code true}, this safety check is skipped and
+     *            archiving proceeds regardless of any live content, potentially disrupting a live race.
+     */
     Triple<DataImportProgress, CompareServersResult, String> archiveReplicaSet(String regionId,
             AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> applicationReplicaSetToArchive,
             String bearerTokenOrNullForApplicationReplicaSetToArchive, String bearerTokenOrNullForArchive,
@@ -246,6 +254,12 @@ public interface LandscapeService {
      *            endpoint
      * @return an error message string in case archiving the database was requested but failed for some reason;
      *         {@code null} otherwise
+     * @param force
+     *            when {@code false} (the recommended default), the affected replica set is first checked for live
+     *            content (e.g., a race that is being tracked live). If live content is found, the removal is not carried
+     *            out and a {@link LiveContentConflictException} carrying the {@link LiveContentCheckResult} is thrown so
+     *            the caller can decide whether to proceed anyway. When {@code true}, this safety check is skipped and
+     *            the removal proceeds regardless of any live content, potentially disrupting a live race.
      */
     String removeApplicationReplicaSet(String regionId,
             AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> applicationReplicaSetToRemove,
@@ -291,6 +305,13 @@ public interface LandscapeService {
      * Shards are updated by spinning up replicas for the temporary transition and changing the auto scaling config.
      * After that all shard replicas are getting shutdown and restarted with the new launch config.
      * It's expected that the replica set has its own auto scaling group if it has shards.
+     *
+     * @param force
+     *            when {@code false} (the recommended default), the {@code replicaSet} is first checked for live content
+     *            (e.g., a race that is being tracked live). If live content is found, the upgrade is not carried out and
+     *            a {@link LiveContentConflictException} carrying the {@link LiveContentCheckResult} is thrown so the
+     *            caller can decide whether to proceed anyway. When {@code true}, this safety check is skipped and the
+     *            upgrade proceeds regardless of any live content, potentially disrupting a live race.
      */
     AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> upgradeApplicationReplicaSet(AwsRegion region,
             AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet,
@@ -301,6 +322,12 @@ public interface LandscapeService {
     /**
      * @return a new replica that was started in case no running replica was found in the {@code replicaSet}, otherwise
      *         {@code null}.
+     * @param force
+     *            when {@code false} (the recommended default), the {@code replicaSet} is first checked for live content
+     *            (e.g., a race that is being tracked live). If live content is found, the operation is not carried out
+     *            and a {@link LiveContentConflictException} carrying the {@link LiveContentCheckResult} is thrown so the
+     *            caller can decide whether to proceed anyway. When {@code true}, this safety check is skipped and the
+     *            operation proceeds regardless of any live content, potentially disrupting a live race.
      */
     SailingAnalyticsProcess<String> ensureAtLeastOneReplicaExistsStopReplicatingAndRemoveMasterFromTargetGroups(
             AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet,
@@ -440,6 +467,12 @@ public interface LandscapeService {
      *            can be used if {@code useSharedInstance} is {@code true} to specify a preferred shared instance to
      *            deploy the new master process to. The instance will be checked for eligibility first, including
      *            checking the AZ, and if not eligible the method behaves as if the instance had not been specified.
+     * @param force
+     *            when {@code false} (the recommended default), the {@code replicaSet} is first checked for live content
+     *            (e.g., a race that is being tracked live). If live content is found, the master is not moved and a
+     *            {@link LiveContentConflictException} carrying the {@link LiveContentCheckResult} is thrown so the caller
+     *            can decide whether to proceed anyway. When {@code true}, this safety check is skipped and the master is
+     *            moved regardless of any live content, potentially disrupting a live race.
      */
     <AppConfigBuilderT extends SailingAnalyticsMasterConfiguration.Builder<AppConfigBuilderT, String>,
     MultiServerDeployerBuilderT extends DeployProcessOnMultiServer.Builder<MultiServerDeployerBuilderT, String, SailingAnalyticsHost<String>, SailingAnalyticsMasterConfiguration<String>, AppConfigBuilderT>>
