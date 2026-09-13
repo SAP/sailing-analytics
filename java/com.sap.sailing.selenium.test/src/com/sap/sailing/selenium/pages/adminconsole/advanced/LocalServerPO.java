@@ -2,6 +2,7 @@ package com.sap.sailing.selenium.pages.adminconsole.advanced;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import com.sap.sailing.selenium.core.BySeleniumId;
 import com.sap.sailing.selenium.core.FindBy;
@@ -38,25 +39,38 @@ public class LocalServerPO extends PageArea {
         return new IpBlocklistPanelPO(this.driver, wrappedTable);
     }
 
-    public void setSelfServiceServer(boolean selfService) {
+    public void setSelfServiceServer(final boolean selfService) {
         if (selfService != isSelfServiceServerCheckbox.isSelected()) {
-            isSelfServiceServerCheckbox.click();
+            clickAndAwaitSelectionState(isSelfServiceServerCheckbox, selfService);
             awaitServerConfigurationUpdated();
         }
     }
 
-    public void setPublicServer(boolean publicServer) {
+    public void setPublicServer(final boolean publicServer) {
         if (publicServer != isPublicServerCheckbox.isSelected()) {
-            isPublicServerCheckbox.click();
+            clickAndAwaitSelectionState(isPublicServerCheckbox, publicServer);
             awaitServerConfigurationUpdated();
         }
     }
 
-    public void setStandaloneServer(boolean standalone) {
+    public void setStandaloneServer(final boolean standalone) {
         if (standalone != isStandaloneServerCheckbox.isSelected()) {
-            isStandaloneServerCheckbox.click();
+            clickAndAwaitSelectionState(isStandaloneServerCheckbox, standalone);
             awaitServerConfigurationUpdated();
         }
+    }
+
+    /**
+     * Clicks the given checkbox and blocks until the Selenium driver observes the checkbox in the
+     * {@code expectedSelectionState}. In Selenium 4 {@link WebElement#click()} is a W3C command that may return before
+     * the browser has run the element's value-change handler; without this barrier a subsequent poll of the
+     * {@code updating} attribute in {@link #awaitServerConfigurationUpdated()} could read the pre-click state and return
+     * immediately. Once the new selection state is visible, the value-change handler has fired and the server
+     * configuration update RPC is in flight, so {@link #awaitServerConfigurationUpdated()} observes a consistent flag.
+     */
+    private void clickAndAwaitSelectionState(final WebElement checkbox, final boolean expectedSelectionState) {
+        checkbox.click();
+        createFluentWait(driver).until(ExpectedConditions.elementSelectionStateToBe(checkbox, expectedSelectionState));
     }
 
     private void awaitServerConfigurationUpdated() {
