@@ -48,6 +48,7 @@ import com.sap.sailing.server.gateway.jaxrs.api.EventsResource;
 import com.sap.sailing.server.gateway.jaxrs.api.LeaderboardGroupsResource;
 import com.sap.sailing.server.gateway.jaxrs.api.LeaderboardsResource;
 import com.sap.sailing.server.gateway.jaxrs.api.LiveContentResource;
+import com.sap.sse.common.TimePoint;
 import com.sap.sailing.server.gateway.jaxrs.api.MasterDataImportResource;
 import com.sap.sailing.server.gateway.jaxrs.api.RemoteServerReferenceResource;
 import com.sap.sailing.server.gateway.serialization.LeaderboardGroupConstants;
@@ -130,10 +131,10 @@ public class SailingServerImpl extends SecuredServerImpl implements SailingServe
     }
 
     @Override
-    public LiveContentCheckResult getLiveContent(final long checkedAtMillis) throws ClientProtocolException, IOException,
+    public LiveContentCheckResult getLiveContent(final TimePoint checkedAt) throws ClientProtocolException, IOException,
             ParseException, JsonDeserializationException {
         final URL liveContentUrl = new URL(getBaseUrl(), GATEWAY_URL_PREFIX + LiveContentResource.V1_LIVE_CONTENT +
-                "?" + LiveContentResource.CHECKED_AT_MILLIS_QUERY_PARAM + "=" + checkedAtMillis);
+                "?" + LiveContentResource.CHECKED_AT_MILLIS_QUERY_PARAM + "=" + checkedAt.asMillis());
         final HttpGet getLiveContent = new HttpGet(liveContentUrl.toString());
         final JSONObject jsonResponse = (JSONObject) getJsonParsedResponse(getLiveContent).getA();
         return new LiveContentCheckResultJsonDeserializer().deserialize(jsonResponse);

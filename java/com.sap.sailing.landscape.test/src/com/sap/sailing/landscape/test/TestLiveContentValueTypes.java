@@ -15,13 +15,16 @@ import com.sap.sailing.landscape.common.LiveContentAwareOperationResult;
 import com.sap.sailing.landscape.common.LiveContentCheckResult;
 import com.sap.sailing.landscape.common.RaceLiveContent;
 import com.sap.sailing.landscape.common.ReplicaSetLiveContent;
+import com.sap.sse.common.TimePoint;
 
 public class TestLiveContentValueTypes {
+    private static final TimePoint CHECKED_AT = TimePoint.of(42L);
+
     @Test
     public void testEmptyCheckResult() {
-        final LiveContentCheckResult result = new LiveContentCheckResult(42L, Collections.emptyList());
+        final LiveContentCheckResult result = new LiveContentCheckResult(CHECKED_AT, Collections.emptyList());
         assertFalse(result.hasLiveContent());
-        assertEquals(42L, result.getCheckedAtMillis());
+        assertEquals(CHECKED_AT, result.getCheckedAt());
     }
 
     @Test
@@ -31,7 +34,7 @@ public class TestLiveContentValueTypes {
                 Collections.singleton(race));
         final ReplicaSetLiveContent replicaSet = new ReplicaSetLiveContent("replica-set",
                 Collections.singleton(event));
-        final LiveContentCheckResult result = new LiveContentCheckResult(42L, Collections.singleton(replicaSet));
+        final LiveContentCheckResult result = new LiveContentCheckResult(CHECKED_AT, Collections.singleton(replicaSet));
         assertTrue(result.hasLiveContent());
         assertEquals("race", result.getReplicaSetsWithLiveContent().get(0).getEventsWithLiveContent().get(0)
                 .getRacesWithLiveContent().get(0).getRaceName());
@@ -40,7 +43,7 @@ public class TestLiveContentValueTypes {
 
     @Test
     public void testOperationResultInvariants() {
-        final LiveContentCheckResult conflict = new LiveContentCheckResult(42L, Collections.emptyList());
+        final LiveContentCheckResult conflict = new LiveContentCheckResult(CHECKED_AT, Collections.emptyList());
         assertTrue(LiveContentAwareOperationResult.success("ok").isSuccessful());
         assertFalse(LiveContentAwareOperationResult.liveContentConflict(conflict).isSuccessful());
         assertThrows(IllegalArgumentException.class, () -> LiveContentAwareOperationResult.liveContentConflict(null));

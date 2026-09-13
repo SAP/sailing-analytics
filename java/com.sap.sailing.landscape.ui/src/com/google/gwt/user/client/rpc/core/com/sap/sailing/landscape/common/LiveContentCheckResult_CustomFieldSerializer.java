@@ -9,11 +9,12 @@ import com.google.gwt.user.client.rpc.SerializationStreamReader;
 import com.google.gwt.user.client.rpc.SerializationStreamWriter;
 import com.sap.sailing.landscape.common.LiveContentCheckResult;
 import com.sap.sailing.landscape.common.ReplicaSetLiveContent;
+import com.sap.sse.common.TimePoint;
 
 public final class LiveContentCheckResult_CustomFieldSerializer extends CustomFieldSerializer<LiveContentCheckResult> {
     public static void serialize(final SerializationStreamWriter writer, final LiveContentCheckResult instance)
             throws SerializationException {
-        writer.writeLong(instance.getCheckedAtMillis());
+        writer.writeObject(instance.getCheckedAt());
         writer.writeInt(instance.getReplicaSetsWithLiveContent().size());
         for (final ReplicaSetLiveContent replicaSet : instance.getReplicaSetsWithLiveContent()) {
             writer.writeObject(replicaSet);
@@ -22,13 +23,13 @@ public final class LiveContentCheckResult_CustomFieldSerializer extends CustomFi
 
     public static LiveContentCheckResult instantiate(final SerializationStreamReader reader)
             throws SerializationException {
-        final long checkedAtMillis = reader.readLong();
+        final TimePoint checkedAt = (TimePoint) reader.readObject();
         final int replicaSetCount = reader.readInt();
         final List<ReplicaSetLiveContent> replicaSets = new ArrayList<>(replicaSetCount);
         for (int i = 0; i < replicaSetCount; i++) {
             replicaSets.add((ReplicaSetLiveContent) reader.readObject());
         }
-        return new LiveContentCheckResult(checkedAtMillis, replicaSets);
+        return new LiveContentCheckResult(checkedAt, replicaSets);
     }
 
     public static void deserialize(final SerializationStreamReader reader, final LiveContentCheckResult instance) {

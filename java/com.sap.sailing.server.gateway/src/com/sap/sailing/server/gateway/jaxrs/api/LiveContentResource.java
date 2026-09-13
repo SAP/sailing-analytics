@@ -61,7 +61,7 @@ public final class LiveContentResource extends AbstractSailingServerResource {
         if (!eventsWithLiveContent.isEmpty()) {
             replicaSetsWithLiveContent.add(new ReplicaSetLiveContent(ServerInfo.getName(), eventsWithLiveContent));
         }
-        final LiveContentCheckResult result = new LiveContentCheckResult(checkedAt.asMillis(),
+        final LiveContentCheckResult result = new LiveContentCheckResult(checkedAt,
                 replicaSetsWithLiveContent);
         return Response.ok(streamingOutput(new LiveContentCheckResultJsonSerializer().serialize(result))).build();
     }

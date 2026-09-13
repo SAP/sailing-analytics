@@ -596,14 +596,14 @@ public class LandscapeServiceImpl implements LandscapeService {
             final Iterable<AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>>> applicationReplicaSets,
             final String bearerToken) throws Exception {
         final String effectiveBearerToken = getEffectiveBearerToken(bearerToken);
-        final long checkedAtMillis = TimePoint.now().asMillis();
+        final TimePoint checkedAt = TimePoint.now();
         final List<ReplicaSetLiveContent> replicaSetsWithLiveContent = new ArrayList<>();
         for (final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet : applicationReplicaSets) {
             final SailingServer server = sailingServerFactoryTracker.getService().getSailingServer(new URL("https", replicaSet.getHostname(), "/"), effectiveBearerToken);
-            final LiveContentCheckResult replicaSetResult = server.getLiveContent(checkedAtMillis);
+            final LiveContentCheckResult replicaSetResult = server.getLiveContent(checkedAt);
             replicaSetsWithLiveContent.addAll(replicaSetResult.getReplicaSetsWithLiveContent());
         }
-        return new LiveContentCheckResult(checkedAtMillis, replicaSetsWithLiveContent);
+        return new LiveContentCheckResult(checkedAt, replicaSetsWithLiveContent);
     }
 
     private void checkForLiveContentUnlessForced(

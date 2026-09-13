@@ -27,7 +27,8 @@ public final class LiveContentCheckResultJsonSerializer implements JsonSerialize
     @Override
     public JSONObject serialize(final LiveContentCheckResult liveContentCheckResult) {
         final JSONObject result = new JSONObject();
-        result.put(CHECKED_AT_MILLIS, liveContentCheckResult.getCheckedAtMillis());
+        result.put(CHECKED_AT_MILLIS, liveContentCheckResult.getCheckedAt() == null ? null
+                : liveContentCheckResult.getCheckedAt().asMillis());
         final JSONArray replicaSets = new JSONArray();
         for (final ReplicaSetLiveContent replicaSet : liveContentCheckResult.getReplicaSetsWithLiveContent()) {
             final JSONObject serializedReplicaSet = new JSONObject();

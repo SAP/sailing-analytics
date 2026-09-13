@@ -11,6 +11,7 @@ import com.sap.sailing.landscape.common.LiveContentCheckResult;
 import com.sap.sailing.landscape.common.RaceLiveContent;
 import com.sap.sailing.landscape.common.ReplicaSetLiveContent;
 import com.sap.sailing.server.gateway.serialization.impl.LiveContentCheckResultJsonSerializer;
+import com.sap.sse.common.TimePoint;
 import com.sap.sse.shared.json.JsonDeserializationException;
 import com.sap.sse.shared.json.JsonDeserializer;
 
@@ -45,8 +46,8 @@ public final class LiveContentCheckResultJsonDeserializer implements JsonDeseria
             replicaSets.add(new ReplicaSetLiveContent(
                     (String) serializedReplicaSet.get(LiveContentCheckResultJsonSerializer.REPLICA_SET_NAME), events));
         }
-        return new LiveContentCheckResult(
-                ((Number) object.get(LiveContentCheckResultJsonSerializer.CHECKED_AT_MILLIS)).longValue(), replicaSets);
+        final Long checkedAtMillis = asLong(object.get(LiveContentCheckResultJsonSerializer.CHECKED_AT_MILLIS));
+        return new LiveContentCheckResult(checkedAtMillis == null ? null : TimePoint.of(checkedAtMillis), replicaSets);
     }
 
     private Long asLong(final Object value) {
