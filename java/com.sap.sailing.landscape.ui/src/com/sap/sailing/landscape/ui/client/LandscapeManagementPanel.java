@@ -677,13 +677,15 @@ public class LandscapeManagementPanel extends SimplePanel {
                             final Iterator<SailingApplicationReplicaSetDTO<String>> replicaSetIterator, StringMessages stringMessages) {
                         assert replicaSetIterator.hasNext();
                         final SailingApplicationReplicaSetDTO<String> replicaSet = replicaSetIterator.next();
-                        landscapeManagementService.moveMasterToOtherInstance(replicaSet,
+                        @SuppressWarnings("unchecked")
+                        final Consumer<Boolean>[] issueRequest = new Consumer[1];
+                        issueRequest[0] = force -> landscapeManagementService.moveMasterToOtherInstance(replicaSet,
                                 instructions.isSharedMasterInstance(), instructions.getInstanceTypeOrNull(),
                                 sshKeyManagementPanel.getSelectedKeyPair() == null ? null : sshKeyManagementPanel.getSelectedKeyPair().getName(),
                                 sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
                                 instructions.getMasterReplicationBearerToken(), instructions.getReplicaReplicationBearerToken(),
                                 instructions.getOptionalMemoryInMegabytesOrNull(), instructions.getOptionalMemoryTotalSizeFactorOrNull(),
-                                /* force */ false,
+                                force,
                                 new AsyncCallback<LiveContentAwareOperationResult<SailingApplicationReplicaSetDTO<String>>>() {
                                     @Override
                                     public void onFailure(final Throwable caught) {
@@ -705,10 +707,16 @@ public class LandscapeManagementPanel extends SimplePanel {
                                             }
                                         } else {
                                             applicationReplicaSetsBusy.setBusy(false);
-                                            showLiveContentWarning(result.getLiveContentCheckResult());
+                                            showLiveContentWarning(result.getLiveContentCheckResult(), confirmed -> {
+                                                if (confirmed) {
+                                                    applicationReplicaSetsBusy.setBusy(true);
+                                                    issueRequest[0].accept(/* force */ true);
+                                                }
+                                            });
                                         }
                                     }
                                 });
+                        issueRequest[0].accept(/* force */ false);
                     }
 
                     @Override
@@ -999,8 +1007,7 @@ public class LandscapeManagementPanel extends SimplePanel {
                             } else {
                                 showLiveContentWarning(result.getLiveContentCheckResult(), confirmed -> {
                                     if (confirmed) {
-                                        final Set<String> additionalForceReplicaSetNames = new HashSet<>(
-                                                forceReplicaSetNames);
+                                        final Set<String> additionalForceReplicaSetNames = new HashSet<>(forceReplicaSetNames);
                                         additionalForceReplicaSetNames.add(replicaSet.getName());
                                         executeStopReplicating(regionId,
                                                 new ArrayList<>(Collections.singleton(replicaSet)),
@@ -1020,12 +1027,32 @@ public class LandscapeManagementPanel extends SimplePanel {
         }
     }
 
-    private void showLiveContentWarning(final LiveContentCheckResult liveContentCheckResult) {
-        showLiveContentWarning(liveContentCheckResult, /* confirmationCallback */ null);
-    }
-
-    private void showLiveContentWarning(final LiveContentCheckResult liveContentCheckResult,
-            final Consumer<Boolean> confirmationCallback) {
+    /**
+     * Warns the user that an operation was refused because one or more affected replica sets are currently serving live
+     * content (as described by {@code liveContentCheckResult}), rendering the affected replica sets, events and races
+     * into the message.
+     * <p>
+     *
+     * The behavior depends on {@code confirmationCallback}:
+     * <ul>
+     * <li>When {@code confirmationCallback} is {@code null}, a plain informational {@link Window#alert(String) alert} is
+     * shown; the user can only acknowledge it and the operation stays aborted.</li>
+     * <li>When {@code confirmationCallback} is non-{@code null}, a {@link ConfirmationDialog} with a "proceed anyway"
+     * and a "cancel" button is shown, and the callback is invoked with the user's decision: {@code true} when the user
+     * chose to proceed despite the live content (the caller is then expected to re-issue the operation with the
+     * affected replica sets forced), or {@code false} when the user cancelled (the caller must leave the operation
+     * aborted). The callback is the sole mechanism by which the user can override a live-content warning; without it the
+     * warning is a dead end.</li>
+     * </ul>
+     *
+     * @param liveContentCheckResult
+     *            the detected live content whose replica sets, events and races are rendered into the warning message
+     * @param confirmationCallback
+     *            invoked with the user's decision when non-{@code null}: {@code true} to proceed despite the live
+     *            content (the caller should then force the operation), {@code false} to cancel. When {@code null}, a
+     *            purely informational alert with no way to proceed is shown instead and this callback is not used.
+     */
+    private void showLiveContentWarning(final LiveContentCheckResult liveContentCheckResult, final Consumer<Boolean> confirmationCallback) {
         final StringBuilder details = new StringBuilder();
         for (final ReplicaSetLiveContent replicaSet : liveContentCheckResult.getReplicaSetsWithLiveContent()) {
             details.append(replicaSet.getReplicaSetName()).append(":\n");
@@ -1155,11 +1182,13 @@ public class LandscapeManagementPanel extends SimplePanel {
                     @Override
                     public void ok(String optionalInstanceTypeName) {
                         applicationReplicaSetsBusy.setBusy(true);
-                        landscapeManagementService.moveAllApplicationProcessesAwayFrom(fromHost, optionalInstanceTypeName,
+                        @SuppressWarnings("unchecked")
+                        final Consumer<Set<String>>[] issueRequest = new Consumer[1];
+                        issueRequest[0] = forceMasterReplicaSetNames -> landscapeManagementService.moveAllApplicationProcessesAwayFrom(fromHost, optionalInstanceTypeName,
                                 sshKeyManagementPanel.getSelectedKeyPair()==null?null:sshKeyManagementPanel.getSelectedKeyPair().getName(),
                                 sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null
                                 ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
-                                Collections.emptySet(),
+                                forceMasterReplicaSetNames,
                                 new AsyncCallback<LiveContentAwareOperationResult<String>>() {
                                     @Override
                                     public void onFailure(Throwable caught) {
@@ -1175,10 +1204,16 @@ public class LandscapeManagementPanel extends SimplePanel {
                                                     fromHost.getInstanceId()), NotificationType.SUCCESS);
                                             refreshApplicationReplicaSetsTable();
                                         } else {
-                                            showLiveContentWarning(result.getLiveContentCheckResult());
+                                            showLiveContentWarning(result.getLiveContentCheckResult(), confirmed -> {
+                                                if (confirmed) {
+                                                    applicationReplicaSetsBusy.setBusy(true);
+                                                    issueRequest[0].accept(getConflictingReplicaSetNames(result.getLiveContentCheckResult()));
+                                                }
+                                            });
                                         }
                                     }
                                 });
+                        issueRequest[0].accept(Collections.emptySet());
                     }
 
                     @Override
@@ -1274,11 +1309,13 @@ public class LandscapeManagementPanel extends SimplePanel {
         final ApplicationReplicaSetActionChainingCallback<String> applicationReplicaSetActionChainingCallback = new ApplicationReplicaSetActionChainingCallback<String>(replicaSetIterator, applicationReplicaSetToRemove,
                 (rId, rsi)->removeApplicationReplicaSet(rId, rsi, stringMessages), regionId,
                 replicaSetName->stringMessages.successfullyRemovedApplicationReplicaSet(replicaSetName));
-        landscapeManagementService.removeApplicationReplicaSet(regionId, applicationReplicaSetToRemove, selectedMongoEndpointForDBArchiving,
+        @SuppressWarnings("unchecked")
+        final Consumer<Boolean>[] issueRequest = new Consumer[1];
+        issueRequest[0] = force -> landscapeManagementService.removeApplicationReplicaSet(regionId, applicationReplicaSetToRemove, selectedMongoEndpointForDBArchiving,
                 sshKeyManagementPanel.getSelectedKeyPair()==null?null:sshKeyManagementPanel.getSelectedKeyPair().getName(),
                         sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null
                         ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
-                        /* force */ false, new AsyncCallback<LiveContentAwareOperationResult<String>>() {
+                        force, new AsyncCallback<LiveContentAwareOperationResult<String>>() {
                             @Override
                             public void onFailure(final Throwable caught) {
                                 applicationReplicaSetActionChainingCallback.onFailure(caught);
@@ -1297,10 +1334,16 @@ public class LandscapeManagementPanel extends SimplePanel {
                                     }
                                 } else {
                                     applicationReplicaSetsBusy.setBusy(false);
-                                    showLiveContentWarning(result.getLiveContentCheckResult());
+                                    showLiveContentWarning(result.getLiveContentCheckResult(), confirmed -> {
+                                        if (confirmed) {
+                                            applicationReplicaSetsBusy.setBusy(true);
+                                            issueRequest[0].accept(/* force */ true);
+                                        }
+                                    });
                                 }
                             }
                         });
+        issueRequest[0].accept(/* force */ false);
     }
     
     private static class ReplicaSetArchivingParameters {
@@ -1345,7 +1388,9 @@ public class LandscapeManagementPanel extends SimplePanel {
                     @Override
                     public void ok(ReplicaSetArchivingParameters bearerTokensAndWhetherToRemoveReplicaSet) {
                         applicationReplicaSetsBusy.setBusy(true);
-                        landscapeManagementService.archiveReplicaSet(regionId, applicationReplicaSetToArchive,
+                        @SuppressWarnings("unchecked")
+                        final Consumer<Boolean>[] issueRequest = new Consumer[1];
+                        issueRequest[0] = force -> landscapeManagementService.archiveReplicaSet(regionId, applicationReplicaSetToArchive,
                                 bearerTokensAndWhetherToRemoveReplicaSet.getBearerTokenOrNullForApplicationReplicaSetToArchive(),
                                 bearerTokensAndWhetherToRemoveReplicaSet.getBearerTokenOrNullForArchive(),
                                 bearerTokensAndWhetherToRemoveReplicaSet.getDurationToWaitBeforeAndBetweenCompareServerAttempts(),
@@ -1354,7 +1399,7 @@ public class LandscapeManagementPanel extends SimplePanel {
                                 selectedMongoEndpointForDBArchiving, sshKeyManagementPanel.getSelectedKeyPair().getName(),
                                 sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null
                                     ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
-                                /* force */ false,
+                                force,
                                 new AsyncCallback<LiveContentAwareOperationResult<Triple<DataImportProgress, CompareServersResultDTO, String>>>() {
                             @Override
                             public void onFailure(final Throwable caught) {
@@ -1366,7 +1411,12 @@ public class LandscapeManagementPanel extends SimplePanel {
                             public void onSuccess(final LiveContentAwareOperationResult<Triple<DataImportProgress, CompareServersResultDTO, String>> operationResult) {
                                 applicationReplicaSetsBusy.setBusy(false);
                                 if (!operationResult.isSuccessful()) {
-                                    showLiveContentWarning(operationResult.getLiveContentCheckResult());
+                                    showLiveContentWarning(operationResult.getLiveContentCheckResult(), confirmed -> {
+                                        if (confirmed) {
+                                            applicationReplicaSetsBusy.setBusy(true);
+                                            issueRequest[0].accept(/* force */ true);
+                                        }
+                                    });
                                 } else {
                                 final Triple<DataImportProgress, CompareServersResultDTO, String> result =
                                         operationResult.getSuccessfulResult();
@@ -1395,6 +1445,7 @@ public class LandscapeManagementPanel extends SimplePanel {
                                 }
                             }
                         });
+                        issueRequest[0].accept(/* force */ false);
                     }
 
                     @Override
@@ -1557,20 +1608,22 @@ public class LandscapeManagementPanel extends SimplePanel {
                                     new Timer() {
                                         @Override
                                         public void run() {
-                                            landscapeManagementService.upgradeApplicationReplicaSet(regionId, replicaSet, 
+                                            @SuppressWarnings("unchecked")
+                                            final Consumer<Boolean>[] issueRequest = new Consumer[1];
+                                            issueRequest[0] = force -> landscapeManagementService.upgradeApplicationReplicaSet(regionId, replicaSet,
                                                     upgradeInstructions.getReleaseNameOrNullForLatestMaster(),
                                                     sshKeyManagementPanel.getSelectedKeyPair()==null?null:sshKeyManagementPanel.getSelectedKeyPair().getName(),
                                                             sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null
                                                             ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
                                                     upgradeInstructions.getReplicaReplicationBearerToken(),
-                                                    /* force */ false,
+                                                    force,
                                                     new AsyncCallback<LiveContentAwareOperationResult<SailingApplicationReplicaSetDTO<String>>>() {
                                                         @Override
                                                         public void onFailure(final Throwable caught) {
                                                             decrementHowManyMoreToGoAndSetNonBusyIfDone(howManyMoreToGo);
                                                             errorReporter.reportError(caught.getMessage());
                                                         }
-            
+
                                                         @Override
                                                         public void onSuccess(final LiveContentAwareOperationResult<SailingApplicationReplicaSetDTO<String>> operationResult) {
                                                             decrementHowManyMoreToGoAndSetNonBusyIfDone(howManyMoreToGo);
@@ -1582,10 +1635,17 @@ public class LandscapeManagementPanel extends SimplePanel {
                                                                 applicationReplicaSetsTable.replaceBasedOnEntityIdentityComparator(result);
                                                                 applicationReplicaSetsTable.refresh();
                                                             } else {
-                                                                showLiveContentWarning(operationResult.getLiveContentCheckResult());
+                                                                showLiveContentWarning(operationResult.getLiveContentCheckResult(), confirmed -> {
+                                                                    if (confirmed) {
+                                                                        howManyMoreToGo[0]++;
+                                                                        applicationReplicaSetsBusy.setBusy(true);
+                                                                        issueRequest[0].accept(/* force */ true);
+                                                                    }
+                                                                });
                                                             }
                                                         }
                                                     });
+                                            issueRequest[0].accept(/* force */ false);
                                         }
                                     }.schedule((int) timeToWaitUntilUpgradingNextReplicaSet.asMillis());
                                     timeToWaitUntilUpgradingNextReplicaSet = timeToWaitUntilUpgradingNextReplicaSet.plus(
