@@ -2,20 +2,22 @@ package com.sap.sailing.landscape.common;
 
 import java.io.Serializable;
 
+import com.sap.sse.common.TimePoint;
+
 /** The identifying and tracking-time information for a live tracked race. */
 public final class RaceLiveContent implements Serializable {
-    private static final long serialVersionUID = 4664388720482818951L;
+    private static final long serialVersionUID = 8789083472887861191L;
     private final String regattaName;
     private final String raceName;
-    private final long trackingStartMillis;
-    private final Long trackingEndMillis;
+    private final TimePoint trackingStart;
+    private final TimePoint trackingEnd;
 
-    public RaceLiveContent(final String regattaName, final String raceName, final long trackingStartMillis,
-            final Long trackingEndMillis) {
+    public RaceLiveContent(final String regattaName, final String raceName, final TimePoint trackingStart,
+            final TimePoint trackingEnd) {
         this.regattaName = regattaName;
         this.raceName = raceName;
-        this.trackingStartMillis = trackingStartMillis;
-        this.trackingEndMillis = trackingEndMillis;
+        this.trackingStart = trackingStart;
+        this.trackingEnd = trackingEnd;
     }
 
     public String getRegattaName() {
@@ -26,11 +28,11 @@ public final class RaceLiveContent implements Serializable {
         return raceName;
     }
 
-    public long getTrackingStartMillis() {
-        return trackingStartMillis;
+    public TimePoint getTrackingStart() {
+        return trackingStart;
     }
 
-    public Long getTrackingEndMillis() {
-        return trackingEndMillis;
+    public TimePoint getTrackingEnd() {
+        return trackingEnd;
     }
 }

@@ -29,7 +29,7 @@ public class TestLiveContentValueTypes {
 
     @Test
     public void testNestedLiveContent() {
-        final RaceLiveContent race = new RaceLiveContent("regatta", "race", 10L, null);
+        final RaceLiveContent race = new RaceLiveContent("regatta", "race", TimePoint.of(10L), null);
         final EventLiveContent event = new EventLiveContent("event-id", "event", 1L, 100L,
                 Collections.singleton(race));
         final ReplicaSetLiveContent replicaSet = new ReplicaSetLiveContent("replica-set",
@@ -38,7 +38,7 @@ public class TestLiveContentValueTypes {
         assertTrue(result.hasLiveContent());
         assertEquals("race", result.getReplicaSetsWithLiveContent().get(0).getEventsWithLiveContent().get(0)
                 .getRacesWithLiveContent().get(0).getRaceName());
-        assertNull(race.getTrackingEndMillis());
+        assertNull(race.getTrackingEnd());
     }
 
     @Test

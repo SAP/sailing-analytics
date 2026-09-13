@@ -1034,8 +1034,8 @@ public class LandscapeManagementPanel extends SimplePanel {
                 details.append("  ").append(event.getEventName()).append(":\n");
                 for (final RaceLiveContent race : event.getRacesWithLiveContent()) {
                     details.append("    ").append(race.getRegattaName()).append(" / ").append(race.getRaceName())
-                            .append(" [").append(race.getTrackingStartMillis()).append(" - ")
-                            .append(race.getTrackingEndMillis() == null ? "open" : race.getTrackingEndMillis())
+                            .append(" [").append(race.getTrackingStart()).append(" - ")
+                            .append(race.getTrackingEnd() == null ? "open" : race.getTrackingEnd())
                             .append("]\n");
                 }
             }

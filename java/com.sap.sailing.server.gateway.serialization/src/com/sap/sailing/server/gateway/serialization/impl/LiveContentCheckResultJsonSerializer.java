@@ -45,8 +45,10 @@ public final class LiveContentCheckResultJsonSerializer implements JsonSerialize
                     final JSONObject serializedRace = new JSONObject();
                     serializedRace.put(REGATTA_NAME, race.getRegattaName());
                     serializedRace.put(RACE_NAME, race.getRaceName());
-                    serializedRace.put(TRACKING_START_MILLIS, race.getTrackingStartMillis());
-                    serializedRace.put(TRACKING_END_MILLIS, race.getTrackingEndMillis());
+                    serializedRace.put(TRACKING_START_MILLIS,
+                            race.getTrackingStart() == null ? null : race.getTrackingStart().asMillis());
+                    serializedRace.put(TRACKING_END_MILLIS,
+                            race.getTrackingEnd() == null ? null : race.getTrackingEnd().asMillis());
                     races.add(serializedRace);
                 }
                 serializedEvent.put(RACES, races);

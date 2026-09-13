@@ -30,12 +30,15 @@ public final class LiveContentCheckResultJsonDeserializer implements JsonDeseria
                 for (final Object serializedRaceObject : (JSONArray) serializedEvent.get(
                         LiveContentCheckResultJsonSerializer.RACES)) {
                     final JSONObject serializedRace = (JSONObject) serializedRaceObject;
+                    final Long trackingStartMillis = asLong(
+                            serializedRace.get(LiveContentCheckResultJsonSerializer.TRACKING_START_MILLIS));
+                    final Long trackingEndMillis = asLong(
+                            serializedRace.get(LiveContentCheckResultJsonSerializer.TRACKING_END_MILLIS));
                     races.add(new RaceLiveContent(
                             (String) serializedRace.get(LiveContentCheckResultJsonSerializer.REGATTA_NAME),
                             (String) serializedRace.get(LiveContentCheckResultJsonSerializer.RACE_NAME),
-                            ((Number) serializedRace.get(LiveContentCheckResultJsonSerializer.TRACKING_START_MILLIS))
-                                    .longValue(),
-                            asLong(serializedRace.get(LiveContentCheckResultJsonSerializer.TRACKING_END_MILLIS))));
+                            trackingStartMillis == null ? null : TimePoint.of(trackingStartMillis),
+                            trackingEndMillis == null ? null : TimePoint.of(trackingEndMillis)));
                 }
                 events.add(new EventLiveContent(
                         (String) serializedEvent.get(LiveContentCheckResultJsonSerializer.EVENT_ID),

@@ -43,8 +43,8 @@ public final class LiveContentResource extends AbstractSailingServerResource {
                 for (final TrackedRace trackedRace : getService().getAllTrackedRacesForEventTrackingAt(event,
                         checkedAt)) {
                     racesWithLiveContent.add(new RaceLiveContent(trackedRace.getRaceIdentifier().getRegattaName(),
-                            trackedRace.getRaceIdentifier().getRaceName(), trackedRace.getStartOfTracking().asMillis(),
-                            trackedRace.getEndOfTracking() == null ? null : trackedRace.getEndOfTracking().asMillis()));
+                            trackedRace.getRaceIdentifier().getRaceName(), trackedRace.getStartOfTracking(),
+                            trackedRace.getEndOfTracking()));
                 }
                 racesWithLiveContent.sort(Comparator.comparing(RaceLiveContent::getRegattaName)
                         .thenComparing(RaceLiveContent::getRaceName));

@@ -5,19 +5,20 @@ import com.google.gwt.user.client.rpc.SerializationException;
 import com.google.gwt.user.client.rpc.SerializationStreamReader;
 import com.google.gwt.user.client.rpc.SerializationStreamWriter;
 import com.sap.sailing.landscape.common.RaceLiveContent;
+import com.sap.sse.common.TimePoint;
 
 public final class RaceLiveContent_CustomFieldSerializer extends CustomFieldSerializer<RaceLiveContent> {
     public static void serialize(final SerializationStreamWriter writer, final RaceLiveContent instance)
             throws SerializationException {
         writer.writeString(instance.getRegattaName());
         writer.writeString(instance.getRaceName());
-        writer.writeLong(instance.getTrackingStartMillis());
-        writer.writeObject(instance.getTrackingEndMillis());
+        writer.writeObject(instance.getTrackingStart());
+        writer.writeObject(instance.getTrackingEnd());
     }
 
     public static RaceLiveContent instantiate(final SerializationStreamReader reader) throws SerializationException {
-        return new RaceLiveContent(reader.readString(), reader.readString(), reader.readLong(),
-                (Long) reader.readObject());
+        return new RaceLiveContent(reader.readString(), reader.readString(), (TimePoint) reader.readObject(),
+                (TimePoint) reader.readObject());
     }
 
     public static void deserialize(final SerializationStreamReader reader, final RaceLiveContent instance) {
