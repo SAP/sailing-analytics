@@ -118,6 +118,9 @@ com.sap.sse.gwt.adminconsole.StringMessages {
     String stopReplicating();
     String liveContentWarningTitle();
     String liveContentWarning(String liveContentDetails);
+    String liveContentUndeterminedWarningTitle();
+    String liveContentUndeterminedWarning(String undeterminedDetails);
+    String liveContentUndeterminedSectionHeader();
     String proceedDespiteLiveContent();
     String sameAsMaster();
     String firstReplicaOnSharedInstance();

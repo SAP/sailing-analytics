@@ -9,7 +9,9 @@ public final class LiveContentConflictException extends Exception {
 
     public LiveContentConflictException(final LiveContentCheckResult liveContentCheckResult) {
         super("The operation would affect " + liveContentCheckResult.getReplicaSetsWithLiveContent().size()
-                + " application replica set(s) containing live tracked races");
+                + " application replica set(s) containing live tracked races and "
+                + liveContentCheckResult.getUndeterminedReplicaSetNames().size()
+                + " application replica set(s) whose live-content state could not be determined");
         this.liveContentCheckResult = liveContentCheckResult;
     }
 

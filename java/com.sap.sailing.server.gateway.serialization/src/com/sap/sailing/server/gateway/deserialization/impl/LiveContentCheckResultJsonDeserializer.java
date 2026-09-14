@@ -50,7 +50,16 @@ public final class LiveContentCheckResultJsonDeserializer implements JsonDeseria
                     (String) serializedReplicaSet.get(LiveContentCheckResultJsonSerializer.REPLICA_SET_NAME), events));
         }
         final Long checkedAtMillis = asLong(object.get(LiveContentCheckResultJsonSerializer.CHECKED_AT_MILLIS));
-        return new LiveContentCheckResult(checkedAtMillis == null ? null : TimePoint.of(checkedAtMillis), replicaSets);
+        final List<String> undeterminedReplicaSetNames = new ArrayList<>();
+        final JSONArray serializedUndeterminedReplicaSets = (JSONArray) object.get(
+                LiveContentCheckResultJsonSerializer.UNDETERMINED_REPLICA_SETS);
+        if (serializedUndeterminedReplicaSets != null) {
+            for (final Object undeterminedReplicaSetName : serializedUndeterminedReplicaSets) {
+                undeterminedReplicaSetNames.add((String) undeterminedReplicaSetName);
+            }
+        }
+        return new LiveContentCheckResult(checkedAtMillis == null ? null : TimePoint.of(checkedAtMillis), replicaSets,
+                undeterminedReplicaSetNames);
     }
 
     private Long asLong(final Object value) {

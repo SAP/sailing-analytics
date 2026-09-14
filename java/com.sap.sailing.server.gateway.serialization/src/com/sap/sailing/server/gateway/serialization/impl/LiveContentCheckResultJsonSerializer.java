@@ -12,6 +12,7 @@ import com.sap.sse.shared.json.JsonSerializer;
 public final class LiveContentCheckResultJsonSerializer implements JsonSerializer<LiveContentCheckResult> {
     public static final String CHECKED_AT_MILLIS = "checkedAtMillis";
     public static final String REPLICA_SETS = "replicaSets";
+    public static final String UNDETERMINED_REPLICA_SETS = "undeterminedReplicaSets";
     public static final String REPLICA_SET_NAME = "replicaSetName";
     public static final String EVENTS = "events";
     public static final String EVENT_ID = "eventId";
@@ -58,6 +59,11 @@ public final class LiveContentCheckResultJsonSerializer implements JsonSerialize
             replicaSets.add(serializedReplicaSet);
         }
         result.put(REPLICA_SETS, replicaSets);
+        final JSONArray undeterminedReplicaSets = new JSONArray();
+        for (final String undeterminedReplicaSetName : liveContentCheckResult.getUndeterminedReplicaSetNames()) {
+            undeterminedReplicaSets.add(undeterminedReplicaSetName);
+        }
+        result.put(UNDETERMINED_REPLICA_SETS, undeterminedReplicaSets);
         return result;
     }
 }

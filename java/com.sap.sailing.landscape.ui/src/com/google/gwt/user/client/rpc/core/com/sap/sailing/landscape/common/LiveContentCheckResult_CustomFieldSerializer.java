@@ -19,6 +19,10 @@ public final class LiveContentCheckResult_CustomFieldSerializer extends CustomFi
         for (final ReplicaSetLiveContent replicaSet : instance.getReplicaSetsWithLiveContent()) {
             writer.writeObject(replicaSet);
         }
+        writer.writeInt(instance.getUndeterminedReplicaSetNames().size());
+        for (final String undeterminedReplicaSetName : instance.getUndeterminedReplicaSetNames()) {
+            writer.writeString(undeterminedReplicaSetName);
+        }
     }
 
     public static LiveContentCheckResult instantiate(final SerializationStreamReader reader)
@@ -29,7 +33,12 @@ public final class LiveContentCheckResult_CustomFieldSerializer extends CustomFi
         for (int i = 0; i < replicaSetCount; i++) {
             replicaSets.add((ReplicaSetLiveContent) reader.readObject());
         }
-        return new LiveContentCheckResult(checkedAt, replicaSets);
+        final int undeterminedReplicaSetCount = reader.readInt();
+        final List<String> undeterminedReplicaSetNames = new ArrayList<>(undeterminedReplicaSetCount);
+        for (int i = 0; i < undeterminedReplicaSetCount; i++) {
+            undeterminedReplicaSetNames.add(reader.readString());
+        }
+        return new LiveContentCheckResult(checkedAt, replicaSets, undeterminedReplicaSetNames);
     }
 
     public static void deserialize(final SerializationStreamReader reader, final LiveContentCheckResult instance) {

@@ -48,4 +48,17 @@ public class TestLiveContentValueTypes {
         assertFalse(LiveContentAwareOperationResult.liveContentConflict(conflict).isSuccessful());
         assertThrows(IllegalArgumentException.class, () -> LiveContentAwareOperationResult.liveContentConflict(null));
     }
+
+    @Test
+    public void testUndeterminedReplicaSets() {
+        final LiveContentCheckResult withoutUndetermined = new LiveContentCheckResult(CHECKED_AT,
+                Collections.emptyList());
+        assertFalse(withoutUndetermined.hasUndeterminedReplicaSets());
+        assertTrue(withoutUndetermined.getUndeterminedReplicaSetNames().isEmpty());
+        final LiveContentCheckResult withUndetermined = new LiveContentCheckResult(CHECKED_AT, Collections.emptyList(),
+                Collections.singleton("old-server"));
+        assertFalse(withUndetermined.hasLiveContent());
+        assertTrue(withUndetermined.hasUndeterminedReplicaSets());
+        assertEquals(Collections.singletonList("old-server"), withUndetermined.getUndeterminedReplicaSetNames());
+    }
 }

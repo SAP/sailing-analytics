@@ -43,6 +43,7 @@ import com.sap.sailing.landscape.SailingAnalyticsMetrics;
 import com.sap.sailing.landscape.SailingAnalyticsProcess;
 import com.sap.sailing.landscape.SailingReleaseRepository;
 import com.sap.sailing.landscape.common.LiveContentCheckResult;
+import com.sap.sailing.landscape.common.LiveContentCheckUnsupportedException;
 import com.sap.sailing.landscape.common.RemoteServiceMappingConstants;
 import com.sap.sailing.landscape.common.ReplicaSetLiveContent;
 import com.sap.sailing.landscape.common.SharedLandscapeConstants;
@@ -598,12 +599,22 @@ public class LandscapeServiceImpl implements LandscapeService {
         final String effectiveBearerToken = getEffectiveBearerToken(bearerToken);
         final TimePoint checkedAt = TimePoint.now();
         final List<ReplicaSetLiveContent> replicaSetsWithLiveContent = new ArrayList<>();
+        final List<String> undeterminedReplicaSetNames = new ArrayList<>();
         for (final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet : applicationReplicaSets) {
             final SailingServer server = sailingServerFactoryTracker.getService().getSailingServer(new URL("https", replicaSet.getHostname(), "/"), effectiveBearerToken);
-            final LiveContentCheckResult replicaSetResult = server.getLiveContent(checkedAt);
-            replicaSetsWithLiveContent.addAll(replicaSetResult.getReplicaSetsWithLiveContent());
+            try {
+                final LiveContentCheckResult replicaSetResult = server.getLiveContent(checkedAt);
+                replicaSetsWithLiveContent.addAll(replicaSetResult.getReplicaSetsWithLiveContent());
+                undeterminedReplicaSetNames.addAll(replicaSetResult.getUndeterminedReplicaSetNames());
+            } catch (final LiveContentCheckUnsupportedException e) {
+                // The server could not answer the live-content query (e.g., it predates the endpoint). Record it as
+                // undetermined and continue so that one un-upgraded server does not abort checking the remaining ones.
+                logger.info("Could not determine live content of replica set " + replicaSet.getName() + ": "
+                        + e.getMessage());
+                undeterminedReplicaSetNames.add(replicaSet.getName());
+            }
         }
-        return new LiveContentCheckResult(checkedAt, replicaSetsWithLiveContent);
+        return new LiveContentCheckResult(checkedAt, replicaSetsWithLiveContent, undeterminedReplicaSetNames);
     }
 
     private void checkForLiveContentUnlessForced(
@@ -611,7 +622,7 @@ public class LandscapeServiceImpl implements LandscapeService {
             final String bearerToken, final boolean force) throws Exception {
         if (!force) {
             final LiveContentCheckResult liveContentCheckResult = checkForLiveContent(Collections.singleton(replicaSet), bearerToken);
-            if (liveContentCheckResult.hasLiveContent()) {
+            if (liveContentCheckResult.hasLiveContent() || liveContentCheckResult.hasUndeterminedReplicaSets()) {
                 throw new LiveContentConflictException(liveContentCheckResult);
             }
         }

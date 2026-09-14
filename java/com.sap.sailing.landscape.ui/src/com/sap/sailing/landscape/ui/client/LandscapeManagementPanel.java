@@ -666,8 +666,7 @@ public class LandscapeManagementPanel extends SimplePanel {
                 new DialogCallback<MoveMasterToOtherInstanceInstructions>() {
                     @Override
                     public void ok(MoveMasterToOtherInstanceInstructions instructions) {
-                        final ArrayList<SailingApplicationReplicaSetDTO<String>> selectedReplicaSets = new ArrayList<>();
-                        replicaSetsForWhichToMoveMaster.forEach(selectedReplicaSets::add);
+                        final ArrayList<SailingApplicationReplicaSetDTO<String>> selectedReplicaSets = new ArrayList<>(replicaSetsForWhichToMoveMaster);
                         if (!selectedReplicaSets.isEmpty()) {
                             applicationReplicaSetsBusy.setBusy(true);
                             // Pre-flight: check the whole selection for live content in a single round-trip and warn
@@ -757,7 +756,7 @@ public class LandscapeManagementPanel extends SimplePanel {
                         // Pre-flight already warned the user about any flagged sets; force this set only if it was
                         // among the confirmed conflicting sets. Otherwise run force=false so the reactive back-end
                         // guard still catches a surprise race that started after pre-flight.
-                        issueRequest.value.accept(confirmedConflictingReplicaSetNames.contains(replicaSet.getName()));
+                        issueRequest.value.accept(/* force */ confirmedConflictingReplicaSetNames.contains(replicaSet.getName()));
                     }
 
                     @Override
@@ -1017,6 +1016,7 @@ public class LandscapeManagementPanel extends SimplePanel {
         for (final ReplicaSetLiveContent replicaSet : liveContentCheckResult.getReplicaSetsWithLiveContent()) {
             result.add(replicaSet.getReplicaSetName());
         }
+        result.addAll(liveContentCheckResult.getUndeterminedReplicaSetNames());
         return result;
     }
 
@@ -1070,8 +1070,9 @@ public class LandscapeManagementPanel extends SimplePanel {
 
     /**
      * Warns the user that an operation was refused because one or more affected replica sets are currently serving live
-     * content (as described by {@code liveContentCheckResult}), rendering the affected replica sets, events and races
-     * into the message.
+     * content and/or because the live-content state of one or more replica sets could not be verified (as described by
+     * {@code liveContentCheckResult}), rendering the affected replica sets, events and races as well as the replica sets
+     * that could not be verified into a single combined message.
      * <p>
      *
      * The behavior depends on {@code confirmationCallback}:
@@ -1080,18 +1081,20 @@ public class LandscapeManagementPanel extends SimplePanel {
      * shown; the user can only acknowledge it and the operation stays aborted.</li>
      * <li>When {@code confirmationCallback} is non-{@code null}, a {@link ConfirmationDialog} with a "proceed anyway"
      * and a "cancel" button is shown, and the callback is invoked with the user's decision: {@code true} when the user
-     * chose to proceed despite the live content (the caller is then expected to re-issue the operation with the
-     * affected replica sets forced), or {@code false} when the user cancelled (the caller must leave the operation
-     * aborted). The callback is the sole mechanism by which the user can override a live-content warning; without it the
-     * warning is a dead end.</li>
+     * chose to proceed despite the live content and/or the unverified replica sets (the caller is then expected to
+     * re-issue the operation with the affected replica sets forced), or {@code false} when the user cancelled (the
+     * caller must leave the operation aborted). The callback is the sole mechanism by which the user can override the
+     * warning; without it the warning is a dead end.</li>
      * </ul>
      *
      * @param liveContentCheckResult
-     *            the detected live content whose replica sets, events and races are rendered into the warning message
+     *            the detected live content whose replica sets, events and races are rendered into the warning message,
+     *            together with the names of any replica sets whose live-content state could not be determined
      * @param confirmationCallback
      *            invoked with the user's decision when non-{@code null}: {@code true} to proceed despite the live
-     *            content (the caller should then force the operation), {@code false} to cancel. When {@code null}, a
-     *            purely informational alert with no way to proceed is shown instead and this callback is not used.
+     *            content and/or unverified replica sets (the caller should then force the operation), {@code false} to
+     *            cancel. When {@code null}, a purely informational alert with no way to proceed is shown instead and
+     *            this callback is not used.
      */
     private void showLiveContentWarning(final LiveContentCheckResult liveContentCheckResult, final Consumer<Boolean> confirmationCallback) {
         final StringBuilder details = new StringBuilder();
@@ -1107,13 +1110,29 @@ public class LandscapeManagementPanel extends SimplePanel {
                 }
             }
         }
-        if (confirmationCallback == null) {
-            Window.alert(StringMessages.INSTANCE.liveContentWarning(details.toString()));
+        final String title;
+        final String message;
+        if (liveContentCheckResult.hasLiveContent()) {
+            if (liveContentCheckResult.hasUndeterminedReplicaSets()) {
+                details.append(StringMessages.INSTANCE.liveContentUndeterminedSectionHeader()).append("\n");
+                for (final String undeterminedReplicaSetName : liveContentCheckResult.getUndeterminedReplicaSetNames()) {
+                    details.append("  ").append(undeterminedReplicaSetName).append("\n");
+                }
+            }
+            title = StringMessages.INSTANCE.liveContentWarningTitle();
+            message = StringMessages.INSTANCE.liveContentWarning(details.toString());
         } else {
-            ConfirmationDialog.create(StringMessages.INSTANCE.liveContentWarningTitle(),
-                    StringMessages.INSTANCE.liveContentWarning(details.toString()),
-                    StringMessages.INSTANCE.proceedDespiteLiveContent(), StringMessages.INSTANCE.cancel(),
-                    confirmationCallback).center();
+            for (final String undeterminedReplicaSetName : liveContentCheckResult.getUndeterminedReplicaSetNames()) {
+                details.append("  ").append(undeterminedReplicaSetName).append("\n");
+            }
+            title = StringMessages.INSTANCE.liveContentUndeterminedWarningTitle();
+            message = StringMessages.INSTANCE.liveContentUndeterminedWarning(details.toString());
+        }
+        if (confirmationCallback == null) {
+            Window.alert(message);
+        } else {
+            ConfirmationDialog.create(title, message, StringMessages.INSTANCE.proceedDespiteLiveContent(),
+                    StringMessages.INSTANCE.cancel(), confirmationCallback).center();
         }
     }
 

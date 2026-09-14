@@ -415,6 +415,7 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
             final JSONObject processJson = new JSONObject();
             processJson.put(REPLICA_SET_NAME, e.getKey());
             processJson.put(PORT, e.getValue().getPort());
+            result.add(processJson);
         }
         return result;
     }

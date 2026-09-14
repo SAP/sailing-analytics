@@ -30,6 +30,7 @@ import com.sap.sailing.domain.base.RemoteSailingServerReference;
 import com.sap.sailing.domain.common.DataImportProgress;
 import com.sap.sailing.domain.common.sharding.ShardingType;
 import com.sap.sailing.landscape.common.LiveContentCheckResult;
+import com.sap.sailing.landscape.common.LiveContentCheckUnsupportedException;
 import com.sap.sailing.server.gateway.deserialization.impl.CompareServersResultJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.CourseAreaJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.DataImportProgressJsonDeserializer;
@@ -132,12 +133,23 @@ public class SailingServerImpl extends SecuredServerImpl implements SailingServe
 
     @Override
     public LiveContentCheckResult getLiveContent(final TimePoint checkedAt) throws ClientProtocolException, IOException,
-            ParseException, JsonDeserializationException {
+            ParseException, JsonDeserializationException, LiveContentCheckUnsupportedException {
         final URL liveContentUrl = new URL(getBaseUrl(), GATEWAY_URL_PREFIX + LiveContentResource.V1_LIVE_CONTENT +
                 "?" + LiveContentResource.CHECKED_AT_MILLIS_QUERY_PARAM + "=" + checkedAt.asMillis());
         final HttpGet getLiveContent = new HttpGet(liveContentUrl.toString());
-        final JSONObject jsonResponse = (JSONObject) getJsonParsedResponse(getLiveContent).getA();
-        return new LiveContentCheckResultJsonDeserializer().deserialize(jsonResponse);
+        final Pair<Object, Integer> jsonParsedResponse = getJsonParsedResponse(getLiveContent);
+        final JSONObject jsonResponse = (JSONObject) jsonParsedResponse.getA();
+        final LiveContentCheckResult result;
+        if (jsonResponse == null) {
+            // A missing or non-successful response (e.g., HTTP 400 from a server that predates the live-content
+            // endpoint) leaves the parsed body null; treat this as "state could not be determined" rather than
+            // dereferencing null while deserializing.
+            throw new LiveContentCheckUnsupportedException(getBaseUrl().getHost(),
+                    "the server did not return a live-content report (HTTP status " + jsonParsedResponse.getB() + ")");
+        } else {
+            result = new LiveContentCheckResultJsonDeserializer().deserialize(jsonResponse);
+        }
+        return result;
     }
 
     @Override
