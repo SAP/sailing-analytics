@@ -16,6 +16,7 @@ import com.sap.sailing.landscape.common.LiveContentCheckResult;
 import com.sap.sailing.landscape.common.RaceLiveContent;
 import com.sap.sailing.landscape.common.ReplicaSetLiveContent;
 import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.Util;
 
 public class TestLiveContentValueTypes {
     private static final TimePoint CHECKED_AT = TimePoint.of(42L);
@@ -36,8 +37,8 @@ public class TestLiveContentValueTypes {
                 Collections.singleton(event));
         final LiveContentCheckResult result = new LiveContentCheckResult(CHECKED_AT, Collections.singleton(replicaSet));
         assertTrue(result.hasLiveContent());
-        assertEquals("race", result.getReplicaSetsWithLiveContent().get(0).getEventsWithLiveContent().get(0)
-                .getRacesWithLiveContent().get(0).getRaceName());
+        assertEquals("race", Util.get(Util.get(Util.get(result.getReplicaSetsWithLiveContent(), 0)
+                .getEventsWithLiveContent(), 0).getRacesWithLiveContent(), 0).getRaceName());
         assertNull(race.getTrackingEnd());
     }
 
@@ -54,11 +55,12 @@ public class TestLiveContentValueTypes {
         final LiveContentCheckResult withoutUndetermined = new LiveContentCheckResult(CHECKED_AT,
                 Collections.emptyList());
         assertFalse(withoutUndetermined.hasUndeterminedReplicaSets());
-        assertTrue(withoutUndetermined.getUndeterminedReplicaSetNames().isEmpty());
+        assertFalse(withoutUndetermined.getUndeterminedReplicaSetNames().iterator().hasNext());
         final LiveContentCheckResult withUndetermined = new LiveContentCheckResult(CHECKED_AT, Collections.emptyList(),
                 Collections.singleton("old-server"));
         assertFalse(withUndetermined.hasLiveContent());
         assertTrue(withUndetermined.hasUndeterminedReplicaSets());
-        assertEquals(Collections.singletonList("old-server"), withUndetermined.getUndeterminedReplicaSetNames());
+        assertEquals(Collections.singletonList("old-server"),
+                Util.asList(withUndetermined.getUndeterminedReplicaSetNames()));
     }
 }

@@ -9,6 +9,7 @@ import com.google.gwt.user.client.rpc.SerializationStreamReader;
 import com.google.gwt.user.client.rpc.SerializationStreamWriter;
 import com.sap.sailing.landscape.common.EventLiveContent;
 import com.sap.sailing.landscape.common.RaceLiveContent;
+import com.sap.sse.common.Util;
 
 public final class EventLiveContent_CustomFieldSerializer extends CustomFieldSerializer<EventLiveContent> {
     public static void serialize(final SerializationStreamWriter writer, final EventLiveContent instance)
@@ -17,7 +18,7 @@ public final class EventLiveContent_CustomFieldSerializer extends CustomFieldSer
         writer.writeString(instance.getEventName());
         writer.writeObject(instance.getEventStartMillis());
         writer.writeObject(instance.getEventEndMillis());
-        writer.writeInt(instance.getRacesWithLiveContent().size());
+        writer.writeInt(Util.size(instance.getRacesWithLiveContent()));
         for (final RaceLiveContent race : instance.getRacesWithLiveContent()) {
             writer.writeObject(race);
         }

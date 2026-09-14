@@ -12,7 +12,7 @@ public final class EventLiveContent implements Serializable {
     private final String eventName;
     private final Long eventStartMillis;
     private final Long eventEndMillis;
-    private final List<RaceLiveContent> racesWithLiveContent;
+    private final Iterable<RaceLiveContent> racesWithLiveContent;
 
     public EventLiveContent(final String eventId, final String eventName, final Long eventStartMillis,
             final Long eventEndMillis, final Iterable<RaceLiveContent> racesWithLiveContent) {
@@ -41,7 +41,7 @@ public final class EventLiveContent implements Serializable {
         return eventEndMillis;
     }
 
-    public List<RaceLiveContent> getRacesWithLiveContent() {
+    public Iterable<RaceLiveContent> getRacesWithLiveContent() {
         return racesWithLiveContent;
     }
 }

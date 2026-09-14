@@ -604,8 +604,8 @@ public class LandscapeServiceImpl implements LandscapeService {
             final SailingServer server = sailingServerFactoryTracker.getService().getSailingServer(new URL("https", replicaSet.getHostname(), "/"), effectiveBearerToken);
             try {
                 final LiveContentCheckResult replicaSetResult = server.getLiveContent(checkedAt);
-                replicaSetsWithLiveContent.addAll(replicaSetResult.getReplicaSetsWithLiveContent());
-                undeterminedReplicaSetNames.addAll(replicaSetResult.getUndeterminedReplicaSetNames());
+                Util.addAll(replicaSetResult.getReplicaSetsWithLiveContent(), replicaSetsWithLiveContent);
+                Util.addAll(replicaSetResult.getUndeterminedReplicaSetNames(), undeterminedReplicaSetNames);
             } catch (final LiveContentCheckUnsupportedException e) {
                 // The server could not answer the live-content query (e.g., it predates the endpoint). Record it as
                 // undetermined and continue so that one un-upgraded server does not abort checking the remaining ones.

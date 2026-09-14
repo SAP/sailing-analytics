@@ -17,6 +17,7 @@ import com.sap.sailing.landscape.common.ReplicaSetLiveContent;
 import com.sap.sailing.server.gateway.deserialization.impl.LiveContentCheckResultJsonDeserializer;
 import com.sap.sailing.server.gateway.serialization.impl.LiveContentCheckResultJsonSerializer;
 import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.Util;
 import com.sap.sse.shared.json.JsonDeserializationException;
 
 public class LiveContentCheckResultJsonSerializerTest {
@@ -34,10 +35,10 @@ public class LiveContentCheckResultJsonSerializerTest {
         final LiveContentCheckResult roundTripped = new LiveContentCheckResultJsonDeserializer().deserialize(serialized);
         assertEquals(CHECKED_AT, roundTripped.getCheckedAt());
         assertTrue(roundTripped.hasLiveContent());
-        assertEquals("R1", roundTripped.getReplicaSetsWithLiveContent().get(0).getEventsWithLiveContent().get(0)
-                .getRacesWithLiveContent().get(0).getRaceName());
+        assertEquals("R1", Util.get(Util.get(Util.get(roundTripped.getReplicaSetsWithLiveContent(), 0)
+                .getEventsWithLiveContent(), 0).getRacesWithLiveContent(), 0).getRaceName());
         assertTrue(roundTripped.hasUndeterminedReplicaSets());
-        assertEquals(Arrays.asList("beta", "gamma"), roundTripped.getUndeterminedReplicaSetNames());
+        assertEquals(Arrays.asList("beta", "gamma"), Util.asList(roundTripped.getUndeterminedReplicaSetNames()));
     }
 
     @Test
@@ -50,6 +51,6 @@ public class LiveContentCheckResultJsonSerializerTest {
         final LiveContentCheckResult roundTripped = new LiveContentCheckResultJsonDeserializer().deserialize(serialized);
         assertFalse(roundTripped.hasLiveContent());
         assertFalse(roundTripped.hasUndeterminedReplicaSets());
-        assertTrue(roundTripped.getUndeterminedReplicaSetNames().isEmpty());
+        assertFalse(roundTripped.getUndeterminedReplicaSetNames().iterator().hasNext());
     }
 }

@@ -9,7 +9,7 @@ import java.util.List;
 public final class ReplicaSetLiveContent implements Serializable {
     private static final long serialVersionUID = -8106650879852011910L;
     private final String replicaSetName;
-    private final List<EventLiveContent> eventsWithLiveContent;
+    private final Iterable<EventLiveContent> eventsWithLiveContent;
 
     public ReplicaSetLiveContent(final String replicaSetName,
             final Iterable<EventLiveContent> eventsWithLiveContent) {
@@ -23,7 +23,7 @@ public final class ReplicaSetLiveContent implements Serializable {
         return replicaSetName;
     }
 
-    public List<EventLiveContent> getEventsWithLiveContent() {
+    public Iterable<EventLiveContent> getEventsWithLiveContent() {
         return eventsWithLiveContent;
     }
 }

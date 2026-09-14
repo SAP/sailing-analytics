@@ -19,8 +19,8 @@ import com.sap.sse.common.TimePoint;
 public final class LiveContentCheckResult implements Serializable {
     private static final long serialVersionUID = -6357657054503530857L;
     private final TimePoint checkedAt;
-    private final List<ReplicaSetLiveContent> replicaSetsWithLiveContent;
-    private final List<String> undeterminedReplicaSetNames;
+    private final Iterable<ReplicaSetLiveContent> replicaSetsWithLiveContent;
+    private final Iterable<String> undeterminedReplicaSetNames;
 
     public LiveContentCheckResult(final TimePoint checkedAt,
             final Iterable<ReplicaSetLiveContent> replicaSetsWithLiveContent) {
@@ -43,7 +43,7 @@ public final class LiveContentCheckResult implements Serializable {
         return checkedAt;
     }
 
-    public List<ReplicaSetLiveContent> getReplicaSetsWithLiveContent() {
+    public Iterable<ReplicaSetLiveContent> getReplicaSetsWithLiveContent() {
         return replicaSetsWithLiveContent;
     }
 
@@ -52,15 +52,15 @@ public final class LiveContentCheckResult implements Serializable {
      * the live-content query yet). Callers that block operations on live content should treat these as potentially
      * serving live content rather than as verified to be idle.
      */
-    public List<String> getUndeterminedReplicaSetNames() {
+    public Iterable<String> getUndeterminedReplicaSetNames() {
         return undeterminedReplicaSetNames;
     }
 
     public boolean hasLiveContent() {
-        return !replicaSetsWithLiveContent.isEmpty();
+        return replicaSetsWithLiveContent.iterator().hasNext();
     }
 
     public boolean hasUndeterminedReplicaSets() {
-        return !undeterminedReplicaSetNames.isEmpty();
+        return undeterminedReplicaSetNames.iterator().hasNext();
     }
 }

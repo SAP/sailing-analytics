@@ -1013,10 +1013,8 @@ public class LandscapeManagementPanel extends SimplePanel {
 
     private Set<String> getConflictingReplicaSetNames(final LiveContentCheckResult liveContentCheckResult) {
         final Set<String> result = new HashSet<>();
-        for (final ReplicaSetLiveContent replicaSet : liveContentCheckResult.getReplicaSetsWithLiveContent()) {
-            result.add(replicaSet.getReplicaSetName());
-        }
-        result.addAll(liveContentCheckResult.getUndeterminedReplicaSetNames());
+        Util.addAll(Util.map(liveContentCheckResult.getReplicaSetsWithLiveContent(), ReplicaSetLiveContent::getReplicaSetName), result);
+        Util.addAll(liveContentCheckResult.getUndeterminedReplicaSetNames(), result);
         return result;
     }
 

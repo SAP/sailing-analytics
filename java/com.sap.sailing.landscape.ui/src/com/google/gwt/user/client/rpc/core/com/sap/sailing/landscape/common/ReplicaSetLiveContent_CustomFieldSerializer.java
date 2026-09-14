@@ -9,12 +9,13 @@ import com.google.gwt.user.client.rpc.SerializationStreamReader;
 import com.google.gwt.user.client.rpc.SerializationStreamWriter;
 import com.sap.sailing.landscape.common.EventLiveContent;
 import com.sap.sailing.landscape.common.ReplicaSetLiveContent;
+import com.sap.sse.common.Util;
 
 public final class ReplicaSetLiveContent_CustomFieldSerializer extends CustomFieldSerializer<ReplicaSetLiveContent> {
     public static void serialize(final SerializationStreamWriter writer, final ReplicaSetLiveContent instance)
             throws SerializationException {
         writer.writeString(instance.getReplicaSetName());
-        writer.writeInt(instance.getEventsWithLiveContent().size());
+        writer.writeInt(Util.size(instance.getEventsWithLiveContent()));
         for (final EventLiveContent event : instance.getEventsWithLiveContent()) {
             writer.writeObject(event);
         }

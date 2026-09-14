@@ -10,16 +10,17 @@ import com.google.gwt.user.client.rpc.SerializationStreamWriter;
 import com.sap.sailing.landscape.common.LiveContentCheckResult;
 import com.sap.sailing.landscape.common.ReplicaSetLiveContent;
 import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.Util;
 
 public final class LiveContentCheckResult_CustomFieldSerializer extends CustomFieldSerializer<LiveContentCheckResult> {
     public static void serialize(final SerializationStreamWriter writer, final LiveContentCheckResult instance)
             throws SerializationException {
         writer.writeObject(instance.getCheckedAt());
-        writer.writeInt(instance.getReplicaSetsWithLiveContent().size());
+        writer.writeInt(Util.size(instance.getReplicaSetsWithLiveContent()));
         for (final ReplicaSetLiveContent replicaSet : instance.getReplicaSetsWithLiveContent()) {
             writer.writeObject(replicaSet);
         }
-        writer.writeInt(instance.getUndeterminedReplicaSetNames().size());
+        writer.writeInt(Util.size(instance.getUndeterminedReplicaSetNames()));
         for (final String undeterminedReplicaSetName : instance.getUndeterminedReplicaSetNames()) {
             writer.writeString(undeterminedReplicaSetName);
         }
