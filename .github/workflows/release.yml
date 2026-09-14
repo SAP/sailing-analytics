@@ -194,6 +194,13 @@ jobs:
         with:
           log-accepted-android-sdk-licenses: 'false'
           cmdline-tools-version: 9123335  # This corresponds to human-friendly version number 8.0
+          # The action's default 'packages' is "tools platform-tools". The legacy "tools"
+          # package was removed from Google's SDK repository; as of the ~2026-09-14 runner
+          # image (cmdline-tools 12.0 preinstalled) sdkmanager no longer resolves it and the
+          # step fails with "Failed to find package 'tools'". We only need the action to
+          # bootstrap cmdline-tools here; buildAndUpdateProduct.sh installs build-tools,
+          # platform-tools and the platform itself. So request just platform-tools.
+          packages: 'platform-tools'
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@315db7fe45ac2880b7758f1933e6e5d59afd5e94 #v1.12.1
         with:
