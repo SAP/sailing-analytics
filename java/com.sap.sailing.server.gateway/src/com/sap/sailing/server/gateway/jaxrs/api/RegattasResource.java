@@ -2313,6 +2313,9 @@ public class RegattasResource extends AbstractSailingServerResource {
                 if (detailType.getPremiumAction() != null && leaderboard.getPermissionType().supports(detailType.getPremiumAction())) {
                     getSecurityService().checkCurrentUserExplicitPermissions(leaderboard, detailType.getPremiumAction());
                 }
+                if (detailType.getTrackedRaceAction() != null && trackedRace.getPermissionType().supports(detailType.getTrackedRaceAction())) {
+                    getSecurityService().checkCurrentUserExplicitPermissions(trackedRace, detailType.getTrackedRaceAction());
+                }
             }
             final Map<Competitor, FutureTask<Iterable<Pair<TimePoint, Map<DetailType, Double>>>>> resultFutures = new HashMap<>();
             for (final String competitorIdAsString : competitorIds) {
