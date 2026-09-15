@@ -240,7 +240,7 @@ public class CandidateChooserImpl implements CandidateChooser {
             } else if (o1 == end || o2 == start) {
                 result = 1;
             } else {
-                result = (int) (o1.getTimePointAsMillis() - o2.getTimePointAsMillis());
+                result = (int) (o1.getTimePoint().asMillis() - o2.getTimePoint().asMillis());
                 if (result == 0) {
                     result = Integer.compare(o1.getOneBasedIndexOfWaypoint(), o2.getOneBasedIndexOfWaypoint());
                     if (result == 0) {
