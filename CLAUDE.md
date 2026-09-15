@@ -10,6 +10,10 @@ Make sure to research the topic/question well and thoroughly instead of just ans
 
 ## Java Coding Style Preferences
 
+### Auto-Formatting
+
+When using any form of auto-formatting, keep it to the actual change and make sure not to apply any auto-formatting to otherwise unchanged code. This would make reviewing a pain.
+
 ### Variable Declarations
 - **Always use `final` where possible** for local variables, parameters, and fields
 - Prefer immutability
@@ -49,6 +53,9 @@ We prefer **generated** serialVersionUID values, not the default "1", so make su
 generate the value only after the first combination of fields and methods has been added
 so that at least for an initial version of the type the serialVersionUID is a true, matching
 ID.
+
+However, once a non-trivial serialVersionUID has been generated, committed and pushed, don't
+change it anymore.
 
 ## i18n Patterns
 

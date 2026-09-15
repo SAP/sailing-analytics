@@ -38,6 +38,10 @@
 #                                env: MERGE_U2D_LOCAL_DOWNSTREAM_BRANCH
 #   --local-fork-branch NAME       default: <fork-remote>-<downstream-remote>-<downstream-branch>
 #                                env: MERGE_U2D_LOCAL_FORK_BRANCH
+#   -f | --force                 force PR creation even when upstream contributes
+#                                nothing new (branch consolidation). Bypasses the
+#                                upstream-contribution guard; the empty-range guard
+#                                still applies. env: MERGE_U2D_FORCE
 #   -h | --help                  show this help and exit
 #
 # So, e.g., `export MERGE_U2D_FORK_REMOTE=aksajhfduwafe` in your .bashrc lets you
@@ -69,6 +73,7 @@ FORK_BRANCH="${MERGE_U2D_FORK_BRANCH:-main}"
 LOCAL_UPSTREAM_BRANCH="${MERGE_U2D_LOCAL_UPSTREAM_BRANCH:-}"     # resolved after parsing if left empty
 LOCAL_DOWNSTREAM_BRANCH="${MERGE_U2D_LOCAL_DOWNSTREAM_BRANCH:-}"
 LOCAL_FORK_BRANCH="${MERGE_U2D_LOCAL_FORK_BRANCH:-}"
+FORCE="${MERGE_U2D_FORCE:-}"   # non-empty => force PR even without upstream contribution
 
 usage() {
   cat <<EOF
@@ -110,6 +115,10 @@ Local branches (defaults derive from the names above):
                                  [env MERGE_U2D_LOCAL_FORK_BRANCH]
 
 Other:
+  -f, --force                    open a PR even if upstream contributes nothing
+                                 new (consolidation). Bypasses the upstream-
+                                 contribution guard; empty-range guard still applies.
+                                 [env MERGE_U2D_FORCE] (current: ${FORCE:+on})
   -h, --help                     show this help and exit
 
 Example (downstream remote named "github" rather than the default "sap"):
@@ -130,6 +139,7 @@ while [ $# -gt 0 ]; do
     --local-upstream-branch)   LOCAL_UPSTREAM_BRANCH="$2"; shift 2 ;;
     --local-downstream-branch) LOCAL_DOWNSTREAM_BRANCH="$2"; shift 2 ;;
     --local-fork-branch)       LOCAL_FORK_BRANCH="$2"; shift 2 ;;
+    -f|--force)               FORCE=1; shift 1 ;;
     --*=*)  # support --opt=value form
       set -- "${1%%=*}" "${1#*=}" "${@:2}" ;;
     -h|--help) usage; exit 0 ;;
@@ -217,12 +227,20 @@ git merge --ff-only "$UPSTREAM_REMOTE/$UPSTREAM_BRANCH" \
 # stop before merging/pushing/PRing so we never open a ridiculous empty (or
 # downstream-into-itself) PR. (A downstream-only advance with no upstream content
 # is excluded here too, precisely because it contributes nothing from upstream.)
+# --force overrides this guard for the branch-consolidation case, where a PR is
+# wanted even though upstream carries nothing new; the empty-range guard further
+# down still applies, so a truly empty PR is never attempted.
 UPSTREAM_CONTRIB_COUNT="$(git rev-list --count "$DOWNSTREAM_REMOTE/$DOWNSTREAM_BRANCH..$LOCAL_UPSTREAM_BRANCH")"
 if [ "$UPSTREAM_CONTRIB_COUNT" -eq 0 ]; then
-  log "$UPSTREAM_REMOTE/$UPSTREAM_BRANCH has no commits beyond $DOWNSTREAM_REMOTE/$DOWNSTREAM_BRANCH — nothing to contribute. No merge, push, or PR. Done."
-  exit 0
+  if [ -n "$FORCE" ]; then
+    log "$UPSTREAM_REMOTE/$UPSTREAM_BRANCH has no commits beyond $DOWNSTREAM_REMOTE/$DOWNSTREAM_BRANCH, but --force is set — proceeding with consolidation."
+  else
+    log "$UPSTREAM_REMOTE/$UPSTREAM_BRANCH has no commits beyond $DOWNSTREAM_REMOTE/$DOWNSTREAM_BRANCH — nothing to contribute. No merge, push, or PR. Done. (Use --force to consolidate anyway.)"
+    exit 0
+  fi
+else
+  log "$UPSTREAM_CONTRIB_COUNT upstream commit(s) not yet on downstream; proceeding."
 fi
-log "$UPSTREAM_CONTRIB_COUNT upstream commit(s) not yet on downstream; proceeding."
 
 # --- 4 & 5. merge downstream then upstream into the fork branch ---------------
 git checkout "$LOCAL_FORK_BRANCH"
@@ -241,7 +259,11 @@ git merge --no-edit "$LOCAL_UPSTREAM_BRANCH" \
 INCOMING_RANGE="$DOWNSTREAM_REMOTE/$DOWNSTREAM_BRANCH..$LOCAL_FORK_BRANCH"
 INCOMING_COUNT="$(git rev-list --count "$INCOMING_RANGE")"
 if [ "$INCOMING_COUNT" -eq 0 ]; then
-  log "No new commits over $DOWNSTREAM_REMOTE/$DOWNSTREAM_BRANCH — nothing to push or PR. Done."
+  if [ -n "$FORCE" ]; then
+    log "Even with --force, $LOCAL_FORK_BRANCH has no commits over $DOWNSTREAM_REMOTE/$DOWNSTREAM_BRANCH; GitHub cannot open an empty PR. Nothing to push or PR. Done."
+  else
+    log "No new commits over $DOWNSTREAM_REMOTE/$DOWNSTREAM_BRANCH — nothing to push or PR. Done."
+  fi
   exit 0
 fi
 log "$INCOMING_COUNT commit(s) will be proposed to $BASE_REPO."
