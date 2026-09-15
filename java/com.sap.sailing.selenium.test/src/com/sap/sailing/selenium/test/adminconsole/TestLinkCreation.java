@@ -185,7 +185,7 @@ public class TestLinkCreation extends AbstractSeleniumTest {
         RaceManagementAppPanelPO raceManagerApp = adminConsole.goToRaceManagerApp();
         DeviceConfigurationCreateDialogPO createDeviceConfiguration = raceManagerApp.createDeviceConfiguration();
         createDeviceConfiguration.setDeviceName(DEVICE_CONFIG_NAME);
-        createDeviceConfiguration.clickOkButtonOrThrow();
+        createDeviceConfiguration.pressOk();
         DeviceConfigurationDetailsAreaPO deviceConfigurationDetails = raceManagerApp.getDeviceConfigurationDetails();
         DeviceConfigurationQRCodeDialogPO qrCodeDialog = deviceConfigurationDetails.openQRCodeDialog();
         Matcher<String> matcher = Matchers.matchesRegex(CHECK_RACE_APP_URL_REGEX);
