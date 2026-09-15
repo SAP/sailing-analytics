@@ -12,6 +12,8 @@ import org.json.simple.parser.ParseException;
 import com.sap.sailing.domain.base.EventBase;
 import com.sap.sailing.domain.base.RemoteSailingServerReference;
 import com.sap.sailing.domain.common.DataImportProgress;
+import com.sap.sailing.landscape.common.LiveContentCheckResult;
+import com.sap.sse.common.TimePoint;
 import com.sap.sse.security.util.SecuredServer;
 import com.sap.sse.shared.json.JsonDeserializationException;
 
@@ -54,6 +56,26 @@ public interface SailingServer extends SecuredServer {
      * venue and course areas.
      */
     Iterable<EventBase> getEvents() throws Exception;
+
+    /**
+     * Asks the remote server which of its {@link EventBase events} were tracking live content (races being tracked)
+     * at a given instant in time, reusing the {@code /v1/livecontent} endpoint. This is a Java facade over that REST
+     * call and is executed with this object's authentication information (see the {@link SailingServer class
+     * documentation}); the remote endpoint requires {@code MANAGE} permission on the {@code AWS} landscape object.
+     *
+     * @param checkedAt
+     *            the instant for which live content shall be determined. A race counts as live content if it was being
+     *            tracked at that instant. Pass {@link TimePoint#now()} to find out what is live right now.
+     * @return a {@link LiveContentCheckResult} describing, per replica set, the events and races that were tracked
+     *         live at {@code checkedAt}. The result is never {@code null}; an empty
+     *         {@link LiveContentCheckResult#getReplicaSetsWithLiveContent() list} (equivalently,
+     *         {@link LiveContentCheckResult#hasLiveContent()} returning {@code false}) means no live content was found.
+     * @throws Exception
+     *             if the remote request cannot be sent or its response cannot be parsed or deserialized; concrete
+     *             implementations may throw more specific exceptions such as {@link IOException},
+     *             {@link ClientProtocolException}, {@link ParseException} or {@link JsonDeserializationException}.
+     */
+    LiveContentCheckResult getLiveContent(TimePoint checkedAt) throws Exception;
 
     MasterDataImportResult importMasterData(SailingServer from, Iterable<UUID> leaderboardGroupIds, boolean override,
             boolean compress, boolean exportWind, boolean exportDeviceConfigs,

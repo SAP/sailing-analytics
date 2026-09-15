@@ -37,11 +37,15 @@ import com.sap.sailing.landscape.ALBToReverseProxyArchiveRedirectMapper;
 import com.sap.sailing.landscape.AwsSessionCredentialsWithExpiry;
 import com.sap.sailing.landscape.EligibleInstanceForReplicaSetFindingStrategy;
 import com.sap.sailing.landscape.LandscapeService;
+import com.sap.sailing.landscape.LiveContentConflictException;
 import com.sap.sailing.landscape.SailingAnalyticsHost;
 import com.sap.sailing.landscape.SailingAnalyticsMetrics;
 import com.sap.sailing.landscape.SailingAnalyticsProcess;
 import com.sap.sailing.landscape.SailingReleaseRepository;
+import com.sap.sailing.landscape.common.LiveContentCheckResult;
+import com.sap.sailing.landscape.common.LiveContentCheckUnsupportedException;
 import com.sap.sailing.landscape.common.RemoteServiceMappingConstants;
+import com.sap.sailing.landscape.common.ReplicaSetLiveContent;
 import com.sap.sailing.landscape.common.SharedLandscapeConstants;
 import com.sap.sailing.landscape.procedures.CreateLaunchTemplateAndAutoScalingGroup;
 import com.sap.sailing.landscape.procedures.DeployProcessOnMultiServer;
@@ -589,14 +593,51 @@ public class LandscapeServiceImpl implements LandscapeService {
     }
     
     @Override
+    public LiveContentCheckResult checkForLiveContent(
+            final Iterable<AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>>> applicationReplicaSets,
+            final String bearerToken) throws Exception {
+        final String effectiveBearerToken = getEffectiveBearerToken(bearerToken);
+        final TimePoint checkedAt = TimePoint.now();
+        final List<ReplicaSetLiveContent> replicaSetsWithLiveContent = new ArrayList<>();
+        final List<String> undeterminedReplicaSetNames = new ArrayList<>();
+        for (final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet : applicationReplicaSets) {
+            final SailingServer server = sailingServerFactoryTracker.getService().getSailingServer(new URL("https", replicaSet.getHostname(), "/"), effectiveBearerToken);
+            try {
+                final LiveContentCheckResult replicaSetResult = server.getLiveContent(checkedAt);
+                Util.addAll(replicaSetResult.getReplicaSetsWithLiveContent(), replicaSetsWithLiveContent);
+                Util.addAll(replicaSetResult.getUndeterminedReplicaSetNames(), undeterminedReplicaSetNames);
+            } catch (final LiveContentCheckUnsupportedException e) {
+                // The server could not answer the live-content query (e.g., it predates the endpoint). Record it as
+                // undetermined and continue so that one un-upgraded server does not abort checking the remaining ones.
+                logger.info("Could not determine live content of replica set " + replicaSet.getName() + ": "
+                        + e.getMessage());
+                undeterminedReplicaSetNames.add(replicaSet.getName());
+            }
+        }
+        return new LiveContentCheckResult(checkedAt, replicaSetsWithLiveContent, undeterminedReplicaSetNames);
+    }
+
+    private void checkForLiveContentUnlessForced(
+            final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet,
+            final String bearerToken, final boolean force) throws Exception {
+        if (!force) {
+            final LiveContentCheckResult liveContentCheckResult = checkForLiveContent(Collections.singleton(replicaSet), bearerToken);
+            if (liveContentCheckResult.hasLiveContent() || liveContentCheckResult.hasUndeterminedReplicaSets()) {
+                throw new LiveContentConflictException(liveContentCheckResult);
+            }
+        }
+    }
+
+    @Override
     public Util.Triple<DataImportProgress, CompareServersResult, String> archiveReplicaSet(String regionId,
             AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> applicationReplicaSetToArchive,
             String bearerTokenOrNullForApplicationReplicaSetToArchive,
             String bearerTokenOrNullForArchive,
             Duration durationToWaitBeforeCompareServers,
             int maxNumberOfCompareServerAttempts, boolean removeApplicationReplicaSet, MongoEndpoint moveDatabaseHere,
-            String optionalKeyName, byte[] passphraseForPrivateKeyDecryption)
+            String optionalKeyName, byte[] passphraseForPrivateKeyDecryption, boolean force)
             throws Exception {
+        checkForLiveContentUnlessForced(applicationReplicaSetToArchive, bearerTokenOrNullForApplicationReplicaSetToArchive, force);
         if (removeApplicationReplicaSet && applicationReplicaSetToArchive.isLocalReplicaSet()) {
             throw new IllegalArgumentException("A replica set cannot archive itself if it is going to be removed. Current replica set: "+ServerInfo.getName());
         }
@@ -661,6 +702,7 @@ public class LandscapeServiceImpl implements LandscapeService {
                             getLandscape().getCentralReverseProxy(region);
                     // TODO bug5311: when refactoring this for general scope migration, moving to a dedicated replica set will not require this
                     // TODO bug5311: when refactoring this for general scope migration, moving into a cold storage server other than ARCHIVE will require ALBToReverseProxyRedirectMapper instead
+                    checkForLiveContentUnlessForced(applicationReplicaSetToArchive, bearerTokenOrNullForApplicationReplicaSetToArchive, force);
                     logger.info("Adding reverse proxy rules for migrated content pointing to ARCHIVE");
                     defaultRedirect.accept(new ALBToReverseProxyArchiveRedirectMapper<>(
                             reverseProxyCluster, hostnameFromWhichToArchive, Optional.ofNullable(optionalKeyName), passphraseForPrivateKeyDecryption));
@@ -674,7 +716,7 @@ public class LandscapeServiceImpl implements LandscapeService {
                                     "; probably such a reference didn't exist");
                         }
                         logger.info("Removing the application replica set archived ("+from+") was requested");
-                        mongoDbArchivingErrorMessage = removeApplicationReplicaSet(regionId, applicationReplicaSetToArchive, moveDatabaseHere, optionalKeyName, passphraseForPrivateKeyDecryption);
+                        mongoDbArchivingErrorMessage = removeApplicationReplicaSetInternal(regionId, applicationReplicaSetToArchive, moveDatabaseHere, optionalKeyName, passphraseForPrivateKeyDecryption);
                     } else {
                         mongoDbArchivingErrorMessage = null;
                         logger.info("Removing remote sailing server references to events on "+from+" with IDs "+eventIDs+" from archive server "+archive);
@@ -721,7 +763,15 @@ public class LandscapeServiceImpl implements LandscapeService {
     }
     
     @Override
-    public String removeApplicationReplicaSet(String regionId,
+    public String removeApplicationReplicaSet(final String regionId,
+            final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> applicationReplicaSet,
+            final MongoEndpoint moveDatabaseHere, final String optionalKeyName,
+            final byte[] passphraseForPrivateKeyDecryption, final boolean force) throws Exception {
+        checkForLiveContentUnlessForced(applicationReplicaSet, /* bearerToken */ null, force);
+        return removeApplicationReplicaSetInternal(regionId, applicationReplicaSet, moveDatabaseHere, optionalKeyName, passphraseForPrivateKeyDecryption);
+    }
+
+    private String removeApplicationReplicaSetInternal(String regionId,
             AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> applicationReplicaSet,
             MongoEndpoint moveDatabaseHere, String optionalKeyName, byte[] passphraseForPrivateKeyDecryption)
             throws Exception {
@@ -1209,8 +1259,9 @@ public class LandscapeServiceImpl implements LandscapeService {
     public AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> upgradeApplicationReplicaSet(AwsRegion region,
             AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet,
             String releaseOrNullForLatestMaster, String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
-            String replicaReplicationBearerToken)
+            String replicaReplicationBearerToken, boolean force)
             throws MalformedURLException, IOException, TimeoutException, Exception {
+        checkForLiveContentUnlessForced(replicaSet, replicaReplicationBearerToken, force);
         if (replicaSet.isLocalReplicaSet()) {
             throw new IllegalArgumentException(
                     "A replica set cannot upgrade itself. Current replica set: " + ServerInfo.getName());
@@ -1241,7 +1292,8 @@ public class LandscapeServiceImpl implements LandscapeService {
         final Set<SailingAnalyticsProcess<String>> replicasToStopAfterUpgradingMaster = new HashSet<>();
         Util.addAll(replicaSet.getReplicas(), replicasToStopAfterUpgradingMaster);
         final SailingAnalyticsProcess<String> additionalReplicaStarted = ensureAtLeastOneReplicaExistsStopReplicatingAndRemoveMasterFromTargetGroups(
-                replicaSet, optionalKeyName, privateKeyEncryptionPassphrase, effectiveReplicaReplicationBearerToken);
+                replicaSet, optionalKeyName, privateKeyEncryptionPassphrase, effectiveReplicaReplicationBearerToken,
+                /* force: outer operation already checked */ true);
         if (replicaSet.getAutoScalingGroup() != null) {
             getLandscape().updateReleaseInAutoScalingGroups(region, replicaSet.getAutoScalingGroup().getLaunchTemplate(),
                     affectedAutoScalingGroups, replicaSet.getName(), release);
@@ -1477,8 +1529,9 @@ public class LandscapeServiceImpl implements LandscapeService {
     public SailingAnalyticsProcess<String> ensureAtLeastOneReplicaExistsStopReplicatingAndRemoveMasterFromTargetGroups(
             final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet,
             String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
-            final String effectiveReplicaReplicationBearerToken) throws Exception, MalformedURLException, IOException,
+            final String effectiveReplicaReplicationBearerToken, final boolean force) throws Exception, MalformedURLException, IOException,
             TimeoutException, InterruptedException, ExecutionException {
+        checkForLiveContentUnlessForced(replicaSet, effectiveReplicaReplicationBearerToken, force);
         final Set<SailingAnalyticsProcess<String>> replicasToStopReplicating = new HashSet<>();
         Util.addAll(replicaSet.getReplicas(), replicasToStopReplicating);
         final SailingAnalyticsProcess<String> additionalReplicaStarted;
@@ -1770,16 +1823,18 @@ public class LandscapeServiceImpl implements LandscapeService {
                     final boolean useSharedInstance, Optional<InstanceType> optionalInstanceType,
                     Optional<SailingAnalyticsHost<String>> optionalPreferredInstanceToDeployTo, String optionalKeyName,
                     byte[] privateKeyEncryptionPassphrase, String optionalMasterReplicationBearerTokenOrNull, final String optionalReplicaReplicationBearerTokenOrNull, Integer optionalMemoryInMegabytesOrNull,
-                    Integer optionalMemoryTotalSizeFactorOrNull)
+                    Integer optionalMemoryTotalSizeFactorOrNull, final boolean force)
                     throws MalformedURLException,
                     IOException, TimeoutException, InterruptedException, ExecutionException, Exception {
+        checkForLiveContentUnlessForced(replicaSet, optionalMasterReplicationBearerTokenOrNull, force);
         final Integer igtimiRiotPort = replicaSet.getMaster().getIgtimiRiotPort(Landscape.WAIT_FOR_PROCESS_TIMEOUT, Optional.ofNullable(optionalKeyName), privateKeyEncryptionPassphrase);
         if (replicaSet.isLocalReplicaSet()) {
             throw new IllegalArgumentException("A replica set cannot move its own master process. Current replica set: "+ServerInfo.getName());
         }
         final SailingAnalyticsProcess<String> newTemporaryReplica = ensureAtLeastOneReplicaExistsStopReplicatingAndRemoveMasterFromTargetGroups(replicaSet,
                 optionalKeyName, privateKeyEncryptionPassphrase,
-                getEffectiveBearerToken(optionalReplicaReplicationBearerTokenOrNull));
+                getEffectiveBearerToken(optionalReplicaReplicationBearerTokenOrNull),
+                /* force: move operation already checked */ true);
         // important to obtain the release before stopping master:
         final Release release = replicaSet.getVersion(Landscape.WAIT_FOR_PROCESS_TIMEOUT, Optional.ofNullable(optionalKeyName), privateKeyEncryptionPassphrase);
         final AwsRegion region = replicaSet.getMaster().getHost().getRegion();
@@ -2153,7 +2208,7 @@ public class LandscapeServiceImpl implements LandscapeService {
     public Triple<SailingAnalyticsHost<String>, Map<String, SailingAnalyticsProcess<String>>, Map<String, SailingAnalyticsProcess<String>>>
     moveAllApplicationProcessesAwayFrom(SailingAnalyticsHost<String> host,
             Optional<InstanceType> optionalInstanceTypeForNewInstance,
-            String optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception {
+            String optionalKeyName, byte[] privateKeyEncryptionPassphrase, Set<String> forceMasterReplicaSetNames) throws Exception {
         if (!host.getInstance().tags().stream().anyMatch(tag->
                 tag.key().equals(SharedLandscapeConstants.SAILING_ANALYTICS_APPLICATION_HOST_TAG) &&
                 tag.value().equals(SharedLandscapeConstants.MULTI_PROCESS_INSTANCE_TAG_VALUE))) {
@@ -2164,6 +2219,21 @@ public class LandscapeServiceImpl implements LandscapeService {
         logger.info("Moving all application processes from shared host "+host+" to a newly started shared host.");
         final AwsRegion region = host.getRegion();
         final HostSupplier<String, SailingAnalyticsHost<String>> hostSupplier = new SailingAnalyticsHostSupplier<>();
+        final Iterable<AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>>> replicaSets = getLandscape()
+                .getApplicationReplicaSetsByTag(region, SharedLandscapeConstants.SAILING_ANALYTICS_APPLICATION_HOST_TAG,
+                        hostSupplier, Landscape.WAIT_FOR_PROCESS_TIMEOUT, Optional.ofNullable(optionalKeyName),
+                        privateKeyEncryptionPassphrase);
+        final List<AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>>> unforcedMasterReplicaSets = new ArrayList<>();
+        for (final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet : replicaSets) {
+            if (replicaSet.getMaster().getHost().getId().equals(host.getId())
+                    && !forceMasterReplicaSetNames.contains(replicaSet.getName())) {
+                unforcedMasterReplicaSets.add(replicaSet);
+            }
+        }
+        final LiveContentCheckResult liveContentCheckResult = checkForLiveContent(unforcedMasterReplicaSets, /* bearerToken */ null);
+        if (liveContentCheckResult.hasLiveContent()) {
+            throw new LiveContentConflictException(liveContentCheckResult);
+        }
         final SailingAnalyticsHost<String> targetHost = createEmptyMultiServer(region,
                 Optional.of(optionalInstanceTypeForNewInstance.orElse(host.getInstanceType())),
                 Optional.of(host.getAvailabilityZone()),
@@ -2171,10 +2241,7 @@ public class LandscapeServiceImpl implements LandscapeService {
                 Optional.ofNullable(optionalKeyName), privateKeyEncryptionPassphrase);
         final Map<String, SailingAnalyticsProcess<String>> masterProcessesMoved = new HashMap<>();
         final Map<String, SailingAnalyticsProcess<String>> replicaProcessesMoved = new HashMap<>();
-        for (final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet : getLandscape()
-                .getApplicationReplicaSetsByTag(region, SharedLandscapeConstants.SAILING_ANALYTICS_APPLICATION_HOST_TAG,
-                        hostSupplier, Landscape.WAIT_FOR_PROCESS_TIMEOUT, Optional.ofNullable(optionalKeyName),
-                        privateKeyEncryptionPassphrase)) {
+        for (final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet : replicaSets) {
             if (replicaSet.getMaster().getHost().getId().equals(host.getId())) {
                 // We're moving a master process:
                 logger.info("Found master process "+replicaSet.getMaster()+" on host "+host+" to move to "+targetHost);
@@ -2208,7 +2275,7 @@ public class LandscapeServiceImpl implements LandscapeService {
                                 privateKeyEncryptionPassphrase),
                         replicaReplicationBearerToken,
                         totalMemorySizeFactor == null ? getMemoryInMegabytes(optionalKeyName, privateKeyEncryptionPassphrase, replicaSet.getMaster()) : null,
-                        totalMemorySizeFactor); 
+                        totalMemorySizeFactor, /* force: all affected masters were checked above */ true);
                 logger.info("Done moving master of "+replicaSet.getName()+" from "+host+" to "+targetHost);
             } else {
                 final SailingAnalyticsProcess<String> replica;
