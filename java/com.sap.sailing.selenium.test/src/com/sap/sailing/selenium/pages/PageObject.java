@@ -9,14 +9,19 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.openqa.selenium.Alert;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
@@ -517,6 +522,111 @@ public class PageObject {
         waitUntil((driver) -> supplier.getAsBoolean());
     }
     
+    /**
+     * Waits for an element inside a possibly animated container to become interactable, then clicks it using WebDriver.
+     */
+    protected void clickWhenInteractable(final Supplier<WebElement> elementSupplier) {
+        final WebElement element = waitUntilInteractable(elementSupplier);
+        element.click();
+    }
+
+    /**
+     * Waits for an element inside a possibly animated container to have a stable, exposed interaction point. JavaScript
+     * is only used to observe layout and hit-testing; the returned element can be used for native WebDriver operations.
+     *
+     * @return the stable, exposed element supplied by {@code elementSupplier}
+     */
+    protected WebElement waitUntilInteractable(final Supplier<WebElement> elementSupplier) {
+        final String[] previousLayoutSignature = new String[1];
+        final int[] stableLayoutSamples = new int[1];
+        final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DEFAULT_LOOKUP_TIMEOUT));
+        wait.pollingEvery(Duration.ofMillis(100));
+        final WebElement interactableElement = wait.until(webDriver -> {
+            WebElement result = null;
+            try {
+                final WebElement element = elementSupplier.get();
+                String layoutSignature = null;
+                if (element.isDisplayed() && element.isEnabled()) {
+                    layoutSignature = getInteractableLayoutSignature(element);
+                }
+                if (layoutSignature == null) {
+                    previousLayoutSignature[0] = null;
+                    stableLayoutSamples[0] = 0;
+                } else {
+                    if (layoutSignature.equals(previousLayoutSignature[0])) {
+                        stableLayoutSamples[0]++;
+                    } else {
+                        previousLayoutSignature[0] = layoutSignature;
+                        stableLayoutSamples[0] = 1;
+                    }
+                    if (stableLayoutSamples[0] >= 3) {
+                        result = element;
+                    }
+                }
+            } catch (ElementNotInteractableException | JavascriptException | NoSuchElementException
+                    | StaleElementReferenceException e) {
+                previousLayoutSignature[0] = null;
+                stableLayoutSamples[0] = 0;
+            }
+            return result;
+        });
+        return interactableElement;
+    }
+
+    /**
+     * Returns a signature of the element and relevant ancestor layout when the element's WebDriver click point is
+     * exposed. A {@code null} result means that the element is not ready for a native click.
+     */
+    private String getInteractableLayoutSignature(WebElement element) {
+        Object result = ((JavascriptExecutor) driver).executeScript(
+                "var element = arguments[0];"
+                + "if (!element.isConnected) return null;"
+                + "var rect = element.getBoundingClientRect();"
+                + "var viewportWidth = document.documentElement.clientWidth;"
+                + "var viewportHeight = document.documentElement.clientHeight;"
+                + "var left = Math.max(0, Math.min(rect.left, rect.right));"
+                + "var right = Math.min(viewportWidth, Math.max(rect.left, rect.right));"
+                + "var top = Math.max(0, Math.min(rect.top, rect.bottom));"
+                + "var bottom = Math.min(viewportHeight, Math.max(rect.top, rect.bottom));"
+                + "var round = function(value) { return Math.round(value * 100) / 100; };"
+                + "var signature = [];"
+                + "for (var node = element; node; node = node.parentElement) {"
+                + "  var style = window.getComputedStyle(node);"
+                + "  if (style.display === 'none' || style.visibility === 'hidden'"
+                + "      || style.visibility === 'collapse' || parseFloat(style.opacity) === 0) return null;"
+                + "  var clipsX = style.overflowX !== 'visible';"
+                + "  var clipsY = style.overflowY !== 'visible';"
+                + "  var hasOtherLayoutEffect = style.clip !== 'auto' || style.clipPath !== 'none'"
+                + "      || style.transform !== 'none';"
+                + "  if (node === element || clipsX || clipsY || hasOtherLayoutEffect) {"
+                + "    var nodeRect = node.getBoundingClientRect();"
+                + "    signature.push([round(nodeRect.left), round(nodeRect.top), round(nodeRect.right),"
+                + "        round(nodeRect.bottom), style.overflowX, style.overflowY, style.clip, style.clipPath,"
+                + "        style.transform, style.opacity].join(','));"
+                + "    if (node !== element) {"
+                + "      if (clipsX) {"
+                + "        left = Math.max(left, nodeRect.left);"
+                + "        right = Math.min(right, nodeRect.right);"
+                + "      }"
+                + "      if (clipsY) {"
+                + "        top = Math.max(top, nodeRect.top);"
+                + "        bottom = Math.min(bottom, nodeRect.bottom);"
+                + "      }"
+                + "    }"
+                + "  }"
+                + "}"
+                + "if (right <= left || bottom <= top) return null;"
+                + "var centerX = Math.floor((left + right) / 2);"
+                + "var centerY = Math.floor((top + bottom) / 2);"
+                + "var hit = document.elementFromPoint(centerX, centerY);"
+                + "if (hit === null || (hit !== element && !element.contains(hit))) return null;"
+                + "signature.push([centerX, centerY].join(','));"
+                + "return signature.join(';');",
+                element);
+        String layoutSignature = (String) result;
+        return layoutSignature;
+    }
+
     protected void waitUntilAlertIsPresent() {
         WebDriverWait webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(DEFAULT_LOOKUP_TIMEOUT));
         webDriverWait.until(ExpectedConditions.alertIsPresent());

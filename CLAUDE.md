@@ -43,6 +43,20 @@ public void processItem(Item item) {  // Missing final
 }
 ```
 
+### serialVersionUID
+
+We prefer **generated** serialVersionUID values, not the default "1", so make sure to
+generate the value only after the first combination of fields and methods has been added
+so that at least for an initial version of the type the serialVersionUID is a true, matching
+ID.
+
+## i18n Patterns
+
+Our primary development language is English (en_US). However, we also have to maintain German (de_DE) ourselves.
+For the downstream repository (github.com/SAP/sailing-analytics) there is a translation process attached
+that produces message strings from the translatable message bundles in all other languages supported,
+based on the English messages.
+
 ## Git Commit Messages
 - Follow existing repository convention: start with bug/issue number (e.g., "bug6214: description")
 - Use descriptive commit messages explaining what changed and why

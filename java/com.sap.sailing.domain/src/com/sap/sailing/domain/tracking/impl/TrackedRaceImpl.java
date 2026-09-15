@@ -3170,7 +3170,7 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
         final AbstractRaceChangeListener raceLogAttachedListener = new AbstractRaceChangeListener() {
             @Override
             public void raceLogAttached(RaceLog raceLog) {
-                int numberOfAttachedRaceLogs = Util.size(getAttachedRaceLogs());
+                final int numberOfAttachedRaceLogs = Util.size(getAttachedRaceLogs());
                 synchronized (latchForRaceLogs) {
                     if (numberOfAttachedRaceLogs >= numberOfExpectedRaceLogs) {
                         latchForRaceLogs.notifyAll();
@@ -3179,10 +3179,9 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
             }
         };
         this.addListener(raceLogAttachedListener);
-        final int numberOfAttachedRaceLogs = Util.size(getAttachedRaceLogs());
         try {
             synchronized (latchForRaceLogs) {
-                while (numberOfAttachedRaceLogs < numberOfExpectedRaceLogs) {
+                while (Util.size(getAttachedRaceLogs()) < numberOfExpectedRaceLogs) {
                     latchForRaceLogs.wait();
                 }
             }
