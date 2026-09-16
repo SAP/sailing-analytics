@@ -6,8 +6,11 @@ import java.util.Set;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.sap.sailing.domain.common.DataImportProgress;
+import com.sap.sailing.landscape.common.EventLiveContent;
 import com.sap.sailing.landscape.common.LiveContentAwareOperationResult;
 import com.sap.sailing.landscape.common.LiveContentCheckResult;
+import com.sap.sailing.landscape.common.RaceLiveContent;
+import com.sap.sailing.landscape.common.ReplicaSetLiveContent;
 import com.sap.sailing.landscape.ui.shared.AmazonMachineImageDTO;
 import com.sap.sailing.landscape.ui.shared.AvailabilityZoneDTO;
 import com.sap.sailing.landscape.ui.shared.AwsInstanceDTO;
@@ -97,7 +100,9 @@ public interface LandscapeManagementWriteService extends RemoteService {
             String optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception;
     
     SerializationDummyDTO serializationDummy(ProcessDTO mongoProcessDTO, AwsInstanceDTO awsInstanceDTO, AwsShardDTO shardDTO,
-            SailingApplicationReplicaSetDTO<String> sailingApplicationReplicationSetDTO, LeaderboardNameDTO leaderboard);
+            SailingApplicationReplicaSetDTO<String> sailingApplicationReplicationSetDTO, LeaderboardNameDTO leaderboard,
+            ReplicaSetLiveContent replicaSetLiveContent, EventLiveContent eventLiveContent, RaceLiveContent raceLiveContent,
+            Long lng);
 
     SailingApplicationReplicaSetDTO<String> createApplicationReplicaSet(String regionId, String name, boolean sharedMasterInstance,
             String masterInstanceType, String optionalReplicaInstanceTypeOrNull, boolean dynamicLoadBalancerMapping,
