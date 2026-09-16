@@ -5,33 +5,20 @@ import java.util.Comparator;
 import com.sap.sailing.domain.base.Waypoint;
 import com.sap.sailing.domain.markpassingcalculation.Candidate;
 import com.sap.sse.common.TimePoint;
-import com.sap.sse.common.impl.AbstractTimePoint;
 
 public class CandidateImpl implements Candidate {
     private static final long serialVersionUID = -4626280455738918911L;
     private final Waypoint w;
-    private final boolean timePointAsMillisIsNull;
-    private final long timePointAsMillis;
+    private final TimePoint timePoint;
     private final double probability;
     private final Integer oneBasedIndexOfWaypoint;
-    private final Comparator<TimePoint> nullSafeTimePointComparator;
+    private static final Comparator<TimePoint> nullSafeTimePointComparator = Comparator.nullsLast(Comparator.naturalOrder());
     
-    public class CandidateTimePoint extends AbstractTimePoint implements TimePoint {
-        private static final long serialVersionUID = 8156956989028606884L;
-
-        @Override
-        public long asMillis() {
-            return timePointAsMillis;
-        }
-    }
-
     public CandidateImpl(int oneBasedIndexOfWaypoint, TimePoint p, double probability, Waypoint w) {
         this.w = w;
-        this.timePointAsMillisIsNull = p == null;
-        this.timePointAsMillis = p == null ? 0 : p.asMillis();
+        this.timePoint = p;
         this.probability = probability;
         this.oneBasedIndexOfWaypoint = oneBasedIndexOfWaypoint;
-        this.nullSafeTimePointComparator = Comparator.nullsLast(Comparator.naturalOrder());
     }
 
     @Override
@@ -41,12 +28,7 @@ public class CandidateImpl implements Candidate {
 
     @Override
     public TimePoint getTimePoint() {
-        return timePointAsMillisIsNull ? null : new CandidateTimePoint();
-    }
-
-    @Override
-    public long getTimePointAsMillis() {
-        return timePointAsMillisIsNull ? -1 : timePointAsMillis;
+        return timePoint;
     }
 
     @Override
