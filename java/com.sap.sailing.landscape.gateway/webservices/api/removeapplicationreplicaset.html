@@ -52,6 +52,17 @@
         <td>
             <div><tt>timeoutInMilliseconds</tt>, timeout in milliseconds to wait for responses from nodes when analyzing the replica sets
                                         existing in the region; if not specified, waiting will not time out.</div>
+            <div><tt>force</tt>, boolean value defaulting to <tt>false</tt>. Before removing the replica set, it is checked for
+                        <em>live content</em>, that is, races that are currently being tracked live. Since removal stops the
+                        master and replica processes and tears down the load balancing, target groups, DNS records and, where
+                        present, the launch template and auto-scaling group, doing so while a race is tracked live would
+                        interrupt that live tracking. If live content is detected and <tt>force</tt> is <tt>false</tt> (the
+                        default), the operation is aborted and the service responds with HTTP status <tt>409 Conflict</tt> and a
+                        JSON body describing the offending replica set(s), events and races (the body has the same structure as
+                        the response of the <a href="/sailingserver/webservices/api/v1/livecontentGetDoc.html">live-content</a>
+                        service). Set <tt>force</tt> to <tt>true</tt> to bypass this safety check
+                        and remove the replica set regardless of any live content, knowingly accepting the disruption of any
+                        live tracking.</div>
         </td>
     </tr>
     <tr>

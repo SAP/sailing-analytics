@@ -68,6 +68,16 @@
                                         was successful will the original be dropped. Note: although you must specify a DB name ("mynewevent" in
                                         the example above), the DB name in the URI will be ignored, and the original DB name will be used under
                                         all circumstances for the copy.</div>
+            <div><tt>force</tt>, boolean value defaulting to <tt>false</tt>. Before archiving, the replica set is checked for
+                        <em>live content</em>, that is, races that are currently being tracked live. Because archiving stops
+                        the replica set's processes and may remove the replica set, doing so while a race is tracked live would
+                        interrupt that live tracking and could lose data still being ingested. If live content is detected and
+                        <tt>force</tt> is <tt>false</tt> (the default), the operation is aborted and the service responds with
+                        HTTP status <tt>409 Conflict</tt> and a JSON body describing the offending replica set(s), events and races
+                        (the body has the same structure as the response of the
+                        <a href="/sailingserver/webservices/api/v1/livecontentGetDoc.html">live-content</a> service). Set <tt>force</tt> to
+                        <tt>true</tt> to bypass this safety check and archive the replica set regardless of any live content,
+                        knowingly accepting the disruption of any live tracking.</div>
         </td>
     </tr>
     <tr>

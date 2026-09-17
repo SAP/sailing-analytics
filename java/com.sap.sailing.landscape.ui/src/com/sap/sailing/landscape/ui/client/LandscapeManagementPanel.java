@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -34,6 +35,11 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.sap.sailing.domain.common.DataImportProgress;
+import com.sap.sailing.landscape.common.EventLiveContent;
+import com.sap.sailing.landscape.common.LiveContentAwareOperationResult;
+import com.sap.sailing.landscape.common.LiveContentCheckResult;
+import com.sap.sailing.landscape.common.RaceLiveContent;
+import com.sap.sailing.landscape.common.ReplicaSetLiveContent;
 import com.sap.sailing.landscape.common.SharedLandscapeConstants;
 import com.sap.sailing.landscape.ui.client.CreateApplicationReplicaSetDialog.CreateApplicationReplicaSetInstructions;
 import com.sap.sailing.landscape.ui.client.MoveMasterProcessDialog.MoveMasterToOtherInstanceInstructions;
@@ -57,6 +63,7 @@ import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Triple;
+import com.sap.sse.common.util.Holder;
 import com.sap.sse.common.util.NaturalComparator;
 import com.sap.sse.gwt.adminconsole.AdminConsoleTableResources;
 import com.sap.sse.gwt.client.EntryPointHelper;
@@ -70,6 +77,7 @@ import com.sap.sse.gwt.client.celltable.TableWrapperWithSingleSelectionAndFilter
 import com.sap.sse.gwt.client.controls.IntegerBox;
 import com.sap.sse.gwt.client.controls.busyindicator.BusyIndicator;
 import com.sap.sse.gwt.client.controls.busyindicator.SimpleBusyIndicator;
+import com.sap.sse.gwt.client.dialog.ConfirmationDialog;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog.DialogCallback;
 import com.sap.sse.landscape.aws.common.shared.RedirectDTO;
@@ -658,27 +666,97 @@ public class LandscapeManagementPanel extends SimplePanel {
                 new DialogCallback<MoveMasterToOtherInstanceInstructions>() {
                     @Override
                     public void ok(MoveMasterToOtherInstanceInstructions instructions) {
-                        final Iterator<SailingApplicationReplicaSetDTO<String>> replicaSetIterator = replicaSetsForWhichToMoveMaster.iterator();
-                        if (replicaSetIterator.hasNext()) {
+                        final ArrayList<SailingApplicationReplicaSetDTO<String>> selectedReplicaSets = new ArrayList<>(replicaSetsForWhichToMoveMaster);
+                        if (!selectedReplicaSets.isEmpty()) {
                             applicationReplicaSetsBusy.setBusy(true);
-                            moveMasterToOtherInstance(instructions, replicaSetIterator, stringMessages);
+                            // Pre-flight: check the whole selection for live content in a single round-trip and warn
+                            // the user once, up front, before any master is moved. Only the replica sets flagged here
+                            // and confirmed by the user are later forced; every other set runs force=false and keeps
+                            // its reactive back-end guard as a fallback for surprise races.
+                            landscapeManagementService.checkForLiveContent(regionId, selectedReplicaSets,
+                                    instructions.getMasterReplicationBearerToken(),
+                                    sshKeyManagementPanel.getSelectedKeyPair() == null ? null : sshKeyManagementPanel.getSelectedKeyPair().getName(),
+                                    sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
+                                    new AsyncCallback<LiveContentCheckResult>() {
+                                        @Override
+                                        public void onFailure(final Throwable caught) {
+                                            applicationReplicaSetsBusy.setBusy(false);
+                                            errorReporter.reportError(caught.getMessage());
+                                        }
+
+                                        @Override
+                                        public void onSuccess(final LiveContentCheckResult preflightResult) {
+                                            final Runnable execute = () -> moveMasterToOtherInstance(instructions,
+                                                    selectedReplicaSets.iterator(), getConflictingReplicaSetNames(preflightResult),
+                                                    stringMessages);
+                                            if (preflightResult.hasLiveContent()) {
+                                                applicationReplicaSetsBusy.setBusy(false);
+                                                showLiveContentWarning(preflightResult, confirmed -> {
+                                                    if (confirmed) {
+                                                        applicationReplicaSetsBusy.setBusy(true);
+                                                        execute.run();
+                                                    }
+                                                });
+                                            } else {
+                                                execute.run();
+                                            }
+                                        }
+                                    });
                         }
                     }
-        
+
                     private void moveMasterToOtherInstance(
                             MoveMasterToOtherInstanceInstructions instructions,
-                            final Iterator<SailingApplicationReplicaSetDTO<String>> replicaSetIterator, StringMessages stringMessages) {
+                            final Iterator<SailingApplicationReplicaSetDTO<String>> replicaSetIterator,
+                            final Set<String> confirmedConflictingReplicaSetNames, StringMessages stringMessages) {
                         assert replicaSetIterator.hasNext();
                         final SailingApplicationReplicaSetDTO<String> replicaSet = replicaSetIterator.next();
-                        landscapeManagementService.moveMasterToOtherInstance(replicaSet,
+                        final Holder<Consumer<Boolean>> issueRequest = new Holder<>();
+                        issueRequest.value = force -> landscapeManagementService.moveMasterToOtherInstance(replicaSet,
                                 instructions.isSharedMasterInstance(), instructions.getInstanceTypeOrNull(),
                                 sshKeyManagementPanel.getSelectedKeyPair() == null ? null : sshKeyManagementPanel.getSelectedKeyPair().getName(),
                                 sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
                                 instructions.getMasterReplicationBearerToken(), instructions.getReplicaReplicationBearerToken(),
                                 instructions.getOptionalMemoryInMegabytesOrNull(), instructions.getOptionalMemoryTotalSizeFactorOrNull(),
-                                new ApplicationReplicaSetActionChainingCallback<MoveMasterToOtherInstanceInstructions>(
-                                        replicaSetIterator, replicaSet, (i, sri)->moveMasterToOtherInstance(instructions, replicaSetIterator, stringMessages), instructions,
-                                        replicaSetName->stringMessages.successfullyMovedMasterOfReplicaSet(replicaSetName)));
+                                force,
+                                new AsyncCallback<LiveContentAwareOperationResult<SailingApplicationReplicaSetDTO<String>>>() {
+                                    @Override
+                                    public void onFailure(final Throwable caught) {
+                                        errorReporter.reportError(caught.getMessage());
+                                        applicationReplicaSetsBusy.setBusy(false);
+                                    }
+
+                                    @Override
+                                    public void onSuccess(final LiveContentAwareOperationResult<SailingApplicationReplicaSetDTO<String>> result) {
+                                        if (result.isSuccessful()) {
+                                            Notification.notify(stringMessages.successfullyMovedMasterOfReplicaSet(
+                                                    replicaSet.getName()), NotificationType.SUCCESS);
+                                            applicationReplicaSetsTable.replaceBasedOnEntityIdentityComparator(
+                                                    result.getSuccessfulResult());
+                                            if (replicaSetIterator.hasNext()) {
+                                                moveMasterToOtherInstance(instructions, replicaSetIterator,
+                                                        confirmedConflictingReplicaSetNames, stringMessages);
+                                            } else {
+                                                applicationReplicaSetsBusy.setBusy(false);
+                                            }
+                                        } else {
+                                            // The operation was refused because one or more affected replica sets are
+                                            // currently serving live content (a live-content conflict); offer the user
+                                            // the chance to proceed and force the operation anyway.
+                                            applicationReplicaSetsBusy.setBusy(false);
+                                            showLiveContentWarning(result.getLiveContentCheckResult(), confirmed -> {
+                                                if (confirmed) {
+                                                    applicationReplicaSetsBusy.setBusy(true);
+                                                    issueRequest.value.accept(/* force */ true);
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
+                        // Pre-flight already warned the user about any flagged sets; force this set only if it was
+                        // among the confirmed conflicting sets. Otherwise run force=false so the reactive back-end
+                        // guard still catches a surprise race that started after pre-flight.
+                        issueRequest.value.accept(/* force */ confirmedConflictingReplicaSetNames.contains(replicaSet.getName()));
                     }
 
                     @Override
@@ -893,36 +971,93 @@ public class LandscapeManagementPanel extends SimplePanel {
         final String selectedRegion = regionsTable.getSelectionModel().getSelectedObject();
         new EnsureReplicaStopReplicatingRemoveMasterFromTargetGroupsDialog(stringMessages, errorReporter, new DialogCallback<String>() {
             @Override
-            public void ok(String replicaReplicationBearerToken) {
+            public void ok(final String replicaReplicationBearerToken) {
+                final ArrayList<SailingApplicationReplicaSetDTO<String>> selectedReplicaSets = new ArrayList<>();
+                applicationReplicaSetsForWhichToEnsureAtLeastOneReplicaStopReplicatingAndRemoveMasterFromTargetGroups
+                        .forEach(selectedReplicaSets::add);
                 applicationReplicaSetsBusy.setBusy(true);
-                final int[] howManyMoreToGo = new int[] { Util.size(applicationReplicaSetsForWhichToEnsureAtLeastOneReplicaStopReplicatingAndRemoveMasterFromTargetGroups) };
-                for (final SailingApplicationReplicaSetDTO<String> applicationReplicaSetForWhichToEnsureAtLeastOneReplicaStopReplicatingAndRemoveMasterFromTargetGroups :
-                    applicationReplicaSetsForWhichToEnsureAtLeastOneReplicaStopReplicatingAndRemoveMasterFromTargetGroups) {
-                    landscapeManagementService.ensureAtLeastOneReplicaExistsStopReplicatingAndRemoveMasterFromTargetGroups(
-                            selectedRegion, applicationReplicaSetForWhichToEnsureAtLeastOneReplicaStopReplicatingAndRemoveMasterFromTargetGroups,
-                            sshKeyManagementPanel.getSelectedKeyPair().getName(),
-                            sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null
-                            ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
-                            replicaReplicationBearerToken, new AsyncCallback<Boolean>() {
-                                @Override
-                                public void onFailure(Throwable caught) {
-                                    decrementHowManyMoreToGoAndSetNonBusyIfDone(howManyMoreToGo);
-                                    errorReporter.reportError(caught.getMessage());
+                landscapeManagementService.checkForLiveContent(selectedRegion, selectedReplicaSets,
+                        replicaReplicationBearerToken, sshKeyManagementPanel.getSelectedKeyPair().getName(),
+                        sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() == null ? null
+                                : sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes(),
+                        new AsyncCallback<LiveContentCheckResult>() {
+                            @Override
+                            public void onFailure(final Throwable caught) {
+                                applicationReplicaSetsBusy.setBusy(false);
+                                errorReporter.reportError(caught.getMessage());
+                            }
+
+                            @Override
+                            public void onSuccess(final LiveContentCheckResult preflightResult) {
+                                final Runnable execute = () -> executeStopReplicating(selectedRegion, selectedReplicaSets,
+                                        replicaReplicationBearerToken, getConflictingReplicaSetNames(preflightResult),
+                                        stringMessages);
+                                if (preflightResult.hasLiveContent()) {
+                                    applicationReplicaSetsBusy.setBusy(false);
+                                    showLiveContentWarning(preflightResult, confirmed -> {
+                                        if (confirmed) {
+                                            applicationReplicaSetsBusy.setBusy(true);
+                                            execute.run();
+                                        }
+                                    });
+                                } else {
+                                    execute.run();
                                 }
-                                
-                                @Override
-                                public void onSuccess(Boolean result) {
-                                    decrementHowManyMoreToGoAndSetNonBusyIfDone(howManyMoreToGo);
-                                    Notification.notify(stringMessages.successfullyStoppedReplicatingAndRemovedMasterFromTargetGroups(
-                                            applicationReplicaSetForWhichToEnsureAtLeastOneReplicaStopReplicatingAndRemoveMasterFromTargetGroups.getName()),
-                                            NotificationType.SUCCESS);
-                                }
-                            });
-                }
+                            }
+                        });
             }
 
             @Override public void cancel() {}
         }).show();
+    }
+
+    private Set<String> getConflictingReplicaSetNames(final LiveContentCheckResult liveContentCheckResult) {
+        final Set<String> result = new HashSet<>();
+        Util.addAll(Util.map(liveContentCheckResult.getReplicaSetsWithLiveContent(), ReplicaSetLiveContent::getReplicaSetName), result);
+        Util.addAll(liveContentCheckResult.getUndeterminedReplicaSetNames(), result);
+        return result;
+    }
+
+    private void executeStopReplicating(final String regionId,
+            final ArrayList<SailingApplicationReplicaSetDTO<String>> replicaSets,
+            final String replicaReplicationBearerToken, final Set<String> forceReplicaSetNames,
+            final StringMessages stringMessages) {
+        final int[] remaining = new int[] { replicaSets.size() };
+        for (final SailingApplicationReplicaSetDTO<String> replicaSet : replicaSets) {
+            landscapeManagementService.ensureAtLeastOneReplicaExistsStopReplicatingAndRemoveMasterFromTargetGroups(
+                    regionId, replicaSet, sshKeyManagementPanel.getSelectedKeyPair().getName(),
+                    sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() == null ? null
+                            : sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes(),
+                    replicaReplicationBearerToken, forceReplicaSetNames.contains(replicaSet.getName()),
+                    new AsyncCallback<LiveContentAwareOperationResult<Boolean>>() {
+                        @Override
+                        public void onFailure(final Throwable caught) {
+                            decrementHowManyMoreToGoAndSetNonBusyIfDone(remaining);
+                            errorReporter.reportError(caught.getMessage());
+                        }
+
+                        @Override
+                        public void onSuccess(final LiveContentAwareOperationResult<Boolean> result) {
+                            decrementHowManyMoreToGoAndSetNonBusyIfDone(remaining);
+                            if (result.isSuccessful()) {
+                                Notification.notify(stringMessages
+                                        .successfullyStoppedReplicatingAndRemovedMasterFromTargetGroups(
+                                                replicaSet.getName()), NotificationType.SUCCESS);
+                            } else {
+                                showLiveContentWarning(result.getLiveContentCheckResult(), confirmed -> {
+                                    if (confirmed) {
+                                        final Set<String> additionalForceReplicaSetNames = new HashSet<>(forceReplicaSetNames);
+                                        additionalForceReplicaSetNames.add(replicaSet.getName());
+                                        executeStopReplicating(regionId,
+                                                new ArrayList<>(Collections.singleton(replicaSet)),
+                                                replicaReplicationBearerToken, additionalForceReplicaSetNames,
+                                                stringMessages);
+                                    }
+                                });
+                            }
+                        }
+                    });
+        }
     }
 
     private void decrementHowManyMoreToGoAndSetNonBusyIfDone(int[] howManyMoreToGo) {
@@ -930,7 +1065,75 @@ public class LandscapeManagementPanel extends SimplePanel {
             applicationReplicaSetsBusy.setBusy(false);
         }
     }
-    
+
+    /**
+     * Warns the user that an operation was refused because one or more affected replica sets are currently serving live
+     * content and/or because the live-content state of one or more replica sets could not be verified (as described by
+     * {@code liveContentCheckResult}), rendering the affected replica sets, events and races as well as the replica sets
+     * that could not be verified into a single combined message.
+     * <p>
+     *
+     * The behavior depends on {@code confirmationCallback}:
+     * <ul>
+     * <li>When {@code confirmationCallback} is {@code null}, a plain informational {@link Window#alert(String) alert} is
+     * shown; the user can only acknowledge it and the operation stays aborted.</li>
+     * <li>When {@code confirmationCallback} is non-{@code null}, a {@link ConfirmationDialog} with a "proceed anyway"
+     * and a "cancel" button is shown, and the callback is invoked with the user's decision: {@code true} when the user
+     * chose to proceed despite the live content and/or the unverified replica sets (the caller is then expected to
+     * re-issue the operation with the affected replica sets forced), or {@code false} when the user cancelled (the
+     * caller must leave the operation aborted). The callback is the sole mechanism by which the user can override the
+     * warning; without it the warning is a dead end.</li>
+     * </ul>
+     *
+     * @param liveContentCheckResult
+     *            the detected live content whose replica sets, events and races are rendered into the warning message,
+     *            together with the names of any replica sets whose live-content state could not be determined
+     * @param confirmationCallback
+     *            invoked with the user's decision when non-{@code null}: {@code true} to proceed despite the live
+     *            content and/or unverified replica sets (the caller should then force the operation), {@code false} to
+     *            cancel. When {@code null}, a purely informational alert with no way to proceed is shown instead and
+     *            this callback is not used.
+     */
+    private void showLiveContentWarning(final LiveContentCheckResult liveContentCheckResult, final Consumer<Boolean> confirmationCallback) {
+        final StringBuilder details = new StringBuilder();
+        for (final ReplicaSetLiveContent replicaSet : liveContentCheckResult.getReplicaSetsWithLiveContent()) {
+            details.append(replicaSet.getReplicaSetName()).append(":\n");
+            for (final EventLiveContent event : replicaSet.getEventsWithLiveContent()) {
+                details.append("  ").append(event.getEventName()).append(":\n");
+                for (final RaceLiveContent race : event.getRacesWithLiveContent()) {
+                    details.append("    ").append(race.getRegattaName()).append(" / ").append(race.getRaceName())
+                            .append(" [").append(race.getTrackingStart()).append(" - ")
+                            .append(race.getTrackingEnd() == null ? "open" : race.getTrackingEnd())
+                            .append("]\n");
+                }
+            }
+        }
+        final String title;
+        final String message;
+        if (liveContentCheckResult.hasLiveContent()) {
+            if (liveContentCheckResult.hasUndeterminedReplicaSets()) {
+                details.append(StringMessages.INSTANCE.liveContentUndeterminedSectionHeader()).append("\n");
+                for (final String undeterminedReplicaSetName : liveContentCheckResult.getUndeterminedReplicaSetNames()) {
+                    details.append("  ").append(undeterminedReplicaSetName).append("\n");
+                }
+            }
+            title = StringMessages.INSTANCE.liveContentWarningTitle();
+            message = StringMessages.INSTANCE.liveContentWarning(details.toString());
+        } else {
+            for (final String undeterminedReplicaSetName : liveContentCheckResult.getUndeterminedReplicaSetNames()) {
+                details.append("  ").append(undeterminedReplicaSetName).append("\n");
+            }
+            title = StringMessages.INSTANCE.liveContentUndeterminedWarningTitle();
+            message = StringMessages.INSTANCE.liveContentUndeterminedWarning(details.toString());
+        }
+        if (confirmationCallback == null) {
+            Window.alert(message);
+        } else {
+            ConfirmationDialog.create(title, message, StringMessages.INSTANCE.proceedDespiteLiveContent(),
+                    StringMessages.INSTANCE.cancel(), confirmationCallback).center();
+        }
+    }
+
     private void defineLandingPage(StringMessages stringMessages, String selectedRegion,
             SailingApplicationReplicaSetDTO<String> applicationReplicaSetToDefineLandingPageFor) {
         if (sshKeyManagementPanel.getSelectedKeyPair() == null) {
@@ -1037,11 +1240,13 @@ public class LandscapeManagementPanel extends SimplePanel {
                     @Override
                     public void ok(String optionalInstanceTypeName) {
                         applicationReplicaSetsBusy.setBusy(true);
-                        landscapeManagementService.moveAllApplicationProcessesAwayFrom(fromHost, optionalInstanceTypeName,
+                        final Holder<Consumer<Set<String>>> issueRequest = new Holder<>();
+                        issueRequest.value = forceMasterReplicaSetNames -> landscapeManagementService.moveAllApplicationProcessesAwayFrom(fromHost, optionalInstanceTypeName,
                                 sshKeyManagementPanel.getSelectedKeyPair()==null?null:sshKeyManagementPanel.getSelectedKeyPair().getName(),
                                 sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null
                                 ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
-                                new AsyncCallback<Void>() {
+                                forceMasterReplicaSetNames,
+                                new AsyncCallback<LiveContentAwareOperationResult<String>>() {
                                     @Override
                                     public void onFailure(Throwable caught) {
                                         applicationReplicaSetsBusy.setBusy(false);
@@ -1049,10 +1254,61 @@ public class LandscapeManagementPanel extends SimplePanel {
                                     }
 
                                     @Override
-                                    public void onSuccess(Void result) {
+                                    public void onSuccess(final LiveContentAwareOperationResult<String> result) {
                                         applicationReplicaSetsBusy.setBusy(false);
-                                        Notification.notify(stringMessages.successfullyMovedAllProcessesAwayFromHost(fromHost.getInstanceId()), NotificationType.SUCCESS);
-                                        refreshApplicationReplicaSetsTable();
+                                        if (result.isSuccessful()) {
+                                            Notification.notify(stringMessages.successfullyMovedAllProcessesAwayFromHost(
+                                                    fromHost.getInstanceId()), NotificationType.SUCCESS);
+                                            refreshApplicationReplicaSetsTable();
+                                        } else {
+                                            // The operation was refused because one or more affected replica sets are
+                                            // currently serving live content (a live-content conflict); offer the user
+                                            // the chance to proceed and force the operation on the conflicting sets.
+                                            showLiveContentWarning(result.getLiveContentCheckResult(), confirmed -> {
+                                                if (confirmed) {
+                                                    applicationReplicaSetsBusy.setBusy(true);
+                                                    issueRequest.value.accept(getConflictingReplicaSetNames(result.getLiveContentCheckResult()));
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
+                        // Pre-flight: check the replica sets whose master lives on the host being vacated for live
+                        // content once, up front, and warn the user before moving anything. This mirrors the back-end
+                        // guard, which only checks the (unforced) master replica sets on the host. Only the confirmed
+                        // conflicting sets are forced; the reactive back-end guard remains as a fallback for surprise
+                        // races.
+                        final ArrayList<SailingApplicationReplicaSetDTO<String>> masterReplicaSetsOnHost = new ArrayList<>();
+                        for (final SailingApplicationReplicaSetDTO<String> replicaSet : applicationReplicaSetsTable.getDataProvider().getList()) {
+                            if (replicaSet.getMaster().getHost().getInstanceId().equals(fromHost.getInstanceId())) {
+                                masterReplicaSetsOnHost.add(replicaSet);
+                            }
+                        }
+                        landscapeManagementService.checkForLiveContent(fromHost.getRegion(),
+                                masterReplicaSetsOnHost,
+                                /* bearerToken */ null,
+                                sshKeyManagementPanel.getSelectedKeyPair() == null ? null : sshKeyManagementPanel.getSelectedKeyPair().getName(),
+                                sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
+                                new AsyncCallback<LiveContentCheckResult>() {
+                                    @Override
+                                    public void onFailure(final Throwable caught) {
+                                        applicationReplicaSetsBusy.setBusy(false);
+                                        errorReporter.reportError(caught.getMessage());
+                                    }
+
+                                    @Override
+                                    public void onSuccess(final LiveContentCheckResult preflightResult) {
+                                        if (preflightResult.hasLiveContent()) {
+                                            applicationReplicaSetsBusy.setBusy(false);
+                                            showLiveContentWarning(preflightResult, confirmed -> {
+                                                if (confirmed) {
+                                                    applicationReplicaSetsBusy.setBusy(true);
+                                                    issueRequest.value.accept(getConflictingReplicaSetNames(preflightResult));
+                                                }
+                                            });
+                                        } else {
+                                            issueRequest.value.accept(Collections.emptySet());
+                                        }
                                     }
                                 });
                     }
@@ -1135,42 +1391,94 @@ public class LandscapeManagementPanel extends SimplePanel {
     
     private void removeApplicationReplicaSets(StringMessages stringMessages, String regionId,
         Iterable<SailingApplicationReplicaSetDTO<String>> applicationReplicaSetsToRemove) {
-        applicationReplicaSetsBusy.setBusy(true);
-        final Iterator<SailingApplicationReplicaSetDTO<String>> replicaSetIterator = applicationReplicaSetsToRemove.iterator();
-        if (replicaSetIterator.hasNext()) {
+        final ArrayList<SailingApplicationReplicaSetDTO<String>> selectedReplicaSets = new ArrayList<>();
+        applicationReplicaSetsToRemove.forEach(selectedReplicaSets::add);
+        if (!selectedReplicaSets.isEmpty()) {
             applicationReplicaSetsBusy.setBusy(true);
-            removeApplicationReplicaSet(regionId, replicaSetIterator, stringMessages);
+            // Pre-flight: check the whole selection for live content in a single round-trip and warn the user once,
+            // up front, before any replica set is removed. Only the sets flagged here and confirmed by the user are
+            // later forced; every other set runs force=false and keeps its reactive back-end guard as a fallback for
+            // surprise races. The remove operation carries no bearer token (matching the back-end guard).
+            landscapeManagementService.checkForLiveContent(regionId, selectedReplicaSets, /* bearerToken */ null,
+                    sshKeyManagementPanel.getSelectedKeyPair() == null ? null : sshKeyManagementPanel.getSelectedKeyPair().getName(),
+                    sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
+                    new AsyncCallback<LiveContentCheckResult>() {
+                        @Override
+                        public void onFailure(final Throwable caught) {
+                            applicationReplicaSetsBusy.setBusy(false);
+                            errorReporter.reportError(caught.getMessage());
+                        }
+
+                        @Override
+                        public void onSuccess(final LiveContentCheckResult preflightResult) {
+                            final Runnable execute = () -> removeApplicationReplicaSet(regionId, selectedReplicaSets.iterator(),
+                                    getConflictingReplicaSetNames(preflightResult), stringMessages);
+                            if (preflightResult.hasLiveContent()) {
+                                applicationReplicaSetsBusy.setBusy(false);
+                                showLiveContentWarning(preflightResult, confirmed -> {
+                                    if (confirmed) {
+                                        applicationReplicaSetsBusy.setBusy(true);
+                                        execute.run();
+                                    }
+                                });
+                            } else {
+                                execute.run();
+                            }
+                        }
+                    });
         }
     }
 
-    private void removeApplicationReplicaSet(String regionId, final Iterator<SailingApplicationReplicaSetDTO<String>> replicaSetIterator, StringMessages stringMessages) {
+    private void removeApplicationReplicaSet(String regionId, final Iterator<SailingApplicationReplicaSetDTO<String>> replicaSetIterator,
+            final Set<String> confirmedConflictingReplicaSetNames, StringMessages stringMessages) {
         assert replicaSetIterator.hasNext();
         final MongoEndpointDTO selectedMongoEndpointForDBArchiving = mongoEndpointsTable.getSelectionModel().getSelectedObject();
         final SailingApplicationReplicaSetDTO<String> applicationReplicaSetToRemove = replicaSetIterator.next();
         final ApplicationReplicaSetActionChainingCallback<String> applicationReplicaSetActionChainingCallback = new ApplicationReplicaSetActionChainingCallback<String>(replicaSetIterator, applicationReplicaSetToRemove,
-                (rId, rsi)->removeApplicationReplicaSet(rId, rsi, stringMessages), regionId,
+                (rId, rsi)->removeApplicationReplicaSet(rId, rsi, confirmedConflictingReplicaSetNames, stringMessages), regionId,
                 replicaSetName->stringMessages.successfullyRemovedApplicationReplicaSet(replicaSetName));
-        landscapeManagementService.removeApplicationReplicaSet(regionId, applicationReplicaSetToRemove, selectedMongoEndpointForDBArchiving,
+        final Holder<Consumer<Boolean>> issueRequest = new Holder<>();
+        issueRequest.value = force -> landscapeManagementService.removeApplicationReplicaSet(regionId, applicationReplicaSetToRemove, selectedMongoEndpointForDBArchiving,
                 sshKeyManagementPanel.getSelectedKeyPair()==null?null:sshKeyManagementPanel.getSelectedKeyPair().getName(),
                         sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null
                         ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
-                        new AsyncCallback<String>() {
+                        force, new AsyncCallback<LiveContentAwareOperationResult<String>>() {
                             @Override
-                            public void onFailure(Throwable caught) {
+                            public void onFailure(final Throwable caught) {
                                 applicationReplicaSetActionChainingCallback.onFailure(caught);
                             }
 
                             @Override
-                            public void onSuccess(String mongoDbArchivingErrorMessage) {
-                                applicationReplicaSetActionChainingCallback.onSuccess(/* application replica set (removed) */ null);
-                                if (mongoDbArchivingErrorMessage != null) {
-                                    errorReporter.reportError(stringMessages.errorArchivingMongoDBTo(
-                                            selectedMongoEndpointForDBArchiving.getReplicaSetName(), mongoDbArchivingErrorMessage));
+                            public void onSuccess(final LiveContentAwareOperationResult<String> result) {
+                                if (result.isSuccessful()) {
+                                    final String mongoDbArchivingErrorMessage = result.getSuccessfulResult();
+                                    applicationReplicaSetActionChainingCallback
+                                            .onSuccess(/* application replica set (removed) */ null);
+                                    if (mongoDbArchivingErrorMessage != null) {
+                                        errorReporter.reportError(stringMessages.errorArchivingMongoDBTo(
+                                                selectedMongoEndpointForDBArchiving.getReplicaSetName(),
+                                                mongoDbArchivingErrorMessage));
+                                    }
+                                } else {
+                                    // The operation was refused because one or more affected replica sets are
+                                    // currently serving live content (a live-content conflict); offer the user
+                                    // the chance to proceed and force the operation anyway.
+                                    applicationReplicaSetsBusy.setBusy(false);
+                                    showLiveContentWarning(result.getLiveContentCheckResult(), confirmed -> {
+                                        if (confirmed) {
+                                            applicationReplicaSetsBusy.setBusy(true);
+                                            issueRequest.value.accept(/* force */ true);
+                                        }
+                                    });
                                 }
                             }
                         });
+        // Pre-flight already warned the user about any flagged sets; force this set only if it was among the
+        // confirmed conflicting sets. Otherwise run force=false so the reactive back-end guard still catches a
+        // surprise race that started after pre-flight.
+        issueRequest.value.accept(confirmedConflictingReplicaSetNames.contains(applicationReplicaSetToRemove.getName()));
     }
-    
+
     private static class ReplicaSetArchivingParameters {
         private final String bearerTokenOrNullForApplicationReplicaSetToArchive;
         private final String bearerTokenOrNullForArchive;
@@ -1213,7 +1521,8 @@ public class LandscapeManagementPanel extends SimplePanel {
                     @Override
                     public void ok(ReplicaSetArchivingParameters bearerTokensAndWhetherToRemoveReplicaSet) {
                         applicationReplicaSetsBusy.setBusy(true);
-                        landscapeManagementService.archiveReplicaSet(regionId, applicationReplicaSetToArchive,
+                        final Holder<Consumer<Boolean>> issueRequest = new Holder<>();
+                        issueRequest.value = force -> landscapeManagementService.archiveReplicaSet(regionId, applicationReplicaSetToArchive,
                                 bearerTokensAndWhetherToRemoveReplicaSet.getBearerTokenOrNullForApplicationReplicaSetToArchive(),
                                 bearerTokensAndWhetherToRemoveReplicaSet.getBearerTokenOrNullForArchive(),
                                 bearerTokensAndWhetherToRemoveReplicaSet.getDurationToWaitBeforeAndBetweenCompareServerAttempts(),
@@ -1222,16 +1531,30 @@ public class LandscapeManagementPanel extends SimplePanel {
                                 selectedMongoEndpointForDBArchiving, sshKeyManagementPanel.getSelectedKeyPair().getName(),
                                 sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null
                                     ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
-                                new AsyncCallback<Triple<DataImportProgress, CompareServersResultDTO, String>>() {
+                                force,
+                                new AsyncCallback<LiveContentAwareOperationResult<Triple<DataImportProgress, CompareServersResultDTO, String>>>() {
                             @Override
-                            public void onFailure(Throwable caught) {
+                            public void onFailure(final Throwable caught) {
                                 applicationReplicaSetsBusy.setBusy(false);
                                 errorReporter.reportError(caught.getMessage());
                             }
 
                             @Override
-                            public void onSuccess(Triple<DataImportProgress, CompareServersResultDTO, String> result) {
+                            public void onSuccess(final LiveContentAwareOperationResult<Triple<DataImportProgress, CompareServersResultDTO, String>> operationResult) {
                                 applicationReplicaSetsBusy.setBusy(false);
+                                if (!operationResult.isSuccessful()) {
+                                    // The operation was refused because one or more affected replica sets are
+                                    // currently serving live content (a live-content conflict); offer the user
+                                    // the chance to proceed and force the operation anyway.
+                                    showLiveContentWarning(operationResult.getLiveContentCheckResult(), confirmed -> {
+                                        if (confirmed) {
+                                            applicationReplicaSetsBusy.setBusy(true);
+                                            issueRequest.value.accept(/* force */ true);
+                                        }
+                                    });
+                                } else {
+                                final Triple<DataImportProgress, CompareServersResultDTO, String> result =
+                                        operationResult.getSuccessfulResult();
                                 final String mongoDBArchivingErrorMessage = result.getC();
                                 if (result == null || result.getA() == null || result.getA().failed()) {
                                     errorReporter.reportError(stringMessages.errorDuringImport(result==null||result.getA()==null?"":result.getA().getErrorMessage()));
@@ -1254,14 +1577,46 @@ public class LandscapeManagementPanel extends SimplePanel {
                                     Notification.notify(stringMessages.successfullyArchivedReplicaSet(
                                             applicationReplicaSetToArchive.getName()), NotificationType.SUCCESS);
                                 }
+                                }
                             }
                         });
+                        // Pre-flight: check the single replica set for live content once, up front, and warn the user
+                        // before archiving. Because this operation acts on exactly one set, a confirmed live-content
+                        // conflict means forcing that very set. The reactive back-end guard below stays as a fallback
+                        // for a surprise race that begins after the pre-flight check.
+                        landscapeManagementService.checkForLiveContent(regionId,
+                                Collections.singleton(applicationReplicaSetToArchive),
+                                bearerTokensAndWhetherToRemoveReplicaSet.getBearerTokenOrNullForApplicationReplicaSetToArchive(),
+                                sshKeyManagementPanel.getSelectedKeyPair() == null ? null : sshKeyManagementPanel.getSelectedKeyPair().getName(),
+                                sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
+                                new AsyncCallback<LiveContentCheckResult>() {
+                                    @Override
+                                    public void onFailure(final Throwable caught) {
+                                        applicationReplicaSetsBusy.setBusy(false);
+                                        errorReporter.reportError(caught.getMessage());
+                                    }
+
+                                    @Override
+                                    public void onSuccess(final LiveContentCheckResult preflightResult) {
+                                        if (preflightResult.hasLiveContent()) {
+                                            applicationReplicaSetsBusy.setBusy(false);
+                                            showLiveContentWarning(preflightResult, confirmed -> {
+                                                if (confirmed) {
+                                                    applicationReplicaSetsBusy.setBusy(true);
+                                                    issueRequest.value.accept(/* force */ true);
+                                                }
+                                            });
+                                        } else {
+                                            issueRequest.value.accept(/* force */ false);
+                                        }
+                                    }
+                                });
                     }
 
                     @Override
                     public void cancel() {
                     }
-            
+
         }) {
             private final TextBox bearerTokenOrNullForApplicationReplicaSetToArchiveBox = createTextBox("");
             private final TextBox bearerTokenOrNullForArchiveBox = createTextBox("");
@@ -1411,45 +1766,44 @@ public class LandscapeManagementPanel extends SimplePanel {
                         stringMessages, errorReporter, new DialogCallback<UpgradeApplicationReplicaSetDialog.UpgradeApplicationReplicaSetInstructions>() {
                             @Override
                             public void ok(UpgradeApplicationReplicaSetInstructions upgradeInstructions) {
+                                final ArrayList<SailingApplicationReplicaSetDTO<String>> selectedReplicaSets = new ArrayList<>();
+                                replicaSets.forEach(selectedReplicaSets::add);
                                 applicationReplicaSetsBusy.setBusy(true);
-                                final int[] howManyMoreToGo = new int[] { Util.size(replicaSets) };
-                                Duration timeToWaitUntilUpgradingNextReplicaSet = Duration.NULL;
-                                for (final SailingApplicationReplicaSetDTO<String> replicaSet : replicaSets) {
-                                    new Timer() {
-                                        @Override
-                                        public void run() {
-                                            landscapeManagementService.upgradeApplicationReplicaSet(regionId, replicaSet, 
-                                                    upgradeInstructions.getReleaseNameOrNullForLatestMaster(),
-                                                    sshKeyManagementPanel.getSelectedKeyPair()==null?null:sshKeyManagementPanel.getSelectedKeyPair().getName(),
-                                                            sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null
-                                                            ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
-                                                    upgradeInstructions.getReplicaReplicationBearerToken(),
-                                                    new AsyncCallback<SailingApplicationReplicaSetDTO<String>>() {
-                                                        @Override
-                                                        public void onFailure(Throwable caught) {
-                                                            decrementHowManyMoreToGoAndSetNonBusyIfDone(howManyMoreToGo);
-                                                            errorReporter.reportError(caught.getMessage());
-                                                        }
-            
-                                                        @Override
-                                                        public void onSuccess(SailingApplicationReplicaSetDTO<String> result) {
-                                                            decrementHowManyMoreToGoAndSetNonBusyIfDone(howManyMoreToGo);
-                                                            if (result != null) {
-                                                                Notification.notify(stringMessages.successfullyUpgradedApplicationReplicaSet(
-                                                                                result.getName(), result.getVersion()), NotificationType.SUCCESS);
-                                                                applicationReplicaSetsTable.replaceBasedOnEntityIdentityComparator(result);
-                                                                applicationReplicaSetsTable.refresh();
-                                                            } else {
-                                                                Notification.notify(stringMessages.upgradingApplicationReplicaSetFailed(replicaSet.getName()),
-                                                                        NotificationType.ERROR);
-                                                            }
+                                // Pre-flight: check the whole selection for live content in a single round-trip and
+                                // warn the user once, up front, before any replica set is upgraded (the walk is
+                                // otherwise spread across timers and could surface a warning minutes in, unattended).
+                                // Only the sets flagged here and confirmed by the user are later forced; every other
+                                // set runs force=false and keeps its reactive back-end guard as a fallback for
+                                // surprise races.
+                                landscapeManagementService.checkForLiveContent(regionId, selectedReplicaSets,
+                                        upgradeInstructions.getReplicaReplicationBearerToken(),
+                                        sshKeyManagementPanel.getSelectedKeyPair() == null ? null : sshKeyManagementPanel.getSelectedKeyPair().getName(),
+                                        sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
+                                        new AsyncCallback<LiveContentCheckResult>() {
+                                            @Override
+                                            public void onFailure(final Throwable caught) {
+                                                applicationReplicaSetsBusy.setBusy(false);
+                                                errorReporter.reportError(caught.getMessage());
+                                            }
+
+                                            @Override
+                                            public void onSuccess(final LiveContentCheckResult preflightResult) {
+                                                final Runnable execute = () -> upgradeApplicationReplicaSets(regionId,
+                                                        selectedReplicaSets, upgradeInstructions,
+                                                        getConflictingReplicaSetNames(preflightResult), stringMessages);
+                                                if (preflightResult.hasLiveContent()) {
+                                                    applicationReplicaSetsBusy.setBusy(false);
+                                                    showLiveContentWarning(preflightResult, confirmed -> {
+                                                        if (confirmed) {
+                                                            applicationReplicaSetsBusy.setBusy(true);
+                                                            execute.run();
                                                         }
                                                     });
-                                        }
-                                    }.schedule((int) timeToWaitUntilUpgradingNextReplicaSet.asMillis());
-                                    timeToWaitUntilUpgradingNextReplicaSet = timeToWaitUntilUpgradingNextReplicaSet.plus(
-                                            DURATION_TO_WAIT_BETWEEN_REPLICA_SET_UPGRADE_REQUESTS);
-                                }
+                                                } else {
+                                                    execute.run();
+                                                }
+                                            }
+                                        });
                             }
 
                             @Override
@@ -1458,6 +1812,66 @@ public class LandscapeManagementPanel extends SimplePanel {
                 }).show();
             }
         });
+    }
+
+    private void upgradeApplicationReplicaSets(final String regionId,
+            final Iterable<SailingApplicationReplicaSetDTO<String>> replicaSets,
+            final UpgradeApplicationReplicaSetInstructions upgradeInstructions,
+            final Set<String> confirmedConflictingReplicaSetNames, final StringMessages stringMessages) {
+        final int[] howManyMoreToGo = new int[] { Util.size(replicaSets) };
+        Duration timeToWaitUntilUpgradingNextReplicaSet = Duration.NULL;
+        for (final SailingApplicationReplicaSetDTO<String> replicaSet : replicaSets) {
+            new Timer() {
+                @Override
+                public void run() {
+                    final Holder<Consumer<Boolean>> issueRequest = new Holder<>();
+                    issueRequest.value = force -> landscapeManagementService.upgradeApplicationReplicaSet(regionId, replicaSet,
+                            upgradeInstructions.getReleaseNameOrNullForLatestMaster(),
+                            sshKeyManagementPanel.getSelectedKeyPair()==null?null:sshKeyManagementPanel.getSelectedKeyPair().getName(),
+                                    sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null
+                                    ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
+                            upgradeInstructions.getReplicaReplicationBearerToken(),
+                            force,
+                            new AsyncCallback<LiveContentAwareOperationResult<SailingApplicationReplicaSetDTO<String>>>() {
+                                @Override
+                                public void onFailure(final Throwable caught) {
+                                    decrementHowManyMoreToGoAndSetNonBusyIfDone(howManyMoreToGo);
+                                    errorReporter.reportError(caught.getMessage());
+                                }
+
+                                @Override
+                                public void onSuccess(final LiveContentAwareOperationResult<SailingApplicationReplicaSetDTO<String>> operationResult) {
+                                    decrementHowManyMoreToGoAndSetNonBusyIfDone(howManyMoreToGo);
+                                    if (operationResult.isSuccessful()) {
+                                        final SailingApplicationReplicaSetDTO<String> result =
+                                                operationResult.getSuccessfulResult();
+                                        Notification.notify(stringMessages.successfullyUpgradedApplicationReplicaSet(
+                                                        result.getName(), result.getVersion()), NotificationType.SUCCESS);
+                                        applicationReplicaSetsTable.replaceBasedOnEntityIdentityComparator(result);
+                                        applicationReplicaSetsTable.refresh();
+                                    } else {
+                                        // The operation was refused because one or more affected replica sets
+                                        // are currently serving live content (a live-content conflict); offer
+                                        // the user the chance to proceed and force the operation anyway.
+                                        showLiveContentWarning(operationResult.getLiveContentCheckResult(), confirmed -> {
+                                            if (confirmed) {
+                                                howManyMoreToGo[0]++;
+                                                applicationReplicaSetsBusy.setBusy(true);
+                                                issueRequest.value.accept(/* force */ true);
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                    // Pre-flight already warned the user about any flagged sets; force this set only if it was among
+                    // the confirmed conflicting sets. Otherwise run force=false so the reactive back-end guard still
+                    // catches a surprise race that started after pre-flight.
+                    issueRequest.value.accept(confirmedConflictingReplicaSetNames.contains(replicaSet.getName()));
+                }
+            }.schedule((int) timeToWaitUntilUpgradingNextReplicaSet.asMillis());
+            timeToWaitUntilUpgradingNextReplicaSet = timeToWaitUntilUpgradingNextReplicaSet.plus(
+                    DURATION_TO_WAIT_BETWEEN_REPLICA_SET_UPGRADE_REQUESTS);
+        }
     }
     
     private void upgradeArchiveServer(StringMessages stringMessages, String regionId,
