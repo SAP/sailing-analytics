@@ -40,9 +40,12 @@ import com.sap.sailing.landscape.SailingAnalyticsHost;
 import com.sap.sailing.landscape.SailingAnalyticsMetrics;
 import com.sap.sailing.landscape.SailingAnalyticsProcess;
 import com.sap.sailing.landscape.SailingReleaseRepository;
+import com.sap.sailing.landscape.common.EventLiveContent;
 import com.sap.sailing.landscape.common.LiveContentAwareOperationResult;
 import com.sap.sailing.landscape.common.LiveContentCheckResult;
+import com.sap.sailing.landscape.common.RaceLiveContent;
 import com.sap.sailing.landscape.common.RemoteServiceMappingConstants;
+import com.sap.sailing.landscape.common.ReplicaSetLiveContent;
 import com.sap.sailing.landscape.common.SharedLandscapeConstants;
 import com.sap.sailing.landscape.impl.SailingAnalyticsHostImpl;
 import com.sap.sailing.landscape.impl.SailingAnalyticsProcessImpl;
@@ -796,7 +799,9 @@ public class LandscapeManagementWriteServiceImpl extends ResultCachingProxiedRem
 
     @Override
     public SerializationDummyDTO serializationDummy(ProcessDTO mongoProcessDTO, AwsInstanceDTO awsInstanceDTO, AwsShardDTO shardDTO,
-            SailingApplicationReplicaSetDTO<String> sailingApplicationReplicationSetDTO, LeaderboardNameDTO leaderboard) {
+            SailingApplicationReplicaSetDTO<String> sailingApplicationReplicationSetDTO, LeaderboardNameDTO leaderboard,
+            ReplicaSetLiveContent replicaSetLiveContent, EventLiveContent eventLiveContent, RaceLiveContent raceLiveContent,
+            Long lng) {
         return null;
     }
     
