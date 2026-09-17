@@ -18,7 +18,7 @@ import com.sap.sse.gwt.client.ErrorReporter;
  * {@code window} callback global is installed at most once when
  * {@link #load(Runnable, MapChooserAndAuthenticationParamsProviderAsync, ErrorReporter, StringMessages)} is invoked for the first
  * time; the selected provider's injected script triggers that global, which in turn invokes all queued callbacks via
- * {@link #callback()}.
+ * {@link #callback()}.<p>
  */
 public class MapsLoader {
     /**
@@ -58,6 +58,7 @@ public class MapsLoader {
     private static MapProvider currentProvider;
     private static boolean loading = false;
     private static boolean loaded = false;
+
     private static final Set<Runnable> callbacks = new HashSet<>();
     
     private MapsLoader() {
@@ -111,7 +112,8 @@ public class MapsLoader {
         final MapProvider result;
         switch (type) {
         case GOOGLE:
-            result = new GoogleMapsProvider(authProvider, errorReporter, stringMessages);
+            result = new GoogleMapsProvider(authProvider, errorReporter, stringMessages,
+                            (String errorMessage)->authFailed(errorReporter, errorMessage));
             break;
         case MAPLIBRE:
             result = new MapLibreProvider(authProvider);
@@ -164,6 +166,11 @@ public class MapsLoader {
         clearGlobalCallback();
     }
 
+    private static void authFailed(ErrorReporter errorReporter, String errorMessage) {
+        loading = false;
+        errorReporter.reportError(errorMessage);
+    }
+    
     /**
      * Removes the {@value #MAP_LOADED_CALLBACK_GLOBAL} {@code window} global installed by
      * {@link #installGlobalCallback()}.

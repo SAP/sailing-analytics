@@ -1,5 +1,7 @@
 package com.sap.sailing.gwt.ui.shared.racemap;
 
+import java.util.function.Consumer;
+
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.ScriptElement;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -30,15 +32,20 @@ public class GoogleMapsProvider implements MapProvider {
         }
     };
 
+    private static Runnable authFailureReporter;
+
     private final MapChooserAndAuthenticationParamsProviderAsync authProvider;
     private final ErrorReporter errorReporter;
     private final StringMessages stringMessages;
 
     public GoogleMapsProvider(final MapChooserAndAuthenticationParamsProviderAsync authProvider,
-            final ErrorReporter errorReporter, final StringMessages stringMessages) {
+            final ErrorReporter errorReporter, final StringMessages stringMessages,
+            Consumer<String> authFailureReporter) {
         this.authProvider = authProvider;
         this.errorReporter = errorReporter;
         this.stringMessages = stringMessages;
+        GoogleMapsProvider.authFailureReporter = ()->
+                    authFailureReporter.accept(stringMessages.errorGoogleMapsAuthenticationFailed());
     }
 
     @Override
@@ -62,6 +69,7 @@ public class GoogleMapsProvider implements MapProvider {
 
             @Override
             public void onSuccess(final String authenticationParams) {
+                installAuthFailureCallback();
                 final ScriptElement scriptElement = Document.get().createScriptElement();
                 scriptElement.setSrc("https://maps.googleapis.com/maps/api/js?v=" + MapsLoader.API_VERSION + "&"
                         + authenticationParams + "&libraries=" + MapsLoader.LIBRARIES + "&callback="
@@ -70,4 +78,14 @@ public class GoogleMapsProvider implements MapProvider {
             }
         });
     }
+    
+    private static void authFailed() {
+        authFailureReporter.run();
+    }
+
+    private static native void installAuthFailureCallback() /*-{
+        $wnd.gm_authFailure = $entry(function() {
+            @com.sap.sailing.gwt.ui.shared.racemap.GoogleMapsProvider::authFailed()();
+        });
+    }-*/;
 }
