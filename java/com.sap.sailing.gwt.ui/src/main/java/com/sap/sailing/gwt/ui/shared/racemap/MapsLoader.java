@@ -4,10 +4,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.debug.client.DebugInfo;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.sap.sailing.gwt.ui.client.MapChooserAndAuthenticationParamsProviderAsync;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sse.gwt.client.ErrorReporter;
+import com.sap.sse.gwt.client.async.PendingAjaxCallMarker;
 
 /**
  * The {@link #load(Runnable, MapChooserAndAuthenticationParamsProviderAsync, ErrorReporter, StringMessages)} method can be used
@@ -55,9 +57,29 @@ public class MapsLoader {
      */
     final static String MAP_LOADED_CALLBACK_GLOBAL = "mapLoadedCallback";
 
+    /**
+     * The pending-Ajax category (see {@code com.sap.sse.gwt.client.async.PendingAjaxCallMarker} and the consuming
+     * {@code com.sap.sailing.selenium.pages.PageObject}) under which the whole asynchronous map-loading sequence is
+     * marked as pending: from the moment {@link #load(Runnable, MapChooserAndAuthenticationParamsProviderAsync, ErrorReporter, StringMessages)}
+     * kicks off its work until {@link #callback()} has run every queued completion callback (or a terminal failure
+     * aborts the sequence). Selenium raceboard tests wait on this category so that they only proceed once the map API
+     * (Google or MapLibre) is fully loaded and the map's UI - including the {@code moreOptionsButton} - has been built.
+     * The mark is provider-agnostic on purpose: it brackets the shared loader sequence rather than any one provider's
+     * protocol. Outside instrumented test runs (see {@link DebugInfo#isDebugIdEnabled()}) marking is a no-op.
+     */
+    public final static String MAP_LOAD_CATEGORY = "mapLoad";
+
     private static MapProvider currentProvider;
     private static boolean loading = false;
     private static boolean loaded = false;
+
+    /**
+     * Guards the {@link #MAP_LOAD_CATEGORY} pending-Ajax mark so that the increment performed when the loader starts
+     * its asynchronous sequence is balanced by exactly one decrement, regardless of which of the several terminal exit
+     * points ({@link #callback()}, the {@code getMapType} failure, or {@link #authFailed(ErrorReporter, String)}) is
+     * reached first. {@code true} while the mark is outstanding.
+     */
+    private static boolean mapLoadPending = false;
 
     private static final Set<Runnable> callbacks = new HashSet<>();
     
@@ -89,9 +111,11 @@ public class MapsLoader {
             callbacks.add(callback);
             if (!loading) {
                 loading = true;
+                markMapLoadPending();
                 authProvider.getMapType(new AsyncCallback<MapProviderTypes>() {
                     @Override
                     public void onFailure(Throwable caught) {
+                        unmarkMapLoadPending();
                         errorReporter.reportError(stringMessages.errorObtainingMapType(caught.getMessage()), /* silentMode */ true);
                     }
 
@@ -164,11 +188,38 @@ public class MapsLoader {
         callbacks.forEach(Runnable::run);
         callbacks.clear();
         clearGlobalCallback();
+        unmarkMapLoadPending();
     }
 
     private static void authFailed(ErrorReporter errorReporter, String errorMessage) {
         loading = false;
+        unmarkMapLoadPending();
         errorReporter.reportError(errorMessage);
+    }
+
+    /**
+     * Marks the whole asynchronous map-loading sequence as a pending Ajax call under {@link #MAP_LOAD_CATEGORY} so that
+     * Selenium raceboard tests can wait for the map (and the map UI built by the completion callbacks) to be ready.
+     * Guarded by {@link DebugInfo#isDebugIdEnabled()} so it is a no-op outside instrumented test runs, and by
+     * {@link #mapLoadPending} so the mark is only ever incremented once per loader sequence.
+     */
+    private static void markMapLoadPending() {
+        if (DebugInfo.isDebugIdEnabled() && !mapLoadPending) {
+            mapLoadPending = true;
+            PendingAjaxCallMarker.incrementPendingAjaxCalls(MAP_LOAD_CATEGORY);
+        }
+    }
+
+    /**
+     * Balances the {@link #markMapLoadPending() mark} at whichever terminal exit point of the loader sequence is
+     * reached first ({@link #callback()}, the {@code getMapType} failure, or {@link #authFailed(ErrorReporter, String)}).
+     * The {@link #mapLoadPending} guard ensures that only the first such call decrements the counter.
+     */
+    private static void unmarkMapLoadPending() {
+        if (mapLoadPending) {
+            mapLoadPending = false;
+            PendingAjaxCallMarker.decrementPendingAjaxCalls(MAP_LOAD_CATEGORY);
+        }
     }
     
     /**

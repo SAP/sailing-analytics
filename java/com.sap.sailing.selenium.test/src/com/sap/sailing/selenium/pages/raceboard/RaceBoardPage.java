@@ -18,7 +18,15 @@ import com.sap.sailing.selenium.pages.timeslider.TimeSliderPO;
  * {@link PageObject} representing the SAP Sailing home page.
  */
 public class RaceBoardPage extends HostPageWithAuthentication {
-    
+
+    /**
+     * The pending-Ajax category under which the RaceBoard's map API (Google or MapLibre) load sequence is bracketed.
+     * Mirrors the value of the client-side constant {@code com.sap.sailing.gwt.ui.shared.racemap.MapsLoader#MAP_LOAD_CATEGORY};
+     * kept as a local literal here (like {@code com.sap.sailing.selenium.core.AjaxCallsComplete#CATEGORY_GLOBAL} mirrors
+     * its client-side counterpart) to avoid a bundle dependency from the Selenium test project on the GWT client bundle.
+     */
+    private static final String MAP_LOAD_CATEGORY = "mapLoad";
+
     @FindBy(how = BySeleniumId.class, using = "moreOptionsButton")
     private WebElement moreOptionsButton;
     
@@ -65,6 +73,12 @@ public class RaceBoardPage extends HostPageWithAuthentication {
     protected void initElements() {
         super.initElements();
         doneInit = true;
+        // The RaceBoard's map API (Google or MapLibre) loads through an asynchronous sequence that is bracketed under
+        // the MapsLoader.MAP_LOAD_CATEGORY pending-Ajax category and only completes once the map UI - including the
+        // moreOptionsButton - has been built. Wait on that category (bypassing the doneInit no-op guard on the global
+        // waitForAjaxRequests override by targeting the category-specific overload) before checking the button, so that
+        // the faster Selenium 4 W3C driver does not outrun the map-init chain and time out looking for moreOptionsButton.
+        waitForAjaxRequests(MAP_LOAD_CATEGORY);
         waitUntil(() -> moreOptionsButton.isDisplayed());
     }
 
