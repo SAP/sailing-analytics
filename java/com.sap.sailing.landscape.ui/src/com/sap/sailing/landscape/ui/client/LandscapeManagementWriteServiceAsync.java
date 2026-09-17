@@ -7,8 +7,11 @@ import java.util.Set;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.sap.sailing.domain.common.DataImportProgress;
 import com.sap.sailing.landscape.SailingAnalyticsHost;
+import com.sap.sailing.landscape.common.EventLiveContent;
 import com.sap.sailing.landscape.common.LiveContentAwareOperationResult;
 import com.sap.sailing.landscape.common.LiveContentCheckResult;
+import com.sap.sailing.landscape.common.RaceLiveContent;
+import com.sap.sailing.landscape.common.ReplicaSetLiveContent;
 import com.sap.sailing.landscape.common.SharedLandscapeConstants;
 import com.sap.sailing.landscape.ui.shared.AmazonMachineImageDTO;
 import com.sap.sailing.landscape.ui.shared.AvailabilityZoneDTO;
@@ -156,6 +159,8 @@ public interface LandscapeManagementWriteServiceAsync {
 
     void serializationDummy(ProcessDTO mongoProcessDTO, AwsInstanceDTO awsInstanceDTO, AwsShardDTO shardDTO,
             SailingApplicationReplicaSetDTO<String> sailingApplicationReplicationSetDTO, LeaderboardNameDTO leaderboard,
+            ReplicaSetLiveContent replicaSetLiveContent, EventLiveContent eventLiveContent, RaceLiveContent raceLiveContent,
+            Long lng,
             AsyncCallback<SerializationDummyDTO> callback);
 
     void defineDefaultRedirect(String regionId, String hostname, RedirectDTO redirect, String keyName,
