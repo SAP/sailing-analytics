@@ -2,10 +2,16 @@ package com.sap.sailing.landscape.ui.client;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.sap.sailing.domain.common.DataImportProgress;
 import com.sap.sailing.landscape.SailingAnalyticsHost;
+import com.sap.sailing.landscape.common.EventLiveContent;
+import com.sap.sailing.landscape.common.LiveContentAwareOperationResult;
+import com.sap.sailing.landscape.common.LiveContentCheckResult;
+import com.sap.sailing.landscape.common.RaceLiveContent;
+import com.sap.sailing.landscape.common.ReplicaSetLiveContent;
 import com.sap.sailing.landscape.common.SharedLandscapeConstants;
 import com.sap.sailing.landscape.ui.shared.AmazonMachineImageDTO;
 import com.sap.sailing.landscape.ui.shared.AvailabilityZoneDTO;
@@ -27,7 +33,7 @@ import com.sap.sse.landscape.aws.common.shared.RedirectDTO;
 
 public interface LandscapeManagementWriteServiceAsync {
     void getRegions(AsyncCallback<ArrayList<String>> callback);
-    
+
     /**
      * @param canBeDeployedInNlbInstanceBasedTargetGroup
      *            A boolean indicating, if true, that the list of available instance types should not contain those,
@@ -39,15 +45,15 @@ public interface LandscapeManagementWriteServiceAsync {
 
     void getMongoEndpoint(String region, String replicaSetName,
             AsyncCallback<MongoEndpointDTO> callback);
-    
+
     void getReverseProxies(String regionId, AsyncCallback<ArrayList<ReverseProxyDTO>> callback);
-    
+
     /**
      * Removes a reverse proxy from the given cluster and terminates it.
      * @return Returns true if a success.
      */
     void removeReverseProxy(ReverseProxyDTO instance, String region, String optionalKeyName, byte[] privateKeyEncryptionPassphrase, AsyncCallback<Void> callback);
-    
+
     /**
      * Rotates the httpd logs on a proxy instance.
      * @param optionalKeyName Name of key used to connect to the instance to restart
@@ -55,18 +61,18 @@ public interface LandscapeManagementWriteServiceAsync {
      */
     void rotateHttpdLogs(ReverseProxyDTO proxy, String region, String optionalKeyName,
             byte[] passphraseForPrivateKeyDecryption, AsyncCallback<Void> callback);
-    
+
     /**
      * Adds a reverse proxy to the cluster and the right load balancer's target group.
      */
     void addReverseProxy(String instanceName, String instanceType, String region, String launchKey, AvailabilityZoneDTO availabilityZoneDTO, AsyncCallback<Void> callback);
-    
-    
+
+
     /**
      * Gets all availability zones in a region.
      */
     void describeAvailabilityZones(String region,AsyncCallback<ArrayList<AvailabilityZoneDTO>> asyncCallback);
-    
+
     /**
      * The calling subject will see only those keys for which it has the {@code READ} permission.
      */
@@ -82,7 +88,7 @@ public interface LandscapeManagementWriteServiceAsync {
      * {@link CREATE_OBJECT} permission on the server on which this is called.
      */
     void generateSshKeyPair(String regionId, String keyName, String privateKeyEncryptionPassphrase, AsyncCallback<SSHKeyPairDTO> callback);
-    
+
     /**
      * Verifies a passphrase for an SSH private key. Returns {@code true} if the passphrase can decipher the private key
      * and {@code false} if this does not work or the key is invalid, or the key is {@code null}.
@@ -114,7 +120,7 @@ public interface LandscapeManagementWriteServiceAsync {
      * credentials.
      */
     void hasValidSessionCredentials(AsyncCallback<Boolean> callback);
-    
+
     /**
      * For a combination of an AWS access key ID, the corresponding secret plus an MFA token code produces new session
      * credentials and stores them in the user's preference store from where they can be obtained again using
@@ -139,7 +145,7 @@ public interface LandscapeManagementWriteServiceAsync {
      * {@link #createMfaSessionCredentials(String, String, String)}.
      */
     void clearSessionCredentials(AsyncCallback<Void> callback);
-    
+
     void getApplicationReplicaSets(String regionId, String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
             AsyncCallback<ArrayList<SailingApplicationReplicaSetDTO<String>>> callback);
 
@@ -153,33 +159,74 @@ public interface LandscapeManagementWriteServiceAsync {
 
     void serializationDummy(ProcessDTO mongoProcessDTO, AwsInstanceDTO awsInstanceDTO, AwsShardDTO shardDTO,
             SailingApplicationReplicaSetDTO<String> sailingApplicationReplicationSetDTO, LeaderboardNameDTO leaderboard,
+            ReplicaSetLiveContent replicaSetLiveContent, EventLiveContent eventLiveContent, RaceLiveContent raceLiveContent,
+            Long lng,
             AsyncCallback<SerializationDummyDTO> callback);
 
     void defineDefaultRedirect(String regionId, String hostname, RedirectDTO redirect, String keyName,
             String passphraseForPrivateKeyDecryption, AsyncCallback<Void> callback);
 
+    /**
+     * @param force
+     *            when {@code false} (the recommended default), the operation first checks whether the affected replica
+     *            set currently serves live content (e.g., a race that is being tracked live). If live content is found,
+     *            the operation is not carried out and the {@code callback} instead receives a
+     *            {@link LiveContentAwareOperationResult} that is not {@link LiveContentAwareOperationResult#isSuccessful()
+     *            successful} and whose {@link LiveContentAwareOperationResult#getLiveContentCheckResult() live-content
+     *            check result} describes what live content was detected, so the user can decide whether to proceed
+     *            anyway. When {@code true}, this safety check is skipped and the operation proceeds regardless of any
+     *            live content, potentially disrupting a live race.
+     */
     void removeApplicationReplicaSet(String regionId,
             SailingApplicationReplicaSetDTO<String> applicationReplicaSetToRemove, MongoEndpointDTO moveDatabaseHere,
-            String optionalKeyName, byte[] passphraseForPrivateKeyDescryption, AsyncCallback<String> callback);
+            String optionalKeyName, byte[] passphraseForPrivateKeyDescryption, boolean force,
+            AsyncCallback<LiveContentAwareOperationResult<String>> callback);
 
     void createDefaultLoadBalancerMappings(String regionId,
             SailingApplicationReplicaSetDTO<String> applicationReplicaSetToCreateLoadBalancerMappingFor,
             boolean useDynamicLoadBalancer, String optionalDomainName, boolean forceDNSUpdate,
             AsyncCallback<SailingApplicationReplicaSetDTO<String>> callback);
 
+    void checkForLiveContent(String regionId,
+            Iterable<SailingApplicationReplicaSetDTO<String>> applicationReplicaSets, String bearerToken,
+            String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
+            AsyncCallback<LiveContentCheckResult> callback);
+
+    /**
+     * @param force
+     *            when {@code false} (the recommended default), the operation first checks whether the affected replica
+     *            set currently serves live content (e.g., a race that is being tracked live). If live content is found,
+     *            the upgrade is not carried out and the {@code callback} instead receives a
+     *            {@link LiveContentAwareOperationResult} that is not {@link LiveContentAwareOperationResult#isSuccessful()
+     *            successful} and whose {@link LiveContentAwareOperationResult#getLiveContentCheckResult() live-content
+     *            check result} describes what live content was detected, so the user can decide whether to proceed
+     *            anyway. When {@code true}, this safety check is skipped and the upgrade proceeds regardless of any live
+     *            content, potentially disrupting a live race.
+     */
     void upgradeApplicationReplicaSet(String regionId,
             SailingApplicationReplicaSetDTO<String> applicationReplicaSetToUpgrade, String releaseOrNullForLatestMaster,
             String optionalKeyName, byte[] privateKeyEncryptionPassphrase, String replicationBearerToken,
-            AsyncCallback<SailingApplicationReplicaSetDTO<String>> callback);
+            boolean force, AsyncCallback<LiveContentAwareOperationResult<SailingApplicationReplicaSetDTO<String>>> callback);
 
     void getReleases(AsyncCallback<ArrayList<ReleaseDTO>> asyncCallback);
 
+    /**
+     * @param force
+     *            when {@code false} (the recommended default), the operation first checks whether the affected replica
+     *            set currently serves live content (e.g., a race that is being tracked live). If live content is found,
+     *            the archiving is not carried out and the {@code callback} instead receives a
+     *            {@link LiveContentAwareOperationResult} that is not {@link LiveContentAwareOperationResult#isSuccessful()
+     *            successful} and whose {@link LiveContentAwareOperationResult#getLiveContentCheckResult() live-content
+     *            check result} describes what live content was detected, so the user can decide whether to proceed
+     *            anyway. When {@code true}, this safety check is skipped and archiving proceeds regardless of any live
+     *            content, potentially disrupting a live race.
+     */
     void archiveReplicaSet(String regionId, SailingApplicationReplicaSetDTO<String> applicationReplicaSetToArchive,
             String bearerTokenOrNullForApplicationReplicaSetToArchive, String bearerTokenOrNullForArchive,
             Duration durationToWaitBeforeCompareServers, int maxNumberOfCompareServerAttempts,
             boolean removeApplicationReplicaSet, MongoEndpointDTO moveDatabaseHere, String optionalKeyName,
-            byte[] passphraseForPrivateKeyDecryption,
-            AsyncCallback<Triple<DataImportProgress, CompareServersResultDTO, String>> callback);
+            byte[] passphraseForPrivateKeyDecryption, boolean force,
+            AsyncCallback<LiveContentAwareOperationResult<Triple<DataImportProgress, CompareServersResultDTO, String>>> callback);
 
     void deployApplicationToExistingHost(String replicaSetName, AwsInstanceDTO hostToDeployTo,
             String replicaInstanceType, boolean dynamicLoadBalancerMapping, String releaseNameOrNullForLatestMaster,
@@ -189,7 +236,7 @@ public interface LandscapeManagementWriteServiceAsync {
             Integer optionalMemoryInMegabytesOrNull, Integer optionalMemoryTotalSizeFactorOrNull, Integer optionalIgtimiRiotPort,
             AwsInstanceDTO optionalPreferredInstanceToDeployUnmanagedReplicaTo,
             AsyncCallback<SailingApplicationReplicaSetDTO<String>> callback);
-    
+
     void createArchiveReplicaSet(String regionId, SailingApplicationReplicaSetDTO<String> applicationReplicaSetToUpgrade,
             String optionalSharedInstanceType, String releaseOrNullForLatestMaster, String optionalKeyName,
             byte[] privateKeyEncryptionPassphrase, String securityReplicationBearerToken, String replicaReplicationBearerToken,
@@ -198,6 +245,7 @@ public interface LandscapeManagementWriteServiceAsync {
     void makeCandidateArchiveServerGoLive(String regionId,
             SailingApplicationReplicaSetDTO<String> archiveReplicaSetToUpgrade, String optionalKeyName,
             byte[] privateKeyEncryptionPassphrase, AsyncCallback<Void> callback);
+
     /**
      * For the given replica set ensures there is at least one healthy replica, then stops replicating on all replicas and
      * removes the master from the public and master target groups. This can be used as a preparatory action for upgrading
@@ -205,11 +253,21 @@ public interface LandscapeManagementWriteServiceAsync {
      * 
      * Other than de-registering the master from the replica set's target groups this method does nothing to the master
      * process/host.
+     *
+     * @param force
+     *            when {@code false} (the recommended default), the operation first checks whether the affected replica
+     *            set currently serves live content (e.g., a race that is being tracked live). If live content is found,
+     *            the operation is not carried out and the {@code callback} instead receives a
+     *            {@link LiveContentAwareOperationResult} that is not {@link LiveContentAwareOperationResult#isSuccessful()
+     *            successful} and whose {@link LiveContentAwareOperationResult#getLiveContentCheckResult() live-content
+     *            check result} describes what live content was detected, so the user can decide whether to proceed
+     *            anyway. When {@code true}, this safety check is skipped and the operation proceeds regardless of any
+     *            live content, potentially disrupting a live race.
      */
     void ensureAtLeastOneReplicaExistsStopReplicatingAndRemoveMasterFromTargetGroups(String regionId,
             SailingApplicationReplicaSetDTO<String> applicationReplicaSet, String optionalKeyName,
-            byte[] privateKeyEncryptionPassphrase, String replicaReplicationBearerToken,
-            AsyncCallback<Boolean> callback);
+            byte[] privateKeyEncryptionPassphrase, String replicaReplicationBearerToken, boolean force,
+            AsyncCallback<LiveContentAwareOperationResult<Boolean>> callback);
 
     /**
      * Updates the AMI to use in the launch template version of those of the {@code replicaSets} that have an auto-scaling group.
@@ -238,12 +296,23 @@ public interface LandscapeManagementWriteServiceAsync {
             Integer optionalMemoryInMegabytesOrNull, Integer optionalMemoryTotalSizeFactorOrNull,
             String optionalSharedReplicaInstanceType, AsyncCallback<SailingApplicationReplicaSetDTO<String>> callback);
 
+    /**
+     * @param force
+     *            when {@code false} (the recommended default), the operation first checks whether the affected replica
+     *            set currently serves live content (e.g., a race that is being tracked live). If live content is found,
+     *            the master is not moved and the {@code callback} instead receives a
+     *            {@link LiveContentAwareOperationResult} that is not {@link LiveContentAwareOperationResult#isSuccessful()
+     *            successful} and whose {@link LiveContentAwareOperationResult#getLiveContentCheckResult() live-content
+     *            check result} describes what live content was detected, so the user can decide whether to proceed
+     *            anyway. When {@code true}, this safety check is skipped and the master is moved regardless of any live
+     *            content, potentially disrupting a live race.
+     */
     void moveMasterToOtherInstance(SailingApplicationReplicaSetDTO<String> applicationReplicaSetDTO,
             boolean useSharedInstance, String optionalInstanceTypeOrNull, String optionalKeyName,
             byte[] privateKeyEncryptionPassphrase, String optionalMasterReplicationBearerTokenOrNull,
             String optionalReplicaReplicationBearerTokenOrNull, Integer optionalMemoryInMegabytesOrNull,
-            Integer optionalMemoryTotalSizeFactorOrNull,
-            AsyncCallback<SailingApplicationReplicaSetDTO<String>> callback);
+            Integer optionalMemoryTotalSizeFactorOrNull, boolean force,
+            AsyncCallback<LiveContentAwareOperationResult<SailingApplicationReplicaSetDTO<String>>> callback);
 
     void changeAutoScalingReplicasInstanceType(SailingApplicationReplicaSetDTO<String> replicaSet,
             String instanceTypeName, String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
@@ -352,9 +421,29 @@ public interface LandscapeManagementWriteServiceAsync {
      * @param optionalInstanceTypeForNewInstance
      *            if not specified, the new multi-instance launched will use the same instance type as the one from
      *            where the processes are moved away ({@code host})
+     * @param forceMasterReplicaSetNames
+     *            the names of those replica sets whose master ("primary") process should be moved even if it currently
+     *            serves live content. Before moving any master, this operation checks each affected primary for live
+     *            content (e.g., a race that is being tracked live); for every replica set <em>not</em> named here that is
+     *            found to have live content, the move is not carried out and the {@code callback} instead receives a
+     *            {@link LiveContentAwareOperationResult} that is not {@link LiveContentAwareOperationResult#isSuccessful()
+     *            successful} and whose {@link LiveContentAwareOperationResult#getLiveContentCheckResult() live-content
+     *            check result} lists the detected live content, so the user can decide whether to proceed anyway.
+     *            Listing a replica set name here skips that safety check for it and forces its master to be moved
+     *            regardless of any live content, potentially disrupting a live race.
+     * @param callback
+     *            on success, receives a {@link LiveContentAwareOperationResult} that is
+     *            {@link LiveContentAwareOperationResult#isSuccessful() successful} and whose
+     *            {@link LiveContentAwareOperationResult#getSuccessfulResult() successful result} is the ID of the new
+     *            host to which all application processes have been moved. If the operation was blocked because one or
+     *            more affected primaries not listed in {@code forceMasterReplicaSetNames} were found to be serving live
+     *            content, it instead receives a result that is not
+     *            {@link LiveContentAwareOperationResult#isSuccessful() successful} and that carries the
+     *            {@link LiveContentAwareOperationResult#getLiveContentCheckResult() live-content check result}.
      */
     void moveAllApplicationProcessesAwayFrom(AwsInstanceDTO host, String optionalInstanceTypeForNewInstance,
-            String optionalKeyName, byte[] privateKeyEncryptionPassphrase, AsyncCallback<Void> callback);
+            String optionalKeyName, byte[] privateKeyEncryptionPassphrase, Set<String> forceMasterReplicaSetNames,
+            AsyncCallback<LiveContentAwareOperationResult<String>> callback);
 
     void hasDNSResourceRecordsForReplicaSet(String replicaSetName, String optionalDomainName, AsyncCallback<Boolean> callback);
 }

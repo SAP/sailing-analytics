@@ -33,8 +33,22 @@ public class GoogleMapsLoader {
     private static boolean loading = false;
     private static boolean loaded = false;
     private static final Set<Runnable> callbacks = new HashSet<>();
-    
+    private static Runnable authFailureListener;
+
     private GoogleMapsLoader() {
+    }
+
+    /**
+     * Registers a listener that is invoked when the Google Maps JavaScript API rejects the request, i.e. when the
+     * API calls its {@code gm_authFailure} hook. This happens for an invalid or missing key, a referrer that is not
+     * allowed, an API that is not enabled, or a quota / billing problem. Unlike a timeout this fires only on an actual
+     * authentication failure and therefore never misfires on a slow but otherwise valid load. Without such a listener
+     * an authentication failure leaves a blank map with no controls and no diagnostic.
+     *
+     * @param listener the listener to notify on an authentication failure; may be {@code null} to clear it.
+     */
+    public static void setAuthFailureListener(final Runnable listener) {
+        authFailureListener = listener;
     }
 
     /**
@@ -48,6 +62,7 @@ public class GoogleMapsLoader {
             if (!loading) {
                 loading = true;
                 installCallback();
+                installAuthFailureCallback();
                 final ScriptElement scriptElement = Document.get().createScriptElement();
                 scriptElement.setSrc("https://maps.googleapis.com/maps/api/js?v="+API_VERSION+"&" + authenticationParams
                         + "&libraries="+LIBRARIES+"&callback=googleMapsLoadedCallback");
@@ -63,10 +78,23 @@ public class GoogleMapsLoader {
         callbacks.clear();
         clearCallback();
     }
+
+    private static void authFailed() {
+        loading = false;
+        if (authFailureListener != null) {
+            authFailureListener.run();
+        }
+    }
     
     private static native void installCallback() /*-{
         $wnd.googleMapsLoadedCallback = $entry(function() {
             @com.sap.sailing.gwt.ui.shared.racemap.GoogleMapsLoader::callback()();
+        });
+    }-*/;
+
+    private static native void installAuthFailureCallback() /*-{
+        $wnd.gm_authFailure = $entry(function() {
+            @com.sap.sailing.gwt.ui.shared.racemap.GoogleMapsLoader::authFailed()();
         });
     }-*/;
     
