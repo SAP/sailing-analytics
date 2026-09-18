@@ -27,10 +27,11 @@ public class WildcardPermissionPanelPO extends PageArea {
         
         public void deletePermission() {
             deleteButton.click();
+            waitForAjaxRequests();
         }
         
         public void deletePermissionAndExpectPermissionError() {
-            deletePermission();
+            deleteButton.click();
             waitForAlertContainingMessageAndAccept("Could not remove permission");
         }
     }
@@ -65,6 +66,7 @@ public class WildcardPermissionPanelPO extends PageArea {
     public void addPermission(String permissionName) {
         enterNewPermissionValue(permissionName);
         clickAddButtonOrThrow();
+        waitForAjaxRequests();
         waitUntil(() -> findPermission(permissionName) != null);
     }
 
