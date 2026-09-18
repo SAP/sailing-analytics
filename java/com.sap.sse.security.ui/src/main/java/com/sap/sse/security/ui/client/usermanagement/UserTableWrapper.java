@@ -35,6 +35,7 @@ import com.sap.sse.gwt.client.DateAndTimeFormatterUtil;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.Notification;
 import com.sap.sse.gwt.client.Notification.NotificationType;
+import com.sap.sse.gwt.client.async.MarkedAsyncCallback;
 import com.sap.sse.gwt.client.celltable.AbstractSortableTextColumn;
 import com.sap.sse.gwt.client.celltable.CellTableWithCheckboxResources;
 import com.sap.sse.gwt.client.celltable.EntityIdentityComparator;
@@ -347,7 +348,7 @@ extends TableWrapper<UserDTO, S, StringMessages, TR> {
                 }
             }
         };
-        getUserManagementService().getUserList(myCallback);
+        getUserManagementService().getUserList(new MarkedAsyncCallback<>(myCallback));
     }
 
     public void refreshUserList(final Callback<Iterable<UserDTO>, Throwable> callback) {

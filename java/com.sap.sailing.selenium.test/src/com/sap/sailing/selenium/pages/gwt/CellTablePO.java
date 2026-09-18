@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -175,11 +176,22 @@ public abstract class CellTablePO<T extends DataEntryPO> extends PageArea {
     }
     
     public List<T> getEntries() {
-        final List<T> entries = new ArrayList<>();
-        for (WebElement row : getRows()) {
-            entries.add(createDataEntry(row));
+        final int maxAttempts = 5;
+        List<T> result = null;
+        for (int attempt = 0; result == null && attempt < maxAttempts; attempt++) {
+            try {
+                final List<T> entries = new ArrayList<>();
+                for (final WebElement row : getRows()) {
+                    entries.add(createDataEntry(row));
+                }
+                result = entries;
+            } catch (final StaleElementReferenceException e) {
+                if (attempt == maxAttempts - 1) {
+                    throw e;
+                }
+            }
         }
-        return entries;
+        return result;
     }
     
     public T getEntry(Object identifier) {

@@ -514,7 +514,8 @@ public class PageObject {
     }
     
     protected void waitUntil(Function<WebDriver, Boolean> predicate) {
-        WebDriverWait webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(DEFAULT_LOOKUP_TIMEOUT));
+        final WebDriverWait webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(DEFAULT_LOOKUP_TIMEOUT));
+        webDriverWait.ignoring(StaleElementReferenceException.class);
         webDriverWait.until(predicate);
     }
     
