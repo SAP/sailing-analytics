@@ -62,6 +62,12 @@ public class RoleDefinitionsPanelPO extends PageArea {
         }
         return null;
     }
+
+    public RoleEntryPO findRoleWhenPresent(final String roleName) {
+        waitForAjaxRequests();
+        waitUntil(() -> findRole(roleName) != null);
+        return findRole(roleName);
+    }
     
     public void selectRole(String name) {
         final CellTablePO<RoleEntryPO> table = getRoleTable();
