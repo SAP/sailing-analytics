@@ -171,7 +171,7 @@ public class AdminConsolePage extends HostPageWithAuthentication {
     public UserManagementPanelPO goToUserManagement() {
         goToTab(ADVANCED_PARENT_LABEL, ADVANCED_TAB_PARENT_IDENTIFIER, true);
         return new UserManagementPanelPO(this.driver,
-                goToTab(USER_MANAGEMENT_PANEL_TAB_LABEL, USER_MANAGEMENT_PANEL_TAB_IDENTIFIER, false));
+                goToTab(USER_MANAGEMENT_PANEL_TAB_LABEL, USER_MANAGEMENT_PANEL_TAB_IDENTIFIER, false), this);
     }
     
     public UserGroupManagementPanelPO goToUserGroupDefinitions() {
