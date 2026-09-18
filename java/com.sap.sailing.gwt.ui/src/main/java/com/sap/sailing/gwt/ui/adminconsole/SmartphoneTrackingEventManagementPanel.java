@@ -704,7 +704,7 @@ public class SmartphoneTrackingEventManagementPanel extends AbstractLeaderboardC
                 new DialogCallback<String>() {
                     @Override
                     public void ok(String prefix) {
-                        sailingServiceWrite.denoteForRaceLogTracking(leaderboard.getName(), prefix, new AsyncCallback<Void>() {
+                        sailingServiceWrite.denoteForRaceLogTracking(leaderboard.getName(), prefix, new MarkedAsyncCallback<Void>(new AsyncCallback<Void>() {
                             @Override
                             public void onSuccess(Void result) {
                                 loadAndRefreshLeaderboard(leaderboard.getName());
@@ -718,7 +718,7 @@ public class SmartphoneTrackingEventManagementPanel extends AbstractLeaderboardC
                                 errorReporter
                                         .reportError("Could not denote for RaceLog tracking: " + caught.getMessage());
                             }
-                        });
+                        }));
 
                     }
 

@@ -82,10 +82,22 @@ public class SmartphoneTrackingEventManagementPanelPO extends PageArea {
         waitForAjaxRequests();
     }
 
-    public void startTrackingForRace(DataEntryPO aRaceRow) {
+    public void startTrackingForRace(final String raceName) {
         // Notifications from previous actions may cover the button on CI
         dismissAllExistingNotifications();
-        aRaceRow.clickActionImage(ACTION_START_TRACKING);
+        // The start-tracking action image only appears once the denotation has been applied
+        // client-side; wait for it (re-fetching the row each poll to survive GWT re-renders)
+        // rather than assuming the row's mere presence implies the action is available.
+        waitUntil(() -> {
+            try {
+                return waitForRaceRow(raceName).hasActionImage(ACTION_START_TRACKING);
+            } catch (final RuntimeException e) {
+                // StaleElementReferenceException (a RuntimeException) and the transient
+                // "table mid-re-render" RuntimeException from createDataEntry both mean "retry"
+                return false;
+            }
+        });
+        waitForRaceRow(raceName).clickActionImage(ACTION_START_TRACKING);
         waitForAjaxRequests();
     }
 
