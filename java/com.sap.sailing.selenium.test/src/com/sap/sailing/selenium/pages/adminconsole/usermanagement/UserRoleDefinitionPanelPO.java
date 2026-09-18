@@ -28,10 +28,11 @@ public class UserRoleDefinitionPanelPO extends PageArea {
         
         public void deleteRole() {
             deleteButton.click();
+            waitForAjaxRequests();
         }
         
         public void deleteRoleAndExpectPermissionError() {
-            deleteRole();
+            deleteButton.click();
             waitForAlertContainingMessageAndAccept("You are not allowed to revoke this role from user");
         }
     }

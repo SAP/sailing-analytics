@@ -25,6 +25,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.sap.sse.gwt.client.ErrorReporter;
+import com.sap.sse.gwt.client.async.MarkedAsyncCallback;
 import com.sap.sse.gwt.client.celltable.CellTableWithCheckboxResources;
 import com.sap.sse.gwt.client.panels.LabeledAbstractFilterablePanel;
 import com.sap.sse.security.shared.HasPermissions;
@@ -88,7 +89,7 @@ public class WildcardPermissionPanel extends HorizontalPanel
                 UserDTO selectedUser = this.userSelectionModel.getSelectedObject();
                 if (selectedUser != null) {
                     userService.getUserManagementWriteService().addPermissionForUser(selectedUser.getName(),
-                            selectedPermission, new AsyncCallback<SuccessInfo>() {
+                            selectedPermission, new MarkedAsyncCallback<SuccessInfo>(new AsyncCallback<SuccessInfo>() {
                                 @Override
                                 public void onFailure(Throwable caught) {
                                     Window.alert(caught.getMessage());
@@ -102,7 +103,7 @@ public class WildcardPermissionPanel extends HorizontalPanel
                                         Window.alert(result.getMessage());
                                     }
                                 }
-                            });
+                            }));
                 }
             }
             suggestPermission.setText("");

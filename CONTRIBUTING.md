@@ -10,7 +10,7 @@ Note: This is a living document. Like the Sailing Analytics, this document will 
 
 ## Reporting Issues
 
-Bug reports welcome! We are currently still using [Bugzilla](https://bugzilla.sapsailing.com) for tracking user stories and bugs.
+Bug and issue reports just like feature requests are welcome! Report them [here](https://github.com/eclipse-sailing-analytics/sailing-analytics/issues).
 
 ### Determining if an Issue Should be Created
 
@@ -22,7 +22,7 @@ Analyzing reports is a bit of work, so please ask yourself these questions befor
 
   * The problem may be caused by code that is not part of Sailing Analytics.
   * The problem may be caused by data being sent to Sailing Analytics through REST API calls.
-  * The behavior may be different from what you expect, but may be working as designed. Or the feature may need improvement. In this case, it would be an enhancement request. Feature requests can also be submitted to [Bugzilla](https://bugzilla.sapsailing.com).
+  * The behavior may be different from what you expect, but may be working as designed. Or the feature may need improvement. In this case, it would be an enhancement request. Feature requests can also be submitted to [Github Issues](https://github.com/eclipse-sailing-analytics/sailing-analytics/issues).
 
 * Is the problem reproducible in the latest release?
   
@@ -148,7 +148,7 @@ Submit the form to us through one of the following methods:
 
   1. Create a fork of the Sailing Analytics sources. 
 
-  1. Work on the change in your fork (either on the `master` branch or on a feature branch, typically named after the Bugzilla issue, such as ``bug1234``).
+  1. Work on the change in your fork (either on the `main` branch or on a feature branch, typically named after the Github issue number, such as ``bug1234``).
 
   1. Commit and push your changes.
 
@@ -165,7 +165,7 @@ Submit the form to us through one of the following methods:
 
 1. After the change has been approved, we will inform you in a comment.
 
-1. Due to internal SAP processes, your pull request cannot be merged directly into the branch. It will be merged internally, and will also immediately appear in the public repository.
+1. Due to internal SAP processes, your pull request cannot be merged directly into the [downstream branch](https://github.com/SAP/sailing-analytics). It will be merged internally, and will also immediately appear in the public repository.
 1. We will close the pull request. At that point, you can delete your branch.
 
 We look forward to hearing from you!
