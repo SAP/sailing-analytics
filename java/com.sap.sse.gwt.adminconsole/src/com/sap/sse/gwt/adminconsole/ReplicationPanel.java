@@ -308,33 +308,51 @@ public class ReplicationPanel extends FlowPanel {
     
     /**
      * Drops the replication connection for every replica currently selected in {@link #replicasTable}.
+     * Shows a single confirmation dialog listing all selected instances before issuing any RPC calls.
      */
     private void dropSelectedReplicas() {
         final Set<ReplicaDTO> selected = new HashSet<>(replicaSelectionModel.getSelectedSet());
-        replicaSelectionModel.clear();
-        for (final ReplicaDTO replica : selected) {
-            dropSingleReplica(replica);
+        if (!selected.isEmpty()) {
+            final StringBuilder list = new StringBuilder();
+            for (final ReplicaDTO replica : selected) {
+                list.append(replica.getName()).append(" (").append(replica.getAdditionalInformation()).append(")\n");
+            }
+            if (Window.confirm(stringMessages.reallyDropReplicas(list.toString()))) {
+                replicaSelectionModel.clear();
+                for (final ReplicaDTO replica : selected) {
+                    executeDropReplica(replica);
+                }
+            }
         }
     }
-    
+
     /**
-     * Calls {@link RemoteReplicationServiceAsync#stopSingleReplicaInstance} for the given replica and
-     * refreshes the list on both success and failure.
+     * Shows a confirmation dialog for the given single replica and, on confirmation, calls
+     * {@link #executeDropReplica}.
      */
     private void dropSingleReplica(final ReplicaDTO replica) {
         if (Window.confirm(stringMessages.reallyDropReplica(replica.getAdditionalInformation(), replica.getName()))) {
-            replicationServiceAsync.stopSingleReplicaInstance(replica.getIdentifier(), new AsyncCallback<Void>() {
-                @Override
-                public void onFailure(Throwable caught) {
-                    errorReporter.reportError(caught.getMessage());
-                    updateReplicaList();
-                }
-                @Override
-                public void onSuccess(Void result) {
-                    updateReplicaList();
-                }
-            });
+            executeDropReplica(replica);
         }
+    }
+
+    /**
+     * Issues the {@link RemoteReplicationServiceAsync#stopSingleReplicaInstance} RPC for the given
+     * replica and refreshes the list on both success and failure. No confirmation dialog — callers
+     * are responsible for confirming with the user before invoking this method.
+     */
+    private void executeDropReplica(final ReplicaDTO replica) {
+        replicationServiceAsync.stopSingleReplicaInstance(replica.getIdentifier(), new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                errorReporter.reportError(caught.getMessage());
+                updateReplicaList();
+            }
+            @Override
+            public void onSuccess(Void result) {
+                updateReplicaList();
+            }
+        });
     }
     
     private void stopReplication() {
