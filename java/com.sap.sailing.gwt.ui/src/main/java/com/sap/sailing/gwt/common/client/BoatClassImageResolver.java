@@ -27,6 +27,7 @@ public class BoatClassImageResolver {
         boatClassIconsMap.put(BoatClassMasterdata.PHRF.getDisplayName(), imageResources.PHRFIcon());
         boatClassIconsMap.put(BoatClassMasterdata._12M.getDisplayName(), imageResources._12mRIcon());
         boatClassIconsMap.put(BoatClassMasterdata._18Footer.getDisplayName(), imageResources._18FooterIcon());
+        boatClassIconsMap.put(BoatClassMasterdata._15M2_SNS.getDisplayName(), imageResources.SNS15m2Icon());
         boatClassIconsMap.put(BoatClassMasterdata._2_4M.getDisplayName(), imageResources._2_4mIcon());
         boatClassIconsMap.put(BoatClassMasterdata._29ER.getDisplayName(), imageResources._29erIcon());
         boatClassIconsMap.put(BoatClassMasterdata._420.getDisplayName(), imageResources._420Icon());
@@ -114,6 +115,7 @@ public class BoatClassImageResolver {
         boatClassIconsMap.put(BoatClassMasterdata.LASER_4_7.getDisplayName(), imageResources.Laser47Icon());
         boatClassIconsMap.put(BoatClassMasterdata.LASER_RADIAL.getDisplayName(), imageResources.LaserRadialIcon());
         boatClassIconsMap.put(BoatClassMasterdata.LAGO_26.getDisplayName(), imageResources.Lago26Icon());
+        boatClassIconsMap.put(BoatClassMasterdata.LACUSTRE.getDisplayName(), imageResources.LacustreIcon());
         boatClassIconsMap.put(BoatClassMasterdata.LONGTZE.getDisplayName(), imageResources.LongtzeIcon());
         boatClassIconsMap.put(BoatClassMasterdata.M32.getDisplayName(), imageResources.M32Icon());
         boatClassIconsMap.put(BoatClassMasterdata.MELGES_20.getDisplayName(), imageResources.Melges20Icon());
@@ -126,6 +128,7 @@ public class BoatClassImageResolver {
         boatClassIconsMap.put(BoatClassMasterdata.NACRA_17_FOIL.getDisplayName(), imageResources.Nacra17FoilIcon());
         boatClassIconsMap.put(BoatClassMasterdata.O_JOLLE.getDisplayName(), imageResources.OJolleIcon());
         boatClassIconsMap.put(BoatClassMasterdata.OK.getDisplayName(), imageResources.OKIcon());
+        boatClassIconsMap.put(BoatClassMasterdata.ONYX.getDisplayName(), imageResources.OnyxIcon());
         boatClassIconsMap.put(BoatClassMasterdata.OPEN_BIC.getDisplayName(), imageResources.OpenBicIcon());
         boatClassIconsMap.put(BoatClassMasterdata.OPTIMIST.getDisplayName(), imageResources.OptimistIcon());
         boatClassIconsMap.put(BoatClassMasterdata.PIRATE.getDisplayName(), imageResources.PiratIcon());
