@@ -17,6 +17,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.sap.sse.gwt.client.ErrorReporter;
+import com.sap.sse.gwt.client.async.MarkedAsyncCallback;
 import com.sap.sse.gwt.client.celltable.AbstractSortableTextColumn;
 import com.sap.sse.gwt.client.celltable.CellTableWithCheckboxResources;
 import com.sap.sse.gwt.client.celltable.EntityIdentityComparator;
@@ -83,7 +84,7 @@ public class RoleWithSecurityDTOTableWrapper extends
                         qualifiedForUser != null ? qualifiedForUser.getName() : null,
                         selectedRole.getRoleDefinition().getId(),
                         qualifiedForTenant == null ? null : qualifiedForTenant.getName(),
-                        selectedRole.isTransitive(), new AsyncCallback<SuccessInfo>() {
+                        selectedRole.isTransitive(), new MarkedAsyncCallback<SuccessInfo>(new AsyncCallback<SuccessInfo>() {
                             @Override
                             public void onFailure(Throwable caught) {
                                 Window.alert(stringMessages.couldNotRemoveRoleFromUser(selectedObject.getName(),
@@ -99,7 +100,7 @@ public class RoleWithSecurityDTOTableWrapper extends
                                     Window.alert(result.getMessage());
                                 }
                             }
-                        });
+                        }));
             } else {
                 Window.alert(stringMessages.pleaseSelect());
             }

@@ -364,6 +364,7 @@ implements ReplicableSecurityService, ClearStateTestSupport {
         this.hasPermissionsProvider = hasPermissionsProvider;
         this.cacheManager = loadReplicationCacheManagerContents();
         this.corsFilterConfigurationsByReplicaSetName = loadCORSFilterConfigurations();
+        applyCORSFilterForLocalReplicaSet();
         logger.info("Loaded shiro.ini file from: classpath:shiro.ini");
         final StringBuilder logMessage = new StringBuilder("[urls] section from Shiro configuration:");
         final Section urlsSection = shiroConfiguration.getSection("urls");
@@ -428,15 +429,18 @@ implements ReplicableSecurityService, ClearStateTestSupport {
         logger.info("Loading CORS filter configurations");
         final ConcurrentMap<String, Pair<Boolean, Set<String>>> result = new ConcurrentHashMap<>();
         result.putAll(PersistenceFactory.INSTANCE.getDefaultDomainObjectFactory().loadCORSFilterConfigurationsForReplicaSetNames());
-        if (result.containsKey(ServerInfo.getName())) {
-            final Pair<Boolean, Set<String>> thisServersCORSFilterConfig = result.get(ServerInfo.getName());
+        return result;
+    }
+
+    private void applyCORSFilterForLocalReplicaSet() {
+        if (corsFilterConfigurationsByReplicaSetName.containsKey(ServerInfo.getName())) {
+            final Pair<Boolean, Set<String>> thisServersCORSFilterConfig = corsFilterConfigurationsByReplicaSetName.get(ServerInfo.getName());
             if (thisServersCORSFilterConfig.getA()) {
                 getCORSFilterConfiguration().setWildcard();
             } else {
                 getCORSFilterConfiguration().setOrigins(thisServersCORSFilterConfig.getB());
             }
         }
-        return result;
     }
     
     @Override
@@ -2665,6 +2669,7 @@ implements ReplicableSecurityService, ClearStateTestSupport {
         final SecurityServiceInitialLoadExtensionsDTO initialLoadExtensions = (SecurityServiceInitialLoadExtensionsDTO) is.readObject();
         final ConcurrentMap<String, Pair<Boolean, Set<String>>> newCORSFilterConfigurations = initialLoadExtensions.getCorsFilterConfigurationsByReplicaSetName();
         corsFilterConfigurationsByReplicaSetName.putAll(newCORSFilterConfigurations);
+        applyCORSFilterForLocalReplicaSet();
         if (initialLoadExtensions.getClientIPBasedTimedLocksForBearerTokenAuthentication() != null) {
             // checking for null for backward compatibility; an older primary/master may not have known this field yet
             clientIPBasedTimedLocksForBearerTokenAuthentication.putAll(initialLoadExtensions.getClientIPBasedTimedLocksForBearerTokenAuthentication());
