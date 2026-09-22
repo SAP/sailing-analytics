@@ -319,8 +319,11 @@ public class MasterDataResource extends AbstractSailingServerResource {
      * ever materializing them all in memory. Each device is streamed exactly once over its merged, non-overlapping
      * {@link MultiTimeRange} sub-ranges (see {@link TopLevelMasterData#getRaceLogTrackingDeviceRanges()}); a device
      * mapped in several regattas therefore no longer has its fixes streamed several times. The mapping ends carried in
-     * the ranges are inclusive, so each sub-range is loaded with {@code toIsInclusive == true}; an open sub-range end
-     * ({@code null}) streams up to the end of the device's fixes. {@link ObjectOutputStream#reset()} is called both
+     * the ranges are already exclusive (each mapping's inclusive end was converted to an exclusive range end by adding
+     * one {@link com.sap.sse.common.TimePoint} resolution unit in
+     * {@link TopLevelMasterData#getRaceLogTrackingDeviceRanges()}), so each sub-range is loaded with
+     * {@code toIsInclusive == false}; an open sub-range end ({@code null}) streams up to the end of the device's
+     * fixes. {@link ObjectOutputStream#reset()} is called both
      * after every {@link #FIXES_PER_HANDLE_TABLE_RESET} fixes within a device section and once more at the end of each
      * device section. A device's merged {@link MultiTimeRange} can span an entire season, so resetting only per device
      * would let the handle table accumulate that device's whole season of fixes (and everything transitively reachable
@@ -356,7 +359,7 @@ public class MasterDataResource extends AbstractSailingServerResource {
                         } catch (final IOException e) {
                             throw new WriteFixException(e);
                         }
-                    }, device, range.from(), range.to(), true);
+                    }, device, range.from(), range.to(), false);
                 }
                 objectOutputStream.writeObject(null);
                 objectOutputStream.reset();

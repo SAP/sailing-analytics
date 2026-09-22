@@ -33,6 +33,7 @@ import com.sap.sailing.domain.racelog.tracking.SensorFixStore;
 import com.sap.sailing.domain.tracking.RaceTrackingConnectivityParameters;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sse.common.MultiTimeRange;
+import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.TimeRange;
 import com.sap.sse.common.Util;
 
@@ -56,11 +57,11 @@ public class TopLevelMasterData implements Serializable {
      * exporter re-stream that device's fixes once per mapping. Folding all of a device's mapping intervals into a
      * single {@link MultiTimeRange} (via {@link MultiTimeRange#union(TimeRange)}) lets the exporter stream each
      * device exactly once over its coalesced, non-overlapping sub-ranges. The mapping end from
-     * {@link RegattaLogDeviceMappingEvent#getToInclusive()} is inclusive; it is carried through as the range end and
-     * the exporter always loads fixes with {@code toIsInclusive == true}. Because {@link MultiTimeRange} treats a
-     * range end as exclusive, two intervals adjacent only at that inclusive instant may coalesce one instant early;
-     * that only ever streams a superset of fixes (never drops one), and identical fixes are idempotent on store, so
-     * it is harmless.
+     * {@link RegattaLogDeviceMappingEvent#getToInclusive()} is <em>inclusive</em>, whereas {@link TimeRange#to()} is
+     * <em>exclusive</em>; each mapping's inclusive end is therefore converted to an exclusive range end by adding one
+     * {@link TimePoint} resolution unit (see {@link #addRangeIfMappingEvent}), so a single-instant mapping such as a
+     * pinged mark ({@code from == toInclusive}) becomes a non-empty range instead of an empty one that
+     * {@link MultiTimeRange} would silently drop. The exporter loads these ranges with {@code toIsInclusive == false}.
      */
     private final Map<DeviceIdentifier, MultiTimeRange> raceLogTrackingDeviceRanges;
     private transient SensorFixStore sensorFixStore;
@@ -119,10 +120,9 @@ public class TopLevelMasterData implements Serializable {
      * {@code RaceLog}, so only the regatta logs need to be scanned. Every mapping event for a given device is folded
      * into that device's accumulated {@link MultiTimeRange} via {@link MultiTimeRange#union(TimeRange)} so the
      * exporter streams each device exactly once over its coalesced, non-overlapping sub-ranges rather than once per
-     * mapping event. The inclusive mapping end from {@link RegattaLogDeviceMappingEvent#getToInclusive()} is carried
-     * through as the (exclusive-typed) {@link TimeRange} end; the exporter always loads fixes with
-     * {@code toIsInclusive == true}, so at worst two intervals adjacent only at that instant coalesce one instant
-     * early, streaming a harmless superset of fixes.
+     * mapping event. The <em>inclusive</em> mapping end from {@link RegattaLogDeviceMappingEvent#getToInclusive()} is
+     * converted to an <em>exclusive</em> {@link TimeRange} end in {@link #addRangeIfMappingEvent}; the exporter then
+     * loads fixes with {@code toIsInclusive == false}.
      */
     private static Map<DeviceIdentifier, MultiTimeRange> collectRaceLogTrackingDeviceRanges(
             Set<LeaderboardGroup> groupsToExport) {
@@ -146,7 +146,20 @@ public class TopLevelMasterData implements Serializable {
         if (logEvent instanceof RegattaLogDeviceMappingEvent<?>) {
             final RegattaLogDeviceMappingEvent<?> mappingEvent = (RegattaLogDeviceMappingEvent<?>) logEvent;
             final DeviceIdentifier device = mappingEvent.getDevice();
-            final TimeRange mappingRange = TimeRange.create(mappingEvent.getFrom(), mappingEvent.getToInclusive());
+            final TimePoint from = mappingEvent.getFrom();
+            final TimePoint toInclusive = mappingEvent.getToInclusive();
+            // RegattaLogDeviceMappingEvent.getToInclusive() is an INCLUSIVE end, whereas TimeRange.to() is EXCLUSIVE.
+            // As mandated by that method's Javadoc, we bridge the gap by adding one TimePoint resolution unit to the
+            // inclusive end to obtain a valid exclusive TimeRange end that still includes the mapping's last instant.
+            // This is what makes a single-instant PING mapping ([t, t] inclusive) a non-empty range [t, t+1ms) rather
+            // than an empty range that MultiTimeRange would silently discard (see bug6227).
+            // WARNING: this hard-codes the current TimePoint resolution of 1 millisecond (see TimePoint.plus(long)).
+            // Should a TimePoint implementation with a finer-than-1ms resolution ever be introduced, this +1ms would be
+            // wrong (it could span multiple representable instants). The clean fix would be a queryable resolution on
+            // TimePoint, e.g. toInclusive.plus(toInclusive.getResolution()); until then, keep this in lock-step with
+            // the resolution assumed elsewhere and with the exporter loading these ranges with toIsInclusive == false.
+            final TimePoint toExclusive = toInclusive == null ? null : toInclusive.plus(1);
+            final TimeRange mappingRange = TimeRange.create(from, toExclusive);
             final MultiTimeRange existing = deviceRanges.get(device);
             final MultiTimeRange merged = existing == null ? MultiTimeRange.of(mappingRange)
                     : existing.union(mappingRange);
