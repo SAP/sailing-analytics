@@ -58,6 +58,12 @@ import com.sap.sse.security.shared.impl.User;
 @Path(MasterDataImportConstants.MASTER_DATA_RESOURCE_BASE_URL)
 public class MasterDataResource extends AbstractSailingServerResource {
     private static final Logger logger = Logger.getLogger(MasterDataResource.class.getName());
+    /**
+     * Number of fixes written between {@link ObjectOutputStream#reset()} calls while streaming a single device's
+     * race-log tracking fixes; see {@link #writeRaceLogTrackingFixes(TopLevelMasterData, ObjectOutputStream)} for why
+     * the handle table must be cleared within a device section and not only between devices (bug6227).
+     */
+    private static final int FIXES_PER_HANDLE_TABLE_RESET = 1000;
 
     @POST
     @Produces("application/x-java-serialized-object")
@@ -314,17 +320,20 @@ public class MasterDataResource extends AbstractSailingServerResource {
      * {@link MultiTimeRange} sub-ranges (see {@link TopLevelMasterData#getRaceLogTrackingDeviceRanges()}); a device
      * mapped in several regattas therefore no longer has its fixes streamed several times. The mapping ends carried in
      * the ranges are inclusive, so each sub-range is loaded with {@code toIsInclusive == true}; an open sub-range end
-     * ({@code null}) streams up to the end of the device's fixes. {@link ObjectOutputStream#reset()} is called once per
-     * device section rather than after every fix: a reset discards the handle table, so the object written after it
-     * must re-emit the full class descriptor hierarchy of the fix type (several hundred bytes) instead of
-     * back-referencing it; doing that after every fix would dwarf the ~30 bytes of actual fix payload and add per-fix
-     * class resolution work on the reading end. Resetting once per device bounds the retained handle set to a single
-     * device's fixes (all the memory goal requires) while keeping the class descriptor shared across that device's
-     * fixes. The framing uses {@code null} sentinels (never fix counts, which a concurrent write could invalidate):
-     * each device section is terminated by a {@code null} fix, and the whole section is terminated by a {@code null}
-     * device. The reset is issued after a device section's {@code null} fix terminator and before the next device's
-     * header, which is a natural per-device boundary; {@code TC_RESET} is an independent stream token that the reader
-     * consumes transparently, so its exact position relative to the {@code null} sentinels does not affect framing.
+     * ({@code null}) streams up to the end of the device's fixes. {@link ObjectOutputStream#reset()} is called both
+     * after every {@link #FIXES_PER_HANDLE_TABLE_RESET} fixes within a device section and once more at the end of each
+     * device section. A device's merged {@link MultiTimeRange} can span an entire season, so resetting only per device
+     * would let the handle table accumulate that device's whole season of fixes (and everything transitively reachable
+     * from them) before the first reset, which is what exhausted the heap (bug6227). Resetting every
+     * {@link #FIXES_PER_HANDLE_TABLE_RESET} fixes instead bounds the retained handle set to that many fixes regardless
+     * of how long a device's ranges are. A reset discards the handle table, so the object written after it must
+     * re-emit the full class descriptor hierarchy of the fix type (several hundred bytes) instead of back-referencing
+     * it; batching the reset amortizes that descriptor re-emission (and the reader's class resolution) over
+     * {@link #FIXES_PER_HANDLE_TABLE_RESET} fixes rather than paying it per fix, and the repeated descriptors compress
+     * well in the gzip stream. The framing uses {@code null} sentinels (never fix counts, which a concurrent write
+     * could invalidate): each device section is terminated by a {@code null} fix, and the whole section is terminated
+     * by a {@code null} device. {@code TC_RESET} is an independent stream token that the reader consumes transparently,
+     * so its position relative to the {@code null} sentinels does not affect framing.
      */
     private void writeRaceLogTrackingFixes(final TopLevelMasterData masterData,
             final ObjectOutputStream objectOutputStream) throws IOException {
@@ -334,10 +343,16 @@ public class MasterDataResource extends AbstractSailingServerResource {
                     .entrySet()) {
                 final DeviceIdentifier device = deviceRange.getKey();
                 objectOutputStream.writeObject(device);
+                final int[] fixesSinceLastReset = new int[] { 0 };
                 for (final TimeRange range : deviceRange.getValue()) {
                     sensorFixStore.loadFixes(fix -> {
                         try {
                             objectOutputStream.writeObject(fix);
+                            fixesSinceLastReset[0]++;
+                            if (fixesSinceLastReset[0] >= FIXES_PER_HANDLE_TABLE_RESET) {
+                                objectOutputStream.reset();
+                                fixesSinceLastReset[0] = 0;
+                            }
                         } catch (final IOException e) {
                             throw new WriteFixException(e);
                         }
