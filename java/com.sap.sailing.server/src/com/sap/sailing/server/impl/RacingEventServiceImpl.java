@@ -145,6 +145,7 @@ import com.sap.sailing.domain.common.DataImportSubProgress;
 import com.sap.sailing.domain.common.DetailType;
 import com.sap.sailing.domain.common.DeviceIdentifier;
 import com.sap.sailing.domain.common.LeaderboardType;
+import com.sap.sailing.domain.common.MasterDataImportObjectCreationCount;
 import com.sap.sailing.domain.common.MaxPointsReason;
 import com.sap.sailing.domain.common.NoWindException;
 import com.sap.sailing.domain.common.RaceIdentifier;
@@ -4692,9 +4693,26 @@ Replicator {
     }
 
     @Override
+    public DataImportProgress createOrUpdateDataImportProgressWithReplication(UUID importOperationId,
+            double overallProgressPct, DataImportSubProgress subProgress, double subProgressPct,
+            final MasterDataImportObjectCreationCount result) {
+        // Create/Update locally, including the final result
+        final DataImportProgress progress = createOrUpdateDataImportProgressWithoutReplication(importOperationId,
+                overallProgressPct, subProgress, subProgressPct);
+        if (result != null) {
+            progress.setResult(result);
+        }
+        // Create/Update on replicas, carrying the same result so a client polling a replica flips getResult() at the
+        // same true completion point as the master (see bug6227)
+        replicate(new CreateOrUpdateDataImportProgress(importOperationId, overallProgressPct, subProgress,
+                subProgressPct, result));
+        return progress;
+    }
+
+    @Override
     public DataImportProgress createOrUpdateDataImportProgressWithoutReplication(UUID importOperationId,
             double overallProgressPct, DataImportSubProgress subProgress, double subProgressPct) {
-        DataImportProgress progress = dataImportLock.getProgress(importOperationId);
+        DataImportProgress progress = getDataImportLock().getProgress(importOperationId);
         boolean newObject = false;
         if (progress == null) {
             progress = new DataImportProgressImpl(importOperationId);
@@ -4704,7 +4722,7 @@ Replicator {
         progress.setCurrentSubProgress(subProgress);
         progress.setCurrentSubProgressPct(subProgressPct);
         if (newObject) {
-            dataImportLock.addProgress(importOperationId, progress);
+            getDataImportLock().addProgress(importOperationId, progress);
         }
         return progress;
     }

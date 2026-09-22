@@ -116,14 +116,18 @@ public class MasterDataImporter {
         }
         racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId, 0.3,
                 DataImportSubProgress.TRANSFER_COMPLETED, 0.5);
-        applyMasterDataImportOperation(topLevelMasterData, importOperationId, override);
+        final MasterDataImportObjectCreationCount creationCount = applyMasterDataImportOperation(topLevelMasterData,
+                importOperationId, override);
         // The ImportMasterDataOperation applied above deliberately stops short of overall completion (it ends at 0.6
         // after waiting for tracked races to load); the wind tracks and the sensor fixes are streamed as top-level
         // objects after the operation's object graph and are imported here (see bug6227). Because the wind and
         // sensor-fix imports usually dominate the overall time, 20% of the progress bar is reserved for each: overall
         // progress rises monotonically from 0.6 through the wind band (0.6 -> 0.8) and the sensor-fix band
         // (0.8 -> 1.0), and the single terminal "Done" marker plus overall 1.0 is emitted here, at the true end of
-        // the whole import, rather than prematurely inside the operation.
+        // the whole import, rather than prematurely inside the operation. The operation's result is likewise published
+        // only here, with replication, so that a client polling either the master or a replica sees
+        // DataImportProgress.getResult() turn non-null only at genuine completion (after the sensor-fix import), not
+        // when the object-graph operation returns at 0.6 (see bug6227).
         final ClassLoader oldContextClassLoaderForStreamedData = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(racingEventService.getDeserializationClassLoader());
         try {
@@ -138,7 +142,7 @@ public class MasterDataImporter {
             Thread.currentThread().setContextClassLoader(oldContextClassLoaderForStreamedData);
         }
         racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId, 1.0,
-                DataImportSubProgress.IMPORT_SENSOR_FIXES, 1.0);
+                DataImportSubProgress.IMPORT_SENSOR_FIXES, 1.0, creationCount);
         logger.info("Done importing master data into " + racingEventService);
         return topLevelMasterData.getEventForLeaderboardGroup();
     }

@@ -167,13 +167,15 @@ public class ImportMasterDataOperation extends
             progress.setOverAllProgressPct(0.6);
             progress.setCurrentSubProgressPct(0);
             waitForTrackedRacesToFinishLoading(trackedRacesToWaitForLoadingComplete);
-            dataImportLock.getProgress(importOperationId).setResult(creationCount);
-            // Deliberately do not mark overall completion (1.0) or log "Done" here. This operation applies only the
-            // object graph; the wind tracks and sensor fixes are streamed and imported afterwards by
-            // MasterDataImporter.importFromStream, which owns the terminal 1.0 progress and the single "Done" log at
-            // the true end of the whole import (see bug6227). This operation therefore ends at 0.6, set above after
-            // waiting for the tracked races to load, leaving 0.6 -> 0.8 for the wind band and 0.8 -> 1.0 for the
-            // sensor-fix band, the two phases that usually dominate the import.
+            // Deliberately do not publish the result, mark overall completion (1.0), or log "Done" here. This
+            // operation applies only the object graph; the wind tracks and sensor fixes are streamed and imported
+            // afterwards by MasterDataImporter.importFromStream, which owns the terminal 1.0 progress, the single
+            // "Done" log, and the result publication (with replication) at the true end of the whole import. Publishing
+            // the result here would let a client polling either the master or a replica report success before the wind
+            // and sensor-fix imports have even started (see bug6227). The result is still returned to the caller below,
+            // which carries it out to MasterDataImporter for publication at genuine completion. This operation
+            // therefore ends at 0.6, set above after waiting for the tracked races to load, leaving 0.6 -> 0.8 for the
+            // wind band and 0.8 -> 1.0 for the sensor-fix band, the two phases that usually dominate the import.
             return creationCount;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error during execution of ImportMasterDataOperation", e);
