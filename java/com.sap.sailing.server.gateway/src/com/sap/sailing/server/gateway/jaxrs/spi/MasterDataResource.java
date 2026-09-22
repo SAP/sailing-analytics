@@ -34,18 +34,21 @@ import com.sap.sailing.domain.base.Event;
 import com.sap.sailing.domain.base.Regatta;
 import com.sap.sailing.domain.base.configuration.DeviceConfiguration;
 import com.sap.sailing.domain.base.impl.CompetitorSerializationCustomizer;
+import com.sap.sailing.domain.common.DeviceIdentifier;
 import com.sap.sailing.domain.common.media.MediaTrack;
 import com.sap.sailing.domain.leaderboard.Leaderboard;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroup;
 import com.sap.sailing.domain.leaderboard.RegattaLeaderboard;
 import com.sap.sailing.domain.masterdataimport.TopLevelMasterData;
-import com.sap.sailing.domain.masterdataimport.TopLevelMasterData.DeviceMappingDescriptor;
+import com.sap.sailing.domain.masterdataimport.WindTrackMasterData;
 import com.sap.sailing.domain.racelog.tracking.SensorFixStore;
 import com.sap.sailing.domain.tracking.RaceTrackingConnectivityParameters;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.server.gateway.interfaces.MasterDataImportConstants;
 import com.sap.sailing.shared.server.gateway.jaxrs.AbstractSailingServerResource;
+import com.sap.sse.common.MultiTimeRange;
 import com.sap.sse.common.NoCorrespondingServiceRegisteredException;
+import com.sap.sse.common.TimeRange;
 import com.sap.sse.common.TransformationException;
 import com.sap.sse.security.SecurityService;
 import com.sap.sse.security.shared.impl.SecuredSecurityTypes.PublicReadableActions;
@@ -64,7 +67,7 @@ public class MasterDataResource extends AbstractSailingServerResource {
             @QueryParam(MasterDataImportConstants.QUERY_PARAM_EXPORT_TRACKED_RACES_AND_START_TRACKING) Boolean exportTrackedRacesAndStartTracking)
             throws UnsupportedEncodingException {
         final SecurityService securityService = getSecurityService();
-        User user = securityService.getCurrentUser();
+        final User user = securityService.getCurrentUser();
         securityService.checkCurrentUserServerPermission(ServerActions.CAN_EXPORT_MASTERDATA);
         final long startTime = System.currentTimeMillis();
         logger.info("Masterdataexport has started; requesting user: "+user.getName());
@@ -81,8 +84,8 @@ public class MasterDataResource extends AbstractSailingServerResource {
             exportTrackedRacesAndStartTracking = false;
         }
         logger.info(String.format("Masterdataexport gzip compression is turned %s", compress ? "on" : "off"));
-        Map<UUID, LeaderboardGroup> allLeaderboardGroups = getService().getLeaderboardGroups();
-        Set<LeaderboardGroup> groupsToExport = new HashSet<LeaderboardGroup>();
+        final Map<UUID, LeaderboardGroup> allLeaderboardGroups = getService().getLeaderboardGroups();
+        final Set<LeaderboardGroup> groupsToExport = new HashSet<LeaderboardGroup>();
         if (requestedLeaderboardGroupsUuids.isEmpty()) {
             // Add all visible LeaderboardGroups.
             // The request will not fail due to missing LeaderboardGroup READ permissions.
@@ -106,7 +109,7 @@ public class MasterDataResource extends AbstractSailingServerResource {
             }
         }
         final List<Serializable> competitorIds = new ArrayList<Serializable>();
-        Set<RaceTrackingConnectivityParameters> connectivityParametersToRestore = new HashSet<>();
+        final Set<RaceTrackingConnectivityParameters> connectivityParametersToRestore = new HashSet<>();
         for (LeaderboardGroup lg : groupsToExport) {
             for (Leaderboard leaderboard : lg.getLeaderboards()) {
                 // All Leaderboards/Regattas contained in the LeaderboardGroup need to be visible
@@ -147,7 +150,7 @@ public class MasterDataResource extends AbstractSailingServerResource {
                 }
             }
         }
-        Set<DeviceConfiguration> raceManagerDeviceConfigurations = new HashSet<>();
+        final Set<DeviceConfiguration> raceManagerDeviceConfigurations = new HashSet<>();
         if (exportDeviceConfigs) {
             for (DeviceConfiguration deviceConfig : getAllDeviceConfigs()) {
                 // DeviceConfiguration are explicitly filtered by their permissions
@@ -158,15 +161,15 @@ public class MasterDataResource extends AbstractSailingServerResource {
                 }
             }
         }
-        ArrayList<Event> events = new ArrayList<>();
+        final ArrayList<Event> events = new ArrayList<>();
         for (Event event : getService().getAllEvents()) {
             events.add(event);
         }
-        ArrayList<MediaTrack> mediaTracks = new ArrayList<>();
+        final ArrayList<MediaTrack> mediaTracks = new ArrayList<>();
         for (MediaTrack mediaTrack : getService().getAllMediaTracks()) {
             mediaTracks.add(mediaTrack);
         }
-        Map<String, Regatta> regattaRaceIds = new HashMap<>();
+        final Map<String, Regatta> regattaRaceIds = new HashMap<>();
         for (Entry<String, Regatta> regattaRaceMap : getService().getPersistentRegattasForRaceIDs().entrySet()) {
             regattaRaceIds.put(regattaRaceMap.getKey(), regattaRaceMap.getValue());
         }
@@ -191,12 +194,12 @@ public class MasterDataResource extends AbstractSailingServerResource {
         } else {
             streamingOutput = new NonCompressingStreamingOutput(masterData, competitorIds, startTime, securityService);
         }
-        ResponseBuilder resp = Response.ok(streamingOutput);
+        final ResponseBuilder resp = Response.ok(streamingOutput);
         if (compress) {
             resp.header("Content-Encoding", "gzip");
         }
         final Response builtResponse = resp.build();
-        long timeToExport = System.currentTimeMillis() - startTime;
+        final long timeToExport = System.currentTimeMillis() - startTime;
         logger.info(String.format("Took %s ms to start masterdataexport-streaming.", timeToExport));
         return builtResponse;
     }
@@ -279,7 +282,27 @@ public class MasterDataResource extends AbstractSailingServerResource {
         objectOutputStream.writeObject(competitorIds);
         objectOutputStream.writeObject(masterData.getAllRegattas());
         objectOutputStream.writeObject(masterData);
+        writeWindTracks(masterData, objectOutputStream);
         writeRaceLogTrackingFixes(masterData, objectOutputStream);
+    }
+
+    /**
+     * Streams the {@link WindTrackMasterData} objects as top-level stream objects, one after another, after the
+     * (wind-free) {@code masterData} has been written (see bug6227). A season's {@link WindTrackMasterData#getWindTrack()
+     * wind tracks} can grow large; keeping them inside the {@link TopLevelMasterData} object graph would retain every
+     * one of them in the reading stream's handle table for back-reference resolution. Writing each as a top-level
+     * object and clearing the serialization handle table via {@link ObjectOutputStream#reset()} between them means at
+     * most one {@link WindTrackMasterData} is retained at a time. The section is framed by a trailing {@code null}
+     * sentinel (never a count, which a concurrent change could invalidate). The {@link ObjectOutputStream#reset()} is
+     * issued after each object; {@code TC_RESET} is an independent stream token the reader consumes transparently.
+     */
+    private void writeWindTracks(final TopLevelMasterData masterData, final ObjectOutputStream objectOutputStream)
+            throws IOException {
+        for (final WindTrackMasterData windTrackMasterData : masterData.getWindTrackMasterDataForStreaming()) {
+            objectOutputStream.writeObject(windTrackMasterData);
+            objectOutputStream.reset();
+        }
+        objectOutputStream.writeObject(null);
     }
 
     /**
@@ -287,31 +310,39 @@ public class MasterDataResource extends AbstractSailingServerResource {
      * (fix-free) {@code masterData} has been written. See bug6227: writing each fix as a top-level object and clearing
      * the serialization handle table via {@link ObjectOutputStream#reset()} means no fix object is retained for
      * back-reference resolution, allowing the fixes to be streamed straight from the {@link SensorFixStore} without
-     * ever materializing them all in memory. {@link ObjectOutputStream#reset()} is called once per device section
-     * rather than after every fix: a reset discards the handle table, so the object written after it must re-emit the
-     * full class descriptor hierarchy of the fix type (several hundred bytes) instead of back-referencing it; doing that
-     * after every fix would dwarf the ~30 bytes of actual fix payload and add per-fix class resolution work on the
-     * reading end. Resetting once per device bounds the retained handle set to a single device's fixes (all the memory
-     * goal requires) while keeping the class descriptor shared across that device's fixes. The framing uses
-     * {@code null} sentinels (never fix counts, which a concurrent write could invalidate): each device section is
-     * terminated by a {@code null} fix, and the whole section is terminated by a {@code null} device. The reset is
-     * issued after a device section's {@code null} fix terminator and before the next device's header, which is a
-     * natural per-device boundary; {@code TC_RESET} is an independent stream token that the reader consumes
-     * transparently, so its exact position relative to the {@code null} sentinels does not affect framing.
+     * ever materializing them all in memory. Each device is streamed exactly once over its merged, non-overlapping
+     * {@link MultiTimeRange} sub-ranges (see {@link TopLevelMasterData#getRaceLogTrackingDeviceRanges()}); a device
+     * mapped in several regattas therefore no longer has its fixes streamed several times. The mapping ends carried in
+     * the ranges are inclusive, so each sub-range is loaded with {@code toIsInclusive == true}; an open sub-range end
+     * ({@code null}) streams up to the end of the device's fixes. {@link ObjectOutputStream#reset()} is called once per
+     * device section rather than after every fix: a reset discards the handle table, so the object written after it
+     * must re-emit the full class descriptor hierarchy of the fix type (several hundred bytes) instead of
+     * back-referencing it; doing that after every fix would dwarf the ~30 bytes of actual fix payload and add per-fix
+     * class resolution work on the reading end. Resetting once per device bounds the retained handle set to a single
+     * device's fixes (all the memory goal requires) while keeping the class descriptor shared across that device's
+     * fixes. The framing uses {@code null} sentinels (never fix counts, which a concurrent write could invalidate):
+     * each device section is terminated by a {@code null} fix, and the whole section is terminated by a {@code null}
+     * device. The reset is issued after a device section's {@code null} fix terminator and before the next device's
+     * header, which is a natural per-device boundary; {@code TC_RESET} is an independent stream token that the reader
+     * consumes transparently, so its exact position relative to the {@code null} sentinels does not affect framing.
      */
     private void writeRaceLogTrackingFixes(final TopLevelMasterData masterData,
             final ObjectOutputStream objectOutputStream) throws IOException {
         final SensorFixStore sensorFixStore = masterData.getSensorFixStore();
         try {
-            for (final DeviceMappingDescriptor descriptor : masterData.getRaceLogTrackingFixMappings()) {
-                objectOutputStream.writeObject(descriptor.getDevice());
-                sensorFixStore.loadFixes(fix -> {
-                    try {
-                        objectOutputStream.writeObject(fix);
-                    } catch (final IOException e) {
-                        throw new WriteFixException(e);
-                    }
-                }, descriptor.getDevice(), descriptor.getFrom(), descriptor.getToInclusive(), true);
+            for (final Entry<DeviceIdentifier, MultiTimeRange> deviceRange : masterData.getRaceLogTrackingDeviceRanges()
+                    .entrySet()) {
+                final DeviceIdentifier device = deviceRange.getKey();
+                objectOutputStream.writeObject(device);
+                for (final TimeRange range : deviceRange.getValue()) {
+                    sensorFixStore.loadFixes(fix -> {
+                        try {
+                            objectOutputStream.writeObject(fix);
+                        } catch (final IOException e) {
+                            throw new WriteFixException(e);
+                        }
+                    }, device, range.from(), range.to(), true);
+                }
                 objectOutputStream.writeObject(null);
                 objectOutputStream.reset();
             }

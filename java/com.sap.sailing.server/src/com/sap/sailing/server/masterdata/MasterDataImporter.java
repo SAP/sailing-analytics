@@ -23,20 +23,23 @@ import com.sap.sailing.domain.base.impl.RegattaImpl;
 import com.sap.sailing.domain.common.DataImportSubProgress;
 import com.sap.sailing.domain.common.DeviceIdentifier;
 import com.sap.sailing.domain.common.MasterDataImportObjectCreationCount;
+import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixImpl;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixMovingImpl;
 import com.sap.sailing.domain.common.tracking.impl.VeryCompactGPSFixImpl;
 import com.sap.sailing.domain.common.tracking.impl.VeryCompactGPSFixMovingImpl;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroup;
 import com.sap.sailing.domain.masterdataimport.TopLevelMasterData;
+import com.sap.sailing.domain.masterdataimport.WindTrackMasterData;
 import com.sap.sailing.domain.persistence.MongoRaceLogStoreFactory;
 import com.sap.sailing.domain.racelog.RaceLogStore;
 import com.sap.sailing.domain.racelog.tracking.SensorFixStore;
+import com.sap.sailing.domain.tracking.DummyTrackedRace;
+import com.sap.sailing.domain.tracking.WindTrack;
 import com.sap.sailing.server.interfaces.RacingEventService;
 import com.sap.sailing.server.operationaltransformation.ImportMasterDataOperation;
 import com.sap.sse.common.NoCorrespondingServiceRegisteredException;
 import com.sap.sse.common.Timed;
-import com.sap.sse.common.Util;
 import com.sap.sse.security.shared.QualifiedObjectIdentifier;
 import com.sap.sse.security.shared.WithQualifiedObjectIdentifier;
 import com.sap.sse.security.shared.impl.User;
@@ -114,17 +117,86 @@ public class MasterDataImporter {
         racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId, 0.3,
                 DataImportSubProgress.TRANSFER_COMPLETED, 0.5);
         applyMasterDataImportOperation(topLevelMasterData, importOperationId, override);
-        racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId, 0.7,
-                DataImportSubProgress.IMPORT_SENSOR_FIXES, 0);
-        final ClassLoader oldContextClassLoaderForFixes = Thread.currentThread().getContextClassLoader();
+        // The ImportMasterDataOperation applied above deliberately stops short of overall completion (it ends at 0.6
+        // after waiting for tracked races to load); the wind tracks and the sensor fixes are streamed as top-level
+        // objects after the operation's object graph and are imported here (see bug6227). Because the wind and
+        // sensor-fix imports usually dominate the overall time, 20% of the progress bar is reserved for each: overall
+        // progress rises monotonically from 0.6 through the wind band (0.6 -> 0.8) and the sensor-fix band
+        // (0.8 -> 1.0), and the single terminal "Done" marker plus overall 1.0 is emitted here, at the true end of
+        // the whole import, rather than prematurely inside the operation.
+        final ClassLoader oldContextClassLoaderForStreamedData = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(racingEventService.getDeserializationClassLoader());
         try {
+            racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId, 0.6,
+                    DataImportSubProgress.IMPORT_WIND_TRACKS, 0);
+            importWindTracks(objectInputStream, importOperationId);
+            racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId, 0.8,
+                    DataImportSubProgress.IMPORT_SENSOR_FIXES, 0);
             importRaceLogTrackingGPSFixes(objectInputStream, importOperationId,
-                    Util.size(topLevelMasterData.getRaceLogTrackingFixMappings()));
+                    topLevelMasterData.getRaceLogTrackingDeviceRanges().size());
         } finally {
-            Thread.currentThread().setContextClassLoader(oldContextClassLoaderForFixes);
+            Thread.currentThread().setContextClassLoader(oldContextClassLoaderForStreamedData);
         }
+        racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId, 1.0,
+                DataImportSubProgress.IMPORT_SENSOR_FIXES, 1.0);
+        logger.info("Done importing master data into " + racingEventService);
         return topLevelMasterData.getEventForLeaderboardGroup();
+    }
+
+    /**
+     * Reads and stores the {@link WindTrackMasterData} objects that the exporter streamed as top-level objects after
+     * the {@link TopLevelMasterData} and before the sensor-fix section (see bug6227). Each {@link WindTrackMasterData}
+     * is read on its own so that at most one of them (with its potentially large {@link WindTrack}) is held in memory
+     * at a time, rather than the whole set being materialized inside the deserialized object graph and retained in the
+     * {@link ObjectInputStream} handle table. The wire framing uses a {@code null} sentinel: the section is terminated
+     * by a {@code null} in place of the next {@link WindTrackMasterData}.
+     * <p>
+     * As with {@link #importRaceLogTrackingGPSFixes(ObjectInputStream, UUID, int) the sensor-fix section}, this only
+     * ever runs on the primary/master: a replica receives wind data through the tracked-race loading replication, not
+     * through this stream, and only ever gets the {@link TopLevelMasterData#copyAndStripOffDataNotNeededOnReplicas()
+     * stripped} {@link ImportMasterDataOperation}. A non-{@code null}
+     * {@link RacingEventService#getMasterDescriptor() master descriptor} therefore means a replica has erroneously
+     * reached this stream-based path, which is a broken routing state; it is reported by throwing an
+     * {@link IllegalStateException} rather than silently draining, so the fault surfaces instead of being hidden. This
+     * mirrors the logic that previously lived in {@code ImportMasterDataOperation.createWindTracks}, moved here so that
+     * the large wind tracks travel through the streaming path instead of the operation's object graph.
+     */
+    private void importWindTracks(final ObjectInputStream objectInputStream, final UUID importOperationId)
+            throws IOException, ClassNotFoundException {
+        if (racingEventService.getMasterDescriptor() != null) {
+            throw new IllegalStateException(
+                    "Master data import from an ObjectInputStream reached a replica RacingEventService; such requests "
+                            + "must always be routed to the primary/master. The primary loads the tracked races with "
+                            + "their fixes and those transactions are replicated; a replica only ever receives the "
+                            + "stripped ImportMasterDataOperation, never the wind-track stream.");
+        } else {
+            Object next = objectInputStream.readObject();
+            while (next != null) {
+                final WindTrackMasterData windMasterData = (WindTrackMasterData) next;
+                final DummyTrackedRace trackedRaceWithNameAndId = new DummyTrackedRace(windMasterData.getRaceName(),
+                        windMasterData.getRaceId());
+                final WindTrack windTrackToWriteTo = racingEventService.getWindStore().getWindTrack(
+                        windMasterData.getRegattaName(), trackedRaceWithNameAndId, windMasterData.getWindSource(), 0,
+                        -1);
+                final WindTrack windTrackToReadFrom = windMasterData.getWindTrack();
+                final List<Wind> fixesToAdd = new ArrayList<>();
+                windTrackToReadFrom.lockForRead();
+                try {
+                    for (final Wind fix : windTrackToReadFrom.getRawFixes()) {
+                        final Wind existingFix = windTrackToWriteTo.getFirstRawFixAtOrAfter(fix.getTimePoint());
+                        if (existingFix == null || !existingFix.equals(fix)) {
+                            fixesToAdd.add(fix);
+                        } else {
+                            logger.fine("Didn't add wind fix in import, because equal fix was already there.");
+                        }
+                    }
+                } finally {
+                    windTrackToReadFrom.unlockAfterRead();
+                }
+                windTrackToWriteTo.add(fixesToAdd);
+                next = objectInputStream.readObject();
+            }
+        }
     }
 
     /**
@@ -145,9 +217,10 @@ public class MasterDataImporter {
      * hidden.
      * <p>
      * Sub-progress for the {@link DataImportSubProgress#IMPORT_SENSOR_FIXES} phase is advanced once per device section,
-     * driven by {@code numberOfDeviceSections} (the number of {@link TopLevelMasterData#getRaceLogTrackingFixMappings()
-     * fix mapping descriptors}, which equals the number of device sections the exporter writes). A finer per-fix
-     * granularity is intentionally not attempted because the streaming format carries no fix count.
+     * driven by {@code numberOfDeviceSections} (the number of entries in
+     * {@link TopLevelMasterData#getRaceLogTrackingDeviceRanges()}, which equals the number of device sections the
+     * exporter writes: the exporter streams each device exactly once over its merged, non-overlapping ranges). A finer
+     * per-fix granularity is intentionally not attempted because the streaming format carries no fix count.
      */
     private void importRaceLogTrackingGPSFixes(final ObjectInputStream objectInputStream, final UUID importOperationId,
             final int numberOfDeviceSections) throws IOException, ClassNotFoundException {
@@ -187,8 +260,9 @@ public class MasterDataImporter {
                 device = objectInputStream.readObject();
                 devicesDone++;
                 if (numberOfDeviceSections > 0) {
-                    racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId, 0.7,
-                            DataImportSubProgress.IMPORT_SENSOR_FIXES, (double) devicesDone / numberOfDeviceSections);
+                    final double fractionDone = (double) devicesDone / numberOfDeviceSections;
+                    racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId,
+                            0.8 + 0.2 * fractionDone, DataImportSubProgress.IMPORT_SENSOR_FIXES, fractionDone);
                 }
             }
         }

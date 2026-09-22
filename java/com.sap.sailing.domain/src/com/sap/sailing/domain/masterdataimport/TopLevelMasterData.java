@@ -1,7 +1,6 @@
 package com.sap.sailing.domain.masterdataimport;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,8 +11,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEvent;
-import com.sap.sailing.domain.abstractlog.race.RaceLog;
-import com.sap.sailing.domain.abstractlog.race.RaceLogEvent;
 import com.sap.sailing.domain.abstractlog.regatta.RegattaLog;
 import com.sap.sailing.domain.abstractlog.regatta.RegattaLogEvent;
 import com.sap.sailing.domain.abstractlog.regatta.events.RegattaLogDeviceMappingEvent;
@@ -35,7 +32,8 @@ import com.sap.sailing.domain.leaderboard.RegattaLeaderboard;
 import com.sap.sailing.domain.racelog.tracking.SensorFixStore;
 import com.sap.sailing.domain.tracking.RaceTrackingConnectivityParameters;
 import com.sap.sailing.domain.tracking.TrackedRace;
-import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.MultiTimeRange;
+import com.sap.sse.common.TimeRange;
 import com.sap.sse.common.Util;
 
 /**
@@ -46,49 +44,35 @@ import com.sap.sse.common.Util;
  */
 public class TopLevelMasterData implements Serializable {
 
-    private static final long serialVersionUID = 2060946970976189968L;
+    private static final long serialVersionUID = -6820731812478920411L;
     private final Map<RegattaIdentifier, Set<String>> raceIdStringsForRegatta;
     private final Set<MediaTrack> filteredMediaTracks;
     private final Set<LeaderboardGroup> leaderboardGroups;
-    private final Set<WindTrackMasterData> windTrackMasterData;
     private final Map<LeaderboardGroup, Set<Event>> eventForLeaderboardGroup;
-    private final Iterable<DeviceMappingDescriptor> raceLogTrackingDeviceMappings;
+    /**
+     * Merged, per-{@link DeviceIdentifier} time ranges over which the exporter streams sensor fixes as separate
+     * top-level stream objects (see bug6227). A device mapped in several regattas (or by several open-ended
+     * {@link RegattaLogDeviceMappingEvent}s) would otherwise appear as several independent mappings, making the
+     * exporter re-stream that device's fixes once per mapping. Folding all of a device's mapping intervals into a
+     * single {@link MultiTimeRange} (via {@link MultiTimeRange#union(TimeRange)}) lets the exporter stream each
+     * device exactly once over its coalesced, non-overlapping sub-ranges. The mapping end from
+     * {@link RegattaLogDeviceMappingEvent#getToInclusive()} is inclusive; it is carried through as the range end and
+     * the exporter always loads fixes with {@code toIsInclusive == true}. Because {@link MultiTimeRange} treats a
+     * range end as exclusive, two intervals adjacent only at that inclusive instant may coalesce one instant early;
+     * that only ever streams a superset of fixes (never drops one), and identical fixes are idempotent on store, so
+     * it is harmless.
+     */
+    private final Map<DeviceIdentifier, MultiTimeRange> raceLogTrackingDeviceRanges;
     private transient SensorFixStore sensorFixStore;
+    /**
+     * The wind tracks to export. These are held only transiently on the export side and streamed as separate
+     * top-level stream objects (one {@link WindTrackMasterData} at a time, with the serialization handle table reset
+     * between them; see bug6227), so the potentially large {@link WindTrackMasterData#getWindTrack() wind tracks} are
+     * never all materialized inside this object graph nor retained in the reading stream's handle table.
+     */
+    private final transient Set<WindTrackMasterData> windTrackMasterDataForStreaming;
     private final Iterable<DeviceConfiguration> deviceConfigurations;
     private final Set<RaceTrackingConnectivityParameters> connectivityParametersToRestore;
-
-    /**
-     * Describes a device-and-time-range mapping for which sensor fixes are to be streamed during master data export.
-     * Instead of eagerly materializing all fixes into memory (see bug6227), the export only records these lightweight,
-     * fully {@link Serializable} descriptors as part of the {@link TopLevelMasterData} object graph; the actual fixes
-     * are then streamed as separate top-level objects directly from the {@link SensorFixStore} at export time and read
-     * back incrementally at import time.
-     */
-    public static final class DeviceMappingDescriptor implements Serializable {
-        private static final long serialVersionUID = -8357246260592272592L;
-        private final DeviceIdentifier device;
-        private final TimePoint from;
-        private final TimePoint toInclusive;
-
-        public DeviceMappingDescriptor(final DeviceIdentifier device, final TimePoint from,
-                final TimePoint toInclusive) {
-            this.device = device;
-            this.from = from;
-            this.toInclusive = toInclusive;
-        }
-
-        public DeviceIdentifier getDevice() {
-            return device;
-        }
-
-        public TimePoint getFrom() {
-            return from;
-        }
-
-        public TimePoint getToInclusive() {
-            return toInclusive;
-        }
-    }
 
     public TopLevelMasterData(final Set<LeaderboardGroup> groupsToExport, final Iterable<Event> allEvents,
             final Map<String, Regatta> regattaForRaceIdString, final Iterable<MediaTrack> allMediaTracks,
@@ -96,7 +80,7 @@ public class TopLevelMasterData implements Serializable {
             Iterable<DeviceConfiguration> raceManagerDeviceConfigurations, final Set<RaceTrackingConnectivityParameters> connectivityParametersToRestore) {
         this(groupsToExport, createEventMap(groupsToExport, allEvents),
                 convertToRaceIdStringsForRegattaMap(regattaForRaceIdString),
-                filterMediaTracks(allMediaTracks, groupsToExport), collectRaceLogTrackingFixMappings(groupsToExport),
+                filterMediaTracks(allMediaTracks, groupsToExport), collectRaceLogTrackingDeviceRanges(groupsToExport),
                 exportWind ? fillWindMap(groupsToExport) : Collections.emptySet(), raceManagerDeviceConfigurations,
                 connectivityParametersToRestore);
         this.sensorFixStore = sensorFixStore;
@@ -106,14 +90,14 @@ public class TopLevelMasterData implements Serializable {
             Map<LeaderboardGroup, Set<Event>> eventForLeaderboardGroup,
             final Map<RegattaIdentifier, Set<String>> raceIdStringsForRegatta,
             final Set<MediaTrack> filteredMediaTracks,
-            Iterable<DeviceMappingDescriptor> raceLogTrackingDeviceMappings,
-            Set<WindTrackMasterData> windTrackMasterData,
+            Map<DeviceIdentifier, MultiTimeRange> raceLogTrackingDeviceRanges,
+            Set<WindTrackMasterData> windTrackMasterDataForStreaming,
             Iterable<DeviceConfiguration> deviceConfigurations,
             final Set<RaceTrackingConnectivityParameters> connectivityParametersToRestore) {
         this.raceIdStringsForRegatta = raceIdStringsForRegatta;
         this.leaderboardGroups = leaderboardGroups;
-        this.raceLogTrackingDeviceMappings = raceLogTrackingDeviceMappings;
-        this.windTrackMasterData = windTrackMasterData;
+        this.raceLogTrackingDeviceRanges = raceLogTrackingDeviceRanges;
+        this.windTrackMasterDataForStreaming = windTrackMasterDataForStreaming;
         this.deviceConfigurations = deviceConfigurations;
         this.eventForLeaderboardGroup = eventForLeaderboardGroup;
         this.filteredMediaTracks = filteredMediaTracks;
@@ -122,53 +106,51 @@ public class TopLevelMasterData implements Serializable {
 
     public TopLevelMasterData copyAndStripOffDataNotNeededOnReplicas() {
         return new TopLevelMasterData(leaderboardGroups, eventForLeaderboardGroup, raceIdStringsForRegatta, filteredMediaTracks,
-                /* strip off raceLogTrackingFixMappings */ Collections.emptyList(),
-                /* strip off windTrackMasterData */ Collections.emptySet(),
+                /* strip off raceLogTrackingDeviceRanges */ Collections.emptyMap(),
+                /* strip off windTrackMasterDataForStreaming */ Collections.emptySet(),
                 /* strip off device configurations */ Collections.emptySet(),
                 /* strip off connectivity params */ Collections.emptySet());
     }
 
-    private static Iterable<DeviceMappingDescriptor> collectRaceLogTrackingFixMappings(Set<LeaderboardGroup> groupsToExport) {
-        final Collection<DeviceMappingDescriptor> mappings = new ArrayList<>();
-        // Add mappings for regatta log mappings
+    /**
+     * Collects, per {@link DeviceIdentifier}, the merged {@link MultiTimeRange} over which sensor fixes are to be
+     * streamed during master data export (see bug6227). Device mappings live only in the regatta log;
+     * {@link RegattaLogDeviceMappingEvent} is a {@link RegattaLogEvent} and can never appear in a
+     * {@code RaceLog}, so only the regatta logs need to be scanned. Every mapping event for a given device is folded
+     * into that device's accumulated {@link MultiTimeRange} via {@link MultiTimeRange#union(TimeRange)} so the
+     * exporter streams each device exactly once over its coalesced, non-overlapping sub-ranges rather than once per
+     * mapping event. The inclusive mapping end from {@link RegattaLogDeviceMappingEvent#getToInclusive()} is carried
+     * through as the (exclusive-typed) {@link TimeRange} end; the exporter always loads fixes with
+     * {@code toIsInclusive == true}, so at worst two intervals adjacent only at that instant coalesce one instant
+     * early, streaming a harmless superset of fixes.
+     */
+    private static Map<DeviceIdentifier, MultiTimeRange> collectRaceLogTrackingDeviceRanges(
+            Set<LeaderboardGroup> groupsToExport) {
+        final Map<DeviceIdentifier, MultiTimeRange> deviceRanges = new HashMap<>();
         for (Regatta regatta : getAllRegattas(groupsToExport)) {
             final RegattaLog regattaLog = regatta.getRegattaLog();
             try {
                 regattaLog.lockForRead();
                 for (RegattaLogEvent logEvent : regattaLog.getRawFixes()) {
-                    addMappingIfMappingEvent(mappings, logEvent);
+                    addRangeIfMappingEvent(deviceRanges, logEvent);
                 }
             } finally {
                 regattaLog.unlockAfterRead();
             }
         }
-        // Add mappings for race log mapping
-        for (LeaderboardGroup group : groupsToExport) {
-            for (Leaderboard leaderboard : group.getLeaderboards()) {
-                for (RaceColumn raceColumn : leaderboard.getRaceColumns()) {
-                    for (Fleet fleet : raceColumn.getFleets()) {
-                        final RaceLog raceLog = raceColumn.getRaceLog(fleet);
-                        try {
-                            raceLog.lockForRead();
-                            for (RaceLogEvent logEvent : raceLog.getRawFixes()) {
-                                addMappingIfMappingEvent(mappings, logEvent);
-                            }
-                        } finally {
-                            raceLog.unlockAfterRead();
-                        }
-                    }
-                }
-            }
-        }
-        return mappings;
+        return deviceRanges;
     }
 
-    private static void addMappingIfMappingEvent(Collection<DeviceMappingDescriptor> mappings,
+    private static void addRangeIfMappingEvent(Map<DeviceIdentifier, MultiTimeRange> deviceRanges,
             AbstractLogEvent<?> logEvent) {
         if (logEvent instanceof RegattaLogDeviceMappingEvent<?>) {
             final RegattaLogDeviceMappingEvent<?> mappingEvent = (RegattaLogDeviceMappingEvent<?>) logEvent;
-            mappings.add(new DeviceMappingDescriptor(mappingEvent.getDevice(), mappingEvent.getFrom(),
-                    mappingEvent.getToInclusive()));
+            final DeviceIdentifier device = mappingEvent.getDevice();
+            final TimeRange mappingRange = TimeRange.create(mappingEvent.getFrom(), mappingEvent.getToInclusive());
+            final MultiTimeRange existing = deviceRanges.get(device);
+            final MultiTimeRange merged = existing == null ? MultiTimeRange.of(mappingRange)
+                    : existing.union(mappingRange);
+            deviceRanges.put(device, merged);
         }
     }
 
@@ -256,8 +238,8 @@ public class TopLevelMasterData implements Serializable {
         return leaderboardGroups;
     }
 
-    public Set<WindTrackMasterData> getWindTrackMasterData() {
-        return windTrackMasterData;
+    public Set<WindTrackMasterData> getWindTrackMasterDataForStreaming() {
+        return windTrackMasterDataForStreaming;
     }
 
     public void setMasterDataExportFlagOnRaceColumns(boolean flagValue) {
@@ -351,8 +333,8 @@ public class TopLevelMasterData implements Serializable {
         return raceIdentifiers;
     }
 
-    public Iterable<DeviceMappingDescriptor> getRaceLogTrackingFixMappings() {
-        return raceLogTrackingDeviceMappings;
+    public Map<DeviceIdentifier, MultiTimeRange> getRaceLogTrackingDeviceRanges() {
+        return raceLogTrackingDeviceRanges;
     }
 
     public SensorFixStore getSensorFixStore() {

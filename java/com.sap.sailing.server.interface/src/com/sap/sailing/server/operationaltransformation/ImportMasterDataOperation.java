@@ -34,7 +34,6 @@ import com.sap.sailing.domain.common.DataImportSubProgress;
 import com.sap.sailing.domain.common.RaceIdentifier;
 import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
 import com.sap.sailing.domain.common.TrackedRaceStatusEnum;
-import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.impl.MasterDataImportObjectCreationCountImpl;
 import com.sap.sailing.domain.common.media.MediaTrack;
 import com.sap.sailing.domain.leaderboard.FlexibleLeaderboard;
@@ -42,7 +41,6 @@ import com.sap.sailing.domain.leaderboard.Leaderboard;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroup;
 import com.sap.sailing.domain.leaderboard.RegattaLeaderboard;
 import com.sap.sailing.domain.masterdataimport.TopLevelMasterData;
-import com.sap.sailing.domain.masterdataimport.WindTrackMasterData;
 import com.sap.sailing.domain.persistence.DomainObjectFactory;
 import com.sap.sailing.domain.persistence.MongoObjectFactory;
 import com.sap.sailing.domain.persistence.MongoRaceLogStoreFactory;
@@ -53,7 +51,6 @@ import com.sap.sailing.domain.regattalike.HasRegattaLike;
 import com.sap.sailing.domain.regattalike.IsRegattaLike;
 import com.sap.sailing.domain.regattalike.RegattaLikeIdentifier;
 import com.sap.sailing.domain.regattalog.RegattaLogStore;
-import com.sap.sailing.domain.tracking.DummyTrackedRace;
 import com.sap.sailing.domain.tracking.DynamicTrackedRace;
 import com.sap.sailing.domain.tracking.RaceHandle;
 import com.sap.sailing.domain.tracking.RaceTracker;
@@ -61,7 +58,6 @@ import com.sap.sailing.domain.tracking.RaceTrackingConnectivityParameters;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.domain.tracking.TrackedRaceStatus;
 import com.sap.sailing.domain.tracking.TrackedRegatta;
-import com.sap.sailing.domain.tracking.WindTrack;
 import com.sap.sailing.domain.tracking.impl.AbstractRaceChangeListener;
 import com.sap.sailing.server.interfaces.DataImportLockWithProgress;
 import com.sap.sailing.server.interfaces.RacingEventService;
@@ -155,10 +151,6 @@ public class ImportMasterDataOperation extends
                 eventCounter++;
                 progress.setCurrentSubProgressPct((double) eventCounter / numOfEventsToHandle);
             }
-            progress.setCurrentSubProgress(DataImportSubProgress.IMPORT_WIND_TRACKS);
-            progress.setOverAllProgressPct(0.5);
-            progress.setCurrentSubProgressPct(0);
-            createWindTracks(toState);
             if (masterData.getDeviceConfigurations() != null) {
                 importDeviceConfigurations(toState);
             }
@@ -168,16 +160,20 @@ public class ImportMasterDataOperation extends
             }
             toState.mediaTracksImported(allMediaTracksToImport, creationCount, override);
             progress.setCurrentSubProgress(DataImportSubProgress.IMPORT_TRACKED_RACES);
-            progress.setOverAllProgressPct(0.8);
+            progress.setOverAllProgressPct(0.53);
             progress.setCurrentSubProgressPct(0);
             final Iterable<TrackedRace> trackedRacesToWaitForLoadingComplete = importTrackedRaces(toState, securityService);            
             progress.setCurrentSubProgress(DataImportSubProgress.WAITING_FOR_TRACKED_RACES_TO_FINISH_LOADING);
-            progress.setOverAllProgressPct(0.9);
+            progress.setOverAllProgressPct(0.6);
             progress.setCurrentSubProgressPct(0);
             waitForTrackedRacesToFinishLoading(trackedRacesToWaitForLoadingComplete);
             dataImportLock.getProgress(importOperationId).setResult(creationCount);
-            progress.setOverAllProgressPct(1.0);
-            logger.info("Done importing master data into "+toState);
+            // Deliberately do not mark overall completion (1.0) or log "Done" here. This operation applies only the
+            // object graph; the wind tracks and sensor fixes are streamed and imported afterwards by
+            // MasterDataImporter.importFromStream, which owns the terminal 1.0 progress and the single "Done" log at
+            // the true end of the whole import (see bug6227). This operation therefore ends at 0.6, set above after
+            // waiting for the tracked races to load, leaving 0.6 -> 0.8 for the wind band and 0.8 -> 1.0 for the
+            // sensor-fix band, the two phases that usually dominate the import.
             return creationCount;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error during execution of ImportMasterDataOperation", e);
@@ -462,36 +458,6 @@ public class ImportMasterDataOperation extends
                         raceColumn.setRaceIdentifier(fleet, raceIdentifier);
                     }
                 }
-            }
-        }
-    }
-
-    private void createWindTracks(RacingEventService toState) {
-        if (toState.getMasterDescriptor() == null) { // don't do this on a replica's RacingEventService; wind data will be received through the tracked race loading replication
-            int numOfWindTracks = masterData.getWindTrackMasterData().size();
-            int i = 0;
-            for (WindTrackMasterData windMasterData : masterData.getWindTrackMasterData()) {
-                DummyTrackedRace trackedRaceWithNameAndId = new DummyTrackedRace(windMasterData.getRaceName(), windMasterData.getRaceId());
-                WindTrack windTrackToWriteTo = toState.getWindStore().getWindTrack(windMasterData.getRegattaName(), trackedRaceWithNameAndId, windMasterData.getWindSource(), 0, -1);
-                final WindTrack windTrackToReadFrom = windMasterData.getWindTrack();
-                final List<Wind> fixesToAdd = new ArrayList<>();
-                windTrackToReadFrom.lockForRead();
-                try {
-                    for (Wind fix : windTrackToReadFrom.getRawFixes()) {
-                        Wind existingFix = windTrackToWriteTo.getFirstRawFixAtOrAfter(fix.getTimePoint());
-                        if (existingFix == null || !existingFix.equals(fix)) {
-                            fixesToAdd.add(fix);
-                        } else {
-                            logger.fine("Didn't add wind fix in import, because equal fix was already there.");
-                        }
-                    }
-                } finally {
-                    windTrackToReadFrom.unlockAfterRead();
-                }
-                windTrackToWriteTo.add(fixesToAdd);
-                i++;
-                progress.setCurrentSubProgressPct((double) i / numOfWindTracks);
-                progress.setOverAllProgressPct(0.5 + (0.3) * ((double) i / numOfWindTracks));
             }
         }
     }
