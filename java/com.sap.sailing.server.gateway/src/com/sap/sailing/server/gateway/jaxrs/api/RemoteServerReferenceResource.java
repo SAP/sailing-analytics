@@ -54,7 +54,6 @@ public class RemoteServerReferenceResource extends AbstractSailingServerResource
     @GET
     @Produces("application/json;charset=UTF-8")
     public Response getRemoteServerReferences() {
-        getSecurityService().checkCurrentUserServerPermission(ServerActions.CONFIGURE_REMOTE_INSTANCES);
         final JSONArray result = new JSONArray();
         for (final Entry<String, RemoteSailingServerReference> e : getService().getAllRemoteServerReferences().entrySet()) {
             final JSONObject serverRefJson = serializeRemoteServerReference(e.getValue());
