@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -32,17 +31,12 @@ import com.sap.sailing.domain.base.configuration.DeviceConfiguration;
 import com.sap.sailing.domain.base.impl.RegattaImpl;
 import com.sap.sailing.domain.common.DataImportProgress;
 import com.sap.sailing.domain.common.DataImportSubProgress;
-import com.sap.sailing.domain.common.DeviceIdentifier;
 import com.sap.sailing.domain.common.RaceIdentifier;
 import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
 import com.sap.sailing.domain.common.TrackedRaceStatusEnum;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.impl.MasterDataImportObjectCreationCountImpl;
 import com.sap.sailing.domain.common.media.MediaTrack;
-import com.sap.sailing.domain.common.tracking.impl.GPSFixImpl;
-import com.sap.sailing.domain.common.tracking.impl.GPSFixMovingImpl;
-import com.sap.sailing.domain.common.tracking.impl.VeryCompactGPSFixImpl;
-import com.sap.sailing.domain.common.tracking.impl.VeryCompactGPSFixMovingImpl;
 import com.sap.sailing.domain.leaderboard.FlexibleLeaderboard;
 import com.sap.sailing.domain.leaderboard.Leaderboard;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroup;
@@ -55,7 +49,6 @@ import com.sap.sailing.domain.persistence.MongoRaceLogStoreFactory;
 import com.sap.sailing.domain.persistence.MongoRegattaLogStoreFactory;
 import com.sap.sailing.domain.racelog.RaceLogIdentifier;
 import com.sap.sailing.domain.racelog.RaceLogStore;
-import com.sap.sailing.domain.racelog.tracking.SensorFixStore;
 import com.sap.sailing.domain.regattalike.HasRegattaLike;
 import com.sap.sailing.domain.regattalike.IsRegattaLike;
 import com.sap.sailing.domain.regattalike.RegattaLikeIdentifier;
@@ -73,8 +66,6 @@ import com.sap.sailing.domain.tracking.impl.AbstractRaceChangeListener;
 import com.sap.sailing.server.interfaces.DataImportLockWithProgress;
 import com.sap.sailing.server.interfaces.RacingEventService;
 import com.sap.sailing.server.interfaces.RacingEventServiceOperation;
-import com.sap.sse.common.NoCorrespondingServiceRegisteredException;
-import com.sap.sse.common.Timed;
 import com.sap.sse.common.Util;
 import com.sap.sse.concurrent.LockUtil;
 import com.sap.sse.security.SecurityService;
@@ -88,8 +79,6 @@ public class ImportMasterDataOperation extends
     private static final long serialVersionUID = 3131715325307370303L;
 
     private static final Logger logger = Logger.getLogger(ImportMasterDataOperation.class.getName());
-    
-    private static final int BATCH_SIZE_FOR_IMPORTING_FIXES = 5000;
 
     private final TopLevelMasterData masterData;
 
@@ -170,14 +159,10 @@ public class ImportMasterDataOperation extends
             progress.setOverAllProgressPct(0.5);
             progress.setCurrentSubProgressPct(0);
             createWindTracks(toState);
-            progress.setCurrentSubProgress(DataImportSubProgress.IMPORT_SENSOR_FIXES);
-            progress.setOverAllProgressPct(0.7);
-            progress.setCurrentSubProgressPct(0);
-            importRaceLogTrackingGPSFixes(toState);
             if (masterData.getDeviceConfigurations() != null) {
                 importDeviceConfigurations(toState);
             }
-            Collection<MediaTrack> allMediaTracksToImport = masterData.getFilteredMediaTracks();
+            Iterable<MediaTrack> allMediaTracksToImport = masterData.getFilteredMediaTracks();
             for (MediaTrack trackToImport : allMediaTracksToImport) {
                 ensureOwnership(trackToImport.getIdentifier(), securityService);
             }
@@ -508,49 +493,6 @@ public class ImportMasterDataOperation extends
                 progress.setCurrentSubProgressPct((double) i / numOfWindTracks);
                 progress.setOverAllProgressPct(0.5 + (0.3) * ((double) i / numOfWindTracks));
             }
-        }
-    }
-    
-    private void importRaceLogTrackingGPSFixes(RacingEventService toState) {
-        if (toState.getMasterDescriptor() == null) { // don't do this on a replica's RacingEventService; tracking data will be received through the tracked race loading replication
-            final Map<DeviceIdentifier, ? extends Iterable<Timed>> raceLogTrackingFixes = masterData.getRaceLogTrackingFixes();
-            if (raceLogTrackingFixes != null) {
-                SensorFixStore store = toState.getSensorFixStore();
-                int i = 0;
-                final int numberOfDevices = raceLogTrackingFixes.size();
-                for (Entry<DeviceIdentifier, ? extends Iterable<Timed>> entry : raceLogTrackingFixes.entrySet()) {
-                    DeviceIdentifier device = entry.getKey();
-                    final Collection<Timed> fixesToAddAsBatch = new ArrayList<>(BATCH_SIZE_FOR_IMPORTING_FIXES);
-                    for (Timed fixToAdd : entry.getValue()) {
-                        if (fixToAdd instanceof VeryCompactGPSFixMovingImpl) {
-                            VeryCompactGPSFixMovingImpl gpsFix = (VeryCompactGPSFixMovingImpl) fixToAdd;
-                            fixToAdd = new GPSFixMovingImpl(gpsFix.getPosition(), fixToAdd.getTimePoint(),
-                                    ((VeryCompactGPSFixMovingImpl) fixToAdd).getSpeed(), gpsFix.getOptionalTrueHeading());
-                        } else if (fixToAdd instanceof VeryCompactGPSFixImpl) {
-                            VeryCompactGPSFixImpl gpsFix = (VeryCompactGPSFixImpl) fixToAdd;
-                            fixToAdd = new GPSFixImpl(gpsFix.getPosition(), fixToAdd.getTimePoint());
-                        } 
-                        fixesToAddAsBatch.add(fixToAdd);
-                        if (fixesToAddAsBatch.size() == BATCH_SIZE_FOR_IMPORTING_FIXES) {
-                            storeFixes(store, device, fixesToAddAsBatch);
-                        }
-                    }
-                    if (!fixesToAddAsBatch.isEmpty()) {
-                        storeFixes(store, device, fixesToAddAsBatch);
-                    }
-                    i++;
-                    progress.setCurrentSubProgressPct((double) i / numberOfDevices);
-                }
-            }
-        }
-    }
-
-    private void storeFixes(SensorFixStore store, DeviceIdentifier device, final Collection<Timed> fixesToAddAsBatch) {
-        try {
-            store.storeFixes(device, fixesToAddAsBatch, /* returnManeuverUpdate */ false, /* returnLiveDelay */ false);
-            fixesToAddAsBatch.clear();
-        } catch (NoCorrespondingServiceRegisteredException e) {
-            logger.severe("Failed to store race log tracking fixes while importing.");
         }
     }
 
