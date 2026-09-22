@@ -15,7 +15,7 @@ public class RevokeEventTest extends AbstractRegattaLogTrackingTest {
     @Test
     public void revokedEventIsExcluded() {
         RegattaLogEvent event = new RegattaLogDeviceCompetitorMappingEventImpl(now, now, author, UUID.randomUUID(), null, null, null, null);
-        RegattaLogRevokeEvent revokeEvent = new RegattaLogRevokeEventImpl(now.plus(1), now.plus(1), author, UUID.randomUUID(), event.getId(),
+        RegattaLogRevokeEvent revokeEvent = new RegattaLogRevokeEventImpl(now.plusResolution(), now.plusResolution(), author, UUID.randomUUID(), event.getId(),
                 null, null, null);
         
         log.add(event);
@@ -29,7 +29,7 @@ public class RevokeEventTest extends AbstractRegattaLogTrackingTest {
     @Test
     public void eventRevokedByAuthorWithLowerPrioIsNotExcluded() {
     	RegattaLogEvent event = new RegattaLogDeviceCompetitorMappingEventImpl(now, now, author, UUID.randomUUID(), null, null, null, null);
-    	RegattaLogRevokeEvent revokeEvent = new RegattaLogRevokeEventImpl(now.plus(1), now.plus(1), author1, UUID.randomUUID(), event.getId(),
+    	RegattaLogRevokeEvent revokeEvent = new RegattaLogRevokeEventImpl(now.plusResolution(), now.plusResolution(), author1, UUID.randomUUID(), event.getId(),
                 null, null, null);
         
         log.add(event);
@@ -43,7 +43,7 @@ public class RevokeEventTest extends AbstractRegattaLogTrackingTest {
     @Test
     public void revokingRevokeEventIsNotHarmful() {
         RegattaLogEvent event = new RegattaLogDeviceCompetitorMappingEventImpl(now, now, author, UUID.randomUUID(), null, null, null, null);
-        RegattaLogRevokeEvent revokeEvent = new RegattaLogRevokeEventImpl(now.plus(1), now.plus(1), author, UUID.randomUUID(), event.getId(),
+        RegattaLogRevokeEvent revokeEvent = new RegattaLogRevokeEventImpl(now.plusResolution(), now.plusResolution(), author, UUID.randomUUID(), event.getId(),
                 null, null, null);
         RegattaLogRevokeEvent revokeEvent2 = new RegattaLogRevokeEventImpl(now.plus(2), now.plus(2), author, UUID.randomUUID(), revokeEvent.getId(),
                 null, null, null);

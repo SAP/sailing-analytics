@@ -91,4 +91,21 @@ public interface TimePoint extends Comparable<TimePoint>, Serializable {
      */
     Duration getResolution();
 
+    /**
+     * The next distinct representable instant after this one, i.e. {@code this.plus(getResolution())}. Because
+     * {@link TimeRange#to()} is <em>exclusive</em>, this is the smallest exclusive range end that still keeps this
+     * instant inside {@code [this, this.plusResolution())}; it is therefore the resolution-safe way to turn an
+     * <em>inclusive</em> upper bound into an <em>exclusive</em> one, and more generally to obtain an instant that is
+     * strictly, but minimally, after this one (e.g. "just after a fix"). Saturation at
+     * {@link TimePoint#EndOfTime} follows {@link #plus(Duration)}.
+     */
+    TimePoint plusResolution();
+
+    /**
+     * The previous distinct representable instant before this one, i.e. {@code this.minus(getResolution())}; the
+     * counterpart of {@link #plusResolution()} for obtaining an instant that is strictly, but minimally, before this
+     * one (e.g. "just before a fix"). Saturation at {@link TimePoint#BeginningOfTime} follows {@link #minus(Duration)}.
+     */
+    TimePoint minusResolution();
+
 }

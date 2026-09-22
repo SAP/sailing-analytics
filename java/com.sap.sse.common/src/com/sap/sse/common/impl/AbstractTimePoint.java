@@ -163,4 +163,14 @@ public abstract class AbstractTimePoint implements TimePoint {
     public Duration getResolution() {
         return Duration.ONE_MILLISECOND;
     }
+
+    @Override
+    public TimePoint plusResolution() {
+        return plus(getResolution());
+    }
+
+    @Override
+    public TimePoint minusResolution() {
+        return minus(getResolution());
+    }
 }
