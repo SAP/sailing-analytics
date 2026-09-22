@@ -79,4 +79,16 @@ public interface TimePoint extends Comparable<TimePoint>, Serializable {
      */
     TimePoint getNearestModuloOneMinute(TimePoint syncToClosestSecondsAndMillisOf);
 
+    /**
+     * The resolution of this time point representation, i.e. the smallest positive {@link Duration} by which two
+     * distinct instants of this implementation can differ. Adding exactly this duration to a time point yields the next
+     * distinct representable instant, so {@code t.plus(t.getResolution())} is the smallest exclusive {@link TimeRange}
+     * end that still keeps {@code t} inside the range {@code [t, t.plus(resolution))}. This is the resolution-safe way
+     * to convert an <em>inclusive</em> end into an <em>exclusive</em> one; see the master data import/export path that
+     * relies on it. All current implementations are backed by milliseconds and therefore return
+     * {@link Duration#ONE_MILLISECOND}; an implementation with a finer (e.g. nanosecond) resolution must override this
+     * accordingly.
+     */
+    Duration getResolution();
+
 }

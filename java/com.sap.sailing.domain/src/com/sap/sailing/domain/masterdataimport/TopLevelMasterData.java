@@ -151,14 +151,12 @@ public class TopLevelMasterData implements Serializable {
             // RegattaLogDeviceMappingEvent.getToInclusive() is an INCLUSIVE end, whereas TimeRange.to() is EXCLUSIVE.
             // As mandated by that method's Javadoc, we bridge the gap by adding one TimePoint resolution unit to the
             // inclusive end to obtain a valid exclusive TimeRange end that still includes the mapping's last instant.
-            // This is what makes a single-instant PING mapping ([t, t] inclusive) a non-empty range [t, t+1ms) rather
-            // than an empty range that MultiTimeRange would silently discard (see bug6227).
-            // WARNING: this hard-codes the current TimePoint resolution of 1 millisecond (see TimePoint.plus(long)).
-            // Should a TimePoint implementation with a finer-than-1ms resolution ever be introduced, this +1ms would be
-            // wrong (it could span multiple representable instants). The clean fix would be a queryable resolution on
-            // TimePoint, e.g. toInclusive.plus(toInclusive.getResolution()); until then, keep this in lock-step with
-            // the resolution assumed elsewhere and with the exporter loading these ranges with toIsInclusive == false.
-            final TimePoint toExclusive = toInclusive == null ? null : toInclusive.plus(1);
+            // This is what makes a single-instant PING mapping ([t, t] inclusive) a non-empty range [t, t+resolution)
+            // rather than an empty range that MultiTimeRange would silently discard (see bug6227). We ask the TimePoint
+            // itself for its resolution (TimePoint.getResolution(), currently one millisecond for all implementations),
+            // so this stays correct should a finer-resolution TimePoint ever be introduced; the exporter loads these
+            // ranges with toIsInclusive == false to match.
+            final TimePoint toExclusive = toInclusive == null ? null : toInclusive.plus(toInclusive.getResolution());
             final TimeRange mappingRange = TimeRange.create(from, toExclusive);
             final MultiTimeRange existing = deviceRanges.get(device);
             final MultiTimeRange merged = existing == null ? MultiTimeRange.of(mappingRange)
