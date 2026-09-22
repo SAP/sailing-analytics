@@ -283,12 +283,40 @@ public class MasterDataResource extends AbstractSailingServerResource {
         }
     }
 
+    /**
+     * Writes the master-data export onto a single {@link ObjectOutputStream} (itself wrapped in gzip). This is the
+     * <em>writing</em> end of the master-data wire format; the <em>reading</em> end is
+     * {@code com.sap.sailing.server.masterdata.MasterDataImporter.importFromStream} in the {@code com.sap.sailing.server}
+     * bundle. The two ends are not independently versioned: they must be changed together and stay in lock-step,
+     * object-for-object, because the reader consumes the objects positionally in exactly the order written here. The
+     * sequence is, and must remain:
+     * <ol>
+     * <li>the {@code competitorIds} {@link List} (read back by {@code MasterDataImporter} to reset competitor data);</li>
+     * <li>{@link TopLevelMasterData#getAllRegattas() all regattas} (written before the graph so that regattas are
+     * deserialized before series);</li>
+     * <li>the fix-free and wind-free {@link TopLevelMasterData} graph;</li>
+     * <li>the wind section written by {@link #writeWindTracks(TopLevelMasterData, ObjectOutputStream)}: an
+     * {@code int} count, then the streamed {@code WindTrackMasterData} objects, then a {@code null} sentinel;</li>
+     * <li>the sensor-fix section written by {@link #writeRaceLogTrackingFixes(TopLevelMasterData, ObjectOutputStream)}:
+     * per device a device header, its fixes, and a {@code null} sentinel, then a {@code null} sentinel for the whole
+     * section.</li>
+     * </ol>
+     * Any change to what, how many, or in which order objects are written here has to be mirrored in
+     * {@code MasterDataImporter.importFromStream} (and the corresponding {@code importWindTracks} /
+     * {@code importRaceLogTrackingGPSFixes} helpers), and vice versa; there is deliberately no mixed-version
+     * compatibility between an old writer and a new reader or the other way round (see bug6227).
+     */
     private void writeObjects(final List<Serializable> competitorIds, final TopLevelMasterData masterData,
             ObjectOutputStream objectOutputStream) throws IOException {
+        // Reader counterpart: MasterDataImporter.importFromStream reads these three objects back in this exact order.
         objectOutputStream.writeObject(competitorIds);
         objectOutputStream.writeObject(masterData.getAllRegattas());
         objectOutputStream.writeObject(masterData);
+        // Reader counterpart: MasterDataImporter.importWindTracks reads the Integer count, the WindTrackMasterData
+        // objects, and the terminating null sentinel written by writeWindTracks below.
         writeWindTracks(masterData, objectOutputStream);
+        // Reader counterpart: MasterDataImporter.importRaceLogTrackingGPSFixes reads the per-device sections and the
+        // terminating null sentinels written by writeRaceLogTrackingFixes below.
         writeRaceLogTrackingFixes(masterData, objectOutputStream);
     }
 
@@ -298,13 +326,23 @@ public class MasterDataResource extends AbstractSailingServerResource {
      * wind tracks} can grow large; keeping them inside the {@link TopLevelMasterData} object graph would retain every
      * one of them in the reading stream's handle table for back-reference resolution. Writing each as a top-level
      * object and clearing the serialization handle table via {@link ObjectOutputStream#reset()} between them means at
-     * most one {@link WindTrackMasterData} is retained at a time. The section is framed by a trailing {@code null}
-     * sentinel (never a count, which a concurrent change could invalidate). The {@link ObjectOutputStream#reset()} is
-     * issued after each object; {@code TC_RESET} is an independent stream token the reader consumes transparently.
+     * most one {@link WindTrackMasterData} is retained at a time. The section is still framed by a trailing
+     * {@code null} sentinel, but it is preceded by the number of {@link WindTrackMasterData} objects that follow so
+     * that the importer can drive a {@link com.sap.sailing.domain.common.tracking.DataImportSubProgress#IMPORT_WIND_TRACKS
+     * wind sub-progress} per track (the wind tracks are held only {@code transient}ly and never travel inside the
+     * {@link TopLevelMasterData} graph, so unlike the sensor-fix device count this expected count cannot be recovered
+     * from the deserialized graph on the reader side and has to be sent explicitly). The count is written as a
+     * bare {@code int} via {@link ObjectOutputStream#writeInt(int)} (not as a boxed {@link Integer}), so it carries no
+     * class descriptor and occupies no handle-table entry; it is a snapshot of the export-side set that is iterated
+     * right after, so it always matches the number of objects actually streamed. The
+     * {@link ObjectOutputStream#reset()} is issued after each object; {@code TC_RESET} is an independent stream token
+     * the reader consumes transparently.
      */
     private void writeWindTracks(final TopLevelMasterData masterData, final ObjectOutputStream objectOutputStream)
             throws IOException {
-        for (final WindTrackMasterData windTrackMasterData : masterData.getWindTrackMasterDataForStreaming()) {
+        final Set<WindTrackMasterData> windTrackMasterDataForStreaming = masterData.getWindTrackMasterDataForStreaming();
+        objectOutputStream.writeInt(windTrackMasterDataForStreaming.size());
+        for (final WindTrackMasterData windTrackMasterData : windTrackMasterDataForStreaming) {
             objectOutputStream.writeObject(windTrackMasterData);
             objectOutputStream.reset();
         }
