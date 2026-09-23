@@ -49,6 +49,19 @@ public class Highcharts {
         }
 
         /**
+         * Set the time options to use on all Highchart instances. As of Highcharts 6 the time
+         * related options were moved out of the {@link Global} options into a dedicated "time"
+         * options object; use this method rather than {@link #setGlobal(Global)} to configure
+         * time zone handling on current Highcharts versions.
+         *
+         * @param time the time configuration options
+         * @return A reference to this {@link org.moxieapps.gwt.highcharts.client.Highcharts.Options} instance for convenient method chaining.
+         */
+        public Options setTime(Time time) {
+            return this.setOption("/time", time);
+        }
+
+        /**
          * Set the language options to use on all Highchart instances.
          *
          * @param lang the language configuration options

@@ -25,7 +25,7 @@ public class AjaxCallsComplete implements ExpectedCondition<Boolean> {
      */
     public static final String CATEGORY_GLOBAL = ""; //$NON-NLS-1$
     
-    private static final String JAVASCRIPT = "return window.PENDING_AJAX_CALLS && (window.PENDING_AJAX_CALLS.numberOfPendingCalls(arguments[0]) === 0)"; //$NON-NLS-1$
+    private static final String JAVASCRIPT = "return " + AjaxCallsExecuted.PENDING_AJAX_CALLS + " && (" + AjaxCallsExecuted.PENDING_AJAX_CALLS + ".numberOfPendingCalls(arguments[0]) === 0)"; //$NON-NLS-1$
     
     private String category;
     
