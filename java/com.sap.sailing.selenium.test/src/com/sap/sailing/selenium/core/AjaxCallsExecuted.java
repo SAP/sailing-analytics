@@ -19,11 +19,19 @@ public class AjaxCallsExecuted implements ExpectedCondition<Boolean> {
      *   <code>com.sap.sailing.gwt.ui.client.MarkedAsyncCallback</code>.</p>
      */
     public static final String CATEGORY_GLOBAL = ""; //$NON-NLS-1$
-    
-    private static final String JAVASCRIPT = "return (window.PENDING_AJAX_CALLS.numberOfFinishedCalls(arguments[0]) >= arguments[1])"; //$NON-NLS-1$
-    
+
+    /**
+     * <p>The name of the browser-global JavaScript object into which the harness records the number of pending and
+     *   finished Ajax calls per category (see {@code PendingAjaxCallBundle} and {@code PendingAjaxCallMarker}).</p>
+     */
+    public static final String PENDING_AJAX_CALLS = "window.PENDING_AJAX_CALLS"; //$NON-NLS-1$
+
+    private static final String JAVASCRIPT = "return (" + PENDING_AJAX_CALLS + ".numberOfFinishedCalls(arguments[0]) >= arguments[1])"; //$NON-NLS-1$
+
+    private static final String NUMBER_OF_FINISHED_CALLS_JAVASCRIPT = "return " + PENDING_AJAX_CALLS + ".numberOfFinishedCalls(arguments[0])"; //$NON-NLS-1$
+
     private String category;
-    
+
     private int numberOfCalls;
     
     /**
@@ -56,7 +64,25 @@ public class AjaxCallsExecuted implements ExpectedCondition<Boolean> {
     @Override
     public Boolean apply(WebDriver driver) {
         JavascriptExecutor executor = (JavascriptExecutor) driver;
-        
+
         return (Boolean) executor.executeScript(JAVASCRIPT, this.category, this.numberOfCalls);
+    }
+
+    /**
+     * <p>Reads the current number of finished Ajax calls in the given category from the harness's pending-Ajax
+     *   semaphore. The value increases monotonically, so callers can read a baseline before triggering an action and
+     *   then wait for the count to advance to reliably detect the completion of the requests the action fires.</p>
+     *
+     * @param driver
+     *   The web driver to use.
+     * @param category
+     *   The category of Ajax calls whose finished count should be read.
+     * @return
+     *   The number of finished Ajax calls in the given category since the page was loaded.
+     */
+    public static int getNumberOfFinishedCalls(WebDriver driver, String category) {
+        JavascriptExecutor executor = (JavascriptExecutor) driver;
+        Long finishedCalls = (Long) executor.executeScript(NUMBER_OF_FINISHED_CALLS_JAVASCRIPT, category);
+        return finishedCalls.intValue();
     }
 }
