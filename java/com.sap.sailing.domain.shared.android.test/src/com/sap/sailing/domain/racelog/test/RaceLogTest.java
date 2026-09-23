@@ -438,7 +438,7 @@ public class RaceLogTest {
         UUID client1Id = UUID.randomUUID();
         UUID client2Id = UUID.randomUUID();
         final TimePoint now = MillisecondsTimePoint.now();
-        RaceLogStartTimeEvent startTimeEvent1 = new RaceLogStartTimeEventImpl(now, author, 1, now.plus(1), /* courseAreaId */ null);
+        RaceLogStartTimeEvent startTimeEvent1 = new RaceLogStartTimeEventImpl(now, author, 1, now.plusResolution(), /* courseAreaId */ null);
         Iterable<RaceLogEvent> empty = raceLog.add(startTimeEvent1, client1Id);
         assertTrue(Util.isEmpty(empty));
         RaceLogStartTimeEvent startTimeEvent2 = new RaceLogStartTimeEventImpl(now.plus(2), author, 1, now.plus(3), /* courseAreaId */ null);

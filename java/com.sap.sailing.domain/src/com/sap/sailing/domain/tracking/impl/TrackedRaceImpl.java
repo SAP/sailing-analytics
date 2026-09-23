@@ -1329,7 +1329,7 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
             if (startOfTracking != null) {
                 timePoint = startOfTracking.asDate();
             } else if (startTime != null) {
-                timePoint = startTime.minus(TimingConstants.PRE_START_PHASE_DURATION_IN_MILLIS).plus(1).asDate();
+                timePoint = startTime.minus(TimingConstants.PRE_START_PHASE_DURATION_IN_MILLIS).plusResolution().asDate();
             }
         }
 

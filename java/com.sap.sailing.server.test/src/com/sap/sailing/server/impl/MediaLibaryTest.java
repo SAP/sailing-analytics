@@ -156,7 +156,7 @@ public class MediaLibaryTest {
     public void testQueryMediaTracksBetween_TrackEndsBeforeRange() {
         TimePoint startTime = MillisecondsTimePoint.now();
         Duration duration = THIRTY_MINUTES_IN_MILLIS;
-        TimePoint rangeStart = startTime.plus(duration).plus(1);
+        TimePoint rangeStart = startTime.plus(duration).plusResolution();
         TimePoint rangeEnd = rangeStart.plus(ONE_HOUR_IN_MILLIS);
 
         assertNoOverlap(startTime, duration, rangeStart, rangeEnd);
@@ -213,8 +213,8 @@ public class MediaLibaryTest {
         firstMediaTrack.duration = MillisecondsDurationImpl.ONE_HOUR;
         mediaLibary.addMediaTrack(firstMediaTrack);
         
-        TimePoint queryStartTime = firstMediaTrack.startTime.plus(1);
-        TimePoint queryEndTime = firstMediaTrack.deriveEndTime().minus(1);
+        TimePoint queryStartTime = firstMediaTrack.startTime.plusResolution();
+        TimePoint queryEndTime = firstMediaTrack.deriveEndTime().minusResolution();
         
         Collection<MediaTrack> firstQueryResult = mediaLibary.findMediaTracksInTimeRange(queryStartTime, queryEndTime);
         assertThat(firstQueryResult.size(), is(1));
@@ -267,7 +267,7 @@ public class MediaLibaryTest {
     @Test
     public void testIntervalEqualsIdentical() throws Exception {
         TimePoint date1 = MillisecondsTimePoint.now();
-        TimePoint date2 = date1.plus(1);
+        TimePoint date2 = date1.plusResolution();
         TimeRange interval = new TimeRangeImpl(date1, date2);
         assertTrue(interval.equals(interval));
     }
@@ -275,7 +275,7 @@ public class MediaLibaryTest {
     @Test
     public void testIntervalEqualsSame() throws Exception {
         TimePoint date1_1 = MillisecondsTimePoint.now();
-        TimePoint date1_2 = date1_1.plus(1);
+        TimePoint date1_2 = date1_1.plusResolution();
         TimePoint date2_1 = date1_1;
         TimePoint date2_2 = date1_2;
         TimeRange interval1 = new TimeRangeImpl(date1_1, date1_2);
@@ -287,7 +287,7 @@ public class MediaLibaryTest {
     @Test
     public void testIntervalEqualsNull() throws Exception {
         TimePoint date1 = MillisecondsTimePoint.now();
-        TimePoint date2 = date1.plus(1);
+        TimePoint date2 = date1.plusResolution();
         TimeRange interval = new TimeRangeImpl(date1, date2);
         assertFalse(interval.equals(null));
     }
@@ -295,7 +295,7 @@ public class MediaLibaryTest {
     @Test
     public void testIntervalNotEquals() throws Exception {
         TimePoint date1_1 = MillisecondsTimePoint.now();
-        TimePoint date1_2 = date1_1.plus(1);
+        TimePoint date1_2 = date1_1.plusResolution();
         TimePoint date2_1 = date1_1.plus(2);
         TimePoint date2_2 = date1_1.plus(3);
         TimeRange interval1 = new TimeRangeImpl(date1_1, date1_2);
