@@ -40,6 +40,7 @@ import com.sap.sailing.domain.racelog.tracking.SensorFixStore;
 import com.sap.sailing.domain.test.TrackBasedTest;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.Util;
 import com.sap.sse.common.media.MimeType;
 
 public class MediaMasterDataExportTest {
@@ -73,8 +74,8 @@ public class MediaMasterDataExportTest {
         Collection<RaceIdentifier> regattaRaces = Collections.emptyList();
         Collection<RaceIdentifier> flexibleRaces = Collections.emptyList();
         TopLevelMasterData topLevelMasterData = createTopLevelMasterData(regattaRaces , flexibleRaces, allMediaTracks);
-        Collection<MediaTrack> filteredMediaTracks = topLevelMasterData.getFilteredMediaTracks();
-        assertEquals(0, filteredMediaTracks.size());
+        Iterable<MediaTrack> filteredMediaTracks = topLevelMasterData.getFilteredMediaTracks();
+        assertEquals(0, Util.size(filteredMediaTracks));
     }
 
     @Test
@@ -96,8 +97,8 @@ public class MediaMasterDataExportTest {
         );
         Collection<RaceIdentifier> flexibleRaces = Collections.emptyList();
         TopLevelMasterData topLevelMasterData = createTopLevelMasterData(regattaRaces , flexibleRaces, allMediaTracks);
-        Collection<MediaTrack> filteredMediaTracks = topLevelMasterData.getFilteredMediaTracks();
-        assertEquals(3, filteredMediaTracks.size());
+        Iterable<MediaTrack> filteredMediaTracks = topLevelMasterData.getFilteredMediaTracks();
+        assertEquals(3, Util.size(filteredMediaTracks));
     }
 
     @Test
@@ -119,8 +120,8 @@ public class MediaMasterDataExportTest {
                 new RegattaNameAndRaceName(matchingRegattaName, matchingRace3)
         );
         TopLevelMasterData topLevelMasterData = createTopLevelMasterData(regattaRaces , flexibleRaces, allMediaTracks);
-        Collection<MediaTrack> filteredMediaTracks = topLevelMasterData.getFilteredMediaTracks();
-        assertEquals(3, filteredMediaTracks.size());
+        Iterable<MediaTrack> filteredMediaTracks = topLevelMasterData.getFilteredMediaTracks();
+        assertEquals(3, Util.size(filteredMediaTracks));
     }
 
     private TopLevelMasterData createTopLevelMasterData(Collection<RaceIdentifier> regattaRaces, Collection<RaceIdentifier> flexibleRaces, Collection<MediaTrack> allMediaTracks) {

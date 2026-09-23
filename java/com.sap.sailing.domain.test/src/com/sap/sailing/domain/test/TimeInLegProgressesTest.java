@@ -48,7 +48,7 @@ public class TimeInLegProgressesTest extends OnlineTracTracBasedTest {
         final Competitor findel = getCompetitorByName("Findel");
         TrackedLegOfCompetitor findelsSecondLeg = getTrackedRace().getTrackedLeg(getTrackedRace().getRace().getCourse().getLegs().get(1)).getTrackedLeg(findel);
         TimePoint findelStartedHisSecondLegAt = findelsSecondLeg.getStartTime();
-        assertEquals(null, findelsSecondLeg.getTime(findelStartedHisSecondLegAt.minus(1)));
+        assertEquals(null, findelsSecondLeg.getTime(findelStartedHisSecondLegAt.minusResolution()));
         assertEquals(0.0, findelsSecondLeg.getTime(findelStartedHisSecondLegAt).asMillis(), 0.00001);
         assertEquals(10000.0, findelsSecondLeg.getTime(findelStartedHisSecondLegAt.plus(10000)).asMillis(), 0.00001);
     }

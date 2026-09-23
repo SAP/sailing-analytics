@@ -201,14 +201,14 @@ public class TrackBasedEstimationWindTrackImpl extends VirtualWindTrackImpl {
                     newStart = start;
                 } else {
                     // don't go beyond the end of time, avoiding overflow
-                    newStart = getDummyFixWithConfidence(getEnd().asMillis()==Long.MAX_VALUE?getEnd():getEnd().plus(1));
+                    newStart = getDummyFixWithConfidence(getEnd().asMillis()==Long.MAX_VALUE?getEnd():getEnd().plusResolution());
                 }
                 final TimePoint newEnd;
                 if (end.after(getEnd())) {
                     newEnd = end;
                 } else {
                     // avoid underflow
-                    newEnd = startTimePoint.asMillis()==0?startTimePoint:startTimePoint.minus(1);
+                    newEnd = startTimePoint.asMillis()==0?startTimePoint:startTimePoint.minusResolution();
                 }
                 if (!newStart.getObject().getTimePoint().after(newEnd)) {
                     result.set(newStart, newEnd);
@@ -627,9 +627,9 @@ public class TrackBasedEstimationWindTrackImpl extends VirtualWindTrackImpl {
             // See WindComparator; if time is equal, position is compared; for dummy fixes this will create arbitrary
             // order, so ensure time point cannot
             // accidentally be equal
-            Wind lastFixBefore = windTrack.getLastFixBefore(timePoint.minus(1)); // subtract one millisecond to be sure
+            Wind lastFixBefore = windTrack.getLastFixBefore(timePoint.minusResolution()); // one resolution unit earlier to be sure
                                                                                  // to be before a fix just inserted
-            Wind firstFixAfter = windTrack.getFirstFixAfter(timePoint.plus(1)); // add one millisecond to be sure to be
+            Wind firstFixAfter = windTrack.getFirstFixAfter(timePoint.plusResolution()); // one resolution unit later to be sure to be
                                                                                 // after a fix just inserted
             final WindWithConfidence<TimePoint> startOfInvalidation;
             if (lastFixBefore == null) {
