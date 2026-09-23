@@ -25,6 +25,16 @@
           <div class="innerContent">
           <h2 class="articleSubheadline">September 2026</h2>
           <ul class="bulletList">
+                <li>Master data import (MDI) now uses noticeably less memory and is a little faster, especially when
+                    importing a whole season. GPS fixes and wind tracks are now streamed and stored incrementally
+                    instead of being held in memory all at once, so large imports are far less likely to run into
+                    memory pressure on the importing server. The import progress bar also advances more smoothly and
+                    monotonically to completion.
+                    See <a href="https://github.com/eclipse-sailing-analytics/sailing-analytics/issues/6227">issue #6227</a>.
+                    Note that this is an incompatible change, modifying the "wire format" for master data import. Make
+                    sure, importing and exporting side are on compatible releases.
+                    </li>
+                <li>Added boat class Yngling.</li>
                 <li>Added boat classes Onyx, Lacustre and 15m&sup2; SNS.</li>
                 <li>Bug fix: when allowing for competitor master data updates coming from TracTrac and the updates
                     were only about competitor nationality changes, those updates were not properly applied in all

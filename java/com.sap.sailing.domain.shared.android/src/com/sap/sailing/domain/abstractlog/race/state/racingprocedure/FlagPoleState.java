@@ -128,7 +128,7 @@ public class FlagPoleState {
         if (currentStateValidFrom == null) {
             return this;
         }
-        return racingProcedure.getActiveFlags(startTime, currentStateValidFrom.minus(1));
+        return racingProcedure.getActiveFlags(startTime, currentStateValidFrom.minusResolution());
     }
     
     public static FlagPole getMostInterestingFlagPole(List<FlagPole> poles) {
