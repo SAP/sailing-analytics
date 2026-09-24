@@ -61,7 +61,10 @@ on:
 jobs:
   # The "changes" job will cause the "build" job to get skipped for trivial changes
   changes:
-    permissions: {}
+    # pull-requests: read lets dorny/paths-filter diff via the REST API on the
+    # PR path; the empty default would make it treat everything as changed.
+    permissions:
+      pull-requests: read
     runs-on: ubuntu-latest
     outputs:
       # On workflow_dispatch there is no 'before' field in the event payload, so

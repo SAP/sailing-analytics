@@ -1,9 +1,8 @@
 name: build-sailing-base-p2
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'java/com.sap.sailing.targetplatform.base/**'
+  # don't run upon push in downstream repo; this happens upstream already,
+  # and the build outputs are stored at download.eclipse.org/sailing-analytics/p2
+  # where also the downstream build is getting them from
   workflow_dispatch: {}
 
 jobs:

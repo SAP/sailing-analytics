@@ -11,6 +11,7 @@ GITROOT="`dirname $0`/.."
 DOCKERDIR="${GITROOT}/docker"
 DOCKERFILE="$DOCKERDIR/Dockerfile"
 if [ "${release_prefix}" = "" ]; then
+  SET_LATEST=1
   release_prefix="main-"
 fi
 pushd "${DOCKERDIR}"

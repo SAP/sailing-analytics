@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eclipse Azimuth Sailing Analytics — Developer Hub</title>
+  <title>SAP Sailing Analytics — Developer Hub</title>
   <meta name="description" content="Open-source platform for live visualization, analysis, and broadcasting of sailing regattas. Proven at the 2020 and 2024 Olympics.">
-  <link rel="icon" href="source/favicon-light.png" type="image/png" media="(prefers-color-scheme: light)">
-  <link rel="icon" href="source/favicon-dark.png" type="image/png" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="source/favicon.ico" type="image/x-icon">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -122,7 +121,7 @@
     .hero__bg {
       position: absolute; inset: 0; overflow: hidden;
     }
-    .hero__bg img {
+    .hero__bg video {
       width: 100%; height: 100%; object-fit: cover; object-position: center 40%;
       opacity: .38;
     }
@@ -583,7 +582,7 @@
       transition: background var(--transition);
     }
     .footer__social a:hover { background: rgba(255,255,255,.18); text-decoration: none; }
-    .footer__social img { height: 18px; width: auto; filter: invert(1) brightness(2); }
+    .footer__social img { width: 16px; height: 16px; filter: invert(1) brightness(2); }
     .footer__col h4 {
       font-size: .75rem; font-weight: 700; text-transform: uppercase;
       letter-spacing: .09em; color: rgba(255,255,255,.35); margin-bottom: 14px;
@@ -625,7 +624,9 @@
 <nav class="nav">
   <div class="container nav__inner">
     <a href="#" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
-      <img src="source/logo-azimuth-no-bg.png" alt="Azimuth" style="height:48px;width:auto;filter:brightness(0) invert(1);">
+      <img src="https://www.sapsailing.com/gwt/images/home/logo-small@2x.png"
+           alt="SAP Sailing Analytics" style="height:40px;width:auto;">
+      <span style="font-size:.9rem;font-weight:700;color:rgba(255,255,255,.9);letter-spacing:.01em;white-space:nowrap;line-height:1;">Sailing Analytics</span>
     </a>
     <div class="nav__links">
       <a href="#solutions">Solutions</a>
@@ -633,30 +634,30 @@
       <a href="#docs">Documentation</a>
       <a href="#tech">Technology</a>
       <a href="#whatsnew">What's New</a>
-      <a class="btn btn-ghost nav__cta" href="https://github.com/eclipse-sailing-analytics/sailing-analytics" target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>GitHub</a>
+      <a class="btn btn-ghost nav__cta" href="https://github.com/SAP/sailing-analytics" target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>GitHub</a>
     </div>
   </div>
 </nav>
 
 <!-- ═══════════════════════════════════ HERO ═══════════════════════════════════ -->
 <section class="hero">
-  <div class="hero__bg"><img src="source/regatta-bg.webp" alt=""></div>
+  <div class="hero__bg"><video autoplay muted loop playsinline style="animation-duration:30s" src="source/bg_video.mp4" poster="../java/com.sap.sailing.www/images/bg-image.jpg"></video></div>
   <div class="container">
     <div class="hero__content">
-      <a class="hero__badge" href="https://github.com/eclipse-sailing-analytics/sailing-analytics?tab=Apache-2.0-1-ov-file#" target="_blank" rel="noopener" style="text-decoration:none;">
+      <div class="hero__badge">
         <span class="hero__badge-dot"></span>
         Open Source &mdash; Apache 2.0
-      </a>
+      </div>
       <h1>Open-source analytics for <span>competitive sailing</span></h1>
       <p class="hero__sub">
-        Eclipse Azimuth Sailing Analytics is a community-driven platform for live GPS tracking,
+        SAP Sailing Analytics is a community-driven platform for live GPS tracking,
         real-time race analysis, and fan engagement — from club regattas to the Olympic Games.
         Free to use, free to contribute.
       </p>
       <div class="hero__actions">
         <a class="btn btn-primary" href="#getting-started">Get Started</a>
         <a class="btn btn-outline-white" href="https://www.sapsailing.com/gwt/Home.html" target="_blank" rel="noopener">Open Application</a>
-        <a class="btn btn-outline-white" href="https://github.com/eclipse-sailing-analytics/sailing-analytics" target="_blank" rel="noopener">View on GitHub</a>
+        <a class="btn btn-outline-white" href="https://github.com/SAP/sailing-analytics" target="_blank" rel="noopener">View on GitHub</a>
       </div>
       <div class="hero__stats">
         <div>
@@ -697,11 +698,11 @@
           <!-- Sailing Analytics -->
           <div class="sol-card">
             <div class="sol-card__img">
-              <img src="source/sailing-analytics-Photoroom.png" alt="Eclipse Azimuth Sailing Analytics">
+              <img src="source/sailing-analytics.png" alt="SAP Sailing Analytics">
             </div>
             <div class="sol-card__body">
               <span class="sol-card__tag sol-card__tag--web">Web Platform</span>
-              <h3>Eclipse Azimuth Sailing Analytics</h3>
+              <h3>SAP Sailing Analytics</h3>
               <p>Real-time GPS analytics for rankings, speeds, maneuvers, and bearings — from club regattas to the Olympic Games. Processes live telemetry in the cloud and visualizes it in multiple frontends.</p>
               <div class="sol-card__links">
                 <button class="btn btn-primary" onclick="openModal('modal-sa')">Learn More</button>
@@ -729,12 +730,12 @@
           <!-- Sail Insight -->
           <div class="sol-card">
             <div class="sol-card__img">
-              <img src="source/sail-insight-1-Photoroom.png" alt="Sail Insight">
+              <img src="source/sail-insight-1.png" alt="Sail Insight">
             </div>
             <div class="sol-card__body">
               <span class="sol-card__tag sol-card__tag--ios">iOS &amp; Android App</span>
               <h3>Sail Insight</h3>
-              <p>Sailors can join, set up, and manage GPS tracking for regattas of various formats. One-design and handicap regattas supported. Connects to the Eclipse Azimuth Sailing Analytics cloud for deep analysis.</p>
+              <p>Sailors can join, set up, and manage GPS tracking for regattas of various formats. One-design and handicap regattas supported. Connects to the SAP Sailing Analytics cloud for deep analysis.</p>
               <div class="sol-card__links">
                 <button class="btn btn-primary" onclick="openModal('modal-si')">Learn More</button>
                 <div class="sol-card__store-split">
@@ -748,12 +749,12 @@
           <!-- Buoy Pinger -->
           <div class="sol-card">
             <div class="sol-card__img">
-              <img src="source/sailing-buoy-pinger-1-Photoroom.png" alt="Sailing Buoy Pinger">
+              <img src="source/sailing-buoy-pinger-1.png" alt="Sailing Buoy Pinger">
             </div>
             <div class="sol-card__body">
               <span class="sol-card__tag sol-card__tag--android">Android App</span>
               <h3>Sailing Buoy Pinger</h3>
-              <p>Simplify race mark positioning and communication with mark layers. Connects to Eclipse Azimuth Sailing Analytics so regatta managers can track mark positions and enable Sail Insight GPS tracking.</p>
+              <p>Simplify race mark positioning and communication with mark layers. Connects to SAP Sailing Analytics so regatta managers can track mark positions and enable Sail Insight GPS tracking.</p>
               <div class="sol-card__links">
                 <button class="btn btn-primary" onclick="openModal('modal-bp')">Learn More</button>
                 <a class="sol-card__store" href="https://play.google.com/store/apps/details?id=com.sap.sailing.android.buoy.positioning.app" target="_blank" rel="noopener"><img src="source/logo-google-play.png" width="13" height="13" alt="" style="display:inline-block;vertical-align:middle;">Google Play</a>
@@ -764,7 +765,7 @@
           <!-- Strategy Simulator -->
           <div class="sol-card">
             <div class="sol-card__img">
-              <img src="source/strategy-simulator-Photoroom.png" alt="Strategy Simulator">
+              <img src="source/strategy-simulator.png" alt="Strategy Simulator">
             </div>
             <div class="sol-card__body">
               <span class="sol-card__tag sol-card__tag--web">Web Platform</span>
@@ -794,7 +795,7 @@
     <p class="eyebrow">Quick Start</p>
     <h2>Up and running in minutes</h2>
     <p class="lead" style="max-width:540px;margin-top:10px;">
-      The fastest way to explore Eclipse Azimuth Sailing Analytics locally is via Docker Compose —
+      The fastest way to explore SAP Sailing Analytics locally is via Docker Compose —
       no build required, just pull and run.
     </p>
     <div class="steps">
@@ -822,7 +823,7 @@
     <div class="code-block">
       <div class="code-block__bar"><span></span><span></span><span></span></div>
       <pre><span class="cc"># Download the Docker Compose configuration</span>
-<span class="ck">wget</span> <span class="cv">"https://github.com/eclipse-sailing-analytics/sailing-analytics/raw/main/docker/docker-compose.yml"</span>
+<span class="ck">wget</span> <span class="cv">"https://github.com/SAP/sailing-analytics/raw/main/docker/docker-compose.yml"</span>
 
 <span class="cc"># Start MongoDB, RabbitMQ, and Sailing Analytics</span>
 <span class="ck">docker-compose</span> up
@@ -832,8 +833,8 @@
     </div>
     <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:28px;">
       <a class="btn btn-yellow" href="https://wiki.sapsailing.com/wiki/howto/onboarding.md" target="_blank" rel="noopener">Full Onboarding Guide</a>
-      <a class="btn btn-outline-white" href="https://github.com/eclipse-sailing-analytics/sailing-analytics/releases" target="_blank" rel="noopener">Latest Release</a>
-      <a class="btn btn-outline-white" href="https://github.com/eclipse-sailing-analytics/sailing-analytics/pkgs/container/sailing-analytics" target="_blank" rel="noopener">Docker Image</a>
+      <a class="btn btn-outline-white" href="https://github.com/SAP/sailing-analytics/releases" target="_blank" rel="noopener">Latest Release</a>
+      <a class="btn btn-outline-white" href="https://github.com/SAP/sailing-analytics/pkgs/container/sailing-analytics" target="_blank" rel="noopener">Docker Image</a>
       <span style="margin-left:auto;display:inline-flex;align-items:center;gap:8px;padding:9px 16px;background:rgba(239,170,0,.12);border:1px solid rgba(239,170,0,.35);border-radius:var(--radius);border-left:3px solid var(--yellow);">
         <span style="font-size:.9rem;font-weight:900;color:var(--yellow);line-height:1;">!</span>
         <span style="font-size:.82rem;color:rgba(255,255,255,.8);">Found a bug or have a feature request? Use the <a href="https://github.com/eclipse-sailing-analytics/sailing-analytics/issues/" target="_blank" rel="noopener" style="color:var(--yellow);font-weight:700;">issue tracker</a> on GitHub.</span>
@@ -859,7 +860,7 @@
     <p class="eyebrow">Technology</p>
     <h2>Built on proven open-source foundations</h2>
     <p class="lead" style="max-width:560px;margin-top:10px;">
-      A polyglot stack - Java backend, GWT frontend, mobile apps - all tied together
+      A polyglot stack — Java backend, GWT frontend, mobile apps — all tied together
       by battle-tested middleware and cloud infrastructure.
     </p>
     <div class="tech__grid">
@@ -958,7 +959,7 @@
           </div>
           <span class="accordion-arrow">▼</span>
         </div>
-        <div class="accordion-body" data-src="https://raw.githubusercontent.com/eclipse-sailing-analytics/sailing-analytics/main/java/com.sap.sailing.gwt.ui/src/main/java/com/sap/sailing/gwt/home/desktop/places/whatsnew/resources/SailingAnalyticsNotes.html">
+        <div class="accordion-body" data-src="https://raw.githubusercontent.com/SAP/sailing-analytics/main/java/com.sap.sailing.gwt.ui/src/main/java/com/sap/sailing/gwt/home/desktop/places/whatsnew/resources/SailingAnalyticsNotes.html">
           <div class="accordion-loading">Loading…</div>
         </div>
       </div>
@@ -972,7 +973,7 @@
           </div>
           <span class="accordion-arrow">▼</span>
         </div>
-        <div class="accordion-body" data-src="https://raw.githubusercontent.com/eclipse-sailing-analytics/sailing-analytics/main/java/com.sap.sailing.gwt.ui/src/main/java/com/sap/sailing/gwt/home/desktop/places/whatsnew/resources/RaceCommitteeAppNotes.html">
+        <div class="accordion-body" data-src="https://raw.githubusercontent.com/SAP/sailing-analytics/main/java/com.sap.sailing.gwt.ui/src/main/java/com/sap/sailing/gwt/home/desktop/places/whatsnew/resources/RaceCommitteeAppNotes.html">
           <div class="accordion-loading">Loading…</div>
         </div>
       </div>
@@ -986,7 +987,7 @@
           </div>
           <span class="accordion-arrow">▼</span>
         </div>
-        <div class="accordion-body" data-src="https://raw.githubusercontent.com/eclipse-sailing-analytics/sailing-analytics/main/java/com.sap.sailing.gwt.ui/src/main/java/com/sap/sailing/gwt/home/desktop/places/whatsnew/resources/InSightAppNotes.html">
+        <div class="accordion-body" data-src="https://raw.githubusercontent.com/SAP/sailing-analytics/main/java/com.sap.sailing.gwt.ui/src/main/java/com/sap/sailing/gwt/home/desktop/places/whatsnew/resources/InSightAppNotes.html">
           <div class="accordion-loading">Loading…</div>
         </div>
       </div>
@@ -1000,7 +1001,7 @@
           </div>
           <span class="accordion-arrow">▼</span>
         </div>
-        <div class="accordion-body" data-src="https://raw.githubusercontent.com/eclipse-sailing-analytics/sailing-analytics/main/java/com.sap.sailing.gwt.ui/src/main/java/com/sap/sailing/gwt/home/desktop/places/whatsnew/resources/BuoyPingerAppNotes.html">
+        <div class="accordion-body" data-src="https://raw.githubusercontent.com/SAP/sailing-analytics/main/java/com.sap.sailing.gwt.ui/src/main/java/com/sap/sailing/gwt/home/desktop/places/whatsnew/resources/BuoyPingerAppNotes.html">
           <div class="accordion-loading">Loading…</div>
         </div>
       </div>
@@ -1014,7 +1015,7 @@
           </div>
           <span class="accordion-arrow">▼</span>
         </div>
-        <div class="accordion-body" data-src="https://raw.githubusercontent.com/eclipse-sailing-analytics/sailing-analytics/main/java/com.sap.sailing.gwt.ui/src/main/java/com/sap/sailing/gwt/home/desktop/places/whatsnew/resources/SailingSimulatorNotes.html">
+        <div class="accordion-body" data-src="https://raw.githubusercontent.com/SAP/sailing-analytics/main/java/com.sap.sailing.gwt.ui/src/main/java/com/sap/sailing/gwt/home/desktop/places/whatsnew/resources/SailingSimulatorNotes.html">
           <div class="accordion-loading">Loading…</div>
         </div>
       </div>
@@ -1029,14 +1030,21 @@
   <div class="container">
     <div class="footer__grid">
       <div class="footer__brand">
-        <img src="source/logo-azimuth-no-bg.png" alt="Azimuth" style="height:80px;width:auto;margin-bottom:4px;">
+        <img src="https://www.sapsailing.com/images/sap-logo.png"
+             alt="SAP Sailing Analytics">
         <p>Open-source regatta analytics platform — live GPS tracking, race analysis, and fan engagement. Proven at the Olympic Games.</p>
         <div class="footer__social">
-          <a href="https://github.com/eclipse-sailing-analytics/sailing-analytics" target="_blank" rel="noopener" title="GitHub">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          <a href="https://instagram.com/sap" target="_blank" rel="noopener" title="Instagram">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
           </a>
-          <a href="https://projects.eclipse.org/projects/technology.sailing-analytics" target="_blank" rel="noopener" title="Eclipse Foundation">
-            <img src="source/logo-eclipse.svg" alt="Eclipse Foundation" style="width:18px;height:18px;display:block;margin:auto;">
+          <a href="https://x.com/sap" target="_blank" rel="noopener" title="X / Twitter">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a href="https://facebook.com/SAP" target="_blank" rel="noopener" title="Facebook">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a href="https://github.com/SAP/sailing-analytics" target="_blank" rel="noopener" title="GitHub">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
           </a>
         </div>
       </div>
@@ -1048,7 +1056,7 @@
           <li><a href="#getting-started">Quick Start</a></li>
           <li><a href="#whatsnew">What's New</a></li>
           <li><a href="https://www.sapsailing.com/gwt/Home.html" target="_blank" rel="noopener">Application</a></li>
-          <li><a href="https://github.com/eclipse-sailing-analytics/sailing-analytics/releases" target="_blank" rel="noopener">Releases</a></li>
+          <li><a href="https://github.com/SAP/sailing-analytics/releases" target="_blank" rel="noopener">Releases</a></li>
         </ul>
       </div>
 
@@ -1058,7 +1066,7 @@
           <li><a href="wiki.html" target="_blank" rel="noopener">Wiki</a></li>
           <li><a href="https://wiki.sapsailing.com/wiki/howto/onboarding.md" target="_blank" rel="noopener">Onboarding</a></li>
           <li><a href="https://wiki.sapsailing.com/wiki/info/api/api-v1.md" target="_blank" rel="noopener">API Reference</a></li>
-          <li><a href="https://github.com/eclipse-sailing-analytics/sailing-analytics/actions" target="_blank" rel="noopener">CI / CD</a></li>
+          <li><a href="https://github.com/SAP/sailing-analytics/actions" target="_blank" rel="noopener">CI / CD</a></li>
           <li><a href="https://github.com/eclipse-sailing-analytics/sailing-analytics/issues/" target="_blank" rel="noopener">Issue Tracker</a></li>
         </ul>
       </div>
@@ -1066,18 +1074,19 @@
       <div class="footer__col">
         <h4>Community</h4>
         <ul>
-          <li><a href="https://github.com/eclipse-sailing-analytics/sailing-analytics" target="_blank" rel="noopener">GitHub</a></li>
-          <li><a href="https://github.com/eclipse-sailing-analytics/sailing-analytics/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a></li>
+          <li><a href="https://github.com/SAP/sailing-analytics" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="https://github.com/SAP/.github/blob/main/CODE_OF_CONDUCT.md" target="_blank" rel="noopener">Code of Conduct</a></li>
           <li><a href="https://wiki.sapsailing.com/wiki/howto/tutorials/home.md" target="_blank" rel="noopener">Support</a></li>
         </ul>
       </div>
     </div>
 
     <div class="footer__bottom">
-      <p>&copy; 2011&ndash;2026 Eclipse Azimuth Sailing Analytics contributors.</p>
+      <p>&copy; 2011&ndash;2026 SAP SE or an SAP affiliate company and sailing-analytics contributors.</p>
       <div class="footer__bottom-links">
         <a href="https://www.sapsailing.com/gwt/Home.html#/imprint/:" target="_blank" rel="noopener">Legal Disclosure</a>
-        <a href="https://github.com/eclipse-sailing-analytics/sailing-analytics" target="_blank" rel="noopener">Source Code</a>
+        <a href="https://www.sap.com/about/legal/privacy.html" target="_blank" rel="noopener">Privacy</a>
+        <a href="https://github.com/SAP/sailing-analytics" target="_blank" rel="noopener">Source Code</a>
         <a href="https://wiki.sapsailing.com/wiki/howto/tutorials/home.md" target="_blank" rel="noopener">Support</a>
       </div>
     </div>
@@ -1091,14 +1100,14 @@
   <div class="modal">
     <div class="modal__header">
       <div class="modal__header-left">
-        <div class="modal__header-title">Eclipse Azimuth Sailing Analytics</div>
+        <div class="modal__header-title">SAP Sailing Analytics</div>
         <div class="modal__header-sub">Web Platform · Cloud &amp; In-Memory</div>
       </div>
       <button class="modal__close" onclick="closeModal('modal-sa')">&times;</button>
     </div>
     <div class="modal__img-slider" id="mslider-sa">
       <div class="modal__img-track">
-        <img src="source/sailing-analytics-Photoroom.png" alt="Eclipse Azimuth Sailing Analytics">
+        <img src="source/sailing-analytics.png" alt="SAP Sailing Analytics">
       </div>
     </div>
     <div class="modal__body">
@@ -1111,7 +1120,7 @@
           </div>
           <span class="modal__card-arrow">→</span>
         </a>
-        <a class="modal__card" href="https://github.com/eclipse-sailing-analytics/sailing-analytics" target="_blank" rel="noopener">
+        <a class="modal__card" href="https://github.com/SAP/sailing-analytics" target="_blank" rel="noopener">
           <div class="modal__card-icon modal__card-icon--yellow">⭐</div>
           <div class="modal__card-text">
             <div class="modal__card-title">GitHub Repository</div>
@@ -1236,10 +1245,10 @@
     </div>
     <div class="modal__img-slider" id="mslider-si">
       <div class="modal__img-track">
-        <img src="source/sail-insight-1-Photoroom.png" alt="Sail Insight 1">
+        <img src="source/sail-insight-1.png" alt="Sail Insight 1">
         <img src="source/sail-insight-2.png" alt="Sail Insight 2">
         <img src="source/sail-insight-3.png" alt="Sail Insight 3">
-        <img src="source/sail-insight-4-Photoroom.png" alt="Sail Insight 4">
+        <img src="source/sail-insight-4.png" alt="Sail Insight 4">
       </div>
       <button class="modal__img-btn modal__img-btn--prev" onclick="mSlide('mslider-si',-1)">&#8249;</button>
       <button class="modal__img-btn modal__img-btn--next" onclick="mSlide('mslider-si',1)">&#8250;</button>
@@ -1295,9 +1304,9 @@
     </div>
     <div class="modal__img-slider" id="mslider-bp">
       <div class="modal__img-track">
-        <img src="source/sailing-buoy-pinger-1-Photoroom.png" alt="Buoy Pinger 1">
-        <img src="source/sailing-buoy-pinger-2-Photoroom.png" alt="Buoy Pinger 2">
-        <img src="source/sailing-buoy-pinger-3-Photoroom.png" alt="Buoy Pinger 3">
+        <img src="source/sailing-buoy-pinger-1.png" alt="Buoy Pinger 1">
+        <img src="source/sailing-buoy-pinger-2.png" alt="Buoy Pinger 2">
+        <img src="source/sailing-buoy-pinger-3.png" alt="Buoy Pinger 3">
       </div>
       <button class="modal__img-btn modal__img-btn--prev" onclick="mSlide('mslider-bp',-1)">&#8249;</button>
       <button class="modal__img-btn modal__img-btn--next" onclick="mSlide('mslider-bp',1)">&#8250;</button>
@@ -1348,7 +1357,7 @@
     </div>
     <div class="modal__img-slider" id="mslider-ss">
       <div class="modal__img-track">
-        <img src="source/strategy-simulator-Photoroom.png" alt="Strategy Simulator">
+        <img src="source/strategy-simulator.png" alt="Strategy Simulator">
       </div>
     </div>
     <div class="modal__body">
@@ -1381,7 +1390,7 @@
       </div>
       <div class="modal__section-label">Source Code</div>
       <div class="modal__cards">
-        <a class="modal__card" href="https://github.com/eclipse-sailing-analytics/sailing-analytics" target="_blank" rel="noopener">
+        <a class="modal__card" href="https://github.com/SAP/sailing-analytics" target="_blank" rel="noopener">
           <div class="modal__card-icon modal__card-icon--green">💻</div>
           <div class="modal__card-text">
             <div class="modal__card-title">GitHub Repository</div>
@@ -1450,6 +1459,14 @@
         {label:'AI Agent',          url:'https://wiki.sapsailing.com/wiki/info/landscape/ai-agent.md'},
       ]},
   ];
+
+  // Hero video — normal speed
+  (function() {
+    const vid = document.querySelector('.hero__bg video');
+    if (vid) {
+      vid.playbackRate = 1.0;
+    }
+  })();
 
   // ── Solutions carousel ────────────────────────────────────────────────────
   (function() {

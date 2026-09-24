@@ -1,0 +1,4 @@
+An exporter to a HANA Cloud DB instance, as an interim step for onward processing
+with other standard SAP tools, such as SAP Analytics Cloud (SAC). A downstream
+SAP-specific addition that over time may be removed from the upstream Eclipse
+Azimuth Sailing Analytics repository.

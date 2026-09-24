@@ -1,10 +1,8 @@
 name: build-aws-sdk-p2
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'java/com.amazon.aws.aws-java-api/**'
-      - 'java/com.amazon.aws.aws-java-api.updatesite/**'
+  # Downstream, don't build upon push; this is restricted to upstream, where the output is
+  # stored at download.eclipse.org/sailing-analytics/p2 where also the downstream build
+  # is getting it from
   workflow_dispatch: {}
 
 jobs:

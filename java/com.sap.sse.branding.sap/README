@@ -1,0 +1,5 @@
+An implementation of the com.sap.sse.branding interfaces, specific to SAP.
+Must be activated only in an SAP-controlled environment and is currently
+also still part of the upstream Eclipse Azimuth Sailing Analytics repo.
+We should probably replace it there by a generic "Azimuth" and "Eclipse"
+branded version, so this bundle may disappear in upstream anytime soon.

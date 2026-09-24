@@ -266,7 +266,7 @@ public class GithubReleasesRepository extends AbstractReleaseRepository implemen
             throw new RuntimeException("You hit the rate limit of "+connection.getHeaderField("x-ratelimit-limit"));
         }
         final String linkHeader = connection.getHeaderField("link");
-        final String nextPageURL = linkHeader == null ? null : getNextPageURL(linkHeader);
+        final String nextPageURL = getNextPageURL(linkHeader);
         logger.fine(()->nextPageURL==null?"This was the last page":("Next page will be "+nextPageURL));
         final List<Pair<TimePoint, GithubRelease>> publishingTimePointsAndReleases = new LinkedList<>();
         final JSONArray releasesJson = (JSONArray) new JSONParser().parse(new InputStreamReader(index));

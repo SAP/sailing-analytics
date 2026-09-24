@@ -3,9 +3,9 @@ if [ $# -eq 0 ]; then
     echo "$0 <bugid>"
     echo ""
     echo
-    echo "Constructs a Jenkins job for the given issue ID"
+    echo "Constructs a Hudson job for the given bugid"
     echo "Example: $0 4221 [ {Bugzilla-API-Key} ]"
-    echo "Builds a Jenkins job for bug branch bug4221, and linking to the Github Issue."
+    echo "Builds a Hudson job for bug branch bug4221, and linking to the Github Issue."
     exit 2
 fi
 
@@ -13,7 +13,7 @@ BUG_ID="$1"
 
 CONFIGFILE=$(mktemp mylocalconfigXXXX.xml)
 RESPONSE_HEADERS=$(mktemp responseheadersXXXX)
-JENKINS_BASE_URL=https://ci.eclipse.org/sailing-analytics
+HUDSON_BASE_URL=https://hudson.sapsailing.com
 GITHUB_ISSUES_BASE="https://github.com/eclipse-sailing-analytics/sailing-analytics/issues/"
 BUGZILLA_BASE=https://bugzilla.sapsailing.com/bugzilla
 COPY_TEMPLATE_JOB=CopyTemplate
@@ -23,16 +23,16 @@ BUG_SUMMARY="$( curl -s -H 'Accept: application/vnd.github+json' https://api.git
 echo "Found: ${BUG_SUMMARY}"
 if [ -z "${USERNAME}" ]; then
   if [[ "$OSTYPE" == *"$OS_FOR_GSED"* ]]; then
-    read -e -p "Jenkins Username (e-mail): " USERNAME
+    read -e -p "Hudson Username: " USERNAME
   else
-    read -p "Jenkins Username (e-mail): " USERNAME
+    read -p "Hudson Username: " USERNAME
 fi
 fi
 if [ -z "${PASSWORD}" ]; then
-  read -s -p "Jenkins Password (API Token): " PASSWORD
+  read -s -p "Hudson Password: " PASSWORD
 fi
 echo
-COPY_TEMPLATE_CONFIG_URL="$JENKINS_BASE_URL/job/$COPY_TEMPLATE_JOB/config.xml"
+COPY_TEMPLATE_CONFIG_URL="$HUDSON_BASE_URL/job/$COPY_TEMPLATE_JOB/config.xml"
 curl -s -X GET $COPY_TEMPLATE_CONFIG_URL -u "$USERNAME:$PASSWORD" -o "$CONFIGFILE"
 
 # On macosx is gnu-sed needed
@@ -92,10 +92,10 @@ else
   s|<name>[^<]*</name>|<name>bug'$BUG_ID'</name>|
   }' "$CONFIGFILE"
 fi
-curl -D "$RESPONSE_HEADERS" -s -XPOST "$JENKINS_BASE_URL/createItem?name=bug$BUG_ID" -u "$USERNAME:$PASSWORD" --data-binary "@$CONFIGFILE" -H "Content-Type:text/xml" >/dev/null 2>/dev/null
+curl -D "$RESPONSE_HEADERS" -s -XPOST "$HUDSON_BASE_URL/createItem?name=bug$BUG_ID" -u "$USERNAME:$PASSWORD" --data-binary "@$CONFIGFILE" -H "Content-Type:text/xml" >/dev/null 2>/dev/null
 RESPONSE_CODE=$(cat "$RESPONSE_HEADERS" | head -n 1 | cut -d ' ' -f2 )
 if [[ "$RESPONSE_CODE" =~ 2.. ]]; then
-  echo "Find your new, enabled Jenkins job at $JENKINS_BASE_URL/job/bug$BUG_ID/"
+  echo "Find your new, enabled Hudson job at $HUDSON_BASE_URL/job/bug$BUG_ID/"
 else
   echo "Error. HTTP response code $RESPONSE_CODE. Did the job already exist?"
 fi
