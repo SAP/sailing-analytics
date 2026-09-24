@@ -169,3 +169,7 @@ Details and options (skip tests, single permutation, proxy): [[Build for deploym
 ## 17. Browser
 
 Install **Chrome or Firefox** (needed to open the AdminConsole in step 15). Safari does not work reliably with this project.
+
+## Contributing to this guide
+
+Made it through the setup? Great, please help keep this guide useful for the next person. If you spotted anything unclear or outdated, found a better way to do a step, or worked out the **native Apple Silicon (arm64) path** in more detail, you are very welcome to improve this document and open a **pull request**. Contributions that flesh out the arm64 variant are especially valuable, since that path will matter more as Rosetta 2 is phased out (see the note at the top).
