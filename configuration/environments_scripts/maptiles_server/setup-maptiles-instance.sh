@@ -16,12 +16,31 @@ if [ $# != 0 ]; then
   OPENFREEMAP_GIT=$( mktemp -d openfreemapXXXX.git )
   git clone https://github.com/axeluhl/openfreemap "${OPENFREEMAP_GIT}"
   cp $( dirname "${0}" )/bake.jsonc "${OPENFREEMAP_GIT}/config/linux_host"
+  if ! command -v uv >/dev/null 2>&1; then
+    echo "The 'uv' tool is required to run ./linux_host/deploy_linux_host.py but was not found." >&2
+    read -r -p "Install it now via 'curl -LsSf https://astral.sh/uv/install.sh | sh'? [y/N] " REPLY
+    if [[ "${REPLY}" =~ ^[Yy]$ ]]; then
+      curl -LsSf https://astral.sh/uv/install.sh | sh
+      # Make uv available in the current shell without requiring a new login session:
+      if [ -f "${HOME}/.local/bin/env" ]; then
+        . "${HOME}/.local/bin/env"
+      fi
+      if ! command -v uv >/dev/null 2>&1; then
+        echo "'uv' still not found on PATH after installation; aborting." >&2
+        exit 3
+      fi
+    else
+      echo "Cannot continue without 'uv'; aborting." >&2
+      exit 3
+    fi
+  fi
   pushd "${OPENFREEMAP_GIT}"
   ./linux_host/deploy_linux_host.py --config bake --host ${SERVER} --user ec2-user
   popd
   rm -rf "${OPENFREEMAP_GIT}"
   scp "${0}" ec2-user@${SERVER}:
   ssh -A ec2-user@${SERVER} ./$( basename "${0}" )
+  ssh -A ec2-user@${SERVER} "tail -f /data/ofm/linux_host/logs/sync.log"
 else
   if ec2-metadata | grep -q instance-id; then
     echo "Running on an AWS EC2 instance as user ${USER} / $(whoami), starting setup..."
