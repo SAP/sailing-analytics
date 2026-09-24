@@ -15,7 +15,7 @@ if [ $# != 0 ]; then
   SERVER=$1
   OPENFREEMAP_GIT=$( mktemp -d openfreemapXXXX.git )
   git clone https://github.com/axeluhl/openfreemap "${OPENFREEMAP_GIT}"
-  cp $( dirname "${0}" )/config.jsonc "${OPENFREEMAP_GIT}/config/linux_host"
+  cp $( dirname "${0}" )/bake.jsonc "${OPENFREEMAP_GIT}/config/linux_host"
   pushd "${OPENFREEMAP_GIT}"
   ./linux_host/deploy_linux_host.py --config bake --host ${SERVER} --user ec2-user
   popd
