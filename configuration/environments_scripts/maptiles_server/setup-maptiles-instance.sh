@@ -17,7 +17,9 @@ if [ $# != 0 ]; then
   git clone https://github.com/axeluhl/openfreemap "${OPENFREEMAP_GIT}"
   cp $( dirname "${0}" )/config.jsonc "${OPENFREEMAP_GIT}/config/linux_host"
   pushd "${OPENFREEMAP_GIT}"
-  ./linux_host/deploy_linux_host.py --config bake --host <IP-ADDRESS> --user ec2-user
+  ./linux_host/deploy_linux_host.py --config bake --host ${SERVER} --user ec2-user
+  popd
+  rm -rf "${OPENFREEMAP_GIT}"
   scp "${0}" ec2-user@${SERVER}:
   ssh -A ec2-user@${SERVER} ./$( basename "${0}" )
 else
