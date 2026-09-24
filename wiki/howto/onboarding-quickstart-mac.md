@@ -2,7 +2,7 @@
 
 A **self-contained, step-by-step** setup guide for macOS. Work through it top to bottom.
 
-This guide follows the structure of the full [[Onboarding|wiki/howto/onboarding#installations]] document; each step links to the relevant section there for background, edge cases and troubleshooting. If anything here ever lags behind that document, the full onboarding document is authoritative.
+This is a condensed guide meant to get you set up without looking elsewhere. The full [[Onboarding|wiki/howto/onboarding]] document remains the authoritative reference for all platforms and holds the background, edge cases and troubleshooting left out here; where that extra detail helps, individual steps link into the matching section. If anything here ever lags behind that document, the full onboarding document wins.
 
 > **⚠️ This quickstart targets the SAPJVM 8 + x86_64 Eclipse setup.** SAPJVM 8 is only available for **Intel (x86_64)**, so Eclipse must also be the **x86_64** build. On Apple Silicon that build runs through **Rosetta 2**.
 >
