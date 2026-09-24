@@ -1,0 +1,61 @@
+{
+  "$schema": "./schema.json",
+
+  // Domains served by this linux_host. Use multiple entries for multiple hostnames.
+  "domains": [
+    {
+      "domain": "maptiles.sapsailing.com",
+
+      // Public server with direct Let's Encrypt access.
+      // Certificates are issued and renewed by nginx's built-in ACME module:
+      // "cert": { "type": "letsencrypt", "email": "admin@example.com" },
+
+      // Recommended for production behind Cloudflare:
+      // create an Origin Certificate and put both files next to each other:
+      //   certs/tiles.example.com.cert
+      //   certs/tiles.example.com.key
+      // "cert": {
+      // "type": "upload",
+      // "cert_path": "certs/tiles.example.com.cert",
+      // },
+
+      // Alternative for local testing only:
+      // "cert": { "type": "dummy" }
+
+      // Behind an AWS ALB (or another proxy/CDN) that terminates TLS: serve
+      // plain HTTP on port 80 only, install no certificate and do not redirect
+      // to HTTPS. This is the recommended setup for the AL2023 fork.
+      "cert": { "type": "alb" }
+    },
+  ],
+
+  // Optional deploy targets. Normally you pass the deploy IP on the command line
+  // with --host [user@]host, which is authoritative and overrides this list, so
+  // this may be empty or omitted. Listed hosts are only used when --host is absent.
+  "hosts": ["my-ofm-host"],
+
+  // Optional default SSH user for deploys, used when --host has no user@ prefix
+  // and --user is not given. Defaults to "ec2-user".
+  // "ssh_user": "ec2-user",
+
+  // Prefetch completed releases and follow the shared deployed-version file.
+  // Set to false to start one detached sync at deployment and install no cron.
+  "auto_update": false,
+
+  // Optional: serve the newest runs already present locally without ever
+  // contacting the upstream deployed-version endpoint or downloading tiles.
+  // Use for instances seeded from another host (golden AMI / copied runs).
+  "local_versions": false,
+
+  // Optional: redirect requests to the tile server root path (/).
+  // Omit to show a plain text OpenFreeMap tile server message.
+  // "root_redirect_url": "https://openfreemap.org",
+
+  // Use ["monaco"] for first deploys and tests (planet is a ~162 GB download).
+  "areas": ["monaco", "planet"],
+
+  // Optional operational Telegram alerts:
+  // "telegram_token": "123456:ABC...",
+  // "telegram_chat_id": "123456789",
+  // "telegram_topic_id": 42
+}

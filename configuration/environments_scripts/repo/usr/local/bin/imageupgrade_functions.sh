@@ -146,6 +146,8 @@ build_crontab_and_setup_files() {
 # name.
 # If a value shall contain the @ literal, it needs to be doubled, as, e.g., in
 #     crontab-some-mail-thing@EMAIL_ADDRESS=john.doe@@example.com
+# To produce a "/" in the output, use an underscore character "_".
+# To produce an underscore, use a double underscore "__".
 # Multiple replacements may be requested by adding more @-phrases:
 #     crontab-something@A=x@B=y
 # Example usage:
