@@ -8,11 +8,11 @@ import java.util.List;
 import org.moxieapps.gwt.highcharts.client.Axis;
 import org.moxieapps.gwt.highcharts.client.AxisTitle;
 import org.moxieapps.gwt.highcharts.client.Chart;
-import org.moxieapps.gwt.highcharts.client.Global;
 import org.moxieapps.gwt.highcharts.client.Highcharts;
 import org.moxieapps.gwt.highcharts.client.Legend;
 import org.moxieapps.gwt.highcharts.client.Point;
 import org.moxieapps.gwt.highcharts.client.Series;
+import org.moxieapps.gwt.highcharts.client.Time;
 import org.moxieapps.gwt.highcharts.client.ToolTip;
 import org.moxieapps.gwt.highcharts.client.ToolTipData;
 import org.moxieapps.gwt.highcharts.client.ToolTipFormatter;
@@ -139,6 +139,11 @@ public class RegattaLogTrackingDeviceMappingsDialog extends DataEntryDialog<Void
         deviceMappingTable.getTable().addColumn(actionCol, stringMessages.actions());
         final HorizontalPanel deviceMappingPanel = new HorizontalPanel();
         mainPanel.add(deviceMappingPanel);
+        Highcharts.setOptions(
+                new Highcharts.Options().setTime(
+                        new Time()
+                        .setUseUTC(false)
+                        ));
         chart = new Chart()
         .setType(Series.Type.COLUMN_RANGE)
         .setChartTitleText(stringMessages.deviceMappings())
@@ -153,11 +158,6 @@ public class RegattaLogTrackingDeviceMappingsDialog extends DataEntryDialog<Void
                 return true;
             }
         }).setColor(SERIES_COLOR));
-        Highcharts.setOptions(
-                new Highcharts.Options().setGlobal(
-                        new Global()
-                        .setUseUTC(false)
-                        ));
         chart.getXAxis().setOption("labels/enabled", false)
         .setGridLineWidth(0)
         .setMinorGridLineWidth(0);
