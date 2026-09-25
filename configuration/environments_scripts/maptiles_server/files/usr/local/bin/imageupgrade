@@ -17,6 +17,5 @@ if echo "${METADATA}" | grep -q "^image-upgrade$"; then
   run_dnf_upgrade
   build_crontab_and_setup_files mongo_instance_setup
   clean_startup_logs
-  clean_mongo_pid
   finalize
 fi
