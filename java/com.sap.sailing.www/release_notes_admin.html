@@ -52,6 +52,12 @@
                     until the actual number of races to restore has been obtained from the database. This way, a server does
                     stay "unhealthy" / "unavailable" according to <tt>/gwt/status</tt> until the races to restore have been
                     loaded.</li>
+                <li>Automatic launching of replicas after starting a new primary/master instance now waits for the primary
+                    to finish loading races, using the <tt>waitUntilRacesLoaded=true</tt> query parameter for the
+                    <tt>/gwt/status</tt> health check URL. With this, the bulk load of GPS fixes will be received as
+                    part of the replica's initial load and does not need to go through the replication channel fix-by-fix.
+                    This addresses <a href="https://github.com/eclipse-sailing-analytics/sailing-analytics/issues/6308">issue #6308</a>.
+                    </li>
           </ul>
           <h2 class="articleSubheadline">August 2026</h2>
           <ul class="bulletList">
