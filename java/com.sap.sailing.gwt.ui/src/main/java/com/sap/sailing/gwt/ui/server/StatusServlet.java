@@ -56,7 +56,7 @@ public class StatusServlet extends HttpServlet {
         final ServletContext servletContext = req.getServletContext();
         final JSONObject result = new JSONObject();
         final RacingEventService service = getService(servletContext);
-        final String waitUntilRacesLoadedString = req.getParameter(LandscapeConstants.WAIT_UNTIL_RACES_LOADED);
+        final String waitUntilRacesLoadedString = req.getParameter(LandscapeConstants.WAIT_FOR_HEALTHY_UNTIL_RACES_LOADED);
         boolean waitUntilRacesLoaded = Boolean.valueOf(waitUntilRacesLoadedString);
         result.put("servername", ServerInfo.getName());
         result.put("serverdirectory", ServerInfo.getServerDirectory().getAbsolutePath());
