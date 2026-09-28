@@ -15,7 +15,7 @@ echo "Metadata: ${METADATA}"
 if echo "${METADATA}" | grep -q "^image-upgrade$"; then
   echo "Image upgrade..."
   run_dnf_upgrade
-  build_crontab_and_setup_files mongo_instance_setup
+  build_crontab_and_setup_files maptiles_server
   clean_startup_logs
   finalize
 fi
