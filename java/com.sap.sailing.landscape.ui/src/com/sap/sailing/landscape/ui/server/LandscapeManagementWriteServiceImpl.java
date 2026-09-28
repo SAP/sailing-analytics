@@ -94,7 +94,7 @@ import com.sap.sse.landscape.aws.AwsInstance;
 import com.sap.sse.landscape.aws.AwsLandscape;
 import com.sap.sse.landscape.aws.AwsShard;
 import com.sap.sse.landscape.aws.HostSupplier;
-import com.sap.sse.landscape.aws.LandscapeConstants;
+import com.sap.sse.landscape.aws.AwsLandscapeConstants;
 import com.sap.sse.landscape.aws.TargetGroup;
 import com.sap.sse.landscape.aws.common.shared.PlainRedirectDTO;
 import com.sap.sse.landscape.aws.common.shared.RedirectDTO;
@@ -219,7 +219,7 @@ public class LandscapeManagementWriteServiceImpl extends ResultCachingProxiedRem
     }
 
     private static final Set<InstanceType> INSTANCE_TYPES_BANNED_FROM_INSTANCE_BASE_NLB_TARGET_GROUPS_AS_SET =
-            new HashSet<>(Arrays.asList(LandscapeConstants.INSTANCE_TYPES_BANNED_FROM_INSTANCE_BASED_NLB_TARGET_GROUPS)); 
+            new HashSet<>(Arrays.asList(AwsLandscapeConstants.INSTANCE_TYPES_BANNED_FROM_INSTANCE_BASED_NLB_TARGET_GROUPS)); 
 
     @Override
     public ArrayList<String> getInstanceTypeNames(boolean canBeDeployedInNlbInstanceBasedTargetGroup) {
@@ -278,9 +278,9 @@ public class LandscapeManagementWriteServiceImpl extends ResultCachingProxiedRem
                                                                                   // description.
                 if (!description.tags().isEmpty()) {
                     for (Tag tag : description.tags()) {
-                        if (tag.key().equals(LandscapeConstants.ALL_REVERSE_PROXIES)
+                        if (tag.key().equals(AwsLandscapeConstants.ALL_REVERSE_PROXIES)
                                 && targetGroup.getLoadBalancerArn() != null
-                                && !targetGroup.getLoadBalancerArn().contains(LandscapeConstants.NLB_ARN_CONTAINS)) {
+                                && !targetGroup.getLoadBalancerArn().contains(AwsLandscapeConstants.NLB_ARN_CONTAINS)) {
                             targetGroupInQuestion = targetGroup;
                         }
                     }
@@ -294,7 +294,7 @@ public class LandscapeManagementWriteServiceImpl extends ResultCachingProxiedRem
         final ArrayList<ReverseProxyDTO> results = new ArrayList<>();
         for (AwsInstance<String> instance : landscape.getReverseProxyCluster(new AwsRegion(region, landscape))
                 .getHosts()) {
-            boolean isDisposable = landscape.getTag(instance, LandscapeConstants.DISPOSABLE_PROXY).isPresent() ? true : false;
+            boolean isDisposable = landscape.getTag(instance, AwsLandscapeConstants.DISPOSABLE_PROXY).isPresent() ? true : false;
             ReverseProxyDTO dto = convertToReverseProxyDTO(region, healths, instance, isDisposable);
             results.add(dto);
         }
