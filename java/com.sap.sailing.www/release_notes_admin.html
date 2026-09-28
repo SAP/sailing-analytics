@@ -58,6 +58,9 @@
                     part of the replica's initial load and does not need to go through the replication channel fix-by-fix.
                     This addresses <a href="https://github.com/eclipse-sailing-analytics/sailing-analytics/issues/6308">issue #6308</a>.
                     </li>
+                <li>When the <tt>waitUntilRacesLoaded=true</tt> query parameter is used with the <tt>/gwt/status</tt>
+                    end point (e.g., for health checks), it is also sufficient to have no more races currently loading
+                    (<tt>numberofracesstillloading &lt;= 0</tt>).</li>
           </ul>
           <h2 class="articleSubheadline">August 2026</h2>
           <ul class="bulletList">
