@@ -3251,7 +3251,7 @@ Replicator {
     @Override
     public void removeRace(Regatta regatta, RaceDefinition race) throws MalformedURLException, IOException,
             InterruptedException {
-        logger.info("Removing the race " + race + "...");
+        logger.info("Removing the race " + regatta.getName()+ " / " + race + "...");
         final RaceTrackingConnectivityParameters connectivityParams = connectivityParametersByRace.remove(race);
         if (connectivityParams != null) {
             getMongoObjectFactory().removeConnectivityParametersForRaceToRestore(connectivityParams);
