@@ -96,8 +96,11 @@ public class StatusServlet extends HttpServlet {
             }
             boolean available = numberOfTrackedRacesRestored >= numberOfTrackedRacesToRestore
                     && (replicationStatus == null || replicationStatus.isAvailable());
-            if (waitUntilRacesLoaded) {
-                available = available && numberOfTrackedRacesRestoredDoneLoading == numberOfTrackedRacesToRestore;
+            if (waitUntilRacesLoaded && numberOfTrackedRacesToRestore > 0) {
+                // interestingly, we sometimes see servers where numberOfTrackedRacesRestoredDoneLoading > numberOfTrackedRacesToRestore...
+                available = available &&
+                        (numberOfTrackedRacesRestoredDoneLoading >= numberOfTrackedRacesToRestore
+                        || numberOfTrackedRacesStillLoading <= 0);
             }
             result.put("available", available);
             resp.setStatus(available ? HttpServletResponse.SC_OK : HttpServletResponse.SC_SERVICE_UNAVAILABLE);
