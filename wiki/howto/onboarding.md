@@ -5,6 +5,8 @@ First of all, make sure you've looked at [http://www.amazon.de/Patterns-Elements
 
 ## SAP Sailing Analytics Development Setup
 
+> **New to the project on a Mac?** There is a self-contained, step-by-step setup guide you can follow top to bottom without looking things up here: [[Onboarding Quickstart (for Mac)|wiki/howto/onboarding-quickstart-mac]]. This document remains the authoritative reference for all platforms and covers the background, edge cases and troubleshooting the quickstart leaves out.
+
 ### Accounts
 
 1. Git Account
