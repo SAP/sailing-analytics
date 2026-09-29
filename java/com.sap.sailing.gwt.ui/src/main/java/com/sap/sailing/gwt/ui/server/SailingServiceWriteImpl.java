@@ -3323,7 +3323,7 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
         final TimePoint startTrackingTimePoint = MillisecondsTimePoint.now();
         // this ensures that the events consistently have different timepoints to ensure a consistent result of the state analysis
         // that's why we can't just call adapter.denoteRaceForRaceLogTracking
-        final TimePoint denotationTimePoint = startTrackingTimePoint.minus(1);
+        final TimePoint denotationTimePoint = startTrackingTimePoint.minusResolution();
         raceLog.add(new RaceLogDenoteForTrackingEventImpl(denotationTimePoint,
                 author, raceLog.getCurrentPassId(), trackedRaceName, regatta.getBoatClass(), UUID.randomUUID()));
         raceLog.add(new RaceLogStartTrackingEventImpl(startTrackingTimePoint, author, raceLog.getCurrentPassId()));

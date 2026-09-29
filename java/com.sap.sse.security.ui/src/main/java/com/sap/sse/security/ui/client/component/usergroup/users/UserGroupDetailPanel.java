@@ -100,8 +100,9 @@ public class UserGroupDetailPanel extends Composite
         addButton.ensureDebugId("AddUserButton");
         // add remove button
         // Removing a user from a group is semantically an UPDATE to the UserGroup, not a per-user DELETE.
-        buttonPanel.addCountingActionWithParentPermission(stringMessages.actionRemove(),
+        buttonPanel.addRemoveActionWithParentPermission(stringMessages.actionRemove(),
                 tenantUsersTable.getSelectionModel(),
+                StrippedUserDTO::getName,
                 () -> (SecuredDTO) TableWrapper.getSingleSelectedObjectOrNull(userGroupSelectionModel), UPDATE, () -> {
             final Set<UserGroupDTO> selectedUserGroups = userGroupSelectionModel.getSelectedSet();
             if (selectedUserGroups != null && selectedUserGroups.size() == 1) {

@@ -145,4 +145,6 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages {
     String replicaColumnTotalOps();
 
     String reallyDropReplica(String additionalInformation, String name);
+
+    String reallyDropReplicas(String replicaList);
 }

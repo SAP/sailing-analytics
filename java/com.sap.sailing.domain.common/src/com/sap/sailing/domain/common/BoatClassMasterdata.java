@@ -170,6 +170,7 @@ public enum BoatClassMasterdata {
     WINGFOIL ("Wingfoil", true, 1.95, 0.8, BoatHullType.SURFERBOARD, false, "Wing Foil", "X-15"),
     X_332 ("X-332", true, 10.06, 3.30, BoatHullType.MONOHULL, true, "X332"),
     X_99 ("X-99", true, 9.96, 2.95, BoatHullType.MONOHULL, true, "X99"),
+    YNGLING ("Yngling", true, 6.35, 1.73, BoatHullType.MONOHULL, true, "Yngling Int.", "Yngling Class"),
     ZOOM8 ("Zoom8", true, 2.65, 1.45, BoatHullType.MONOHULL, false, "Zoom 8", "Zoom_8", "Zoom-8"),
     
     // multi-class "boat classes"; to be replaced at some later point in time by something like a RegattaClass

@@ -117,7 +117,7 @@ public class VirtualWindFixesTest {
         windTrack.lockForRead();
         try {
             final Iterable<Wind> fixes = windTrack.getFixes(evenStart, /* fromInclusive */ true,
-                            evenStart.plus(virtualSet.getResolutionInMilliseconds()).plus(1), /* toInclusive */ false);
+                            evenStart.plus(virtualSet.getResolutionInMilliseconds()).plusResolution(), /* toInclusive */ false);
             assertEquals(2, Util.size(fixes));
             Wind wind1 = fixes.iterator().next();
             assertEquals(evenStart, wind1.getTimePoint());

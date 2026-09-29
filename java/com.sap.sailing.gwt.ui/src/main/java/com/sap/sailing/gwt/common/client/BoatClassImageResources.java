@@ -668,6 +668,10 @@ public interface BoatClassImageResources extends ClientBundle {
     @ImageOptions(preventInlining = true)
     ImageResource X332Icon();
 
+    @Source("com/sap/sailing/gwt/ui/client/images/boatclass/YNGLING.png")
+    @ImageOptions(preventInlining = true)
+    ImageResource YnglingIcon();
+
     @Source("com/sap/sailing/gwt/ui/client/images/boatclass/ZOOM8.png")
     @ImageOptions(preventInlining = true)
     ImageResource Zoom8Icon();

@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -32,35 +31,26 @@ import com.sap.sailing.domain.base.configuration.DeviceConfiguration;
 import com.sap.sailing.domain.base.impl.RegattaImpl;
 import com.sap.sailing.domain.common.DataImportProgress;
 import com.sap.sailing.domain.common.DataImportSubProgress;
-import com.sap.sailing.domain.common.DeviceIdentifier;
 import com.sap.sailing.domain.common.RaceIdentifier;
 import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
 import com.sap.sailing.domain.common.TrackedRaceStatusEnum;
-import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.impl.MasterDataImportObjectCreationCountImpl;
 import com.sap.sailing.domain.common.media.MediaTrack;
-import com.sap.sailing.domain.common.tracking.impl.GPSFixImpl;
-import com.sap.sailing.domain.common.tracking.impl.GPSFixMovingImpl;
-import com.sap.sailing.domain.common.tracking.impl.VeryCompactGPSFixImpl;
-import com.sap.sailing.domain.common.tracking.impl.VeryCompactGPSFixMovingImpl;
 import com.sap.sailing.domain.leaderboard.FlexibleLeaderboard;
 import com.sap.sailing.domain.leaderboard.Leaderboard;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroup;
 import com.sap.sailing.domain.leaderboard.RegattaLeaderboard;
 import com.sap.sailing.domain.masterdataimport.TopLevelMasterData;
-import com.sap.sailing.domain.masterdataimport.WindTrackMasterData;
 import com.sap.sailing.domain.persistence.DomainObjectFactory;
 import com.sap.sailing.domain.persistence.MongoObjectFactory;
 import com.sap.sailing.domain.persistence.MongoRaceLogStoreFactory;
 import com.sap.sailing.domain.persistence.MongoRegattaLogStoreFactory;
 import com.sap.sailing.domain.racelog.RaceLogIdentifier;
 import com.sap.sailing.domain.racelog.RaceLogStore;
-import com.sap.sailing.domain.racelog.tracking.SensorFixStore;
 import com.sap.sailing.domain.regattalike.HasRegattaLike;
 import com.sap.sailing.domain.regattalike.IsRegattaLike;
 import com.sap.sailing.domain.regattalike.RegattaLikeIdentifier;
 import com.sap.sailing.domain.regattalog.RegattaLogStore;
-import com.sap.sailing.domain.tracking.DummyTrackedRace;
 import com.sap.sailing.domain.tracking.DynamicTrackedRace;
 import com.sap.sailing.domain.tracking.RaceHandle;
 import com.sap.sailing.domain.tracking.RaceTracker;
@@ -68,13 +58,10 @@ import com.sap.sailing.domain.tracking.RaceTrackingConnectivityParameters;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.domain.tracking.TrackedRaceStatus;
 import com.sap.sailing.domain.tracking.TrackedRegatta;
-import com.sap.sailing.domain.tracking.WindTrack;
 import com.sap.sailing.domain.tracking.impl.AbstractRaceChangeListener;
 import com.sap.sailing.server.interfaces.DataImportLockWithProgress;
 import com.sap.sailing.server.interfaces.RacingEventService;
 import com.sap.sailing.server.interfaces.RacingEventServiceOperation;
-import com.sap.sse.common.NoCorrespondingServiceRegisteredException;
-import com.sap.sse.common.Timed;
 import com.sap.sse.common.Util;
 import com.sap.sse.concurrent.LockUtil;
 import com.sap.sse.security.SecurityService;
@@ -88,8 +75,6 @@ public class ImportMasterDataOperation extends
     private static final long serialVersionUID = 3131715325307370303L;
 
     private static final Logger logger = Logger.getLogger(ImportMasterDataOperation.class.getName());
-    
-    private static final int BATCH_SIZE_FOR_IMPORTING_FIXES = 5000;
 
     private final TopLevelMasterData masterData;
 
@@ -166,33 +151,31 @@ public class ImportMasterDataOperation extends
                 eventCounter++;
                 progress.setCurrentSubProgressPct((double) eventCounter / numOfEventsToHandle);
             }
-            progress.setCurrentSubProgress(DataImportSubProgress.IMPORT_WIND_TRACKS);
-            progress.setOverAllProgressPct(0.5);
-            progress.setCurrentSubProgressPct(0);
-            createWindTracks(toState);
-            progress.setCurrentSubProgress(DataImportSubProgress.IMPORT_SENSOR_FIXES);
-            progress.setOverAllProgressPct(0.7);
-            progress.setCurrentSubProgressPct(0);
-            importRaceLogTrackingGPSFixes(toState);
             if (masterData.getDeviceConfigurations() != null) {
                 importDeviceConfigurations(toState);
             }
-            Collection<MediaTrack> allMediaTracksToImport = masterData.getFilteredMediaTracks();
+            Iterable<MediaTrack> allMediaTracksToImport = masterData.getFilteredMediaTracks();
             for (MediaTrack trackToImport : allMediaTracksToImport) {
                 ensureOwnership(trackToImport.getIdentifier(), securityService);
             }
             toState.mediaTracksImported(allMediaTracksToImport, creationCount, override);
             progress.setCurrentSubProgress(DataImportSubProgress.IMPORT_TRACKED_RACES);
-            progress.setOverAllProgressPct(0.8);
+            progress.setOverAllProgressPct(0.53);
             progress.setCurrentSubProgressPct(0);
             final Iterable<TrackedRace> trackedRacesToWaitForLoadingComplete = importTrackedRaces(toState, securityService);            
             progress.setCurrentSubProgress(DataImportSubProgress.WAITING_FOR_TRACKED_RACES_TO_FINISH_LOADING);
-            progress.setOverAllProgressPct(0.9);
+            progress.setOverAllProgressPct(0.6);
             progress.setCurrentSubProgressPct(0);
             waitForTrackedRacesToFinishLoading(trackedRacesToWaitForLoadingComplete);
-            dataImportLock.getProgress(importOperationId).setResult(creationCount);
-            progress.setOverAllProgressPct(1.0);
-            logger.info("Done importing master data into "+toState);
+            // Deliberately do not publish the result, mark overall completion (1.0), or log "Done" here. This
+            // operation applies only the object graph; the wind tracks and sensor fixes are streamed and imported
+            // afterwards by MasterDataImporter.importFromStream, which owns the terminal 1.0 progress, the single
+            // "Done" log, and the result publication (with replication) at the true end of the whole import. Publishing
+            // the result here would let a client polling either the master or a replica report success before the wind
+            // and sensor-fix imports have even started (see bug6227). The result is still returned to the caller below,
+            // which carries it out to MasterDataImporter for publication at genuine completion. This operation
+            // therefore ends at 0.6, set above after waiting for the tracked races to load, leaving 0.6 -> 0.8 for the
+            // wind band and 0.8 -> 1.0 for the sensor-fix band, the two phases that usually dominate the import.
             return creationCount;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error during execution of ImportMasterDataOperation", e);
@@ -478,79 +461,6 @@ public class ImportMasterDataOperation extends
                     }
                 }
             }
-        }
-    }
-
-    private void createWindTracks(RacingEventService toState) {
-        if (toState.getMasterDescriptor() == null) { // don't do this on a replica's RacingEventService; wind data will be received through the tracked race loading replication
-            int numOfWindTracks = masterData.getWindTrackMasterData().size();
-            int i = 0;
-            for (WindTrackMasterData windMasterData : masterData.getWindTrackMasterData()) {
-                DummyTrackedRace trackedRaceWithNameAndId = new DummyTrackedRace(windMasterData.getRaceName(), windMasterData.getRaceId());
-                WindTrack windTrackToWriteTo = toState.getWindStore().getWindTrack(windMasterData.getRegattaName(), trackedRaceWithNameAndId, windMasterData.getWindSource(), 0, -1);
-                final WindTrack windTrackToReadFrom = windMasterData.getWindTrack();
-                final List<Wind> fixesToAdd = new ArrayList<>();
-                windTrackToReadFrom.lockForRead();
-                try {
-                    for (Wind fix : windTrackToReadFrom.getRawFixes()) {
-                        Wind existingFix = windTrackToWriteTo.getFirstRawFixAtOrAfter(fix.getTimePoint());
-                        if (existingFix == null || !existingFix.equals(fix)) {
-                            fixesToAdd.add(fix);
-                        } else {
-                            logger.fine("Didn't add wind fix in import, because equal fix was already there.");
-                        }
-                    }
-                } finally {
-                    windTrackToReadFrom.unlockAfterRead();
-                }
-                windTrackToWriteTo.add(fixesToAdd);
-                i++;
-                progress.setCurrentSubProgressPct((double) i / numOfWindTracks);
-                progress.setOverAllProgressPct(0.5 + (0.3) * ((double) i / numOfWindTracks));
-            }
-        }
-    }
-    
-    private void importRaceLogTrackingGPSFixes(RacingEventService toState) {
-        if (toState.getMasterDescriptor() == null) { // don't do this on a replica's RacingEventService; tracking data will be received through the tracked race loading replication
-            final Map<DeviceIdentifier, ? extends Iterable<Timed>> raceLogTrackingFixes = masterData.getRaceLogTrackingFixes();
-            if (raceLogTrackingFixes != null) {
-                SensorFixStore store = toState.getSensorFixStore();
-                int i = 0;
-                final int numberOfDevices = raceLogTrackingFixes.size();
-                for (Entry<DeviceIdentifier, ? extends Iterable<Timed>> entry : raceLogTrackingFixes.entrySet()) {
-                    DeviceIdentifier device = entry.getKey();
-                    final Collection<Timed> fixesToAddAsBatch = new ArrayList<>(BATCH_SIZE_FOR_IMPORTING_FIXES);
-                    for (Timed fixToAdd : entry.getValue()) {
-                        if (fixToAdd instanceof VeryCompactGPSFixMovingImpl) {
-                            VeryCompactGPSFixMovingImpl gpsFix = (VeryCompactGPSFixMovingImpl) fixToAdd;
-                            fixToAdd = new GPSFixMovingImpl(gpsFix.getPosition(), fixToAdd.getTimePoint(),
-                                    ((VeryCompactGPSFixMovingImpl) fixToAdd).getSpeed(), gpsFix.getOptionalTrueHeading());
-                        } else if (fixToAdd instanceof VeryCompactGPSFixImpl) {
-                            VeryCompactGPSFixImpl gpsFix = (VeryCompactGPSFixImpl) fixToAdd;
-                            fixToAdd = new GPSFixImpl(gpsFix.getPosition(), fixToAdd.getTimePoint());
-                        } 
-                        fixesToAddAsBatch.add(fixToAdd);
-                        if (fixesToAddAsBatch.size() == BATCH_SIZE_FOR_IMPORTING_FIXES) {
-                            storeFixes(store, device, fixesToAddAsBatch);
-                        }
-                    }
-                    if (!fixesToAddAsBatch.isEmpty()) {
-                        storeFixes(store, device, fixesToAddAsBatch);
-                    }
-                    i++;
-                    progress.setCurrentSubProgressPct((double) i / numberOfDevices);
-                }
-            }
-        }
-    }
-
-    private void storeFixes(SensorFixStore store, DeviceIdentifier device, final Collection<Timed> fixesToAddAsBatch) {
-        try {
-            store.storeFixes(device, fixesToAddAsBatch, /* returnManeuverUpdate */ false, /* returnLiveDelay */ false);
-            fixesToAddAsBatch.clear();
-        } catch (NoCorrespondingServiceRegisteredException e) {
-            logger.severe("Failed to store race log tracking fixes while importing.");
         }
     }
 

@@ -870,7 +870,7 @@ public class TrackTest {
         track.addGPSFix(fix);
         assertEquals(1, invalidationCalls.size());
         // the lateOutlier's predecessor now is expected to have changed validity again, causing a distance cache invalidation at its time
-        assertEquals(track.getLastFixBefore(timePointOfLastRawFixBeforeLateOutlier).getTimePoint().plus(1), invalidationCalls.iterator().next());
+        assertEquals(track.getLastFixBefore(timePointOfLastRawFixBeforeLateOutlier).getTimePoint().plusResolution(), invalidationCalls.iterator().next());
         assertTrue(timePointForLateOutlier.compareTo(fix.getTimePoint()) < 0);
         // expect the invalidation to have started at the fix before the outlier, leaving the previous result ending at the fix right before the outlier intact
         final com.sap.sse.common.Util.Pair<TimePoint, com.sap.sse.common.Util.Pair<TimePoint, Distance>> stillStillPresentFullIntervalCacheEntry = distanceCache
@@ -1313,7 +1313,7 @@ public class TrackTest {
                 /* bearing deg delta */ 0.1, /* knot speed delta */ 0.1); // fetch again from the cache
         // assuming that all test fixes are within a few milliseconds and the averaging interval is much larger than that,
         // adding a single fix in the middle should invalidate the cache
-        track.add(new GPSFixMovingImpl(gpsFix3.getPosition(), gpsFix3.getTimePoint().plus(1), gpsFix3.getSpeed(), /* optionalTrueHeading */ null));
+        track.add(new GPSFixMovingImpl(gpsFix3.getPosition(), gpsFix3.getTimePoint().plusResolution(), gpsFix3.getSpeed(), /* optionalTrueHeading */ null));
         assertFalse(compactFix3.isEstimatedSpeedCached());
     }
 }

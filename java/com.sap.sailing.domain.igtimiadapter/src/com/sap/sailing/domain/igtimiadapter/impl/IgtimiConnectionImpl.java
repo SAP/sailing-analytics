@@ -139,7 +139,7 @@ public class IgtimiConnectionImpl extends SecuredServerImpl implements IgtimiCon
                         + (reason == null ? "" : ". Reason: " + reason));
             }
             Util.addAll(messageParser.apply(resourceDataJson), result);
-            windowStartTime = windowEndTime.plus(1);
+            windowStartTime = windowEndTime.plusResolution();
         }
         return result;
     }

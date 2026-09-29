@@ -1329,7 +1329,7 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
             if (startOfTracking != null) {
                 timePoint = startOfTracking.asDate();
             } else if (startTime != null) {
-                timePoint = startTime.minus(TimingConstants.PRE_START_PHASE_DURATION_IN_MILLIS).plus(1).asDate();
+                timePoint = startTime.minus(TimingConstants.PRE_START_PHASE_DURATION_IN_MILLIS).plusResolution().asDate();
             }
         }
 
@@ -3248,9 +3248,9 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
                 addListener(new AbstractRaceChangeListener() {
                     @Override
                     public void statusChanged(TrackedRaceStatus newStatus, TrackedRaceStatus oldStatus) {
-                        logger.info("race "+TrackedRaceImpl.this+" went from "+oldStatus+" to "+newStatus);
+                        logger.info("race "+TrackedRaceImpl.this.getRaceIdentifier()+" went from "+oldStatus+" to "+newStatus);
                         if (hasFinishedLoading(newStatus.getStatus())) {
-                            logger.info("race "+TrackedRaceImpl.this+" is considered having finished loading; running "+runnable);
+                            logger.info("race "+TrackedRaceImpl.this.getRaceIdentifier()+" is considered having finished loading; running "+runnable);
                             removeListener(this);
                             runnable.run();
                         }

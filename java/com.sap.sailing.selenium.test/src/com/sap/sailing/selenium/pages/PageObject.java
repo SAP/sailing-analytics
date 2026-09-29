@@ -508,6 +508,22 @@ public class PageObject {
         wait.until(new AjaxCallsExecuted(category, numberOfCalls));
     }
     
+    /**
+     * <p>Returns the current number of finished Ajax requests in the given category, as tracked by the harness's
+     *   pending-Ajax semaphore. The counter increases monotonically, so a caller can read a baseline before triggering
+     *   an action and then {@link #waitForAjaxRequestsExecuted(String, int)} for {@code baseline + n} to reliably wait
+     *   for the completion of the {@code n} requests the action fires. This encapsulates the underlying
+     *   {@code window.PENDING_AJAX_CALLS} representation.</p>
+     * 
+     * @param category
+     *   The category of Ajax requests whose finished count should be returned.
+     * @return
+     *   The number of finished Ajax requests in the given category since the page was loaded.
+     */
+    protected int getNumberOfFinishedAjaxRequests(String category) {
+        return AjaxCallsExecuted.getNumberOfFinishedCalls(this.driver, category);
+    }
+    
     protected void waitForElement(String seleniumId) {
         WebDriverWait webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(DEFAULT_LOOKUP_TIMEOUT));
         webDriverWait.until(ExpectedConditions.presenceOfElementLocated(new BySeleniumId(seleniumId)));
