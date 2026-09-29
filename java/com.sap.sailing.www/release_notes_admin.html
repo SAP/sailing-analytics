@@ -46,6 +46,9 @@
                 <li>Bug fix: when loading a replica for a primary that already has a non-empty CORS configuration for its replica set,
                     this CORS configuration was not properly applied on the replica, hence not serving the <tt>frame-ancestores</tt>
                     HTTP response header correctly.</li>
+                <li>When the <tt>waitUntilRacesLoaded=true</tt> query parameter is used with the <tt>/gwt/status</tt>
+                    end point (e.g., for health checks), it is also sufficient to have no more races currently loading
+                    (<tt>numberofracesstillloading &lt;= 0</tt>).</li>
           </ul>
           <h2 class="articleSubheadline">August 2026</h2>
           <ul class="bulletList">
