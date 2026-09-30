@@ -4,9 +4,9 @@ import com.sap.sailing.domain.base.BoatClass;
 import com.sap.sailing.domain.base.SharedDomainFactory;
 import com.sap.sailing.domain.common.BoatClassMasterdata;
 import com.sap.sailing.domain.common.BoatHullType;
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.impl.MeterDistance;
 import com.sap.sse.common.impl.NamedImpl;
 
 public class BoatClassImpl extends NamedImpl implements BoatClass {

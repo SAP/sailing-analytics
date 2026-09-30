@@ -3,7 +3,7 @@ package com.sap.sailing.server.gateway.serialization.impl;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import com.sap.sailing.domain.common.Position;
+import com.sap.sse.common.Position;
 import com.sap.sse.shared.json.JsonSerializer;
 
 public class MongoDbFriendlyPositionJsonSerializer implements JsonSerializer<Position> {

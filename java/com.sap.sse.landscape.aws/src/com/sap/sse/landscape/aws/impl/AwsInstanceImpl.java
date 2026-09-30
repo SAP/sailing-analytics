@@ -334,6 +334,11 @@ public class AwsInstanceImpl<ShardingKey> implements AwsInstance<ShardingKey> {
     }
     
     @Override
+    public void setTerminationProtection(boolean terminationProtection) {
+        landscape.setTerminationProtection(this, terminationProtection);
+    }
+
+    @Override
     public void terminate() {
         landscape.terminate(this);
     }

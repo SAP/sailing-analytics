@@ -9,9 +9,9 @@ import com.google.gwt.maps.client.base.Point;
 import com.google.gwt.maps.client.overlays.MapCanvasProjection;
 import com.sap.sailing.domain.common.LegType;
 import com.sap.sailing.domain.common.PassingInstruction;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.gwt.ui.shared.MarkDTO;
 import com.sap.sailing.gwt.ui.shared.WaypointDTO;
+import com.sap.sse.common.Position;
 
 public class LaylineClipper {
     protected final List<Position> markPositions = new ArrayList<>(1);

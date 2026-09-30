@@ -11,15 +11,11 @@ import java.util.logging.Logger;
 import com.sap.sailing.domain.base.BoatClass;
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.Waypoint;
-import com.sap.sailing.domain.common.BearingChangeAnalyzer;
 import com.sap.sailing.domain.common.ManeuverType;
 import com.sap.sailing.domain.common.NauticalSide;
 import com.sap.sailing.domain.common.NoWindException;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.common.Tack;
 import com.sap.sailing.domain.common.Wind;
-import com.sap.sailing.domain.common.WindSourceType;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.maneuverdetection.ApproximatedFixesCalculator;
 import com.sap.sailing.domain.maneuverdetection.ManeuverDetector;
@@ -40,9 +36,12 @@ import com.sap.sailing.domain.tracking.impl.ManeuverWithMainCurveBoundariesImpl;
 import com.sap.sailing.domain.tracking.impl.ManeuverWithStableSpeedAndCourseBoundariesImpl;
 import com.sap.sailing.domain.tracking.impl.SpeedWithBearingStepImpl;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.BearingChangeAnalyzer;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
@@ -55,6 +54,13 @@ import com.sap.sse.common.impl.MillisecondsTimePoint;
  *
  */
 public class ManeuverDetectorImpl extends AbstractManeuverDetectorImpl {
+    
+    /**
+     * This {@link #DETECTOR_VERSION} variable indicates the version of the {@link ManeuverDetector} and must be changed
+     * manually when changing the calculator. It should be changed by adding +1;
+     */
+    public static final int DETECTOR_VERSION = 1;
+
 
     private static final Logger logger = Logger.getLogger(ManeuverDetectorImpl.class.getName());
 
@@ -190,7 +196,7 @@ public class ManeuverDetectorImpl extends AbstractManeuverDetectorImpl {
      * Checks whether {@code currentFix} can be grouped together with the previous fixes in order to be regarded as a
      * single maneuver spot. For this, the {@code newCourseChangeDirection must match the direction of provided {@code
      * lastCourseChangeDirection}. Additionally, the distance from {@code previousFix} to {@code currentFix} must be <=
-     * 3 hull lengths, or the time difference <= getApproximatedManeuverDuration().
+     * 4 hull lengths, or the time difference <= getApproximatedManeuverDuration().
      * 
      * @param lastCourseChangeDirection The last course within previous three fixes counting from {@code currentFix}
      * 
@@ -205,17 +211,20 @@ public class ManeuverDetectorImpl extends AbstractManeuverDetectorImpl {
      */
     protected boolean checkDouglasPeuckerFixesGroupable(NauticalSide lastCourseChangeDirection,
             NauticalSide newCourseChangeDirection, GPSFixMoving previousFix, GPSFixMoving currentFix) {
+        final boolean result;
         if (lastCourseChangeDirection != newCourseChangeDirection) {
-            return false;
+            result = false;
+        } else {
+            Distance fourHullLengths = trackedRace.getRace().getBoatOfCompetitor(competitor).getBoatClass().getHullLength().scale(4);
+            if (currentFix.getTimePoint().asMillis()
+                    - previousFix.getTimePoint().asMillis() > getApproximateManeuverDuration().asMillis()
+                    && currentFix.getPosition().getDistance(previousFix.getPosition()).compareTo(fourHullLengths) > 0) {
+                result = false;
+            } else {
+                result = true;
+            }
         }
-        Distance threeHullLengths = trackedRace.getRace().getBoatOfCompetitor(competitor).getBoatClass().getHullLength()
-                .scale(3);
-        if (currentFix.getTimePoint().asMillis()
-                - previousFix.getTimePoint().asMillis() > getApproximateManeuverDuration().asMillis()
-                && currentFix.getPosition().getDistance(previousFix.getPosition()).compareTo(threeHullLengths) > 0) {
-            return false;
-        }
-        return true;
+        return result;
     }
 
     private List<Maneuver> getAllManeuversFromManeuverSpots(List<? extends ManeuverSpot> maneuverSpots) {
@@ -322,8 +331,7 @@ public class ManeuverDetectorImpl extends AbstractManeuverDetectorImpl {
         }
         TimePoint maneuverTimePoint = maneuverCurve.getMainCurveBoundaries().getTimePoint();
         Position maneuverPosition = track.getEstimatedPosition(maneuverTimePoint, /* extrapolate */false);
-        final Wind wind = trackedRace.getWind(maneuverPosition, maneuverTimePoint,
-                /* exclude */ trackedRace.getWindSources(WindSourceType.MANEUVER_BASED_ESTIMATION));
+        final Wind wind = trackedRace.getWind(maneuverPosition, maneuverTimePoint);
         List<Maneuver> maneuvers = determineManeuversFromManeuverCurve(maneuverCurve.getMainCurveBoundaries(),
                 maneuverCurve.getManeuverCurveWithStableSpeedAndCourseBoundaries(), wind,
                 maneuverCurve.getMarkPassing());

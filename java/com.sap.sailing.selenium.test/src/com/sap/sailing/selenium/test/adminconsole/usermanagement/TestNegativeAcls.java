@@ -339,7 +339,7 @@ public class TestNegativeAcls extends AbstractSeleniumTest {
         RoleDefinitionCreationAndUpdateDialogPO createRoleDialog = roleDefinitions.getCreateRoleDialog();
         createRoleDialog.setName(CUSTOM_ROLE);
         createRoleDialog.clickOkButtonOrThrow();
-        AclPopupPO aclPopup = roleDefinitions.findRole(CUSTOM_ROLE).openAclPopup();
+        AclPopupPO aclPopup = roleDefinitions.findRoleWhenPresent(CUSTOM_ROLE).openAclPopup();
         aclPopup.addUserGroup("");
         AclActionInputPO allowedActionsInput = aclPopup.getAllowedActionsInput();
         // adding this ACL ensures that other users may read and update the custom role

@@ -6,9 +6,9 @@ import com.google.gwt.canvas.dom.client.TextMetrics;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.base.LatLng;
 import com.google.gwt.maps.client.base.Point;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.gwt.ui.shared.racemap.CanvasOverlayV3;
 import com.sap.sse.common.Color;
+import com.sap.sse.common.Position;
 
 /**
  * A google map overlay based on a HTML5 canvas for drawing a competitor info on a map at a given position.

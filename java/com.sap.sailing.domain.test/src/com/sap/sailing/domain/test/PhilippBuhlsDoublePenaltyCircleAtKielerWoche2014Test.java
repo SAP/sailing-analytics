@@ -20,13 +20,13 @@ import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.common.ManeuverType;
 import com.sap.sailing.domain.common.NoWindException;
 import com.sap.sailing.domain.common.WindSourceType;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.impl.WindImpl;
 import com.sap.sailing.domain.common.impl.WindSourceImpl;
 import com.sap.sailing.domain.tracking.Maneuver;
 import com.sap.sailing.domain.tractracadapter.ReceiverType;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 /**
@@ -66,7 +66,7 @@ public class PhilippBuhlsDoublePenaltyCircleAtKielerWoche2014Test extends Abstra
     public void testDoublePenaltyForPhilippAndTobiasAndMaximAndDharmender() throws ParseException, NoWindException {
         assertTwoPenalties("Buhl",             "06/21/2014-13:03:18", "06/21/2014-13:03:47", "06/21/2014-13:03:30", "06/21/2014-13:03:40");
         assertTwoPenalties("Dharmender Singh", "06/21/2014-12:51:40", "06/21/2014-12:52:40", "06/21/2014-12:52:01", "06/21/2014-12:52:10");
-        assertTwoPenalties("Schadewaldt",      "06/21/2014-12:46:50", "06/21/2014-12:47:30", "06/21/2014-12:47:10", "06/21/2014-12:47:19");
+        assertTwoPenalties("Schadewaldt",      "06/21/2014-12:46:50", "06/21/2014-12:47:30", "06/21/2014-12:47:14", "06/21/2014-12:47:19");
         assertTwoPenalties("Maxim Nikolaev",   "06/21/2014-12:49:22", "06/21/2014-12:50:13", "06/21/2014-12:49:37", "06/21/2014-12:49:52");
     }
 

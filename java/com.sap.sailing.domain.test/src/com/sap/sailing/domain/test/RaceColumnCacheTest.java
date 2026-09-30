@@ -130,7 +130,7 @@ public class RaceColumnCacheTest extends AbstractLeaderboardTest {
                 new HashSet<Sideline>(), EmptyWindStore.INSTANCE, 5000, 20000, 20000,
                 /* useMarkPassingCalculator */ false, OneDesignRankingMetric::new,
                 mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null,
-                /* markPassingRaceFingerprintRegistry */ null));
+                /* markPassingRaceFingerprintRegistry */ null, /* maneuverRaceFingerprintRegistry */ null));
         return spyedTrackedRace;
     }
 

@@ -1,5 +1,7 @@
 # Training of internal Wind Estimation models
 
+[[_TOC_]]
+
 This document describes the generation process of Machine Learning (ML) models which are used internally by the maneuver-based wind estimation. It is highly recommended to process this howto step by step considering the order of sections. At the end of this howto, you will generate a file containing the representation of internal models used by ``com.sap.sailing.windestimation`` bundle. You can use this file to update the wind estimation models of a running server instance. If you are interested in a more advanced tutorial which requires all the execution steps contained in ``SimpleModelsTrainingPart...`` classes to be executed manually, then you might be interested in [Advanced Guide for training of internal Wind Estimation models](./windestimationAdvanced.md)
 
 ## Prerequisites
@@ -17,7 +19,7 @@ To complete the training process successfully, you need to make sure that you ha
 
 ### Docker-Based
 
-In our docker registry under ``docker.sapsailing.com`` there is a repository called ``windestimationtraining`` where images can be found to run the training process in a mostly automated way. All you need is an account for ``docker.sapsailing.com`` and an account on ``sapsailing.com`` that has the ``TRACKED_RACE:EXPORT`` permission for all races in the archive server (see the ``raw-data`` role). Furthermore, you need a MongoDB with approximately 100GB of available space. This can be a MongoDB replica set, of course. All you need is the URI to establish the connection.
+In the docker registry under ``ghcr.io/eclipse-sailing-analytics`` there is a repository called ``windestimationtraining`` where images can be found to run the training process in a mostly automated way. All you need is an account on ``sapsailing.com`` that has the ``TRACKED_RACE:EXPORT`` permission for all races in the archive server (see the ``raw-data`` role). Furthermore, you need a MongoDB with approximately 100GB of available space. This can be a MongoDB replica set, of course. All you need is the URI to establish the connection.
 
 If you want to try the following on a plain Amazon Linux instance, try to start with an instance type that has fast SSD storage attached (NVMe) and 16GB of RAM, such as ``c5d.2xlarge``. SSH into it (probably with the ``ec2-user`` account), then try this:
 
@@ -62,7 +64,6 @@ Then continue as follows:
    systemctl start docker.service
    systemctl start mongod
    systemctl start docker
-   docker login docker.sapsailing.com
    touch /tmp/windEstimationModels.dat
 ```
 
@@ -70,11 +71,11 @@ For your account that is equipped with the ``TRACKED_RACE:EXPORT`` permission yo
 
 ```
    docker run --mount type=bind,source=/tmp/windEstimationModels.dat,target=/home/sailing/windEstimationModels.dat \
-              -m 10g --rm -d \
+              -m 12g --rm -d \
               -e MONGODB_URI="mongodb://172.17.0.1/windestimation?retryWrites=true" \
               -e BEARER_TOKEN="{your-bearer-token-here}" \
-              -e MEMORY=-Xmx6g \
-              docker.sapsailing.com/windestimationtraining:latest
+              -e MEMORY=-Xmx8g \
+              ghcr.io/eclipse-sailing-analytics/windestimationtraining:latest
 ```
 If successful (and you may want to remove the ``--rm`` option otherwise to allow you to inspect logs after unsuccessful execution) you will find the output under ``/tmp/windEstimationModels.dat`` which you can upload as usual, e.g., as in
 
@@ -89,10 +90,10 @@ If successful (and you may want to remove the ``--rm`` option otherwise to allow
 Under ``docker/Dockerfile_windestimation`` there is a docker file that can be used to produce the Docker image, given that a ``WindEstimationModelsTraining.jar`` exists under [https://static.sapsailing.com/WindEstimationModelsTraining.jar](https://static.sapsailing.com/WindEstimationModelsTraining.jar). Producing an image works like this:
 
 ```
-    docker build --no-cache -f Dockerfile_windestimation -t docker.sapsailing.com/windestimationtraining:0.0.4 .
+    docker build --no-cache -f Dockerfile_windestimation -t ghcr.io/eclipse-sailing-analytics/windestimationtraining:0.0.4 .
 ```
 
-To produce the JAR file used for the Docker image creation, run an "Export" command in Eclipse, using "File - Export - Runnable JAR File" with the ``SimpleModelsTrainingPart1`` launch configuration. This will export a JAR that you can then upload to ``trac@sapsailing.com:static`` using a command such as
+To produce the JAR file used for the Docker image creation, run an "Export" command in Eclipse, using "File - Export - Runnable JAR File" with the ``SimpleModelsTrainingPart1`` launch configuration with the option "Package required libraries into generated JAR" selected. This will export a JAR that you can then upload to ``trac@sapsailing.com:static`` using a command such as
 ```
     scp WindEstimationModelsTraining.jar trac@sapsailing.com:static
 ```

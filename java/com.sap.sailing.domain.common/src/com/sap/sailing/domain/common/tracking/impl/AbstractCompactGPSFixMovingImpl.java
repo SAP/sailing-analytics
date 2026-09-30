@@ -1,16 +1,16 @@
 package com.sap.sailing.domain.common.tracking.impl;
 
-import com.sap.sailing.domain.common.AbstractSpeedImpl;
-import com.sap.sailing.domain.common.CourseChange;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.SpeedWithBearing;
-import com.sap.sailing.domain.common.impl.AbstractSpeedWithAbstractBearingImpl;
-import com.sap.sailing.domain.common.impl.AbstractSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
+import com.sap.sse.common.AbstractSpeedImpl;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.CourseChange;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.impl.AbstractSpeedWithAbstractBearingImpl;
+import com.sap.sse.common.impl.AbstractSpeedWithBearingImpl;
 
 /**
  * A memory-conserving representation of a {@link GPSFixMoving} object that produces the fine-grained
@@ -30,11 +30,6 @@ public abstract class AbstractCompactGPSFixMovingImpl extends AbstractCompactGPS
         @Override
         public abstract double getKnots();
 
-        @Override
-        public Position travelTo(Position pos, TimePoint from, TimePoint to) {
-            return pos.translateGreatCircle(getBearing(), this.travel(from, to));
-        }
-        
         @Override
         public SpeedWithBearing applyCourseChange(CourseChange courseChange) {
             return AbstractSpeedWithBearingImpl.applyCourseChange(this, courseChange);

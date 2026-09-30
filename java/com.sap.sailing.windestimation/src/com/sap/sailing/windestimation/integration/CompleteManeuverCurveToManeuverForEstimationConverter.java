@@ -4,7 +4,6 @@ import com.sap.sailing.domain.base.BoatClass;
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.SpeedWithBearingWithConfidence;
 import com.sap.sailing.domain.common.ManeuverType;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.maneuverdetection.TrackTimeInfo;
 import com.sap.sailing.domain.polars.PolarDataService;
@@ -16,6 +15,7 @@ import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.windestimation.data.ManeuverForEstimation;
 import com.sap.sailing.windestimation.data.transformer.ManeuverForEstimationTransformer;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Speed;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.MillisecondsDurationImpl;
@@ -47,7 +47,7 @@ public class CompleteManeuverCurveToManeuverForEstimationConverter {
         if (!maneuverForEstimationTransformer.isManeuverEligibleForAnalysis(
                 maneuver.getManeuverCurveWithStableSpeedAndCourseBoundaries().getDirectionChangeInDegrees(),
                 maneuver.getMainCurveBoundaries().getDirectionChangeInDegrees())) {
-            // skip further computation in order to improve performance performance
+            // skip further computation in order to improve performance
             return null;
         }
         BoatClass boatClass = trackedRace.getBoatOfCompetitor(competitor).getBoatClass();
@@ -111,7 +111,7 @@ public class CompleteManeuverCurveToManeuverForEstimationConverter {
         // TODO compute scaledSpeedDivisor, recompute maneuverForEstimation, reclassify all maneuver instances if
         // scaledSpeedDivisor has significantly changed?
         ManeuverForEstimation maneuverForEstimation = maneuverForEstimationTransformer
-                .getManeuverForEstimation(convertableManeuver, 1.0, boatClass);
+                .getManeuverForEstimation(convertableManeuver, 1.0, boatClass, competitor.getName());
         return maneuverForEstimation;
     }
 

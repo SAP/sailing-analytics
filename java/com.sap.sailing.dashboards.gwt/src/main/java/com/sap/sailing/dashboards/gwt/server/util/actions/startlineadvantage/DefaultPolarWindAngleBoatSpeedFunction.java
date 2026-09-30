@@ -6,9 +6,9 @@ import org.apache.commons.math.analysis.polynomials.PolynomialSplineFunction;
 
 import com.sap.sailing.domain.base.SpeedWithConfidence;
 import com.sap.sailing.domain.base.impl.SpeedWithConfidenceImpl;
-import com.sap.sailing.domain.common.impl.KnotSpeedImpl;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.impl.KnotSpeedImpl;
 
 /**
  * Contains a {@link PolynomialSplineFunction} that describes the boat speed at incoming wind angles from 0 to 180 degrees.

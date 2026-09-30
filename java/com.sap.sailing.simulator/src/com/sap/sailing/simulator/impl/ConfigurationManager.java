@@ -10,9 +10,9 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.simulator.BoatClassProperties;
 import com.sap.sailing.simulator.RaceProperties;
+import com.sap.sse.common.impl.MeterDistance;
 
 public enum ConfigurationManager {
     INSTANCE;

@@ -86,4 +86,13 @@ public interface CompetitorSelectionProvider {
      * @return the size of all filtered competitors
      */
     public int getFilteredCompetitorsListSize();
+
+    /**
+     * If a {@link CompetitorDTO competitor} with {@code competitorIdAsString} as its {@link CompetitorDTO#getIdAsString()} is currently
+     * considered {@link #isSelected(CompetitorDTO) selected}, the correponding {@link CompetitorDTO} object is returned; otherwise,
+     * {@code null} is returned.
+     */
+    CompetitorDTO getSelectedCompetitor(String competitorIdAsString);
+    
+    Iterable<String> getSelectedCompetitorIdsAsStrings();
 }

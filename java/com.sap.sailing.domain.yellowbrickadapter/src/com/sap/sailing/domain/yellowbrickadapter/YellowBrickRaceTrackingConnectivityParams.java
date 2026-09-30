@@ -3,6 +3,7 @@ package com.sap.sailing.domain.yellowbrickadapter;
 import com.sap.sailing.domain.base.DomainFactory;
 import com.sap.sailing.domain.base.Regatta;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroupResolver;
+import com.sap.sailing.domain.maneuverhash.ManeuverRaceFingerprintRegistry;
 import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprintRegistry;
 import com.sap.sailing.domain.racelog.RaceLogAndTrackedRaceResolver;
 import com.sap.sailing.domain.racelog.RaceLogStore;
@@ -46,20 +47,25 @@ public class YellowBrickRaceTrackingConnectivityParams extends AbstractRaceTrack
     @Override
     public RaceTracker createRaceTracker(TrackedRegattaRegistry trackedRegattaRegistry, WindStore windStore,
             RaceLogAndTrackedRaceResolver raceLogResolver, LeaderboardGroupResolver leaderboardGroupResolver,
-            long timeoutInMilliseconds, RaceTrackingHandler raceTrackingHandler, MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry) throws Exception {
+            long timeoutInMilliseconds, RaceTrackingHandler raceTrackingHandler,
+            MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry,
+            ManeuverRaceFingerprintRegistry maneuverRaceFingerprintRegistry) throws Exception {
         return new YellowBrickRaceTrackerImpl(this, /* regatta */ null, trackedRegattaRegistry, windStore,
                 raceLogResolver, leaderboardGroupResolver, timeoutInMilliseconds, raceTrackingHandler, raceLogStore,
-                regattaLogStore, baseDomainFactory, yellowBrickTrackingAdapter);
+                regattaLogStore, baseDomainFactory, yellowBrickTrackingAdapter, markPassingRaceFingerprintRegistry, maneuverRaceFingerprintRegistry);
     }
 
     @Override
     public RaceTracker createRaceTracker(Regatta regatta, TrackedRegattaRegistry trackedRegattaRegistry,
             WindStore windStore, RaceLogAndTrackedRaceResolver raceLogResolver,
             LeaderboardGroupResolver leaderboardGroupResolver, long timeoutInMilliseconds,
-            RaceTrackingHandler raceTrackingHandler, MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry) throws Exception {
-        return new YellowBrickRaceTrackerImpl(this, regatta, trackedRegattaRegistry, windStore, raceLogResolver,
+            RaceTrackingHandler raceTrackingHandler,
+            MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry,
+            ManeuverRaceFingerprintRegistry maneuverRaceFingerprintRegistry) throws Exception {
+        return new YellowBrickRaceTrackerImpl(this, regatta, trackedRegattaRegistry,
+                windStore, raceLogResolver,
                 leaderboardGroupResolver, timeoutInMilliseconds, raceTrackingHandler, raceLogStore, regattaLogStore,
-                baseDomainFactory, yellowBrickTrackingAdapter);
+                baseDomainFactory, yellowBrickTrackingAdapter, markPassingRaceFingerprintRegistry, maneuverRaceFingerprintRegistry);
     }
 
     @Override

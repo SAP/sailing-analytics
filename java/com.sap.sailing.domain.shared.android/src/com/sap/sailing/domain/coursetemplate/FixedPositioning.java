@@ -1,6 +1,6 @@
 package com.sap.sailing.domain.coursetemplate;
 
-import com.sap.sailing.domain.common.Position;
+import com.sap.sse.common.Position;
 
 public interface FixedPositioning extends Positioning {
     Position getFixedPosition();

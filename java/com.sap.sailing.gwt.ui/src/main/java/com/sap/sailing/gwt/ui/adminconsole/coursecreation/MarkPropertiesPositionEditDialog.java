@@ -3,9 +3,9 @@ package com.sap.sailing.gwt.ui.adminconsole.coursecreation;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.gwt.ui.client.StringMessages;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog;
 import com.sap.sse.gwt.client.dialog.DoubleBox;
 

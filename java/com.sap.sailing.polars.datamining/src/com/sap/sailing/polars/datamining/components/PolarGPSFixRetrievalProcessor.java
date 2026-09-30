@@ -7,7 +7,6 @@ import java.util.concurrent.ExecutorService;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.Leg;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.WindSource;
 import com.sap.sailing.domain.common.impl.WindSpeedSteppingWithMaxDistance;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
@@ -21,6 +20,7 @@ import com.sap.sailing.polars.datamining.data.impl.GPSFixWithPolarContext;
 import com.sap.sailing.polars.datamining.data.impl.PolarStatisticImpl;
 import com.sap.sailing.polars.datamining.data.impl.SpeedClusterGroup;
 import com.sap.sailing.polars.datamining.shared.PolarDataMiningSettings;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Speed;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util.Pair;

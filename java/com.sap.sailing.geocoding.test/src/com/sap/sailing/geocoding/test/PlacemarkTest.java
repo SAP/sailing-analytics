@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.Placemark;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.domain.common.impl.PlacemarkImpl;
+import com.sap.sse.common.impl.DegreePosition;
 
 public class PlacemarkTest {
     @Test

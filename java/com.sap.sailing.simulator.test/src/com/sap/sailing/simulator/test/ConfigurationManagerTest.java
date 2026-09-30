@@ -7,12 +7,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.simulator.BoatClassProperties;
 import com.sap.sailing.simulator.RaceProperties;
 import com.sap.sailing.simulator.impl.BoatClassPropertiesImpl;
 import com.sap.sailing.simulator.impl.ConfigurationManager;
 import com.sap.sailing.simulator.impl.RacePropertiesImpl;
+import com.sap.sse.common.impl.MeterDistance;
 
 public class ConfigurationManagerTest {
 

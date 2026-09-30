@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import com.sap.sailing.domain.common.impl.KnotSpeedImpl;
 import com.sap.sailing.polars.datamining.data.impl.SpeedClusterGroup;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.impl.KnotSpeedImpl;
 import com.sap.sse.datamining.data.Cluster;
 
 public class SpeedClusterGroupTest {

@@ -3,10 +3,10 @@ package com.sap.sailing.windestimation.data;
 import java.util.List;
 
 import com.sap.sailing.domain.base.BoatClass;
-import com.sap.sailing.domain.common.impl.MeterPerSecondSpeedImpl;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.impl.MeterPerSecondSpeedImpl;
 
 /**
  * Competitor track with elements (e.g. maneuvers or gps-fixes) which has been fetched during data import.

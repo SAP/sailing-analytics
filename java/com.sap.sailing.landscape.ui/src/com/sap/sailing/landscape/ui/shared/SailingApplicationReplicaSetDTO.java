@@ -18,6 +18,9 @@ public class SailingApplicationReplicaSetDTO<ShardingKey> implements Named, IsSe
     private String version;
     private String releaseNotesLink;
     private String hostname;
+    /**
+     * Originates from load balancer rule and therefore it can be null of not managed by load balancer rule
+     */
     private String defaultRedirectPath;
     private String autoScalingGroupAmiId;
     
@@ -74,6 +77,9 @@ public class SailingApplicationReplicaSetDTO<ShardingKey> implements Named, IsSe
         return hostname;
     }
 
+    /**
+     * @return may be null if not managed by load balancer rule 
+     */  
     public String getDefaultRedirectPath() {
         return defaultRedirectPath;
     }

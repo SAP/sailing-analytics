@@ -13,11 +13,8 @@ import com.sap.sailing.domain.base.Waypoint;
 import com.sap.sailing.domain.common.LegType;
 import com.sap.sailing.domain.common.ManeuverType;
 import com.sap.sailing.domain.common.NoWindException;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.TackType;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.tracking.BravoFix;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.leaderboard.caching.LeaderboardDTOCalculationReuseCache;
@@ -33,10 +30,13 @@ import com.sap.sailing.domain.tracking.WindPositionMode;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 
 /**
  * Provides a convenient view on the tracked leg, projecting to a single competitor's performance.
@@ -311,14 +311,15 @@ public class TrackedLegOfCompetitorImpl implements TrackedLegOfCompetitor {
         if (speed != null) {
             Bearing projectToBearing;
             try {
-                if (cache.getLegType(getTrackedLeg(), at) != LegType.REACHING) {
+                final LegType legType = cache.getLegType(getTrackedLeg(), at);
+                if (legType != LegType.REACHING) {
                     final Wind wind = getTrackedRace().getWind(windPositionMode, getTrackedLeg(), getCompetitor(), at, cache);
                     if (wind == null) {
                         // This is not really likely to happen because wind==null would have let the call
                         // to cache.getLegType(...) fail with a NoWindException
                         throw new NoWindException("Need at least wind direction to determine windward speed");
                     }
-                    projectToBearing = wind.getBearing();
+                    projectToBearing = legType == LegType.UPWIND ? wind.getFrom() : wind.getBearing();
                 } else {
                     projectToBearing = cache.getLegBearing(getTrackedLeg(), at);
                 }
@@ -327,11 +328,9 @@ public class TrackedLegOfCompetitorImpl implements TrackedLegOfCompetitor {
                 projectToBearing = cache.getLegBearing(getTrackedLeg(), at);
             }
             if (speed.getBearing() != null && projectToBearing != null) {
-                double cos = Math.cos(speed.getBearing().getRadians() - projectToBearing.getRadians());
-                if (cos < 0) {
-                    projectToBearing = projectToBearing.reverse();
-                }
-                result = new KnotSpeedWithBearingImpl(Math.abs(speed.getKnots() * cos), projectToBearing);
+                // cos becomes negative after > 90 from leg direction
+                final double cos = Math.cos(speed.getBearing().getRadians() - projectToBearing.getRadians());
+                result = new KnotSpeedWithBearingImpl(speed.getKnots() * cos, projectToBearing);
             } else {
                 result = null;
             }
@@ -816,7 +815,8 @@ public class TrackedLegOfCompetitorImpl implements TrackedLegOfCompetitor {
             if (hasStartedLeg(timePoint)) {
                 Distance windwardDistanceToGo = getWindwardDistanceToGo(timePoint, windPositionMode);
                 Speed vmg = getVelocityMadeGood(timePoint, windPositionMode, cache);
-                result = vmg == null ? null : vmg.getDuration(windwardDistanceToGo);
+                //return null if boat standing still or going backwards
+                result = vmg == null || vmg.getKnots() <= 0 ? null : vmg.getDuration(windwardDistanceToGo);
             } else {
                 result = null;
             }

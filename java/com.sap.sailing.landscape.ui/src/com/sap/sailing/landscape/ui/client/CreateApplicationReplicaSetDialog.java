@@ -319,7 +319,7 @@ public class CreateApplicationReplicaSetDialog extends AbstractApplicationReplic
         return new CreateApplicationReplicaSetInstructions(nameBox.getValue(), sharedMasterInstanceBox.getValue(),
                 getDedicatedInstanceTypeListBox().getSelectedValue(),
                 getSharedInstanceTypeListBox().getSelectedValue(),
-                getReleaseNameBoxValue(), dynamicLoadBalancerCheckBox==null?false:dynamicLoadBalancerCheckBox.getValue(),
+                LandscapeDialogUtil.getReleaseNameBoxValue(getReleaseNameBox(), stringMessages), dynamicLoadBalancerCheckBox==null?false:dynamicLoadBalancerCheckBox.getValue(),
                 getMasterReplicationBearerTokenBox().getValue(), getReplicaReplicationBearerTokenBox().getValue(),
                 domainNameBox.getValue(), memoryInMegabytesBox.getValue(), memoryTotalSizeFactorBox.getValue(),
                 igtimiRiotPortBox.getValue(), startWithReplicaOnSharedInstanceBox.getValue());

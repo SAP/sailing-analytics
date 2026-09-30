@@ -8,12 +8,12 @@ import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import com.sap.sailing.domain.base.Competitor;
-import com.sap.sailing.domain.common.Bounds;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.markpassingcalculation.Candidate;
 import com.sap.sailing.domain.markpassingcalculation.CandidateChooser;
 import com.sap.sailing.domain.markpassingcalculation.CandidateFinder;
 import com.sap.sailing.domain.tracking.DynamicGPSFixTrack;
+import com.sap.sse.common.Bounds;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 

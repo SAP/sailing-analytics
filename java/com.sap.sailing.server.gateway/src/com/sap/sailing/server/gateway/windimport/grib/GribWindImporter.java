@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.WindSource;
 import com.sap.sailing.domain.common.WindSourceType;
@@ -19,6 +18,7 @@ import com.sap.sailing.domain.common.impl.WindSourceWithAdditionalID;
 import com.sap.sailing.grib.GribWindField;
 import com.sap.sailing.grib.GribWindFieldFactory;
 import com.sap.sailing.server.gateway.windimport.AbstractWindImporter;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 

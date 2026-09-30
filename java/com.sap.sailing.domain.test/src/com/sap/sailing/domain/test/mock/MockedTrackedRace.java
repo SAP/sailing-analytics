@@ -36,10 +36,8 @@ import com.sap.sailing.domain.base.configuration.RegattaConfiguration;
 import com.sap.sailing.domain.common.CompetitorRegistrationType;
 import com.sap.sailing.domain.common.MaxPointsReason;
 import com.sap.sailing.domain.common.NoWindException;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
 import com.sap.sailing.domain.common.RegattaIdentifier;
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.common.Tack;
 import com.sap.sailing.domain.common.TargetTimeInfo;
 import com.sap.sailing.domain.common.Wind;
@@ -50,11 +48,13 @@ import com.sap.sailing.domain.common.racelog.Flags;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.common.tracking.SensorFix;
+import com.sap.sailing.domain.leaderboard.HasCourseAreasListener;
 import com.sap.sailing.domain.leaderboard.ScoringScheme;
 import com.sap.sailing.domain.leaderboard.caching.LeaderboardDTOCalculationReuseCache;
 import com.sap.sailing.domain.leaderboard.impl.CompetitorAndRankComparable;
 import com.sap.sailing.domain.leaderboard.impl.CompetitorProviderFromRaceColumnsAndRegattaLike;
 import com.sap.sailing.domain.leaderboard.impl.RankAndRankComparable;
+import com.sap.sailing.domain.maneuverhash.ManeuverRaceFingerprintRegistry;
 import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprintRegistry;
 import com.sap.sailing.domain.polars.PolarDataService;
 import com.sap.sailing.domain.racelog.RaceLogAndTrackedRaceResolver;
@@ -100,7 +100,9 @@ import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.IsManagedByCache;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
@@ -648,6 +650,14 @@ public class MockedTrackedRace implements DynamicTrackedRace {
                     public void setAutoRestartTrackingUponCompetitorSetChange(
                             boolean autoRestartTrackingUponCompetitorSetChange) {
                     }
+
+                    @Override
+                    public void addCourseAreaChangeListener(HasCourseAreasListener listener) {
+                    }
+
+                    @Override
+                    public void removeCourseAreaChangeListener(HasCourseAreasListener listener) {
+                    }
                 };
             }
 
@@ -690,12 +700,13 @@ public class MockedTrackedRace implements DynamicTrackedRace {
 
             @Override
             public DynamicTrackedRace createTrackedRace(RaceDefinition raceDefinition, Iterable<Sideline> sidelines,
-                    WindStore windStore, long delayToLiveInMillis,
-                    long millisecondsOverWhichToAverageWind, long millisecondsOverWhichToAverageSpeed,
-                    DynamicRaceDefinitionSet raceDefinitionSetToUpdate, boolean useMarkPassingcalculator,
-                    RaceLogAndTrackedRaceResolver raceLogResolver,
+                    WindStore windStore, long delayToLiveInMillis, long millisecondsOverWhichToAverageWind,
+                    long millisecondsOverWhichToAverageSpeed, DynamicRaceDefinitionSet raceDefinitionSetToUpdate,
+                    boolean useMarkPassingcalculator, RaceLogAndTrackedRaceResolver raceLogResolver,
                     Optional<ThreadLocalTransporter> threadLocalTransporter,
-                    TrackingConnectorInfo trackingConnectorInfo, MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry) {
+                    TrackingConnectorInfo trackingConnectorInfo,
+                    MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry,
+                    ManeuverRaceFingerprintRegistry maneuverRaceFingerprintRegistry) {
                 return null;
             }
 
@@ -743,7 +754,7 @@ public class MockedTrackedRace implements DynamicTrackedRace {
     }
 
     @Override
-    public List<GPSFixMoving> approximate(Competitor competitor, Distance maxDistance, TimePoint from, TimePoint to) {
+    public List<GPSFixMoving> approximate(Competitor competitor, TimePoint from, TimePoint to) {
         return null;
     }
 
@@ -1389,12 +1400,21 @@ public class MockedTrackedRace implements DynamicTrackedRace {
     }
 
     @Override
+    public IncrementalWindEstimation getWindEstimation() {
+        return null;
+    }
+
+    @Override
     public TrackingConnectorInfo getTrackingConnectorInfo() {
         return null;
     }
 
     @Override
     public void runWhenDoneLoading(Runnable runnable) {
+    }
+
+    @Override
+    public void runWhenPastLoading(Runnable callback) {
     }
 
     @Override

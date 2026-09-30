@@ -28,6 +28,10 @@ public class MstManeuverGraphGenerator extends AbstractMstGraphGenerator<Maneuve
         this.transitionProbabilitiesCalculator = transitionProbabilitiesCalculator;
     }
 
+    public MstGraphNodeTransitionProbabilitiesCalculator getTransitionProbabilitiesCalculator() {
+        return transitionProbabilitiesCalculator;
+    }
+    
     @Override
     protected double getDistanceBetweenObservations(ManeuverWithProbabilisticTypeClassification o1,
             ManeuverWithProbabilisticTypeClassification o2) {
@@ -91,6 +95,25 @@ public class MstManeuverGraphGenerator extends AbstractMstGraphGenerator<Maneuve
 
         public List<MstGraphLevel> getLeaves() {
             return leaves;
+        }
+        
+        @Override
+        public String toString() {
+            StringBuilder result = new StringBuilder();
+            result.append("MST maneuver graph:\n");
+            appendGraphLevelToStringBuilder(root, result, 0);
+            return result.toString();
+        }
+        
+        private void appendGraphLevelToStringBuilder(MstGraphLevel graphLevel, StringBuilder result, int indent) {
+            for (int i = 0; i < indent; i++) {
+                result.append(" ");
+            }
+            result.append(graphLevel);
+            result.append("\n");
+            for (MstGraphLevel child : graphLevel.getChildren()) {
+                appendGraphLevelToStringBuilder(child, result, indent + 1);
+            }
         }
     }
 }

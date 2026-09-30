@@ -10,9 +10,9 @@ import com.sap.sailing.dashboards.gwt.client.device.LocationListener;
 import com.sap.sailing.dashboards.gwt.client.device.Orientation;
 import com.sap.sailing.dashboards.gwt.client.device.OrientationListener;
 import com.sap.sailing.dashboards.gwt.client.device.OrientationType;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.DegreePosition;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Util.Pair;
+import com.sap.sse.common.impl.DegreePosition;
 
 /**
  * The classes task is to notify its listeners about changes in distance and angle from the actual device to a pointed

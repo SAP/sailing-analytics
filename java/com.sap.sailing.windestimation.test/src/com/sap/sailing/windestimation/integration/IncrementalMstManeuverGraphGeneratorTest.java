@@ -3,10 +3,12 @@ package com.sap.sailing.windestimation.integration;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -15,14 +17,15 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
+import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Competitor;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.maneuverdetection.TrackTimeInfo;
 import com.sap.sailing.domain.maneuverdetection.impl.IncrementalManeuverDetectorImpl;
 import com.sap.sailing.domain.maneuverdetection.impl.ManeuverDetectorWithEstimationDataSupportDecoratorImpl;
+import com.sap.sailing.domain.polars.PolarDataService;
 import com.sap.sailing.domain.test.OnlineTracTracBasedTest;
 import com.sap.sailing.domain.tracking.CompleteManeuverCurve;
 import com.sap.sailing.domain.tracking.impl.DynamicTrackedRaceImpl;
@@ -37,6 +40,7 @@ import com.sap.sailing.windestimation.model.classifier.maneuver.ManeuverFeatures
 import com.sap.sailing.windestimation.model.exception.ModelPersistenceException;
 import com.sap.sailing.windestimation.model.regressor.twdtransition.GaussianBasedTwdTransitionDistributionCache;
 import com.sap.sailing.windestimation.model.store.ClassPathReadOnlyModelStoreImpl;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
@@ -46,8 +50,7 @@ import com.sap.sse.common.impl.MillisecondsTimePoint;
  * @author Vladislav Chumak (D069712)
  *
  */
-public class IncrementalMstManeuverGraphGeneratorTest extends OnlineTracTracBasedTest {
-
+public class IncrementalMstManeuverGraphGeneratorTest extends AbstractTestWithLocal505PolarData {
     protected final SimpleDateFormat dateFormat;
     private ClassPathReadOnlyModelStoreImpl modelStore;
 
@@ -74,22 +77,23 @@ public class IncrementalMstManeuverGraphGeneratorTest extends OnlineTracTracBase
     }
 
     @Test
-    public void testIncrementalMstManeuverGraphGenerator() {
-        GaussianBasedTwdTransitionDistributionCache gaussianBasedTwdTransitionDistributionCache = new GaussianBasedTwdTransitionDistributionCache(
-                modelStore, false, Long.MAX_VALUE);
-        DistanceAndDurationAwareWindTransitionProbabilitiesCalculator transitionProbabilitiesCalculator = new DistanceAndDurationAwareWindTransitionProbabilitiesCalculator(
+    public void testIncrementalMstManeuverGraphGenerator() throws ClassNotFoundException, IOException, ParseException, InterruptedException, NoSuchAlgorithmException {
+        final GaussianBasedTwdTransitionDistributionCache gaussianBasedTwdTransitionDistributionCache = new GaussianBasedTwdTransitionDistributionCache(
+                modelStore, /* preload all models */ false, Long.MAX_VALUE);
+        final DistanceAndDurationAwareWindTransitionProbabilitiesCalculator transitionProbabilitiesCalculator = new DistanceAndDurationAwareWindTransitionProbabilitiesCalculator(
                 gaussianBasedTwdTransitionDistributionCache, true);
-        ManeuverClassifiersCache maneuverClassifiersCache = new ManeuverClassifiersCache(modelStore, true,
-                Long.MAX_VALUE, new ManeuverFeatures(false, false, false));
+        final ManeuverClassifiersCache maneuverClassifiersCache = new ManeuverClassifiersCache(modelStore, /* preload all models */  true,
+                Long.MAX_VALUE, new ManeuverFeatures(/* polarsInformation */ true, /* scaledSpeed */ false, /* marksInformation */ false));
         assertTrue(gaussianBasedTwdTransitionDistributionCache.isReady() && maneuverClassifiersCache.isReady(),
                 "Wind estimation models are empty");
-        DynamicTrackedRaceImpl trackedRace = getTrackedRace();
-        IncrementalMstManeuverGraphGenerator generator = new IncrementalMstManeuverGraphGenerator(
-                new CompleteManeuverCurveToManeuverForEstimationConverter(trackedRace, null),
+        final DynamicTrackedRaceImpl trackedRace = getTrackedRace();
+        final PolarDataService polarDataService = createPolarDataService();
+        final IncrementalMstManeuverGraphGenerator generator = new IncrementalMstManeuverGraphGenerator(
+                new CompleteManeuverCurveToManeuverForEstimationConverter(trackedRace, polarDataService),
                 transitionProbabilitiesCalculator, maneuverClassifiersCache);
-        Set<Pair<Position, TimePoint>> cleanManeuvers = new TreeSet<>(
+        final Set<Pair<Position, TimePoint>> cleanManeuvers = new TreeSet<>(
                 new TimePointAndPositionWithToleranceComparator());
-        for (Competitor competitor : trackedRace.getRace().getCompetitors()) {
+        for (final Competitor competitor : trackedRace.getRace().getCompetitors()) {
             IncrementalManeuverDetectorImpl maneuverDetector = new IncrementalManeuverDetectorImpl(trackedRace,
                     competitor, null);
             TrackTimeInfo trackTimeInfo = maneuverDetector.getTrackTimeInfo();
@@ -123,19 +127,19 @@ public class IncrementalMstManeuverGraphGeneratorTest extends OnlineTracTracBase
                 }
             }
         }
-        MstManeuverGraphComponents mstGraph = generator.parseGraph();
-        List<ManeuverForEstimation> collectedManeuversFromGraph = new ArrayList<>();
+        final MstManeuverGraphComponents mstGraph = generator.parseGraph();
+        final List<ManeuverForEstimation> collectedManeuversFromGraph = new ArrayList<>();
         collectAllManeuversInGraph(mstGraph.getRoot(), collectedManeuversFromGraph);
-        Set<Pair<Position, TimePoint>> cleanManeuversFromGraph = new TreeSet<>(
+        final Set<Pair<Position, TimePoint>> cleanManeuversFromGraph = new TreeSet<>(
                 new TimePointAndPositionWithToleranceComparator());
         collectedManeuversFromGraph.stream()
                 .map(maneuver -> new Pair<>(maneuver.getManeuverPosition(), maneuver.getManeuverTimePoint()))
                 .forEach(pair -> cleanManeuversFromGraph.add(pair));
 
-        for (Pair<Position, TimePoint> pair : cleanManeuversFromGraph) {
+        for (final Pair<Position, TimePoint> pair : cleanManeuversFromGraph) {
             assertTrue(cleanManeuvers.contains(pair), "Target set does not contain maneuver at " + pair);
         }
-        for (Pair<Position, TimePoint> pair : cleanManeuvers) {
+        for (final Pair<Position, TimePoint> pair : cleanManeuvers) {
             assertTrue(cleanManeuversFromGraph.contains(pair), "Set from graph  does not contain maneuver at " + pair);
         }
     }

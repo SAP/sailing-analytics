@@ -20,6 +20,8 @@ import java.util.UUID;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -114,6 +116,12 @@ public class SearchServiceTest {
     private DynamicTrackedRace aalOrcTrackedR2;
     private SecurityService securityService;
 
+    @AfterEach
+    public void tearDown() {
+        ThreadContext.unbindSecurityManager();
+        ThreadContext.unbindSubject();
+    }
+
     @BeforeEach
     public void setUp() {
         UserGroupImpl defaultTenant = new UserGroupImpl(new UUID(0, 1), "defaultTenant");
@@ -121,8 +129,16 @@ public class SearchServiceTest {
         securityService = Mockito.mock(SecurityService.class);
         SecurityManager securityManager = Mockito.mock(org.apache.shiro.mgt.SecurityManager.class);
         Subject fakeSubject = Mockito.mock(Subject.class);
-        SecurityUtils.setSecurityManager(securityManager);
+        // Stub the mock BEFORE installing it as the global SecurityManager to avoid a race
+        // condition: SecurityUtils.setSecurityManager() sets a JVM-wide static singleton.
+        // Any thread that calls SecurityUtils.getSubject() (when no Subject is bound to its
+        // ThreadContext) will trigger securityManager.createSubject(). If that happens between
+        // the .when(securityManager) call (which sets pending doAnswer-style answers on the
+        // mock's InvocationContainer) and the .createSubject() call (which completes the
+        // stubbing), the other thread's call consumes the pending answers first, causing an
+        // AssertionError in InvocationContainerImpl.setMethodForStubbing (line 123).
         Mockito.doReturn(fakeSubject).when(securityManager).createSubject(Mockito.any());
+        SecurityUtils.setSecurityManager(securityManager);
         Mockito.doReturn(defaultTenant).when(securityService).getServerGroup();
         Mockito.doReturn(currentUser).when(securityService).getCurrentUser();
         Mockito.doReturn(true).when(securityService).hasCurrentUserReadPermission(Mockito.any());
@@ -246,7 +262,7 @@ public class SearchServiceTest {
         // track only R1 and R3
         pfingstbusch29erTrackedR1 = server.apply(new CreateTrackedRace(pfingstbusch29er.getRaceIdentifier(pfingstbusch29erR1), EmptyWindStore.INSTANCE, /* delayToLiveInMillis */ 3000,
                 /* millisecondsOverWhichToAverageWind */ 15000, /* millisecondsOverWhichToAverageSpeed */ 15000, null));
-        pfingstbusch29erTrackedR1.setStartOfTrackingReceived(pfingstbuschStartDate.plus(1));
+        pfingstbusch29erTrackedR1.setStartOfTrackingReceived(pfingstbuschStartDate.plusResolution());
         pfingstbusch29erLeaderboard.getRaceColumnByName("R1").setTrackedRace(pfingstbusch29erLeaderboard.getRaceColumnByName("R1").getFleetByName("Default"), pfingstbusch29erTrackedR1);
         pfingstbusch29erTrackedR3 = server.apply(new CreateTrackedRace(pfingstbusch29er.getRaceIdentifier(pfingstbusch29erR3), EmptyWindStore.INSTANCE, /* delayToLiveInMillis */ 3000,
                 /* millisecondsOverWhichToAverageWind */ 15000, /* millisecondsOverWhichToAverageSpeed */ 15000, null));

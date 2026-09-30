@@ -1,8 +1,8 @@
 package com.sap.sailing.simulator.impl;
 
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.simulator.TimedPositionWithSpeed;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 
 public class TimedPositionWithSpeedImpl implements TimedPositionWithSpeed {

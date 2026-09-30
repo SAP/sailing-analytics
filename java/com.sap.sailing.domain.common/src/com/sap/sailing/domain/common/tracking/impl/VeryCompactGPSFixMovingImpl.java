@@ -3,14 +3,16 @@ package com.sap.sailing.domain.common.tracking.impl;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.sap.sailing.domain.common.AbstractPosition;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.SpeedWithBearing;
-import com.sap.sailing.domain.common.impl.AbstractSpeedWithAbstractBearingImpl;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sse.common.AbstractBearing;
+import com.sap.sse.common.AbstractPosition;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.impl.AbstractSpeedWithAbstractBearingImpl;
+import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 
 /**
  * A memory-conserving representation of a {@link GPSFixMoving} object that produces the fine-grained
@@ -187,13 +189,17 @@ public class VeryCompactGPSFixMovingImpl extends AbstractCompactGPSFixMovingImpl
      * uncached.
      */
     @Override
-    public void cacheEstimatedSpeed(SpeedWithBearing estimatedSpeed) {
+    public synchronized SpeedWithBearing cacheEstimatedSpeed(SpeedWithBearing estimatedSpeed) {
         try {
             cachedEstimatedSpeedInKnotsScaled = CompactPositionHelper.getKnotSpeedScaled(estimatedSpeed);
             cachedEstimatedSpeedBearingInDegreesScaled = CompactPositionHelper.getDegreeBearingScaled(estimatedSpeed.getBearing());
             super.cacheEstimatedSpeed(estimatedSpeed);
+            final SpeedWithBearing veryCompactEstimatedSpeed = getCachedEstimatedSpeed();
+            return new KnotSpeedWithBearingImpl(veryCompactEstimatedSpeed.getKnots(),
+                    new DegreeBearingImpl(veryCompactEstimatedSpeed.getBearing().getDegrees()));
         } catch (CompactionNotPossibleException e) {
             logger.log(Level.FINER, "Cannot cache estimated speed "+estimatedSpeed+" in compact fix:", e);
+            return estimatedSpeed;
         }
     }
 }

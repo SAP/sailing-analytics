@@ -64,7 +64,7 @@ import com.sap.sse.security.shared.TypeRelativeObjectIdentifier;
  * @author Axel Uhl (d043530)
  *
  */
-public interface Leaderboard extends LeaderboardBase, HasRaceColumns, HasCPUMeter {
+public interface Leaderboard extends LeaderboardBase, HasRaceColumns, HasCPUMeter, HasCourseAreas {
     /**
      * If the leaderboard is a "matrix" with the cells being defined by a competitor / race "coordinate,"
      * then this interface defines the structure of the "cells."
@@ -701,6 +701,7 @@ public interface Leaderboard extends LeaderboardBase, HasRaceColumns, HasCPUMete
      * @return the {@link CourseArea} objects on which races of this leaderboard may run; always valid, never
      *         {@code null}, but may be empty
      */
+    @Override
     Iterable<CourseArea> getCourseAreas();
 
     /**

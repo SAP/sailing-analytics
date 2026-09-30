@@ -4,7 +4,6 @@ import java.util.NavigableSet;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.Waypoint;
-import com.sap.sailing.domain.common.BearingChangeAnalyzer;
 import com.sap.sailing.domain.common.NauticalSide;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
@@ -15,6 +14,7 @@ import com.sap.sailing.domain.tracking.ManeuverCurveBoundaries;
 import com.sap.sailing.domain.tracking.MarkPassing;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.BearingChangeAnalyzer;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
 

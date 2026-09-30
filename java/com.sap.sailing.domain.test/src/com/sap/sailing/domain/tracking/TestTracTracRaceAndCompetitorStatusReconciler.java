@@ -9,6 +9,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,8 @@ import com.sap.sailing.domain.abstractlog.race.impl.RaceLogFlagEventImpl;
 import com.sap.sailing.domain.abstractlog.race.impl.RaceLogPassChangeEventImpl;
 import com.sap.sailing.domain.abstractlog.race.impl.RaceLogStartTimeEventImpl;
 import com.sap.sailing.domain.base.Competitor;
+import com.sap.sailing.domain.base.Fleet;
+import com.sap.sailing.domain.base.RaceColumn;
 import com.sap.sailing.domain.base.RaceDefinition;
 import com.sap.sailing.domain.base.impl.BoatClassImpl;
 import com.sap.sailing.domain.base.impl.BoatImpl;
@@ -38,10 +41,10 @@ import com.sap.sailing.domain.base.impl.RaceDefinitionImpl;
 import com.sap.sailing.domain.base.impl.TeamImpl;
 import com.sap.sailing.domain.common.LeaderboardNameConstants;
 import com.sap.sailing.domain.common.MaxPointsReason;
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.MeterDistance;
+import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
 import com.sap.sailing.domain.common.racelog.Flags;
 import com.sap.sailing.domain.leaderboard.FlexibleLeaderboard;
+import com.sap.sailing.domain.leaderboard.Leaderboard;
 import com.sap.sailing.domain.leaderboard.impl.FlexibleLeaderboardImpl;
 import com.sap.sailing.domain.leaderboard.impl.LowPoint;
 import com.sap.sailing.domain.leaderboard.impl.ThresholdBasedResultDiscardingRuleImpl;
@@ -55,6 +58,9 @@ import com.sap.sse.common.Color;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util.Pair;
+import com.sap.sse.common.Util.Triple;
+import com.sap.sse.common.impl.DegreePosition;
+import com.sap.sse.common.impl.MeterDistance;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.metering.CPUMeter;
 import com.tractrac.model.lib.api.event.ICompetitor;
@@ -112,6 +118,13 @@ public class TestTracTracRaceAndCompetitorStatusReconciler {
             public TrackedRace resolveTrackedRace(SimpleRaceLogIdentifier identifier) {
                 return null;
             }
+
+            @Override
+            public List<Triple<Leaderboard, RaceColumn, Fleet>> getColumnsWithRaceLogForTrackedRace(
+                    RegattaAndRaceIdentifier trackedRaceIdentifier) {
+                return null;
+            }
+
         });
         tractracCompetitor = mock(ICompetitor.class);
         tractracRaceCompetitor = mock(IRaceCompetitor.class);
@@ -243,6 +256,12 @@ public class TestTracTracRaceAndCompetitorStatusReconciler {
             public TrackedRace resolveTrackedRace(SimpleRaceLogIdentifier identifier) {
                 return null;
             }
+
+            @Override
+            public List<Triple<Leaderboard, RaceColumn, Fleet>> getColumnsWithRaceLogForTrackedRace(
+                    RegattaAndRaceIdentifier trackedRaceIdentifier) {
+                return null;
+            }
         });
         final TimePoint noneStatusTimePoint = manualAbortTimePoint.plus(Duration.ONE_MINUTE.times(1));
         when(tractracRace.getStatusLastChangedTime()).thenReturn(noneStatusTimePoint.asMillis());
@@ -318,7 +337,7 @@ public class TestTracTracRaceAndCompetitorStatusReconciler {
         // now simulate a yet newer TracTrac event that is expected to reset the "IRM" / MaxPointsReason:
         final TimePoint yetNewerResultTimePoint = startOfPass.plus(Duration.ONE_SECOND.times(3));
         when(tractracRaceCompetitor.getStatusLastChangedTime()).thenReturn(yetNewerResultTimePoint.asMillis());
-        when(tractracRaceCompetitor.getStatus()).thenReturn(RaceCompetitorStatusType.NO_DATA);
+        when(tractracRaceCompetitor.getStatus()).thenReturn(RaceCompetitorStatusType.FIN);
         reconciler.reconcileCompetitorStatus(tractracRaceCompetitor, trackedRace);
         {
             final Pair<CompetitorResult, TimePoint> raceLogBasedResult = reconciler.getRaceLogResultAndCreationTimePointForCompetitor(raceLog, competitor);
@@ -334,7 +353,7 @@ public class TestTracTracRaceAndCompetitorStatusReconciler {
         final TimePoint resultTimePoint = startOfPass.plus(Duration.ONE_SECOND);
         when(tractracRaceCompetitor.getStatusLastChangedTime()).thenReturn(resultTimePoint.asMillis());
         when(tractracRaceCompetitor.getOfficialRank()).thenReturn(42);
-        when(tractracRaceCompetitor.getStatus()).thenReturn(RaceCompetitorStatusType.NO_DATA);
+        when(tractracRaceCompetitor.getStatus()).thenReturn(RaceCompetitorStatusType.FIN);
         reconciler.reconcileCompetitorStatus(tractracRaceCompetitor, trackedRace);
         {
             final Pair<CompetitorResult, TimePoint> raceLogBasedResult = reconciler.getRaceLogResultAndCreationTimePointForCompetitor(raceLog, competitor);
@@ -384,7 +403,7 @@ public class TestTracTracRaceAndCompetitorStatusReconciler {
     @Test
     public void testOfficialNullFinishTimeAndZeroRank() {
         final TimePoint resultTimePoint = startOfPass.plus(Duration.ONE_SECOND.times(1));
-        when(tractracRaceCompetitor.getStatus()).thenReturn(RaceCompetitorStatusType.NO_DATA);
+        when(tractracRaceCompetitor.getStatus()).thenReturn(RaceCompetitorStatusType.FIN);
         when(tractracRaceCompetitor.getStatusLastChangedTime()).thenReturn(resultTimePoint.asMillis());
         when(tractracRaceCompetitor.getOfficialRank()).thenReturn(0);
         when(trackedRace.getFinishingTime()).thenReturn(null);
@@ -399,7 +418,7 @@ public class TestTracTracRaceAndCompetitorStatusReconciler {
     @Test
     public void testOfficialFinishTimeAndValidRankUpdateScoreCorrectionMetadata() {
         final TimePoint resultTimePoint = startOfPass.plus(Duration.ONE_SECOND.times(1));
-        when(tractracRaceCompetitor.getStatus()).thenReturn(RaceCompetitorStatusType.FINISH_CONFIRMED);
+        when(tractracRaceCompetitor.getStatus()).thenReturn(RaceCompetitorStatusType.FIN);
         when(tractracRaceCompetitor.getStatusLastChangedTime()).thenReturn(resultTimePoint.asMillis());
         when(tractracRaceCompetitor.getOfficialRank()).thenReturn(4);
         when(trackedRace.getFinishingTime()).thenReturn(null);

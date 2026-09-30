@@ -6,7 +6,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Util.Pair;
 import com.sap.sse.landscape.Host;
 import com.sap.sse.landscape.RotatingFileBasedLog;
 import com.sap.sse.landscape.application.ApplicationProcess;
@@ -69,13 +71,27 @@ implements com.sap.sse.landscape.Process<RotatingFileBasedLog, MetricsT> {
      * the proxy's configuration.
      */
     private static final String CONFIG_FILE_EXTENSION = ".conf";
-    private static final String HOME_REDIRECT_MACRO = "Home-SSL";
-    private static final String PLAIN_REDIRECT_MACRO = "Plain-SSL";
-    private static final String EVENT_REDIRECT_MACRO = "Event-SSL";
-    private static final String SERIES_REDIRECT_MACRO = "Series-SSL";
+    private static final String HOME_REDIRECT_MACRO = "Home";
+    private static final String PLAIN_REDIRECT_MACRO = "Plain";
+    private static final String EVENT_REDIRECT_MACRO = "Event";
+    private static final String SERIES_REDIRECT_MACRO = "Series";
     private static final String HOME_ARCHIVE_REDIRECT_MACRO = "Home-ARCHIVE";
     private static final String EVENT_ARCHIVE_REDIRECT_MACRO = "Event-ARCHIVE";
     private static final String SERIES_ARCHIVE_REDIRECT_MACRO = "Series-ARCHIVE";
+    private static final String CONFIG_FILE_FOR_ARCHIVE_AND_FAILOVER_DEFINITION = "000-macros"+CONFIG_FILE_EXTENSION;
+    
+    /**
+     * Name of the "macro"/variable definition used in the file identified by {@link #CONFIG_FILE_FOR_ARCHIVE_AND_FAILOVER_DEFINITION}
+     * that specifies the internal IP address of the primary ARCHIVE server to use.
+     */
+    private static final String ARCHIVE_IP = "ARCHIVE_IP";
+
+    /**
+     * Name of the "macro"/variable definition used in the file identified by {@link #CONFIG_FILE_FOR_ARCHIVE_AND_FAILOVER_DEFINITION}
+     * that specifies the internal IP address of the fail-over ARCHIVE server to use.
+     */
+    private static final String ARCHIVE_FAILOVER_IP = "ARCHIVE_FAILOVER_IP";
+    
     private final AwsInstance<ShardingKey> host;
     
     public ApacheReverseProxy(AwsLandscape<ShardingKey> landscape, AwsInstance<ShardingKey> host) {
@@ -101,10 +117,35 @@ implements com.sap.sse.landscape.Process<RotatingFileBasedLog, MetricsT> {
      */
     public void rotateLogs(Optional<String> optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception {
         final String command = "logrotate --force -v /etc/logrotate.d/httpd 2>&1;  echo \"logrotate done\"";
-        logger.info("Standard output from forced log rotate on " + this.getHostname() + ": " + runCommandAndReturnStdoutAndStderr(command, "Standard error from logrotate ",
+        logger.info("Standard output from forced log rotate on " + this.getHostname() + ": " + runCommandAndReturnStdoutAndLogStderr(command, "Standard error from logrotate ",
                         Level.ALL, optionalKeyName, privateKeyEncryptionPassphrase));
     }
     
+    @Override
+    public Pair<String, String> getArchiveAndFailoverIPs(Optional<String> optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception {
+        final String absolute000MacrosConfigFilePath = getAbsoluteConfigFilePath(CONFIG_FILE_FOR_ARCHIVE_AND_FAILOVER_DEFINITION);
+        final String command = "cat "+absolute000MacrosConfigFilePath+" | grep \"^Define "+ARCHIVE_IP+"\" | sed -e 's/^Define "+ARCHIVE_IP+" //'; "
+                             + "cat "+absolute000MacrosConfigFilePath+" | grep \"^Define "+ARCHIVE_FAILOVER_IP+"\" | sed -e 's/^Define "+ARCHIVE_FAILOVER_IP+" //'";
+        final String[] archiveAndFailoverIPs = runCommandAndReturnStdoutAndLogStderr(command,
+                "Standard error from getting "+ARCHIVE_IP+" and "+ARCHIVE_FAILOVER_IP+": ",
+                Level.INFO, optionalKeyName, privateKeyEncryptionPassphrase).split("\n");
+        return new Pair<>(archiveAndFailoverIPs[0], archiveAndFailoverIPs[1]);
+    }
+
+    @Override
+    public void setArchiveAndFailoverIPs(String productionArchiveIP, String failoverArchiveIP, Optional<String> optionalKeyName,
+            byte[] privateKeyEncryptionPassphrase) throws Exception {
+        final String absolute000MacrosConfigFilePath = getAbsoluteConfigFilePath(CONFIG_FILE_FOR_ARCHIVE_AND_FAILOVER_DEFINITION);
+        final SshCommandChannel sshChannel = getHost().createRootSshChannel(TIMEOUT, optionalKeyName, privateKeyEncryptionPassphrase);
+        String patch000MacrosCommand = "su - " + CONFIG_USER + " -c 'cd " + CONFIG_REPO_PATH + " && git checkout "
+                + CONFIG_REPO_MAIN_BRANCH_NAME
+                + " && sed -i -e \"s/^Define "+ARCHIVE_IP+" .*$/Define "+ARCHIVE_IP+" "+productionArchiveIP+"/\" -e \"s/^Define "+ARCHIVE_FAILOVER_IP+" .*$/Define "+ARCHIVE_FAILOVER_IP+" "+failoverArchiveIP+"/\" "+absolute000MacrosConfigFilePath
+                + " && " + createCommitAndPushString(CONFIG_FILE_FOR_ARCHIVE_AND_FAILOVER_DEFINITION, "Switching to new ARCHIVE server", /* performPush */ true)
+                + "'"; // concludes the "su"; re-loading is expected to happen through the post-receive hook triggered by the push
+        final String stdout = sshChannel.runCommandAndReturnStdoutAndLogStderr(patch000MacrosCommand, "Standard error from switching to new ARCHIVE server", Level.WARNING);
+        logger.info("Stdout from upgrading to new ARCHIVE: "+stdout);
+    }
+
     /**
      * Creates a redirect file and updates the git repo.
      * 
@@ -132,33 +173,33 @@ implements com.sap.sse.landscape.Process<RotatingFileBasedLog, MetricsT> {
                 + CONFIG_REPO_MAIN_BRANCH_NAME + " && echo \"Use " + macroName + " " + hostname + " "
                 + String.join(" ", macroArguments) + "\" > " + getAbsoluteConfigFilePath(configFileNameForHostname);
         if (doCommit) {
-           command = command + "  && cd "
+           command = command + " && cd "
             + CONFIG_REPO_PATH + " && " + createCommitAndPushString(configFileNameForHostname,
                     "Set " + configFileNameForHostname + " redirect", doPush);
         }
         command = command + "'; service httpd reload"; // Concludes the su. And reloads as the root user.
         logger.info("Standard output from setting up the re-direct for " + hostname
                 + " and reloading the Apache httpd server: "
-                + runCommandAndReturnStdoutAndStderr(command,
+                + runCommandAndReturnStdoutAndLogStderr(command,
                         "Standard error from setting up the re-direct for " + hostname
                                 + " and reloading the Apache httpd server: ",
                         Level.INFO, optionalKeyName, privateKeyEncryptionPassphrase));
     }
-
+    
     /**
      * Overloads {@link #setRedirect(String, String, String, Optional, byte[], boolean, boolean, String...)} and
      * defaults to {@code true} and {@code true} for committing and pushing.
      * 
      * @see #setRedirect(String, String, String, Optional, byte[], boolean, boolean, String...)
      */
-    public void setRedirect(String configFileNameForHostname, String macroName, String hostname,
+    private void setRedirect(String configFileNameForHostname, String macroName, String hostname,
             Optional<String> optionalKeyName, byte[] privateKeyEncryptionPassphrase, String... macroArguments)
             throws Exception {
         setRedirect(configFileNameForHostname, macroName, hostname, optionalKeyName, privateKeyEncryptionPassphrase,
                 /* doCommit */ true, /* doPush */ true, macroArguments);
     }
     
-    private String runCommandAndReturnStdoutAndStderr(String command, String stderrLogPrefix, Level stderrLogLevel,
+    private String runCommandAndReturnStdoutAndLogStderr(String command, String stderrLogPrefix, Level stderrLogLevel,
             Optional<String> optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception {
         final SshCommandChannel sshChannel = getHost().createRootSshChannel(TIMEOUT, optionalKeyName, privateKeyEncryptionPassphrase);
         final String stdout = sshChannel.runCommandAndReturnStdoutAndLogStderr(command, stderrLogPrefix, stderrLogLevel);
@@ -166,10 +207,16 @@ implements com.sap.sse.landscape.Process<RotatingFileBasedLog, MetricsT> {
     }
     
     /**
-     *  Creates a command, that can be ran on an instance to commit, and optionally push, changes to a file (within a git repository). ASSUMES the command is ran from within the repository.
-     * @param editedFileName The file name edited, created or deleted to commit. This includes the {@link #CONFIG_FILE_EXTENSION}, but not a path. The method appends the relative path.
-     * @param commitMsg The commit message, without escaped speech marks.
-     * @param performPush Boolean indicating whether to push changes or not. True for performing a push.
+     * Creates a command, that can be ran on an instance to commit, and optionally push, changes to a file (within a git
+     * repository). ASSUMES the command is ran from within the repository.
+     * 
+     * @param editedFileName
+     *            The file name edited, created or deleted to commit. This includes the {@link #CONFIG_FILE_EXTENSION},
+     *            but not a path. The method appends the relative path.
+     * @param commitMsg
+     *            The commit message, without escaped speech marks.
+     * @param performPush
+     *            Boolean indicating whether to push changes or not. True for performing a push.
      * @return Returns the created command (in String form) to perform a commit and optional push.
      */
     private String createCommitAndPushString(String editedFileName, String commitMsg, boolean performPush) {
@@ -264,7 +311,6 @@ implements com.sap.sse.landscape.Process<RotatingFileBasedLog, MetricsT> {
         removeRedirect(configFileName, hostname, optionalKeyName, privateKeyEncryptionPassphrase);
     }
     
-    
     /**
      * @param configFileName The name of the file to remove.
      * @param hostname The hostname which was removed.
@@ -283,7 +329,7 @@ implements com.sap.sse.landscape.Process<RotatingFileBasedLog, MetricsT> {
         command.append("'; service httpd reload;"); // ' closes the su. The reload must be run as the root user.
         logger.info("Standard output from removing the re-direct for " + hostname
                 + " and reloading the Apache httpd server: "
-                + runCommandAndReturnStdoutAndStderr(command.toString(),
+                + runCommandAndReturnStdoutAndLogStderr(command.toString(),
                         "Standard error from removing the re-direct for " + hostname
                                 + " and reloading the Apache httpd server: ",
                         Level.INFO, optionalKeyName, privateKeyEncryptionPassphrase));

@@ -1,0 +1,1 @@
+* * * * *  export PATH=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin; notify-unhealthy-mongodb-of-sailing-instance 2>/var/log/notify-unhealthy-mongodb-of-sailing-instance.err >/var/log/notify-unhealthy-mongodb-of-sailing-instance.out

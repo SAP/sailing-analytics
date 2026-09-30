@@ -165,6 +165,11 @@ extends Process<RotatingFileBasedLog, MetricsT> {
         return Wait.wait(()->isReady(optionalTimeout), optionalTimeout, Duration.ONE_SECOND.times(5), Level.INFO, ""+this+" not yet ready");
     }
 
+    default boolean waitUntilAlive(Optional<Duration> optionalTimeout) throws TimeoutException, Exception {
+        return Wait.wait(()->isAlive(optionalTimeout), success->success, /* retryOnException */ true,
+                optionalTimeout, Duration.ONE_SECOND.times(5), Level.INFO, ""+this+" not yet alive");
+    }
+
     Release getVersion(Optional<Duration> optionalTimeout, Optional<String> optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception;
 
     TimePoint getStartTimePoint(Optional<Duration> optionalTimeout) throws Exception;

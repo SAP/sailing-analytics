@@ -1,10 +1,10 @@
 package com.sap.sailing.domain.common.tracking.impl;
 
-import com.sap.sailing.domain.common.AbstractPosition;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sse.common.AbstractBearing;
+import com.sap.sse.common.AbstractPosition;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.Position;
 
 /**
  * Keeps the precise values of lat/lng and speed/course.

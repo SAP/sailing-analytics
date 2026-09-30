@@ -9,10 +9,10 @@ import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.tractracadapter.DomainFactory;
 import com.sap.sailing.domain.tractracadapter.LoadingQueueDoneCallBack;
 import com.sap.sailing.domain.tractracadapter.Receiver;
+import com.sap.sse.common.Position;
 import com.tractrac.model.lib.api.data.IPosition;
 import com.tractrac.model.lib.api.map.IPositionedItem;
 import com.tractrac.subscription.lib.api.map.IPositionedItemPositionListener;

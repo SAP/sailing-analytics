@@ -1,6 +1,6 @@
 package com.sap.sailing.windestimation.data;
 
-import com.sap.sailing.domain.common.Position;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 
 public class WindSourceMetadata {

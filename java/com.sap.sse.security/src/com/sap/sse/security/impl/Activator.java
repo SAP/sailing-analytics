@@ -19,7 +19,6 @@ import com.sap.sse.ServerInfo;
 import com.sap.sse.classloading.ServiceTrackerCustomizerForClassLoaderSupplierRegistrations;
 import com.sap.sse.mail.MailService;
 import com.sap.sse.replication.Replicable;
-import com.sap.sse.replication.ReplicationMasterDescriptor;
 import com.sap.sse.replication.ReplicationService;
 import com.sap.sse.rest.CORSFilterConfiguration;
 import com.sap.sse.security.SecurityInitializationCustomizer;
@@ -289,9 +288,12 @@ public class Activator implements BundleActivator {
                     // create security service, it will also create a default admin user if no users exist
                     createAndRegisterSecurityService(bundleContext, userStore, accessControlStore, subscriptionPlanProvider);
                     applyCustomizations();
-                    migrate(userStore, securityService.get());
-                    final ReplicationMasterDescriptor masterDescriptor = securityService.get().getMasterDescriptor();
-                    if (masterDescriptor == null) {
+                    final ReplicationService replicationService = ServiceTrackerFactory.createAndOpen(context, ReplicationService.class).waitForService(0);
+                    // See also bug 6244: if the SecurityService will become a replica, don't worry about subscriptions
+                    // and migrations as that is relevant only on the primary, and we don't want to establish or even replicate
+                    // effects of temporary locally-created SERVER objects, ownerships, and permissions.
+                    if (!replicationService.isReplicationStarting() && securityService.get().getMasterDescriptor() == null) {
+                        migrate(userStore, securityService.get());
                         startSubscriptionDataUpdateTask(bundleContext);
                         startSubscriptionPlanUpdateTask(bundleContext);
                     }

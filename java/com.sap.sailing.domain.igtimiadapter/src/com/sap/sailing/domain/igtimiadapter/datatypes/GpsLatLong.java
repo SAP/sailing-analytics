@@ -2,11 +2,11 @@ package com.sap.sailing.domain.igtimiadapter.datatypes;
 
 import java.util.Map;
 
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.domain.igtimiadapter.IgtimiFixReceiver;
 import com.sap.sailing.domain.igtimiadapter.Sensor;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.impl.DegreePosition;
 
 public class GpsLatLong extends Fix {
     private static final long serialVersionUID = 5056284867725893553L;

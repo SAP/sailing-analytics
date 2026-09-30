@@ -1,6 +1,6 @@
 package com.sap.sailing.racecommittee.app.domain.coursedesign;
 
-import com.sap.sailing.domain.common.Position;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Bearing;
 
 public interface CourseDesignFactory {

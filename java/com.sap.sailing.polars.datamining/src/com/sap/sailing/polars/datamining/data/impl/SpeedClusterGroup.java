@@ -3,9 +3,9 @@ package com.sap.sailing.polars.datamining.data.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.sap.sailing.domain.common.impl.KnotSpeedImpl;
 import com.sap.sailing.domain.common.impl.WindSpeedSteppingWithMaxDistance;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.impl.KnotSpeedImpl;
 import com.sap.sse.datamining.data.Cluster;
 import com.sap.sse.datamining.data.ClusterBoundary;
 import com.sap.sse.datamining.data.ClusterGroup;

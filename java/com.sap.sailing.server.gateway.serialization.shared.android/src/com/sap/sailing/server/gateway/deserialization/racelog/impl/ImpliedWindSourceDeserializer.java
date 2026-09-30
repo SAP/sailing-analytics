@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 
 import org.json.simple.JSONObject;
 
-import com.sap.sailing.domain.common.impl.KnotSpeedImpl;
 import com.sap.sailing.domain.common.orc.FixedSpeedImpliedWind;
 import com.sap.sailing.domain.common.orc.ImpliedWindSource;
 import com.sap.sailing.domain.common.orc.OtherRaceAsImpliedWindSource;
@@ -16,6 +15,7 @@ import com.sap.sailing.domain.common.orc.impl.OwnMaxImpliedWindImpl;
 import com.sap.sailing.server.gateway.serialization.racelog.impl.ImpliedWindSourceSerializer;
 import com.sap.sse.common.Speed;
 import com.sap.sse.common.Util.Triple;
+import com.sap.sse.common.impl.KnotSpeedImpl;
 import com.sap.sse.shared.json.JsonDeserializationException;
 import com.sap.sse.shared.json.JsonDeserializer;
 

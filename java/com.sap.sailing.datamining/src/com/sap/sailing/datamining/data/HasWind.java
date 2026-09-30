@@ -3,8 +3,8 @@ package com.sap.sailing.datamining.data;
 import java.util.Locale;
 
 import com.sap.sailing.datamining.Activator;
-import com.sap.sailing.domain.common.Positioned;
 import com.sap.sailing.domain.common.Wind;
+import com.sap.sse.common.Positioned;
 import com.sap.sse.common.Timed;
 import com.sap.sse.datamining.annotations.Dimension;
 import com.sap.sse.datamining.data.Cluster;

@@ -85,7 +85,7 @@ public class TrackedRaceStartTimeInferenceTest extends AbstractGPSFixStoreTest {
         final DynamicTrackedRaceImpl trackedRace = new DynamicTrackedRaceImpl(regatta, race,
                 Collections.<Sideline> emptyList(), EmptyWindStore.INSTANCE, 0, 0, 0,
                 /* useMarkPassingCalculator */ false,
-                OneDesignRankingMetric::new, mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null);
+                OneDesignRankingMetric::new, mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null, /* maneuverRaceFingerprintRegistry */ null);
         
         MillisecondsTimePoint startOfRaceInRaceLog = new MillisecondsTimePoint(10000);
         MillisecondsTimePoint endOfRaceInRaceLog = new MillisecondsTimePoint(20000);
@@ -163,7 +163,7 @@ public class TrackedRaceStartTimeInferenceTest extends AbstractGPSFixStoreTest {
         final DynamicTrackedRaceImpl trackedRace = new DynamicTrackedRaceImpl(regatta, race,
                 Collections.<Sideline> emptyList(), EmptyWindStore.INSTANCE, 0, 0, 0,
                 /* useMarkPassingCalculator */ false,
-                OneDesignRankingMetric::new, mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null);
+                OneDesignRankingMetric::new, mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null, /* maneuverRaceFingerprintRegistry */ null);
         trackedRace.attachRaceLog(raceLog);
         final TimePoint[] oldAndNewStartTimeNotifiedByRace = new TimePoint[2];
         trackedRace.addListener(new AbstractRaceChangeListener() {
@@ -208,7 +208,7 @@ public class TrackedRaceStartTimeInferenceTest extends AbstractGPSFixStoreTest {
         final DynamicTrackedRaceImpl trackedRace = new DynamicTrackedRaceImpl(regatta, race,
                 Collections.<Sideline> emptyList(), EmptyWindStore.INSTANCE, 0, 0, 0,
                 /* useMarkPassingCalculator */ false,
-                OneDesignRankingMetric::new, mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null);
+                OneDesignRankingMetric::new, mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null, /* maneuverRaceFingerprintRegistry */ null);
         final TimePoint[] oldAndNewStartTimeNotifiedByRace = new TimePoint[2];
         trackedRace.addListener(new AbstractRaceChangeListener() {
             @Override
@@ -257,7 +257,7 @@ public class TrackedRaceStartTimeInferenceTest extends AbstractGPSFixStoreTest {
         final DynamicTrackedRaceImpl trackedRace = new DynamicTrackedRaceImpl(regatta, race,
                 Collections.<Sideline> emptyList(), EmptyWindStore.INSTANCE, 0, 0, 0,
                 /* useMarkPassingCalculator */ false,
-                OneDesignRankingMetric::new, mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null);
+                OneDesignRankingMetric::new, mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null, /* maneuverRaceFingerprintRegistry */ null);
         trackedRace.attachRaceLog(raceLog);
         trackedRace.attachRegattaLog(regattaLog);
         final TimePoint[] newStartAndEndOfTrackingNotifiedByRace = new TimePoint[2];
@@ -365,7 +365,7 @@ public class TrackedRaceStartTimeInferenceTest extends AbstractGPSFixStoreTest {
         final DynamicTrackedRaceImpl trackedRace = new DynamicTrackedRaceImpl(regatta, race,
                 Collections.<Sideline> emptyList(), EmptyWindStore.INSTANCE, 0, 0, 0,
                 /* useMarkPassingCalculator */ false,
-                OneDesignRankingMetric::new, mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null);
+                OneDesignRankingMetric::new, mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null, /* maneuverRaceFingerprintRegistry */ null);
         trackedRace.attachRaceLog(raceLog);
         final TimePoint[] oldAndNewStartTimeNotifiedByRace = new TimePoint[2];
         trackedRace.addListener(new AbstractRaceChangeListener() {

@@ -3,11 +3,11 @@ package com.sap.sailing.gwt.ui.shared.racemap;
 import com.google.gwt.canvas.dom.client.CanvasGradient;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.sap.sailing.domain.common.MarkType;
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.gwt.ui.shared.CoursePositionsDTO;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Color;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.impl.MeterDistance;
 
 /**
  * A class for course mark graphics based on SVG graphics drawn to a HTML5 canvas

@@ -13,33 +13,33 @@ import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.PositionWithConfidence;
 import com.sap.sailing.domain.base.impl.PositionWithConfidenceImpl;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.Wind;
-import com.sap.sailing.domain.common.confidence.BearingWithConfidence;
-import com.sap.sailing.domain.common.confidence.BearingWithConfidenceCluster;
-import com.sap.sailing.domain.common.confidence.ConfidenceBasedAverager;
-import com.sap.sailing.domain.common.confidence.HasConfidence;
-import com.sap.sailing.domain.common.confidence.HasConfidenceAndIsScalable;
-import com.sap.sailing.domain.common.confidence.Weigher;
-import com.sap.sailing.domain.common.confidence.impl.BearingWithConfidenceImpl;
-import com.sap.sailing.domain.common.confidence.impl.ScalableDoubleWithConfidence;
 import com.sap.sailing.domain.common.confidence.impl.ScalableWind;
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
-import com.sap.sailing.domain.common.impl.MeterDistance;
-import com.sap.sailing.domain.common.impl.NauticalMileDistance;
-import com.sap.sailing.domain.common.impl.RadianBearingImpl;
 import com.sap.sailing.domain.common.impl.WindImpl;
-import com.sap.sailing.domain.common.scalablevalue.impl.ScalablePosition;
 import com.sap.sailing.domain.confidence.ConfidenceBasedWindAverager;
 import com.sap.sailing.domain.confidence.ConfidenceFactory;
 import com.sap.sailing.domain.tracking.WindWithConfidence;
 import com.sap.sailing.domain.tracking.impl.WindWithConfidenceImpl;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.confidence.BearingWithConfidence;
+import com.sap.sse.common.confidence.BearingWithConfidenceCluster;
+import com.sap.sse.common.confidence.ConfidenceBasedAverager;
+import com.sap.sse.common.confidence.HasConfidence;
+import com.sap.sse.common.confidence.Weigher;
+import com.sap.sse.common.confidence.impl.BearingWithConfidenceImpl;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.DegreePosition;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
+import com.sap.sse.common.impl.MeterDistance;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
+import com.sap.sse.common.impl.NauticalMileDistance;
+import com.sap.sse.common.impl.RadianBearingImpl;
+import com.sap.sse.common.scalablevalue.HasConfidenceAndIsScalable;
+import com.sap.sse.common.scalablevalue.ScalableDoubleWithConfidence;
 import com.sap.sse.common.scalablevalue.ScalableValue;
+import com.sap.sse.common.scalablevalue.impl.ScalablePosition;
 
 public class ConfidenceTest {
     private static class ScalableBearing implements ScalableValue<ScalableBearing, Bearing> {
@@ -534,35 +534,35 @@ public class ConfidenceTest {
     
     @Test
     public void simpleApproximateScalableBearingDistanceTest1() {
-        com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing sb = new com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing(new DegreeBearingImpl(100));
+        com.sap.sse.common.scalablevalue.impl.ScalableBearing sb = new com.sap.sse.common.scalablevalue.impl.ScalableBearing(new DegreeBearingImpl(100));
         Bearing b = new DegreeBearingImpl(280);
         assertEquals(360./Math.PI, sb.getApproximateDegreeDistanceTo(b), 0.001);
     }
 
     @Test
     public void simpleApproximateScalableBearingDistanceTest2() {
-        com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing sb = new com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing(new DegreeBearingImpl(0));
+        com.sap.sse.common.scalablevalue.impl.ScalableBearing sb = new com.sap.sse.common.scalablevalue.impl.ScalableBearing(new DegreeBearingImpl(0));
         Bearing b = new DegreeBearingImpl(180);
         assertEquals(360./Math.PI, sb.getApproximateDegreeDistanceTo(b), 0.001);
     }
 
     @Test
     public void simpleApproximateScalableBearingDistanceTest3() {
-        com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing sb = new com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing(new DegreeBearingImpl(100));
+        com.sap.sse.common.scalablevalue.impl.ScalableBearing sb = new com.sap.sse.common.scalablevalue.impl.ScalableBearing(new DegreeBearingImpl(100));
         Bearing b = new DegreeBearingImpl(101);
         assertEquals(1, sb.getApproximateDegreeDistanceTo(b), 0.01);
     }
 
     @Test
     public void simpleApproximateScalableBearingDistanceTest4() {
-        com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing sb = new com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing(new DegreeBearingImpl(0));
+        com.sap.sse.common.scalablevalue.impl.ScalableBearing sb = new com.sap.sse.common.scalablevalue.impl.ScalableBearing(new DegreeBearingImpl(0));
         Bearing b = new DegreeBearingImpl(1);
         assertEquals(1, sb.getApproximateDegreeDistanceTo(b), 0.01);
     }
 
     @Test
     public void scaledApproximateScalableBearingDistanceTest1() {
-        com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing sb = new com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing(new DegreeBearingImpl(100)).
+        com.sap.sse.common.scalablevalue.impl.ScalableBearing sb = new com.sap.sse.common.scalablevalue.impl.ScalableBearing(new DegreeBearingImpl(100)).
                 multiply(123);
         Bearing b = new DegreeBearingImpl(280);
         assertEquals(360./Math.PI, sb.getApproximateDegreeDistanceTo(b), 0.001);
@@ -570,7 +570,7 @@ public class ConfidenceTest {
 
     @Test
     public void scaledApproximateScalableBearingDistanceTest2() {
-        com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing sb = new com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing(new DegreeBearingImpl(0)).
+        com.sap.sse.common.scalablevalue.impl.ScalableBearing sb = new com.sap.sse.common.scalablevalue.impl.ScalableBearing(new DegreeBearingImpl(0)).
                 multiply(123);
         Bearing b = new DegreeBearingImpl(180);
         assertEquals(360./Math.PI, sb.getApproximateDegreeDistanceTo(b), 0.001);
@@ -578,7 +578,7 @@ public class ConfidenceTest {
 
     @Test
     public void scaledApproximateScalableBearingDistanceTest3() {
-        com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing sb = new com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing(new DegreeBearingImpl(100)).
+        com.sap.sse.common.scalablevalue.impl.ScalableBearing sb = new com.sap.sse.common.scalablevalue.impl.ScalableBearing(new DegreeBearingImpl(100)).
         multiply(123);
         Bearing b = new DegreeBearingImpl(101);
         assertEquals(1, sb.getApproximateDegreeDistanceTo(b), 0.01);
@@ -586,7 +586,7 @@ public class ConfidenceTest {
 
     @Test
     public void scaledApproximateScalableBearingDistanceTest4() {
-        com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing sb = new com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing(new DegreeBearingImpl(0)).
+        com.sap.sse.common.scalablevalue.impl.ScalableBearing sb = new com.sap.sse.common.scalablevalue.impl.ScalableBearing(new DegreeBearingImpl(0)).
         multiply(123);
         Bearing b = new DegreeBearingImpl(1);
         assertEquals(1, sb.getApproximateDegreeDistanceTo(b), 0.01);

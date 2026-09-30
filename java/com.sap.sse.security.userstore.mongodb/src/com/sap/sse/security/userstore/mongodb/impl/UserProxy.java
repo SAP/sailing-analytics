@@ -245,4 +245,14 @@ public class UserProxy implements User {
     public TimedLock getTimedLock() {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public boolean getDidOptOutOfFeatureAndCommunityEmails() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setDidOptOutOfFeatureAndCommunityEmails(boolean didOptOutOfFeatureAndCommunityEmails) {
+        throw new UnsupportedOperationException();
+    }
 }

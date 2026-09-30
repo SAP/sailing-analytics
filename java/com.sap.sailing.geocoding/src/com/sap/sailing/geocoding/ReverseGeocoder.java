@@ -9,8 +9,8 @@ import java.util.TimeZone;
 import org.json.simple.parser.ParseException;
 
 import com.sap.sailing.domain.common.Placemark;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.geocoding.impl.ReverseGeocoderImpl;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 
 public interface ReverseGeocoder {

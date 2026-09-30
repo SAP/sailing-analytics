@@ -1,5 +1,7 @@
 package com.sap.sailing.domain.markpassinghash.impl;
 
+import java.util.logging.Logger;
+
 import org.json.simple.JSONObject;
 
 import com.sap.sailing.domain.abstractlog.race.RaceLog;
@@ -19,6 +21,8 @@ import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.Util.Triple;
 
 public class MarkPassingRaceFingerprintImpl implements MarkPassingRaceFingerprint {
+    private static final Logger logger = Logger.getLogger(MarkPassingRaceFingerprintImpl.class.getName());
+
     private final int calculatorVersion;
     private final int competitorHash;
     private final TimePoint startOfTracking;
@@ -70,7 +74,13 @@ public class MarkPassingRaceFingerprintImpl implements MarkPassingRaceFingerprin
     }
 
     public MarkPassingRaceFingerprintImpl(JSONObject json) {
-        this.calculatorVersion = ((Number) json.get(JSON_FIELDS.CALCULATOR_VERSION.name())).intValue();
+        final Number calculatorVersionNumber = (Number) json.get(JSON_FIELDS.CALCULATOR_VERSION.name());
+        if (calculatorVersionNumber == null) {
+            this.calculatorVersion = -1;
+            logger.warning("Mark passing fingerprint JSON document did not contain CALCULATOR_VERSION field: "+json);
+        } else {
+            this.calculatorVersion = calculatorVersionNumber.intValue();
+        }
         this.competitorHash = ((Number) json.get(JSON_FIELDS.COMPETITOR_HASH.name())).intValue();
         this.startOfTracking = TimePoint.of((Long) json.get(JSON_FIELDS.START_OF_TRACKING_AS_MILLIS.name()));
         this.endOfTracking = TimePoint.of((Long) json.get(JSON_FIELDS.END_OF_TRACKING_AS_MILLIS.name()));

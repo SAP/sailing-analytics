@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 import com.sap.sailing.domain.common.orc.ORCCertificate;
+import com.sap.sailing.domain.orc.ORCPublicCertificateDatabase.CertificateFamily;
 import com.sap.sailing.domain.orc.ORCPublicCertificateDatabase.CertificateHandle;
 import com.sap.sailing.domain.orc.ORCPublicCertificateDatabase.CountryOverview;
 import com.sap.sailing.domain.orc.impl.ORCPublicCertificateDatabaseImpl;
@@ -52,8 +53,9 @@ public class FailIfNoValidOrcCertificateRule implements BeforeTestExecutionCallb
             countryWithMostValidCertificates = StreamSupport
                     .stream(db.getCountriesWithValidCertificates().spliterator(), /* parallel */ false)
                     .max((c1, c2) -> c1.getCertCount() - c2.getCertCount()).get();
-            Iterable<CertificateHandle> certificateHandles = db.search(countryWithMostValidCertificates.getIssuingCountry(),
-                    countryWithMostValidCertificates.getVPPYear(), null, null, null, null, /* includeInvalid */ false);
+            Iterable<CertificateHandle> certificateHandles = Util.filter(db.search(countryWithMostValidCertificates.getIssuingCountry(),
+                    countryWithMostValidCertificates.getVPPYear(), null, null, null, null, /* includeInvalid */ false),
+                    certHandle->certHandle.getFamily() != CertificateFamily.ORC_LIGHT); // exclude LITE certificates
             final List<CertificateHandle> randomSubset = new ArrayList<>();
             Util.addAll(certificateHandles, randomSubset);
             Collections.shuffle(randomSubset);

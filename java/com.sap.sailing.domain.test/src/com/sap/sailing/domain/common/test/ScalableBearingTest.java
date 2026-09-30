@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-import com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.scalablevalue.impl.ScalableBearing;
 
 public class ScalableBearingTest {
     @Test

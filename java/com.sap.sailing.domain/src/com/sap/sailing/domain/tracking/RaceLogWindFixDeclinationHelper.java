@@ -9,9 +9,9 @@ import com.sap.sailing.declination.Declination;
 import com.sap.sailing.declination.DeclinationService;
 import com.sap.sailing.domain.abstractlog.race.RaceLogWindFixEvent;
 import com.sap.sailing.domain.common.Wind;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.impl.WindImpl;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 
 public class RaceLogWindFixDeclinationHelper {
     private static final Logger logger = Logger.getLogger(RaceLogWindFixDeclinationHelper.class.getName());

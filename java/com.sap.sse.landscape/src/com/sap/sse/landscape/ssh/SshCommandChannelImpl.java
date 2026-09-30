@@ -37,10 +37,10 @@ public class SshCommandChannelImpl implements SshCommandChannel {
         final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
         try {
             sendCommandLineSynchronously(commandLine, stderr);
+            final String result = getStreamContentsAsString();
             if (stderrLogLevel != null && stderr.size() > 0) {
                 logger.log(stderrLogLevel, (stderrLogPrefix==null?"":(stderrLogPrefix+": "))+stderr.toString());
             }
-            final String result = getStreamContentsAsString();
             return result;
         } finally {
             disconnect();
@@ -51,7 +51,7 @@ public class SshCommandChannelImpl implements SshCommandChannel {
     public InputStream sendCommandLineSynchronously(String commandLine, OutputStream stderr) throws IOException, InterruptedException, JSchException {
         stdout = channel.getInputStream();
         channel.setCommand(commandLine);
-        channel.setExtOutputStream(stderr);
+        channel.setErrStream(stderr);
         channel.connect(/* timeout in milliseconds */ 5000);
         return stdout;
     }

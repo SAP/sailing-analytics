@@ -3,11 +3,11 @@ package com.sap.sailing.domain.swisstimingadapter.impl;
 import java.net.DatagramPacket;
 
 import com.sap.sailing.domain.base.impl.KilometersPerHourSpeedWithBearingImpl;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.domain.swisstimingadapter.SwissTimingFormatException;
 import com.sap.sailing.domain.swisstimingadapter.SwissTimingMessage;
 import com.sap.sailing.domain.swisstimingadapter.SwissTimingMessageParser;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 public class SwissTimingMessageParserImpl implements SwissTimingMessageParser {

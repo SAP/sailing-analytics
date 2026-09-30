@@ -120,7 +120,7 @@ public class ReceiveMarkPassingDataTest extends AbstractTracTracLiveTest {
                     public void addRaceDefinition(RaceDefinition race, DynamicTrackedRace trackedRace) {
                     }
                 }, /* trackedRegattaRegistry */null,
-                mock(RaceLogAndTrackedRaceResolver.class), /* markPassingRaceFingerprintRegistry */ null, mock(LeaderboardGroupResolver.class), /* courseDesignUpdateURI */null,
+                mock(RaceLogAndTrackedRaceResolver.class), /* markPassingRaceFingerprintRegistry */ null,/*maneuverRaceFingerprintRegistry*/ null, mock(LeaderboardGroupResolver.class), /* courseDesignUpdateURI */null,
                 /* tracTracApiToken */null, getEventSubscriber(), getRaceSubscriber(), /*ignoreTracTracMarkPassings*/ false,
                 RaceTracker.TIMEOUT_FOR_RECEIVING_RACE_DEFINITION_IN_MILLISECONDS, new DefaultRaceTrackingHandler(),
                 /* raceAndCompetitorStatusWithRaceLogReconciler */ null, ReceiverType.RACECOURSE, ReceiverType.MARKPOSITIONS, ReceiverType.RACESTARTFINISH, ReceiverType.RAWPOSITIONS)) {

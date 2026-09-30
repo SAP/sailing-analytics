@@ -28,15 +28,14 @@ import com.sap.sailing.domain.base.RaceDefinition;
 import com.sap.sailing.domain.base.Regatta;
 import com.sap.sailing.domain.base.Sideline;
 import com.sap.sailing.domain.base.Waypoint;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.TrackedRaceStatusEnum;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.WindSource;
 import com.sap.sailing.domain.common.WindSourceType;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.impl.WindImpl;
 import com.sap.sailing.domain.common.impl.WindSourceWithAdditionalID;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
+import com.sap.sailing.domain.maneuverhash.ManeuverRaceFingerprintRegistry;
 import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprintRegistry;
 import com.sap.sailing.domain.racelog.RaceLogAndTrackedRaceResolver;
 import com.sap.sailing.domain.racelog.RaceLogStore;
@@ -73,9 +72,11 @@ import com.sap.sailing.domain.tracking.WindTrack;
 import com.sap.sailing.domain.tracking.impl.TrackedRaceStatusImpl;
 import com.sap.sailing.domain.tracking.impl.UpdateHandler;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 import difflib.PatchFailedException;
@@ -122,6 +123,8 @@ public class SwissTimingRaceTrackerImpl extends AbstractRaceTrackerImpl<SwissTim
     private final RaceLogAndTrackedRaceResolver raceLogResolver;
     
     private final MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry;
+    
+    private final ManeuverRaceFingerprintRegistry maneuverRaceFingerprintRegistry;
 
     /**
      * If set to a non-{@code null}, non-{@link String#isEmpty() empty} value, updates about start time changes, course
@@ -140,17 +143,18 @@ public class SwissTimingRaceTrackerImpl extends AbstractRaceTrackerImpl<SwissTim
             WindStore windStore, DomainFactory domainFactory, SwissTimingFactory factory,
             TrackedRegattaRegistry trackedRegattaRegistry, RaceLogAndTrackedRaceResolver raceLogResolver,
             SwissTimingTrackingConnectivityParameters connectivityParams, RaceTrackingHandler raceTrackingHandler,
-            MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry)
+            MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry, ManeuverRaceFingerprintRegistry maneuverRaceFingerprintRegistry)
             throws InterruptedException, UnknownHostException, IOException, ParseException, URISyntaxException {
         this(/* regatta */ null, windStore, domainFactory, factory, trackedRegattaRegistry, raceLogStore,
-                regattaLogStore, raceLogResolver, connectivityParams, raceTrackingHandler, markPassingRaceFingerprintRegistry);
+                regattaLogStore, raceLogResolver, connectivityParams, raceTrackingHandler, markPassingRaceFingerprintRegistry,
+                maneuverRaceFingerprintRegistry);
     }
 
     protected SwissTimingRaceTrackerImpl(Regatta regatta, WindStore windStore, DomainFactory domainFactory,
             SwissTimingFactory factory, TrackedRegattaRegistry trackedRegattaRegistry, RaceLogStore raceLogStore,
             RegattaLogStore regattaLogStore, RaceLogAndTrackedRaceResolver raceLogResolver,
             SwissTimingTrackingConnectivityParameters connectivityParams, RaceTrackingHandler raceTrackingHandler,
-            MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry)
+            MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry, ManeuverRaceFingerprintRegistry maneuverRaceFingerprintRegistry)
             throws InterruptedException, UnknownHostException, IOException, ParseException, URISyntaxException {
         super(connectivityParams);
         this.raceLogResolver = raceLogResolver;
@@ -158,6 +162,7 @@ public class SwissTimingRaceTrackerImpl extends AbstractRaceTrackerImpl<SwissTim
         this.tmdMessageQueue = new TMDMessageQueue(this);
         this.trackedRegattaRegistry = trackedRegattaRegistry;
         this.markPassingRaceFingerprintRegistry = markPassingRaceFingerprintRegistry;
+        this.maneuverRaceFingerprintRegistry = maneuverRaceFingerprintRegistry;
         final Regatta effectiveRegatta;
         // Try to find a pre-associated event based on the Race ID
         if (regatta == null) {
@@ -543,7 +548,9 @@ public class SwissTimingRaceTrackerImpl extends AbstractRaceTrackerImpl<SwissTim
                 }
             }, useInternalMarkPassingAlgorithm, raceLogResolver,
                     /* Not needed because the RaceTracker is not active on a replica */ Optional.empty(),
-                    new TrackingConnectorInfoImpl(SwissTimingAdapter.NAME, SwissTimingAdapter.DEFAULT_URL,/*no api connection to query the webUrl*/ null), markPassingRaceFingerprintRegistry);
+                    new TrackingConnectorInfoImpl(SwissTimingAdapter.NAME, SwissTimingAdapter.DEFAULT_URL,
+                    /*no api connection to query the webUrl*/ null), markPassingRaceFingerprintRegistry,
+                    maneuverRaceFingerprintRegistry);
             addUpdateHandlers();
             notifyRaceCreationListeners();
             logger.info("Created SwissTiming RaceDefinition and TrackedRace for "+race.getName());

@@ -9,11 +9,7 @@ import com.sap.sailing.domain.base.Mark;
 import com.sap.sailing.domain.base.SpeedWithBearingWithConfidence;
 import com.sap.sailing.domain.base.Waypoint;
 import com.sap.sailing.domain.common.ManeuverType;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.common.Wind;
-import com.sap.sailing.domain.common.WindSourceType;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.maneuverdetection.CompleteManeuverCurveWithEstimationData;
 import com.sap.sailing.domain.maneuverdetection.ManeuverCurveWithUnstableCourseAndSpeedWithEstimationData;
@@ -33,10 +29,13 @@ import com.sap.sailing.domain.tracking.impl.NonCachingMarkPositionAtTimePointCac
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 
 /**
  * A decorator which adds support for management of estimation data for wind estimation to an existing maneuver detector
@@ -75,8 +74,7 @@ public class ManeuverDetectorWithEstimationDataSupportDecoratorImpl
             TimePoint maneuverTimePoint = maneuverCurve.getMainCurveBoundaries().getTimePoint();
             Position maneuverPosition = maneuverDetector.track.getEstimatedPosition(maneuverTimePoint,
                     /* extrapolate */false);
-            Wind wind = maneuverDetector.trackedRace.getWind(maneuverPosition, maneuverTimePoint,
-                    /* exclude */ maneuverDetector.trackedRace.getWindSources(WindSourceType.MANEUVER_BASED_ESTIMATION));
+            Wind wind = maneuverDetector.trackedRace.getWind(maneuverPosition, maneuverTimePoint);
             maneuvers
                     .addAll(maneuverDetector.determineManeuversFromManeuverCurve(maneuverCurve.getMainCurveBoundaries(),
                             maneuverCurve.getManeuverCurveWithStableSpeedAndCourseBoundaries(), wind,
@@ -456,17 +454,18 @@ public class ManeuverDetectorWithEstimationDataSupportDecoratorImpl
             Waypoint nextWaypoint = legAfter.getLeg().getTo();
             for (Mark mark : nextWaypoint.getMarks()) {
                 Position nextMarkPosition = markPositionAtTimePointCache.getEstimatedPosition(mark);
-                Bearing absoluteBearing = maneuverEndPosition.getBearingGreatCircle(nextMarkPosition);
-                Bearing resultCandidate = absoluteBearing.getDifferenceTo(boatCourse);
-                if (result == null) {
-                    result = resultCandidate;
-                } else if (Math.signum(result.getDegrees()) != Math.signum(resultCandidate.getDegrees())) {
-                    result = new DegreeBearingImpl(0);
-                    break;
-                } else if (Math.abs(result.getDegrees()) > Math.abs(resultCandidate.getDegrees())) {
-                    result = resultCandidate;
+                if (nextMarkPosition != null) {
+                    Bearing absoluteBearing = maneuverEndPosition.getBearingGreatCircle(nextMarkPosition);
+                    Bearing resultCandidate = absoluteBearing.getDifferenceTo(boatCourse);
+                    if (result == null) {
+                        result = resultCandidate;
+                    } else if (Math.signum(result.getDegrees()) != Math.signum(resultCandidate.getDegrees())) {
+                        result = new DegreeBearingImpl(0);
+                        break;
+                    } else if (Math.abs(result.getDegrees()) > Math.abs(resultCandidate.getDegrees())) {
+                        result = resultCandidate;
+                    }
                 }
-
             }
         }
         return result;

@@ -13,11 +13,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.Placemark;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.domain.common.impl.PlacemarkImpl;
 import com.sap.sailing.geocoding.ReverseGeocoder;
 import com.sap.sailing.geocoding.impl.ReverseGeocoderImpl;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.impl.DegreePosition;
 
 public class ReverseGeocoderTest {
     private ReverseGeocoder geocoder;

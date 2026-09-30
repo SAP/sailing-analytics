@@ -1,14 +1,13 @@
 package com.sap.sailing.domain.base.impl;
 
-import com.sap.sailing.domain.common.CourseChange;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.SpeedWithBearing;
-import com.sap.sailing.domain.common.impl.AbstractSpeedWithAbstractBearingImpl;
-import com.sap.sailing.domain.common.impl.AbstractSpeedWithBearingImpl;
-import com.sap.sailing.domain.common.impl.KilometersPerHourSpeedImpl;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.CourseChange;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Speed;
-import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.SpeedWithBearing;
+import com.sap.sse.common.impl.AbstractSpeedWithAbstractBearingImpl;
+import com.sap.sse.common.impl.AbstractSpeedWithBearingImpl;
+import com.sap.sse.common.impl.KilometersPerHourSpeedImpl;
 
 public class KilometersPerHourSpeedWithBearingImpl extends KilometersPerHourSpeedImpl implements SpeedWithBearing {
     private static final long serialVersionUID = 5749611820871048625L;
@@ -22,11 +21,6 @@ public class KilometersPerHourSpeedWithBearingImpl extends KilometersPerHourSpee
     @Override
     public Bearing getBearing() {
         return bearing;
-    }
-
-    @Override
-    public Position travelTo(Position pos, TimePoint from, TimePoint to) {
-        return pos.translateGreatCircle(getBearing(), this.travel(from, to));
     }
 
     @Override

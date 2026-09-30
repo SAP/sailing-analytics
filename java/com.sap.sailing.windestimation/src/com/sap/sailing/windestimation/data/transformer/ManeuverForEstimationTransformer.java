@@ -23,12 +23,12 @@ public class ManeuverForEstimationTransformer
     public static final int MIN_SECONDS_TO_OTHER_MANEUVER = 4;
 
     public List<ManeuverForEstimation> getManeuversForEstimation(
-            List<? extends ConvertableToManeuverForEstimation> convertableManeuvers, BoatClass boatClass) {
+            List<? extends ConvertableToManeuverForEstimation> convertableManeuvers, BoatClass boatClass, String competitorName) {
         double speedScalingDivisor = getSpeedScalingDivisor(convertableManeuvers);
         List<ManeuverForEstimation> maneuversForEstimation = new ArrayList<>();
         for (ConvertableToManeuverForEstimation maneuver : convertableManeuvers) {
             ManeuverForEstimation maneuverForEstimation = getManeuverForEstimation(maneuver, speedScalingDivisor,
-                    boatClass);
+                    boatClass, competitorName);
             maneuversForEstimation.add(maneuverForEstimation);
         }
         return maneuversForEstimation;
@@ -149,7 +149,7 @@ public class ManeuverForEstimationTransformer
     }
 
     public ManeuverForEstimation getManeuverForEstimation(ConvertableToManeuverForEstimation maneuver,
-            double speedScalingDivisor, BoatClass boatClass) {
+            double speedScalingDivisor, BoatClass boatClass, String competitorName) {
         ManeuverCategory maneuverCategory = getManeuverCategory(maneuver);
         double speedLossRatio = maneuver.getSpeedWithBearingBefore().getKnots() > 0
                 ? maneuver.getLowestSpeed().getKnots() / maneuver.getSpeedWithBearingBefore().getKnots()
@@ -175,7 +175,8 @@ public class ManeuverForEstimationTransformer
                 maneuver.getCourseChangeInDegreesWithinTurningSection(), maneuver.getMaxTurningRateInDegreesPerSecond(),
                 deviationFromOptimalTackAngleInDegrees, deviationFromOptimalJibeAngleInDegrees, speedLossRatio,
                 speedGainRatio, lowestSpeedVsExitingSpeedRatio, clean, maneuverCategory, scaledSpeedBeforeInKnots,
-                scaledSpeedAfterInKnots, maneuver.isMarkPassing(), boatClass, markPassingDataAvailable);
+                scaledSpeedAfterInKnots, maneuver.isMarkPassing(), boatClass, markPassingDataAvailable,
+                competitorName);
         return maneuverForEstimation;
     }
 
@@ -183,7 +184,7 @@ public class ManeuverForEstimationTransformer
     public List<ManeuverForEstimation> transformElements(
             CompetitorTrackWithEstimationData<ConvertableToManeuverForEstimation> competitorTrackWithElementsToTransform) {
         return getManeuversForEstimation(competitorTrackWithElementsToTransform.getElements(),
-                competitorTrackWithElementsToTransform.getBoatClass());
+                competitorTrackWithElementsToTransform.getBoatClass(), competitorTrackWithElementsToTransform.getCompetitorName());
     }
 
 }

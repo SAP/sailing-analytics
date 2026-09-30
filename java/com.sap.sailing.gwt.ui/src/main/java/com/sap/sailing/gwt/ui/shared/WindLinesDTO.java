@@ -7,7 +7,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
-import com.sap.sailing.domain.common.Position;
+import com.sap.sse.common.Position;
 
 public class WindLinesDTO implements IsSerializable {
     

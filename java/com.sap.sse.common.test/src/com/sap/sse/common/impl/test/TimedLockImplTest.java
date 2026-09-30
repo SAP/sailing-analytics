@@ -3,7 +3,9 @@
  */
 package com.sap.sse.common.impl.test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,19 +33,20 @@ class TimedLockImplTest {
     void testExtendLockDuration() {
         final TimedLockImpl lock = new TimedLockImpl();
         final Duration firstLockingDelay = lock.getNextLockingDelay();
+        // locking delay should double each time extendLockDuration is called
+        final Duration secondLockingDelay = firstLockingDelay.plus(firstLockingDelay);
         // initial locking delay should be greater than 0
         assertTrue(firstLockingDelay.compareTo(Duration.NULL) > 0);
         assertTrue(firstLockingDelay.compareTo(Duration.ofMillis(0)) > 0);
         final TimePoint expectedLockedUntil = TimePoint.now().plus(firstLockingDelay);
         // locking delay should be applied to lockedUntil
         lock.extendLockDuration();
-        assertEquals(lock.getLockedUntil(), expectedLockedUntil);
-        // locking delay should double
-        final Duration secondLockingDelay = firstLockingDelay.plus(firstLockingDelay);
+        assertFalse(lock.getLockedUntil().before(expectedLockedUntil));
+        assertTrue(lock.getLockedUntil().before(TimePoint.now().plus(secondLockingDelay)));
         assertEquals(lock.getNextLockingDelay(), secondLockingDelay);
         // double locking delay should be applied to lockedUntil
         lock.extendLockDuration();
-        assertEquals(lock.getLockedUntil(), TimePoint.now().plus(secondLockingDelay));
+        assertFalse(lock.getLockedUntil().before(TimePoint.now().plus(secondLockingDelay)));
     }
 
      /**
@@ -59,5 +62,4 @@ class TimedLockImplTest {
          lock.resetLock();
          assertFalse(lock.isLocked());
      }
-
 }

@@ -1,8 +1,8 @@
 package com.sap.sailing.domain.tracking.impl;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.tracking.TrackedLeg;
 import com.sap.sailing.domain.tracking.TrackedRace;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 
 public class LegMiddleWindTrackImpl extends CombinedWindTrackImpl {

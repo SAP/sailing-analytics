@@ -3,9 +3,9 @@ package com.sap.sailing.polars.windestimation;
 import java.util.function.Function;
 
 import com.sap.sailing.domain.common.ManeuverType;
-import com.sap.sailing.domain.common.confidence.ConfidenceBasedAverager;
-import com.sap.sailing.domain.common.confidence.HasConfidenceAndIsScalable;
 import com.sap.sailing.domain.polars.PolarDataService;
+import com.sap.sse.common.confidence.ConfidenceBasedAverager;
+import com.sap.sse.common.scalablevalue.HasConfidenceAndIsScalable;
 import com.sap.sse.common.scalablevalue.ScalableValue;
 
 /**

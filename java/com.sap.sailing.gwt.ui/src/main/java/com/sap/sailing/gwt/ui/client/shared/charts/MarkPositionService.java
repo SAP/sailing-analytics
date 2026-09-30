@@ -2,10 +2,10 @@ package com.sap.sailing.gwt.ui.client.shared.charts;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.IsSerializable;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.gwt.ui.client.shared.charts.RaceIdentifierToLeaderboardRaceColumnAndFleetMapper.LeaderboardNameRaceColumnNameAndFleetName;
 import com.sap.sailing.gwt.ui.shared.GPSFixDTO;
 import com.sap.sailing.gwt.ui.shared.MarkDTO;
+import com.sap.sse.common.Position;
 
 public interface MarkPositionService {
     public static class MarkTrackDTO implements IsSerializable {

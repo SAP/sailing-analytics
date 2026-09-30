@@ -18,10 +18,6 @@ import com.google.gwt.maps.client.overlays.PolylineOptions;
 import com.google.gwt.maps.client.overlays.overlayhandlers.OverlayViewMethods;
 import com.google.gwt.maps.client.overlays.overlayhandlers.OverlayViewOnDrawHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.sap.sailing.domain.common.Mile;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.RadianPosition;
 import com.sap.sailing.gwt.ui.client.SimulatorServiceAsync;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.gwt.ui.client.shared.racemap.CoordinateSystem;
@@ -33,6 +29,10 @@ import com.sap.sailing.gwt.ui.simulator.racemap.TwoDPoint;
 import com.sap.sailing.gwt.ui.simulator.racemap.TwoDSegment;
 import com.sap.sailing.gwt.ui.simulator.racemap.TwoDVector;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.Mile;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.impl.DegreePosition;
+import com.sap.sse.common.impl.RadianPosition;
 import com.sap.sse.gwt.client.ErrorReporter;
 
 /**

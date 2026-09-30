@@ -53,6 +53,8 @@ public interface AwsInstance<ShardingKey> extends Host {
     default String getId() {
         return getInstanceId();
     }
+    
+    void setTerminationProtection(boolean terminationProtection);
 
     void terminate();
 

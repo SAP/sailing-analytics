@@ -13,19 +13,19 @@ public class SAPBrandingConfiguration implements BrandingConfiguration {
     private String greyTransparentLogoURL;
     private final ResourceBundleStringMessages sailingServerStringMessages;
     private static final String STRING_MESSAGES_BASE_NAME = "stringmessages/SAPBrandingStringMessages";
-    
+
     /**
-     * The following path consists of the "Web-ContextPath" from the bundle's MANIFEST.MF, followed by the
-     * images folder name and hence constitutes the URL path to which a "/" and the image file name has to
-     * be appended to obtain a URL path to an image.
+     * The following path consists of the "Web-ContextPath" from the bundle's MANIFEST.MF, followed by the images folder
+     * name and hence constitutes the URL path to which a "/" and the image file name has to be appended to obtain a URL
+     * path to an image.
      */
     private static final String IMAGES_ROOT = "/sap-branding/images";
 
     public SAPBrandingConfiguration() {
-        sailingServerStringMessages = ResourceBundleStringMessages.create(STRING_MESSAGES_BASE_NAME, getClass().getClassLoader(),
-                StandardCharsets.UTF_8.name());
+        sailingServerStringMessages = ResourceBundleStringMessages.create(STRING_MESSAGES_BASE_NAME,
+                getClass().getClassLoader(), StandardCharsets.UTF_8.name());
     }
-    
+
     private static String image(String fileName) {
         return IMAGES_ROOT + "/" + fileName;
     }
@@ -49,7 +49,7 @@ public class SAPBrandingConfiguration implements BrandingConfiguration {
     public String getBrandTitle(Optional<String> locale) {
         return "SAP";
     }
-    
+
     @Override
     public String getSolutionsInSailingImageURL() {
         return image("solutions-sap-in-sailing.jpg");
@@ -74,7 +74,7 @@ public class SAPBrandingConfiguration implements BrandingConfiguration {
     public String getSailInSightAppImageURL() {
         return image("solutions-sap-sailing-insight.png");
     }
-    
+
     @Override
     public String getSailingSimulatorImageURL() {
         return image("solutions-simulator.png");
@@ -97,12 +97,14 @@ public class SAPBrandingConfiguration implements BrandingConfiguration {
 
     @Override
     public String getSailingAnalyticsReadMoreText(Optional<String> locale) {
-        return sailingServerStringMessages.get(locale.map(l->Locale.forLanguageTag(l)).orElse(Locale.ENGLISH), "sailingAnalyticsReadMore");
+        return sailingServerStringMessages.get(locale.map(l -> Locale.forLanguageTag(l)).orElse(Locale.ENGLISH),
+                "sailingAnalyticsReadMore");
     }
-    
+
     @Override
     public String getSailingAnalyticsSailing(Optional<String> locale) {
-        return sailingServerStringMessages.get(locale.map(l->Locale.forLanguageTag(l)).orElse(Locale.ENGLISH), "sailingAnalyticsSailing");
+        return sailingServerStringMessages.get(locale.map(l -> Locale.forLanguageTag(l)).orElse(Locale.ENGLISH),
+                "sailingAnalyticsSailing");
     }
 
     @Override
@@ -127,12 +129,14 @@ public class SAPBrandingConfiguration implements BrandingConfiguration {
 
     @Override
     public String getSportsOn(Optional<String> locale) {
-        return sailingServerStringMessages.get(locale.map(l->Locale.forLanguageTag(l)).orElse(Locale.ENGLISH), "sportsOn");
+        return sailingServerStringMessages.get(locale.map(l -> Locale.forLanguageTag(l)).orElse(Locale.ENGLISH),
+                "sportsOn");
     }
 
     @Override
     public String getFollowSports(Optional<String> locale) {
-        return sailingServerStringMessages.get(locale.map(l->Locale.forLanguageTag(l)).orElse(Locale.ENGLISH), "followSports");
+        return sailingServerStringMessages.get(locale.map(l -> Locale.forLanguageTag(l)).orElse(Locale.ENGLISH),
+                "followSports");
     }
 
     @Override
@@ -149,45 +153,58 @@ public class SAPBrandingConfiguration implements BrandingConfiguration {
     public String getInstagramLink() {
         return "https://www.instagram.com/sap/";
     }
+
     @Override
     public String getWelcomeToSailingAnalytics(Optional<String> locale) {
-        return sailingServerStringMessages.get(locale.map(l->Locale.forLanguageTag(l)).orElse(Locale.ENGLISH), "welcomeToSailingAnalytics");
+        return sailingServerStringMessages.get(locale.map(l -> Locale.forLanguageTag(l)).orElse(Locale.ENGLISH),
+                "welcomeToSailingAnalytics");
     }
 
     @Override
     public String getWelcomeToSailingAnalyticsBody(Optional<String> locale) {
-        return sailingServerStringMessages.get(locale.map(l->Locale.forLanguageTag(l)).orElse(Locale.ENGLISH), "welcomeToSailingAnalyticsBody");
+        return sailingServerStringMessages.get(locale.map(l -> Locale.forLanguageTag(l)).orElse(Locale.ENGLISH),
+                "welcomeToSailingAnalyticsBody");
     }
-    
+
     @Override
     public String getMoreLoginInformationNotificationsURL() {
         return image("notifications.png");
     }
-    
+
     @Override
     public String getMoreLoginInformationSettingsURL() {
         return image("settings.png");
     }
-    
+
     @Override
     public String getMoreLoginInformationSailorProfilesURL() {
         return image("sailorprofiles.png");
     }
-    
+
     @Override
     public String getMoreLoginInformationSimulatorURL() {
         return image("simulator.png");
     }
+
     @Override
     public String getInSailingContent(Optional<String> locale) {
-        return sailingServerStringMessages.get(locale.map(l -> Locale.forLanguageTag(l)).orElse(Locale.ENGLISH), "inSailingContent");
+        return sailingServerStringMessages.get(locale.map(l -> Locale.forLanguageTag(l)).orElse(Locale.ENGLISH),
+                "inSailingContent");
     }
+
     @Override
     public String getFollowGitHub(Optional<String> locale) {
-        return sailingServerStringMessages.get(locale.map(l -> Locale.forLanguageTag(l)).orElse(Locale.ENGLISH), "followGitHub");
+        return sailingServerStringMessages.get(locale.map(l -> Locale.forLanguageTag(l)).orElse(Locale.ENGLISH),
+                "followGitHub");
     }
+
     @Override
     public String getGitHubLink() {
         return "https://github.com/SAP/sailing-analytics";
+    }
+
+    @Override
+    public String getGitHubPagesLink() {
+        return "https://docs.sapsailing.com";
     }
 }

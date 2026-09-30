@@ -1,9 +1,9 @@
 package com.sap.sailing.domain.queclinkadapter.impl;
 
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.queclinkadapter.PositionRelatedReport;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 
 public class PositionRelatedReportImpl implements PositionRelatedReport {

@@ -2,10 +2,10 @@ package com.sap.sailing.selenium.api.coursetemplate;
 
 import org.json.simple.JSONObject;
 
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.selenium.api.core.JsonWrapper;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 public class DeviceMapping extends JsonWrapper {

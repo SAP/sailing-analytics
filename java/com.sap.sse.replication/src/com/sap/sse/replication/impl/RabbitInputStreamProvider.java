@@ -39,14 +39,16 @@ public class RabbitInputStreamProvider extends NamedImpl {
         messagesAreWrittenToThis = new PipedOutputStream();
         clientReadsFromThis = new PipedInputStream(messagesAreWrittenToThis);
         final QueueingConsumer messageConsumer = new QueueingConsumer(channel);
-        channel.basicConsume(queueName, /* auto-ack */ true, messageConsumer);
+        channel.basicQos(1); // with "manual" acknowledgement, process one message at a time, avoiding overloading inbound socket
+        channel.basicConsume(queueName, /* auto-ack */ false, messageConsumer);
         new Thread(getClass().getSimpleName()) {
             @Override
             public void run() {
                 while (true) {
                     try {
-                        Delivery delivery = messageConsumer.nextDelivery();
+                        final Delivery delivery = messageConsumer.nextDelivery();
                         byte[] bytesFromMessage = delivery.getBody();
+                        channel.basicAck(delivery.getEnvelope().getDeliveryTag(), /* multiple */ false);
                         if (RabbitOutputStream.startsWithTerminationCommand(bytesFromMessage, bytesFromMessage.length)) {
                             if (bytesFromMessage.length == RabbitOutputStream.TERMINATION_COMMAND.length) {
                                 // received exactly TERMINATION_COMMAND

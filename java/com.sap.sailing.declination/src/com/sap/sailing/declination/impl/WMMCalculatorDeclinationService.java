@@ -10,8 +10,8 @@ import java.util.TreeMap;
 import com.sap.sailing.declination.Declination;
 import com.sap.sailing.declination.DeclinationService;
 import com.sap.sailing.declination.impl.Geomagnetism.Result;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.DegreeBearingImpl;
 

@@ -5,16 +5,16 @@ import java.util.Iterator;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.WindSource;
 import com.sap.sailing.domain.common.WindSourceType;
-import com.sap.sailing.domain.common.confidence.HasConfidenceAndIsScalable;
-import com.sap.sailing.domain.common.confidence.Weigher;
-import com.sap.sailing.domain.common.confidence.impl.ConfidenceBasedAveragerImpl;
 import com.sap.sailing.domain.common.confidence.impl.ScalableWind;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.impl.WindImpl;
 import com.sap.sailing.domain.confidence.ConfidenceBasedWindAverager;
 import com.sap.sailing.domain.tracking.WindWithConfidence;
 import com.sap.sailing.domain.tracking.impl.WindWithConfidenceImpl;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.confidence.Weigher;
+import com.sap.sse.common.confidence.impl.ConfidenceBasedAveragerImpl;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
+import com.sap.sse.common.scalablevalue.HasConfidenceAndIsScalable;
 
 /**
  * In order to enable the aggregation of {@link Wind} objects whose {@link WindSource}'s {@link WindSourceType} suggests

@@ -4,9 +4,9 @@ package com.sap.sailing.simulator.windfield;
 
 import java.io.Serializable;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.simulator.Grid;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 
 public interface WindFieldGenerator extends WindField, Serializable {

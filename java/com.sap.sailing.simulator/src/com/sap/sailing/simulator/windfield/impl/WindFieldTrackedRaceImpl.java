@@ -3,15 +3,15 @@ package com.sap.sailing.simulator.windfield.impl;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.Wind;
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.simulator.TimedPosition;
 import com.sap.sailing.simulator.impl.TimedPositionImpl;
 import com.sap.sailing.simulator.windfield.WindFieldGenerator;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.impl.DegreePosition;
+import com.sap.sse.common.impl.MeterDistance;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 /**

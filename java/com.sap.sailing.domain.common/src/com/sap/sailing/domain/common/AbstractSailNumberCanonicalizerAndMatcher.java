@@ -109,6 +109,11 @@ public abstract class AbstractSailNumberCanonicalizerAndMatcher<CompetitorType> 
             if (canonicalizedSailID != null) {
                 result.put(canonicalizedSailID, competitor);
             }
+            final String canonicalizedSailIDWithoutDefaultNationality = canonicalizeSailID(
+                    competitorIdentifyingText.trim(), /* defaultNationality */ null);
+            if (canonicalizedSailIDWithoutDefaultNationality != null) {
+                result.put(canonicalizedSailIDWithoutDefaultNationality, competitor);
+            }
         }
         return result;
     }

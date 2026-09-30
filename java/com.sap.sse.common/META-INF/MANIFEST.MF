@@ -6,6 +6,8 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: SAP
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: com.sap.sse.common,
+ com.sap.sse.common.confidence,
+ com.sap.sse.common.confidence.impl,
  com.sap.sse.common.fileupload,
  com.sap.sse.common.filter,
  com.sap.sse.common.filter.impl,
@@ -14,6 +16,7 @@ Export-Package: com.sap.sse.common,
  com.sap.sse.common.mail,
  com.sap.sse.common.media,
  com.sap.sse.common.scalablevalue,
+ com.sap.sse.common.scalablevalue.impl,
  com.sap.sse.common.search,
  com.sap.sse.common.settings,
  com.sap.sse.common.settings.generic,

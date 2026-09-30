@@ -7,12 +7,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.sap.sailing.domain.common.Bounds;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.BoundsImpl;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.domain.common.quadtree.QuadTree;
+import com.sap.sse.common.Bounds;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.impl.BoundsImpl;
+import com.sap.sse.common.impl.DegreePosition;
 
 /**
  * A node in a {@link QuadTree}. There may be internal nodes that have no elements in them but have exactly

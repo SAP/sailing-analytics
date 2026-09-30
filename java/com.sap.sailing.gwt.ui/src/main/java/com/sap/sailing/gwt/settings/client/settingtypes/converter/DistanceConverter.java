@@ -1,7 +1,7 @@
 package com.sap.sailing.gwt.settings.client.settingtypes.converter;
 
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.impl.MeterDistance;
 import com.sap.sse.common.settings.generic.ValueConverter;
 import com.sap.sse.common.settings.value.DoubleValue;
 import com.sap.sse.common.settings.value.Value;

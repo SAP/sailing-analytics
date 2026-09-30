@@ -5,11 +5,11 @@ import java.util.Iterator;
 import java.util.NavigableSet;
 import java.util.SortedSet;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.domain.tracking.WindTrack;
 import com.sap.sailing.domain.tracking.impl.WindTrackImpl.DummyWind;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.shared.util.impl.AbstractUnmodifiableNavigableSet;

@@ -79,7 +79,6 @@ public class RaceGroupJsonExportServlet extends AbstractJsonHttpServlet {
                         .checkPermission(leaderboard.getIdentifier().getStringPermission(DefaultActions.READ));
                 if (leaderboard instanceof RegattaLeaderboard && !(leaderboard instanceof RegattaLeaderboardWithEliminations)) {
                     result.add(serializer.serialize(raceGroupFactory.convert((RegattaLeaderboard) leaderboard)));
-
                     final Regatta regatta = ((RegattaLeaderboard) leaderboard).getRegatta();
                     SecurityUtils.getSubject()
                             .checkPermission(regatta.getIdentifier().getStringPermission(DefaultActions.READ));

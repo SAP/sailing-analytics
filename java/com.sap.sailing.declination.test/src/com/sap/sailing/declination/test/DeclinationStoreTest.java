@@ -31,12 +31,12 @@ import com.sap.sailing.declination.Declination;
 import com.sap.sailing.declination.impl.DeclinationImporter;
 import com.sap.sailing.declination.impl.DeclinationRecordImpl;
 import com.sap.sailing.declination.impl.DeclinationStore;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.domain.common.quadtree.QuadTree;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 public abstract class DeclinationStoreTest<I extends DeclinationImporter> extends AbstractDeclinationTest<I> {
@@ -71,7 +71,7 @@ public abstract class DeclinationStoreTest<I extends DeclinationImporter> extend
         oos1.close();
         ByteArrayOutputStream bos2 = new ByteArrayOutputStream();
         ObjectOutputStream oos2 = new ObjectOutputStream(bos2);
-        oos2.writeUTF("T�t�r���");
+        oos2.writeUTF("Tätäräää");
         oos2.close();
         byte[] bos1Arr = bos1.toByteArray();
         byte[] bos2Arr = bos2.toByteArray();
@@ -104,7 +104,7 @@ public abstract class DeclinationStoreTest<I extends DeclinationImporter> extend
                 // don't write a second header
             }
         };
-        oos2.writeUTF("T�t�r���");
+        oos2.writeUTF("Tätäräää");
         oos2.close();
         byte[] bos1Arr = bos1.toByteArray();
         byte[] bos2Arr = bos2.toByteArray();
@@ -116,7 +116,7 @@ public abstract class DeclinationStoreTest<I extends DeclinationImporter> extend
         String s1 = ois.readUTF();
         assertEquals("Humba Humba", s1);
         String s2 = ois.readUTF();
-        assertEquals("T�t�r���", s2);
+        assertEquals("Tätäräää", s2);
         ois.close();
     }
 
@@ -137,7 +137,7 @@ public abstract class DeclinationStoreTest<I extends DeclinationImporter> extend
                 // don't write a second header
             }
         };
-        oos2.writeUTF("T�t�r���");
+        oos2.writeUTF("Tätäräää");
         oos2.writeDouble(1.);
         oos2.writeDouble(2.);
         oos2.writeDouble(3.);
@@ -157,7 +157,7 @@ public abstract class DeclinationStoreTest<I extends DeclinationImporter> extend
         assertEquals(3., ois.readDouble(), 0.000000001);
         assertEquals(4., ois.readDouble(), 0.000000001);
         String s2 = ois.readUTF();
-        assertEquals("T�t�r���", s2);
+        assertEquals("Tätäräää", s2);
         assertEquals(1., ois.readDouble(), 0.000000001);
         assertEquals(2., ois.readDouble(), 0.000000001);
         assertEquals(3., ois.readDouble(), 0.000000001);
@@ -183,7 +183,7 @@ public abstract class DeclinationStoreTest<I extends DeclinationImporter> extend
                 // don't write a second header
             }
         };
-        oos2.writeUTF("T�t�r���");
+        oos2.writeUTF("Tätäräää");
         oos2.writeDouble(1.);
         oos2.writeDouble(2.);
         oos2.writeDouble(3.);
@@ -203,7 +203,7 @@ public abstract class DeclinationStoreTest<I extends DeclinationImporter> extend
         assertEquals(3., ois.readDouble(), 0.000000001);
         assertEquals(4., ois.readDouble(), 0.000000001);
         String s2 = ois.readUTF();
-        assertEquals("T�t�r���", s2);
+        assertEquals("Tätäräää", s2);
         assertEquals(1., ois.readDouble(), 0.000000001);
         assertEquals(2., ois.readDouble(), 0.000000001);
         assertEquals(3., ois.readDouble(), 0.000000001);
@@ -234,7 +234,7 @@ public abstract class DeclinationStoreTest<I extends DeclinationImporter> extend
                 // don't write a second header
             }
         };
-        oos2.writeUTF("T�t�r���");
+        oos2.writeUTF("Tätäräää");
         oos2.writeDouble(1.);
         oos2.writeDouble(2.);
         oos2.writeDouble(3.);
@@ -254,7 +254,7 @@ public abstract class DeclinationStoreTest<I extends DeclinationImporter> extend
         assertEquals(3., ois.readDouble(), 0.000000001);
         assertEquals(4., ois.readDouble(), 0.000000001);
         String s2 = ois.readUTF();
-        assertEquals("T�t�r���", s2);
+        assertEquals("Tätäräää", s2);
         assertEquals(1., ois.readDouble(), 0.000000001);
         assertEquals(2., ois.readDouble(), 0.000000001);
         assertEquals(3., ois.readDouble(), 0.000000001);

@@ -2,6 +2,9 @@ package com.sap.sailing.gwt.ui.server;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.lang.management.ManagementFactory;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -20,9 +23,12 @@ import com.mongodb.connection.ClusterDescription;
 import com.mongodb.connection.ServerDescription;
 import com.sap.sailing.server.interfaces.RacingEventService;
 import com.sap.sse.ServerInfo;
+import com.sap.sse.common.Duration;
+import com.sap.sse.common.Util;
 import com.sap.sse.mongodb.MongoDBService;
 import com.sap.sse.replication.ReplicationService;
 import com.sap.sse.replication.ReplicationStatus;
+import com.sap.sse.util.ThreadPoolUtil;
 
 public class StatusServlet extends HttpServlet {
     private static final String WAIT_UNTIL_RACES_LOADED = "waitUntilRacesLoaded";
@@ -58,6 +64,22 @@ public class StatusServlet extends HttpServlet {
         try {
             final JSONObject versionAsJson = ServerInfo.getBuildVersionJson();
             result.putAll(versionAsJson);
+            final ScheduledExecutorService defaultBackgroundTaskThreadPoolExecutor = ThreadPoolUtil.INSTANCE.getDefaultBackgroundTaskThreadPoolExecutor();
+            if (defaultBackgroundTaskThreadPoolExecutor instanceof ThreadPoolExecutor) {
+                final long queueLengthDefaultBackgroundThreadPoolExecutor = ((ThreadPoolExecutor) defaultBackgroundTaskThreadPoolExecutor).getQueue().size();
+                result.put("defaultbackgroundthreadpoolexecutorqueuelength", queueLengthDefaultBackgroundThreadPoolExecutor);
+                final long nonDelayedQueueLengthDefaultBackgroundThreadPoolExecutor = Util.size(ThreadPoolUtil.INSTANCE.getTasksDelayedByLessThan((ThreadPoolExecutor) defaultBackgroundTaskThreadPoolExecutor, Duration.ONE_SECOND));
+                result.put("defaultbackgroundthreadpoolexecutorqueuelengthnondelayed", nonDelayedQueueLengthDefaultBackgroundThreadPoolExecutor);
+            }
+            final ScheduledExecutorService defaultForegroundTaskThreadPoolExecutor = ThreadPoolUtil.INSTANCE.getDefaultForegroundTaskThreadPoolExecutor();
+            if (defaultForegroundTaskThreadPoolExecutor instanceof ThreadPoolExecutor) {
+                final long queueLengthDefaultForegroundThreadPoolExecutor = ((ThreadPoolExecutor) defaultForegroundTaskThreadPoolExecutor).getQueue().size();
+                result.put("defaultforegroundthreadpoolexecutorqueuelength", queueLengthDefaultForegroundThreadPoolExecutor);
+                final long nonDelayedQueueLengthDefaultForegroundThreadPoolExecutor = Util.size(ThreadPoolUtil.INSTANCE.getTasksDelayedByLessThan((ThreadPoolExecutor) defaultForegroundTaskThreadPoolExecutor, Duration.ONE_SECOND));
+                result.put("defaultforegroundthreadpoolexecutorqueuelengthnondelayed", nonDelayedQueueLengthDefaultForegroundThreadPoolExecutor);
+            }
+            final double systemLoadAverageLastMinute = ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage();
+            result.put("systemloadaveragelastminute", systemLoadAverageLastMinute);
             final long numberOfTrackedRacesToRestore = service.getNumberOfTrackedRacesToRestore();
             result.put("numberofracestorestore", numberOfTrackedRacesToRestore);
             final int numberOfTrackedRacesRestored = service.getNumberOfTrackedRacesRestored();
@@ -74,8 +96,11 @@ public class StatusServlet extends HttpServlet {
             }
             boolean available = numberOfTrackedRacesRestored >= numberOfTrackedRacesToRestore
                     && (replicationStatus == null || replicationStatus.isAvailable());
-            if (waitUntilRacesLoaded) {
-                available = available && numberOfTrackedRacesRestoredDoneLoading == numberOfTrackedRacesToRestore;
+            if (waitUntilRacesLoaded && numberOfTrackedRacesToRestore > 0) {
+                // interestingly, we sometimes see servers where numberOfTrackedRacesRestoredDoneLoading > numberOfTrackedRacesToRestore...
+                available = available &&
+                        (numberOfTrackedRacesRestoredDoneLoading >= numberOfTrackedRacesToRestore
+                        || numberOfTrackedRacesStillLoading <= 0);
             }
             result.put("available", available);
             resp.setStatus(available ? HttpServletResponse.SC_OK : HttpServletResponse.SC_SERVICE_UNAVAILABLE);

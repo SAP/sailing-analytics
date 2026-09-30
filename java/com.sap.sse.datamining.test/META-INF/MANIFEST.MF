@@ -16,3 +16,4 @@ Require-Bundle: org.hamcrest;bundle-version="2.2.0",
  junit-platform-engine;bundle-version="1.11.3",
  org.opentest4j;bundle-version="1.3.0"
 Automatic-Module-Name: com.sap.sse.datamining.test
+Import-Package: com.sap.sailing.polars.mining

@@ -2,10 +2,10 @@ package com.sap.sailing.server.gateway.serialization.impl;
 
 import org.json.simple.JSONObject;
 
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.server.gateway.deserialization.TypeBasedJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.GPSFixMovingJsonDeserializer;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.shared.json.JsonSerializer;
 
 public class GPSFixMovingJsonSerializer implements JsonSerializer<GPSFixMoving> {

@@ -71,7 +71,8 @@ Require-Bundle: com.sap.sailing.domain,
  org.apache.httpcomponents.httpclient,
  org.apache.httpcomponents.httpcore,
  com.sap.sailing.server.gateway.interfaces,
- com.sap.sailing.landscape.common
+ com.sap.sailing.landscape.common,
+ com.sap.sse.landscape.common
 Bundle-ClassPath: .
 Web-ContextPath: /sailingserver
 Export-Package: com.sap.sailing.server.gateway,

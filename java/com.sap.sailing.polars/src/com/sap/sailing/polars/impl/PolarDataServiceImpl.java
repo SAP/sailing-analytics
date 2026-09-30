@@ -23,9 +23,6 @@ import com.sap.sailing.domain.common.LegType;
 import com.sap.sailing.domain.common.ManeuverType;
 import com.sap.sailing.domain.common.PolarSheetGenerationSettings;
 import com.sap.sailing.domain.common.Tack;
-import com.sap.sailing.domain.common.confidence.BearingWithConfidence;
-import com.sap.sailing.domain.common.confidence.impl.BearingWithConfidenceImpl;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.impl.PolarSheetGenerationSettingsImpl;
 import com.sap.sailing.domain.common.polars.NotEnoughDataHasBeenAddedException;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
@@ -44,7 +41,10 @@ import com.sap.sailing.polars.regression.impl.IncrementalAnyOrderLeastSquaresImp
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Speed;
 import com.sap.sse.common.Util.Pair;
+import com.sap.sse.common.confidence.BearingWithConfidence;
+import com.sap.sse.common.confidence.impl.BearingWithConfidenceImpl;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sse.datamining.data.ClusterGroup;
 import com.sap.sse.datamining.shared.GroupKey;
 import com.sap.sse.replication.interfaces.impl.AbstractReplicableWithObjectInputStream;
@@ -68,10 +68,48 @@ public class PolarDataServiceImpl extends AbstractReplicableWithObjectInputStrea
     private DomainFactory domainFactory;
 
     /**
-     * Constructs the polar data service with default generation settings.
+     * See {@link #PolarDataServiceImpl(boolean)}. Preserved across
+     * {@link #resetState() state resets}.
+     */
+    private final boolean waitForLoadingOfAllRacesToRestoreToBeStarted;
+
+    /**
+     * Convenience constructor equivalent to
+     * {@code new PolarDataServiceImpl(false)}. See
+     * {@link #PolarDataServiceImpl(boolean)} for the meaning of the flag; briefly, this default
+     * does <em>not</em> enable the "wait until the client has finished triggering all startup
+     * races" gate on {@link #runWhenPolarLoadingFinishedFor(TrackedRace, Runnable)}. That gate
+     * is only needed by clients that batch-restore many races through this service and expect
+     * drain-callbacks to hold until that batch is fully queued. Ad-hoc uses and tests can rely
+     * on this default.
      */
     public PolarDataServiceImpl() {
+        this(/* waitForLoadingOfAllRacesToRestoreToBeStarted */ false);
+    }
+
+    /**
+     * @param waitForLoadingOfAllRacesToRestoreToBeStarted
+     *            when {@code true}, callbacks registered via
+     *            {@link #runWhenPolarLoadingFinishedFor(TrackedRace, Runnable)} won't fire until
+     *            the client has explicitly called {@link #markLoadingOfAllRacesToRestoreStarted()}
+     *            <em>and</em> the race's fixes are in the loading pipeline. Constructing with
+     *            {@code true} and never calling {@code markLoadingOfAllRacesToRestoreStarted()}
+     *            will hold callbacks indefinitely — used by the OSGi/production wiring which
+     *            makes that promise. See bug6241 and
+     *            {@link PolarDataMiner#PolarDataMiner(PolarSheetGenerationSettings, CubicRegressionPerCourseProcessor, SpeedRegressionPerAngleClusterProcessor, ClusterGroup, boolean)}.
+     */
+    public PolarDataServiceImpl(boolean waitForLoadingOfAllRacesToRestoreToBeStarted) {
+        this.waitForLoadingOfAllRacesToRestoreToBeStarted = waitForLoadingOfAllRacesToRestoreToBeStarted;
         resetState();
+    }
+
+    public PolarDataServiceImpl filterToBoatClasses(Iterable<BoatClass> boatClassesToFilterTo) {
+        final PolarDataMiner filteredPolarDataMiner = polarDataMiner.filterToBoatClasses(boatClassesToFilterTo);
+        // A filtered clone is a derived view, not driven by a startup-restore batch; keep the
+        // default (non-gated) mode regardless of this instance's setting.
+        final PolarDataServiceImpl filteredService = new PolarDataServiceImpl();
+        filteredService.polarDataMiner = filteredPolarDataMiner;
+        return filteredService;
     }
 
     @Override
@@ -80,11 +118,13 @@ public class PolarDataServiceImpl extends AbstractReplicableWithObjectInputStrea
         ClusterGroup<Bearing> angleClusterGroup = createAngleClusterGroup();
         CubicRegressionPerCourseProcessor cubicRegressionPerCourseProcessor = new CubicRegressionPerCourseProcessor();
         SpeedRegressionPerAngleClusterProcessor speedRegressionPerAngleClusterProcessor = new SpeedRegressionPerAngleClusterProcessor(angleClusterGroup);
-        this.polarDataMiner = new PolarDataMiner(settings, cubicRegressionPerCourseProcessor, speedRegressionPerAngleClusterProcessor, angleClusterGroup);
+        this.polarDataMiner = new PolarDataMiner(settings, cubicRegressionPerCourseProcessor,
+                speedRegressionPerAngleClusterProcessor, angleClusterGroup,
+                waitForLoadingOfAllRacesToRestoreToBeStarted);
     }
     
-    public boolean isCurrentlyActiveAndOrHasQueue() {
-        return polarDataMiner.isCurrentlyActiveAndOrHasQueue();
+    public boolean isCurrentlyActiveOrHasQueue() {
+        return polarDataMiner.isCurrentlyActiveOrHasQueue();
     }
 
     private ClusterGroup<Bearing> createAngleClusterGroup() {
@@ -224,8 +264,23 @@ public class PolarDataServiceImpl extends AbstractReplicableWithObjectInputStrea
     }
 
     @Override
-    public void raceFinishedLoading(TrackedRace race) {
-        polarDataMiner.raceFinishedTracking(race);
+    public void raceFinishedLoading(TrackedRace race, Runnable callbackWhenRaceChangingToTrackingOfFinishedStatus) {
+        polarDataMiner.raceFinishedLoading(race, callbackWhenRaceChangingToTrackingOfFinishedStatus);
+    }
+
+    @Override
+    public void runWhenPolarLoadingFinishedFor(TrackedRace race, Runnable callback) {
+        polarDataMiner.runWhenPolarLoadingFinishedFor(race, callback);
+    }
+
+    @Override
+    public void raceRemoved(TrackedRace race) {
+        polarDataMiner.raceRemoved(race);
+    }
+
+    @Override
+    public void markLoadingOfAllRacesToRestoreStarted() {
+        polarDataMiner.markLoadingOfAllRacesToRestoreStarted();
     }
 
     @Override
@@ -301,7 +356,8 @@ public class PolarDataServiceImpl extends AbstractReplicableWithObjectInputStrea
         CubicRegressionPerCourseProcessor cubicRegressionPerCourseProcessor = (CubicRegressionPerCourseProcessor) is.readObject();
         SpeedRegressionPerAngleClusterProcessor speedRegressionPerAngleClusterProcessor = (SpeedRegressionPerAngleClusterProcessor) is.readObject();
         polarDataMiner = new PolarDataMiner(backendPolarSettings, cubicRegressionPerCourseProcessor,
-                speedRegressionPerAngleClusterProcessor, speedRegressionPerAngleClusterProcessor.getAngleCluster());
+                speedRegressionPerAngleClusterProcessor, speedRegressionPerAngleClusterProcessor.getAngleCluster(),
+                waitForLoadingOfAllRacesToRestoreToBeStarted);
     }
 
     @Override

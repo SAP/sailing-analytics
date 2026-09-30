@@ -1,12 +1,12 @@
 package com.sap.sailing.domain.base.impl;
 
 import com.sap.sailing.domain.base.SpeedWithBearingWithConfidence;
-import com.sap.sailing.domain.common.DoubleTriple;
-import com.sap.sailing.domain.common.SpeedWithBearing;
-import com.sap.sailing.domain.common.confidence.impl.HasConfidenceImpl;
-import com.sap.sailing.domain.common.scalablevalue.impl.ScalableSpeedWithBearing;
+import com.sap.sse.common.DoubleTriple;
+import com.sap.sse.common.SpeedWithBearing;
+import com.sap.sse.common.confidence.impl.HasConfidenceImpl;
 import com.sap.sse.common.scalablevalue.IsScalable;
 import com.sap.sse.common.scalablevalue.ScalableValue;
+import com.sap.sse.common.scalablevalue.impl.ScalableSpeedWithBearing;
 
 public class SpeedWithBearingWithConfidenceImpl<RelativeTo> extends
         HasConfidenceImpl<DoubleTriple, SpeedWithBearing, RelativeTo> implements

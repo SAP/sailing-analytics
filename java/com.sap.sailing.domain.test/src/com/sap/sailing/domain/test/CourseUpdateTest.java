@@ -108,7 +108,7 @@ public class CourseUpdateTest extends AbstractTracTracLiveTest {
                 /* delayToLiveInMillis */0l, /* millisecondsOverWhichToAverageWind */30000, /* simulator */null, /* courseDesignUpdateURI */
                 null, /* tracTracApiToken */null, getEventSubscriber(), getRaceSubscriber(),
                 /*ignoreTracTracMarkPassings*/false, mock(RaceLogAndTrackedRaceResolver.class), mock(LeaderboardGroupResolver.class), RaceTracker.TIMEOUT_FOR_RECEIVING_RACE_DEFINITION_IN_MILLISECONDS,
-                new DefaultRaceTrackingHandler(), /* markPassingRaceFingerprintRegistry */ null) {
+                new DefaultRaceTrackingHandler(), /* markPassingRaceFingerprintRegistry */ null, /*maneuverRaceFingerprintRegistry*/ null) {
             @Override
             protected void handleEvent(Triple<IControlRoute, Long, Void> event) {
                 super.handleEvent(event);

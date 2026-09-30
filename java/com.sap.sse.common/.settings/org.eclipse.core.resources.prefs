@@ -1,4 +1,8 @@
 eclipse.preferences.version=1
 encoding//src/com/sap/sse/common/AbstractBearing.java=UTF-8
+encoding//src/com/sap/sse/common/AbstractPosition.java=UTF-8
+encoding//src/com/sap/sse/common/Position.java=UTF-8
+encoding//src/com/sap/sse/common/confidence/impl/ConfidenceBasedAveragerImpl.java=utf-8
+encoding//src/com/sap/sse/common/impl/AbstractSpeedWithAbstractBearingImpl.java=UTF-8
 encoding//src/com/sap/sse/common/impl/CountryCodeFactoryImpl.java=UTF-8
 encoding/<project>=UTF-8

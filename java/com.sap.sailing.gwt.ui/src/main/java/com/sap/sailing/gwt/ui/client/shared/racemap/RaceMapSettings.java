@@ -5,14 +5,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.sap.sailing.domain.common.ManeuverType;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.domain.common.security.SecuredDomainType.TrackedRaceActions;
 import com.sap.sailing.gwt.settings.client.settingtypes.DistanceSetting;
 import com.sap.sailing.gwt.ui.client.shared.racemap.RaceMapHelpLinesSettings.HelpLineTypes;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.impl.MeterDistance;
 import com.sap.sse.common.settings.generic.AbstractGenericSerializableSettingsWithContext;
 import com.sap.sse.common.settings.generic.BooleanSetting;
 import com.sap.sse.common.settings.generic.DoubleSetting;

@@ -3,10 +3,10 @@ package com.sap.sailing.simulator.test.util;
 import java.io.IOException;
 import java.util.NavigableMap;
 
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.simulator.impl.PolarDiagram49STG;
 import com.sap.sailing.simulator.impl.PolarDiagramBase;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 
 public class PolarDiagramInterpolate {
 

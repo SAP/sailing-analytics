@@ -9,18 +9,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.RaceDefinition;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.Wind;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.impl.WindImpl;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.domain.tracking.impl.CombinedWindAsNavigableSet;
 import com.sap.sailing.domain.tracking.impl.CombinedWindTrackImpl;
 import com.sap.sailing.domain.tracking.impl.VirtualWindFixesAsNavigableSet;
 import com.sap.sse.InvalidDateException;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.util.DateParser;
 
@@ -117,7 +117,7 @@ public class VirtualWindFixesTest {
         windTrack.lockForRead();
         try {
             final Iterable<Wind> fixes = windTrack.getFixes(evenStart, /* fromInclusive */ true,
-                            evenStart.plus(virtualSet.getResolutionInMilliseconds()).plus(1), /* toInclusive */ false);
+                            evenStart.plus(virtualSet.getResolutionInMilliseconds()).plusResolution(), /* toInclusive */ false);
             assertEquals(2, Util.size(fixes));
             Wind wind1 = fixes.iterator().next();
             assertEquals(evenStart, wind1.getTimePoint());

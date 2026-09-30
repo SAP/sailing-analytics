@@ -41,7 +41,6 @@ import com.sap.sailing.domain.base.impl.CourseDataImpl;
 import com.sap.sailing.domain.base.impl.WaypointImpl;
 import com.sap.sailing.domain.common.DeviceIdentifier;
 import com.sap.sailing.domain.common.PassingInstruction;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixImpl;
 import com.sap.sailing.domain.coursetemplate.CommonMarkProperties;
@@ -91,6 +90,7 @@ import com.sap.sailing.server.gateway.deserialization.impl.CourseConfigurationBu
 import com.sap.sailing.server.interfaces.CourseAndMarkConfigurationFactory;
 import com.sap.sailing.shared.server.SharedSailingData;
 import com.sap.sse.common.NoCorrespondingServiceRegisteredException;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.RepeatablePart;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Timed;
@@ -566,7 +566,7 @@ public class CourseAndMarkConfigurationFactoryImpl implements CourseAndMarkConfi
                         .add(new RegattaLogCloseOpenEndedDeviceMappingEventImpl(
                                 timePointForDefinitionOfMarksAndDeviceMappings, author,
                                 existingDeviceMapping.getRegattaLogEvent().getId(),
-                                timePointForDefinitionOfMarksAndDeviceMappings.minus(1)));
+                                timePointForDefinitionOfMarksAndDeviceMappings.minusResolution()));
             }
         }
     }

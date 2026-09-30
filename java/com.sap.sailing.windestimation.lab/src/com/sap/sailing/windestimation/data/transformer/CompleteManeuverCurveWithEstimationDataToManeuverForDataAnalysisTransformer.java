@@ -31,7 +31,7 @@ public class CompleteManeuverCurveWithEstimationDataToManeuverForDataAnalysisTra
             if (maneuver != null) {
                 ManeuverForDataAnalysis maneuverForClassification = getManeuverForDataAnalysis(maneuver,
                         previousManeuver, nextManeuver, speedScalingDivisor,
-                        competitorTrackWithElementsToTransform.getBoatClass());
+                        competitorTrackWithElementsToTransform.getBoatClass(), competitorTrackWithElementsToTransform.getCompetitorName());
                 if (maneuverForClassification != null) {
                     maneuversForClassification.add(maneuverForClassification);
                 }
@@ -41,7 +41,7 @@ public class CompleteManeuverCurveWithEstimationDataToManeuverForDataAnalysisTra
         }
         if (maneuver != null) {
             ManeuverForDataAnalysis maneuverForClassification = getManeuverForDataAnalysis(maneuver, previousManeuver,
-                    null, speedScalingDivisor, competitorTrackWithElementsToTransform.getBoatClass());
+                    null, speedScalingDivisor, competitorTrackWithElementsToTransform.getBoatClass(), competitorTrackWithElementsToTransform.getCompetitorName());
             if (maneuverForClassification != null) {
                 maneuversForClassification.add(maneuverForClassification);
             }
@@ -51,7 +51,7 @@ public class CompleteManeuverCurveWithEstimationDataToManeuverForDataAnalysisTra
 
     private ManeuverForDataAnalysis getManeuverForDataAnalysis(CompleteManeuverCurveWithEstimationData maneuver,
             CompleteManeuverCurveWithEstimationData previousManeuver,
-            CompleteManeuverCurveWithEstimationData nextManeuver, double speedScalingDivisor, BoatClass boatClass) {
+            CompleteManeuverCurveWithEstimationData nextManeuver, double speedScalingDivisor, BoatClass boatClass, String competitorName) {
         if (maneuver.getWind() == null) {
             return null;
         }
@@ -64,7 +64,7 @@ public class CompleteManeuverCurveWithEstimationDataToManeuverForDataAnalysisTra
                         new ConvertableManeuverForEstimationAdapterForCompleteManeuverCurveWithEstimationData(maneuver,
                                 courseChangeInDegreesWithinTurningSectionOfPreviousManeuver,
                                 courseChangeInDegreesWithinTurningSectionOfNextManeuver),
-                        speedScalingDivisor, boatClass);
+                        speedScalingDivisor, boatClass, competitorName);
         ManeuverTypeForDataAnalysis maneuverType = getManeuverTypeForDataAnalysis(maneuver);
         double absoluteTotalCourseChangeInDegrees = Math.abs(maneuverForEstimation.getCourseChangeInDegrees());
         double absoluteTotalCourseChangeWithinMainCurveInDegrees = Math

@@ -29,8 +29,6 @@ import com.sap.sailing.domain.base.Mark;
 import com.sap.sailing.domain.base.RaceDefinition;
 import com.sap.sailing.domain.base.Waypoint;
 import com.sap.sailing.domain.common.PassingInstruction;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.markpassingcalculation.Candidate;
@@ -45,12 +43,14 @@ import com.sap.sailing.domain.tracking.impl.MarkPositionAtTimePointCacheImpl;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.TimeRange;
 import com.sap.sse.common.Timed;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.MeterDistance;
 import com.sap.sse.common.impl.TimeRangeImpl;
 import com.sap.sse.concurrent.LockUtil;
 import com.sap.sse.util.ThreadPoolUtil;
@@ -1481,24 +1481,30 @@ public class CandidateFinderImpl implements CandidateFinder {
                 // passing instructions. If no passing instructions are given, construct two lines, one to each direction
                 // orthogonally to the adjacent leg:
                 if (w == race.getRace().getCourse().getFirstWaypoint()) {
-                    if (instruction == PassingInstruction.None || instruction == PassingInstruction.Single_Unknown) {
-                        b = markPositionCache.getLegBearing(race.getTrackedLegStartingAt(w)).add(new DegreeBearingImpl(90));
-                        result.add(new Pair<>(p, b));
-                        b = markPositionCache.getLegBearing(race.getTrackedLegStartingAt(w)).add(new DegreeBearingImpl(270));
-                    } else {
-                        b = markPositionCache.getLegBearing(race.getTrackedLegStartingAt(w)).add(new DegreeBearingImpl(instruction == PassingInstruction.Port ? 90 : 270));
+                    final Bearing legBearingStartingAtW = markPositionCache.getLegBearing(race.getTrackedLegStartingAt(w));
+                    if (legBearingStartingAtW != null) {
+                        if (instruction == PassingInstruction.None || instruction == PassingInstruction.Single_Unknown) {
+                            b = legBearingStartingAtW.add(new DegreeBearingImpl(90));
+                            result.add(new Pair<>(p, b));
+                            b = legBearingStartingAtW.add(new DegreeBearingImpl(270));
+                        } else {
+                            b = legBearingStartingAtW.add(new DegreeBearingImpl(instruction == PassingInstruction.Port ? 90 : 270));
+                        }
                     }
                 } else if (w == race.getRace().getCourse().getLastWaypoint()) {
-                    if (instruction == PassingInstruction.None || instruction == PassingInstruction.Single_Unknown) {
-                        b = markPositionCache.getLegBearing(race.getTrackedLegFinishingAt(w)).add(new DegreeBearingImpl(90));
-                        result.add(new Pair<>(p, b));
-                        b = markPositionCache.getLegBearing(race.getTrackedLegFinishingAt(w)).add(new DegreeBearingImpl(270));
-                    } else {
-                        b = markPositionCache.getLegBearing(race.getTrackedLegFinishingAt(w)).add(new DegreeBearingImpl(instruction == PassingInstruction.Port ? 90 : 270));
+                    final Bearing legBearingFinishingAtW = markPositionCache.getLegBearing(race.getTrackedLegFinishingAt(w));
+                    if (legBearingFinishingAtW != null) {
+                        if (instruction == PassingInstruction.None || instruction == PassingInstruction.Single_Unknown) {
+                            b = legBearingFinishingAtW.add(new DegreeBearingImpl(90));
+                            result.add(new Pair<>(p, b));
+                            b = legBearingFinishingAtW.add(new DegreeBearingImpl(270));
+                        } else {
+                            b = legBearingFinishingAtW.add(new DegreeBearingImpl(instruction == PassingInstruction.Port ? 90 : 270));
+                        }
                     }
                 } else {
-                    Bearing before = markPositionCache.getLegBearing(race.getTrackedLegFinishingAt(w));
-                    Bearing after = markPositionCache.getLegBearing(race.getTrackedLegStartingAt(w));
+                    final Bearing before = markPositionCache.getLegBearing(race.getTrackedLegFinishingAt(w));
+                    final Bearing after = markPositionCache.getLegBearing(race.getTrackedLegStartingAt(w));
                     if (before != null && after != null) {
                         b = before.middle(after.reverse());
                     }

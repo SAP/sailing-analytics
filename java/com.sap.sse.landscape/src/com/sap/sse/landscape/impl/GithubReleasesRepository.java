@@ -3,14 +3,18 @@ package com.sap.sse.landscape.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Logger;
@@ -24,6 +28,7 @@ import org.json.simple.parser.ParseException;
 
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.landscape.Release;
 import com.sap.sse.landscape.ReleaseRepository;
@@ -68,6 +73,15 @@ public class GithubReleasesRepository extends AbstractReleaseRepository implemen
     private final static String GITHUB_API_BASE_URL = "https://api.github.com";
     private final static String GITHUB_BASE_URL = "https://github.com";
     private final static int NUMBER_OF_RELEASES_PER_PAGE = 100; // default would be 30; maximum is 100
+    /**
+     * Content types under which the release {@code .tar.gz} archive asset may be published on GitHub. Historically the
+     * release workflow set {@code application/x-tar} explicitly; when the type is inferred from the file extension it
+     * instead becomes {@code application/gzip} (the value the {@code mime-types} library returns for {@code .gz}). Other
+     * types are commonly seen in the wild for a gzip-compressed tar. We accept all of them so the archive asset is found
+     * regardless of which producer variant published the release.
+     */
+    private final static Set<String> ARCHIVE_ASSET_CONTENT_TYPES = new HashSet<>(Arrays.asList("application/x-tar", "application/gzip",
+            "application/x-gzip", "application/x-compressed-tar"));
     private final String owner;
     private final String repositoryName;
     
@@ -153,8 +167,8 @@ public class GithubReleasesRepository extends AbstractReleaseRepository implemen
                 } else {
                     logger.fine(()->"Need to fetch page with newest releases because last request was at "+
                             (lastFetchOfNewestReleases==null?"<never>":lastFetchOfNewestReleases));
-                    lastFetchOfNewestReleases = now;
                     fillCacheWithNewestReleases();
+                    lastFetchOfNewestReleases = now;
                 }
                 cachedReleasesIterator = releasesByPublishingTimePoint.descendingMap().values().iterator();
             }
@@ -215,6 +229,11 @@ public class GithubReleasesRepository extends AbstractReleaseRepository implemen
      * cache when this method is invoked.
      * <p>
      * 
+     * If the {@code GITHUB_TOKEN} environment variable is set, it is used as a bearer token forthe Github requests,
+     * resulting in a higher rate limit. If no token is set, or if using the token results in a 401 response code
+     * (authentication failed), an unauthenticated request is tried instead.
+     * <p>
+     * 
      * The method makes no changes to the cache or any other state of this instance.
      * 
      * @return the link to the next page in the returned pair's {@link Pair#getA() A component}, and the sequence of
@@ -222,7 +241,24 @@ public class GithubReleasesRepository extends AbstractReleaseRepository implemen
      */
     private synchronized Pair<String, Iterable<Pair<TimePoint, GithubRelease>>> getReleasesFromPage(String pageURL) throws IOException, ParseException {
         logger.info("Requesting releases page "+pageURL);
-        final URLConnection connection = HttpUrlConnectionHelper.redirectConnection(new URL(pageURL));
+        final URLConnection connection;
+        final String githubToken = System.getenv("GITHUB_TOKEN");
+        if (Util.hasLength(githubToken)) {
+            final HttpURLConnection authenticatedConnectionAttempt = (HttpURLConnection) HttpUrlConnectionHelper
+                    .redirectConnectionWithBearerToken(new URL(pageURL), githubToken);
+            if (authenticatedConnectionAttempt.getResponseCode() == 401) {
+                try {
+                    authenticatedConnectionAttempt.disconnect();
+                } catch (Exception e) {
+                    logger.warning("Couldn't disconnect from Github: "+e.getMessage());
+                }
+                connection = HttpUrlConnectionHelper.redirectConnection(new URL(pageURL));
+            } else {
+                connection = authenticatedConnectionAttempt;
+            }
+        } else {
+            connection = HttpUrlConnectionHelper.redirectConnection(new URL(pageURL));
+        }
         final InputStream index = (InputStream) connection.getContent();
         final String xRatelimitRemaining = connection.getHeaderField("x-ratelimit-remaining");
         logger.fine(()->""+xRatelimitRemaining+" requests left in this hour");
@@ -230,7 +266,7 @@ public class GithubReleasesRepository extends AbstractReleaseRepository implemen
             throw new RuntimeException("You hit the rate limit of "+connection.getHeaderField("x-ratelimit-limit"));
         }
         final String linkHeader = connection.getHeaderField("link");
-        final String nextPageURL = getNextPageURL(linkHeader);
+        final String nextPageURL = linkHeader == null ? null : getNextPageURL(linkHeader);
         logger.fine(()->nextPageURL==null?"This was the last page":("Next page will be "+nextPageURL));
         final List<Pair<TimePoint, GithubRelease>> publishingTimePointsAndReleases = new LinkedList<>();
         final JSONArray releasesJson = (JSONArray) new JSONParser().parse(new InputStreamReader(index));
@@ -353,7 +389,7 @@ public class GithubReleasesRepository extends AbstractReleaseRepository implemen
         String releaseNotesURL = null;
         for (final Object archiveAsset : (JSONArray) releaseJson.get("assets")) {
             final JSONObject archiveAssetJson = (JSONObject) archiveAsset;
-            if (archiveAssetJson.get("content_type").equals("application/x-tar")) {
+            if (ARCHIVE_ASSET_CONTENT_TYPES.contains(archiveAssetJson.get("content_type"))) {
                 archiveDownloadURL = archiveAssetJson.get("browser_download_url").toString();
             } else if (archiveAssetJson.get("name").equals(Release.RELEASE_NOTES_FILE_NAME)) {
                 releaseNotesURL = archiveAssetJson.get("browser_download_url").toString();

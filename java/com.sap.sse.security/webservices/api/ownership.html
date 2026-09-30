@@ -93,6 +93,22 @@
         <td><code>curl "http://127.0.0.1:8888/security/api/restsecurity/ownership/TRACKED_RACE?id=Croatia%20Coast%20Cup%202019%20-%20ORC%20with%20Spinnaker&id=Race%201%20-%20ORC%20mit%20Spi"</code><br>
                 Will provide a JSON document as explained above.</td>
     </tr>
+    <tr>
+        <td>Request Method:</td>
+        <td>DELETE /{objectType}/{typeRelativeObjectId}</td>
+    </tr>
+    <tr>
+        <td>Parameter (path)</td>
+        <td>
+            <div>objectType</div> Object type represents the type of object to delete the ownership information for
+            <div>objectId</div> Unique Object id.
+        </td>
+    </tr>
+    <tr>
+        <td>Example:</td>
+        <td><code>curl -i -X DELETE "http://admin:admin@127.0.0.1:8888/security/api/restsecurity/ownership/USER_GROUP/82832851-07ac-47ee-9ddf-6f4f9eaa7823"</code><br>
+             Will delete the ownership information for the group identified.
+    </tr>
 
     <tr>
         <td>Request Method:</td>
@@ -102,7 +118,7 @@
         <td>Output format:</td>
         <td>a JSON document of the following format<br>
             <pre>{"objectType":"USER_GROUP","objectId":"82832851-07ac-47ee-9ddf-6f4f9eaa7823","displayName": null,"acl":[{"groupId":null,"actions":["READ","!DELETE"]},{"groupId":"82832851-07ac-47ee-9ddf-6f4f9eaa7823","actions":["READ","!UPDATE"]}]}
-</pre>
+            </pre>
         </td>
     </tr>
      <tr>
@@ -142,6 +158,23 @@
         <td><code>curl -i -X PUT -H 'Content-Type: application/json' -d '{"objectType":"USER_GROUP","objectId":"82832851-07ac-47ee-9ddf-6f4f9eaa7823","displayName":"The Admin Tenant ACL","acl":[{"groupId":null,"actions":["READ","!UPDATE"]},{"groupId":"82832851-07ac-47ee-9ddf-6f4f9eaa7823","actions":["READ","!DELETE"]}]}' "http://admin:admin@127.0.0.1:8888/security/api/restsecurity/ownership/USER_GROUP/82832851-07ac-47ee-9ddf-6f4f9eaa7823/acl"</code><br>
                 Will provide a JSON document as explained above.</td>
     </tr>
+    <tr>
+        <td>Request Method:</td>
+        <td>DELETE /{objectType}/{typeRelativeObjectId}/acl</td>
+    </tr>
+    <tr>
+        <td>Parameter (path)</td>
+        <td>
+            <div>objectType</div> Object type represents the type of object to delete the ACL information for
+            <div>objectId</div> Unique Object id.
+        </td>
+    </tr>
+    <tr>
+        <td>Example:</td>
+        <td><code>curl -i -X DELETE "http://admin:admin@127.0.0.1:8888/security/api/restsecurity/ownership/USER_GROUP/82832851-07ac-47ee-9ddf-6f4f9eaa7823/acl"</code><br>
+             Will delete the ACL information for the group identified.
+    </tr>
+    
     
 </table>
 </body>

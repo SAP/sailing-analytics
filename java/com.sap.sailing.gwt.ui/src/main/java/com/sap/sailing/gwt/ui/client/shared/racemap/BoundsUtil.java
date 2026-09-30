@@ -3,14 +3,14 @@ package com.sap.sailing.gwt.ui.client.shared.racemap;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.base.LatLng;
 import com.google.gwt.maps.client.base.LatLngBounds;
-import com.sap.sailing.domain.common.Bounds;
 import com.sap.sailing.domain.common.NonCardinalBounds;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.BoundsImpl;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.Bounds;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.impl.BoundsImpl;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.DegreePosition;
 
 /**
  * Converts between {@link Bounds} and {@link LatLngBounds}.

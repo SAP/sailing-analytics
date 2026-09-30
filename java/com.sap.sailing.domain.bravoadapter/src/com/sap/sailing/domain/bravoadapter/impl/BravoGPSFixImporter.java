@@ -11,8 +11,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.sap.sailing.declination.DeclinationService;
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.sensordata.BravoExtendedSensorDataMetadata;
 import com.sap.sailing.domain.common.tracking.DoubleVectorFix;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
@@ -25,6 +23,8 @@ import com.sap.sailing.server.gateway.windimport.bravo.FunnyDegreeConverter;
 import com.sap.sailing.server.trackfiles.impl.BravoExtendedDataImporterImpl;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.DegreePosition;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 
 public class BravoGPSFixImporter implements GPSFixImporter {
     private static final Logger logger = Logger.getLogger(BravoGPSFixImporter.class.getName());

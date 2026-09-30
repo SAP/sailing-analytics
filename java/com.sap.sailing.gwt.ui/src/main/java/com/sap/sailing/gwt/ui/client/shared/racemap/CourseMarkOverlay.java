@@ -10,8 +10,6 @@ import com.google.gwt.maps.client.base.LatLng;
 import com.google.gwt.maps.client.base.Point;
 import com.google.gwt.maps.client.base.Size;
 import com.sap.sailing.domain.common.MarkType;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.gwt.ui.shared.CoursePositionsDTO;
 import com.sap.sailing.gwt.ui.shared.MarkDTO;
 import com.sap.sailing.gwt.ui.shared.racemap.CanvasOverlayV3;
@@ -19,7 +17,9 @@ import com.sap.sailing.gwt.ui.shared.racemap.MarkVectorGraphics;
 import com.sap.sailing.gwt.ui.shared.racemap.MarkVectorGraphicsFactory;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.impl.MeterDistance;
 
 /**
  * A google map overlay based on a HTML5 canvas for drawing course marks (canvases) and the buoy zone if the mark is a buoy.

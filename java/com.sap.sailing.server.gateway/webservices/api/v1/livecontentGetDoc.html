@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <link href='../../../../sailing-fontface-1.0.cache.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+    <link href='../../../main.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+    <link rel='icon' href='../../../../sap.ico' type='image/x-icon'>
+    <title>SAP Sailing Analytics Webservices API Version 1.0</title>
+</head>
+<body>
+<h1>SAP Sailing Analytics Webservices API Version 1.0</h1>
+<h2>URL: /sailingserver/api/v1/livecontent</h2>
+
+<b>Description:</b>
+<p>Reports the "live content" hosted by this server instance at a given point in time. Content is
+considered "live" when it is being tracked, i.e. when the point in time to check falls into the
+tracking interval of a race. The result is grouped hierarchically by replica set, then by event,
+and finally by the individual tracked races. Only events that may be live at the checked point in
+time and that actually contain at least one tracked race are included, and events and races are
+sorted by their names.</p>
+<p>This endpoint is primarily used to decide whether a server or replica set may be safely taken
+down or migrated: if it reports any live content for the current point in time, an operation that
+would interrupt tracking should be avoided.</p>
+<p>All time points in the response are encoded as epoch milliseconds (UTC). A missing (unbounded)
+time point, such as the end of tracking of a race that is still being tracked or an event without a
+defined start or end date, is reported as <tt>null</tt>. Every race that is returned is guaranteed
+to have a non-<tt>null</tt> <tt>trackingStartMillis</tt>; only <tt>trackingEndMillis</tt> may be
+<tt>null</tt>.</p>
+<p><b>Permissions:</b> accessing this endpoint requires the <tt>MANAGE</tt> permission on the
+landscape (<tt>AWS</tt>) object; without it the request is rejected.</p>
+<br/>
+<table>
+    <tr>
+        <td>Webservice Type:</td>
+        <td>REST</td>
+    </tr>
+    <tr>
+        <td>Output format:</td>
+        <td>Json</td>
+    </tr>
+    <tr>
+        <td>Mandatory parameters:</td>
+        <td>None</td>
+    </tr>
+    <tr>
+        <td>Optional parameters:</td>
+        <td>checkedAtMillis: the point in time to check for live content, given as epoch
+            milliseconds (UTC). If omitted, the server's current time is used.</td>
+    </tr>
+    <tr>
+        <td>Request method:</td>
+        <td>GET</td>
+    </tr>
+    <tr>
+        <td>Examples:</td>
+        <td>
+            <a href="http://www.sapsailing.com/sailingserver/api/v1/livecontent">http://www.sapsailing.com/sailingserver/api/v1/livecontent</a>
+            <br/>
+            <a href="http://www.sapsailing.com/sailingserver/api/v1/livecontent?checkedAtMillis=1700000000000">http://www.sapsailing.com/sailingserver/api/v1/livecontent?checkedAtMillis=1700000000000</a>
+        </td>
+    </tr>
+    <tr>
+        <td>Example Response:</td>
+        <td>
+        <pre>
+			{
+			  "checkedAtMillis": 1700000000000,
+			  "replicaSets": [
+			    {
+			      "replicaSetName": "www",
+			      "events": [
+			        {
+			          "eventId": "a1b2c3d4-0000-0000-0000-000000000000",
+			          "eventName": "Kiel Week 2023",
+			          "eventStartMillis": 1699900000000,
+			          "eventEndMillis": 1700400000000,
+			          "races": [
+			            {
+			              "regattaName": "49er",
+			              "raceName": "R1",
+			              "trackingStartMillis": 1699999000000,
+			              "trackingEndMillis": null
+			            },
+			            {
+			              "regattaName": "49er",
+			              "raceName": "R2",
+			              "trackingStartMillis": 1699995000000,
+			              "trackingEndMillis": 1699998000000
+			            }
+			          ]
+			        }
+			      ]
+			    }
+			  ]
+			}
+        </pre>
+        </td>
+    </tr>
+</table>
+<div style="height: 1em;"></div>
+<a href="index.html">Back to Web Service Overview</a> 
+</body>
+</html>

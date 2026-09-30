@@ -2,11 +2,11 @@ package com.sap.sailing.domain.igtimiadapter.datatypes;
 
 import java.util.Map;
 
-import com.sap.sailing.domain.common.impl.KilometersPerHourSpeedImpl;
 import com.sap.sailing.domain.igtimiadapter.IgtimiFixReceiver;
 import com.sap.sailing.domain.igtimiadapter.Sensor;
 import com.sap.sse.common.Speed;
 import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.impl.KilometersPerHourSpeedImpl;
 
 /**
  * Speed through water expressed in kilometers per hour.

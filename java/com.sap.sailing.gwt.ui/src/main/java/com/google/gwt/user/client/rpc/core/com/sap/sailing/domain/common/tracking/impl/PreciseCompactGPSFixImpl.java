@@ -4,8 +4,8 @@ import com.google.gwt.user.client.rpc.CustomFieldSerializer;
 import com.google.gwt.user.client.rpc.SerializationException;
 import com.google.gwt.user.client.rpc.SerializationStreamReader;
 import com.google.gwt.user.client.rpc.SerializationStreamWriter;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.domain.common.tracking.impl.PreciseCompactGPSFixImpl.PreciseCompactPosition;
+import com.sap.sse.common.impl.DegreePosition;
 
 public final class PreciseCompactGPSFixImpl {
     public static final class PreciseCompactPosition_CustomFieldSerializer extends CustomFieldSerializer<PreciseCompactPosition> {

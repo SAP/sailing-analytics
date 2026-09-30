@@ -139,9 +139,9 @@ public class TestUserManagement extends AbstractSeleniumTest {
         userManagementPanel.unlockSelectedUsers();
         // logout and correct login within now-unlocked lock window
         authenticationMenu = logoutAndGoToAdminConsolePage().getAuthenticationMenu();
-        assertTrue(
-                authenticationMenu.attemptLogin(
-                        TEST_USER_NAME, TEST_USER_PASSWORD + UserManagementPanelPO.PASSWORD_COMPLEXITY_SALT));
+        assertTrue(authenticationMenu.attemptLoginExpectingAlertContainingMessage(TEST_USER_NAME,
+                TEST_USER_PASSWORD + UserManagementPanelPO.PASSWORD_COMPLEXITY_SALT,
+                "This server is configured as public"));
     }
 
     private void attemptAbusiveLogins(final String username, final String wrongPassword, final int attempts, AuthenticationMenuPO authenticationMenu)

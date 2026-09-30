@@ -8,9 +8,9 @@ GWT="`mktemp -t -d gwt.XXXXX`"
 GWT_ROOT="${GWT}/trunk"
 cd "${GWT}"
 echo "GWT directory: ${GWT}"
-git clone https://github.com/SAP/gwt-forward-serialization-rpc.git -b issue-7987-gwt-${GWT_VERSION} trunk
+git clone https://github.com/eclipse-sailing-analytics/gwt-forward-serialization-rpc.git -b issue-7987-gwt-${GWT_VERSION} trunk
 git clone https://github.com/gwtproject/tools.git -b main
-git clone https://github.com/SAP/gwt-maven-plugin-forward-serialization-rpc.git -b ${GWT_VERSION} gwt-maven-plugin
+git clone https://github.com/eclipse-sailing-analytics/gwt-maven-plugin-forward-serialization-rpc.git -b ${GWT_VERSION} gwt-maven-plugin
 cd ${GWT_ROOT}
 ant clean dist-dev -Dgwt.version=${GWT_VERSION}
 cp build/dist/gwt-${GWT_VERSION}.zip ${GWT}

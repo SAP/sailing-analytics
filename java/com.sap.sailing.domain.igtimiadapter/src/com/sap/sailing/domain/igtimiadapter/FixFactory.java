@@ -21,9 +21,6 @@ import com.igtimi.IgtimiData.Heading;
 import com.igtimi.IgtimiData.HeadingMagnetic;
 import com.igtimi.IgtimiData.SpeedOverGround;
 import com.igtimi.IgtimiStream.Msg;
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.KilometersPerHourSpeedImpl;
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.domain.igtimiadapter.datatypes.AWA;
 import com.sap.sailing.domain.igtimiadapter.datatypes.AWS;
 import com.sap.sailing.domain.igtimiadapter.datatypes.BatteryLevel;
@@ -40,6 +37,9 @@ import com.sap.sailing.domain.igtimiadapter.datatypes.SOG;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.DegreePosition;
+import com.sap.sse.common.impl.KilometersPerHourSpeedImpl;
+import com.sap.sse.common.impl.MeterDistance;
 import com.sun.jersey.core.util.Base64;
 
 /**

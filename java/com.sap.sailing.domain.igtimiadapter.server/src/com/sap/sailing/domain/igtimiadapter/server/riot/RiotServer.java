@@ -101,7 +101,15 @@ public interface RiotServer extends Replicable<ReplicableRiotServer, RiotReplica
     Device getDeviceBySerialNumber(String deviceSerialNumber);
 
     /**
-     * Assigns a unique ID and leaves service tag and name {@code null}
+     * On a primary instance of this service, assigns a unique ID, leaves service tag and name {@code null}, and
+     * returns the resulting {@link Device} object.<p>
+     * 
+     * On a replica, this is a no-op, {@code null} is returned, and only through replication of the underlying
+     * core operation to the primary will this then cause the creation of the {@link Device} entity on the
+     * primary instance. Once this has happened, the primary will replicate an operation that invokes
+     * {@link ReplicableRiotServer#internalDeviceCreated(long, String)} on the replicas, telling the ID
+     * under which the primary has created the device. The replica can then apply any data/fixes received
+     * from the device it had buffered so far.
      */
     Device createDevice(String deviceSerialNumber);
     

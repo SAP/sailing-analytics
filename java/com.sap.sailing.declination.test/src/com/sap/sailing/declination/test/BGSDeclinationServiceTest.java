@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.declination.Declination;
 import com.sap.sailing.declination.impl.BGSImporter;
-import com.sap.sailing.domain.common.impl.DegreePosition;
+import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 public class BGSDeclinationServiceTest extends DeclinationServiceTest<BGSImporter> {

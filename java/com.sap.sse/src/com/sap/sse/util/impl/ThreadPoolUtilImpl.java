@@ -8,6 +8,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,6 +18,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.subject.Subject;
 
+import com.sap.sse.common.Duration;
 import com.sap.sse.common.Util;
 import com.sap.sse.util.ThreadPoolUtil;
 
@@ -129,5 +133,23 @@ public class ThreadPoolUtilImpl implements ThreadPoolUtil {
     @Override
     public <T> Callable<T> associateWithSubjectIfAny(Callable<T> callable) {
         return getSubjectOrNull().map(subject->subject.associateWith(callable)).orElse(callable);
+    }
+
+    @Override
+    public Iterable<ScheduledFuture<?>> getTasksDelayedByLessThan(ThreadPoolExecutor executor,
+            Duration delayLessThan) {
+        return Util.map(Util.filter(executor.getQueue(), task->((ScheduledFuture<?>) task).getDelay(TimeUnit.MILLISECONDS) < delayLessThan.asMillis()),
+                task->(ScheduledFuture<?>) task);
+    }
+
+    @Override
+    public Optional<Integer> getQueueLength(ScheduledExecutorService executor) {
+        final Optional<Integer> result;
+        if (executor instanceof ThreadPoolExecutor) {
+            result = Optional.of(((ThreadPoolExecutor) executor).getQueue().size());
+        } else {
+            result = Optional.empty();
+        }
+        return result;
     }
 }

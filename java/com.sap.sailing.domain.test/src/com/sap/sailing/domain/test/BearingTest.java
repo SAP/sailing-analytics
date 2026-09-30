@@ -10,19 +10,19 @@ import java.util.Collections;
 import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.impl.PositionWithConfidenceImpl;
-import com.sap.sailing.domain.common.BearingCluster;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.confidence.BearingWithConfidence;
-import com.sap.sailing.domain.common.confidence.BearingWithConfidenceCluster;
-import com.sap.sailing.domain.common.confidence.ConfidenceBasedAverager;
-import com.sap.sailing.domain.common.confidence.ConfidenceFactory;
-import com.sap.sailing.domain.common.confidence.HasConfidence;
-import com.sap.sailing.domain.common.confidence.impl.BearingWithConfidenceImpl;
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.RadianBearingImpl;
-import com.sap.sailing.domain.common.scalablevalue.impl.ScalablePosition;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.BearingCluster;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.confidence.BearingWithConfidence;
+import com.sap.sse.common.confidence.BearingWithConfidenceCluster;
+import com.sap.sse.common.confidence.ConfidenceBasedAverager;
+import com.sap.sse.common.confidence.ConfidenceFactory;
+import com.sap.sse.common.confidence.HasConfidence;
+import com.sap.sse.common.confidence.impl.BearingWithConfidenceImpl;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.DegreePosition;
+import com.sap.sse.common.impl.RadianBearingImpl;
+import com.sap.sse.common.scalablevalue.impl.ScalablePosition;
 
 public class BearingTest {
     @Test

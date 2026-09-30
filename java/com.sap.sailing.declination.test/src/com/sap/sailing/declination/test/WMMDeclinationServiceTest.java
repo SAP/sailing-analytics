@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.declination.Declination;
 import com.sap.sailing.declination.impl.WMMCalculatorDeclinationService;
-import com.sap.sailing.domain.common.impl.DegreePosition;
+import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 public class WMMDeclinationServiceTest {

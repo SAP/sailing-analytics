@@ -13,6 +13,10 @@ public interface SharedLandscapeConstants {
      */
     String DEFAULT_DOMAIN_NAME = "sapsailing.com";
 
+    String DEFAULT_SAILING_SERVER = "www." + DEFAULT_DOMAIN_NAME;
+
+    String DEFAULT_SAILING_SERVER_URL = "https://" + DEFAULT_SAILING_SERVER;
+
     /**
      * Servers in any of these domains we want to trust. This can and shall be used, e.g., to guard server-side requests
      * to URLs that may have been provided through an API or UI by some potentially untrusted client or user.
@@ -125,6 +129,14 @@ public interface SharedLandscapeConstants {
     String SAILING_ANALYTICS_APPLICATION_HOST_TAG = "sailing-analytics-server";
 
     String ARCHIVE_SERVER_APPLICATION_REPLICA_SET_NAME = "ARCHIVE";
+    
+    String ARCHIVE_SERVER_INSTANCE_NAME = "SL Archive";
+    
+    String ARCHIVE_SERVER_NEW_CANDIDATE_INSTANCE_NAME = ARCHIVE_SERVER_INSTANCE_NAME+" (New Candidate)";
+
+    String ARCHIVE_SERVER_FAILOVER_INSTANCE_NAME = ARCHIVE_SERVER_INSTANCE_NAME+" (Failover)";
+
+    String ARCHIVE_CANDIDATE_SUBDOMAIN = "archive-candidate";
 
     /**
      * Value of the {@link #SAILING_ANALYTICS_APPLICATION_HOST_TAG} tag
@@ -139,7 +151,7 @@ public interface SharedLandscapeConstants {
 
     String DEFAULT_DEDICATED_INSTANCE_TYPE_NAME = "C5_2_XLARGE";
     
-    String DEFAULT_SHARED_INSTANCE_TYPE_NAME = "I3_2_XLARGE";
+    String DEFAULT_SHARED_INSTANCE_TYPE_NAME = "I4_I_2_XLARGE";
 
     /**
      * Tells how to size process heaps on shared instances by default, based on the instance's physical memory.

@@ -1,10 +1,10 @@
 package com.sap.sailing.domain.maneuverdetection.impl;
 
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.tracking.ManeuverCurveBoundaries;
 import com.sap.sailing.domain.tracking.SpeedWithBearingStepsIterable;
 import com.sap.sailing.domain.tracking.impl.ManeuverCurveBoundariesImpl;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 
 /**
@@ -15,7 +15,7 @@ import com.sap.sse.common.TimePoint;
  *
  */
 public class ManeuverMainCurveDetailsWithBearingSteps extends ManeuverCurveBoundariesImpl {
-
+    private static final long serialVersionUID = 5448900675868938268L;
     private final TimePoint timePoint;
     private final double maxTurningRateInDegreesPerSecond;
     private final SpeedWithBearingStepsIterable speedWithBearingSteps;

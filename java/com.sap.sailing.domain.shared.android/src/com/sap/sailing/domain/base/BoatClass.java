@@ -8,7 +8,7 @@ import com.sap.sse.common.Named;
 import com.sap.sse.common.TimePoint;
 
 public interface BoatClass extends Named, IsManagedByCache<SharedDomainFactory<?>> {
-    final Duration APPROXIMATE_AVERAGE_MANEUVER_DURATION = Duration.ONE_SECOND.times(8); // as discussed with Dennis Gehrlein
+    final Duration APPROXIMATE_AVERAGE_MANEUVER_DURATION = Duration.ONE_SECOND.times(10);
 
     /**
      * The distance returned by this method should be appropriate for use in

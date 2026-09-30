@@ -1,5 +1,7 @@
 package com.sap.sailing.selenium.test.adminconsole.smartphonetracking;
 
+import java.time.Duration;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -30,7 +32,7 @@ public class RegisterCompetitorsDialogPO extends DataEntryDialogPO {
     }
 
     public TrackedRacesCompetitorTablePO getCompetitorTable() {
-        Wait<WebDriver> wait = new WebDriverWait(driver, 10);
+        Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         WebElement competitorTable = wait
                 .until(ExpectedConditions.presenceOfElementLocated(new BySeleniumId("CompetitorsTable")));
         return new TrackedRacesCompetitorTablePO(this.driver, competitorTable);

@@ -1,6 +1,7 @@
 package com.sap.sse.gwt.client.celltable;
 
 import com.google.gwt.cell.client.Cell.Context;
+import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.dom.client.BrowserEvents;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -15,6 +16,7 @@ import com.google.gwt.view.client.DefaultSelectionEventManager.SelectAction;
 import com.google.gwt.view.client.ListDataProvider;
 import com.sap.sse.common.InvertibleComparator;
 import com.sap.sse.common.SortingOrder;
+import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.InvertibleComparatorAdapter;
 import com.sap.sse.gwt.client.controls.BetterCheckboxCell;
 
@@ -22,26 +24,37 @@ import com.sap.sse.gwt.client.controls.BetterCheckboxCell;
  * A column to be used in a {@link CellTable} that controls and reflects a table's selection model using stylable
  * "check boxes". To make things work, clients have to also call
  * {@link CellTable#setSelectionModel(com.google.gwt.view.client.SelectionModel, com.google.gwt.view.client.CellPreviewEvent.Handler)}
- * with the result of this columns {@link #getSelectionModel} as the first and the result of the
+ * with the result of this column's {@link #getSelectionModel()} as the first and the result of the
  * {@link #getSelectionManager()} method as second argument. This will ensure that the event handling and selection
  * updates work properly.
  * <p>
- * 
  * Clients should use the column's own {@link #getSelectionModel() RefreshableMultiSelectionModel}. This will ensure that
  * the {@link SelectionCheckboxColumn} will be refreshed correctly when the selection changes or the
  * {@link ListDataProvider} has new elements. Clients should also ensure that the {@link Flushable} and the
  * {@link ListDataProvider} are not <code>null</code>; otherwise the {@link RefreshableMultiSelectionModel selection model}
- * won�t work correctly. The {@link Flushable} interface is used to ensure that the selection state is displayed
+ * won't work correctly. The {@link Flushable} interface is used to ensure that the selection state is displayed
  * correctly by {@link SelectionCheckboxColumn}. To ensure this, the {@link Flushable#flush()} method is called after
  * every selection state change.
  * <p>
  * The column uses the {@link BetterCheckboxCell} cell to implement the display properties. Three CSS styles can be used
  * to parameterize this column: one for the <code>&lt;td&gt;</code> element rendering the cell, and two for the
  * <code>&lt;div&gt;</code> element representing a selected or deselected element.
- * 
+ * <p>
+ * Column header: There are two ways to provide a header for this column:
+ * <ol>
+ * <li>{@link #createHeader()} returns a live select-all/deselect-all {@link Header} backed by a {@link CheckboxCell}.
+ * It ticks when all rows are selected and unticks as soon as all rows are deselected. Clicking it selects or deselects
+ * all rows in the {@link ListDataProvider}. This header must be passed explicitly to the table's
+ * {@code addColumn(Column, Header)} or {@code insertColumn(int, Column, Header, ...)} call — it is not
+ * returned by {@link #getHeader()}.</li>
+ * <li>{@link #getHeader()} returns a static checkmark (&#x2713;) header. It serves as a fallback default if no
+ * select-all behavior is needed, but is not currently used by any caller — {@link #createHeader()} is the
+ * preferred choice for all existing usages.</li>
+ * </ol>
+ *
  * @author Axel Uhl (D043530)
  * @author Lukas Furmanek
- * 
+ *
  * @param <T>
  */
 public class SelectionCheckboxColumn<T> extends AbstractSortableColumnWithMinMax<T, Boolean> {
@@ -50,7 +63,6 @@ public class SelectionCheckboxColumn<T> extends AbstractSortableColumnWithMinMax
     private final EventTranslator<T> selectionEventTranslator;
     private final RefreshableMultiSelectionModel<T> selectionModel;
     private final ListDataProvider<T> listDataProvider;
-    private final Flushable display;
 
     /**
      * @param selectedCheckboxCSSClass
@@ -63,26 +75,67 @@ public class SelectionCheckboxColumn<T> extends AbstractSortableColumnWithMinMax
      *            {@link EntityIdentityComparator} to create a {@link RefreshableMultiSelectionModel}
      * @param listDataProvider
      *            {@link ListDataProvider} to create a {@link RefreshableMultiSelectionModel}
-     * @param display
-     *            {@link Flushable} to redraw the selected elements on the display
      */
     public SelectionCheckboxColumn(String selectedCheckboxCSSClass, String deselectedCheckboxCSSClass,
             String checkboxColumnCellCSSClass, EntityIdentityComparator<T> entityIdentityComparator,
-            ListDataProvider<T> listDataProvider, Flushable display) {
+            ListDataProvider<T> listDataProvider) {
         this(new BetterCheckboxCell(selectedCheckboxCSSClass, deselectedCheckboxCSSClass), checkboxColumnCellCSSClass,
-                entityIdentityComparator, listDataProvider, display);
+                entityIdentityComparator, listDataProvider);
     }
     
     private SelectionCheckboxColumn(BetterCheckboxCell checkboxCell, String checkboxColumnCellCSSClass,
-            EntityIdentityComparator<T> entityIdentityComparator, ListDataProvider<T> listDataProvider,
-            Flushable display) {
+            EntityIdentityComparator<T> entityIdentityComparator, ListDataProvider<T> listDataProvider) {
         super(checkboxCell, SortingOrder.DESCENDING);
-        this.display = display;
         this.listDataProvider = listDataProvider;
         this.cell = checkboxCell;
         this.checkboxColumnCellCSSClass = checkboxColumnCellCSSClass;
         this.selectionEventTranslator = createSelectionEventTranslator();
-        this.selectionModel = createSelectionModel(entityIdentityComparator);
+        final EntityIdentityComparator<T> entityIdentityComparator1 = entityIdentityComparator;
+        this.selectionModel = new RefreshableMultiSelectionModel<T>(entityIdentityComparator1, listDataProvider);
+        this.setSortable(false);
+    }
+    
+    /**
+     * Creates and returns a live select-all/deselect-all {@link Header} for use as this column's header. The returned
+     * header displays a {@link CheckboxCell} that is ticked when all rows in the {@link ListDataProvider} are selected,
+     * and unticked whenever there is no selection. Clicking the header checkbox selects or
+     * deselects all rows accordingly.
+     * <p>
+     * The returned header must be passed explicitly to the table when adding this column, e.g.:
+     * <pre>
+     *   final Header&lt;Boolean&gt; selectAllHeader = checkboxColumn.createHeader();
+     *   table.addColumn(checkboxColumn, selectAllHeader);
+     * </pre>
+     * This method should be called exactly once per column instance, as each call registers a new selection change
+     * handler on the underlying selection model.
+     *
+     * @return a {@link Header} with select-all/deselect-all behavior; distinct from the static checkmark returned by
+     *         {@link #getHeader()}
+     */
+    public Header<Boolean> createHeader() {
+        final CheckboxCell selectAllCell = new CheckboxCell();
+        final Header<Boolean> selectAllHeader = new Header<Boolean>(selectAllCell) {
+            @Override
+            public Boolean getValue() {
+                return false;
+             }
+        };
+        selectAllHeader.setUpdater(value -> {
+            for (final T mp : listDataProvider.getList()) {
+                if (selectionModel != null) {
+                    selectionModel.setSelected(mp, value);
+                }
+            }
+        });
+        selectionModel.addSelectionChangeHandler(e -> {
+            final int selected = Util.size(selectionModel.getSelectedElements());
+            if (selected == 0) {
+                selectAllCell.setViewData(/* key */ selectAllHeader.getValue(), false);
+            } else if (selected == listDataProvider.getList().size()) {
+                selectAllCell.setViewData(/* key */ selectAllHeader.getValue(), true);
+            }
+        });
+        return selectAllHeader;
     }
     
     /**
@@ -102,31 +155,6 @@ public class SelectionCheckboxColumn<T> extends AbstractSortableColumnWithMinMax
         return selectionModel;
     }
 
-    /**
-     * Clients should use the {@link RefreshableMultiSelectionModel} returned by this method for the {@link CellTable}
-     * to which they add this column. If they do so, the {@link Flushable#flush()} method will be
-     * triggered correctly for all selection changes. Otherwise, clients or subclasses are responsible to issue the
-     * necessary calls to {@link Flushable#flush()} after selection changes.
-     */
-    private RefreshableMultiSelectionModel<T> createSelectionModel(final EntityIdentityComparator<T> entityIdentityComparator) {
-        return new RefreshableMultiSelectionModel<T>(entityIdentityComparator, listDataProvider) {
-            @Override
-            public void clear() {
-                super.clear();
-                display.flush();
-            }
-
-            @Override
-            public void setSelected(T item, boolean selected) {
-                boolean wasSelected = isSelected(item);
-                super.setSelected(item, selected);
-                if (wasSelected != selected) {
-                    display.flush();
-                }
-            }
-        };
-    }
-    
     /**
      * @return a selection event translator that works nicely with
      *         {@link DefaultSelectionEventManager#createCustomManager(EventTranslator)} to ensure that this selection

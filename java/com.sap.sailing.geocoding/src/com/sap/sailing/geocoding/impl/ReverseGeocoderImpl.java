@@ -26,14 +26,14 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.sap.sailing.domain.common.Placemark;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.domain.common.impl.PlacemarkImpl;
 import com.sap.sailing.domain.common.quadtree.QuadTree;
 import com.sap.sailing.geocoding.ReverseGeocoder;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sse.util.HttpUrlConnectionHelper;
 
 public class ReverseGeocoderImpl implements ReverseGeocoder {

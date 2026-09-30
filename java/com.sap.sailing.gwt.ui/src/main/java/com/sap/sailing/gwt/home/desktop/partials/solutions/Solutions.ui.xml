@@ -51,7 +51,7 @@
                             <p ui:field="contentSailingAnalytics2" />
                             <g:Anchor ui:field="sailingAnalyticsDetailsAnchor"
                                 styleName="{res.mainCss.button}">
-                                <ui:text from='{i18n.sailingRaceManagerReadMore}' />
+                                <ui:text from='{i18n.readMore}' />
                             </g:Anchor>
                         </div>
                     </div>
@@ -66,7 +66,7 @@
                                 <sb:PlayStoreBadge targetUrl="{i18n.playstoreRacecommitteeApp}"/>
                                 <g:Anchor ui:field="raceCommitteeAppDetailsAnchor"
                                     styleName="{res.mainCss.button}">
-                                    <ui:text from='{i18n.sailingRaceManagerReadMore}' />
+                                    <ui:text from='{i18n.readMore}' />
                                 </g:Anchor>
                             </div>
                         </div>
@@ -83,7 +83,7 @@
                             <sb:PlayStoreBadge targetUrl="{i18n.playstoreInsightApp}"/>
                             <g:Anchor ui:field="inSightAppDetailsAnchor"
                                 styleName="{res.mainCss.button}">
-                                <ui:text from='{i18n.sailInSightReadMore}' />
+                                <ui:text from='{i18n.readMore}' />
                             </g:Anchor>
                         </div>
                     </div>
@@ -99,7 +99,7 @@
                                 <sb:PlayStoreBadge targetUrl="{i18n.playStoreBuoyPingerApp}"/>
                                 <g:Anchor ui:field="buoyPingerAppDetailsAnchor"
                                     styleName="{res.mainCss.button}">
-                                    <ui:text from='{i18n.sailingBuoyPingerReadMore}' />
+                                    <ui:text from='{i18n.readMore}' />
                                 </g:Anchor>
                             </div>
                         </div>
@@ -118,7 +118,7 @@
                             </p>
                             <g:Anchor ui:field="simulatorAppDetailsAnchor"
                                 styleName="{res.mainCss.button}">
-                                <ui:text from='{i18n.strategySimulatorReadMore}' />
+                                <ui:text from='{i18n.readMore}' />
                             </g:Anchor>
                         </div>
                     </div>

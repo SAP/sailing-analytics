@@ -14,6 +14,7 @@ import com.sap.sse.security.ui.client.UserService;
 public class ApplicationReplicaSetsImagesBarCell extends ImagesBarCell {
     static final String ACTION_REMOVE = DefaultActions.DELETE.name();
     static final String ACTION_UPGRADE = "UPGRADE";
+    static final String ACTION_ACTIVATE_ARCHIVE_CANDIDATE = "ACTIVATE_ARCHIVE_CANDIDATE";
     static final String ACTION_ARCHIVE = "ARCHIVE";
     static final String ACTION_DEFINE_LANDING_PAGE = "DEFINE_LANDING_PAGE";
     static final String ACTION_CREATE_LOAD_BALANCER_MAPPING = "CREATE_LOAD_BALANGER_MAPPING";
@@ -60,8 +61,11 @@ public class ApplicationReplicaSetsImagesBarCell extends ImagesBarCell {
         result.add(new ImageSpec(ACTION_LAUNCH_ANOTHER_REPLICA_SET_ON_THIS_MASTER,
                 stringMessages.launchAnotherReplicaSetOnThisMaster(),
                 IconResources.INSTANCE.launchAnotherReplicaSetOnThisMasterIcon()));
-        if (!applicationReplicaSet.isLocalReplicaSet(userService) && !applicationReplicaSet.isArchive()) {
+        if (!applicationReplicaSet.isLocalReplicaSet(userService)) {
             result.add(new ImageSpec(ACTION_UPGRADE, stringMessages.upgrade(), IconResources.INSTANCE.refreshIcon()));
+        }
+        if (applicationReplicaSet.isArchive()) {
+            result.add(new ImageSpec(ACTION_ACTIVATE_ARCHIVE_CANDIDATE, stringMessages.activateArchiveCandidate(), IconResources.INSTANCE.check()));
         }
         if (!applicationReplicaSet.isArchive()) {
             result.add(

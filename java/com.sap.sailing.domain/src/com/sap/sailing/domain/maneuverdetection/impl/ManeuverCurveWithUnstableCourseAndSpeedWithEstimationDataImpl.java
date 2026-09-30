@@ -1,15 +1,15 @@
 package com.sap.sailing.domain.maneuverdetection.impl;
 
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.maneuverdetection.ManeuverCurveWithUnstableCourseAndSpeedWithEstimationData;
 import com.sap.sailing.domain.tracking.impl.ManeuverCurveBoundariesImpl;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 
 public class ManeuverCurveWithUnstableCourseAndSpeedWithEstimationDataImpl extends ManeuverCurveBoundariesImpl
         implements ManeuverCurveWithUnstableCourseAndSpeedWithEstimationData {
-
+    private static final long serialVersionUID = 1227678171850468360L;
     private final SpeedWithBearing averageSpeedWithBearingBefore;
     private final Duration durationFromPreviousManeuverEndToManeuverStart;
     private final SpeedWithBearing averageSpeedWithBearingAfter;

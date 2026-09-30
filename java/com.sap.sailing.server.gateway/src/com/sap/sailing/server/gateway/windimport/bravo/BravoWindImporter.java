@@ -17,8 +17,6 @@ import java.util.zip.ZipInputStream;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.WindSource;
 import com.sap.sailing.domain.common.WindSourceType;
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.impl.WindImpl;
 import com.sap.sailing.domain.common.impl.WindSourceWithAdditionalID;
 import com.sap.sailing.domain.common.tracking.DoubleVectorFix;
@@ -30,6 +28,8 @@ import com.sap.sailing.server.trackfiles.impl.BaseBravoDataImporterImpl;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.DegreePosition;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 public class BravoWindImporter extends AbstractWindImporter {
@@ -91,7 +91,7 @@ public class BravoWindImporter extends AbstractWindImporter {
                 for (final DoubleVectorFix fix : fixes) {
                     // latitude / longitude are represented in funny NMEA-like way; the value divided by 100 as
                     // a floored integer represents the full degrees; the value modulo 100 represents the decimal
-                    // minutes. Example: the pair (4124.645890, 213.738670) stands for N41�24.645890 E002�13.738670
+                    // minutes. Example: the pair (4124.645890, 213.738670) stands for N41°24.645890 E002°13.738670
                     final Wind wind = new WindImpl(new DegreePosition(FunnyDegreeConverter.funnyLatLng(fix.get(Fields.Lat.ordinal())),
                             FunnyDegreeConverter.funnyLatLng(fix.get(Fields.Lon.ordinal()))),
                             fix.getTimePoint(), new KnotSpeedWithBearingImpl(fix.get(Fields.TWS.ordinal()),

@@ -17,7 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import com.sap.sailing.domain.common.DeviceIdentifier;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.security.SecuredDomainType;
 import com.sap.sailing.domain.coursetemplate.CommonMarkProperties;
 import com.sap.sailing.domain.coursetemplate.CourseTemplate;
@@ -49,6 +48,7 @@ import com.sap.sailing.shared.server.operations.RecordUsageForMarkTemplateOperat
 import com.sap.sailing.shared.server.operations.SetPositioningInformationForMarkPropertiesOperation;
 import com.sap.sailing.shared.server.operations.UpdateCourseTemplateOperation;
 import com.sap.sailing.shared.server.operations.UpdateMarkPropertiesOperation;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.RepeatablePart;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.TypeBasedServiceFinder;

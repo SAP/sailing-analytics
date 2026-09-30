@@ -147,10 +147,7 @@ public class WindCourseRange {
         }
         double deviationFromPortsideTowardStarboardInDegrees = deviationFromPortsideBoundaryTowardStarboard
                 - angleTowardStarboard;
-        if (deviationFromPortsideTowardStarboardInDegrees <= 0) {
-            return true;
-        }
-        return false;
+        return deviationFromPortsideTowardStarboardInDegrees <= 0;
     }
 
     @Override
@@ -191,7 +188,7 @@ public class WindCourseRange {
         if (b>360) {
             b -= 360;
         }
-        return "Wind from "+(angleTowardStarboard==0?a:(a+"-"+b))+"° ("+angleTowardStarboard+"°)";
+        return "Wind from "+(angleTowardStarboard==0?a:(a+"-"+b))+"Â° ("+angleTowardStarboard+"Â°)";
     }
 
     public enum CombinationModeOnViolation {

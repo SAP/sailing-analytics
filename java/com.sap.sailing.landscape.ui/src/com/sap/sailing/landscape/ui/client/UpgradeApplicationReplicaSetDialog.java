@@ -40,6 +40,8 @@ public class UpgradeApplicationReplicaSetDialog extends AbstractApplicationRepli
     
     @Override
     protected UpgradeApplicationReplicaSetInstructions getResult() {
-        return new UpgradeApplicationReplicaSetInstructions(getReleaseNameBoxValue(), getMasterReplicationBearerTokenBox().getValue(), getReplicaReplicationBearerTokenBox().getValue());
+        return new UpgradeApplicationReplicaSetInstructions(
+                LandscapeDialogUtil.getReleaseNameBoxValue(getReleaseNameBox(), stringMessages),
+                getMasterReplicationBearerTokenBox().getValue(), getReplicaReplicationBearerTokenBox().getValue());
     }
 }

@@ -33,7 +33,7 @@
         <td>json</td>
     </tr>
     <tr>
-        <td>Mandatory query parameters:</td>
+        <td>Mandatory form parameters:</td>
         <td>
             <div>server2, the hostname for the second server.</div>
         </td>
@@ -144,6 +144,48 @@
          "localhost:8889": []
         }
         </pre>
+   </td>
+  </tr>
+    <tr>
+        <td>Webservice Type:</td>
+        <td>GET</td>
+    </tr>
+    <tr>
+        <td>Output format:</td>
+        <td>json</td>
+    </tr>
+    <tr>
+        <td>Mandatory query parameters:</td>
+        <td>
+            <div>server2, the hostname for the second server.</div>
+        </td>
+    </tr>
+    <tr>
+        <td>Optional query parameters:</td>
+        <td>
+            <div><tt>server1</tt>, the hostname for the first server. Defaults to the target of your request</div>
+            <div><tt>leaderboardgroupUUID[]</tt>, the leaderboardgroup UUID you want to compare.
+             Use multiple times if you need to compare more than one leaderboardgroup. Don't specify if you'd like
+             to compare <em>all</em> leaderboard groups of both servers with each other.</div>
+        </td>
+        The GET method can easily be used from a Browser UI. It uses any session/cookie credentials or may be used
+        with basic authentication. No authentication information can be provided as query parameters with the GET method.
+    </tr>
+    <tr>
+        <td>Request method:</td>
+        <td>GET</td>
+    </tr>
+    <tr>
+        <td>Example:</td>
+        <td>curl http://127.0.0.1:8888/sailingserver/api/v1/compareservers?server2=127.0.0.1:8889&leaderboardgroupUUID[]=0334e85e-ebc9-4835-b44d-5db71245b9e9&leaderboardgroupUUID[]=78476ac8-5519-4c3f-9c6d-670468edf4fc" -H "Authorization: Basic YWRtaW46YWRtaW4="<br>
+        produces output:<pre>
+        {
+            127.0.0.1:8889  []
+            127.0.0.1:8888  []
+        }
+        </pre>
+        </td>
+    </tr>
    </td>
   </tr>
 </table>

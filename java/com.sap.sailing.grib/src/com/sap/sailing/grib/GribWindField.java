@@ -2,10 +2,10 @@ package com.sap.sailing.grib;
 
 import java.io.IOException;
 
-import com.sap.sailing.domain.common.Bounds;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.tracking.WindWithConfidence;
+import com.sap.sse.common.Bounds;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.TimeRange;
 

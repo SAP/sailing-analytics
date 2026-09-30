@@ -53,7 +53,7 @@ public class ScreenShotRule implements TestExecutionExceptionHandler {
     private void captureScreenshots(ExtensionContext context) {
         final TestEnvironment environment;
         if (context.getRequiredTestInstance() instanceof AbstractSeleniumTest) {
-            AbstractSeleniumTest testInstance = (AbstractSeleniumTest) context.getRequiredTestInstance();
+            final AbstractSeleniumTest testInstance = (AbstractSeleniumTest) context.getRequiredTestInstance();
             environment = testInstance.getEnvironment();
         } else {
             throw new IllegalStateException("The test instance must be of type AbstractSeleniumTest to use the ScreenShotRule.");
@@ -72,24 +72,55 @@ public class ScreenShotRule implements TestExecutionExceptionHandler {
                     if (driver instanceof TakesScreenshot) {
                         source = new ByteArrayInputStream(((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES));
                     }
-                    try {
-                        final File destinationDir = new File(screenshotFolder, context.getRequiredTestClass().getName());
-                        destinationDir.mkdirs();
-                        final File destination = new File(destinationDir, filename + SCREENSHOT_FILE_EXTENSION); //$NON-NLS-1$
-                        final Path path = destination.toPath();
-                        Files.copy(source, path, StandardCopyOption.REPLACE_EXISTING);
-                        // ATTENTION: Do not remove this line because it is needed for the JUnit Attachment Plugin!
-                        System.out.println(String.format(ATTACHMENT_FORMAT, destination.getCanonicalFile().toURI()));
-                    } catch (IOException exception) {
-                        throw new RuntimeException(exception);
-                    }
+                    final File destinationDir = new File(screenshotFolder, context.getRequiredTestClass().getName());
+                    destinationDir.mkdirs();
+                    final File destination = new File(destinationDir, filename + SCREENSHOT_FILE_EXTENSION);
+                    Files.copy(source, destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    // Absolute path to the screenshot file
+                    final Path absoluteFile = destination.toPath().toAbsolutePath().normalize();
+                    // Jenkins JUnit Attachments Plugin resolves [[ATTACHMENT|<path>]] markers against
+                    // the build's workspace root ($WORKSPACE), not against the directory containing the
+                    // JUnit XML. So we relativize against the workspace root (the repo root, identified
+                    // by walking up to the enclosing .git directory) and emit a workspace-relative path.
+                    final Path workspaceRoot = findWorkspaceRoot(absoluteFile);
+                    final Path attachmentPath = workspaceRoot != null
+                            ? workspaceRoot.relativize(absoluteFile)
+                            : screenshotFolder.toPath().toAbsolutePath().normalize().relativize(absoluteFile);
+                    // ATTENTION: required for JUnit Attachment Plugin
+                    final String attachmentLine = String.format(ATTACHMENT_FORMAT,
+                            attachmentPath.toString().replace("\\", "/")) + System.lineSeparator();
+                    System.out.print(attachmentLine);
+                    System.out.flush();
+                    System.err.print(attachmentLine);
+                    System.err.flush();
                 } catch (Exception e) {
                     logger.log(Level.WARNING, "Could not capture screenshot for window: " + window.getWindowHandle(), e);
                 }
             });
         }
     }
-    
+
+    /**
+     * Walks up from the given path until it finds a directory containing a {@code .git}
+     * entry (file or directory — submodule worktrees use a file). Returns that ancestor
+     * directory, which corresponds to the Jenkins build workspace root for repository
+     * checkouts. Returns {@code null} if no such ancestor exists (e.g. running outside
+     * any git checkout), in which case callers should fall back to a different base.
+     */
+    private static Path findWorkspaceRoot(final Path startFrom) {
+        Path current = startFrom.toAbsolutePath().normalize();
+        if (Files.isRegularFile(current)) {
+            current = current.getParent();
+        }
+        while (current != null) {
+            if (Files.exists(current.resolve(".git"))) {
+                return current;
+            }
+            current = current.getParent();
+        }
+        return null;
+    }
+
     private InputStream getScreenshotNotSupportedImage() {
         return AbstractSeleniumTest.class.getResourceAsStream(NOT_SUPPORTED_IMAGE);
     }

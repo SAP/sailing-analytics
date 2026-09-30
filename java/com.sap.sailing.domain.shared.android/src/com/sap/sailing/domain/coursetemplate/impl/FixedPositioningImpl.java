@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.coursetemplate.impl;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.coursetemplate.FixedPositioning;
+import com.sap.sse.common.Position;
 
 public class FixedPositioningImpl implements FixedPositioning {
     private static final long serialVersionUID = 267606077936062645L;

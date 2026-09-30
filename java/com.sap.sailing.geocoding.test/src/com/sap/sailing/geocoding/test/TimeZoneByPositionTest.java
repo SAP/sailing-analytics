@@ -12,9 +12,9 @@ import java.util.TimeZone;
 import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.Test;
 
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.geocoding.impl.ReverseGeocoderImpl;
 import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.impl.DegreePosition;
 
 public class TimeZoneByPositionTest {
     @Test

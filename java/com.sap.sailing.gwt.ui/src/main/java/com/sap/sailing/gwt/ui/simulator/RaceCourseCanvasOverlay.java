@@ -16,10 +16,10 @@ import com.google.gwt.maps.client.events.mousemove.MouseMoveMapEvent;
 import com.google.gwt.maps.client.events.mousemove.MouseMoveMapHandler;
 import com.google.gwt.maps.client.geometrylib.SphericalUtils;
 import com.google.gwt.maps.client.overlays.Marker;
-import com.sap.sailing.domain.common.Mile;
 import com.sap.sailing.gwt.ui.client.shared.racemap.CoordinateSystem;
 import com.sap.sailing.gwt.ui.simulator.racemap.FullCanvasOverlay;
 import com.sap.sailing.simulator.util.SailingSimulatorConstants;
+import com.sap.sse.common.Mile;
 
 /**
  * This class implements the layer to display the race course on the map. Currently the course only consists of the

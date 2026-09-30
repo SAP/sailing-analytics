@@ -11,7 +11,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
-import com.sap.sailing.domain.common.Position;
+import com.sap.sse.common.Position;
 
 /**
  * @author Alexander Ries (D062114)

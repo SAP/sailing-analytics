@@ -57,6 +57,12 @@ public interface SecuredServer {
     void setGroupAndUserOwner(HasPermissions type, TypeRelativeObjectIdentifier typeRelativeObjectId,
             Optional<String> displayName, Optional<UUID> groupId, Optional<String> username)
             throws MalformedURLException, ClientProtocolException, IOException, ParseException;
+    
+    void deleteOwnership(HasPermissions type, TypeRelativeObjectIdentifier typeRelativeObjectId)
+            throws MalformedURLException, ClientProtocolException, IOException, ParseException;
+    
+    void deleteAccessControlLists(HasPermissions type, TypeRelativeObjectIdentifier typeRelativeObjectId)
+            throws MalformedURLException, ClientProtocolException, IOException, ParseException;
 
     Iterable<Pair<WildcardPermission, Boolean>> hasPermissions(Iterable<WildcardPermission> permissions) throws UnsupportedEncodingException, MalformedURLException, ClientProtocolException, IOException, ParseException;
     /**

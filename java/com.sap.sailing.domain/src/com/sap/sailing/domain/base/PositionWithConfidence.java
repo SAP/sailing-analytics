@@ -1,8 +1,8 @@
 package com.sap.sailing.domain.base;
 
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.confidence.HasConfidenceAndIsScalable;
-import com.sap.sailing.domain.common.scalablevalue.impl.ScalablePosition;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.scalablevalue.HasConfidenceAndIsScalable;
+import com.sap.sse.common.scalablevalue.impl.ScalablePosition;
 
 /**
  * A position with a confidence attached. The scalable intermediate type represents the x/y/z coordinate of the

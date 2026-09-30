@@ -4,9 +4,9 @@ import java.util.Date;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.sap.sailing.domain.common.LegType;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.Tack;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.impl.DegreeBearingImpl;
 
 public class GPSFixDTOWithSpeedWindTackAndLegType extends GPSFixDTO implements IsSerializable {

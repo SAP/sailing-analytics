@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.declination.Declination;
 import com.sap.sailing.declination.DeclinationService;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.impl.DegreePosition;
 
 public class WMMFileTest {
     private static Geomagnetism g;

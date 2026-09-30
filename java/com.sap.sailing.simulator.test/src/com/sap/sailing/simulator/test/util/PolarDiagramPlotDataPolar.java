@@ -8,11 +8,11 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.sap.sailing.domain.common.impl.KnotSpeedImpl;
 import com.sap.sailing.simulator.PolarDiagram;
 import com.sap.sailing.simulator.impl.PolarDiagram49STG;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.impl.KnotSpeedImpl;
 
 public class PolarDiagramPlotDataPolar {
 

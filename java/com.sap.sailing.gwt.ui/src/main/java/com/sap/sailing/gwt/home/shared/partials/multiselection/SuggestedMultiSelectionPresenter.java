@@ -6,12 +6,14 @@ import com.google.gwt.view.client.ProvidesKey;
 import com.sap.sailing.gwt.home.shared.partials.multiselection.SuggestedMultiSelectionPresenter.Display;
 
 public interface SuggestedMultiSelectionPresenter<T, D extends Display<T>> extends ProvidesKey<T> {
-    
+
     void addSelection(T item);
     
     void removeSelection(T item);
     
     void clearSelection();
+    
+    Collection<T> getSelection();
     
     void getSuggestionItems(Iterable<String> queryTokens, int limit, final SuggestionItemsCallback<T> callback);
     
@@ -23,7 +25,7 @@ public interface SuggestedMultiSelectionPresenter<T, D extends Display<T>> exten
     
     void persist();
     
-    void initSelectedItems(Collection<T> selectedItems);
+    void initSelectedItems(Iterable<T> selectedItems);
     
     interface SuggestionItemsCallback<T> {
         void setSuggestionItems(Collection<T> suggestionItems);

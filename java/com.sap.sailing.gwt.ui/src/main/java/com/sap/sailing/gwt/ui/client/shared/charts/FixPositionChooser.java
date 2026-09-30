@@ -19,13 +19,13 @@ import com.google.gwt.maps.client.mvc.MVCArray;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.sap.sailing.domain.common.FixType;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.gwt.ui.client.shared.racemap.CoordinateSystem;
 import com.sap.sailing.gwt.ui.client.shared.racemap.FixOverlay;
 import com.sap.sailing.gwt.ui.shared.GPSFixDTO;
 import com.sap.sailing.gwt.ui.shared.GPSFixDTOWithSpeedWindTackAndLegType;
 import com.sap.sailing.gwt.ui.shared.WindDTO;
+import com.sap.sse.common.Position;
 
 public class FixPositionChooser {
     private final Callback<Position, Exception> callback;

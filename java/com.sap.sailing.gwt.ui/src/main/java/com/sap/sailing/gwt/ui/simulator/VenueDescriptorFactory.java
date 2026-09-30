@@ -3,9 +3,9 @@ package com.sap.sailing.gwt.ui.simulator;
 import java.util.ArrayList;
 
 import com.google.gwt.maps.client.base.LatLng;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.gwt.ui.client.shared.racemap.CoordinateSystem;
 import com.sap.sailing.simulator.util.SailingSimulatorConstants;
+import com.sap.sse.common.impl.DegreePosition;
 
 public class VenueDescriptorFactory {
     public static VenueDescriptor createVenue(char event, CoordinateSystem coordinateSystem) {

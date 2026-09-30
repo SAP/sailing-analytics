@@ -5,10 +5,10 @@ import com.google.gwt.canvas.dom.client.Context2d.TextAlign;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.base.LatLng;
 import com.google.gwt.maps.client.base.Point;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.gwt.ui.client.shared.racemap.CoordinateSystem;
 import com.sap.sailing.gwt.ui.simulator.racemap.FullCanvasOverlay;
 import com.sap.sailing.simulator.util.SailingSimulatorConstants;
+import com.sap.sse.common.impl.DegreePosition;
 
 public class RegattaAreaCanvasOverlay extends FullCanvasOverlay {
 
@@ -194,7 +194,7 @@ public class RegattaAreaCanvasOverlay extends FullCanvasOverlay {
         double lon2 = lon1
                 + Math.atan2(Math.sin(brng) * Math.sin(d / R) * Math.cos(lat1),
                         Math.cos(d / R) - Math.sin(lat1) * Math.sin(lat2));
-        lon2 = (lon2 + 3 * Math.PI) % (2 * Math.PI) - Math.PI; // normalize to -180� ... +180�*/
+        lon2 = (lon2 + 3 * Math.PI) % (2 * Math.PI) - Math.PI; // normalize to -180° ... +180°*/
 
         double lat2deg = lat2 / Math.PI * 180;
         double lon2deg = lon2 / Math.PI * 180;

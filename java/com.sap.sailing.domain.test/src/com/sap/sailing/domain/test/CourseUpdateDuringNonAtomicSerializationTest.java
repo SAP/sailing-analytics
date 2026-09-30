@@ -88,7 +88,7 @@ public class CourseUpdateDuringNonAtomicSerializationTest implements Serializabl
                 EmptyWindStore.INSTANCE, 
                 /* delayToLiveInMillis */10000, /* millisecondsOverWhichToAverageWind */30000, /* millisecondsOverWhichToAverageSpeed */
                 7000, /* useMarkPassingCalculator */ false, OneDesignRankingMetric::new,
-                mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null) {
+                mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null, /* maneuverRaceFingerprintRegistry */ null) {
             private static final long serialVersionUID = 9114777576548711763L;
 
             @Override

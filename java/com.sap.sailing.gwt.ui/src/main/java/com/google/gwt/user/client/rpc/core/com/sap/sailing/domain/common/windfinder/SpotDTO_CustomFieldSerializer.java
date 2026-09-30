@@ -4,8 +4,8 @@ import com.google.gwt.user.client.rpc.CustomFieldSerializer;
 import com.google.gwt.user.client.rpc.SerializationException;
 import com.google.gwt.user.client.rpc.SerializationStreamReader;
 import com.google.gwt.user.client.rpc.SerializationStreamWriter;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.windfinder.SpotDTO;
+import com.sap.sse.common.Position;
 
 public class SpotDTO_CustomFieldSerializer extends CustomFieldSerializer<SpotDTO> {
     @Override

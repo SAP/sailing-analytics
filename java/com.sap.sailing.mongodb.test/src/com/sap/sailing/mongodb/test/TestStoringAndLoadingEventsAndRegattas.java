@@ -68,8 +68,6 @@ import com.sap.sailing.domain.common.RankingMetrics;
 import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
 import com.sap.sailing.domain.common.RegattaNameAndRaceName;
 import com.sap.sailing.domain.common.ScoringSchemeType;
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.NauticalMileDistance;
 import com.sap.sailing.domain.common.racelog.RacingProcedureType;
 import com.sap.sailing.domain.leaderboard.EventResolver;
 import com.sap.sailing.domain.leaderboard.Leaderboard;
@@ -106,7 +104,9 @@ import com.sap.sailing.server.operationaltransformation.UpdateLeaderboardMaxPoin
 import com.sap.sse.common.Color;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
+import com.sap.sse.common.impl.NauticalMileDistance;
 import com.sap.sse.common.media.MediaTagConstants;
 import com.sap.sse.common.media.MimeType;
 import com.sap.sse.shared.media.ImageDescriptor;
@@ -177,6 +177,11 @@ public class TestStoringAndLoadingEventsAndRegattas extends AbstractMongoDBTest 
             @Override
             public Event getEvent(Serializable id) {
                 return id.equals(loadedEvent.getId()) ? loadedEvent : null;
+            }
+
+            @Override
+            public Iterable<Event> getAllEvents() {
+                return Collections.singleton(loadedEvent);
             }
         }, new LeaderboardGroupResolver() {
             @Override

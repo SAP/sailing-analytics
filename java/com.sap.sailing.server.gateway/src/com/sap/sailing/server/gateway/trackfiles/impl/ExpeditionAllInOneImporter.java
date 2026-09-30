@@ -50,7 +50,6 @@ import com.sap.sailing.domain.base.impl.EventBaseImpl;
 import com.sap.sailing.domain.common.CompetitorRegistrationType;
 import com.sap.sailing.domain.common.LeaderboardNameConstants;
 import com.sap.sailing.domain.common.Placemark;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.RankingMetrics;
 import com.sap.sailing.domain.common.RegattaIdentifier;
 import com.sap.sailing.domain.common.RegattaName;
@@ -101,6 +100,7 @@ import com.sap.sailing.server.util.WaitForTrackedRaceUtil;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.NoCorrespondingServiceRegisteredException;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.TransformationException;
 import com.sap.sse.common.TypeBasedServiceFinderFactory;
@@ -828,7 +828,7 @@ public class ExpeditionAllInOneImporter {
             // this ensures that the events consistently have different timepoints to ensure a consistent result of the
             // state analysis
             // that's why we can't just call adapter.denoteRaceForRaceLogTracking
-            final TimePoint denotationTimePoint = startTrackingTimePoint.minus(1);
+            final TimePoint denotationTimePoint = startTrackingTimePoint.minusResolution();
             raceLog.add(new RaceLogDenoteForTrackingEventImpl(denotationTimePoint, service.getServerAuthor(),
                     raceLog.getCurrentPassId(), trackedRaceName, regatta.getBoatClass(), UUID.randomUUID()));
             raceLog.add(new RaceLogStartTrackingEventImpl(startTrackingTimePoint, author, raceLog.getCurrentPassId()));

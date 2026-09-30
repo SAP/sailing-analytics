@@ -1,9 +1,9 @@
 package com.sap.sailing.domain.tracking.impl;
 
 import com.sap.sailing.domain.common.Wind;
-import com.sap.sailing.domain.common.confidence.impl.HasConfidenceImpl;
 import com.sap.sailing.domain.common.confidence.impl.ScalableWind;
 import com.sap.sailing.domain.tracking.WindWithConfidence;
+import com.sap.sse.common.confidence.impl.HasConfidenceImpl;
 
 public class WindWithConfidenceImpl<RelativeTo> extends HasConfidenceImpl<ScalableWind, Wind, RelativeTo> implements WindWithConfidence<RelativeTo> {
     private static final long serialVersionUID = -644015582690775666L;

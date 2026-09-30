@@ -1,19 +1,19 @@
 package com.sap.sailing.domain.tracking.impl;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.WindSourceType;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.domain.tracking.WindWithConfidence;
 import com.sap.sailing.domain.tracking.impl.TrackBasedEstimationWindTrackImpl.EstimatedWindFixesAsNavigableSet;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 
 /**
  * A wind track that delivers the result of
- * {@link TrackedRace#getWind(com.sap.sailing.domain.common.Position, com.sap.sse.common.TimePoint)},
+ * {@link TrackedRace#getWind(com.sap.sse.common.Position, com.sap.sse.common.TimePoint)},
  * using a {@link CombinedWindAsNavigableSet} as its internal raw fixes collection. Resolution of raw fixes is set to 10s.
- * As the result of {@link TrackedRace#getWind(com.sap.sailing.domain.common.Position, com.sap.sse.common.TimePoint)}
+ * As the result of {@link TrackedRace#getWind(com.sap.sse.common.Position, com.sap.sse.common.TimePoint)}
  * is already a smoothened, outlier-removed and averaged value, the averaging methods {@link #getAveragedWind(Position, TimePoint)}
  * and {@link #getAveragedWindWithConfidence(Position, TimePoint)} are redefined such that they immediately delegate
  * to {@link TrackedRace#getWindWithConfidence(Position, TimePoint)}.

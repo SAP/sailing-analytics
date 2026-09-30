@@ -3,12 +3,12 @@ package com.sap.sailing.simulator.impl;
 import java.util.List;
 
 import com.sap.sailing.domain.common.LegType;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.simulator.Grid;
 import com.sap.sailing.simulator.PolarDiagram;
 import com.sap.sailing.simulator.SimulationParameters;
 import com.sap.sailing.simulator.windfield.WindFieldGenerator;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
 
 public class SimulationParametersImpl implements SimulationParameters {
 

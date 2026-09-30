@@ -1,10 +1,10 @@
 package com.sap.sailing.domain.common.tracking.impl;
 
-import com.sap.sailing.domain.common.AbstractPosition;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sse.common.AbstractBearing;
+import com.sap.sse.common.AbstractPosition;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.Position;
 
 /**
  * Uses scaled, rounded internal representations of the values for lat/lng and speed/course. See

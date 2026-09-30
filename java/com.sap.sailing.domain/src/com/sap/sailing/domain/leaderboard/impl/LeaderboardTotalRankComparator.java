@@ -169,8 +169,10 @@ public class LeaderboardTotalRankComparator implements Comparator<Competitor> {
         List<Util.Pair<RaceColumn, Double>> o2TotalPoints = new ArrayList<>();
         double o1ScoreSum = getLeaderboard().getCarriedPoints(o1);
         double o2ScoreSum = getLeaderboard().getCarriedPoints(o2);
-        Double o1MedalRaceScore = 0.0; // "blindly" adds them all up, regardless of "series starts with zero score"
-        Double o2MedalRaceScore = 0.0; // "blindly" adds them all up, regardless of "series starts with zero score"
+        final List<Util.Pair<RaceColumn, Double>> o1ScoringMedalRaces = new ArrayList<>();
+        final List<Util.Pair<RaceColumn, Double>> o2ScoringMedalRaces = new ArrayList<>();
+        Double o1MedalRaceScoreSum = 0.0; // "blindly" adds them all up, regardless of "series starts with zero score"
+        Double o2MedalRaceScoreSum = 0.0; // "blindly" adds them all up, regardless of "series starts with zero score"
         Double o1CarryForwardScoreInMedals = null;
         Double o2CarryForwardScoreInMedals = null;
         // When a column has isStartsWithZeroScore, the competitor's score only need to be reset to zero if from there on
@@ -240,10 +242,12 @@ public class LeaderboardTotalRankComparator implements Comparator<Competitor> {
                     // only count the score for the medal race score if it wasn't a carry-forward column
                     if (!raceColumn.isCarryForward()) {
                         if (o1Score != null) {
-                            o1MedalRaceScore += o1Score;
+                            o1MedalRaceScoreSum += o1Score;
+                            o1ScoringMedalRaces.add(new Pair<>(raceColumn, o1Score));
                         }
                         if (o2Score != null) {
-                            o2MedalRaceScore += o2Score;
+                            o2MedalRaceScoreSum += o2Score;
+                            o2ScoringMedalRaces.add(new Pair<>(raceColumn, o2Score));
                         }
                     } else {
                         o1CarryForwardScoreInMedals = o1Score;
@@ -316,16 +320,23 @@ public class LeaderboardTotalRankComparator implements Comparator<Competitor> {
                             if (result == 0) {
                                 result = scoringScheme.compareByLastMedalRacesCriteria(o1, o1Scores, o2, o2Scores, nullScoresAreBetter, leaderboard,
                                         raceColumnsToConsider,
-                                        (competitor, raceColumn)->totalPointsCache.get(new Pair<>(competitor, raceColumn)), cache, timePoint, zeroBasedIndexOfLastMedalSeriesInWhichO1Scored, numberOfMedalRacesWonO1, numberOfMedalRacesWonO2);
+                                        (competitor, raceColumn)->totalPointsCache.get(new Pair<>(competitor, raceColumn)), cache, timePoint,
+                                        zeroBasedIndexOfLastMedalSeriesInWhichO1Scored, numberOfMedalRacesWonO1, numberOfMedalRacesWonO2);
                                 if (result == 0) {
-                                    result = scoringScheme.compareByMedalRaceScore(o1MedalRaceScore, o2MedalRaceScore, nullScoresAreBetter);
+                                    result = scoringScheme.compareByMedalRaceScore(o1, o2, o1MedalRaceScoreSum,
+                                            o2MedalRaceScoreSum, o1ScoringMedalRaces, o2ScoringMedalRaces, timePoint,
+                                            leaderboard, Collections.unmodifiableMap(discardedRaceColumnsPerCompetitor),
+                                            (competitor1, raceColumn1) -> totalPointsCache
+                                                    .get(new Pair<>(competitor1, raceColumn1)),
+                                            nullScoresAreBetter, cache);
                                     if (result == 0) {
                                         result = scoringScheme.compareByBetterScore(o1, Collections.unmodifiableList(o1TotalPoints),
                                                                                     o2, Collections.unmodifiableList(o2TotalPoints),
                                                                                     raceColumnsToConsider, nullScoresAreBetter, timePoint,
                                                                                     leaderboard,
                                                                                     Collections.unmodifiableMap(discardedRaceColumnsPerCompetitor),
-                                                                                    (competitor1, raceColumn1) -> totalPointsCache.get(new Pair<>(competitor1, raceColumn1)), cache);
+                                                                                    (competitor1, raceColumn1) -> totalPointsCache.get(new Pair<>(competitor1, raceColumn1)),
+                                                                                    cache);
                                         if (result == 0) {
                                             // compare by last race:
                                             result = scoringScheme.compareByLastRace(o1TotalPoints, o2TotalPoints, nullScoresAreBetter, o1, o2, timePoint, cache);

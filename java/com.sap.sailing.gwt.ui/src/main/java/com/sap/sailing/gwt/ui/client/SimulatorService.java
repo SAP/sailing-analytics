@@ -3,7 +3,6 @@ package com.sap.sailing.gwt.ui.client;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.RemoteService;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.gwt.ui.shared.BoatClassDTOsAndNotificationMessage;
 import com.sap.sailing.gwt.ui.shared.ConfigurationException;
 import com.sap.sailing.gwt.ui.shared.PolarDiagramDTOAndNotificationMessage;
@@ -20,6 +19,7 @@ import com.sap.sailing.gwt.ui.shared.WindLatticeGenParamsDTO;
 import com.sap.sailing.gwt.ui.shared.WindPatternDTO;
 import com.sap.sailing.gwt.ui.simulator.windpattern.WindPatternDisplay;
 import com.sap.sailing.gwt.ui.simulator.windpattern.WindPatternNotFoundException;
+import com.sap.sse.common.Position;
 
 public interface SimulatorService extends RemoteService {
 

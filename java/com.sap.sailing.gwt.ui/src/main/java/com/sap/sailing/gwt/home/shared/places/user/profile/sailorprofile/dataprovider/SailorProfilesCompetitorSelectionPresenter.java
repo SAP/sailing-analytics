@@ -1,5 +1,6 @@
 package com.sap.sailing.gwt.home.shared.places.user.profile.sailorprofile.dataprovider;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -107,11 +108,16 @@ public class SailorProfilesCompetitorSelectionPresenter implements EditModeChang
     }
 
     @Override
-    public void initSelectedItems(Collection<SimpleCompetitorWithIdDTO> selectedItems) {
+    public void initSelectedItems(Iterable<SimpleCompetitorWithIdDTO> selectedItems) {
     }
 
     @Override
     public String createSuggestionAdditionalDisplayString(SimpleCompetitorWithIdDTO value) {
         return competitorDataProvider.createSuggestionAdditionalDisplayString(value);
+    }
+
+    @Override
+    public Collection<SimpleCompetitorWithIdDTO> getSelection() {
+        return new ArrayList<>(competitors);
     }
 }

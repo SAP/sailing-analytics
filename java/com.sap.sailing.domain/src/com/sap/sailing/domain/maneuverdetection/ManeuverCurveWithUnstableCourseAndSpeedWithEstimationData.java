@@ -1,8 +1,8 @@
 package com.sap.sailing.domain.maneuverdetection;
 
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.tracking.ManeuverCurveBoundaries;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.SpeedWithBearing;
 
 /**
  * Contains the information about the maneuver curve with unstable course and speed, which is regarded as relevant for

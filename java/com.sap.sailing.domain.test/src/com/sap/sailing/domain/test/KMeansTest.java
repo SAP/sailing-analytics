@@ -13,7 +13,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.ScalableInteger;
-import com.sap.sailing.domain.common.confidence.impl.ScalableDouble;
+import com.sap.sse.common.scalablevalue.ScalableDouble;
 import com.sap.sse.util.kmeans.Cluster;
 import com.sap.sse.util.kmeans.KMeansClusterer;
 import com.sap.sse.util.kmeans.KMeansClustererWithEquidistantInitialization;

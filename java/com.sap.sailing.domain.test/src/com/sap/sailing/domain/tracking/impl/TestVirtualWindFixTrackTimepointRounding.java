@@ -5,10 +5,10 @@ import java.util.NavigableSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.domain.tracking.WindTrack;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

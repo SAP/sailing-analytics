@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import com.sap.sse.landscape.aws.LandscapeConstants;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.Util.Pair;
 import com.sap.sse.concurrent.ConsumerWithException;
 import com.sap.sse.landscape.Landscape;
 import com.sap.sse.landscape.Log;
@@ -251,5 +252,20 @@ public class ApacheReverseProxyCluster<ShardingKey, MetricsT extends Application
     public void removeRedirect(Scope<ShardingKey> scope, Optional<String> optionalKeyName,
             byte[] privateKeyEncryptionPassphrase) throws Exception {
         setRedirect(proxy -> proxy.removeRedirect(scope, optionalKeyName, privateKeyEncryptionPassphrase));
+    }
+
+    @Override
+    public Pair<String, String> getArchiveAndFailoverIPs(Optional<String> optionalKeyName,
+            byte[] privateKeyEncryptionPassphrase) throws Exception {
+        return getReverseProxies().iterator().next().getArchiveAndFailoverIPs(optionalKeyName, privateKeyEncryptionPassphrase);
+    }
+
+    @Override
+    public void setArchiveAndFailoverIPs(String productionArchiveServerInternalIPAddress, String failoverArchiveServerInternalIPAddress,
+            Optional<String> optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception {
+        if (getReverseProxies().iterator().hasNext()) {
+            final ApacheReverseProxy<ShardingKey, MetricsT, ProcessT> proxy = getReverseProxies().iterator().next();
+            proxy.setArchiveAndFailoverIPs(productionArchiveServerInternalIPAddress, failoverArchiveServerInternalIPAddress, optionalKeyName, privateKeyEncryptionPassphrase);
+        }
     }
 }

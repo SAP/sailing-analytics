@@ -21,12 +21,9 @@ import com.mongodb.client.MongoDatabase;
 import com.sap.sailing.domain.base.RaceDefinition;
 import com.sap.sailing.domain.base.Regatta;
 import com.sap.sailing.domain.base.Sideline;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.WindSource;
 import com.sap.sailing.domain.common.WindSourceType;
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.impl.WindImpl;
 import com.sap.sailing.domain.common.impl.WindSourceImpl;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroupResolver;
@@ -48,9 +45,12 @@ import com.sap.sailing.domain.tractracadapter.DomainFactory;
 import com.sap.sailing.domain.tractracadapter.Receiver;
 import com.sap.sailing.domain.tractracadapter.ReceiverType;
 import com.sap.sailing.server.impl.RacingEventServiceImpl;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.DegreePosition;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.mongodb.MongoDBConfiguration;
 
@@ -92,7 +92,7 @@ public class TestStoringAndRetrievingWindTracksTest extends AbstractTracTracLive
                     @Override
                     public void addRaceDefinition(RaceDefinition race, DynamicTrackedRace trackedRace) {
                     }
-                }, /* trackedRegattaRegistry */ null, mock(RaceLogAndTrackedRaceResolver.class), /* markPassingRaceFingerprintRegistry */ null,
+                }, /* trackedRegattaRegistry */ null, mock(RaceLogAndTrackedRaceResolver.class), /* markPassingRaceFingerprintRegistry */ null, /*maneuverRaceFingerprintRegistry*/ null, 
                 mock(LeaderboardGroupResolver.class), /*courseDesignUpdateURI*/ null, /*tracTracApiToken*/ null, getEventSubscriber(), getRaceSubscriber(), /*ignoreTracTracMarkPassings*/ false,
                 RaceTracker.TIMEOUT_FOR_RECEIVING_RACE_DEFINITION_IN_MILLISECONDS, new DefaultRaceTrackingHandler(), /* raceAndCompetitorStatusWithRaceLogReconciler */ null, ReceiverType.RACECOURSE);
         addListenersForStoredDataAndStartController(typeControllers);
@@ -107,7 +107,7 @@ public class TestStoringAndRetrievingWindTracksTest extends AbstractTracTracLive
                     public void addRaceDefinition(RaceDefinition race, DynamicTrackedRace trackedRace) {
                     }
                 }, /*useMarkPassingCalculator*/ false, mock(RaceLogAndTrackedRaceResolver.class),
-                Optional.empty(), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null);
+                Optional.empty(), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null, /*maneuverRaceFingerprintRegistry*/ null);
         WindSource windSource = new WindSourceImpl(WindSourceType.WEB);
         MongoClient myFirstMongo = newMongo();
         MongoDatabase firstDatabase = myFirstMongo.getDatabase(dbConfiguration.getDatabaseName());

@@ -91,7 +91,6 @@ extends TableWrapper<T, S, SM, TR> {
         mainPanel.insert(filterPanel, 0);
     }
     
-    
     @Override
     public void refresh(Iterable<T> newItems) {
         getFilterPanel().updateAll(newItems);

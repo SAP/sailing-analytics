@@ -84,8 +84,11 @@ public final class ManeuverClassifierModelContext extends ModelContext<ManeuverF
         return numberOfSupportedManeuverTypes;
     }
 
-    public double[] getLikelihoodsPerManeuverTypeOrdinal(double[] likelihoodsFromModel) {
-        double[] likelihoodsPerManeuverTypes = new double[ManeuverTypeForClassification.values().length];
+    /**
+     * @return a new array with as many entries as maneuver types defined in {@link ManeuverTypeForClassification}
+     */
+    public double[] getLikelihoodsPerManeuverTypeOrdinal(final double[] likelihoodsFromModel) {
+        final double[] likelihoodsPerManeuverTypes = new double[ManeuverTypeForClassification.values().length];
         for (int j = 0; j < indexToManeuverTypeOrdinalMapping.length; j++) {
             int mappedI = indexToManeuverTypeOrdinalMapping[j];
             likelihoodsPerManeuverTypes[j] = likelihoodsFromModel[mappedI];

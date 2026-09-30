@@ -12,7 +12,7 @@ COMMAND="sudo service httpd reload"
 MAIN_BRANCH_NAME="main"
 DISPOSABLE_BRANCH_NAME="disposable"
 CENTRAL_BRANCH_NAME="central"
-CHECKED_OUT_WORKSPACE_NAME="checked-out" # Assumes it is in the root user.
+CHECKED_OUT_WORKSPACE_NAME="checked-out"
 sync_repo() {
             #$1 tag key to use
             #$2 branch to check out

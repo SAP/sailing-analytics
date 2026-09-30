@@ -2,10 +2,16 @@ package com.sap.sailing.landscape.ui.client;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
+import com.google.gwt.user.client.ui.SuggestBox;
 import com.sap.sailing.landscape.ui.client.i18n.StringMessages;
+import com.sap.sse.common.Util;
 import com.sap.sse.common.util.NaturalComparator;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog;
@@ -66,5 +72,24 @@ public class LandscapeDialogUtil {
                 break;
             }
         }
+    }
+    
+    public static SuggestBox createReleaseNameBox(StringMessages stringMessages, Iterable<String> releaseNames, DataEntryDialog<?> dialog) {
+        final List<String> releaseNamesAndLatestMaster = new LinkedList<>();
+        Util.addAll(releaseNames, releaseNamesAndLatestMaster);
+        final Comparator<String> newestFirstComaprator = (r1, r2)->r2.compareTo(r1);
+        Collections.sort(releaseNamesAndLatestMaster, newestFirstComaprator);
+        releaseNamesAndLatestMaster.add(0, stringMessages.latestMasterRelease());
+        SuggestBox releaseNameBox = dialog.createSuggestBox(releaseNamesAndLatestMaster);
+        if (releaseNameBox.getSuggestOracle() instanceof MultiWordSuggestOracle) {
+            ((MultiWordSuggestOracle) releaseNameBox.getSuggestOracle()).setComparator(newestFirstComaprator);
+        }
+        releaseNameBox.setValue(stringMessages.latestMasterRelease());
+        return releaseNameBox;
+    }
+    
+    public static String getReleaseNameBoxValue(SuggestBox releaseNameBox, StringMessages stringMessages) {
+        return (!Util.hasLength(releaseNameBox.getValue()) || Util.equalsWithNull(releaseNameBox.getValue(), stringMessages.latestMasterRelease()))
+                ? null : releaseNameBox.getValue();
     }
 }

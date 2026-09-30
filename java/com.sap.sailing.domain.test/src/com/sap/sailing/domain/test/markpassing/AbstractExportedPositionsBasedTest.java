@@ -43,8 +43,6 @@ import com.sap.sailing.domain.base.impl.TeamImpl;
 import com.sap.sailing.domain.base.impl.WaypointImpl;
 import com.sap.sailing.domain.common.PassingInstruction;
 import com.sap.sailing.domain.common.TrackedRaceStatusEnum;
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixImpl;
@@ -60,6 +58,8 @@ import com.sap.sailing.domain.tracking.impl.TrackedRaceStatusImpl;
 import com.sap.sse.common.Color;
 import com.sap.sse.common.impl.AbstractColor;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.DegreePosition;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 /**
@@ -107,7 +107,7 @@ public abstract class AbstractExportedPositionsBasedTest {
                 EmptyWindStore.INSTANCE,
                 /* delayToLiveInMillis */ 3000, /* millisecondsOverWhichToAverageWind */ 15000,
                 /* millisecondsOverWhichToAverageSpeed */ 10000, /* useInternalMarkPassingAlgorithm */ true,
-                OneDesignRankingMetric::new, /* raceLogResolver */ null, /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null);
+                OneDesignRankingMetric::new, /* raceLogResolver */ null, /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null, /* maneuverRaceFingerprintRegistry */ null);
         result.setStatus(new TrackedRaceStatusImpl(TrackedRaceStatusEnum.LOADING, 0.0));
         for (final Entry<CompetitorWithBoat, Iterable<GPSFixMoving>> e : competitorsAndTheirTracks.entrySet()) {
             final DynamicGPSFixTrack<Competitor, GPSFixMoving> track = result.getTrack(e.getKey());

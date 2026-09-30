@@ -51,6 +51,11 @@ implements SailingAnalyticsProcess<ShardingKey> {
     private static final String STATUS_SERVERDIRECTORY_PROPERTY_NAME = "serverdirectory";
     private static final String STATUS_RELEASE_PROPERTY_NAME = "release";
     private static final String MONGODB_CONFIGURATION_PROPERTY_NAME = "mongoDbConfiguration";
+    private static final String SYSTEM_LOAD_AVERAGE_LAST_MINUTE_NAME = "systemloadaveragelastminute";
+    private static final String DEFAULT_BACKGROUND_THREAD_POOL_EXECUTOR_QUEUE_LENGTH_NAME = "defaultbackgroundthreadpoolexecutorqueuelength";
+    private static final String DEFAULT_FOREGROUND_THREAD_POOL_EXECUTOR_QUEUE_LENGTH_NAME = "defaultforegroundthreadpoolexecutorqueuelength";
+    private static final String DEFAULT_BACKGROUND_THREAD_POOL_EXECUTOR_QUEUE_LENGTH_NONDELAYED_NAME = "defaultbackgroundthreadpoolexecutorqueuelengthnondelayed";
+    private static final String DEFAULT_FOREGROUND_THREAD_POOL_EXECUTOR_QUEUE_LENGTH_NONDELAYED_NAME = "defaultforegroundthreadpoolexecutorqueuelengthnondelayed";
     private Integer expeditionUdpPort;
     private Integer igtimiRiotPort;
     private Release release;
@@ -124,6 +129,36 @@ implements SailingAnalyticsProcess<ShardingKey> {
             }
         }
         return release;
+    }
+    
+    @Override
+    public double getLastMinuteSystemLoadAverage(Optional<Duration> optionalTimeout) throws TimeoutException, Exception {
+        final JSONObject status = getStatus(optionalTimeout);
+        return ((Number) status.get(SYSTEM_LOAD_AVERAGE_LAST_MINUTE_NAME)).doubleValue();
+    }
+    
+    @Override
+    public int getDefaultBackgroundThreadPoolExecutorQueueSize(Optional<Duration> optionalTimeout) throws TimeoutException, Exception {
+        final JSONObject status = getStatus(optionalTimeout);
+        return ((Number) status.get(DEFAULT_BACKGROUND_THREAD_POOL_EXECUTOR_QUEUE_LENGTH_NAME)).intValue();
+    }
+    
+    @Override
+    public int getDefaultForegroundThreadPoolExecutorQueueSize(Optional<Duration> optionalTimeout) throws TimeoutException, Exception {
+        final JSONObject status = getStatus(optionalTimeout);
+        return ((Number) status.get(DEFAULT_FOREGROUND_THREAD_POOL_EXECUTOR_QUEUE_LENGTH_NAME)).intValue();
+    }
+    
+    @Override
+    public int getDefaultBackgroundThreadPoolExecutorQueueSizeNondelayed(Optional<Duration> optionalTimeout) throws TimeoutException, Exception {
+        final JSONObject status = getStatus(optionalTimeout);
+        return ((Number) status.get(DEFAULT_BACKGROUND_THREAD_POOL_EXECUTOR_QUEUE_LENGTH_NONDELAYED_NAME)).intValue();
+    }
+    
+    @Override
+    public int getDefaultForegroundThreadPoolExecutorQueueSizeNondelayed(Optional<Duration> optionalTimeout) throws TimeoutException, Exception {
+        final JSONObject status = getStatus(optionalTimeout);
+        return ((Number) status.get(DEFAULT_FOREGROUND_THREAD_POOL_EXECUTOR_QUEUE_LENGTH_NONDELAYED_NAME)).intValue();
     }
     
     @Override

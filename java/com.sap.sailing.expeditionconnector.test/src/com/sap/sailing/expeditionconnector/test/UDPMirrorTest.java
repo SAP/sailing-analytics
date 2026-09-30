@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -73,13 +72,6 @@ public class UDPMirrorTest {
             }
         }
         sendingSocket.close();
-        
         assertTrue(Arrays.equals(buf1, buf2));
-    }
-    
-    @SuppressWarnings("deprecation")
-    @AfterEach
-    public void stopMirror() {
-        mirrorThread.stop();
     }
 }

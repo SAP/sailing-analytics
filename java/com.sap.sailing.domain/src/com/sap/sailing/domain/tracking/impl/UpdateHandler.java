@@ -171,7 +171,6 @@ public class UpdateHandler {
     
     protected HttpURLConnection setConnectionPropertiesAndSendWithPayload(HttpURLConnection connection, String payload) throws IOException {
         return followRedirects(connection, c-> {
-            authenticate(c);
             c.setRequestMethod(HttpPostRequestMethod);
             c.setDoOutput(true);
             c.setUseCaches(false);

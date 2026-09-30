@@ -1,11 +1,11 @@
 package com.sap.sailing.domain.tracking.impl;
 
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.test.PositionAssert;
 import com.sap.sailing.domain.tracking.GPSFixTrack;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 public abstract class PositionInterpolationAndExtrapolationTest<FixType extends GPSFix> {

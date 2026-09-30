@@ -8,8 +8,6 @@ import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.sap.sailing.domain.common.SpeedWithBearing;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.simulator.PolarDiagram;
 import com.sap.sailing.simulator.impl.PolarDiagram49;
 import com.sap.sailing.simulator.impl.PolarDiagram49Bethwaite;
@@ -20,7 +18,9 @@ import com.sap.sailing.simulator.impl.PolarDiagramCSV;
 import com.sap.sse.common.AbstractBearing;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 
 public class PolarDiagramCSVTest {
     private static double DELTA_PERCENTAGE = 0.54;

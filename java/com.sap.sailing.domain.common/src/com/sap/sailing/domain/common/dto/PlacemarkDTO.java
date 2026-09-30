@@ -1,6 +1,6 @@
 package com.sap.sailing.domain.common.dto;
 
-import com.sap.sailing.domain.common.Position;
+import com.sap.sse.common.Position;
 import com.sap.sse.security.shared.dto.NamedDTO;
 
 public class PlacemarkDTO extends NamedDTO {

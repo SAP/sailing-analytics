@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Arrays;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -93,5 +94,12 @@ public class RegexTest {
         }
         final Matcher m1 = nationalityPattern.matcher(sb.toString());
         assertFalse(m1.matches());
+    }
+    
+    @Test
+    public void testExpeditionHeaderSplitting() {
+        final String line = "a                                                ,                                                   b ,,                                               c";
+        final String[] splitResult = line.split("\\s*,\\s*");
+        assertEquals(Arrays.asList("a", "b", "", "c"), Arrays.asList(splitResult));
     }
 }

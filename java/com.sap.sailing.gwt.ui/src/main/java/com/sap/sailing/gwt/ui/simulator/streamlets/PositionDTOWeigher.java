@@ -2,10 +2,10 @@ package com.sap.sailing.gwt.ui.simulator.streamlets;
 
 import java.util.Date;
 
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.confidence.Weigher;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.confidence.Weigher;
+import com.sap.sse.common.impl.DegreePosition;
 
 /**
  * A weigher that uses a {@link DegreePosition} and a {@link Date} to compute a confidence based on spatial

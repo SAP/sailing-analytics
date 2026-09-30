@@ -25,12 +25,12 @@ import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.CompetitorRegistrationType;
 import com.sap.sailing.domain.common.NotFoundException;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.RankingMetrics;
 import com.sap.sailing.domain.common.ScoringSchemeType;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.server.gateway.jaxrs.api.AbstractLeaderboardsResource;
 import com.sap.sse.InvalidDateException;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sse.rest.StreamingOutputUtil;
 
 public class EventResourceTest extends AbstractJaxRsApiTest {

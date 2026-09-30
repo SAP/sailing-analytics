@@ -12,10 +12,10 @@ import java.util.Collection;
 import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.Test;
 
-import com.sap.sailing.domain.common.impl.KnotSpeedImpl;
 import com.sap.sailing.domain.common.orc.ORCCertificate;
 import com.sap.sailing.domain.orc.impl.ORCCertificatesRmsImporter;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.impl.KnotSpeedImpl;
 
 public class TestORCCertificateImporterRMS extends AbstractORCCertificateImporterTest {
     private static final String RESOURCES = "resources/orc/";

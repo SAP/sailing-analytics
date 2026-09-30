@@ -316,13 +316,10 @@ public class RaceAndCompetitorStatusWithRaceLogReconciler {
         } else {
             switch (raceCompetitorStatusType) {
             // TODO we expect NSC and perhaps also TLE to show up; support the mapping to MaxPointsReason.NSC / TLE, respectively when they appear
-            case ABANDONED:
-                result = MaxPointsReason.NONE; // TODO bug 5154: find out what ABANDONED means and if/how we can translate it to a MaxPointsReason
-                break;
             case BFD:
                 result = MaxPointsReason.BFD;
                 break;
-            case DISQUALIFIED:
+            case DSQ:
                 result = MaxPointsReason.DSQ;
                 break;
             case DNC:
@@ -331,31 +328,19 @@ public class RaceAndCompetitorStatusWithRaceLogReconciler {
             case DNF:
                 result = MaxPointsReason.DNF;
                 break;
-            case DONT_RACE:
-                result = MaxPointsReason.DNS; // TODO bug 5154: find out what DONT_RACE means and if/how we can translate it to a MaxPointsReason; is it DNS?
+            case DNS:
+                result = MaxPointsReason.DNS;
                 break;
             case FIN:
-                result = MaxPointsReason.NONE; // TODO bug 5154: find out what FIN means and if/how we can translate it to a MaxPointsReason; does it mean the competitor finished properly?
-                break;
-            case FINISH_CONFIRMED:
-                result = MaxPointsReason.NONE; // TODO bug 5154: find out what FINISH_CONFIRMED means and if/how we can translate it to a MaxPointsReason; does it mean the competitor finished properly?
-                break;
-            case MIS:
-                result = MaxPointsReason.NONE; // TODO bug 5154: find out what MIS means and if/how we can translate it to a MaxPointsReason; does it mean the competitor is "missing?"
-                break;
-            case NO_COLLECT:
-                result = MaxPointsReason.NONE; // TODO bug 5154: find out what NO_COLLECT means and if/how we can translate it to a MaxPointsReason
-                break;
-            case NO_DATA:
-                result = MaxPointsReason.NONE;
+                result = MaxPointsReason.NONE; // TODO bug 5154: It is just a boat that has finished. MaxPointsReason.NONE is fine
                 break;
             case OCS:
                 result = MaxPointsReason.OCS;
                 break;
-            case RACING:
+            case RAC:
                 result = MaxPointsReason.NONE;
                 break;
-            case RETIRED:
+            case RET:
                 result = MaxPointsReason.RET;
                 break;
             case UFD:
@@ -381,6 +366,15 @@ public class RaceAndCompetitorStatusWithRaceLogReconciler {
                 break;
             case RCT:
                 result = MaxPointsReason.RCT;
+                break;
+            case DPI:
+                result = MaxPointsReason.DPI;
+                break;
+            case RDG:
+                result = MaxPointsReason.RDG;
+                break;
+            case ZFP:
+                result = MaxPointsReason.ZFP;
                 break;
             default:
                 result = MaxPointsReason.NONE;

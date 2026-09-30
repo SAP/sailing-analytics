@@ -3,9 +3,9 @@ package com.sap.sailing.gwt.ui.shared.courseCreation;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.gwt.ui.shared.DeviceIdentifierDTO;
 import com.sap.sailing.gwt.ui.shared.GPSFixDTO;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimeRange;
 import com.sap.sse.common.Util.Triple;
 

@@ -3,8 +3,8 @@ package com.sap.sailing.simulator;
 import java.util.Map;
 
 import com.sap.sailing.domain.common.PathType;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 
 public class SimulationResults {
