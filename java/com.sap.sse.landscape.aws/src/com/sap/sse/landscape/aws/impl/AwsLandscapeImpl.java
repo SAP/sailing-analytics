@@ -645,24 +645,59 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
     public <HostT extends AwsInstance<ShardingKey>> HostT getHostByPublicIpAddress(com.sap.sse.landscape.Region region, String publicIpAddress, HostSupplier<ShardingKey, HostT> hostSupplier) {
         return getHost(region, getInstanceByPublicIpAddress(region, publicIpAddress), hostSupplier);
     }
-
+    
+    private Instance getFirstInstance(DescribeInstancesResponse response) {
+        for (Reservation reservation : response.reservations()) {
+            for (Instance instance : reservation.instances()) {
+                return instance;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Searches for an instance that matches the private dns name if this fails it tries the to resolve the private ip address
+     */
     @Override
-    public Instance getInstanceByPrivateIpAddress(com.sap.sse.landscape.Region region, String privateIpAddress) {
+    public Instance getInstanceByPrivateDnsNameOrIpAddress(com.sap.sse.landscape.Region region, String privateDnsNameOrIpAddress) {
         InetAddress inetAddress;
         try {
-            inetAddress = InetAddress.getByName(privateIpAddress);
-            return getEc2Client(getRegion(region))
-                    .describeInstances(b->b.filters(Filter.builder().name("private-ip-address").values(inetAddress.getHostAddress()).build())).reservations()
-                    .iterator().next().instances().iterator().next();
-        } catch (UnknownHostException | NoSuchElementException e) {
-            logger.warning("IP address for "+privateIpAddress+" not found");
-            return null;
-        }
-    }
+            DescribeInstancesResponse response = getEc2Client(getRegion(region))
+                .describeInstances(b -> b.filters(
+                        Filter.builder().name("private-dns-name").values(privateDnsNameOrIpAddress).build())
+                );
+            Instance instance = getFirstInstance(response);
+            if (instance != null) {
+                return instance;
+            }
 
+            inetAddress = InetAddress.getByName(privateDnsNameOrIpAddress);
+            response = getEc2Client(getRegion(region))
+                .describeInstances(b -> b.filters(
+                        Filter.builder().name("private-ip-address").values(inetAddress.getHostAddress()).build())
+                );
+            instance = getFirstInstance(response);
+            if (instance != null) {
+                return instance;
+            }
+        } catch (UnknownHostException | NoSuchElementException e) {
+            logger.severe("An error occurred while trying to find the instance: " + e.getMessage());
+        }
+
+        logger.warning("Instance for " + privateDnsNameOrIpAddress + " not found");
+        return null;
+    }
+    
+    /**
+     * Returns a host first by private dns name and alternatively by private ip address
+     */
     @Override
-    public <HostT extends AwsInstance<ShardingKey>> HostT getHostByPrivateIpAddress(com.sap.sse.landscape.Region region, String privateIpAddress, HostSupplier<ShardingKey, HostT> hostSupplier) {
-        return getHost(region, getInstanceByPrivateIpAddress(region, privateIpAddress), hostSupplier);
+    public <HostT extends AwsInstance<ShardingKey>> HostT getHostByPrivateDnsNameOrIpAddress(com.sap.sse.landscape.Region region, String privateIpAddress, HostSupplier<ShardingKey, HostT> hostSupplier) {
+        final Instance instanceByPrivateDnsNameOrIpAddress = getInstanceByPrivateDnsNameOrIpAddress(region, privateIpAddress);
+        if (instanceByPrivateDnsNameOrIpAddress == null) {
+            throw new IllegalArgumentException("Couldn't find instance with IP/hostname "+privateIpAddress+" in region "+region);
+        }
+        return getHost(region, instanceByPrivateDnsNameOrIpAddress, hostSupplier);
     }
 
     private Route53Client getRoute53Client() {
@@ -998,7 +1033,6 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
         }
         final Ec2Client ec2Client = getEc2Client(getRegion(az.getRegion()));
         final Builder runInstancesRequestBuilder = RunInstancesRequest.builder()
-            .additionalInfo("Test " + getClass().getName())
             .imageId(fromImage.getId().toString())
             .minCount(numberOfHostsToLaunch)
             .maxCount(numberOfHostsToLaunch)
@@ -1036,6 +1070,21 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
             awsTags.add(Tag.builder().key(tag.getKey()).value(tag.getValue()).build());
         }
         return awsTags;
+    }
+
+    @Override
+    public void setTerminationProtection(AwsInstance<ShardingKey> host, boolean terminationProtection) {
+        logger.info("Setting termination protection for instance "+host+" to "+terminationProtection);
+        getEc2Client(getRegion(host.getAvailabilityZone().getRegion())).modifyInstanceAttribute(b->b
+                .instanceId(host.getInstanceId())
+                .disableApiTermination(a->a.value(terminationProtection)));
+    }
+
+    @Override
+    public void setInstanceName(AwsInstance<ShardingKey> host, String newInstanceName) {
+        logger.info("Setting Name tag for instance "+host+" to "+newInstanceName);
+        getEc2Client(getRegion(host.getAvailabilityZone().getRegion()))
+                .createTags(b -> b.resources(host.getInstanceId()).tags(Tag.builder().key("Name").value(newInstanceName).build()));
     }
 
     @Override
@@ -1196,7 +1245,7 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
                         DescribeTargetHealthRequest.builder().targetGroupArn(targetGroup.getTargetGroupArn()).build())
                 .targetHealthDescriptions().forEach(targetHealthDescription -> {
                     if (targetHealthDescription.target().id().matches("[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+")) {
-                        AwsInstance<ShardingKey> awsInstance = getHostByPrivateIpAddress(targetGroup.getRegion(), targetHealthDescription.target().id().trim(),
+                        AwsInstance<ShardingKey> awsInstance = getHostByPrivateDnsNameOrIpAddress(targetGroup.getRegion(), targetHealthDescription.target().id().trim(),
                                 AwsInstanceImpl::new);
                         result.put(awsInstance, targetHealthDescription.targetHealth());
                     } else {

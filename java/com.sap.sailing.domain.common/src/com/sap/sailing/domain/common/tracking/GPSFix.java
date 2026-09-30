@@ -1,10 +1,10 @@
 package com.sap.sailing.domain.common.tracking;
 
-import com.sap.sailing.domain.common.Positioned;
-import com.sap.sailing.domain.common.SpeedWithBearing;
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Positioned;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.Timed;
+import com.sap.sse.common.impl.MeterDistance;
 
 public interface GPSFix extends Positioned, Timed, WithValidityCache, WithEstimatedSpeedCache {
     /**

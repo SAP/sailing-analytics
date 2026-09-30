@@ -2,10 +2,10 @@ package com.sap.sailing.windestimation.data.serialization;
 
 import org.json.simple.JSONObject;
 
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.windestimation.data.LabeledTwdTransition;
 import com.sap.sailing.windestimation.data.ManeuverTypeForClassification;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.MeterDistance;
 import com.sap.sse.common.impl.MillisecondsDurationImpl;
 import com.sap.sse.shared.json.JsonDeserializationException;
 import com.sap.sse.shared.json.JsonDeserializer;

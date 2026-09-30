@@ -100,7 +100,6 @@ public interface ScoringScheme extends Serializable {
      *            scores of the first competitor, in the order of race columns in the leaderboard
      * @param competitor2Scores
      *            scores of the second competitor, in the order of race columns in the leaderboard
-     * @param raceColumnsToConsider TODO
      * @param discardedRaceColumnsPerCompetitor
      *            for each competitor holds the result of {@link Leaderboard#getResultDiscardingRule()
      *            Leaderborad.getResultDiscardingRule()}{@code .}{@link ResultDiscardingRule#getDiscardedRaceColumns(Competitor, Leaderboard, Iterable, TimePoint, ScoringScheme)
@@ -108,8 +107,11 @@ public interface ScoringScheme extends Serializable {
      *            for each competitor again.
      */
     int compareByBetterScore(Competitor o1, List<Util.Pair<RaceColumn, Double>> competitor1Scores, Competitor o2,
-            List<Util.Pair<RaceColumn, Double>> competitor2Scores, Iterable<RaceColumn> raceColumnsToConsider, boolean nullScoresAreBetter,
-            TimePoint timePoint, Leaderboard leaderboard, Map<Competitor, Set<RaceColumn>> discardedRaceColumnsPerCompetitor, BiFunction<Competitor, RaceColumn, Double> totalPointsSupplier, WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache);
+            List<Util.Pair<RaceColumn, Double>> competitor2Scores, Iterable<RaceColumn> raceColumnsToConsider,
+            boolean nullScoresAreBetter, TimePoint timePoint, Leaderboard leaderboard,
+            Map<Competitor, Set<RaceColumn>> discardedRaceColumnsPerCompetitor,
+            BiFunction<Competitor, RaceColumn, Double> totalPointsSupplier,
+            WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache);
 
     /**
      * In case two competitors scored in different numbers of races, this scoring scheme decides whether this
@@ -335,8 +337,9 @@ public interface ScoringScheme extends Serializable {
     }
     
     /**
-     * Compares by the number of races won in the medal series. This default implementation simply compares the two numbers, and
-     * the competitor with the greater number is scored better ("less").
+     * Compares by the number of races won in the medal series. This default implementation simply compares the two
+     * numbers, and the competitor with the greater number is scored better ("less"). It is used if
+     * {@link #isMedalWinAmountCriteria()} returns {@code true} (which by default it doesn't).
      */
     default int compareByMedalRacesWon(int numberOfMedalRacesWonO1, int numberOfMedalRacesWonO2) {
         return Integer.compare(numberOfMedalRacesWonO2, numberOfMedalRacesWonO1);
@@ -348,14 +351,29 @@ public interface ScoringScheme extends Serializable {
     }
 
     /**
-     * Precondition: either both scored in medal race or both didn't. If both scored, the better score wins.
+     * Precondition: either both scored in medal race or both didn't. If both scored, the better score sum wins. If both
+     * scored the same sum in the medal races, apply
+     * {@link #compareByScoreSum(Competitor, List, double, Competitor, List, double, boolean, boolean, Supplier)} to
+     * apply the same tie breaking to the medal races as for other series.
+     * <p>
+     * 
      * This is to be applied only if the net score of both competitors are equal to each other.
      */
-    default int compareByMedalRaceScore(Double o1MedalRaceScore, Double o2MedalRaceScore, boolean nullScoresAreBetter) {
+    default int compareByMedalRaceScore(Competitor o1, Competitor o2, Double o1MedalRaceScore, Double o2MedalRaceScore,
+            List<Pair<RaceColumn, Double>> o1ScoringMedalRaces, List<Pair<RaceColumn, Double>> o2ScoringMedalRaces,
+            TimePoint timePoint, Leaderboard leaderboard,
+            Map<Competitor, Set<RaceColumn>> discardedRaceColumnsPerCompetitor,
+            BiFunction<Competitor, RaceColumn, Double> totalPointsSupplier, boolean nullScoresAreBetter,
+            WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache) {
         assert o1MedalRaceScore != null || o2MedalRaceScore == null;
-        final int result;
+        int result;
         if (o1MedalRaceScore != null) {
             result = getScoreComparator(nullScoresAreBetter).compare(o1MedalRaceScore, o2MedalRaceScore);
+            if (result == 0 && o1ScoringMedalRaces.size() > 1) { // only work calling if more than one scoring medal race
+                result = compareByBetterScore(o1, o1ScoringMedalRaces, o2, o2ScoringMedalRaces,
+                        Util.map(o1ScoringMedalRaces, Pair::getA), nullScoresAreBetter, timePoint, leaderboard,
+                        discardedRaceColumnsPerCompetitor, totalPointsSupplier, cache);
+            }
         } else {
             result = 0;
         }
@@ -374,7 +392,9 @@ public interface ScoringScheme extends Serializable {
 
     default int compareByLastMedalRacesCriteria(Competitor o1, List<Pair<RaceColumn, Double>> o1Scores, Competitor o2,
             List<Pair<RaceColumn, Double>> o2Scores, boolean nullScoresAreBetter, Leaderboard leaderboard,
-            Iterable<RaceColumn> raceColumnsToConsider, BiFunction<Competitor, RaceColumn, Double> totalPointsSupplier, WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache, TimePoint timePoint, int zeroBasedIndexOfLastMedalSeriesInWhichBothScored, int numberOfMedalRacesWonO1, int numberOfMedalRacesWonO2) {
+            Iterable<RaceColumn> raceColumnsToConsider, BiFunction<Competitor, RaceColumn, Double> totalPointsSupplier,
+            WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache, TimePoint timePoint, int zeroBasedIndexOfLastMedalSeriesInWhichBothScored,
+            int numberOfMedalRacesWonO1, int numberOfMedalRacesWonO2) {
         return 0;
     }
 

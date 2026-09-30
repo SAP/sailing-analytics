@@ -2,11 +2,11 @@ package com.sap.sailing.expeditionconnector;
 
 import java.util.Set;
 
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.udpconnector.UDPMessage;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 
 public interface ExpeditionMessage extends UDPMessage {

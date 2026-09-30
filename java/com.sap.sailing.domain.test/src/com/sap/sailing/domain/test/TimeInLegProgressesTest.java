@@ -15,13 +15,13 @@ import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.common.WindSourceType;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.impl.WindImpl;
 import com.sap.sailing.domain.common.impl.WindSourceImpl;
 import com.sap.sailing.domain.tracking.TrackedLegOfCompetitor;
 import com.sap.sailing.domain.tractracadapter.ReceiverType;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 public class TimeInLegProgressesTest extends OnlineTracTracBasedTest {
@@ -48,7 +48,7 @@ public class TimeInLegProgressesTest extends OnlineTracTracBasedTest {
         final Competitor findel = getCompetitorByName("Findel");
         TrackedLegOfCompetitor findelsSecondLeg = getTrackedRace().getTrackedLeg(getTrackedRace().getRace().getCourse().getLegs().get(1)).getTrackedLeg(findel);
         TimePoint findelStartedHisSecondLegAt = findelsSecondLeg.getStartTime();
-        assertEquals(null, findelsSecondLeg.getTime(findelStartedHisSecondLegAt.minus(1)));
+        assertEquals(null, findelsSecondLeg.getTime(findelStartedHisSecondLegAt.minusResolution()));
         assertEquals(0.0, findelsSecondLeg.getTime(findelStartedHisSecondLegAt).asMillis(), 0.00001);
         assertEquals(10000.0, findelsSecondLeg.getTime(findelStartedHisSecondLegAt.plus(10000)).asMillis(), 0.00001);
     }

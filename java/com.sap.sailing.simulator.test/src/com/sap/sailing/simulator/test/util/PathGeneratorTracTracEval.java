@@ -5,10 +5,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.simulator.Path;
 import com.sap.sailing.simulator.impl.PathGeneratorTracTrac;
-import com.sap.sse.common.Distance;
 
 public class PathGeneratorTracTracEval {
 
@@ -59,30 +57,25 @@ public class PathGeneratorTracTracEval {
     }
 
     public void testGetLegPolyline() {
-
-        Distance maxDistance = new MeterDistance(4.88);
-
         PathGeneratorTracTracEval.pathGenerator.setSelectionParameters(0, 0);
-        Path legPolyline0 = PathGeneratorTracTracEval.pathGenerator.getPathPolyline(maxDistance);
+        Path legPolyline0 = PathGeneratorTracTracEval.pathGenerator.getPathPolyline();
         Assertions.assertEquals(10, legPolyline0.getPathPoints().size());
 
         PathGeneratorTracTracEval.pathGenerator.setSelectionParameters(1, 0);
-        Path legPolyline1 = PathGeneratorTracTracEval.pathGenerator.getPathPolyline(maxDistance);
+        Path legPolyline1 = PathGeneratorTracTracEval.pathGenerator.getPathPolyline();
         Assertions.assertEquals(7, legPolyline1.getPathPoints().size());
 
         PathGeneratorTracTracEval.pathGenerator.setSelectionParameters(2, 0);
-        Path legPolyline2 = PathGeneratorTracTracEval.pathGenerator.getPathPolyline(maxDistance);
+        Path legPolyline2 = PathGeneratorTracTracEval.pathGenerator.getPathPolyline();
         Assertions.assertEquals(8, legPolyline2.getPathPoints().size());
 
         PathGeneratorTracTracEval.pathGenerator.setSelectionParameters(3, 0);
-        Path legPolyline3 = PathGeneratorTracTracEval.pathGenerator.getPathPolyline(maxDistance);
+        Path legPolyline3 = PathGeneratorTracTracEval.pathGenerator.getPathPolyline();
         Assertions.assertEquals(7, legPolyline3.getPathPoints().size());
     }
 
     public void testGetLegsNames() {
-
         List<String> legsNames = PathGeneratorTracTracEval.pathGenerator.getLegsNames();
-
         Assertions.assertEquals(4, legsNames.size());
         Assertions.assertEquals("G1 Start-Finish -> G1 Mark 1", legsNames.get(0));
         Assertions.assertEquals("G1 Mark 1 -> G1 Mark 4", legsNames.get(1));

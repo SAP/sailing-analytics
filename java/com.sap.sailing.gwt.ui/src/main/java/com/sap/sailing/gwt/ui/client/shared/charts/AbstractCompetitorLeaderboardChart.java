@@ -142,7 +142,7 @@ public abstract class AbstractCompetitorLeaderboardChart<SettingsType extends Ge
                     new Marker().setEnabled(true).setHoverState(
                             new Marker().setEnabled(true).setRadius(4))).setShadow(false)
                                 .setHoverStateLineWidth(LINE_WIDTH));
-        ChartUtil.useCheckboxesToShowAndHide(chart);
+        ChartUtil.useCheckboxesToShowAndHide(chart, () -> {});
         chart.getXAxis().setType(Axis.Type.LINEAR);
         chart.getXAxis().setLabels(new XAxisLabels().setFormatter(new AxisLabelsFormatter() {
             @Override

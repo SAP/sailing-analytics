@@ -20,6 +20,7 @@ public class AclActionInputPO extends PageArea {
     }
     
     public void addAction(String name) {
+        waitUntil(() -> inputSuggestBox.isDisplayed() && inputSuggestBox.isEnabled());
         SuggestBoxPO.create(driver, inputSuggestBox).appendText(name);
         addButton.click();
     }

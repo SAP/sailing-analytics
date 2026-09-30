@@ -2,9 +2,9 @@ package com.sap.sailing.server.gateway.deserialization.impl;
 
 import org.json.simple.JSONObject;
 
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.server.gateway.serialization.impl.PositionJsonSerializer;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sse.shared.json.JsonDeserializationException;
 import com.sap.sse.shared.json.JsonDeserializer;
 

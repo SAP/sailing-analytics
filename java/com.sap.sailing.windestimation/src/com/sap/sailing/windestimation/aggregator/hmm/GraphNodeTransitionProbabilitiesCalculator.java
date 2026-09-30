@@ -52,7 +52,4 @@ public interface GraphNodeTransitionProbabilitiesCalculator<GL extends GraphLeve
             GL currentLevel);
 
     WindCourseRange getWindCourseRangeForManeuverType(ManeuverForEstimation maneuver, ManeuverTypeForClassification maneuverType);
-
-    boolean isPropagateIntersectedWindRangeOfHeadupAndBearAway();
-
 }

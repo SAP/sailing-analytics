@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <link href='../../../../sailing-fontface-1.0.cache.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+    <link href='../../../main.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+    <link rel='icon' href='../../../../sap.ico' type='image/x-icon'>
+    <title>SAP Sailing Analytics Webservices API Version 1.0</title>
+</head>
+<body>
+<h1>SAP Sailing Analytics Webservices API Version 1.0</h1>
+<h2>URL: /sailinglandscape/api/landscape/livecontentcheck</h2>
+
+<b>Description:</b>
+ <p>Checks one or more application replica sets in a region for <em>live content</em>, that is, races that are currently
+ being tracked live, and reports what was found without changing anything. This is the landscape-wide, aggregating check:
+ running in the landscape manager, it resolves each named replica set in the region and queries its master, then combines
+ the individual answers into a single result covering all requested replica sets. It is the single-server
+ <a href="/sailingserver/webservices/api/v1/livecontentGetDoc.html">live-content</a> query
+ (<tt>GET /sailingserver/api/v1/livecontent</tt>, which each individual server answers about itself) fanned out and
+ aggregated across the replica sets' masters &mdash; the two are counterparts rather than duplicates, and they share the
+ same JSON response format.</p>
+ <p>This is exactly the check that the disruptive landscape operations
+ (<a href="upgradeapplicationreplicaset.html">upgradeapplicationreplicaset</a>,
+ <a href="movetoarchiveserver.html">movetoarchiveserver</a>, <a href="removeapplicationreplicaset.html">removeapplicationreplicaset</a>,
+ <a href="movemastertootherinstance.html">movemastertootherinstance</a> and
+ <a href="stopreplicatingandremovemasterfromtargetgroups.html">stopreplicatingandremovemasterfromtargetgroups</a>) run
+ internally before proceeding and, unless forced, reject the operation with HTTP status <tt>409 Conflict</tt> if live
+ content is present. Call this service beforehand to find out whether such an operation would be blocked, and on which
+ events and races. An empty <tt>replicaSets</tt> array in the response means no live content was found.</p>
+ <p>The response has the same structure as the <a href="/sailingserver/webservices/api/v1/livecontentGetDoc.html">live-content</a>
+ service (grouped by replica set, then event, then tracked race, with all time points encoded as epoch milliseconds in
+ UTC); see there for a detailed description of the fields.</p>
+ <br />
+ <table>
+    <tr>
+        <td>Webservice Type:</td>
+        <td>POST</td>
+    </tr>
+    <tr>
+        <td>Output format:</td>
+        <td>json</td>
+    </tr>
+    <tr>
+        <td>Mandatory query parameters:</td>
+        <td>
+            <div><tt>regionId</tt>, region where the replica sets are located, e.g., eu-west-1</div>
+            <div><tt>replicaSetName</tt>, the name of a replica set to check for live content. This parameter may be repeated to check
+                                 several replica sets in one request (e.g., <tt>-d 'replicaSetName=alpha' -d 'replicaSetName=beta'</tt>).</div>
+        </td>
+    </tr>
+    <tr>
+        <td>Optional form parameters:</td>
+        <td>
+            <div><tt>keyName</tt>, the name of the SSH key to use; must identify an existing SSH key by that name in the region specified
+                          and will be used to log on to existing and new instances using a root ssh connection. If not specified, the
+                          key used to launch an instance will be used for trying to connect to it, and a private key with matching name
+                          for the respective region will be looked up.</div>
+            <div><tt>privateKeyEncryptionPassphrase</tt>, the pass phrase to decrypt the private key for the key specified by the keyName parameter</div>
+            <div><tt>masterReplicationBearerToken</tt>, the bearer token used to query the replica sets' masters for their live content; defaults to the
+                                               bearer token of the user authenticated for this request.</div>
+            <div><tt>timeoutInMilliseconds</tt>, timeout in milliseconds to wait for responses from nodes when analyzing the replica sets
+                                        existing in the region; if not specified, waiting will not time out.</div>
+        </td>
+    </tr>
+    <tr>
+        <td>Request method:</td>
+        <td>POST</td>
+    </tr>
+    <tr>
+        <td>Example:</td>
+        <td>curl -X POST -d 'regionId=eu-west-2' -d 'replicaSetName=mynewevent' -d 'keyName=Horst' --data-urlencode 'privateKeyEncryptionPassphrase=HorstsSuperSecretPassword' -H 'Authorization: Bearer RwGK+DV38LKjeuDu+Bx87/3blLJHD7Ff+NCLeud9nRQ=' "https://sapsailing.com/sailinglandscape/api/landscape/livecontentcheck"<br>
+        produces output (empty <tt>replicaSets</tt> means no live content was found):<pre>
+            {
+              "checkedAtMillis": 1700000000000,
+              "replicaSets": [
+                {
+                  "replicaSetName": "mynewevent",
+                  "events": [
+                    {
+                      "eventId": "a1b2c3d4-0000-0000-0000-000000000000",
+                      "eventName": "Kiel Week 2023",
+                      "eventStartMillis": 1699900000000,
+                      "eventEndMillis": 1700400000000,
+                      "races": [
+                        {
+                          "regattaName": "49er",
+                          "raceName": "R1",
+                          "trackingStartMillis": 1699999000000,
+                          "trackingEndMillis": null
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+        </pre>
+        </td>
+    </tr>
+</table>
+<div style="height: 1em;"></div>
+<a href="index.html">Back to Web Service Overview</a>
+</body>
+</html>

@@ -42,7 +42,7 @@ public class SerializeRankingMetricTest extends AbstractSerializationTest {
                 new RaceDefinitionImpl("Race", new CourseImpl("Course", Collections.<Waypoint>emptyList()) , 
                         /* boatClass */ _49er, Collections.<Competitor,Boat>emptyMap()),
                 Collections.<Sideline> emptyList(), EmptyWindStore.INSTANCE, 0l, 0l, 0l,
-                false, TimeOnTimeAndDistanceRankingMetric::new, null, /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null);
+                false, TimeOnTimeAndDistanceRankingMetric::new, null, /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null, /* mneuverRaceFingerprintRegistry */ null);
         RankingMetric clone = cloneBySerialization(trackedRace.getRankingMetric(), DomainFactory.INSTANCE);
         assertNotNull(clone);
         assertTrue(clone instanceof TimeOnTimeAndDistanceRankingMetric);

@@ -165,11 +165,7 @@ public class MarkPassingCalculator {
             if (listener != null) {
                 synchronized (MarkPassingCalculator.this) {
                     if (listenerThread == null) {
-                        listenerThread = createAndStartListenerThread();
-                        synchronized (listenerThread) {
-                            listenerThreadStarted = true;
-                            listenerThread.notifyAll();
-                        }
+                        createAndStartListenerThread();
                     }
                 }
             }
@@ -181,11 +177,21 @@ public class MarkPassingCalculator {
         }
     }
 
-    private Thread createAndStartListenerThread() {
-        final Thread result = new Thread(listen, "MarkPassingCalculator for race " + race.getRace().getName());
-        result.setDaemon(true);
-        result.start();
-        return result;
+    /**
+     * Must be invoked while owning this object's monitor. Launches a thread running the {@link #listen} task, assigning
+     * the thread to the {@link #listenerThread} field and marking the thread as started while owning the thread's
+     * object monitor ({@code synchronized}), notifying all waiters of the {@link Thread} object, such as the
+     * {@link #waitUntilStopped(long)} method.
+     */
+    private void createAndStartListenerThread() {
+        assert Thread.holdsLock(this);
+        listenerThread = new Thread(listen, "MarkPassingCalculator for race " + race.getRaceIdentifier());
+        listenerThread.setDaemon(true);
+        listenerThread.start();
+        synchronized (listenerThread) {
+            listenerThreadStarted = true;
+            listenerThread.notifyAll();
+        }
     }
 
     /**
@@ -479,7 +485,7 @@ public class MarkPassingCalculator {
                         newCompetitorFixes.get(competitorAndFixesFinderConsidersAffected.getKey()),
                         competitorFixesThatReplacedExistingOnes
                                 .get(competitorAndFixesFinderConsidersAffected.getKey()));
-                tasks.add((race.getTrackedRegatta().cpuMeterCallable(new Callable<Void>() {
+                tasks.add(race.getTrackedRegatta().cpuMeterCallable(new Callable<Void>() {
                     @Override
                     public Void call() throws Exception {
                         runnable.run();
@@ -496,7 +502,7 @@ public class MarkPassingCalculator {
                                 + competitorAndFixesFinderConsidersAffected.getKey() + " with "
                                 + competitorAndFixesFinderConsidersAffected.getValue().size() + " fixes";
                     }
-                }, CPUMeteringType.MARK_PASSINGS.name())));
+                }, CPUMeteringType.MARK_PASSINGS.name()));
             }
             ThreadPoolUtil.INSTANCE.invokeAllAndLogExceptions(executor, Level.INFO,
                     "Error during mark passing calculation: %s", tasks);
@@ -604,6 +610,7 @@ public class MarkPassingCalculator {
                             if (markPassingRaceFingerprintRegistry != null) {
                                 initializationExecutor.submit(()->{
                                     final Map<Competitor, Map<Waypoint, MarkPassing>> markPassings = race.getMarkPassings(/* waitForLatestUpdates */ true);
+                                    // TODO bug6182: do we need to store when we can assume that the race is still live? How to find out reliably?
                                     markPassingRaceFingerprintRegistry.storeMarkPassings(race.getRaceIdentifier(),
                                             MarkPassingRaceFingerprintFactory.INSTANCE.createFingerprint(race),
                                             markPassings, race.getRace().getCourse());
@@ -637,7 +644,7 @@ public class MarkPassingCalculator {
         // the queue may have filled up while we were suspended
         if (!suspended) {
             if (listenerThread == null) {
-                listenerThread = createAndStartListenerThread();
+                createAndStartListenerThread();
             } else if (listenerThread.getState() == State.TERMINATED) {
                 logger.severe("Listener thread of MarkPassingCalculator (MPC) for race " + race.getRace().getName()
                         + " terminated but not null. Why are we still receiving updates? We must have been stopped before!");

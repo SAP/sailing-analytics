@@ -3,7 +3,6 @@ package com.sap.sailing.gwt.ui.client;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.gwt.ui.shared.BoatClassDTOsAndNotificationMessage;
 import com.sap.sailing.gwt.ui.shared.PolarDiagramDTOAndNotificationMessage;
 import com.sap.sailing.gwt.ui.shared.Request1TurnerDTO;
@@ -18,6 +17,7 @@ import com.sap.sailing.gwt.ui.shared.WindLatticeDTO;
 import com.sap.sailing.gwt.ui.shared.WindLatticeGenParamsDTO;
 import com.sap.sailing.gwt.ui.shared.WindPatternDTO;
 import com.sap.sailing.gwt.ui.simulator.windpattern.WindPatternDisplay;
+import com.sap.sse.common.Position;
 
 public interface SimulatorServiceAsync {
 

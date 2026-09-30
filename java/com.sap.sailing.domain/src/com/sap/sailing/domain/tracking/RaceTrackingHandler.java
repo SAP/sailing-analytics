@@ -18,6 +18,7 @@ import com.sap.sailing.domain.base.impl.DynamicCompetitor;
 import com.sap.sailing.domain.base.impl.DynamicCompetitorWithBoat;
 import com.sap.sailing.domain.base.impl.DynamicTeam;
 import com.sap.sailing.domain.base.impl.RaceDefinitionImpl;
+import com.sap.sailing.domain.maneuverhash.ManeuverRaceFingerprintRegistry;
 import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprintRegistry;
 import com.sap.sailing.domain.racelog.RaceLogAndTrackedRaceResolver;
 import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
@@ -38,7 +39,9 @@ public interface RaceTrackingHandler {
             long millisecondsOverWhichToAverageWind, long millisecondsOverWhichToAverageSpeed,
             DynamicRaceDefinitionSet raceDefinitionSetToUpdate, boolean useMarkPassingCalculator,
             RaceLogAndTrackedRaceResolver raceLogResolver, Optional<ThreadLocalTransporter> threadLocalTransporter,
-            TrackingConnectorInfo trackingConnectorInfo, MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry);
+            TrackingConnectorInfo trackingConnectorInfo,
+            MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry,
+            ManeuverRaceFingerprintRegistry maneuverRaceFingerprintRegistry);
 
     DynamicCompetitor getOrCreateCompetitor(CompetitorAndBoatStore competitorAndBoatStore, Serializable competitorId,
             String name, String shortName, Color displayColor, String email, URI flagImageURI, DynamicTeam team,
@@ -62,10 +65,14 @@ public interface RaceTrackingHandler {
                 long millisecondsOverWhichToAverageWind, long millisecondsOverWhichToAverageSpeed,
                 DynamicRaceDefinitionSet raceDefinitionSetToUpdate, boolean useMarkPassingCalculator,
                 RaceLogAndTrackedRaceResolver raceLogResolver, Optional<ThreadLocalTransporter> threadLocalTransporter,
-                TrackingConnectorInfo trackingConnectorInfo, MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry) {
-            return trackedRegatta.createTrackedRace(raceDefinition, sidelines, windStore, delayToLiveInMillis,
+                TrackingConnectorInfo trackingConnectorInfo,
+                MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry,
+                ManeuverRaceFingerprintRegistry maneuverRaceFingerprintRegistry) {
+            return trackedRegatta.createTrackedRace(raceDefinition, sidelines,
+                    windStore, delayToLiveInMillis,
                     millisecondsOverWhichToAverageWind, millisecondsOverWhichToAverageSpeed, raceDefinitionSetToUpdate,
-                    useMarkPassingCalculator, raceLogResolver, threadLocalTransporter, trackingConnectorInfo, markPassingRaceFingerprintRegistry);
+                    useMarkPassingCalculator, raceLogResolver, threadLocalTransporter, trackingConnectorInfo,
+                    markPassingRaceFingerprintRegistry, maneuverRaceFingerprintRegistry);
         }
 
         @Override

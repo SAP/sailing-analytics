@@ -13,7 +13,7 @@ import org.xml.sax.SAXException;
 
 import com.sap.sailing.declination.Declination;
 import com.sap.sailing.declination.impl.DeclinationImporter;
-import com.sap.sailing.domain.common.impl.DegreePosition;
+import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 public abstract class DeclinationImportTest<I extends DeclinationImporter> extends AbstractDeclinationTest<I> {

@@ -17,6 +17,7 @@ import org.apache.shiro.authz.UnauthorizedException;
 import org.osgi.framework.BundleContext;
 
 import com.sap.sailing.domain.common.security.SecuredDomainType;
+import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.filestorage.FileStorageService;
 import com.sap.sse.filestorage.FileStorageServiceProperty;
@@ -41,8 +42,6 @@ import com.sap.sse.security.shared.TypeRelativeObjectIdentifier;
  * @author Jan Broß
  *
  */
-
-
 public class LocalFileStorageServiceImpl extends BaseFileStorageServiceImpl implements FileStorageService {
     private static final long serialVersionUID = -8661781258137340835L;
     private static final String testFile = "Bundesliga2014_Regatta6_eventteaser.jpg";
@@ -62,6 +61,9 @@ public class LocalFileStorageServiceImpl extends BaseFileStorageServiceImpl impl
     @Override
     public URI storeFile(InputStream is, String fileExtension, long lengthInBytes)
             throws IOException, UnauthorizedException {
+        if (Util.hasLength(fileExtension) && (fileExtension.contains("..") || fileExtension.contains("/") || fileExtension.contains("\\"))) {
+            throw new IllegalArgumentException("File extension must not contain '..' or a file separator like '/'.");
+        }
         String fileName = getKey(fileExtension);
         String pathToFile = localPath.getValue() + "/" + fileName;
         return getSecurityService().setOwnershipCheckPermissionForObjectCreationAndRevertOnError(SecuredDomainType.FILE_STORAGE,

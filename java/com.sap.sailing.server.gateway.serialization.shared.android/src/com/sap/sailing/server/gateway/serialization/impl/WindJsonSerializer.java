@@ -2,8 +2,8 @@ package com.sap.sailing.server.gateway.serialization.impl;
 
 import org.json.simple.JSONObject;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.Wind;
+import com.sap.sse.common.Position;
 import com.sap.sse.shared.json.JsonSerializer;
 
 public class WindJsonSerializer implements JsonSerializer<Wind> {

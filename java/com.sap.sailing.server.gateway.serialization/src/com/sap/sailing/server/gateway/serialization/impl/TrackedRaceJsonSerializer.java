@@ -26,11 +26,11 @@ public class TrackedRaceJsonSerializer implements JsonSerializer<TrackedRace> {
     private final String windSourceIdToSerialize;
     private final Function<WindSource, WindTrackJsonSerializer> windTrackSerializerProducer;
 
-    public TrackedRaceJsonSerializer(Function<WindSource, WindTrackJsonSerializer> windTrackSerializer, String windSourceToSerialize, String windSourceIdToSerialize) {
+    public TrackedRaceJsonSerializer(final Function<WindSource, WindTrackJsonSerializer> windTrackSerializer,
+            final String windSourceToSerialize, final String windSourceIdToSerialize) {
         this.windTrackSerializerProducer = windTrackSerializer;
         this.windSourceToSerialize = windSourceToSerialize;
         this.windSourceIdToSerialize = windSourceIdToSerialize;
-        windSourceToSerialize = WindSourceType.COMBINED.name();
     }
 
     public JSONObject serialize(TrackedRace trackedRace) {

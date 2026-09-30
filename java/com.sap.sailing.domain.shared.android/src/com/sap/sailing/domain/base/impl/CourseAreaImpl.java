@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import com.sap.sailing.domain.base.CourseArea;
 import com.sap.sailing.domain.base.SharedDomainFactory;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.impl.NamedImpl;
 
 public class CourseAreaImpl extends NamedImpl implements CourseArea {

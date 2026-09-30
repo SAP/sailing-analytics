@@ -2,6 +2,8 @@ package com.sap.sse.landscape.aws;
 
 import java.util.Optional;
 import java.util.UUID;
+
+import com.sap.sse.common.Util.Pair;
 import com.sap.sse.landscape.Host;
 import com.sap.sse.landscape.Log;
 import com.sap.sse.landscape.application.ApplicationProcess;
@@ -124,4 +126,13 @@ public interface ReverseProxy<ShardingKey, MetricsT extends ApplicationProcessMe
      *            member instances and their availability zones.
      */
     String getTargetGroupHealthCheckPath(String targetGroupArn);
+
+    /**
+     * Fetches the ARCHIVE_IP and ARCHIVE_FAILOVER_IP definitions from the 000-macros.conf file in the reverse proxy and returns
+     * them, in this order, as strings.
+     */
+    Pair<String, String> getArchiveAndFailoverIPs(Optional<String> optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception;
+
+    void setArchiveAndFailoverIPs(String productionArchiveServerInternalIPAddress, String failoverArchiveServerInternalIPAddress,
+            Optional<String> ofNullable, byte[] privateKeyEncryptionPassphrase) throws Exception;
 }

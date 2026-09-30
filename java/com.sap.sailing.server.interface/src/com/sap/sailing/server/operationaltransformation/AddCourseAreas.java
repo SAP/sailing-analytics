@@ -5,10 +5,10 @@ import java.util.UUID;
 import com.sap.sailing.domain.base.CourseArea;
 import com.sap.sailing.domain.base.Event;
 import com.sap.sailing.domain.base.Venue;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.server.interfaces.RacingEventService;
 import com.sap.sailing.server.interfaces.RacingEventServiceOperation;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
 
 /**
  * Adds a course area to an {@link Event}'s {@link Venue}.

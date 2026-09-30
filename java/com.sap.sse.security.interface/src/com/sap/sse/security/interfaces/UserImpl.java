@@ -72,6 +72,8 @@ public class UserImpl extends SecurityUserImpl<RoleDefinition, Role, UserGroup, 
     private String passwordResetSecret;
     
     private boolean emailValidated;
+    
+    private boolean didOptOutOfFeatureAndCommunityEmails;
 
     private final Map<AccountType, Account> accounts;
 
@@ -111,13 +113,14 @@ public class UserImpl extends SecurityUserImpl<RoleDefinition, Role, UserGroup, 
     public UserImpl(String name, String email, Map<String, UserGroup> defaultTenantForServer,
             Collection<Account> accounts, UserGroupProvider userGroupProvider, TimedLock timedLock) {
         this(name, email, /* fullName */ null, /* company */ null, /* locale */ null, /* is email validated */ false,
-                /* password reset secret */ null, /* validation secret */ null, defaultTenantForServer, accounts,
-                userGroupProvider, timedLock);
+                /* did opt out of feature and community emails */ false, /* password reset secret */ null, /* validation secret */ null,
+                defaultTenantForServer, accounts, userGroupProvider, timedLock);
     }
 
-    public UserImpl(String name, String email, String fullName, String company, Locale locale, Boolean emailValidated,
-            String passwordResetSecret, String validationSecret, Map<String, UserGroup> defaultTenantForServer,
-            Collection<Account> accounts, UserGroupProvider userGroupProvider, TimedLock timedLock) {
+    public UserImpl(String name, String email, String fullName, String company, Locale locale, boolean emailValidated,
+            boolean didOptOutOfFeatureAndCommunityEmails, String passwordResetSecret, String validationSecret,
+            Map<String, UserGroup> defaultTenantForServer, Collection<Account> accounts,
+            UserGroupProvider userGroupProvider, TimedLock timedLock) {
         super(name);
         this.timedLock = timedLock;
         this.defaultTenantForServer = defaultTenantForServer;
@@ -128,6 +131,7 @@ public class UserImpl extends SecurityUserImpl<RoleDefinition, Role, UserGroup, 
         this.passwordResetSecret = passwordResetSecret;
         this.validationSecret = validationSecret;
         this.emailValidated = emailValidated;
+        this.didOptOutOfFeatureAndCommunityEmails = didOptOutOfFeatureAndCommunityEmails;
         this.accounts = new HashMap<>();
         this.userGroupProvider = userGroupProvider;
         for (Account a : accounts) {
@@ -252,6 +256,11 @@ public class UserImpl extends SecurityUserImpl<RoleDefinition, Role, UserGroup, 
         this.email = email;
     }
 
+    @Override
+    public void setDidOptOutOfFeatureAndCommunityEmails(boolean didOptOutOfFeatureAndCommunityEmails) {
+        this.didOptOutOfFeatureAndCommunityEmails = didOptOutOfFeatureAndCommunityEmails;
+    }
+
     /**
      * The email address is set to not yet validated by resetting the
      * {@link #emailValidated} flag. A new {@link #validationSecret} is generated and returned which
@@ -370,6 +379,9 @@ public class UserImpl extends SecurityUserImpl<RoleDefinition, Role, UserGroup, 
         builder.append("isEmailValidated()=");
         builder.append(isEmailValidated());
         builder.append(", ");
+        builder.append("didOptOutOfFeatureAndCommunityEmails()=");
+        builder.append(getDidOptOutOfFeatureAndCommunityEmails());
+        builder.append(", ");
         if (getPermissions() != null) {
             builder.append("getPermissions()=");
             builder.append(getPermissions());
@@ -471,5 +483,10 @@ public class UserImpl extends SecurityUserImpl<RoleDefinition, Role, UserGroup, 
     @Override
     public TimedLock getTimedLock() {
         return timedLock;
+    }
+
+    @Override
+    public boolean getDidOptOutOfFeatureAndCommunityEmails() {
+        return this.didOptOutOfFeatureAndCommunityEmails;
     }
 }

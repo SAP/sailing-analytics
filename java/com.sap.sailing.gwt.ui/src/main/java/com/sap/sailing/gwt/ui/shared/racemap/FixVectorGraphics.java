@@ -2,8 +2,8 @@ package com.sap.sailing.gwt.ui.shared.racemap;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.sap.sailing.domain.common.FixType;
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.impl.MeterDistance;
 
 /**
  * A class for course fix graphics based on SVG graphics drawn to a HTML5 canvas

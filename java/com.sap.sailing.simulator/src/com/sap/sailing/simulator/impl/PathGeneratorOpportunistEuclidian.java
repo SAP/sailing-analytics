@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.sap.sailing.domain.common.LegType;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.simulator.Path;
 import com.sap.sailing.simulator.PolarDiagram;
@@ -15,6 +13,8 @@ import com.sap.sailing.simulator.TimedPositionWithSpeed;
 import com.sap.sailing.simulator.windfield.WindFieldGenerator;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 

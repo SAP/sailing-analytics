@@ -3,8 +3,8 @@ package com.sap.sailing.datamining;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.sap.sailing.domain.common.impl.KnotSpeedImpl;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.impl.KnotSpeedImpl;
 import com.sap.sse.datamining.data.Cluster;
 import com.sap.sse.datamining.data.ClusterBoundary;
 import com.sap.sse.datamining.data.ClusterFormatter;

@@ -11,10 +11,10 @@ import java.util.List;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.AbstractCellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
+import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -152,8 +152,9 @@ public class MarkTemplatePanel extends FlowPanel implements FilterablePanelProvi
                     public int hashCode(MarkTemplateDTO t) {
                         return t.getUuid().hashCode();
                     }
-                }, filterableMarkTemplates.getAllListDataProvider(), markTemplateTable);
-        markTemplateTable.addColumn(checkColumn, SafeHtmlUtils.fromSafeConstant("<br/>"));
+                }, filterableMarkTemplates.getAllListDataProvider());
+        Header<Boolean> selectAllHeader = checkColumn.createHeader();
+        markTemplateTable.addColumn(checkColumn, selectAllHeader);
         markTemplateTable.setColumnWidth(checkColumn, 40, Unit.PX);
         // id
         Column<MarkTemplateDTO, String> idColumn = new Column<MarkTemplateDTO, String>(new TextCell()) {

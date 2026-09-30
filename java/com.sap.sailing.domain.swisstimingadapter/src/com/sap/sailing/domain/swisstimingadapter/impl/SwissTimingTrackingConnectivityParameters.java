@@ -4,6 +4,7 @@ package com.sap.sailing.domain.swisstimingadapter.impl;
 import com.sap.sailing.domain.base.BoatClass;
 import com.sap.sailing.domain.base.Regatta;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroupResolver;
+import com.sap.sailing.domain.maneuverhash.ManeuverRaceFingerprintRegistry;
 import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprintRegistry;
 import com.sap.sailing.domain.racelog.RaceLogAndTrackedRaceResolver;
 import com.sap.sailing.domain.racelog.RaceLogStore;
@@ -73,18 +74,25 @@ public class SwissTimingTrackingConnectivityParameters extends AbstractRaceTrack
 
     @Override
     public RaceTracker createRaceTracker(TrackedRegattaRegistry trackedRegattaRegistry, WindStore windStore,
-            RaceLogAndTrackedRaceResolver raceLogResolver, LeaderboardGroupResolver leaderboardGroupResolver, long timeoutInMilliseconds,
-            RaceTrackingHandler raceTrackingHandler, MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry) throws Exception {
-        return swissTimingFactory.createRaceTracker(raceLogStore, regattaLogStore, windStore, domainFactory, trackedRegattaRegistry, raceLogResolver,
-                this, raceTrackingHandler, markPassingRaceFingerprintRegistry);
+            RaceLogAndTrackedRaceResolver raceLogResolver, LeaderboardGroupResolver leaderboardGroupResolver,
+            long timeoutInMilliseconds, RaceTrackingHandler raceTrackingHandler,
+            MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry,
+            ManeuverRaceFingerprintRegistry maneuverRaceFingerprintRegistry) throws Exception {
+        return swissTimingFactory.createRaceTracker(raceLogStore, regattaLogStore, windStore, domainFactory,
+                trackedRegattaRegistry, raceLogResolver, this, raceTrackingHandler, markPassingRaceFingerprintRegistry,
+                maneuverRaceFingerprintRegistry);
     }
 
     @Override
     public RaceTracker createRaceTracker(Regatta regatta, TrackedRegattaRegistry trackedRegattaRegistry,
-            WindStore windStore, RaceLogAndTrackedRaceResolver raceLogResolver, LeaderboardGroupResolver leaderboardGroupResolver, long timeoutInMilliseconds,
-            RaceTrackingHandler raceTrackingHandler, MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry) throws Exception {
-        return swissTimingFactory.createRaceTracker(regatta, windStore, domainFactory, trackedRegattaRegistry, raceLogResolver, raceLogStore,
-                regattaLogStore, this, raceTrackingHandler, markPassingRaceFingerprintRegistry);
+            WindStore windStore, RaceLogAndTrackedRaceResolver raceLogResolver,
+            LeaderboardGroupResolver leaderboardGroupResolver, long timeoutInMilliseconds,
+            RaceTrackingHandler raceTrackingHandler,
+            MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry,
+            ManeuverRaceFingerprintRegistry maneuverRaceFingerprintRegistry) throws Exception {
+        return swissTimingFactory.createRaceTracker(regatta, windStore, domainFactory, trackedRegattaRegistry,
+                raceLogResolver, raceLogStore, regattaLogStore, this, raceTrackingHandler,
+                markPassingRaceFingerprintRegistry, maneuverRaceFingerprintRegistry);
     }
 
     @Override

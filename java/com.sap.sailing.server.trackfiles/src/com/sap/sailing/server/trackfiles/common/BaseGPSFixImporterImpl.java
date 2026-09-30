@@ -1,11 +1,11 @@
 package com.sap.sailing.server.trackfiles.common;
 
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixMovingImpl;
 import com.sap.sailing.domain.trackfiles.TrackFileImportDeviceIdentifier;
 import com.sap.sailing.domain.trackimport.GPSFixImporter;
+import com.sap.sse.common.SpeedWithBearing;
 
 /**
  * When an importer only provides latitude/longitude positions but no course over ground (COG) and no speed over ground

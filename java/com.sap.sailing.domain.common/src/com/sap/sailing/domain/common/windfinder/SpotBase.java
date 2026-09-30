@@ -2,8 +2,8 @@ package com.sap.sailing.domain.common.windfinder;
 
 import java.net.URL;
 
-import com.sap.sailing.domain.common.Positioned;
 import com.sap.sse.common.NamedWithID;
+import com.sap.sse.common.Positioned;
 import com.sap.sse.common.TimePoint;
 
 /**

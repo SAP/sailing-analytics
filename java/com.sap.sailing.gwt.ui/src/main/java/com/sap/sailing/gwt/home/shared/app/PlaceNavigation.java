@@ -10,6 +10,7 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.EventListener;
 import com.google.gwt.user.client.Window;
+import com.sap.sailing.landscape.common.SharedLandscapeConstants;
 import com.sap.sse.gwt.client.LinkUtil;
 import com.sap.sse.gwt.settings.UrlBuilderUtil;
 
@@ -27,7 +28,7 @@ public class PlaceNavigation<T extends Place> {
         this.mapper = mapper;
         String locationURL = getLocationURL();
         this.isDestinationOnRemoteServer = !(placeNavigator.isStandaloneServer() || isLocationOnLocalhost(locationURL) || isLocationOnDefaultSapSailingServer(locationURL));
-        this.baseUrl = isDestinationOnRemoteServer ? AbstractPlaceNavigator.DEFAULT_SAPSAILING_SERVER_URL : locationURL;
+        this.baseUrl = isDestinationOnRemoteServer ? SharedLandscapeConstants.DEFAULT_SAILING_SERVER_URL : locationURL;
     }
 
     public PlaceNavigation(String baseUrl, T destinationPlace, boolean isDestinationOnRemoteServer,
@@ -82,7 +83,7 @@ public class PlaceNavigation<T extends Place> {
     }
 
     private boolean isLocationOnDefaultSapSailingServer(String urlToCheck) {
-        return urlToCheck.contains(AbstractPlaceNavigator.DEFAULT_SAPSAILING_SERVER);
+        return urlToCheck.contains(SharedLandscapeConstants.DEFAULT_SAILING_SERVER);
     }
 
     private boolean isLocationOnLocalhost(String urlToCheck) {

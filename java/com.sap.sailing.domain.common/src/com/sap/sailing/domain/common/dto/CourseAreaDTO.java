@@ -2,8 +2,8 @@ package com.sap.sailing.domain.common.dto;
 
 import java.util.UUID;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
 import com.sap.sse.security.shared.dto.NamedDTO;
 
 /**

@@ -36,6 +36,7 @@ public class LabeledManeuverForEstimationJsonSerializer implements JsonSerialize
     public static final String BOAT_CLASS = "boatClass";
     public static final String MARK_PASSING_DATA_AVAILABLE = "markPassingDataAvailable";
     public static final String REGATTA_NAME = "regattaName";
+    public static final String COMPETITOR_NAME = "competitorName";
 
     private final BoatClassJsonSerializer boatClassSerializer = new DetailedBoatClassJsonSerializer();
 
@@ -69,6 +70,7 @@ public class LabeledManeuverForEstimationJsonSerializer implements JsonSerialize
         json.put(WIND_SPEED, maneuver.getWind().getKnots());
         json.put(WIND_COURSE, maneuver.getWind().getBearing().getDegrees());
         json.put(REGATTA_NAME, maneuver.getRegattaName());
+        json.put(COMPETITOR_NAME, maneuver.getCompetitorName());
         return json;
     }
 

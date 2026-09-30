@@ -1,7 +1,7 @@
 package com.sap.sailing.declination;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Timed;
 

@@ -4,7 +4,7 @@ import org.json.simple.JSONObject;
 
 import com.sap.sailing.domain.base.ControlPoint;
 import com.sap.sailing.domain.base.Mark;
-import com.sap.sailing.domain.common.Position;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Util;
 import com.sap.sse.shared.json.JsonSerializer;
 

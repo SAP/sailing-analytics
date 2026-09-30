@@ -272,6 +272,7 @@ public abstract class AbstractFilterablePanel<T> extends HorizontalPanel {
      * Removes an object and applies the search filter.
      */
     public void remove(T object) {
+        select(object, false);
         all.getList().remove(object);
         filter();
     }
@@ -287,11 +288,13 @@ public abstract class AbstractFilterablePanel<T> extends HorizontalPanel {
      * <code>removeAll(all)</code> with <code>all</code> being a copy of what you get when calling {@link #getAll()}.
      */
     public void removeAll() {
+        deselectAll();
         all.getList().clear();
         filter();
     }
 
     public void removeAll(Iterable<T> objects) {
+        objects.forEach(o->select(o, false)); // clear those objects removed from the selection
         Util.removeAll(objects, all.getList());
         filter();
     }

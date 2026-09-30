@@ -32,9 +32,6 @@ import com.sap.sailing.domain.base.impl.SeriesImpl;
 import com.sap.sailing.domain.base.impl.WaypointImpl;
 import com.sap.sailing.domain.common.CompetitorRegistrationType;
 import com.sap.sailing.domain.common.PassingInstruction;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixImpl;
 import com.sap.sailing.domain.leaderboard.impl.HighPoint;
 import com.sap.sailing.domain.racelog.RaceLogAndTrackedRaceResolver;
@@ -43,8 +40,11 @@ import com.sap.sailing.domain.tracking.DynamicTrackedRace;
 import com.sap.sailing.domain.tracking.impl.DynamicTrackedRaceImpl;
 import com.sap.sailing.domain.tracking.impl.DynamicTrackedRegattaImpl;
 import com.sap.sailing.domain.tracking.impl.EmptyWindStore;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.impl.DegreePosition;
+import com.sap.sse.common.impl.MeterDistance;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 public class AbstractMockedRaceMarkPassingTest {
@@ -88,7 +88,7 @@ public class AbstractMockedRaceMarkPassingTest {
         race = new DynamicTrackedRaceImpl(new DynamicTrackedRegattaImpl(r), raceDef, new ArrayList<Sideline>(),
                 new EmptyWindStore(), 0, 10000, 10000, /* useMarkPassingCalculator */ false,
                 OneDesignRankingMetric::new,
-                mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null);
+                mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null, /* maneuverRaceFingerprintRegistry */null);
         race.setStartTimeReceived(new MillisecondsTimePoint(10000));
         TimePoint t = new MillisecondsTimePoint(30000);
         List<Util.Pair<Mark, Position>> pos = Arrays.asList(new Util.Pair<Mark, Position>(m, new DegreePosition(0, 0)),

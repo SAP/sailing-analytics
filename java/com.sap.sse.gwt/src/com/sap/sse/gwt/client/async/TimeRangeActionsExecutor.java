@@ -48,7 +48,7 @@ import com.sap.sse.common.Util.Pair;
  *
  * @author Tim Hessenmüller (D062243)
  */
-public class TimeRangeActionsExecutor<Result, SubResult, Key> {
+public class TimeRangeActionsExecutor<Result, SubResult, Key> extends AbstractActionsExecutor {
     /**
      * Callback called by {@link TimeRangeActionsExecutor#executor} upon receiving an answer from the server for a
      * potentially trimmed request. The compound {@code Result} is {@link TimeRangeAsyncCallback#unzipResult(Object)
@@ -80,6 +80,8 @@ public class TimeRangeActionsExecutor<Result, SubResult, Key> {
                 final TimeRangeResultCache<SubResult> cache = getSubResultCache(key);
                 cache.registerResult(action, trimmedSubResultForKey);
             }
+            numberOfPendingActions--;
+            notifyListeners();
         }
 
         @Override
@@ -89,6 +91,8 @@ public class TimeRangeActionsExecutor<Result, SubResult, Key> {
                 callback.onFailure(caught);
                 callbackWasCalled = true;
             }
+            numberOfPendingActions--;
+            notifyListeners();
         }
 
         /**
@@ -141,11 +145,8 @@ public class TimeRangeActionsExecutor<Result, SubResult, Key> {
         }
     }
 
-    private final Map<Key, TimeRangeResultCache<SubResult>> cacheMap = new HashMap<>(); //TODO Invalidation
-
-    public TimeRangeActionsExecutor() {
-    }
-
+    private final Map<Key, TimeRangeResultCache<SubResult>> cacheMap = new HashMap<>();
+    
     /**
      * Executes a {@link TimeRangeAsyncAction} and returns the results to a {@link TimeRangeAsyncCallback}. Calls
      * {@link #execute(TimeRangeAsyncAction, AsyncCallback, boolean)} with {@code forceTimeRange} set to {@code false},
@@ -202,6 +203,8 @@ public class TimeRangeActionsExecutor<Result, SubResult, Key> {
                 trimmedTimeRanges.put(subRequest.getKey(), potentiallyTrimmedTimeRange);
             }
         }
+        numberOfPendingActions++;
+        notifyListeners();
         action.execute(trimmedTimeRanges, execCallback);
     }
 

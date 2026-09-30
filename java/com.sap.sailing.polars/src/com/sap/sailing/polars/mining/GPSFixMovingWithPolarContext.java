@@ -4,16 +4,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.sap.sailing.domain.base.BoatClass;
+import com.sap.sailing.domain.base.CPUMeteringType;
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.SpeedWithBearingWithConfidence;
 import com.sap.sailing.domain.common.LegType;
 import com.sap.sailing.domain.common.NoWindException;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.WindSource;
 import com.sap.sailing.domain.common.WindSourceType;
-import com.sap.sailing.domain.common.confidence.BearingWithConfidence;
-import com.sap.sailing.domain.common.confidence.ConfidenceFactory;
-import com.sap.sailing.domain.common.confidence.impl.BearingWithConfidenceImpl;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.tracking.GPSFixTrack;
 import com.sap.sailing.domain.tracking.TrackedLeg;
@@ -21,8 +18,12 @@ import com.sap.sailing.domain.tracking.TrackedLegOfCompetitor;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.domain.tracking.WindWithConfidence;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util.Pair;
+import com.sap.sse.common.confidence.BearingWithConfidence;
+import com.sap.sse.common.confidence.ConfidenceFactory;
+import com.sap.sse.common.confidence.impl.BearingWithConfidenceImpl;
 import com.sap.sse.common.impl.DegreeBearingImpl;
 import com.sap.sse.datamining.data.Cluster;
 import com.sap.sse.datamining.data.ClusterGroup;
@@ -54,7 +55,9 @@ public class GPSFixMovingWithPolarContext implements LegTypePolarClusterKey, Ang
         this.angleClusterGroup = angleClusterGroup;
         this.windSourcesToExcludeForSpeed = collectWindSourcesToIgnoreForSpeed();
         this.absTrueWindAngle = computeTrueWindAngleAbsolute();
-        this.wind = race.getWindWithConfidence(fix.getPosition(), fix.getTimePoint(), windSourcesToExcludeForSpeed);
+        this.wind = race.getTrackedRegatta().getCPUMeter().callWithCPUMeter(
+                () -> race.getWindWithConfidence(fix.getPosition(), fix.getTimePoint(), windSourcesToExcludeForSpeed),
+                CPUMeteringType.BACKEND_POLARS.name());
         this.boatSpeed = computeBoatSpeed();
     }
 

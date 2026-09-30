@@ -1,11 +1,11 @@
 package com.sap.sailing.gwt.ui.client.shared.charts;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.gwt.ui.client.SailingServiceWriteAsync;
 import com.sap.sailing.gwt.ui.client.shared.charts.RaceIdentifierToLeaderboardRaceColumnAndFleetMapper.LeaderboardNameRaceColumnNameAndFleetName;
 import com.sap.sailing.gwt.ui.shared.GPSFixDTO;
 import com.sap.sailing.gwt.ui.shared.MarkDTO;
+import com.sap.sse.common.Position;
 
 public class MarkPositionServiceForSailingService implements MarkPositionService {
     private final SailingServiceWriteAsync sailingServiceWrite;

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
 
 /**
  * Used to define a populated place in the world.<br />

@@ -92,7 +92,6 @@ public class DijkstraShortestPathFinderImpl<T extends ElementWithQuality> implem
             result.append("\n");
             predecessor = nodeOnShortestPath;
         }
-        
         return result.toString();
     }
 

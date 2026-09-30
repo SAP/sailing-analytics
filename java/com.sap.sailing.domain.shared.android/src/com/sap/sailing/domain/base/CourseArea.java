@@ -2,11 +2,11 @@ package com.sap.sailing.domain.base;
 
 import java.util.UUID;
 
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.Positioned;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.IsManagedByCache;
 import com.sap.sse.common.NamedWithID;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.Positioned;
 
 /**
  * A named area in a sailing {@link Venue} where races take place. Usually, the areas carry names according to the NATO

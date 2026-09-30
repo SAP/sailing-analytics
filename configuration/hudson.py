@@ -78,6 +78,8 @@ class Downloader:
 	p_builds = 0
 
 	def __init__(self, base_url, auth, max_concurrent_connections, api_suffix="api/json"):
+		if not base_url.startswith(('http://', 'https://')):
+			base_url = 'https://' + base_url
 		self.base_url = base_url
 		self.__session = aiohttp.ClientSession(auth=aiohttp.BasicAuth(auth[0], auth[1]))
 		self.__lock = asyncio.Semaphore(max_concurrent_connections)

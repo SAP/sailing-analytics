@@ -1,9 +1,9 @@
 package com.sap.sailing.gwt.ui.client.shared.racemap.windladder;
 
 import com.google.gwt.maps.client.MapWidget;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.gwt.ui.client.shared.racemap.CoordinateSystem;
 import com.sap.sailing.gwt.ui.shared.WindDTO;
+import com.sap.sse.common.Position;
 
 /**
  * <p>Main WindLadder component.</p>

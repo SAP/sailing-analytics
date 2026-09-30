@@ -3,9 +3,9 @@ package com.sap.sailing.simulator;
 import java.io.Serializable;
 import java.util.Map;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.DegreeBearingImpl;
 

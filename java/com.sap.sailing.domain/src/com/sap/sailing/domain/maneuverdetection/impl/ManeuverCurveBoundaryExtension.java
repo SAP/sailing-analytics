@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.maneuverdetection.impl;
 
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 
 /**

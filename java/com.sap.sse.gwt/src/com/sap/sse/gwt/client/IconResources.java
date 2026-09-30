@@ -85,4 +85,7 @@ public interface IconResources extends ClientBundle {
     
     @Source("images/command_symbol.png")
     ImageResource commandSymbol();
+    
+    @Source("images/check.png")
+    ImageResource check();
 }

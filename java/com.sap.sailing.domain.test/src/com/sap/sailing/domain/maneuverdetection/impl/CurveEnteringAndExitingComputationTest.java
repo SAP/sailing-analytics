@@ -11,14 +11,14 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.NauticalSide;
-import com.sap.sailing.domain.common.SpeedWithBearing;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.tracking.SpeedWithBearingStep;
 import com.sap.sailing.domain.tracking.SpeedWithBearingStepsIterable;
 import com.sap.sailing.domain.tracking.impl.SpeedWithBearingStepImpl;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 /**

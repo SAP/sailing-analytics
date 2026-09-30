@@ -43,6 +43,7 @@ public class SocialFooter extends Composite {
         ClientConfiguration cfg = ClientConfiguration.getInstance();
         SocialFooterResources.INSTANCE.css().ensureInjected();
         initWidget(uiBinder.createAndBindUi(this));
+        setHrefOrHide(gitHubItem, gitHubLink, gitHubTopText, cfg.getGitHubPagesLink(), cfg.getFollowGitHub(Optional.empty()));
         if (!cfg.isBrandingActive() || !Util.hasLength(cfg.getFollowSports(Optional.empty()))) {
             htmlPanel.getElement().getStyle().setDisplay(Display.NONE);
         } else {
@@ -50,7 +51,6 @@ public class SocialFooter extends Composite {
             setHrefOrHide(xItem, xLink, xTopText, cfg.getxLink(), cfg.getSportsOn(Optional.empty()));
             setHrefOrHide(facebookItem, facebookLink, facebookTopText, cfg.getFacebookLink(), cfg.getSportsOn(Optional.empty()));
             setHrefOrHide(instagramItem, instagramLink, instagramTopText, cfg.getInstagramLink(), cfg.getSportsOn(Optional.empty()));
-            setHrefOrHide(gitHubItem, gitHubLink, gitHubTopText, cfg.getGitHubLink(), cfg.getFollowGitHub(Optional.empty()));
         }
         htmlPanel.getElement().setAttribute(DEBUG_ID_ATTRIBUTE, "socialFooter");
     }

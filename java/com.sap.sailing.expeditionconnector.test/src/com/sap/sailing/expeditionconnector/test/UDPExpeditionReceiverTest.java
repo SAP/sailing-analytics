@@ -40,11 +40,9 @@ import org.junit.jupiter.api.Timeout;
 import com.sap.sailing.declination.Declination;
 import com.sap.sailing.declination.DeclinationService;
 import com.sap.sailing.domain.common.DeviceIdentifier;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.WindSource;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.domain.common.tracking.BravoExtendedFix;
 import com.sap.sailing.domain.common.tracking.DoubleVectorFix;
 import com.sap.sailing.domain.common.tracking.GPSFix;
@@ -65,12 +63,14 @@ import com.sap.sailing.expeditionconnector.persistence.ExpeditionGpsDeviceIdenti
 import com.sap.sailing.expeditionconnector.persistence.ExpeditionSensorDeviceIdentifierImpl;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.NoCorrespondingServiceRegisteredException;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.TimeRange;
 import com.sap.sse.common.Timed;
 import com.sap.sse.common.TransformationException;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Triple;
+import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 @Timeout(value=60, unit=TimeUnit.SECONDS)

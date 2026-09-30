@@ -9,8 +9,6 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import com.sap.sailing.domain.common.BearingChangeAnalyzer;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.tracking.WindTrack;
 import com.sap.sailing.domain.tracking.WindWithConfidence;
@@ -25,6 +23,8 @@ import com.sap.sailing.windestimation.preprocessing.DummyRacePreprocessingPipeli
 import com.sap.sailing.windestimation.preprocessing.RaceWithRandomClippingPreprocessingPipelineImpl;
 import com.sap.sailing.windestimation.util.LoggingUtil;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.BearingChangeAnalyzer;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util.Pair;
 

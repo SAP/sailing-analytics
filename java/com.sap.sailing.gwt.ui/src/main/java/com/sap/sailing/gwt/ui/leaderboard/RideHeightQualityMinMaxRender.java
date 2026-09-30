@@ -4,8 +4,8 @@ import java.util.Comparator;
 
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.sap.sailing.domain.common.dto.LeaderboardRowDTO;
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.domain.common.tracking.BravoFix;
+import com.sap.sse.common.impl.MeterDistance;
 
 public class RideHeightQualityMinMaxRender extends MinMaxRenderer<LeaderboardRowDTO> {
 

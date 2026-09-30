@@ -1,8 +1,8 @@
 package com.sap.sailing.declination.impl;
 
 import com.sap.sailing.declination.Declination;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 

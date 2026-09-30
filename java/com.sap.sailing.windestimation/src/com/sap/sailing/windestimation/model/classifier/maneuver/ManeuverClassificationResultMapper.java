@@ -13,11 +13,11 @@ public class ManeuverClassificationResultMapper implements
         ClassificationResultMapper<ManeuverForEstimation, ManeuverClassifierModelContext, ManeuverWithProbabilisticTypeClassification> {
 
     @Override
-    public ManeuverWithProbabilisticTypeClassification mapToClassificationResult(double[] likelihoods,
+    public ManeuverWithProbabilisticTypeClassification mapToClassificationResult(final double[] likelihoods,
             ManeuverForEstimation maneuver, ManeuverClassifierModelContext modelContext) {
-        likelihoods = modelContext.getLikelihoodsPerManeuverTypeOrdinal(likelihoods);
+        final double[] likelihoodsPerManeuverTypeOrdinal = modelContext.getLikelihoodsPerManeuverTypeOrdinal(likelihoods);
         ManeuverWithProbabilisticTypeClassification maneuverClassificationResult = new ManeuverWithProbabilisticTypeClassification(
-                maneuver, likelihoods);
+                maneuver, likelihoodsPerManeuverTypeOrdinal);
         return maneuverClassificationResult;
     }
 

@@ -93,6 +93,19 @@ public class TestUserGroupCreation extends AbstractSeleniumTest {
         final UserGroupRoleDefinitionPanelPO userRolesPO = userGroupManagementPanel.getUserGroupRoles();
         createRole(userRolesPO);
         userGroupManagementPanel.selectGroup(TEST_GROUP_NAME);
+        userRolesPO.removeRoleViaActionButton(TEST_ROLE);
+        userGroupManagementPanel.selectGroup(TEST_GROUP_NAME);
+        assertNull(userRolesPO.findRole(TEST_ROLE));
+    }
+
+    @SeleniumTestCase
+    public void testRoleRemovalViaGlobalRemoveButton() {
+        final UserGroupManagementPanelPO userGroupManagementPanel = goToUserGroupDefinitionsPanel();
+        createGroup(userGroupManagementPanel);
+        userGroupManagementPanel.selectGroup(TEST_GROUP_NAME);
+        final UserGroupRoleDefinitionPanelPO userRolesPO = userGroupManagementPanel.getUserGroupRoles();
+        createRole(userRolesPO);
+        userGroupManagementPanel.selectGroup(TEST_GROUP_NAME);
         userRolesPO.removeRole(TEST_ROLE);
         userGroupManagementPanel.selectGroup(TEST_GROUP_NAME);
         assertNull(userRolesPO.findRole(TEST_ROLE));

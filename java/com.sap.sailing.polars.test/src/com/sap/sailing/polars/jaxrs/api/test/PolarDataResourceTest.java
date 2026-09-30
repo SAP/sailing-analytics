@@ -19,13 +19,14 @@ import com.sap.sailing.domain.base.impl.DomainFactoryImpl;
 import com.sap.sailing.domain.common.LegType;
 import com.sap.sailing.domain.common.polars.NotEnoughDataHasBeenAddedException;
 import com.sap.sailing.polars.impl.PolarDataServiceImpl;
+import com.sap.sailing.polars.jaxrs.client.FileBasedPolarDataClient;
 
 public class PolarDataResourceTest {
     private static final Logger logger = Logger.getLogger(PolarDataResourceTest.class.getName());
     private static final double[] SPEED_FUNCTIONS_COEFFS_DOWNWIND = 
-            new double[]{ 0, 2.2378615205516326, -0.0801870828343283, 9.81959605693472E-4 };
+            new double[]{ 0, 1.2454692253503623, 0.13300922896236855, -0.006811462395111101 };
     private static final double[] ANGLE_FUNCTION_COEFFS_DOWNWIND = 
-            new double[]{ 138.3296034098894, -5.908558698662091, 1.1870404653964215, -0.056603488833331994 };
+            new double[]{ 146.08526498113133, -8.612243308300094, 1.2273401844320233, -0.0411405074199962 };
     private static final String BOAT_CLASS = "GC32";
 
     private PolarDataServiceImpl polarService;
@@ -35,7 +36,7 @@ public class PolarDataResourceTest {
     public void setUp() throws IOException, ParseException, ClassNotFoundException, InterruptedException {
         polarService = new PolarDataServiceImpl();
         domainFactory = new DomainFactoryImpl(/* raceLogResolver */ null);
-        final PolarDataClientMock client = new PolarDataClientMock(new File("resources/polar_data"), polarService, domainFactory);
+        final FileBasedPolarDataClient client = new FileBasedPolarDataClient(new File("resources/polar_data"), polarService, domainFactory);
         client.updatePolarDataRegressions();
         // ensure that setting the domain factory has worked
         polarService.runWithDomainFactory(domainFactory -> { 
@@ -48,7 +49,7 @@ public class PolarDataResourceTest {
     }
 
     /**
-     * Test to check if client importing data correctly. Using {@link PolarDataClientMock} which use {@link File}
+     * Test to check if client importing data correctly. Using {@link FileBasedPolarDataClient} which use {@link File}
      * polar_data.json as source
      * 
      * @throws NotEnoughDataHasBeenAddedException
@@ -58,14 +59,12 @@ public class PolarDataResourceTest {
         BoatClass boatClass = domainFactory.getOrCreateBoatClass(BOAT_CLASS);
         PolynomialFunction angleDownwindFunction = new PolynomialFunction(ANGLE_FUNCTION_COEFFS_DOWNWIND);
         PolynomialFunction speedDownwindFunction = new PolynomialFunction(SPEED_FUNCTIONS_COEFFS_DOWNWIND);
-
-        assertThat(polarService.getSpeedRegressionsPerAngle().size(), is(68));
-        assertThat(polarService.getCubicRegressionsPerCourse().size(), is(4));
-        assertThat(polarService.getFixCountPerBoatClass().get(boatClass), is(9330L));
+        assertThat(polarService.getSpeedRegressionsPerAngle().size(), is(36));
+        assertThat(polarService.getCubicRegressionsPerCourse().size(), is(2));
+        assertThat(polarService.getFixCountPerBoatClass().get(boatClass), is(248239L));
         // presuming that if downwind functions & regression collections' size are correct then any other thing is
         // imported correctly
         assertThat(polarService.getAngleRegressionFunction(boatClass, LegType.DOWNWIND), is(angleDownwindFunction));
         assertThat(polarService.getSpeedRegressionFunction(boatClass, LegType.DOWNWIND), is(speedDownwindFunction));
     }
-
 }

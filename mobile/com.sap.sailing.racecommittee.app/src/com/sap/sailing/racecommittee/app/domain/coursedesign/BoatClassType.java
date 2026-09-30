@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.sap.sailing.domain.common.impl.MeterDistance;
+import com.sap.sse.common.impl.MeterDistance;
 import com.sap.sse.common.Distance;
 
 @SuppressWarnings("serial")

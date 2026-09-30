@@ -1,7 +1,7 @@
 package com.sap.sailing.dashboards.gwt.server.util.actions.startlineadvantage.precalculation;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.Wind;
+import com.sap.sse.common.Position;
 
 /**
  * In order to calculate the startline adavantage by wind, the data objects defined in this class

@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.common.Wind;
-import com.sap.sailing.domain.common.impl.KnotSpeedImpl;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.igtimiadapter.IgtimiConnection;
 import com.sap.sailing.domain.igtimiadapter.IgtimiConnectionFactory;
@@ -28,6 +27,7 @@ import com.sap.sailing.domain.tracking.DynamicTrack;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.KnotSpeedImpl;
 
 /**
  * Igtimi fixes come as isolated single fixes from separate sensors, and even if they are attached to the same device,

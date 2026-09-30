@@ -1,11 +1,11 @@
 package com.sap.sailing.domain.common.tracking.impl;
 
-import com.sap.sailing.domain.common.SpeedWithBearing;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.SpeedWithBearing;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 
 public abstract class AbstractGPSFixImpl implements GPSFix {
     private static final long serialVersionUID = 9037068515469957639L;
@@ -96,6 +96,7 @@ public abstract class AbstractGPSFixImpl implements GPSFix {
     }
 
     @Override
-    public void cacheEstimatedSpeed(SpeedWithBearing estimatedSpeed) {
+    public SpeedWithBearing cacheEstimatedSpeed(SpeedWithBearing estimatedSpeed) {
+        return estimatedSpeed;
     }
 }

@@ -23,7 +23,7 @@
                         <p ui:field="contentSailingAnalytics1" />
                         <p ui:field="contentSailingAnalytics2" />
                         <a class="{res.mainCss.button}" ui:field="sailingAnalyticsDetailsAnchor">
-                            <ui:text from="{i18n.sailingRaceManagerReadMore}"/>
+                            <ui:text from="{i18n.readMore}"/>
                         </a>
                     </g:HTMLPanel>
                 </s:content>
@@ -36,7 +36,7 @@
                         <p ui:field="contentSailingRaceManager" />
                         <sb:PlayStoreBadge targetUrl="{i18n.playstoreRacecommitteeApp}"/>
                         <a class="{res.mainCss.button}" ui:field="raceManagerAppDetailsAnchor">
-                           <ui:text from="{i18n.sailingRaceManagerReadMore}"/>
+                           <ui:text from="{i18n.readMore}"/>
                         </a>
                     </g:HTMLPanel>
                 </s:content>
@@ -50,7 +50,7 @@
                         <sb:AppStoreBadge targetUrl="{i18n.appstoreSapSailInsight}"/>
                         <sb:PlayStoreBadge targetUrl="{i18n.playstoreInsightApp}"/>
                         <a class="{res.mainCss.button}" ui:field="sailInSightAppDetailsAnchor">
-                           <ui:text from="{i18n.sailInSightReadMore}"/>
+                           <ui:text from="{i18n.readMore}"/>
                         </a>
                     </g:HTMLPanel>
                 </s:content>
@@ -63,7 +63,7 @@
                         <p ui:field="contentSailingBuoyPinger" />
                         <sb:PlayStoreBadge targetUrl="{i18n.playStoreBuoyPingerApp}"/>
                         <a class="{res.mainCss.button}" ui:field="buoyPingerAppDetailsAnchor">
-                           <ui:text from="{i18n.sailInSightReadMore}"/>
+                           <ui:text from="{i18n.readMore}"/>
                         </a>
                     </g:HTMLPanel>
                 </s:content>
@@ -77,7 +77,7 @@
                             <ui:text from='{i18n.contentStrategySimulator}' />
                         </p>
                         <a class="{res.mainCss.button}" ui:field="simulatorAppDetailsAnchor">
-                           <ui:text from="{i18n.strategySimulatorReadMore}"/>
+                           <ui:text from="{i18n.readMore}"/>
                         </a>
                     </g:HTMLPanel>
                 </s:content>

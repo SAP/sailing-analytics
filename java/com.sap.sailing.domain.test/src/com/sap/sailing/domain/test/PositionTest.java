@@ -6,22 +6,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-import com.sap.sailing.domain.common.Mile;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.SpeedWithBearing;
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
-import com.sap.sailing.domain.common.impl.MeterDistance;
-import com.sap.sailing.domain.common.impl.NauticalMileDistance;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.common.tracking.impl.CompactionNotPossibleException;
 import com.sap.sailing.domain.common.tracking.impl.VeryCompactGPSFixImpl;
 import com.sap.sailing.domain.common.tracking.impl.VeryCompactGPSFixMovingImpl;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Mile;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.DegreePosition;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
+import com.sap.sse.common.impl.MeterDistance;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
+import com.sap.sse.common.impl.NauticalMileDistance;
 
 public class PositionTest {
     @Test
@@ -120,7 +120,7 @@ public class PositionTest {
     @Test
     public void translateTest() {
         Position p1 = new DegreePosition(0, 0);
-        // now travel to 123� for 0.001 nautical miles (~ 1.852m)
+        // now travel to 123° for 0.001 nautical miles (~ 1.852m)
         Position p2 = p1.translateGreatCircle(new DegreeBearingImpl(123), new NauticalMileDistance(0.001));
         assertEquals(123, p1.getBearingGreatCircle(p2).getDegrees(), 0.0000001);
         assertEquals(0.001, p1.getDistance(p2).getNauticalMiles(), 0.0000001);

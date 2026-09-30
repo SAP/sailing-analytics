@@ -5,14 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.SpeedWithBearing;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixMovingImpl;
 import com.sap.sailing.domain.tracking.DynamicGPSFixTrack;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.SpeedWithBearing;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 
 public class PositionInterpolationAndExtrapolationWithSpeedInfoTest extends PositionInterpolationAndExtrapolationTest<GPSFixMoving> {
     private SpeedWithBearing speed;

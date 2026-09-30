@@ -273,7 +273,7 @@ public class PreferenceObjectBasedNotificationSetTest {
         Map<String, UserGroup> defaultTenantForServer = new ConcurrentHashMap<>();
         defaultTenantForServer.put(serverName, defaultTenantForSingleServer);
         store.createUser(username, email, new TimedLockImpl());
-        store.updateUser(new UserImpl(username, email, null, null, null, true, null, null, defaultTenantForServer,
+        store.updateUser(new UserImpl(username, email, null, null, null, true, false, null, null, defaultTenantForServer,
                 Collections.emptySet(), /* userGroupProvider */ null, new TimedLockImpl()));
     }
     

@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 import com.sap.sailing.grib.GribWindField;
 import com.sap.sailing.grib.GribWindFieldFactory;
+import com.sap.sse.common.Util;
 import com.sap.sse.common.util.MappingIterable;
 import com.sap.sse.util.LoggerAppender;
 
@@ -188,6 +189,9 @@ public class GribWindFieldFactoryImpl implements GribWindFieldFactory {
      * are no longer needed.
      */
     private File copyStreamToFile(InputStream s, String filename) throws IOException {
+        if (Util.hasLength(filename) && (filename.contains("..") || filename.contains("/") || filename.contains("\\"))) {
+            throw new IllegalArgumentException("File extension must not contain '..' or a file separator like '/'.");
+        }
         Path tempDir = Files.createTempDirectory("gribcache");
         Path filePath = tempDir.resolve(filename);
         Files.copy(s, filePath);

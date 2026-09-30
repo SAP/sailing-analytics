@@ -1,6 +1,5 @@
 package com.sap.sailing.domain.orc.impl;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.orc.AverageWindOnLegCache;
 import com.sap.sailing.domain.common.orc.ORCPerformanceCurveLeg;
@@ -12,6 +11,7 @@ import com.sap.sailing.domain.tracking.WindWithConfidence;
 import com.sap.sailing.domain.tracking.impl.NoCachingWindLegTypeAndLegBearingCache;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util.Pair;
 
@@ -19,7 +19,7 @@ import com.sap.sse.common.Util.Pair;
  * Abstract base class for adapting a {@link TrackedLeg} to the {@link ORCPerformanceCurveLeg} interface. If wind
  * information is known, the leg will be of type {@link ORCPerformanceCurveLegTypes#TWA} using as the {@link #getTwa()
  * TWA} the angular difference between this leg's bearing and the TWA as obtained from the
- * {@link TrackedRace#getWind(com.sap.sailing.domain.common.Position, TimePoint) TrackedRace} of which the
+ * {@link TrackedRace#getWind(com.sap.sse.common.Position, TimePoint) TrackedRace} of which the
  * {@link TrackedLeg} passed to the constructor is a part. If no wind information is known, the leg is emulated to be of
  * type {@link ORCPerformanceCurveLegTypes#LONG_DISTANCE}, and {@link #getTwa()} will return {@code null}.
  * <p>

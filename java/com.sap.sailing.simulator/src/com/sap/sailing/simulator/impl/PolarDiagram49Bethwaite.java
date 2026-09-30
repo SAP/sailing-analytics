@@ -4,10 +4,10 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import com.sap.sailing.domain.base.DomainFactory;
-import com.sap.sailing.domain.common.impl.KnotSpeedImpl;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Speed;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.KnotSpeedImpl;
 
 public class PolarDiagram49Bethwaite extends PolarDiagramBase {
 

@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -175,6 +176,36 @@ public class SecuredServerImpl implements SecuredServer {
         }
     }
     
+    @Override
+    public void deleteOwnership(HasPermissions type, TypeRelativeObjectIdentifier typeRelativeObjectId)
+            throws MalformedURLException, ClientProtocolException, IOException, ParseException {
+        final URL deleteOwnershipUrl = new URL(getBaseUrl(),
+                SECURITY_API_PREFIX + OwnershipResource.RESTSECURITY_OWNERSHIP + "/"
+                        + type.getName() + "/" + typeRelativeObjectId.toString());
+        final HttpDelete deleteRequest = new HttpDelete(deleteOwnershipUrl.toString());
+        deleteRequest.setHeader(HTTP.CONTENT_TYPE, "application/json");
+        authenticate(deleteRequest);
+        final CloseableHttpResponse response = createHttpClient().execute(deleteRequest);
+        if (response.getStatusLine().getStatusCode() >= 300) {
+            throw new IllegalArgumentException(response.getStatusLine().getReasonPhrase());
+        }
+    }
+
+    @Override
+    public void deleteAccessControlLists(HasPermissions type, TypeRelativeObjectIdentifier typeRelativeObjectId)
+            throws MalformedURLException, ClientProtocolException, IOException, ParseException {
+        final URL deleteACLUrl = new URL(getBaseUrl(),
+                SECURITY_API_PREFIX + OwnershipResource.RESTSECURITY_OWNERSHIP + "/"
+                        + type.getName() + "/" + typeRelativeObjectId.toString() + "/" + OwnershipResource.KEY_ACL);
+        final HttpDelete deleteRequest = new HttpDelete(deleteACLUrl.toString());
+        deleteRequest.setHeader(HTTP.CONTENT_TYPE, "application/json");
+        authenticate(deleteRequest);
+        final CloseableHttpResponse response = createHttpClient().execute(deleteRequest);
+        if (response.getStatusLine().getStatusCode() >= 300) {
+            throw new IllegalArgumentException(response.getStatusLine().getReasonPhrase());
+        }
+    }
+
     @Override
     public Map<UUID, Set<String>> getAccessControlLists(HasPermissions type, TypeRelativeObjectIdentifier typeRelativeObjectId) throws ClientProtocolException, IOException, ParseException {
         final URL getGroupAndUserOwnerUrl = new URL(getBaseUrl(), SECURITY_API_PREFIX + OwnershipResource.RESTSECURITY_OWNERSHIP

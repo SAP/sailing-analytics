@@ -47,8 +47,6 @@ import com.sap.sailing.domain.common.BoatClassMasterdata;
 import com.sap.sailing.domain.common.CompetitorRegistrationType;
 import com.sap.sailing.domain.common.ScoringSchemeType;
 import com.sap.sailing.domain.common.WindSourceType;
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.impl.WindImpl;
 import com.sap.sailing.domain.common.impl.WindSourceImpl;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixImpl;
@@ -68,6 +66,8 @@ import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.DegreePosition;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sse.common.impl.MillisecondsDurationImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
@@ -144,7 +144,7 @@ public class TestCrossFleetScoring extends LeaderboardScoringAndRankingTestBase 
                     /* delay for wind estimation cache invalidation */ 0, /* useMarkPassingCalculator */ false,
                     tr -> new TimeOnTimeAndDistanceRankingMetric(tr, timeOnTimeFactors, // time-on-time
                             c -> new MillisecondsDurationImpl((long) (1000. * timeOnDistanceAllowance.apply(c)))),
-                    mock(RaceLogAndTrackedRaceResolver.class), null, /* markPassingRaceFingerprintRegistry */ null);
+                    mock(RaceLogAndTrackedRaceResolver.class), null, /* markPassingRaceFingerprintRegistry */ null, /* maneuverRaceFingerprintRegistry */ null);
             // in this simplified artificial course, the top mark is exactly north of the right leeward gate
             DegreePosition topPosition = new DegreePosition(1, 0);
             trackedRace.getOrCreateTrack(left)

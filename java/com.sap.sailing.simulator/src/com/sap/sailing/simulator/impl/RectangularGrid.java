@@ -3,12 +3,12 @@ package com.sap.sailing.simulator.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.simulator.Grid;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.impl.DegreePosition;
 
 /**
  * Implements the {@link Grid} interface by providing a grid of GPS-positions based on the plane approximation of the

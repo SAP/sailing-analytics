@@ -5,9 +5,9 @@ import java.text.ParseException;
 
 import com.sap.sailing.declination.impl.DeclinationImporter;
 import com.sap.sailing.declination.impl.WMMCalculatorDeclinationService;
-import com.sap.sailing.domain.common.Mile;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Mile;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 
 public interface DeclinationService {

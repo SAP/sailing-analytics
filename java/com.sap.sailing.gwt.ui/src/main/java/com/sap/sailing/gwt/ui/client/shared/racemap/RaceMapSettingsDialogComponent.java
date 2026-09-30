@@ -18,7 +18,6 @@ import com.google.gwt.user.client.ui.LongBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.sap.sailing.domain.common.ManeuverType;
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.gwt.common.client.premium.SailingPremiumCheckBox;
 import com.sap.sailing.gwt.ui.client.ManeuverTypeFormatter;
 import com.sap.sailing.gwt.ui.client.StringMessages;
@@ -26,6 +25,7 @@ import com.sap.sailing.gwt.ui.client.shared.racemap.RaceMapHelpLinesSettings.Hel
 import com.sap.sailing.gwt.ui.client.shared.racemap.RaceMapZoomSettings.ZoomTypes;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.impl.MeterDistance;
 import com.sap.sse.gwt.client.controls.IntegerBox;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog.Validator;

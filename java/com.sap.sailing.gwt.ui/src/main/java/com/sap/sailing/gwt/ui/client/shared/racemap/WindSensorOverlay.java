@@ -3,13 +3,13 @@ package com.sap.sailing.gwt.ui.client.shared.racemap;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.base.Point;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.WindSource;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.gwt.ui.client.WindSourceTypeFormatter;
 import com.sap.sailing.gwt.ui.shared.WindDTO;
 import com.sap.sailing.gwt.ui.shared.WindTrackInfoDTO;
 import com.sap.sailing.gwt.ui.shared.racemap.CanvasOverlayV3;
+import com.sap.sse.common.Position;
 
 /**
  * A google map overlay based on a HTML5 canvas for drawing a wind sensor (as an rotating arrow)

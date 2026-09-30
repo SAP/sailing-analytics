@@ -1,7 +1,7 @@
 package com.sap.sailing.racecommittee.app.utils;
 
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.DegreePosition;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sailing.racecommittee.app.R;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;

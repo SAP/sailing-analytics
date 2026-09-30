@@ -24,7 +24,6 @@ import com.sap.sailing.domain.common.MaxPointsReason;
 import com.sap.sailing.domain.common.NoWindException;
 import com.sap.sailing.domain.common.NotFoundException;
 import com.sap.sailing.domain.common.PassingInstruction;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.RaceIdentifier;
 import com.sap.sailing.domain.common.RankingMetrics;
 import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
@@ -85,6 +84,7 @@ import com.sap.sailing.gwt.ui.shared.SwissTimingRaceRecordDTO;
 import com.sap.sailing.gwt.ui.shared.TracTracConfigurationWithSecurityDTO;
 import com.sap.sailing.gwt.ui.shared.TracTracRaceRecordDTO;
 import com.sap.sailing.gwt.ui.shared.TrackFileImportDeviceIdentifierDTO;
+import com.sap.sailing.gwt.ui.shared.TrackingTimesRevocationReportDTO;
 import com.sap.sailing.gwt.ui.shared.TypedDeviceMappingDTO;
 import com.sap.sailing.gwt.ui.shared.UrlDTO;
 import com.sap.sailing.gwt.ui.shared.VenueDTO;
@@ -97,6 +97,7 @@ import com.sap.sailing.gwt.ui.shared.courseCreation.MarkRoleDTO;
 import com.sap.sailing.gwt.ui.shared.courseCreation.MarkTemplateDTO;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.NoCorrespondingServiceRegisteredException;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.TransformationException;
 import com.sap.sse.common.Util;
@@ -251,7 +252,7 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
     
     void updateIgtimiDevice(IgtimiDeviceWithSecurityDTO editedObject);
 
-    void removeIgtimiDevice(String serialNumber);
+    void removeIgtimiDevice(long deviceId);
     
     boolean sendGPSOffCommandToIgtimiDevice(String serialNumber) throws IOException;
 
@@ -762,4 +763,6 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
 
     void copyPairingListFromOtherLeaderboard(String sourceLeaderboardName, String targetLeaderboardName, String fromRaceColumnName,
             String toRaceColumnInclusiveName) throws UnauthorizedException, NotFoundException;
+    
+    TrackingTimesRevocationReportDTO revokeExplicitTrackingTimes(String leaderboardName) throws NotFoundException;
 }

@@ -14,7 +14,7 @@ import com.sap.sse.gwt.client.controls.datetime.DateTimeInput.Accuracy;
 public class EventEditDialog extends EventDialog {
     public EventEditDialog(EventDTO event, Collection<EventDTO> otherExistingEvents, List<LeaderboardGroupDTO> availableLeaderboardGroups,
             SailingServiceWriteAsync sailingServiceWrite, StringMessages stringMessages, DialogCallback<EventDTO> callback, MediaServiceAsync mediaService) {
-        super(new EventParameterValidator(stringMessages, otherExistingEvents), sailingServiceWrite, stringMessages, availableLeaderboardGroups, event.getLeaderboardGroups(), callback);
+        super(new EventParameterValidator(stringMessages, otherExistingEvents), sailingServiceWrite, stringMessages, availableLeaderboardGroups, event.getLeaderboardGroups(), otherExistingEvents, callback);
         nameEntryField = createTextBox(event.getName());
         nameEntryField.setVisibleLength(50);
         descriptionEntryField = createTextArea(event.getDescription());
@@ -30,7 +30,7 @@ public class EventEditDialog extends EventDialog {
         baseURLEntryField = createTextBox(event.getBaseURL());
         baseURLEntryField.setVisibleLength(50);
         id = event.id;
-        courseAreaNameList.setValue(new ArrayList<>(event.getVenue().getCourseAreas()));
+        courseAreaList.setValue(new ArrayList<>(event.getVenue().getCourseAreas()));
         List<String> leaderboardGroupNames = new ArrayList<>();
         for(LeaderboardGroupDTO leaderboardGroupDTO: event.getLeaderboardGroups()) {
             leaderboardGroupNames.add(leaderboardGroupDTO.getName());

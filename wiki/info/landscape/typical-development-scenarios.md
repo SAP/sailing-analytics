@@ -77,6 +77,20 @@ From the list shown, pick the bundle you need and add it to the '*.target' file,
 * Select the features of the p2 repository you want to use in the project
 * Reload the target platform
 
+## Upgrading the Jetty p2 Repository
+
+We're maintaining a p2 repository with the Jetty version we include in our target platform. As of this writing, we're using version 9.4.58. The p2 repository lives at [https://download.eclipse.org/sailing-analytics/p2/jetty-9.4.58.v20250814/](https://download.eclipse.org/sailing-analytics/p2/jetty-9.4.58.v20250814/).
+
+We create this p2 repository by running the ``.github/workflow/build-jetty-p2.yml`` workflow (see [here](https://github.com/eclipse-sailing-analytics/sailing-analytics/actions/workflows/build-jetty-p2.yml)). It has a "workflow_dispatch" configuration and requires manual triggering. The Jetty version for which to produce the p2 repository is contained in the workflow file (``echo "VERSION=9.4.58.v20250814" >>"${GITHUB_ENV}"``) and can be updated to the version desired. After running the workflow successfully, the p2 repository with the new version number will show under ``https://download.eclipse.org/sailing-analytics/p2/jetty-${VERSION}``.
+
+Next, the target platform definition must be adjusted. For this, in your local checked-out Git workspace, run the script ``java/com.sap.sailing.targetplatform/scripts/activateJettyP2Repo.sh``. It will modify the ``feature.xml`` files and your ``*.target`` files so they point to the correct version. Furthermore, it grabs two additional OSGi bundles from Maven Central: ``apache-jsp`` and ``jetty-osgi-boot-jsp``, both used for OSGi/JSP support inside Jetty. Their versions must match that of the Jetty p2 repository exactly but are not part of the Jetty shipment itself. Therefore, they need to go into the "sailing base p2" repository. The ``activateJettyP2Repo.sh`` puts them into the local definition of that "sailing base p2" repository, which then needs to be built and uploaded to the ``download.eclipse.org/sailing-analytics/p2`` area.
+
+For this, once you commit and push the changes to the ``java/com.sap.sailing.targetplatform.base`` project to the ``main`` branch, the ``build-sailing-base-p2`` workflow will be triggered by these changes and build and upload the new "sailing base p2" repository. With this, your target platform should be up to date again.
+
+Before pushing all these changes to the ``main`` branch you may also want to consider testing things locally and even with a non-``main`` branch build through Github Actions. For this, use the ``java/com.sap.sailing.targetplatform/scripts/createJettyP2RepoFromMavenCentral.sh`` script and the ``java/com.sap.sailing.targetplatform/scripts/createLocalBaseP2repository.sh`` script to test the p2 repositories in their new versions prior to uploading them. Also, work with the ``local_target_platform`` input parameter of the [release](https://github.com/eclipse-sailing-analytics/sailing-analytics/actions/workflows/release.yml) workflow and set it to ``true`` for a branch build after having made your changes to the target platform definition and "sailing base p2" repository contents on your branch.
+
+Merge to ``main`` only when such measures have produced "green" builds, and don't forget to inform your co-developers, e.g., through the [Github Discussions](https://github.com/eclipse-sailing-analytics/sailing-analytics/discussions) section of the repository.
+
 ## Working with the Amazon AWS SDK Java API
 
 A Java API exists for the Amazon Web Services (AWS) in the form of a modular Software Development Kit (SDK). It can be found, e.g., on Maven Central, under the group ID ``software.amazon.awssdk``. A core module and various service-specific modules exist, e.g., for load balancing, Route 53 DNS handling, or the EC2 base infrastructure. Source JARs are available for the API, too, and the API has further dependencies to other artifacts. None of these artifacts is OSGi-enabled.

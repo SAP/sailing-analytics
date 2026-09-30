@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import com.google.gwt.cell.client.AbstractCell;
@@ -40,7 +39,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.SelectionChangeEvent;
 import com.sap.sailing.domain.common.dto.CourseAreaDTO;
 import com.sap.sailing.gwt.common.client.help.HelpButton;
 import com.sap.sailing.gwt.common.client.help.HelpButtonResources;
@@ -81,6 +79,7 @@ import com.sap.sse.security.ui.client.component.EditOwnershipDialog;
 import com.sap.sse.security.ui.client.component.EditOwnershipDialog.DialogConfig;
 import com.sap.sse.security.ui.client.component.SecuredDTOOwnerColumn;
 import com.sap.sse.security.ui.client.component.editacl.EditACLDialog;
+import com.google.gwt.user.cellview.client.Header;
 
 /**
  * A composite showing the list of all sailing events  
@@ -100,6 +99,7 @@ public class EventListComposite extends Composite {
     private final Displayer<LeaderboardGroupDTO> leaderboardGroupsDisplayer;
     private final Displayer<EventDTO> eventsDisplayer;
     private Iterable<LeaderboardGroupDTO> availableLeaderboardGroups;
+    private final Map<UUID, LeaderboardGroupDTO> availableLeaderboardGroupsById;
     
     public static class AnchorCell extends AbstractCell<SafeHtml> {
         @Override
@@ -128,6 +128,7 @@ public class EventListComposite extends Composite {
         this.presenter = presenter;
         this.placeController = placeController;
         this.availableLeaderboardGroups = Collections.emptyList();
+        this.availableLeaderboardGroupsById = new HashMap<>();
         this.allEvents = new ArrayList<EventDTO>();
         final VerticalPanel panel = new VerticalPanel();
         final AccessControlledButtonPanel buttonPanel = new AccessControlledButtonPanel(userService, EVENT);
@@ -177,22 +178,11 @@ public class EventListComposite extends Composite {
         final Button create = buttonPanel.addCreateAction(stringMessages.actionAddEvent(), this::openCreateEventDialog);
         create.ensureDebugId("CreateEventButton");
         final Button remove = buttonPanel.addRemoveAction(stringMessages.remove(), refreshableEventSelectionModel, true,
-                () -> removeEvents(refreshableEventSelectionModel.getSelectedSet()));
-        remove.ensureDebugId("RemoveEventsButton");
-        this.refreshableEventSelectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-            @Override
-            public void onSelectionChange(SelectionChangeEvent event) {
-                final Set<EventDTO> selectedEvents = refreshableEventSelectionModel.getSelectedSet();
-                boolean canDeleteAll = true;
-                for (EventDTO eventDTO : selectedEvents) {
-                    if (!userService.hasPermission(eventDTO, DefaultActions.DELETE)) {
-                        canDeleteAll = false;
-                    }
-                }
-                remove.setEnabled(!selectedEvents.isEmpty() && canDeleteAll);
-
-            }
+                () -> {
+            final List<EventDTO> selected = new ArrayList<>(refreshableEventSelectionModel.getSelectedSet());
+            removeEvents(selected);
         });
+        remove.ensureDebugId("RemoveEventsButton");
         buttonPanel.addUnsecuredWidget(new HelpButton(HelpButtonResources.INSTANCE,
                 stringMessages.videoGuide(), "https://sapsailing-documentation.s3-eu-west-1.amazonaws.com/adminconsole/CreatingYourFirstEvent.mp4"));
         panel.add(filterTextbox);
@@ -229,7 +219,7 @@ public class EventListComposite extends Composite {
                     public int hashCode(EventDTO t) {
                         return t.id.hashCode();
                     }
-                }, filterTextbox.getAllListDataProvider(),table);
+                }, filterTextbox.getAllListDataProvider());
         AnchorCell anchorCell = new AnchorCell();
         ListHandler<EventDTO> listHandler = new ListHandler<EventDTO>(eventListDataProvider.getList());
         final TextColumn<EventDTO> eventUUidColumn = new AbstractSortableTextColumn<EventDTO>(
@@ -372,7 +362,8 @@ public class EventListComposite extends Composite {
         configureTableColumnSortHandler(listHandler, eventSelectionCheckboxColumn,
                 eventNameColumn, venueNameColumn, startEndDateColumn, isPublicColumn, courseAreasColumn,
                 leaderboardGroupsColumn, groupColumn, userColumn);
-        table.addColumn(eventSelectionCheckboxColumn, eventSelectionCheckboxColumn.getHeader());
+        final Header<Boolean> selectAllHeader = eventSelectionCheckboxColumn.createHeader();
+        table.addColumn(eventSelectionCheckboxColumn, selectAllHeader);
         table.addColumn(eventNameColumn, stringMessages.event());
         table.addColumn(venueNameColumn, stringMessages.venue());
         table.addColumn(startEndDateColumn, stringMessages.from() + "/" + stringMessages.to());
@@ -505,45 +496,51 @@ public class EventListComposite extends Composite {
     }
     
     private void openCreateDefaultRegattaDialog(final EventDTO createdEvent) {
-        CreateDefaultRegattaDialog dialog = new CreateDefaultRegattaDialog(sailingServiceWrite, stringMessages, errorReporter, new DialogCallback<Void>() {
+        final CreateDefaultRegattaDialog dialog = new CreateDefaultRegattaDialog(sailingServiceWrite, stringMessages,
+                errorReporter, new DialogCallback<Void>() {
             @Override
             public void cancel() {
             }
 
             @Override
-            public void ok(Void editedObject) {
-                sailingServiceWrite.getRegattas(new AsyncCallback<List<RegattaDTO>>() {
+            public void ok(final Void editedObject) {
+                sailingServiceWrite.getRegattas(new MarkedAsyncCallback<List<RegattaDTO>>(
+                        new AsyncCallback<List<RegattaDTO>>() {
                     @Override
-                    public void onFailure(Throwable caught) {
-                        sailingServiceWrite.getEvents(new AsyncCallback<List<EventDTO>>() {
+                    public void onFailure(final Throwable caught) {
+                        sailingServiceWrite.getEvents(new MarkedAsyncCallback<List<EventDTO>>(
+                                new AsyncCallback<List<EventDTO>>() {
                             @Override
-                            public void onFailure(Throwable caught) {
-                                openCreateRegattaDialog(Collections.<RegattaDTO>emptyList(), Collections.<EventDTO>emptyList(), createdEvent);
+                            public void onFailure(final Throwable caught) {
+                                openCreateRegattaDialog(Collections.<RegattaDTO>emptyList(),
+                                        Collections.<EventDTO>emptyList(), createdEvent);
                             }
 
                             @Override
-                            public void onSuccess(List<EventDTO> result) {
-                                openCreateRegattaDialog(Collections.<RegattaDTO>emptyList(), Collections.unmodifiableList(result), createdEvent);
+                            public void onSuccess(final List<EventDTO> result) {
+                                openCreateRegattaDialog(Collections.<RegattaDTO>emptyList(),
+                                        Collections.unmodifiableList(result), createdEvent);
                             }
-                        });
-
+                        }));
                     }
 
                     @Override
                     public void onSuccess(final List<RegattaDTO> existingRegattas) {
-                        sailingServiceWrite.getEvents(new AsyncCallback<List<EventDTO>>() {
+                        sailingServiceWrite.getEvents(new MarkedAsyncCallback<List<EventDTO>>(
+                                new AsyncCallback<List<EventDTO>>() {
                             @Override
-                            public void onFailure(Throwable caught) {
+                            public void onFailure(final Throwable caught) {
                                 openCreateRegattaDialog(existingRegattas, Collections.<EventDTO>emptyList(), createdEvent);
                             }
 
                             @Override
-                            public void onSuccess(List<EventDTO> result) {
-                                openCreateRegattaDialog(existingRegattas, Collections.unmodifiableList(result), createdEvent);
+                            public void onSuccess(final List<EventDTO> result) {
+                                openCreateRegattaDialog(existingRegattas, Collections.unmodifiableList(result),
+                                        createdEvent);
                             }
-                        });
+                        }));
                     }
-                });
+                }));
             }
         });
         dialog.ensureDebugId("CreateDefaultRegattaDialog");
@@ -578,23 +575,10 @@ public class EventListComposite extends Composite {
                                     @Override
                                     public void onSuccess(LeaderboardGroupDTO newGroup) {
                                         newEvent.addLeaderboardGroup(newGroup);
-                                        // fillEvents() will have replaced newEvent in allEvents by a new copy coming from the server which
-                                        // doesn't know about the new leaderboard group yet. An updateEvent call will link the leaderboard group
-                                        // to the event on the server
-                                        EventDTO matchingEvent = null;
-                                        for (EventDTO event : allEvents) {
-                                            if (event.id.equals(newEvent.id)) {
-                                                matchingEvent = event;
-                                            }
-                                        }
-                                        if (matchingEvent != null) {
-                                            updateEvent(matchingEvent, newEvent);
-                                        } else {
-                                            errorReporter.reportError("Could not find the event with name "+newEvent.getName()+" to which the leaderboardgroup should be added");
-                                        }
+                                        updateEvent(newEvent, newEvent,
+                                                () -> openCreateDefaultRegattaDialog(newEvent));
                                         presenter.getLeaderboardGroupsRefresher().add(newGroup);
                                         presenter.getLeaderboardGroupsRefresher().callAllFill();
-                                        openCreateDefaultRegattaDialog(newEvent);
                                     }
                                 }));
             }
@@ -629,7 +613,12 @@ public class EventListComposite extends Composite {
     }
 
     private void updateEvent(final EventDTO oldEvent, final EventDTO updatedEvent) {
-        Pair<List<CourseAreaDTO>, List<CourseAreaDTO>> courseAreasToAddAndRemove = getCourseAreasToAdd(oldEvent, updatedEvent);
+        updateEvent(oldEvent, updatedEvent, null);
+    }
+
+    private void updateEvent(final EventDTO oldEvent, final EventDTO updatedEvent, final Runnable onSuccess) {
+        final Pair<List<CourseAreaDTO>, List<CourseAreaDTO>> courseAreasToAddAndRemove = getCourseAreasToAdd(oldEvent,
+                updatedEvent);
         final List<CourseAreaDTO> courseAreasToAdd = courseAreasToAddAndRemove.getA();
         final List<CourseAreaDTO> courseAreasToRemove = courseAreasToAddAndRemove.getB();
         final List<UUID> updatedEventLeaderboardGroupIds = updatedEvent.getLeaderboardGroupIds();
@@ -637,64 +626,94 @@ public class EventListComposite extends Composite {
                 updatedEvent.startDate, updatedEvent.endDate, updatedEvent.getVenue(), updatedEvent.isPublic,
                 updatedEventLeaderboardGroupIds, updatedEvent.getOfficialWebsiteURL(), updatedEvent.getBaseURL(),
                 updatedEvent.getSailorsInfoWebsiteURLs(), updatedEvent.getImages(), updatedEvent.getVideos(),
-                updatedEvent.getWindFinderReviewedSpotsCollectionIds(), new AsyncCallback<EventDTO>() {
+                updatedEvent.getWindFinderReviewedSpotsCollectionIds(),
+                new MarkedAsyncCallback<EventDTO>(new AsyncCallback<EventDTO>() {
                     @Override
-                    public void onFailure(Throwable t) {
+                    public void onFailure(final Throwable t) {
                         errorReporter.reportError(
                                 "Error trying to update sailing event" + oldEvent.getName() + ": " + t.getMessage());
                     }
 
                     @Override
-                    public void onSuccess(EventDTO result) {
-                        sailingServiceWrite.createCourseAreas(oldEvent.id, courseAreasToAdd,
-                                new AsyncCallback<Void>() {
-                                    @Override
-                                    public void onFailure(Throwable t) {
-                                        errorReporter.reportError("Error trying to add course area to sailing event "
-                                                + oldEvent.getName() + ": " + t.getMessage());
-                                    }
-
-                                    @Override
-                                    public void onSuccess(Void result) {
-                                        final UUID[] idsOfCourseAreasToRemove = new UUID[courseAreasToRemove.size()];
-                                        int j = 0;
-                                        for (CourseAreaDTO courseAreaToRemove : courseAreasToRemove) {
-                                            idsOfCourseAreasToRemove[j++] = courseAreaToRemove.getId();
-                                        }
-                                        sailingServiceWrite.removeCourseAreas(oldEvent.id, idsOfCourseAreasToRemove,
-                                                new AsyncCallback<Void>() {
-                                                    @Override
-                                                    public void onFailure(Throwable t) {
-                                                        errorReporter.reportError(
-                                                                "Error trying to remove course area from sailing event "
-                                                                        + oldEvent.getName() + ": " + t.getMessage());
-                                                    }
-
-                                                    @Override
-                                                    public void onSuccess(Void result) {
-                                                        presenter.getEventsRefresher().reloadAndCallFillAll();
-                                                        if (!oldEvent.getName().equals(updatedEvent.getName())) {
-                                                            sailingServiceWrite.renameEvent(oldEvent.id,
-                                                                    updatedEvent.getName(), new AsyncCallback<Void>() {
-                                                                        @Override
-                                                                        public void onSuccess(Void result) {
-                                                                        }
-
-                                                                        @Override
-                                                                        public void onFailure(Throwable t) {
-                                                                            errorReporter.reportError(
-                                                                                    "Error trying to rename sailing event "
-                                                                                            + oldEvent.getName() + ": "
-                                                                                            + t.getMessage());
-                                                                        }
-                                                                    });
-                                                        }
-                                                    }
-                                                });
-                                    }
-                                });
+                    public void onSuccess(final EventDTO result) {
+                        createCourseAreas(oldEvent, updatedEvent, courseAreasToAdd, courseAreasToRemove, onSuccess);
                     }
-                });
+                }));
+    }
+
+    private void createCourseAreas(final EventDTO oldEvent, final EventDTO updatedEvent,
+            final List<CourseAreaDTO> courseAreasToAdd, final List<CourseAreaDTO> courseAreasToRemove,
+            final Runnable onSuccess) {
+        if (courseAreasToAdd.isEmpty()) {
+            removeCourseAreas(oldEvent, updatedEvent, courseAreasToRemove, onSuccess);
+        } else {
+            sailingServiceWrite.createCourseAreas(oldEvent.id, courseAreasToAdd,
+                    new MarkedAsyncCallback<Void>(new AsyncCallback<Void>() {
+                        @Override
+                        public void onFailure(final Throwable t) {
+                            errorReporter.reportError("Error trying to add course area to sailing event "
+                                    + oldEvent.getName() + ": " + t.getMessage());
+                        }
+
+                        @Override
+                        public void onSuccess(final Void result) {
+                            removeCourseAreas(oldEvent, updatedEvent, courseAreasToRemove, onSuccess);
+                        }
+                    }));
+        }
+    }
+
+    private void removeCourseAreas(final EventDTO oldEvent, final EventDTO updatedEvent,
+            final List<CourseAreaDTO> courseAreasToRemove, final Runnable onSuccess) {
+        if (courseAreasToRemove.isEmpty()) {
+            renameEvent(oldEvent, updatedEvent, onSuccess);
+        } else {
+            final UUID[] idsOfCourseAreasToRemove = new UUID[courseAreasToRemove.size()];
+            int i = 0;
+            for (final CourseAreaDTO courseAreaToRemove : courseAreasToRemove) {
+                idsOfCourseAreasToRemove[i++] = courseAreaToRemove.getId();
+            }
+            sailingServiceWrite.removeCourseAreas(oldEvent.id, idsOfCourseAreasToRemove,
+                    new MarkedAsyncCallback<Void>(new AsyncCallback<Void>() {
+                        @Override
+                        public void onFailure(final Throwable t) {
+                            errorReporter.reportError("Error trying to remove course area from sailing event "
+                                    + oldEvent.getName() + ": " + t.getMessage());
+                        }
+
+                        @Override
+                        public void onSuccess(final Void result) {
+                            renameEvent(oldEvent, updatedEvent, onSuccess);
+                        }
+                    }));
+        }
+    }
+
+    private void renameEvent(final EventDTO oldEvent, final EventDTO updatedEvent, final Runnable onSuccess) {
+        if (oldEvent.getName().equals(updatedEvent.getName())) {
+            completeEventUpdate(onSuccess);
+        } else {
+            sailingServiceWrite.renameEvent(oldEvent.id, updatedEvent.getName(),
+                    new MarkedAsyncCallback<Void>(new AsyncCallback<Void>() {
+                        @Override
+                        public void onSuccess(final Void result) {
+                            completeEventUpdate(onSuccess);
+                        }
+
+                        @Override
+                        public void onFailure(final Throwable t) {
+                            errorReporter.reportError("Error trying to rename sailing event " + oldEvent.getName() + ": "
+                                    + t.getMessage());
+                        }
+                    }));
+        }
+    }
+
+    private void completeEventUpdate(final Runnable onSuccess) {
+        presenter.getEventsRefresher().reloadAndCallFillAll();
+        if (onSuccess != null) {
+            onSuccess.run();
+        }
     }
 
     private Pair<List<CourseAreaDTO>, List<CourseAreaDTO>> getCourseAreasToAdd(final EventDTO oldEvent, final EventDTO updatedEvent) {
@@ -709,9 +728,9 @@ public class EventListComposite extends Composite {
         sailingServiceWrite.createEvent(newEvent.getName(), newEvent.getDescription(), newEvent.startDate, newEvent.endDate,
                 newEvent.getVenue().getName(), newEvent.isPublic, newEvent.getVenue().getCourseAreas(), newEvent.getOfficialWebsiteURL(), newEvent.getBaseURL(),
                 newEvent.getSailorsInfoWebsiteURLs(), newEvent.getImages(), newEvent.getVideos(), newEvent.getLeaderboardGroupIds(),
-                new AsyncCallback<EventDTO>() {
+                new MarkedAsyncCallback<EventDTO>(new AsyncCallback<EventDTO>() {
             @Override
-            public void onFailure(Throwable t) {
+            public void onFailure(final Throwable t) {
                 errorReporter.reportError("Error trying to create new event " + newEvent.getName() + ": " + t.getMessage());
             }
 
@@ -738,11 +757,25 @@ public class EventListComposite extends Composite {
                     openCreateDefaultRegattaDialog(newEvent);
                 }
             }
-        });
+        }));
     }
 
+    /**
+     * Updates {@link #availableLeaderboardGroups} and {@link #availableLeaderboardGroupsById} from
+     * the {@code leaderboardGroups} iterable, filtered to those to which the user has {@link DefaultActions#UPDATE}
+     * permission. Then, these leaderboard groups are used to update {@link #allEvents all events} regarding the
+     * {@link LeaderboardGroupDTO}s they reference to ensure consistency for the {@link EventDTO}s and any
+     * other leaderboard group displayer.
+     */
     public void fillLeaderboardGroups(Iterable<LeaderboardGroupDTO> leaderboardGroups) {
         availableLeaderboardGroups = Util.filter(leaderboardGroups, lg->userService.hasPermission(lg, DefaultActions.UPDATE));
+        availableLeaderboardGroupsById.clear();
+        for (final LeaderboardGroupDTO lgDto : availableLeaderboardGroups) {
+            availableLeaderboardGroupsById.put(lgDto.getId(), lgDto);
+        }
+        for (final EventDTO event : allEvents) {
+            event.replaceLeaderboardGroupsWithSameId(availableLeaderboardGroupsById);
+        }
     }
 
     public void fillEvents(Iterable<EventDTO> events) {
@@ -754,7 +787,10 @@ public class EventListComposite extends Composite {
             noEventsLabel.setVisible(true);
         }
         allEvents.clear();
-        events.forEach(allEvents::add);
+        events.forEach(e->{
+            e.replaceLeaderboardGroupsWithSameId(availableLeaderboardGroupsById);
+            allEvents.add(e);
+        });
         filterTextbox.updateAll(allEvents);
         eventTable.redraw();
     }

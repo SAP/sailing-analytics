@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.common.tracking.impl;
 
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.common.tracking.GPSFix;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.AbstractTimePoint;
 
@@ -84,7 +84,7 @@ public abstract class AbstractCompactGPSFixImpl extends AbstractGPSFixImpl {
     }
 
     @Override
-    public void invalidateCache() {
+    public synchronized void invalidateCache() {
         whatIsCached &= ~IS_VALIDITY_CACHED;
     }
 
@@ -104,12 +104,13 @@ public abstract class AbstractCompactGPSFixImpl extends AbstractGPSFixImpl {
     }
 
     @Override
-    public void invalidateEstimatedSpeedCache() {
+    public synchronized void invalidateEstimatedSpeedCache() {
         whatIsCached &= ~IS_ESTIMATED_SPEED_CACHED;
     }
 
     @Override
-    public void cacheEstimatedSpeed(SpeedWithBearing estimatedSpeed) {
+    public synchronized SpeedWithBearing cacheEstimatedSpeed(SpeedWithBearing estimatedSpeed) {
         whatIsCached |= IS_ESTIMATED_SPEED_CACHED;
+        return super.cacheEstimatedSpeed(estimatedSpeed);
     }
 }

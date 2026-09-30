@@ -102,6 +102,7 @@ com.sap.sse.gwt.adminconsole.StringMessages {
     String successfullyUpgradedApplicationReplicaSet(String name, String version);
     String upgradingApplicationReplicaSetFailed(String name);
     String upgradeApplicationReplicaSet();
+    String upgradeArchiveServer();
     String successfullyArchivedReplicaSet(String name);
     String removeArchivedReplicaSet();
     String bearerTokenOrNullForApplicationReplicaSetToArchive(String replicaSetName);
@@ -115,6 +116,12 @@ com.sap.sse.gwt.adminconsole.StringMessages {
     String ensureAtLeastOneReplicaExistsStopReplicatingAndRemoveMasterFromTargetGroups();
     String successfullyStoppedReplicatingAndRemovedMasterFromTargetGroups(String replicaSetName);
     String stopReplicating();
+    String liveContentWarningTitle();
+    String liveContentWarning(String liveContentDetails);
+    String liveContentUndeterminedWarningTitle();
+    String liveContentUndeterminedWarning(String undeterminedDetails);
+    String liveContentUndeterminedSectionHeader();
+    String proceedDespiteLiveContent();
     String sameAsMaster();
     String firstReplicaOnSharedInstance();
     String machineImageId();
@@ -172,11 +179,15 @@ com.sap.sse.gwt.adminconsole.StringMessages {
     String successfullyRotatedHttpdLogsOnInstance(String instance);
     String invalidOperationForThisProxy();
     String pleaseProvideNonEmptyNameAndAZ();
-    String unlockedSuccessfully();
+    String success();
     String availabilityZone();
     String runOnExisting();
     String publicIp();
     String privateIp();
     String igtimiRiotPort();
     String examplePort(int examplePort);
+    String successfullyLaunchedNewArchiveCandidate(String replicaSetName, String releaseName);
+    String successfullySwitchedToNewArchiveCandidate(String replicaSetName);
+    String activateArchiveCandidate();
+    String reallySwitchToNewArchiveCandidate();
 }

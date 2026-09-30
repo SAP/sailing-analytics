@@ -1,10 +1,10 @@
 package com.sap.sailing.datamining.data;
 
 import com.sap.sailing.domain.common.NoWindException;
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.common.tracking.BravoFix;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.datamining.annotations.Connector;
 import com.sap.sse.datamining.annotations.Statistic;
 

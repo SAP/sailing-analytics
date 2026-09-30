@@ -7,9 +7,9 @@ import java.util.UUID;
 import com.sap.sailing.domain.abstractlog.race.analyzing.impl.RaceLogResolver;
 import com.sap.sailing.domain.common.MarkType;
 import com.sap.sailing.domain.common.PassingInstruction;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sse.common.Color;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
 
 public interface SharedDomainFactory<RLR extends RaceLogResolver> extends CompetitorFactory, BoatFactory {
 

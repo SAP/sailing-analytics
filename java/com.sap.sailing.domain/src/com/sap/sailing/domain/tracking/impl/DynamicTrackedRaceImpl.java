@@ -44,6 +44,7 @@ import com.sap.sailing.domain.common.racelog.Flags;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.common.tracking.SensorFix;
+import com.sap.sailing.domain.maneuverhash.ManeuverRaceFingerprintRegistry;
 import com.sap.sailing.domain.markpassingcalculation.MarkPassingCalculator;
 import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprintRegistry;
 import com.sap.sailing.domain.racelog.RaceLogAndTrackedRaceResolver;
@@ -123,11 +124,11 @@ DynamicTrackedRace, GPSTrackListener<Competitor, GPSFixMoving> {
             long millisecondsOverWhichToAverageSpeed, long delayForCacheInvalidationOfWindEstimation,
             boolean useInternalMarkPassingAlgorithm, RankingMetricConstructor rankingMetricConstructor,
             RaceLogAndTrackedRaceResolver raceLogResolver, TrackingConnectorInfo trackingConnectorInfo,
-            MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry) {
+            MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry, ManeuverRaceFingerprintRegistry maneuverRaceFingerprintRegistry) {
         super(trackedRegatta, race, sidelines, windStore, delayToLiveInMillis, millisecondsOverWhichToAverageWind,
                 millisecondsOverWhichToAverageSpeed, delayForCacheInvalidationOfWindEstimation,
                 useInternalMarkPassingAlgorithm, rankingMetricConstructor, raceLogResolver, trackingConnectorInfo,
-                markPassingRaceFingerprintRegistry);
+                markPassingRaceFingerprintRegistry, maneuverRaceFingerprintRegistry);
         raceStateBasedStartTimeChangedListener = createRaceStateStartTimeChangeListener();
         this.competitorResultsFromRaceLog = new HashMap<>();
         this.logListener = new DynamicTrackedRaceLogListener(this);
@@ -209,11 +210,11 @@ DynamicTrackedRace, GPSTrackListener<Competitor, GPSFixMoving> {
             WindStore windStore, long delayToLiveInMillis, long millisecondsOverWhichToAverageWind,
             long millisecondsOverWhichToAverageSpeed, boolean useInternalMarkPassingAlgorithm,
             RankingMetricConstructor rankingMetricConstructor, RaceLogAndTrackedRaceResolver raceLogResolver, TrackingConnectorInfo trackingConnectorInfo,
-            MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry) {
+            MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry, ManeuverRaceFingerprintRegistry maneuverRaceFingerprintRegistry) {
         this(trackedRegatta, race, sidelines, windStore, delayToLiveInMillis,
                 millisecondsOverWhichToAverageWind, millisecondsOverWhichToAverageSpeed,
                 millisecondsOverWhichToAverageWind / 2, useInternalMarkPassingAlgorithm, rankingMetricConstructor, raceLogResolver, trackingConnectorInfo,
-                markPassingRaceFingerprintRegistry);
+                markPassingRaceFingerprintRegistry, maneuverRaceFingerprintRegistry);
     }
 
     @Override
@@ -935,7 +936,7 @@ DynamicTrackedRace, GPSTrackListener<Competitor, GPSFixMoving> {
             LockUtil.unlockAfterRead(getSerializationLock());
         }
     }
-
+    
     /**
      * The {@link CompetitorResults} from the race log as cached in {@link #competitorResultsFromRaceLog} may optionally
      * set a finishing time for competitors. Also, depending on how the race log has been modified (e.g., a new pass

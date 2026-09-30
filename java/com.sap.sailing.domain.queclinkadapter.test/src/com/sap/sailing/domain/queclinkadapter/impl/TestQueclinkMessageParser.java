@@ -14,8 +14,6 @@ import java.util.regex.Matcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.domain.queclinkadapter.FRIReport;
 import com.sap.sailing.domain.queclinkadapter.HBDAcknowledgement;
 import com.sap.sailing.domain.queclinkadapter.HBDServerAcknowledgement;
@@ -23,8 +21,10 @@ import com.sap.sailing.domain.queclinkadapter.Message;
 import com.sap.sailing.domain.queclinkadapter.MessageParser;
 import com.sap.sailing.domain.queclinkadapter.MessageType;
 import com.sap.sailing.domain.queclinkadapter.MessageType.Direction;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.impl.DegreePosition;
 
 public class TestQueclinkMessageParser {
     private static final double EPSILON = 0.00000001;

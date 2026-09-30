@@ -3,8 +3,6 @@ package com.sap.sailing.domain.common.orc;
 import java.io.Serializable;
 import java.util.Map;
 
-import com.sap.sailing.domain.common.impl.KnotSpeedImpl;
-import com.sap.sailing.domain.common.impl.NauticalMileDistance;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.CountryCode;
 import com.sap.sse.common.Distance;
@@ -13,6 +11,8 @@ import com.sap.sse.common.Speed;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.WithID;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.KnotSpeedImpl;
+import com.sap.sse.common.impl.NauticalMileDistance;
 
 /**
  * Represents semantically a real ORC certificate for a {@link Competitor}, which is used to rate different type of

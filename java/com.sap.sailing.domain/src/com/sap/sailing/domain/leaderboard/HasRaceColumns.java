@@ -31,4 +31,8 @@ public interface HasRaceColumns {
         }
         return null;
     }
+    
+    default boolean hasTrackedRace(TrackedRace trackedRace) {
+        return getRaceColumnAndFleet(trackedRace) != null;
+    }
 }

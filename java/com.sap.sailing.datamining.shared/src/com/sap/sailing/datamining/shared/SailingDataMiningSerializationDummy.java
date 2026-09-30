@@ -4,13 +4,13 @@ import com.sap.sailing.domain.common.LegType;
 import com.sap.sailing.domain.common.ManeuverType;
 import com.sap.sailing.domain.common.NauticalSide;
 import com.sap.sailing.domain.common.Tack;
-import com.sap.sailing.domain.common.impl.CentralAngleDistance;
-import com.sap.sailing.domain.common.impl.MeterDistance;
-import com.sap.sailing.domain.common.impl.NauticalMileDistance;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.impl.CentralAngleDistance;
+import com.sap.sse.common.impl.MeterDistance;
+import com.sap.sse.common.impl.NauticalMileDistance;
 import com.sap.sse.datamining.shared.SerializationDummy;
 import com.sap.sse.datamining.shared.data.AverageWithStats;
 

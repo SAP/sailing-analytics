@@ -3,6 +3,7 @@ package com.sap.sailing.domain.persistence;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -37,12 +38,15 @@ import com.sap.sailing.domain.leaderboard.LeaderboardGroup;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroupResolver;
 import com.sap.sailing.domain.leaderboard.LeaderboardRegistry;
 import com.sap.sailing.domain.leaderboard.RegattaLeaderboardWithEliminations;
+import com.sap.sailing.domain.maneuverhash.ManeuverRaceFingerprint;
 import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprint;
 import com.sap.sailing.domain.racelog.RaceLogIdentifier;
 import com.sap.sailing.domain.regattalike.RegattaLikeIdentifier;
+import com.sap.sailing.domain.tracking.Maneuver;
 import com.sap.sailing.domain.tracking.MarkPassing;
 import com.sap.sailing.domain.tracking.RaceTrackingConnectivityParameters;
 import com.sap.sailing.domain.tracking.RaceTrackingConnectivityParametersHandler;
+import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.domain.tracking.TrackedRegattaRegistry;
 import com.sap.sailing.domain.tracking.WindTrack;
 import com.sap.sse.common.NoCorrespondingServiceRegisteredException;
@@ -229,10 +233,14 @@ public interface DomainObjectFactory {
     Wind loadWind(Document windDocument);
 
     Map<RaceIdentifier, MarkPassingRaceFingerprint> loadFingerprintsForMarkPassingHashes();
+    
+    Map<RaceIdentifier, ManeuverRaceFingerprint> loadFingerprintsForManeuverHashes();
 
     /**
      * For races that have a {@link MarkPassingRaceFingerprint} stored in the database (see {@link #loadFingerprintsForMarkPassingHashes()})
      * a caller can load the corresponding mark passings with this method.
      */
     Map<Competitor, Map<Waypoint, MarkPassing>> loadMarkPassings(RaceIdentifier raceIdentifier, Course course);
+    
+    Map<Competitor, List<Maneuver>> loadManeuvers(TrackedRace trackedRace, Course course);
 }

@@ -306,7 +306,8 @@ public class SimulatorMainPanel extends SimplePanel {
                 /*
                  * isScreenLargeEnoughToOfferChartSupport: no wind or competitor chart is shown; use full horizontal
                  * extension of time panel
-                 */ false, userService, /*TODO: raceDTO is needed for permission check */null);
+                 */ false, userService, /*TODO: raceDTO is needed for permission check */null,
+                /* pending server operations count supplier */ null, /* timeRangeActionsExecutor */ null);
         busyIndicator = new SimpleBusyIndicator(false, 0.8f);
         simulatorMap = new SimulatorMap(simulatorSvc, stringMessages, errorReporter, xRes, yRes, border, streamletPars,
                 timer, timePanel, windParams, busyIndicator, mode, this, showMapControls,

@@ -1,12 +1,12 @@
 package com.sap.sailing.domain.maneuverdetection.impl;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.maneuverdetection.CompleteManeuverCurveWithEstimationData;
 import com.sap.sailing.domain.maneuverdetection.ManeuverCurveWithUnstableCourseAndSpeedWithEstimationData;
 import com.sap.sailing.domain.maneuverdetection.ManeuverMainCurveWithEstimationData;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
 
 /**
  * 

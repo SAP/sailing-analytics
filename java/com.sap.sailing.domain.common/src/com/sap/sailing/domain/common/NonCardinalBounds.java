@@ -2,7 +2,9 @@ package com.sap.sailing.domain.common;
 
 import com.sap.sailing.domain.common.impl.NonCardinalBoundsImpl;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.Bounds;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.impl.DegreeBearingImpl;
 
 /**

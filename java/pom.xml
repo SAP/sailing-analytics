@@ -48,7 +48,7 @@
     Can we move the system property -Dmongo.dbName to "parameters.mongodb"? If so the IP of the host would be the same for all
     profiles. -->
     <parameters.common>
-      -Dfile.encoding=UTF-8 -Dmongo.dbName=winddbTest -DspatialWind=true -Xss100m -Dgwt.rpc.version=9 -Dgoogle.maps.authenticationparams=key=AIzaSyD1Se4tIkt-wglccbco3S7twaHiG20hR9E
+      -Dfile.encoding=UTF-8 -Dmongo.dbName=winddbTest -DspatialWind=true -Xss100m -Dgwt.rpc.version=9 -Dgoogle.maps.authenticationparams=key=AIzaSyD1Se4tIkt-wglccbco3S7twaHiG20hR9E -Digtimi.base.url=http://127.0.0.1:8888
     </parameters.common>
     <parameters.vm-settings>
       -ea -Xmx8192m -XX:+UseG1GC

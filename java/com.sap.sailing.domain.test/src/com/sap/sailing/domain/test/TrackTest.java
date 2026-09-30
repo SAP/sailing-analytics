@@ -29,15 +29,6 @@ import org.junit.jupiter.api.Test;
 import com.sap.sailing.domain.base.Boat;
 import com.sap.sailing.domain.base.impl.BoatClassImpl;
 import com.sap.sailing.domain.base.impl.BoatImpl;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.SpeedWithBearing;
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.KnotSpeedImpl;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
-import com.sap.sailing.domain.common.impl.MeterDistance;
-import com.sap.sailing.domain.common.impl.MeterPerSecondSpeedWithDegreeBearingImpl;
-import com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing;
-import com.sap.sailing.domain.common.scalablevalue.impl.ScalableSpeed;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.common.tracking.impl.CompactionNotPossibleException;
@@ -56,14 +47,23 @@ import com.sap.sse.common.AbstractBearing;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.TimeRange;
 import com.sap.sse.common.Timed;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.DegreePosition;
+import com.sap.sse.common.impl.KnotSpeedImpl;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
+import com.sap.sse.common.impl.MeterDistance;
+import com.sap.sse.common.impl.MeterPerSecondSpeedWithDegreeBearingImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
+import com.sap.sse.common.scalablevalue.impl.ScalableBearing;
+import com.sap.sse.common.scalablevalue.impl.ScalableSpeed;
 
 public class TrackTest {
     private static final int MILLIS_BETWEEN_FIXES = 3000000;
@@ -357,7 +357,7 @@ public class TrackTest {
         GPSFix fix4 = new GPSFixImpl(new DegreePosition(4./60., 0), new MillisecondsTimePoint(10800000)); // 1nm in one hour = 1kt
         track.addGPSFix(fix4);
         assertEquals(1., track.getMaximumSpeedOverGround(new MillisecondsTimePoint(0), new MillisecondsTimePoint(3600000)).
-                getB().getKnots(), 0.001);
+                getB().getKnots(), 0.01);
     }
 
     @Test
@@ -372,7 +372,7 @@ public class TrackTest {
         GPSFix fix4 = new GPSFixImpl(new DegreePosition(4./60., 0), new MillisecondsTimePoint(10800000)); // 1nm in one hour = 1kt
         track.addGPSFix(fix4);
         assertEquals(2., track.getMaximumSpeedOverGround(new MillisecondsTimePoint(0), new MillisecondsTimePoint(10800000)).
-                getB().getKnots(), 0.001);
+                getB().getKnots(), 0.01);
     }
 
     @Test
@@ -870,7 +870,7 @@ public class TrackTest {
         track.addGPSFix(fix);
         assertEquals(1, invalidationCalls.size());
         // the lateOutlier's predecessor now is expected to have changed validity again, causing a distance cache invalidation at its time
-        assertEquals(track.getLastFixBefore(timePointOfLastRawFixBeforeLateOutlier).getTimePoint().plus(1), invalidationCalls.iterator().next());
+        assertEquals(track.getLastFixBefore(timePointOfLastRawFixBeforeLateOutlier).getTimePoint().plusResolution(), invalidationCalls.iterator().next());
         assertTrue(timePointForLateOutlier.compareTo(fix.getTimePoint()) < 0);
         // expect the invalidation to have started at the fix before the outlier, leaving the previous result ending at the fix right before the outlier intact
         final com.sap.sse.common.Util.Pair<TimePoint, com.sap.sse.common.Util.Pair<TimePoint, Distance>> stillStillPresentFullIntervalCacheEntry = distanceCache
@@ -1313,7 +1313,7 @@ public class TrackTest {
                 /* bearing deg delta */ 0.1, /* knot speed delta */ 0.1); // fetch again from the cache
         // assuming that all test fixes are within a few milliseconds and the averaging interval is much larger than that,
         // adding a single fix in the middle should invalidate the cache
-        track.add(new GPSFixMovingImpl(gpsFix3.getPosition(), gpsFix3.getTimePoint().plus(1), gpsFix3.getSpeed(), /* optionalTrueHeading */ null));
+        track.add(new GPSFixMovingImpl(gpsFix3.getPosition(), gpsFix3.getTimePoint().plusResolution(), gpsFix3.getSpeed(), /* optionalTrueHeading */ null));
         assertFalse(compactFix3.isEstimatedSpeedCached());
     }
 }

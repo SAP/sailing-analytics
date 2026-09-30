@@ -1,9 +1,9 @@
 package com.sap.sailing.gwt.ui.shared;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
-import com.sap.sailing.domain.common.confidence.BearingWithConfidence;
-import com.sap.sailing.domain.common.confidence.impl.BearingWithConfidenceImpl;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.confidence.BearingWithConfidence;
+import com.sap.sse.common.confidence.impl.BearingWithConfidenceImpl;
 import com.sap.sse.common.impl.DegreeBearingImpl;
 
 public class BearingWithConfidenceDTO implements IsSerializable {

@@ -1,9 +1,9 @@
 package com.sap.sailing.domain.common.impl;
 
 import com.sap.sailing.domain.common.NonCardinalBounds;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
 
 public class NonCardinalBoundsImpl implements NonCardinalBounds {
     /**

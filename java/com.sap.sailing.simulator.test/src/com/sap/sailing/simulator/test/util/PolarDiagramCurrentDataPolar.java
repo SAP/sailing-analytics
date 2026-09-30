@@ -5,12 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import com.sap.sailing.domain.common.SpeedWithBearing;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.simulator.impl.PolarDiagram49STG;
 import com.sap.sailing.simulator.impl.PolarDiagramBase;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 
 public class PolarDiagramCurrentDataPolar {
 

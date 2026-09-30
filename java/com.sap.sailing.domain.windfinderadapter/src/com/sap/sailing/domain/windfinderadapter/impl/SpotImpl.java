@@ -20,13 +20,13 @@ import java.util.logging.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.windfinder.SpotDTO;
 import com.sap.sailing.domain.windfinder.ReviewedSpotsCollection;
 import com.sap.sailing.domain.windfinder.Spot;
 import com.sap.sailing.domain.windfinder.WindFinderSpotListener;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.util.HttpUrlConnectionHelper;

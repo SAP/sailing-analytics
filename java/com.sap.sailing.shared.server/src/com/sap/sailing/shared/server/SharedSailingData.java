@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.sap.sailing.domain.common.DeviceIdentifier;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.coursetemplate.CommonMarkProperties;
 import com.sap.sailing.domain.coursetemplate.CourseTemplate;
 import com.sap.sailing.domain.coursetemplate.FixedPositioning;
@@ -18,6 +17,7 @@ import com.sap.sailing.domain.coursetemplate.Positioning;
 import com.sap.sailing.domain.coursetemplate.WaypointTemplate;
 import com.sap.sailing.shared.server.impl.ReplicatingSharedSailingData;
 import com.sap.sailing.shared.server.impl.SharedSailingDataImpl;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.RepeatablePart;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.MillisecondsTimePoint;

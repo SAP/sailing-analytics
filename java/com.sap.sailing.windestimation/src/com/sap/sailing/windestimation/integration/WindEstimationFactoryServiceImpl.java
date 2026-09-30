@@ -70,7 +70,24 @@ public class WindEstimationFactoryServiceImpl extends
 
     @Override
     public IncrementalWindEstimation createIncrementalWindEstimationTrack(TrackedRace trackedRace) {
-        IncrementalWindEstimation windEstimation = new IncrementalMstHmmWindEstimationForTrackedRace(trackedRace,
+        // bug6241: the incremental wind estimation is only useful when a polar-data service is
+        // available on the tracked race, because the estimator captures that service at
+        // construction time and uses it to classify maneuvers (via
+        // CompleteManeuverCurveToManeuverForEstimationConverter which asks the polar service
+        // for target tack and jibe angles) and to infer wind speed (via
+        // PolarsBasedTwsCalculatorImpl). Without polars the estimator would produce speedless
+        // wind fixes and use null polar angles for classification, which is what the
+        // symptoms of bug6241 described. Callers coordinating the estimator's construction
+        // are expected to have waited for the polar service to be installed on the race and
+        // for the polar-data loading pipeline to have drained this race's fixes (see
+        // RacingEventServiceImpl.scheduleWindEstimationInstallation) before invoking this
+        // factory method.
+        if (trackedRace.getPolarDataService() == null) {
+            throw new IllegalStateException(
+                    "Cannot create IncrementalWindEstimation for race " + trackedRace.getRaceIdentifier()
+                            + " because its PolarDataService is not set. See bug6241.");
+        }
+        final IncrementalWindEstimation windEstimation = new IncrementalMstHmmWindEstimationForTrackedRace(trackedRace,
                 new WindSourceImpl(WindSourceType.MANEUVER_BASED_ESTIMATION), trackedRace.getPolarDataService(),
                 trackedRace.getMillisecondsOverWhichToAverageWind(), maneuverClassifiersCache,
                 gaussianBasedTwdTransitionDistributionCache);

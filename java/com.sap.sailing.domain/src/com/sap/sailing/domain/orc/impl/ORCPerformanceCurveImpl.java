@@ -21,7 +21,6 @@ import org.apache.commons.math3.analysis.solvers.NewtonRaphsonSolver;
 import org.apache.commons.math3.exception.DimensionMismatchException;
 
 import com.sap.sailing.domain.base.Competitor;
-import com.sap.sailing.domain.common.impl.KnotSpeedImpl;
 import com.sap.sailing.domain.common.orc.ORCCertificate;
 import com.sap.sailing.domain.common.orc.ORCPerformanceCurveCourse;
 import com.sap.sailing.domain.common.orc.ORCPerformanceCurveLeg;
@@ -34,6 +33,7 @@ import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.Speed;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.KnotSpeedImpl;
 import com.sap.sse.common.impl.SecondsDurationImpl;
 import com.sap.sse.common.util.CubicSpline;
 import com.sap.sse.common.util.CubicSpline.SplineBoundaryCondition;

@@ -17,7 +17,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import com.sap.sailing.declination.Declination;
-import com.sap.sailing.domain.common.Position;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.DegreeBearingImpl;
 import com.sap.sse.util.XmlUtil;

@@ -2,11 +2,11 @@ package com.sap.sailing.server.gateway.deserialization.impl;
 
 import org.json.simple.JSONObject;
 
-import com.sap.sailing.domain.common.SpeedWithBearing;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.server.gateway.serialization.impl.ManeuverWindJsonSerializer;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sse.shared.json.JsonDeserializationException;
 import com.sap.sse.shared.json.JsonDeserializer;
 

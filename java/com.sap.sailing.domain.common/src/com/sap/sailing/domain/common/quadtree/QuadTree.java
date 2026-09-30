@@ -2,12 +2,12 @@ package com.sap.sailing.domain.common.quadtree;
 
 import java.io.Serializable;
 
-import com.sap.sailing.domain.common.Bounds;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.BoundsImpl;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.domain.common.quadtree.impl.Node;
 import com.sap.sailing.domain.common.quadtree.impl.Node.GetResult;
+import com.sap.sse.common.Bounds;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.impl.BoundsImpl;
+import com.sap.sse.common.impl.DegreePosition;
 
 /**
  * A spatial data structure that provides efficient (O(log n)) access to nearest neighbors and

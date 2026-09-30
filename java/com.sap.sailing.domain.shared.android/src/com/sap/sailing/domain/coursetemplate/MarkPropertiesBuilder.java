@@ -5,11 +5,11 @@ import java.util.UUID;
 
 import com.sap.sailing.domain.common.DeviceIdentifier;
 import com.sap.sailing.domain.common.MarkType;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.coursetemplate.impl.FixedPositioningImpl;
 import com.sap.sailing.domain.coursetemplate.impl.MarkPropertiesImpl;
 import com.sap.sailing.domain.coursetemplate.impl.TrackingDeviceBasedPositioningImpl;
 import com.sap.sse.common.Color;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 
 public class MarkPropertiesBuilder {

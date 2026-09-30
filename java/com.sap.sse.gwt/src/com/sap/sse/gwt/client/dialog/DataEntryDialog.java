@@ -281,7 +281,7 @@ public abstract class DataEntryDialog<T> {
      * 
      * @see #createSuggestBox(SuggestOracle)
      */
-    protected SuggestBox createSuggestBox(Iterable<String> suggestValues) {
+    public SuggestBox createSuggestBox(Iterable<String> suggestValues) {
         List<String> suggestValuesAsCollection = new ArrayList<>();
         Util.addAll(suggestValues, suggestValuesAsCollection);
         final MultiWordSuggestOracle oracle = new MultiWordSuggestOracle();
@@ -299,7 +299,7 @@ public abstract class DataEntryDialog<T> {
      * 
      * @see SuggestBox#SuggestBox(SuggestOracle)
      */
-    protected SuggestBox createSuggestBox(SuggestOracle suggestOracle) {
+    public SuggestBox createSuggestBox(SuggestOracle suggestOracle) {
         final SuggestBox result = new SuggestBox(suggestOracle);
         ensureHasValueIsValidated(result.getValueBox());
         ensureChangeableIsValidated(result.getValueBox());

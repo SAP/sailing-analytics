@@ -1,13 +1,17 @@
 package com.sap.sse.util;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 
+import com.sap.sse.common.Duration;
 import com.sap.sse.util.impl.ThreadPoolUtilImpl;
 
 public interface ThreadPoolUtil {
@@ -118,4 +122,21 @@ public interface ThreadPoolUtil {
     Runnable associateWithSubjectIfAny(Runnable runnable);
 
     <T> Callable<T> associateWithSubjectIfAny(Callable<T> callable);
+    
+    /**
+     * In the {@code executor}'s queue filters tasks for those with a delay less than {@code delayLessThan} and
+     * returns the corresponding tasks. This can be used, e.g., to judge an executor's immediate workload or
+     * give an estimate of the future workload mapped over time.
+     */
+    Iterable<ScheduledFuture<?>> getTasksDelayedByLessThan(ThreadPoolExecutor executor, Duration delayLessThan);
+    
+    /**
+     * Tries to obtain the queue length from the {@code executor}. The queue is not exposed directly by the
+     * {@link SecheduledExeutorService} interface, but many implementation classes expose it, and if the executor is
+     * instance of such a class, the queue length can most likely be determined.
+     * <p>
+     * 
+     * The executors returned by the methods of this object will all be able to provide their queue length.
+     */
+    Optional<Integer> getQueueLength(ScheduledExecutorService executor);
 }

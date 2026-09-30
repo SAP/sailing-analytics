@@ -15,13 +15,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.sap.sailing.domain.common.Bounds;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.BoundsImpl;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.domain.common.quadtree.QuadTree;
 import com.sap.sailing.domain.common.quadtree.impl.Node;
+import com.sap.sse.common.Bounds;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.impl.BoundsImpl;
+import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sse.testutils.Measurement;
 import com.sap.sse.testutils.MeasurementCase;
 import com.sap.sse.testutils.MeasurementXMLFile;

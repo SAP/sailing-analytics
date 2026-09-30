@@ -10,11 +10,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.tracking.GPSFixTrack;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 

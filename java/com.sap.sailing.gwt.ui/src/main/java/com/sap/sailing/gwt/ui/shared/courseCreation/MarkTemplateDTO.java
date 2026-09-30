@@ -80,4 +80,24 @@ public class MarkTemplateDTO extends NamedDTO implements SecuredDTO {
         return commonMarkProperties;
     }
 
+    @Override
+    public int hashCode() {
+        return uuid != null ? uuid.hashCode() : System.identityHashCode(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof MarkTemplateDTO)) {
+            return false;
+        }
+        final MarkTemplateDTO other = (MarkTemplateDTO) obj;
+        if (uuid == null || other.uuid == null) {
+            return false;
+        }
+        return uuid.equals(other.uuid);
+    }
+
 }

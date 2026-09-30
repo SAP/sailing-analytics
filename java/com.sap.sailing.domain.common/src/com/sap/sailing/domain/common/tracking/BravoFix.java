@@ -1,8 +1,8 @@
 package com.sap.sailing.domain.common.tracking;
 
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.impl.MeterDistance;
 import com.sap.sse.datamining.annotations.Dimension;
 import com.sap.sse.datamining.annotations.Statistic;
 

@@ -1,5 +1,7 @@
 package com.sap.sailing.android.tracking.app.services;
 
+import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
+
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -24,7 +26,7 @@ import com.sap.sailing.android.tracking.app.R;
 import com.sap.sailing.android.tracking.app.utils.AppPreferences;
 import com.sap.sailing.android.tracking.app.utils.DatabaseHelper;
 import com.sap.sailing.android.tracking.app.valueobjects.EventInfo;
-import com.sap.sailing.domain.common.impl.MeterPerSecondSpeedImpl;
+import com.sap.sse.common.impl.MeterPerSecondSpeedImpl;
 import com.sap.sailing.domain.common.tracking.impl.FlatSmartphoneUuidAndGPSFixMovingJsonSerializer;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Duration;
@@ -42,8 +44,6 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
-
-import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 
 public class TrackingService extends Service implements LocationListener {
 

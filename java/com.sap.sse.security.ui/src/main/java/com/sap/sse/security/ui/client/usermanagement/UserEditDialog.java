@@ -9,6 +9,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -49,6 +50,7 @@ public class UserEditDialog extends DataEntryDialog<UserDTO> {
     private final TextBox fullName;
     private final TextBox company;
     private final TextBox email;
+    private final CheckBox optOutOfFeatureAndCommunityEmailsCheckbox;
     private final VerticalPanel accountPanels;
 
     private final UserService userService;
@@ -73,6 +75,9 @@ public class UserEditDialog extends DataEntryDialog<UserDTO> {
         this.email = createTextBox(userToEdit.getEmail(), 70);
         this.fullName = createTextBox(userToEdit.getFullName(), 70);
         this.company = createTextBox(userToEdit.getCompany(), 70);
+        this.optOutOfFeatureAndCommunityEmailsCheckbox = new CheckBox(stringMessages.optOutOfFeatureAndCommunityEmails(),
+                userToEdit.getDidOptOutOfFeatureAndCommunityEmails());
+        optOutOfFeatureAndCommunityEmailsCheckbox.setValue(userToEdit.getDidOptOutOfFeatureAndCommunityEmails());
         this.accountPanels = new VerticalPanel();
         for (AccountDTO a : userToEdit.getAccounts()) {
             DecoratorPanel accountPanelDecorator = new DecoratorPanel();
@@ -155,8 +160,8 @@ public class UserEditDialog extends DataEntryDialog<UserDTO> {
                 permissions.add((WildcardPermissionWithSecurityDTO) permission);
         }
         final UserDTO user = new UserDTO(userToEdit.getName(), email.getText(), fullName.getText(), company.getText(),
-                userToEdit.getLocale(), userToEdit.isEmailValidated(), userToEdit.getAccounts(),
-                userToEdit.getRoles(), userToEdit.getDefaultTenant(), permissions,
+                userToEdit.getLocale(), userToEdit.isEmailValidated(), optOutOfFeatureAndCommunityEmailsCheckbox.getValue(),
+                userToEdit.getAccounts(), userToEdit.getRoles(), userToEdit.getDefaultTenant(), permissions,
                 userToEdit.getUserGroups(), userToEdit.getLockedUntil());
         return user;
     }
@@ -172,6 +177,8 @@ public class UserEditDialog extends DataEntryDialog<UserDTO> {
         result.setWidget(2, 1, email);
         result.setWidget(3, 0, new Label(stringMessages.company()));
         result.setWidget(3, 1, company);
+        result.setWidget(4, 0, new Label(stringMessages.optOutOfFeatureAndCommunityEmails()));
+        result.setWidget(4, 1, optOutOfFeatureAndCommunityEmailsCheckbox);
         result.setWidget(4, 0, accountPanels);
         return result;
     }

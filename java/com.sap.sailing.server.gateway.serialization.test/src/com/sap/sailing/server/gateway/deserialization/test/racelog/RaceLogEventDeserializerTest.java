@@ -34,7 +34,6 @@ import com.sap.sailing.domain.base.impl.DynamicCompetitor;
 import com.sap.sailing.domain.common.BoatClassMasterdata;
 import com.sap.sailing.domain.common.WindSource;
 import com.sap.sailing.domain.common.WindSourceType;
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.domain.common.impl.WindSourceImpl;
 import com.sap.sailing.domain.common.impl.WindSourceWithAdditionalID;
 import com.sap.sailing.domain.common.orc.ORCCertificate;
@@ -57,6 +56,7 @@ import com.sap.sailing.server.gateway.serialization.racelog.impl.RaceLogEventSer
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.MeterDistance;
 import com.sap.sse.shared.json.JsonDeserializer;
 
 public class RaceLogEventDeserializerTest {

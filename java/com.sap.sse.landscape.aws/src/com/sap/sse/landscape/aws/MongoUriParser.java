@@ -1,6 +1,5 @@
 package com.sap.sse.landscape.aws;
 
-import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
@@ -156,8 +155,7 @@ public class MongoUriParser<ShardingKey> {
      * If the host isn't found in the landscape, the {@link Pair#getA()} component of the pair returned will be {@code null}.
      */
     private Pair<AwsInstance<ShardingKey>, Integer> getHostAndPort(String hostname, Integer optionalPort) throws UnknownHostException {
-        final InetAddress address = InetAddress.getByName(hostname);
-        final AwsInstance<ShardingKey> hostByPrivateIp = landscape.getHostByPrivateIpAddress(region, address.getHostAddress(), AwsInstanceImpl::new);
-        return new Pair<>(hostByPrivateIp, optionalPort);
+        final AwsInstance<ShardingKey> hostByPrivateDnsOrIp = landscape.getHostByPrivateDnsNameOrIpAddress(region, hostname, AwsInstanceImpl::new);
+        return new Pair<>(hostByPrivateDnsOrIp, optionalPort);
     }
 }

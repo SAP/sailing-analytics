@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <link href='../../../../sailing-fontface-1.0.cache.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+    <link href='../../../main.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+    <link rel='icon' href='../../../../sap.ico' type='image/x-icon'>
+    <title>SAP Sailing Analytics Webservices API Version 1.0</title>
+</head>
+<body>
+<h1>SAP Sailing Analytics Webservices API Version 1.0</h1>
+<h2>URL: /api/v1/regattas/{regattaname}/races/{racename}/competitordata</h2>
+
+<b>Description:</b>
+<p>
+Gets the binary representation of the server's polar data. By default, data for all boat classes is returned.
+Optionally, the results can be filtered to specific boat classes using the <tt>boatClassName</tt> query parameter,
+which may be specified multiple times to include several boat classes.
+</p>
+<p>
+You need the <tt>POLAR_DATA:READ</tt> permission for this. The output can be deserialized into a Java object of type
+<tt>com.sap.sailing.polars.impl.PolarDataServiceImpl</tt> using its <tt>initiallyFillFromInternal</tt> method. It
+is the same format used by the cross-server replication of the polar data. See also the <tt>com.sap.sailing.polars.jaxrs.client.PolarDataClient</tt>
+class.
+</p>
+<br />
+<table>
+    <tr>
+        <td>Webservice Type:</td>
+        <td>REST</td>
+    </tr>
+    <tr>
+        <td>Webservice Method:</td>
+        <td>GET</td>
+    </tr>
+    <tr>
+        <td>Output format:</td>
+        <td>Binary Java Object</td>
+    </tr>
+    <tr>
+        <td valign="top">Query Parameters:</td>
+        <td>
+            <table border="1" cellpadding="4" cellspacing="0">
+                <tr>
+                    <th>Name</th><th>Required</th><th>Description</th>
+                </tr>
+                <tr>
+                    <td><tt>boatClassName</tt></td>
+                    <td>No</td>
+                    <td>Name of a boat class to include in the response. May be specified multiple times
+                        to request data for several boat classes. If omitted, data for all boat classes is returned.</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td valign="top">Examples:</td>
+        <td>
+          All boat classes:<br/>
+          <tt>curl -o polar.dat -H 'Authorization: Bearer {your-access-token-here}' <a href="https://www.sapsailing.com/polars/api/polar_data">https://www.sapsailing.com/polars/api/polar_data</a></tt>
+          <br/><br/>
+          Filtered to specific boat classes:<br/>
+          <tt>curl -o polar.dat -H 'Authorization: Bearer {your-access-token-here}' "<a href="https://www.sapsailing.com/polars/api/polar_data?boatClassName=49er&amp;boatClassName=Nacra17">https://www.sapsailing.com/polars/api/polar_data?boatClassName=49er&amp;boatClassName=Nacra17</a>"</tt>
+        </td>
+    </tr>
+</table>
+<div style="height: 1em;"></div>
+<a href="index.html">Back to Web Service Overview</a> 
+</body>
+</html>

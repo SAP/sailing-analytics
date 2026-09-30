@@ -3,21 +3,21 @@ package com.sap.sailing.domain.tracking;
 import java.util.Iterator;
 
 import com.sap.sailing.domain.base.SpeedWithBearingWithConfidence;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.common.TrackedRaceStatusEnum;
-import com.sap.sailing.domain.common.confidence.Weigher;
-import com.sap.sailing.domain.common.impl.KnotSpeedImpl;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.shared.tracking.MappedTrack;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.TimeRange;
 import com.sap.sse.common.Timed;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.confidence.Weigher;
+import com.sap.sse.common.impl.KnotSpeedImpl;
 
 /**
  * A track records the {@link GPSFix}es received for an object of type

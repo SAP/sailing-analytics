@@ -7,17 +7,17 @@ import java.util.List;
 import com.sap.sailing.domain.abstractlog.race.RaceLog;
 import com.sap.sailing.domain.abstractlog.race.RaceLogWindFixEvent;
 import com.sap.sailing.domain.abstractlog.race.analyzing.impl.WindFixesFinder;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.Wind;
-import com.sap.sailing.domain.common.confidence.BearingWithConfidence;
-import com.sap.sailing.domain.common.confidence.BearingWithConfidenceCluster;
-import com.sap.sailing.domain.common.confidence.Weigher;
-import com.sap.sailing.domain.common.confidence.impl.BearingWithConfidenceImpl;
 import com.sap.sailing.domain.tracking.impl.WindSummaryImpl;
 import com.sap.sailing.domain.tracking.impl.WindWithConfidenceImpl;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Speed;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util.Pair;
+import com.sap.sse.common.confidence.BearingWithConfidence;
+import com.sap.sse.common.confidence.BearingWithConfidenceCluster;
+import com.sap.sse.common.confidence.Weigher;
+import com.sap.sse.common.confidence.impl.BearingWithConfidenceImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 /**

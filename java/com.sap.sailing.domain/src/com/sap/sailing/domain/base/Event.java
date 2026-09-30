@@ -4,12 +4,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.WindSource;
 import com.sap.sailing.domain.common.WindSourceType;
 import com.sap.sailing.domain.leaderboard.Leaderboard;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroup;
 import com.sap.sailing.domain.tracking.TrackedRace;
+import com.sap.sse.common.Position;
 
 /**
  * An event is a group of {@link Regatta regattas} carried out at a common venue within a common time frame. For

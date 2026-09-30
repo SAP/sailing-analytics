@@ -13,9 +13,7 @@ import com.sap.sailing.domain.base.CompetitorAndBoat;
 import com.sap.sailing.domain.base.Waypoint;
 import com.sap.sailing.domain.base.impl.CompetitorAndBoatImpl;
 import com.sap.sailing.domain.common.ManeuverType;
-import com.sap.sailing.domain.common.confidence.impl.ScalableDouble;
 import com.sap.sailing.domain.common.polars.NotEnoughDataHasBeenAddedException;
-import com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing;
 import com.sap.sailing.domain.polars.PolarDataService;
 import com.sap.sailing.domain.tracking.Maneuver;
 import com.sap.sailing.domain.tracking.TrackedRace;
@@ -26,6 +24,8 @@ import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.impl.DegreeBearingImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
+import com.sap.sse.common.scalablevalue.ScalableDouble;
+import com.sap.sse.common.scalablevalue.impl.ScalableBearing;
 import com.sap.sse.util.kmeans.Cluster;
 
 /**

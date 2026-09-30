@@ -12,18 +12,8 @@ import java.util.logging.Logger;
 
 import com.sap.sailing.declination.Declination;
 import com.sap.sailing.declination.DeclinationService;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.common.Wind;
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.KilometersPerHourSpeedImpl;
-import com.sap.sailing.domain.common.impl.KnotSpeedImpl;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
-import com.sap.sailing.domain.common.impl.MeterPerSecondSpeedImpl;
 import com.sap.sailing.domain.common.impl.WindImpl;
-import com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing;
-import com.sap.sailing.domain.common.scalablevalue.impl.ScalablePosition;
-import com.sap.sailing.domain.common.scalablevalue.impl.ScalableSpeedWithBearing;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixImpl;
 import com.sap.sailing.domain.tracking.DynamicTrack;
@@ -33,10 +23,20 @@ import com.sap.sailing.nmeaconnector.NMEAWindReceiver;
 import com.sap.sailing.nmeaconnector.TimedBearing;
 import com.sap.sailing.nmeaconnector.TimedSpeedWithBearing;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.DegreePosition;
+import com.sap.sse.common.impl.KilometersPerHourSpeedImpl;
+import com.sap.sse.common.impl.KnotSpeedImpl;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
+import com.sap.sse.common.impl.MeterPerSecondSpeedImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
+import com.sap.sse.common.scalablevalue.impl.ScalableBearing;
+import com.sap.sse.common.scalablevalue.impl.ScalablePosition;
+import com.sap.sse.common.scalablevalue.impl.ScalableSpeedWithBearing;
 
 import net.sf.marineapi.nmea.event.AbstractSentenceListener;
 import net.sf.marineapi.nmea.io.SentenceReader;
@@ -125,7 +125,7 @@ public class NMEAWindReceiverImpl implements NMEAWindReceiver {
             // or degrees magnetic, and we need to find out which is available
             final TimePoint timePoint = getLastTimePoint();
             if (timePoint != null) {
-                final com.sap.sailing.domain.common.Position position = getPosition(timePoint);
+                final com.sap.sse.common.Position position = getPosition(timePoint);
                 if (position != null) {
                     final Speed speed;
                     if (!Double.isNaN(sentence.getWindSpeed())) {
@@ -335,7 +335,7 @@ public class NMEAWindReceiverImpl implements NMEAWindReceiver {
      * to {@link #notifyListeners(Wind)}.
      */
     private void tryToCreateWindFixFromTrueWind(TimedSpeedWithBearing trueWind) {
-        final com.sap.sailing.domain.common.Position position = getPosition(trueWind.getTimePoint());
+        final com.sap.sse.common.Position position = getPosition(trueWind.getTimePoint());
         if (position != null) {
             final Wind wind = new WindImpl(position, trueWind.getTimePoint(), trueWind);
             notifyListeners(wind);
@@ -349,7 +349,7 @@ public class NMEAWindReceiverImpl implements NMEAWindReceiver {
      * passed to {@link #notifyListeners(Wind)}.
      */
     private void tryToCreateWindFixFromApparentWind(TimedSpeedWithBearing apparentWind) {
-        final com.sap.sailing.domain.common.Position position = getPosition(apparentWind.getTimePoint());
+        final com.sap.sse.common.Position position = getPosition(apparentWind.getTimePoint());
         if (position != null) {
             final SpeedWithBearing sensorSpeed = sensorSpeeds.getInterpolatedValue(getLastTimePoint(), fix->new ScalableSpeedWithBearing(fix));
             if (sensorSpeed != null) {
@@ -385,7 +385,7 @@ public class NMEAWindReceiverImpl implements NMEAWindReceiver {
         return result;
     }
 
-    private com.sap.sailing.domain.common.Position getPosition(TimePoint timePoint) {
+    private com.sap.sse.common.Position getPosition(TimePoint timePoint) {
         return sensorPositions.getInterpolatedValue(timePoint, gpsFix->new ScalablePosition(gpsFix.getPosition()));
     }
 

@@ -23,7 +23,7 @@ class EntityIdentityWrapper<T> {
 
     @Override
     public int hashCode() {
-        return comp.hashCode(t);
+        return comp == null ? t.hashCode() : comp.hashCode(t);
     }
     
     private T getT() {
@@ -37,6 +37,12 @@ class EntityIdentityWrapper<T> {
         }
         @SuppressWarnings("unchecked") // need to cast to generic type argument T
         EntityIdentityWrapper<T> objAsT = ((EntityIdentityWrapper<T>) obj);
-        return comp.representSameEntity(t, objAsT.getT());
+        final boolean result;
+        if (comp == null) {
+            result = t.equals(objAsT.getT());
+        } else {
+            result = comp.representSameEntity(t, objAsT.getT());
+        }
+        return result;
     }
 }

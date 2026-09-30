@@ -3,10 +3,10 @@ package com.sap.sailing.gwt.ui.shared;
 import java.util.Collections;
 
 import com.sap.sailing.domain.common.MarkType;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.domain.common.racelog.tracking.MappableToDevice;
 import com.sap.sse.common.Color;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.impl.DegreePosition;
 
 public class MarkDTO extends ControlPointDTO implements MappableToDevice {
     private static final long serialVersionUID = -8031499997812618751L;

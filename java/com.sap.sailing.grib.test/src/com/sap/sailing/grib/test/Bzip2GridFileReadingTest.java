@@ -9,8 +9,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.DegreePosition;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.impl.DegreePosition;
 
 import ucar.ma2.ArrayFloat.D3;
 import ucar.nc2.VariableSimpleIF;

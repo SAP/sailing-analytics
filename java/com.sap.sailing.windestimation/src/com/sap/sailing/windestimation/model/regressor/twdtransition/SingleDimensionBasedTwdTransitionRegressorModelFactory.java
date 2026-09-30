@@ -1,6 +1,5 @@
 package com.sap.sailing.windestimation.model.regressor.twdtransition;
 
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.windestimation.data.ManeuverTypeForClassification;
 import com.sap.sailing.windestimation.data.TwdTransition;
 import com.sap.sailing.windestimation.model.ModelFactory;
@@ -8,6 +7,7 @@ import com.sap.sailing.windestimation.model.regressor.IncrementalSingleDimension
 import com.sap.sailing.windestimation.model.regressor.RegressorModelFactory;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.MeterDistance;
 
 /**
  * Base class for {@link DistanceBasedTwdTransitionRegressorModelFactory} and

@@ -19,4 +19,5 @@ Require-Bundle: junit-jupiter-api;bundle-version="5.11.3",
  net.bytebuddy.byte-buddy-agent;bundle-version="1.14.12",
  org.mockito.mockito-core;bundle-version="4.8.1"
 Automatic-Module-Name: com.sap.sailing.windestimation.test
-Import-Package: com.sap.sse.testutils
+Import-Package: com.sap.sailing.polars,
+ com.sap.sse.testutils

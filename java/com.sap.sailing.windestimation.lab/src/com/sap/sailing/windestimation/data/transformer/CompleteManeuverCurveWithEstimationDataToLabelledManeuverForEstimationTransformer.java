@@ -18,7 +18,7 @@ public class CompleteManeuverCurveWithEstimationDataToLabelledManeuverForEstimat
                 .getConvertableManeuvers(competitorTrackWithElementsToTransform.getElements());
         return internalTransformer.getManeuversForEstimation(convertableManeuvers,
                 competitorTrackWithElementsToTransform.getBoatClass(),
-                competitorTrackWithElementsToTransform.getRegattaName());
+                competitorTrackWithElementsToTransform.getRegattaName(), competitorTrackWithElementsToTransform.getCompetitorName());
     }
 
 }

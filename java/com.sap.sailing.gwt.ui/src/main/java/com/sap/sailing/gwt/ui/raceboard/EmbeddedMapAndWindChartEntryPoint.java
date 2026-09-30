@@ -193,7 +193,7 @@ public class EmbeddedMapAndWindChartEntryPoint extends AbstractSailingReadEntryP
                 timer, timeRangeWithZoomProvider, getStringMessages(), /* canReplayWhileLive */ false,
                 /* isScreenLargeEnoughToOfferChartSupport set to true iff wind chart will be displayed */ raceboardPerspectiveSettings
                         .isShowWindChart(),
-                getUserService(), raceDTOProxy) {
+                getUserService(), raceDTOProxy, asyncActionsExecutor, /* timeRangeActionsExecutor */ null) {
             protected boolean isLiveModeToBeMadePossible() {
                 return true;
             }

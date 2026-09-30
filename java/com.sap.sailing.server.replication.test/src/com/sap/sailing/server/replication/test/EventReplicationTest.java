@@ -15,12 +15,12 @@ import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.domain.base.CourseArea;
 import com.sap.sailing.domain.base.Event;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroup;
 import com.sap.sailing.server.operationaltransformation.AddLeaderboardGroupToEvent;
 import com.sap.sailing.server.operationaltransformation.CreateLeaderboardGroup;
 import com.sap.sailing.server.operationaltransformation.RemoveLeaderboardGroupFromEvent;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.MillisecondsTimePoint;

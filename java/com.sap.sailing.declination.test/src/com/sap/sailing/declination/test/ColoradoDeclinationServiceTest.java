@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import com.sap.sailing.declination.Declination;
 import com.sap.sailing.declination.impl.ColoradoImporter;
-import com.sap.sailing.domain.common.impl.DegreePosition;
+import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
 @Disabled("currently, http://magcalc.geomag.info/ seems down")

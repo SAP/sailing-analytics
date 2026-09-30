@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -107,6 +108,18 @@ public class OwnershipResource extends AbstractSecurityResource {
         return getOwnership(objectType, new String[] { typeRelativeObjectId });
     }
 
+    @Path("{objectType}/{typeRelativeObjectId}")
+    @DELETE
+    @Produces("application/json;charset=UTF-8")
+    public Response deleteOwnership(@PathParam("objectType") String objectType,
+            @PathParam("typeRelativeObjectId") String typeRelativeObjectId) throws OwnershipException {
+        QualifiedObjectIdentifier identifier = new QualifiedObjectIdentifierImpl(objectType,
+                new TypeRelativeObjectIdentifier(typeRelativeObjectId));
+        SecurityUtils.getSubject().checkPermission(identifier.getStringPermission(DefaultActions.CHANGE_OWNERSHIP));
+        getSecurityService().deleteOwnership(identifier);
+        return Response.ok().build();
+    }
+
     @Path("{objectType}")
     @GET
     @Produces("application/json;charset=UTF-8")
@@ -197,5 +210,17 @@ public class OwnershipResource extends AbstractSecurityResource {
             getSecurityService().overrideAccessControlList(identifier, actionsByUserGroup);
         }
         return Response.ok(new GeneralResponse(true, "ACL changed successfully").toString()).build();
+    }
+    
+    @Path("{objectType}/{typeRelativeObjectId}/"+KEY_ACL)
+    @DELETE
+    @Produces("application/json;charset=UTF-8")
+    public Response deleteAccessControlLists(@PathParam("objectType") String objectType,
+            @PathParam("typeRelativeObjectId") String typeRelativeObjectId) throws OwnershipException {
+        QualifiedObjectIdentifier identifier = new QualifiedObjectIdentifierImpl(objectType,
+                new TypeRelativeObjectIdentifier(typeRelativeObjectId));
+        SecurityUtils.getSubject().checkPermission(identifier.getStringPermission(DefaultActions.CHANGE_ACL));
+        getSecurityService().deleteAccessControlList(identifier);
+        return Response.ok().build();
     }
 }

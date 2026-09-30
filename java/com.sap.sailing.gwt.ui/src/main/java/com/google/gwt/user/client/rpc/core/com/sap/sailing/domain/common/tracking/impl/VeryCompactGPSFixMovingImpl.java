@@ -7,13 +7,13 @@ import com.google.gwt.user.client.rpc.CustomFieldSerializer;
 import com.google.gwt.user.client.rpc.SerializationException;
 import com.google.gwt.user.client.rpc.SerializationStreamReader;
 import com.google.gwt.user.client.rpc.SerializationStreamWriter;
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.tracking.impl.CompactionNotPossibleException;
 import com.sap.sailing.domain.common.tracking.impl.VeryCompactGPSFixMovingImpl.VeryCompactEstimatedSpeed;
 import com.sap.sailing.domain.common.tracking.impl.VeryCompactGPSFixMovingImpl.VeryCompactPosition;
 import com.sap.sailing.domain.common.tracking.impl.VeryCompactGPSFixMovingImpl.VeryCompactSpeedWithBearing;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.DegreePosition;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 
 public final class VeryCompactGPSFixMovingImpl {
     private static final Logger logger = Logger.getLogger(VeryCompactGPSFixMovingImpl.class.getName());

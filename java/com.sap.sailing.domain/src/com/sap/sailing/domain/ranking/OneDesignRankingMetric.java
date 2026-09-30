@@ -7,7 +7,6 @@ import java.util.function.Supplier;
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.Leg;
 import com.sap.sailing.domain.base.Waypoint;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.RankingMetrics;
 import com.sap.sailing.domain.tracking.MarkPassing;
 import com.sap.sailing.domain.tracking.TrackedLeg;
@@ -19,6 +18,7 @@ import com.sap.sailing.domain.tracking.impl.RaceRankComparator;
 import com.sap.sailing.domain.tracking.impl.WindwardToGoComparator;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 
 public class OneDesignRankingMetric extends NonPerformanceCurveRankingMetric {

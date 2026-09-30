@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.selenium.api.core.JsonWrapper;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.impl.DegreePosition;
 
 public class MarkConfiguration extends JsonWrapper {
 

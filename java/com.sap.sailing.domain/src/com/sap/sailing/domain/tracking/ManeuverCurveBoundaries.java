@@ -1,9 +1,11 @@
 package com.sap.sailing.domain.tracking;
 
-import com.sap.sailing.domain.common.SpeedWithBearing;
+import java.io.Serializable;
+
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.DegreeBearingImpl;
 
@@ -15,7 +17,7 @@ import com.sap.sse.common.impl.DegreeBearingImpl;
  * @author Vladislav Chumak (D069712)
  *
  */
-public interface ManeuverCurveBoundaries {
+public interface ManeuverCurveBoundaries extends Serializable {
 
     /**
      * Gets the computed time point of curve start.

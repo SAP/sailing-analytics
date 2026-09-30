@@ -3,7 +3,7 @@ package com.sap.sailing.domain.windestimation;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import com.sap.sailing.domain.common.Position;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util.Pair;
 

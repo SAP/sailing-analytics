@@ -1,6 +1,8 @@
 package com.sap.sailing.domain.common;
 
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.Positioned;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.Timed;
 
 /**

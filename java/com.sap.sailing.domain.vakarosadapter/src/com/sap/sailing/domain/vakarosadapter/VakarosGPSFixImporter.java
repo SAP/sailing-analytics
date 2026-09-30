@@ -14,8 +14,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixMovingImpl;
 import com.sap.sailing.domain.trackfiles.TrackFileImportDeviceIdentifier;
@@ -26,6 +24,8 @@ import com.sap.sailing.server.trackfiles.impl.CompressedStreamsUtil;
 import com.sap.sailing.server.trackfiles.impl.ExpeditionImportFileHandler;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.DegreePosition;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 
 public class VakarosGPSFixImporter implements GPSFixImporter {
 

@@ -13,18 +13,18 @@ import java.util.TreeSet;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.Waypoint;
-import com.sap.sailing.domain.common.Bounds;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.BoundsImpl;
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.markpassingcalculation.Candidate;
 import com.sap.sailing.domain.tracking.GPSFixTrack;
+import com.sap.sse.common.Bounds;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.ValueCollectionConstructor;
+import com.sap.sse.common.impl.BoundsImpl;
+import com.sap.sse.common.impl.MeterDistance;
 
 /**
  * A sequence of {@link Candidate}s such that the track of smoothed GPS fixes between them fits into a bounding box that

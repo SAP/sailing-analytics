@@ -32,7 +32,7 @@ else
     sudo mv imageupgrade_functions.sh /usr/local/bin
     # build-crontab
     . imageupgrade_functions.sh
-    # Install MongoDB 5.0 and configure as replica set "replica"
+    # Install MongoDB 7.0 and configure as replica set "replica"
     setup_mongo_7_0_on_AL2023
     sudo su - -c "cat << EOF >>/etc/mongod.conf
 replication:

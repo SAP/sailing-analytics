@@ -33,8 +33,6 @@ import com.google.gwt.maps.client.overlays.Polyline;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.gwt.ui.client.RequiresDataInitialization;
 import com.sap.sailing.gwt.ui.client.SimulatorServiceAsync;
 import com.sap.sailing.gwt.ui.client.StringMessages;
@@ -54,8 +52,10 @@ import com.sap.sailing.gwt.ui.simulator.util.ColorPaletteGenerator;
 import com.sap.sailing.gwt.ui.simulator.util.SimulatorResources;
 import com.sap.sailing.gwt.ui.simulator.windpattern.WindPatternDisplay;
 import com.sap.sailing.simulator.util.SailingSimulatorConstants;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sse.common.impl.RGBColor;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.Notification;
@@ -445,6 +445,8 @@ public class SimulatorMap extends AbsolutePanel implements RequiresDataInitializ
 
             @Override
             public void onSuccess(String googleMapsLoaderAuthenticationParams) {
+                GoogleMapsLoader.setAuthFailureListener(
+                        () -> errorReporter.reportError(stringMessages.errorGoogleMapsAuthenticationFailed()));
                 GoogleMapsLoader.load(onLoad, googleMapsLoaderAuthenticationParams);
             }
         });

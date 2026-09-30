@@ -6,7 +6,7 @@ import java.util.Set;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.sap.sailing.domain.common.NauticalSide;
-import com.sap.sailing.domain.common.Position;
+import com.sap.sse.common.Position;
 
 public class CoursePositionsDTO implements IsSerializable {
     public RaceCourseDTO course;

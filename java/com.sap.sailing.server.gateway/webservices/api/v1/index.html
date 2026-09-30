@@ -147,10 +147,14 @@ For questions and support please get in touch through <a href="mailto:support@sa
 		<td><a href="raceTargetTimeGetDoc.html">/sailingserver/api/v1/regattas/{regattaname}/races/{racename}/targettime</a></td>
 		<td>Gets the estimated target time of a race</td>
 	</tr>
-	<tr>
-		<td><a href="raceWindGetDoc.html">/sailingserver/api/v1/regattas/{regattaname}/races/{racename}/wind</a></td>
-		<td>Gets all GPS positions and data values for the wind of a race</td>
-	</tr>
+    <tr>
+        <td><a href="raceWindGetDoc.html">/sailingserver/api/v1/regattas/{regattaname}/races/{racename}/wind</a></td>
+        <td>Gets all GPS positions and data values for the wind of a race</td>
+    </tr>
+    <tr>
+        <td><a href="raceWindAtPositionGetDoc.html">/sailingserver/api/v1/regattas/{regattaname}/races/{racename}/wind_at_position</a></td>
+        <td>Gets interpolated, averaged and dampened wind data for a race for one or more positions specified in the query parameters</td>
+    </tr>
 	<tr>
 		<td><a href="regattasDataMiningGetDoc.html">/sailingserver/api/v1/regattas/datamining</a></td>
 		<td>Gets all query identifiers for regattas</td>
@@ -397,6 +401,10 @@ For questions and support please get in touch through <a href="mailto:support@sa
     <tr>
         <td><a href="status.html">/sailingserver/api/v1/status</a></td>
         <td>Returns a status description for the "RacingEventService" core service</td>
+    </tr>
+    <tr>
+        <td><a href="livecontentGetDoc.html">/sailingserver/api/v1/livecontent</a></td>
+        <td>Reports the events and tracked races that are "live" (being tracked) on this server at a given point in time, grouped by replica set and event</td>
     </tr>
     <tr>
         <td><a href="trackedeventsGetDoc.html">/sailingserver/api/v1/trackedevents</a></td>

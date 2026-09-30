@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.openqa.selenium.ElementNotSelectableException;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -13,6 +13,8 @@ import com.sap.sailing.selenium.core.BySeleniumId;
 import com.sap.sailing.selenium.core.FindBy;
 import com.sap.sailing.selenium.pages.PageArea;
 import com.sap.sailing.selenium.pages.adminconsole.ActionsHelper;
+import com.sap.sailing.selenium.pages.adminconsole.AdminConsolePage;
+import com.sap.sailing.selenium.pages.adminconsole.advanced.LocalServerPO;
 import com.sap.sailing.selenium.pages.gwt.CellTablePO;
 import com.sap.sailing.selenium.pages.gwt.DataEntryPO;
 import com.sap.sailing.selenium.pages.gwt.GenericCellTablePO;
@@ -43,8 +45,15 @@ public class UserManagementPanelPO extends PageArea {
     
     private TimePoint lastCreateUser;
 
+    private final AdminConsolePage adminConsole;
+
     public UserManagementPanelPO(WebDriver driver, WebElement element) {
+        this(driver, element, null);
+    }
+
+    public UserManagementPanelPO(WebDriver driver, WebElement element, AdminConsolePage adminConsole) {
         super(driver, element);
+        this.adminConsole = adminConsole;
     }
 
     private CellTablePO<DataEntryPO> getUserTable() {
@@ -92,17 +101,10 @@ public class UserManagementPanelPO extends PageArea {
     }
     
     public CreateUserDialogPO getCreateUserDialog() {
-        final TimePoint now = TimePoint.now();
-        if (lastCreateUser != null && now.minus(SecurityService.DEFAULT_CLIENT_IP_BASED_USER_CREATION_LOCKING_DURATION).before(lastCreateUser)) {
-            try {
-                final long sleepTimeMillis = now.until(lastCreateUser.plus(SecurityService.DEFAULT_CLIENT_IP_BASED_USER_CREATION_LOCKING_DURATION)).asMillis();
-                logger.info("Waiting "+sleepTimeMillis+"ms to create next user in "+this);
-                Thread.sleep(sleepTimeMillis);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+        if (adminConsole != null) {
+            clearUserCreationLockForLocalIp();
         } else {
-            logger.info("No wait required in dialog "+this);
+            throttleClientSideForUserCreationLock();
         }
         createUserButton.click();
         final WebElement dialog = findElementBySeleniumId(this.driver, "CreateUserDialog");
@@ -113,6 +115,42 @@ public class UserManagementPanelPO extends PageArea {
                 lastCreateUser = TimePoint.now();
             }
         };
+    }
+
+    /**
+     * Clears the server-side per-IP user-creation lock for the local client via the admin console's "User Creation
+     * Abuse" blocklist panel, so a subsequent user creation is not rejected by the rate limit. The server keys the lock
+     * by the connection's remote address, whose textual form for a loopback client depends on the stack (an IPv4 form
+     * such as {@code 127.0.0.1} or an IPv6 loopback form such as {@code 0:0:0:0:0:0:0:1} or {@code ::1}) and may be
+     * rendered with additional formatting in the table. Rather than guessing that literal, every currently locked
+     * address shown in the panel is unblocked. This requires navigating to the Local Server panel and back to User
+     * Management; the excursion is self-contained and leaves the User Management tab selected again for the caller.
+     */
+    private void clearUserCreationLockForLocalIp() {
+        final LocalServerPO localServer = adminConsole.goToLocalServerPanel();
+        localServer.getUserCreationAbusePO().unblockAllPresentIps();
+        adminConsole.goToUserManagement();
+    }
+
+    /**
+     * Legacy fallback used when this panel was created without an {@link AdminConsolePage} reference and therefore
+     * cannot reach the blocklist panel to clear the server-side lock: pre-emptively sleeps for the remainder of the
+     * {@link SecurityService#DEFAULT_CLIENT_IP_BASED_USER_CREATION_LOCKING_DURATION} window since the last successful
+     * creation so the server IP lock is never hit.
+     */
+    private void throttleClientSideForUserCreationLock() {
+        final TimePoint now = TimePoint.now();
+        if (lastCreateUser != null && now.minus(SecurityService.DEFAULT_CLIENT_IP_BASED_USER_CREATION_LOCKING_DURATION).before(lastCreateUser)) {
+            try {
+                final long sleepTimeMillis = now.until(lastCreateUser.plus(SecurityService.DEFAULT_CLIENT_IP_BASED_USER_CREATION_LOCKING_DURATION)).asMillis();
+                logger.info("Waiting "+sleepTimeMillis+"ms to create next user in "+this);
+                Thread.sleep(sleepTimeMillis);
+            } catch (final InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            logger.info("No wait required in dialog "+this);
+        }
     }
     
     public void createUserWithEqualUsernameAndPassword(String usernameAndPassword) {
@@ -138,7 +176,7 @@ public class UserManagementPanelPO extends PageArea {
                 userTableEntry.select();
             }
         } catch (StaleElementReferenceException e) {
-            throw new ElementNotSelectableException("Cannot select user any more. Entry has already been removed from DOM.", e);
+            throw new ElementNotInteractableException("Cannot select user any more. Entry has already been removed from DOM.", e);
         }
     }
     

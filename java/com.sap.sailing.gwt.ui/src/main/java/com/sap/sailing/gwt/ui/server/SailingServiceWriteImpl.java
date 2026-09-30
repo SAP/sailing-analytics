@@ -169,7 +169,6 @@ import com.sap.sailing.domain.common.MaxPointsReason;
 import com.sap.sailing.domain.common.NoWindException;
 import com.sap.sailing.domain.common.NotFoundException;
 import com.sap.sailing.domain.common.PassingInstruction;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.RaceIdentifier;
 import com.sap.sailing.domain.common.RankingMetrics;
 import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
@@ -178,7 +177,6 @@ import com.sap.sailing.domain.common.RegattaName;
 import com.sap.sailing.domain.common.RegattaNameAndRaceName;
 import com.sap.sailing.domain.common.ScoringSchemeType;
 import com.sap.sailing.domain.common.ServiceException;
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.common.UnableToCloseDeviceMappingException;
 import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.WindSource;
@@ -196,9 +194,6 @@ import com.sap.sailing.domain.common.dto.RaceColumnInSeriesDTO;
 import com.sap.sailing.domain.common.dto.RaceDTO;
 import com.sap.sailing.domain.common.dto.RegattaCreationParametersDTO;
 import com.sap.sailing.domain.common.dto.TagDTO;
-import com.sap.sailing.domain.common.impl.KilometersPerHourSpeedImpl;
-import com.sap.sailing.domain.common.impl.KnotSpeedImpl;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.impl.WindImpl;
 import com.sap.sailing.domain.common.impl.WindSourceImpl;
 import com.sap.sailing.domain.common.media.MediaTrack;
@@ -212,6 +207,7 @@ import com.sap.sailing.domain.common.racelog.tracking.DoesNotHaveRegattaLogExcep
 import com.sap.sailing.domain.common.racelog.tracking.MarkAlreadyUsedInRaceException;
 import com.sap.sailing.domain.common.racelog.tracking.NotDenotableForRaceLogTrackingException;
 import com.sap.sailing.domain.common.racelog.tracking.NotDenotedForRaceLogTrackingException;
+import com.sap.sailing.domain.common.racelog.tracking.TrackingTimesRevocationErrorCode;
 import com.sap.sailing.domain.common.security.SecuredDomainType;
 import com.sap.sailing.domain.common.security.SecuredDomainType.EventActions;
 import com.sap.sailing.domain.common.tagging.RaceLogNotFoundException;
@@ -293,6 +289,7 @@ import com.sap.sailing.gwt.ui.shared.SwissTimingRaceRecordDTO;
 import com.sap.sailing.gwt.ui.shared.TracTracConfigurationWithSecurityDTO;
 import com.sap.sailing.gwt.ui.shared.TracTracRaceRecordDTO;
 import com.sap.sailing.gwt.ui.shared.TrackFileImportDeviceIdentifierDTO;
+import com.sap.sailing.gwt.ui.shared.TrackingTimesRevocationReportDTO;
 import com.sap.sailing.gwt.ui.shared.TypedDeviceMappingDTO;
 import com.sap.sailing.gwt.ui.shared.UrlDTO;
 import com.sap.sailing.gwt.ui.shared.VenueDTO;
@@ -368,8 +365,10 @@ import com.sap.sse.aicore.CredentialsParser;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.NoCorrespondingServiceRegisteredException;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.RepeatablePart;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.TimeRange;
 import com.sap.sse.common.TransformationException;
@@ -378,6 +377,9 @@ import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.Util.Triple;
 import com.sap.sse.common.WithID;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.KilometersPerHourSpeedImpl;
+import com.sap.sse.common.impl.KnotSpeedImpl;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.common.impl.TimeRangeImpl;
 import com.sap.sse.common.mail.MailException;
@@ -2123,9 +2125,9 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
     }
 
     @Override
-    public void removeIgtimiDevice(String serialNumber) {
+    public void removeIgtimiDevice(long deviceId) {
         final RiotServer riotServer = getRiotServer();
-        final Device existingDevice = riotServer.getDeviceBySerialNumber(serialNumber);
+        final Device existingDevice = riotServer.getDeviceById(deviceId);
         if (existingDevice != null) {
             getSecurityService().checkPermissionAndDeleteOwnershipForObjectRemoval(existingDevice, () -> {
                 riotServer.removeDevice(existingDevice.getId());
@@ -3321,7 +3323,7 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
         final TimePoint startTrackingTimePoint = MillisecondsTimePoint.now();
         // this ensures that the events consistently have different timepoints to ensure a consistent result of the state analysis
         // that's why we can't just call adapter.denoteRaceForRaceLogTracking
-        final TimePoint denotationTimePoint = startTrackingTimePoint.minus(1);
+        final TimePoint denotationTimePoint = startTrackingTimePoint.minusResolution();
         raceLog.add(new RaceLogDenoteForTrackingEventImpl(denotationTimePoint,
                 author, raceLog.getCurrentPassId(), trackedRaceName, regatta.getBoatClass(), UUID.randomUUID()));
         raceLog.add(new RaceLogStartTrackingEventImpl(startTrackingTimePoint, author, raceLog.getCurrentPassId()));
@@ -4194,5 +4196,24 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
         // their own listener-based replication scheme.
         getRaceLogTrackingAdapter().copyPairingListFromOtherLeaderboard((RegattaLeaderboard) sourceLeaderboard,
                 (RegattaLeaderboard) targetLeaderboard, fromRaceColumnName, toRaceColumnInclusiveName);
+    }
+
+    @Override
+    public TrackingTimesRevocationReportDTO revokeExplicitTrackingTimes(String leaderboardName) throws NotFoundException {
+        final Leaderboard leaderboard = getLeaderboardByName(leaderboardName);
+        getService().getSecurityService().checkCurrentUserUpdatePermission(leaderboard);
+        final TrackingTimesRevocationReportDTO result;
+        if (leaderboard instanceof RegattaLeaderboard) {
+            final Regatta regatta = ((RegattaLeaderboard) leaderboard).getRegatta();
+            if (regatta.isControlTrackingFromStartAndFinishTimes()) {
+                result = new TrackingTimesRevocationReportDTO(getRaceLogTrackingAdapter().revokeExplicitTrackingTimes(
+                        (RegattaLeaderboard) leaderboard, /* raceLogResolver */ getService()));
+            } else {
+                result = new TrackingTimesRevocationReportDTO(TrackingTimesRevocationErrorCode.NO_AUTOMATED_TRACKING_TIMES);
+            }
+        } else {
+           result = new TrackingTimesRevocationReportDTO(TrackingTimesRevocationErrorCode.NO_REGATTA_LEADERBOARD);
+        }
+        return result;
     }
 }

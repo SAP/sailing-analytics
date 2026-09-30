@@ -1,7 +1,7 @@
 package com.sap.sailing.domain.common.windfinder;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.common.impl.NamedImpl;

@@ -10,12 +10,12 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.sap.sailing.domain.common.ManeuverType;
 import com.sap.sailing.domain.common.dto.BoatClassDTO;
-import com.sap.sailing.domain.common.impl.KnotSpeedImpl;
 import com.sap.sailing.gwt.ui.client.SailingServiceAsync;
 import com.sap.sailing.gwt.ui.shared.BearingWithConfidenceDTO;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Speed;
 import com.sap.sse.common.Util.Triple;
+import com.sap.sse.common.impl.KnotSpeedImpl;
 
 /**
  * Cache for maneuver angles for different boat classes, maneuver types and wind speeds.

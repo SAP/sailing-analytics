@@ -45,7 +45,9 @@ Require-Bundle: com.sap.sailing.domain,
  com.sap.sailing.server.gateway.serialization.shared.android,
  com.sap.sailing.shared.persistence,
  com.sap.sailing.competitorimport,
- org.apache.shiro.core;bundle-version="1.2.2"
+ org.apache.shiro.core;bundle-version="1.2.2",
+ net.bytebuddy.byte-buddy;bundle-version="1.14.12",
+ net.bytebuddy.byte-buddy-agent;bundle-version="1.14.12"
 Import-Package: com.sap.sailing.domain.common,
  com.sap.sailing.domain.common.impl,
  com.sap.sailing.domain.common.orc,

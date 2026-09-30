@@ -14,8 +14,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.sap.sailing.declination.DeclinationService;
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixMovingImpl;
 import com.sap.sailing.domain.trackfiles.TrackFileImportDeviceIdentifier;
@@ -27,6 +25,8 @@ import com.sap.sailing.server.trackfiles.impl.ExpeditionExtendedDataImporterImpl
 import com.sap.sailing.server.trackfiles.impl.ExpeditionImportFileHandler;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.DegreePosition;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 
 public class ExpeditionGPSFixImporter implements GPSFixImporter {
     private static final Logger logger = Logger.getLogger(ExpeditionGPSFixImporter.class.getName());

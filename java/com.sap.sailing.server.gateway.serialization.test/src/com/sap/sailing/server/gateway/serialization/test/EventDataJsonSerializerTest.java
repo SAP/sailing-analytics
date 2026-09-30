@@ -23,8 +23,6 @@ import com.sap.sailing.domain.base.DomainFactory;
 import com.sap.sailing.domain.base.EventBase;
 import com.sap.sailing.domain.base.Venue;
 import com.sap.sailing.domain.base.impl.VenueImpl;
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.NauticalMileDistance;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroup;
 import com.sap.sailing.server.gateway.deserialization.impl.CourseAreaJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.EventBaseJsonDeserializer;
@@ -38,7 +36,9 @@ import com.sap.sailing.server.gateway.serialization.impl.TrackingConnectorInfoJs
 import com.sap.sailing.server.gateway.serialization.impl.VenueJsonSerializer;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
+import com.sap.sse.common.impl.NauticalMileDistance;
 import com.sap.sse.shared.json.JsonDeserializationException;
 import com.sap.sse.shared.json.JsonSerializer;
 import com.sap.sse.shared.media.ImageDescriptor;

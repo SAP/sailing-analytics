@@ -94,4 +94,24 @@ public class MarkPropertiesDTO extends NamedDTO implements SecuredDTO {
     public String getPositioningType() {
         return positioningType;
     }
+
+    @Override
+    public int hashCode() {
+        return uuid != null ? uuid.hashCode() : System.identityHashCode(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof MarkPropertiesDTO)) {
+            return false;
+        }
+        final MarkPropertiesDTO other = (MarkPropertiesDTO) obj;
+        if (uuid == null || other.uuid == null) {
+            return false;
+        }
+        return uuid.equals(other.uuid);
+    }
 }

@@ -16,7 +16,6 @@ import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.sap.sailing.domain.common.impl.KnotSpeedImpl;
 import com.sap.sailing.domain.common.orc.ORCCertificate;
 import com.sap.sailing.domain.orc.ORCCertificatesCollection;
 import com.sap.sailing.domain.orc.ORCCertificatesImporter;
@@ -25,6 +24,7 @@ import com.sap.sailing.server.gateway.serialization.racelog.impl.ORCCertificateJ
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Speed;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.KnotSpeedImpl;
 
 public class ORCCertificateJsonDeserializerTest {
     private ORCCertificateJsonSerializer serializer;

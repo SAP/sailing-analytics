@@ -3,9 +3,9 @@ package com.sap.sailing.server.gateway.serialization.impl;
 import org.json.simple.JSONObject;
 
 import com.sap.sailing.domain.base.ControlPoint;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixImpl;
 import com.sap.sailing.server.gateway.serialization.coursedata.impl.MarkJsonSerializer;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.shared.json.JsonSerializer;

@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-import com.sap.sailing.domain.common.Bounds;
-import com.sap.sailing.domain.common.impl.BoundsImpl;
-import com.sap.sailing.domain.common.impl.DegreePosition;
+import com.sap.sse.common.Bounds;
+import com.sap.sse.common.impl.BoundsImpl;
+import com.sap.sse.common.impl.DegreePosition;
 
 public class BoundsTest {
     @Test

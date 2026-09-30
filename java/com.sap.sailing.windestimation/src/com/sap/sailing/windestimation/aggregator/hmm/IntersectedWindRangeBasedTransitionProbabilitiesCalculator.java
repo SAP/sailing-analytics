@@ -177,9 +177,4 @@ public class IntersectedWindRangeBasedTransitionProbabilitiesCalculator<GL exten
     protected Duration getDuration(ManeuverForEstimation fromManeuver, ManeuverForEstimation toManeuver) {
         return fromManeuver.getManeuverTimePoint().until(toManeuver.getManeuverTimePoint()).abs();
     }
-
-    public boolean isPropagateIntersectedWindRangeOfHeadupAndBearAway() {
-        return propagateIntersectedWindRangeOfHeadupAndBearAway;
-    }
-
 }

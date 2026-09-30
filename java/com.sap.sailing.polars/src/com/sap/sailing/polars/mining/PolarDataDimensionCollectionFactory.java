@@ -40,7 +40,6 @@ public class PolarDataDimensionCollectionFactory {
         Collection<Function<?>> dimensions = new ArrayList<>();
         FunctionFactory functionFactory = new FunctionFactory();
         addTackAndLegTypeDimensions(dimensions, functionFactory);
-
         addPolarBaseDimension(dimensions, functionFactory);
         return dimensions;
     }

@@ -1,13 +1,13 @@
 package com.sap.sailing.domain.common.tracking.impl;
 
-import com.sap.sailing.domain.common.AbstractPosition;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.SpeedWithBearing;
-import com.sap.sailing.domain.common.impl.AbstractSpeedWithAbstractBearingImpl;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sse.common.AbstractBearing;
+import com.sap.sse.common.AbstractPosition;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.impl.AbstractSpeedWithAbstractBearingImpl;
 
 /**
  * A compact representation of a GPS fix which collects all primitive-typed attributes in one object to avoid
@@ -97,9 +97,9 @@ public class PreciseCompactGPSFixImpl extends AbstractCompactGPSFixImpl {
     }
 
     @Override
-    public void cacheEstimatedSpeed(SpeedWithBearing estimatedSpeed) {
+    public SpeedWithBearing cacheEstimatedSpeed(SpeedWithBearing estimatedSpeed) {
         cachedEstimatedSpeedBearingInDegrees = estimatedSpeed.getBearing().getDegrees();
         cachedEstimatedSpeedInKnots = estimatedSpeed.getKnots();
-        super.cacheEstimatedSpeed(estimatedSpeed);
+        return super.cacheEstimatedSpeed(estimatedSpeed);
     }
 }

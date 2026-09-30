@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
+import com.sap.sailing.landscape.common.SharedLandscapeConstants;
 import com.sap.sse.ServerInfo;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.HttpRequestHeaderConstants;
@@ -332,7 +333,7 @@ implements AwsApplicationReplicaSet<ShardingKey, MetricsT, ProcessT> {
             // or no load balancer forwards to it; in any case we can only default to the assumption that the process may be an archive
             // server:
             if (getName().equals(ARCHIVE_SERVER_NAME)) {
-                setHostname("www.sapsailing.com"); // TODO this should probably be archive-failover.sapsailing.com for the fail-over ARCHIVE server
+                setHostname("www."+SharedLandscapeConstants.DEFAULT_DOMAIN_NAME); // TODO this should probably be archive-failover.sapsailing.com for the fail-over ARCHIVE server; TODO bug6208: use something other than "www" for the ARCHIVE
             } else {
                 logger.warning("Found an application replica set " + getName() + " that is not the "
                         + ARCHIVE_SERVER_NAME + " replica set; no hostname can be inferred.");

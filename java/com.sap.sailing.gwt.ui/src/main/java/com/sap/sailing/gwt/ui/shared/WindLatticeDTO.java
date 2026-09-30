@@ -2,7 +2,7 @@ package com.sap.sailing.gwt.ui.shared;
 
 import java.io.Serializable;
 
-import com.sap.sailing.domain.common.Position;
+import com.sap.sse.common.Position;
 
 public class WindLatticeDTO implements Serializable {
 

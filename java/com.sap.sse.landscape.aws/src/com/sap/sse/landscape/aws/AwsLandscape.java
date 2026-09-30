@@ -185,7 +185,7 @@ public interface AwsLandscape<ShardingKey> extends Landscape<ShardingKey> {
      *            private key; see also {@link #getKeyPairInfo(Region, String)}
      * @param userData
      *            zero or more strings representing the user data to be passed to the instance; multiple strings will be
-     *            concatenated, using the line separator to join them. The instance is able to read the user data throuh
+     *            concatenated, using the line separator to join them. The instance is able to read the user data through
      *            the AWS SDK installed on the instance.
      */
     default <HostT extends AwsInstance<ShardingKey>> HostT launchHost(
@@ -262,7 +262,7 @@ public interface AwsLandscape<ShardingKey> extends Landscape<ShardingKey> {
      */
     <HostT extends AwsInstance<ShardingKey>> Iterable<HostT> getRunningHostsWithTag(Region region, String tagName, HostSupplier<ShardingKey, HostT> hostSupplier);
 
-    <HostT extends AwsInstance<ShardingKey>> HostT getHostByPrivateIpAddress(Region region, String publicIpAddress,
+    <HostT extends AwsInstance<ShardingKey>> HostT getHostByPrivateDnsNameOrIpAddress(Region region, String privateDnsNameOrIpAddress,
             HostSupplier<ShardingKey, HostT> hostSupplier);
 
     <HostT extends AwsInstance<ShardingKey>> HostT getHostByPublicIpAddress(Region region, String publicIpAddress,
@@ -288,6 +288,8 @@ public interface AwsLandscape<ShardingKey> extends Landscape<ShardingKey> {
      */
     SSHKeyPair importKeyPair(Region region, byte[] publicKey, byte[] encryptedPrivateKey, String keyName) throws JSchException;
 
+    void setTerminationProtection(AwsInstance<ShardingKey> host, boolean terminationProtection);
+    
     void terminate(AwsInstance<ShardingKey> host);
 
     /**
@@ -329,7 +331,7 @@ public interface AwsLandscape<ShardingKey> extends Landscape<ShardingKey> {
 
     Instance getInstanceByPublicIpAddress(Region region, String publicIpAddress);
 
-    Instance getInstanceByPrivateIpAddress(Region region, String publicIpAddress);
+    Instance getInstanceByPrivateDnsNameOrIpAddress(Region region, String privateDnsNameOrIpAddress);
 
     /**
      * @param hostname
@@ -890,4 +892,6 @@ public interface AwsLandscape<ShardingKey> extends Landscape<ShardingKey> {
      * Removes hosts from an IP-based target group.
      */
     void removeIpTargetFromTargetGroup(TargetGroup<ShardingKey> targetGroup, Iterable<AwsInstance<ShardingKey>> hosts);
+
+    void setInstanceName(AwsInstance<ShardingKey> host, String newInstanceName);
 }

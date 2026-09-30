@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-import com.sap.sailing.domain.common.impl.MeterPerSecondSpeedImpl;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.impl.MeterPerSecondSpeedImpl;
 
 public class BeaufortTest {
     @Test

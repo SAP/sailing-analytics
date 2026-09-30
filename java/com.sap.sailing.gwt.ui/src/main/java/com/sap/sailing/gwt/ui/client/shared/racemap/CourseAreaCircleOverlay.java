@@ -9,10 +9,10 @@ import com.google.gwt.maps.client.base.LatLng;
 import com.google.gwt.maps.client.base.Point;
 import com.google.gwt.maps.client.overlays.overlayhandlers.OverlayViewMethods;
 import com.google.gwt.maps.client.overlays.overlayhandlers.OverlayViewOnAddHandler;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.dto.CourseAreaDTO;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.gwt.ui.shared.racemap.CanvasOverlayV3;
+import com.sap.sse.common.Position;
 
 /**
  * A google map overlay based on a HTML5 canvas for drawing a course area circle with a center point that has

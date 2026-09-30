@@ -1,8 +1,8 @@
 package com.sap.sailing.gwt.ui.client.shared.racemap;
 
 import com.google.gwt.maps.client.base.LatLng;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.Position;
 
 /**
  * Maps original coordinates, headings, bearings, and directions to a map coordinate space. The default mapping will

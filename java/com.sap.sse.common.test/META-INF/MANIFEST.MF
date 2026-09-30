@@ -18,3 +18,4 @@ Require-Bundle: org.mockito.mockito-core;bundle-version="1.9.5",
  net.bytebuddy.byte-buddy-agent;bundle-version="1.14.12"
 Export-Package: com.sap.sse.common.test
 Automatic-Module-Name: com.sap.sse.common.test
+Import-Package: com.sap.sse.testutils

@@ -1,0 +1,16 @@
+#!/bin/bash
+MAILINGLIST=/var/cache/landscapeManagersMailingList
+SAILING_INSTANCES=$( aws ec2 describe-instances --filters Name=tag-key,Values=sailing-analytics-server | jq -r '.Reservations[].Instances[].NetworkInterfaces[].PrivateIpAddresses[].Association.PublicIp' )
+for i in ${SAILING_INSTANCES}; do
+  for j in `ssh -o StrictHostKeyChecking=no sailing@$i "ls /home/sailing/servers"`; do
+    if ssh -o StrictHostKeyChecking=no sailing@$i "/home/sailing/servers/$j/status 2>/dev/null | jq -r '.mongoDbConfiguration.servers[].type'" | grep -q UNKNOWN; then
+      MAIL_BODY='A DB for a Sailing Analytics process of replica set '${j}' running on node '${i}' is down!
+
+Check status of DB urgently. To unsubscribe, change '${MAILINGLIST}' on '`hostname`'."' 
+      if [ -n "${MAIL_BODY}" ]; then
+	  echo "${MAIL_BODY}" | mail -s "MongoDB Replica Set of Application $j Unhealthy" `cat "${MAILINGLIST}"`
+	  logger -t unhealthy-mongo "${MAIL_BODY}"
+      fi
+    fi
+  done
+done

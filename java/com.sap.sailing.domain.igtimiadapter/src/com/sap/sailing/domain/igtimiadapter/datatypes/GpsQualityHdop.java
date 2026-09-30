@@ -2,11 +2,11 @@ package com.sap.sailing.domain.igtimiadapter.datatypes;
 
 import java.util.Map;
 
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.domain.igtimiadapter.IgtimiFixReceiver;
 import com.sap.sailing.domain.igtimiadapter.Sensor;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.impl.MeterDistance;
 
 public class GpsQualityHdop extends Fix {
     private static final long serialVersionUID = -5319766127405258823L;

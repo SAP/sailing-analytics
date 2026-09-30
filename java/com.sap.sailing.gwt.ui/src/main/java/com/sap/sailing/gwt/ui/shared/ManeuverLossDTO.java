@@ -1,10 +1,10 @@
 package com.sap.sailing.gwt.ui.shared;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.SpeedWithBearing;
 
 public class ManeuverLossDTO implements IsSerializable {
     private Position maneuverStartPosition;

@@ -2,6 +2,8 @@ package com.sap.sailing.domain.persistence.impl;
 
 import com.sap.sailing.domain.base.RaceDefinition;
 import com.sap.sailing.domain.common.tracking.GPSFix;
+import com.sap.sailing.domain.maneuverhash.ManeuverRaceFingerprint;
+import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprint;
 import com.sap.sailing.domain.tracking.RaceTrackingConnectivityParameters;
 
 /**
@@ -123,8 +125,12 @@ public enum CollectionNames {
     ANNIVERSARIES,
     
     /**
-     * Contains the Hashes for the {@link MarkPassingHashFingerprint}
+     * Contains the hashes for the {@link MarkPassingRaceFingerprint} and the mark passings for those races
      */
-    MARKPASSINGS;
-
+    MARKPASSINGS,
+    
+    /**
+     * Contains the hashes for the {@link ManeuverRaceFingerprint} and the maneuvers for those races
+     */
+    MANEUVERS;
 }

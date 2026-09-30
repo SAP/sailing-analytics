@@ -18,11 +18,13 @@ import com.sap.sailing.domain.common.Tack;
 import com.sap.sailing.domain.common.polars.NotEnoughDataHasBeenAddedException;
 import com.sap.sailing.domain.polars.PolarsChangedListener;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.Util;
 import com.sap.sse.datamining.components.AdditionalResultDataBuilder;
 import com.sap.sse.datamining.components.Processor;
 import com.sap.sse.datamining.factories.GroupKeyFactory;
 import com.sap.sse.datamining.impl.components.GroupedDataEntry;
 import com.sap.sse.datamining.shared.GroupKey;
+import com.sap.sse.datamining.shared.impl.GenericGroupKey;
 
 /**
  * Groups incoming fixes by boatclass and legtype into {@link AngleAndSpeedRegression} instances and
@@ -45,6 +47,44 @@ public class CubicRegressionPerCourseProcessor implements
      */
     private transient ConcurrentMap<BoatClass, Set<PolarsChangedListener>> listeners;
 
+    private boolean isFinished;
+
+    private boolean isAborted;
+
+    public CubicRegressionPerCourseProcessor filterToBoatClasses(Iterable<BoatClass> boatClasses) {
+        final Set<BoatClass> allowedBoatClasses = Util.asSet(boatClasses);
+        final CubicRegressionPerCourseProcessor filteredProcessor = new CubicRegressionPerCourseProcessor();
+        for (final Map.Entry<GroupKey, AngleAndSpeedRegression> entry : regressions.entrySet()) {
+            GroupKey key = entry.getKey();
+            BoatClass boatClass = extractBoatClass(key);
+            if (boatClass != null && allowedBoatClasses.contains(boatClass)) {
+                filteredProcessor.regressions.put(key, entry.getValue());
+            }
+        }
+        return filteredProcessor;
+    }
+
+    private BoatClass extractBoatClass(GroupKey key) {
+        final BoatClass result;
+        if (key.hasSubKeys()) {
+            // In the compound key, BoatClass is the second dimension (index 1)
+            GroupKey boatClassKey = key.getKeys().get(1);
+            if (boatClassKey instanceof GenericGroupKey) {
+                Object value = ((GenericGroupKey<?>) boatClassKey).getValue();
+                if (value instanceof BoatClass) {
+                    result = (BoatClass) value;
+                } else {
+                    result = null;
+                }
+            } else {
+                result = null;
+            }
+        } else {
+            result = null;
+        }
+        return result;
+    }
+    
     @Override
     public boolean canProcessElements() {
         return true;
@@ -109,7 +149,6 @@ public class CubicRegressionPerCourseProcessor implements
 
     private GroupKey createGroupKey(final BoatClass boatClass, final LegType legType) {
         LegTypePolarClusterKey key = new LegTypePolarClusterKey() {
-
             @Override
             public BoatClass getBoatClass() {
                 return boatClass;
@@ -184,41 +223,40 @@ public class CubicRegressionPerCourseProcessor implements
 
     @Override
     public Class<GroupedDataEntry<GPSFixMovingWithPolarContext>> getInputType() {
-        // TODO Auto-generated method stub
-        return null;
+        @SuppressWarnings("unchecked")
+        final Class<GroupedDataEntry<GPSFixMovingWithPolarContext>> result = (Class<GroupedDataEntry<GPSFixMovingWithPolarContext>>) (Class<?>) GroupedDataEntry.class;
+        return result;
     }
 
     @Override
     public Class<Void> getResultType() {
         // No result type here, since this is a special case of a processor. It's the end of the pipe so to say.
-        return null;
+        return Void.class;
     }
 
     @Override
     public void finish() throws InterruptedException {
-        // Nothing to do here
+        isFinished = true;
     }
 
     @Override
     public boolean isFinished() {
-        return false;
+        return isFinished;
     }
 
     @Override
     public void abort() {
-        // TODO Auto-generated method stub
+        isAborted = true;
     }
 
     @Override
     public boolean isAborted() {
-        // TODO Auto-generated method stub
-        return false;
+        return isAborted;
     }
 
     @Override
     public AdditionalResultDataBuilder getAdditionalResultData(AdditionalResultDataBuilder additionalDataBuilder) {
-        // TODO Auto-generated method stub
-        return null;
+        return additionalDataBuilder;
     }
 
     public Map<GroupKey, AngleAndSpeedRegression> getRegressions() {

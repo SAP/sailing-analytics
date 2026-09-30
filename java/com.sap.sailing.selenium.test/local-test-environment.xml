@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--
   Configuration file for the test environment. This file is used for the configuration of the environment for the
@@ -27,8 +27,9 @@
     - http://code.google.com/p/selenium/wiki/OperaDriver
     - http://code.google.com/p/selenium/wiki/SafariDriver
     - http://code.google.com/p/selenium/wiki/RemoteWebDriverServer
-
-    Note: For the Chrome, Firefox and InternetExplorer driver an additional "server", which acts as a bridge between the browser and the driver, is needed.
+    
+    Note: For the Chrome, Firefox and InternetExplorer driver an additional "server", which acts as a bridge between the
+          browser and the driver, is needed.
   -->
   <system-properties>
      <!--

@@ -14,14 +14,8 @@ import java.util.logging.Logger;
 
 import com.sap.sailing.declination.Declination;
 import com.sap.sailing.declination.DeclinationService;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.common.Wind;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sailing.domain.common.impl.WindImpl;
-import com.sap.sailing.domain.common.scalablevalue.impl.ScalableBearing;
-import com.sap.sailing.domain.common.scalablevalue.impl.ScalablePosition;
-import com.sap.sailing.domain.common.scalablevalue.impl.ScalableSpeed;
 import com.sap.sailing.domain.igtimiadapter.BulkFixReceiver;
 import com.sap.sailing.domain.igtimiadapter.IgtimiConnection;
 import com.sap.sailing.domain.igtimiadapter.IgtimiFixReceiverAdapter;
@@ -41,10 +35,16 @@ import com.sap.sailing.domain.tracking.DynamicTrackWithRemove;
 import com.sap.sailing.domain.tracking.WindListener;
 import com.sap.sailing.domain.tracking.impl.DynamicTrackWithRemoveImpl;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
+import com.sap.sse.common.scalablevalue.impl.ScalableBearing;
+import com.sap.sse.common.scalablevalue.impl.ScalablePosition;
+import com.sap.sse.common.scalablevalue.impl.ScalableSpeed;
 
 /**
  * Receives Igtimi {@link Fix}es and tries to generate a {@link Wind} object from each {@link AWS} fix. For this to

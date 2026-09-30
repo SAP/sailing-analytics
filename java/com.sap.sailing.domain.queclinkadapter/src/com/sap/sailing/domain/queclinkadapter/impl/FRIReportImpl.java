@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.sap.sailing.domain.base.impl.KilometersPerHourSpeedWithBearingImpl;
-import com.sap.sailing.domain.common.impl.DegreePosition;
-import com.sap.sailing.domain.common.impl.MeterDistance;
 import com.sap.sailing.domain.queclinkadapter.FRIReport;
 import com.sap.sailing.domain.queclinkadapter.IOStatus;
 import com.sap.sailing.domain.queclinkadapter.MessageType;
@@ -16,6 +14,8 @@ import com.sap.sailing.domain.queclinkadapter.PositionRelatedReport;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.DegreePosition;
+import com.sap.sse.common.impl.MeterDistance;
 
 public class FRIReportImpl extends MessageWithDeviceOriginImpl implements FRIReport {
     private final Byte reportId;

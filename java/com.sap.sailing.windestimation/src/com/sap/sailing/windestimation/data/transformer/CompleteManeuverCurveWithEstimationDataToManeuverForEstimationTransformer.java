@@ -24,7 +24,6 @@ public class CompleteManeuverCurveWithEstimationDataToManeuverForEstimationTrans
         List<ConvertableToLabeledManeuverForEstimation> convertableManeuvers = ConvertableManeuverForEstimationAdapterForCompleteManeuverCurveWithEstimationData
                 .getConvertableManeuvers(competitorTrackWithElementsToTransform.getElements());
         return internalTransformer.getManeuversForEstimation(convertableManeuvers,
-                competitorTrackWithElementsToTransform.getBoatClass());
+                competitorTrackWithElementsToTransform.getBoatClass(), competitorTrackWithElementsToTransform.getCompetitorName());
     }
-
 }

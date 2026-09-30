@@ -19,13 +19,13 @@ import java.util.logging.Logger;
 
 import org.osgi.framework.FrameworkUtil;
 
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.simulator.Path;
 import com.sap.sailing.simulator.SimulationParameters;
 import com.sap.sailing.simulator.TimedPositionWithSpeed;
 import com.sap.sailing.simulator.util.SailingSimulatorConstants;
 import com.sap.sailing.simulator.windfield.WindFieldGenerator;
 import com.sap.sailing.simulator.windfield.impl.WindFieldGeneratorMeasured;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Util;
 
 public class SimulatorUtils {

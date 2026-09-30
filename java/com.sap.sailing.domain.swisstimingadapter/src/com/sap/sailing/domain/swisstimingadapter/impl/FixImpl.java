@@ -2,12 +2,12 @@ package com.sap.sailing.domain.swisstimingadapter.impl;
 
 import java.io.Serializable;
 
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.swisstimingadapter.Fix;
 import com.sap.sailing.domain.swisstimingadapter.TrackerType;
 import com.sap.sse.common.Distance;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.SpeedWithBearing;
 
 public class FixImpl implements Fix {
     private final Serializable trackedObjectId;

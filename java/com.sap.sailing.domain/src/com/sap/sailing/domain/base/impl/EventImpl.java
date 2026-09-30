@@ -18,17 +18,17 @@ import com.sap.sailing.domain.base.Event;
 import com.sap.sailing.domain.base.EventListener;
 import com.sap.sailing.domain.base.Venue;
 import com.sap.sailing.domain.common.Placemark;
-import com.sap.sailing.domain.common.Position;
 import com.sap.sailing.domain.common.WindSource;
 import com.sap.sailing.domain.common.WindSourceType;
-import com.sap.sailing.domain.common.scalablevalue.impl.ScalablePosition;
 import com.sap.sailing.domain.leaderboard.Leaderboard;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroup;
 import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.geocoding.ReverseGeocoder;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.scalablevalue.impl.ScalablePosition;
 
 public class EventImpl extends EventBaseImpl implements Event {
     private static final long serialVersionUID = 855135446595485715L;

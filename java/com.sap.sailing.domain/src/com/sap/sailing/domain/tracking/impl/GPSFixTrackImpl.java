@@ -16,19 +16,8 @@ import com.sap.sailing.domain.base.SpeedWithBearingWithConfidence;
 import com.sap.sailing.domain.base.SpeedWithConfidence;
 import com.sap.sailing.domain.base.impl.SpeedWithBearingWithConfidenceImpl;
 import com.sap.sailing.domain.base.impl.SpeedWithConfidenceImpl;
-import com.sap.sailing.domain.common.Position;
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.common.TrackedRaceStatusEnum;
 import com.sap.sailing.domain.common.Wind;
-import com.sap.sailing.domain.common.confidence.BearingWithConfidence;
-import com.sap.sailing.domain.common.confidence.BearingWithConfidenceCluster;
-import com.sap.sailing.domain.common.confidence.ConfidenceBasedAverager;
-import com.sap.sailing.domain.common.confidence.ConfidenceFactory;
-import com.sap.sailing.domain.common.confidence.HasConfidence;
-import com.sap.sailing.domain.common.confidence.Weigher;
-import com.sap.sailing.domain.common.confidence.impl.BearingWithConfidenceImpl;
-import com.sap.sailing.domain.common.impl.KnotSpeedWithBearingImpl;
-import com.sap.sailing.domain.common.impl.NauticalMileDistance;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.common.tracking.WithValidityCache;
@@ -46,14 +35,25 @@ import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Speed;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.TimeRange;
 import com.sap.sse.common.Timed;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.confidence.BearingWithConfidence;
+import com.sap.sse.common.confidence.BearingWithConfidenceCluster;
+import com.sap.sse.common.confidence.ConfidenceBasedAverager;
+import com.sap.sse.common.confidence.ConfidenceFactory;
+import com.sap.sse.common.confidence.HasConfidence;
+import com.sap.sse.common.confidence.Weigher;
+import com.sap.sse.common.confidence.impl.BearingWithConfidenceImpl;
 import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sse.common.impl.MillisecondsDurationImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
+import com.sap.sse.common.impl.NauticalMileDistance;
 import com.sap.sse.common.impl.TimeRangeImpl;
 import com.sap.sse.shared.util.impl.ArrayListNavigableSet;
 
@@ -275,7 +275,8 @@ public abstract class GPSFixTrackImpl<ItemType, FixType extends GPSFix> extends 
         }
 
         @Override
-        public void cacheEstimatedSpeed(SpeedWithBearing estimatedSpeed) {
+        public SpeedWithBearing cacheEstimatedSpeed(SpeedWithBearing estimatedSpeed) {
+            return estimatedSpeed;
         }
     }
 
@@ -631,11 +632,14 @@ public abstract class GPSFixTrackImpl<ItemType, FixType extends GPSFix> extends 
                         ConfidenceFactory.INSTANCE.createExponentialTimeDifferenceWeigher(
                                 // use a minimum confidence to avoid the bearing to flip to 270deg in case all is zero
                                 getMillisecondsOverWhichToAverageSpeed() / 2, /* minimumConfidence */ 0.00000001)); // half confidence if half averaging interval apart
-                result = estimatedSpeed == null ? null : estimatedSpeed.getObject();
                 if (estimatedSpeed != null) {
                     if (ceil != null && ceil.getTimePoint().equals(at)) {
-                        ceil.cacheEstimatedSpeed(result);
+                        result = ceil.cacheEstimatedSpeed(estimatedSpeed.getObject()); // this way, should the fix apply compaction, we will still return consistent (compacted) results
+                    } else {
+                        result = estimatedSpeed.getObject();
                     }
+                } else {
+                    result = null;
                 }
             }
             if (logger.isLoggable(Level.FINEST) && (estimatedSpeedCacheHits + estimatedSpeedCacheMisses) % 1000 == 0) {
@@ -1022,6 +1026,11 @@ public abstract class GPSFixTrackImpl<ItemType, FixType extends GPSFix> extends 
      * point of the <code>gpsFix</code> "upwards." However, if the adjacent earlier fixes have changed their validity by
      * the addition of <code>gpsFix</code>, the distance cache must be invalidated starting with the first fix whose
      * validity changed.
+     * <p>
+     * 
+     * When a fix's validity changes, the set of fixes returned by {@link #getInternalFixes()} changes. Since
+     * {@link #getEstimatedSpeed(TimePoint)} uses {@link #getInternalFixes()} for its calculation, the estimated
+     * speed caches of fixes whose speed calculation might be affected need to be invalidated as well.
      */
     private void invalidateValidityAndEstimatedSpeedAndDistanceCaches(FixType gpsFix) {
         assertWriteLock();
@@ -1034,7 +1043,7 @@ public abstract class GPSFixTrackImpl<ItemType, FixType extends GPSFix> extends 
         // stopped moving at the last fix.
         FixType last = getInternalFixes().lower(gpsFix);
         if (last != null) {
-            distanceCacheInvalidationStart = last.getTimePoint().plus(1); // add one millisecond to invalidate *after*
+            distanceCacheInvalidationStart = last.getTimePoint().plusResolution(); // one resolution unit later to invalidate *after*
                                                                           // the last fix only
         }
         gpsFix.invalidateCache();
@@ -1047,14 +1056,42 @@ public abstract class GPSFixTrackImpl<ItemType, FixType extends GPSFix> extends 
             boolean lowerWasValid = isValid(getRawFixes(), lower);
             lower.invalidateCache();
             boolean lowerIsValid = isValid(getRawFixes(), lower);
-            if (lowerIsValid != lowerWasValid && lower.getTimePoint().before(distanceCacheInvalidationStart)) {
-                distanceCacheInvalidationStart = lower.getTimePoint();
+            if (lowerIsValid != lowerWasValid) {
+                if (lower.getTimePoint().before(distanceCacheInvalidationStart)) {
+                    distanceCacheInvalidationStart = lower.getTimePoint();
+                }
+                invalidateEstimatedSpeedCachesAffectedByValidityChange(lower);
             }
         }
         getDistanceCache().invalidateAllAtOrLaterThan(distanceCacheInvalidationStart);
         Iterable<FixType> highers = getLaterFixesWhoseValidityMayBeAffected(gpsFix);
         for (FixType higher : highers) {
+            boolean higherWasValid = isValid(getRawFixes(), higher);
             higher.invalidateCache();
+            boolean higherIsValid = isValid(getRawFixes(), higher);
+            if (higherIsValid != higherWasValid) {
+                invalidateEstimatedSpeedCachesAffectedByValidityChange(higher);
+            }
+        }
+    }
+    
+    /**
+     * When the validity of {@code fixWithChangedValidity} changes, the set of fixes returned by
+     * {@link #getInternalFixes()} changes. Since {@link #getEstimatedSpeed(TimePoint)} uses
+     * {@link #getInternalFixes()} for its calculation, this method invalidates the estimated speed caches
+     * of all fixes whose speed estimation might be affected by this change.
+     * <p>
+     * 
+     * The affected fixes are those within the time interval returned by
+     * {@link #getTimeIntervalWhoseEstimatedSpeedMayHaveChangedAfterAddingFix(GPSFix)}, since a validity
+     * change has the same effect on speed estimation as adding or removing a fix.
+     */
+    private void invalidateEstimatedSpeedCachesAffectedByValidityChange(FixType fixWithChangedValidity) {
+        TimeRange affectedInterval = getTimeIntervalWhoseEstimatedSpeedMayHaveChangedAfterAddingFix(fixWithChangedValidity);
+        for (FixType affectedFix : getInternalRawFixes().subSet(
+                createDummyGPSFix(affectedInterval.from()), true,
+                createDummyGPSFix(affectedInterval.to()), true)) {
+            affectedFix.invalidateEstimatedSpeedCache();
         }
     }
 

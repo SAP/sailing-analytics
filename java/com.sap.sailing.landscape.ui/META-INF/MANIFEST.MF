@@ -28,7 +28,8 @@ Require-Bundle: com.sap.sse.gwt,
  com.sap.sse,
  com.sap.sse.shared.android,
  com.sap.sailing.domain
-Export-Package: com.google.gwt.user.client.rpc.core.com.sap.sse.landscape.aws.common.shared,
+Export-Package: com.google.gwt.user.client.rpc.core.com.sap.sailing.landscape.common,
+ com.google.gwt.user.client.rpc.core.com.sap.sse.landscape.aws.common.shared,
  com.google.gwt.user.client.rpc.core.com.sap.sse.landscape.common.shared,
  com.sap.sailing.landscape.ui.client,
  com.sap.sailing.landscape.ui.server,
@@ -36,6 +37,8 @@ Export-Package: com.google.gwt.user.client.rpc.core.com.sap.sse.landscape.aws.co
 Bundle-ActivationPolicy: lazy
 Import-Package: com.sap.sailing.domain.common,
  com.sap.sailing.server.gateway.interfaces,
+ javax.servlet;version="[3.1.0,4.0.0)",
+ javax.servlet.http;version="[3.1.0,4.0.0)",
  org.osgi.framework;version="1.8.0",
  org.osgi.util.tracker;version="1.5.1"
 Bundle-Activator: com.sap.sailing.landscape.ui.impl.Activator

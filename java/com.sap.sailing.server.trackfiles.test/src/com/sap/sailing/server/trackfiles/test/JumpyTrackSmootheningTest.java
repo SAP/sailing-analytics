@@ -51,9 +51,7 @@ import com.sap.sailing.domain.common.BoatClassMasterdata;
 import com.sap.sailing.domain.common.CompetitorRegistrationType;
 import com.sap.sailing.domain.common.MarkType;
 import com.sap.sailing.domain.common.PassingInstruction;
-import com.sap.sailing.domain.common.SpeedWithBearing;
 import com.sap.sailing.domain.common.TrackedRaceStatusEnum;
-import com.sap.sailing.domain.common.impl.DegreePosition;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixImpl;
@@ -75,9 +73,11 @@ import com.sap.sailing.domain.tracking.impl.TrackedRaceStatusImpl;
 import com.sap.sailing.server.trackfiles.RouteConverterGPSFixImporterFactory;
 import com.sap.sse.common.Color;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
+import com.sap.sse.common.impl.DegreePosition;
 
 import difflib.PatchFailedException;
 
@@ -317,7 +317,7 @@ public class JumpyTrackSmootheningTest {
         final RaceDefinition race = new RaceDefinitionImpl(name, course, boatClass, competitorsAndTheirBoats, UUID.randomUUID());
         return new DynamicTrackedRaceWithMarkPassingCalculator(trackedRegatta, race, /* sidelines */ Collections.emptySet(), new EmptyWindStore(), /* delayToLiveInMillis */ 1000,
                 WindTrack.DEFAULT_MILLISECONDS_OVER_WHICH_TO_AVERAGE_WIND, /* time over which to average speed: */ boatClass.getApproximateManeuverDurationInMilliseconds(),
-                /* useInternalMarkPassingAlgorithm */ true, OneDesignRankingMetric::new, mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null);
+                /* useInternalMarkPassingAlgorithm */ true, OneDesignRankingMetric::new, mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null, /* maneuverRaceFingerprintRegistry */ null);
     }
 
     private Mark createAndPlaceMark(DynamicTrackedRace trackedRace, String name, String shortName, double latDeg, double lngDeg,

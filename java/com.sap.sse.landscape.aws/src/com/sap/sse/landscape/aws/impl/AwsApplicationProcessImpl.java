@@ -155,7 +155,7 @@ implements AwsApplicationProcess<ShardingKey, MetricsT, ProcessT> {
             } catch (Exception e) {
                 logger.info("Unable to find master by public IP "+ipAddressOrHostname+" ("+e.getMessage()+"); trying to look up master assuming "+ipAddressOrHostname+" is the private IP");
                 try {
-                    host = landscape.getHostByPrivateIpAddress(getHost().getRegion(), ipAddressOrHostname, hostSupplier);
+                    host = landscape.getHostByPrivateDnsNameOrIpAddress(getHost().getRegion(), ipAddressOrHostname, hostSupplier);
                 } catch (Exception f) {
                     logger.info("Unable to find master by private IP "+ipAddressOrHostname+" ("+f.getMessage()+") either. Returning null.");
                     host = null;

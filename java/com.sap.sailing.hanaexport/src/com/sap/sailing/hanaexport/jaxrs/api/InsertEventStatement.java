@@ -5,7 +5,7 @@ import java.sql.Date;
 import java.sql.SQLException;
 
 import com.sap.sailing.domain.base.Event;
-import com.sap.sailing.domain.common.Position;
+import com.sap.sse.common.Position;
 
 public class InsertEventStatement extends AbstractPreparedInsertStatement<Event> {
     protected InsertEventStatement(Connection connection) throws SQLException {

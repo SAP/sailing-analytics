@@ -1,11 +1,13 @@
 package com.sap.sailing.selenium.pages.gwt;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -72,24 +74,40 @@ public class GenericCellTablePO<T extends DataEntryPO> extends CellTablePO<T> {
         @Override
         public <S extends CellTablePO<T>> T createEntry(S table, WebElement element) {
             Class<?> clazz = table.getClass();
+            T result = null;
             final List<Exception> exceptionsCaught = new ArrayList<>();
-            while (clazz != null) {
+            while (clazz != null && result == null) {
                 try {
-                    Constructor<T> constructor = this.type.getConstructor(clazz, WebElement.class);
-                    return constructor.newInstance(table, element);
-                } catch (Exception exception) {
+                    final Constructor<T> constructor = this.type.getConstructor(clazz, WebElement.class);
+                    result = constructor.newInstance(table, element);
+                } catch (final NoSuchMethodException exception) {
                     clazz = clazz.getSuperclass();
                     exceptionsCaught.add(exception);
+                } catch (final InvocationTargetException exception) {
+                    if (exception.getCause() instanceof StaleElementReferenceException) {
+                        throw (StaleElementReferenceException) exception.getCause();
+                    } else {
+                        throw new RuntimeException("Can't create DataEntry of type " + this.type
+                                + " on table of type " + table.getClass().getName() + " on web element " + element,
+                                exception);
+                    }
+                } catch (final InstantiationException | IllegalAccessException exception) {
+                    throw new RuntimeException("Can't create DataEntry of type " + this.type + " on table of type "
+                            + table.getClass().getName() + " on web element " + element, exception);
                 }
             }
-            logger.warning("Unable to construct a DataEntryPO of type " + this.type.getName() + " for table " + table
-                    + " of type " + (table == null ? null : table.getClass().getName()) + " from web element "
-                    + element);
-            for (final Exception e : exceptionsCaught) {
-                logger.log(Level.WARNING, "Exception caught while trying to create a DataEntryPO of type "+this.type.getName(), e);
+            if (result == null) {
+                logger.warning("Unable to construct a DataEntryPO of type " + this.type.getName() + " for table "
+                        + table + " of type " + (table == null ? null : table.getClass().getName())
+                        + " from web element " + element);
+                for (final Exception e : exceptionsCaught) {
+                    logger.log(Level.WARNING,
+                            "Exception caught while trying to create a DataEntryPO of type " + this.type.getName(), e);
+                }
+                throw new RuntimeException("Can't create DataEntry of type " + this.type + " on table of type "
+                        + table.getClass().getName() + " on web element " + element);
             }
-            throw new RuntimeException("Can't create DataEntry of type " + this.type + " on table of type "
-                    + table.getClass().getName() + " on web element " + element);
+            return result;
         }
     }
     

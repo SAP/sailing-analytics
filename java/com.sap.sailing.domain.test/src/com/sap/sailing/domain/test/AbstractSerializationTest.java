@@ -11,7 +11,7 @@ import java.util.HashMap;
 import com.sap.sailing.domain.base.DomainFactory;
 
 public abstract class AbstractSerializationTest {
-    static <T extends Serializable> T cloneBySerialization(final T s, DomainFactory resolveAgainst) throws IOException, ClassNotFoundException {
+    protected static <T extends Serializable> T cloneBySerialization(final T s, DomainFactory resolveAgainst) throws IOException, ClassNotFoundException {
         PipedOutputStream pos = new PipedOutputStream();
         PipedInputStream pis = new PipedInputStream(pos);
         final ObjectOutputStream dos = new ObjectOutputStream(pos);
@@ -27,7 +27,8 @@ public abstract class AbstractSerializationTest {
             }
         }.start();
         Thread.currentThread().setContextClassLoader(AbstractSerializationTest.class.getClassLoader());
-        ObjectInputStream dis = resolveAgainst.createObjectInputStreamResolvingAgainstThisFactory(pis, /* resolve listener */ null, /* classLoaderCache */ new HashMap<>());
+        ObjectInputStream dis = resolveAgainst == null ? new ObjectInputStream(pis) :
+            resolveAgainst.createObjectInputStreamResolvingAgainstThisFactory(pis, /* resolve listener */ null, /* classLoaderCache */ new HashMap<>());
         @SuppressWarnings("unchecked")
         T result = (T) dis.readObject();
         dis.close();

@@ -1,10 +1,10 @@
 package com.sap.sailing.domain.confidence;
 
-import com.sap.sailing.domain.common.confidence.Weigher;
 import com.sap.sailing.domain.confidence.impl.ConfidenceFactoryImpl;
 import com.sap.sailing.domain.tracking.WindWithConfidence;
+import com.sap.sse.common.confidence.Weigher;
 
-public interface ConfidenceFactory extends com.sap.sailing.domain.common.confidence.ConfidenceFactory {
+public interface ConfidenceFactory extends com.sap.sse.common.confidence.ConfidenceFactory {
     ConfidenceFactory INSTANCE = new ConfidenceFactoryImpl();
     
     /**

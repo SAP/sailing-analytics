@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-import com.sap.sailing.domain.common.BearingChangeAnalyzer;
+import com.sap.sse.common.BearingChangeAnalyzer;
 import com.sap.sse.common.impl.DegreeBearingImpl;
 
 public class BearingChangeAnalyzerTest {

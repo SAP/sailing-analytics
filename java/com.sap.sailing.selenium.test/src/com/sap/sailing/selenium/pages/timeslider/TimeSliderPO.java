@@ -1,5 +1,6 @@
 package com.sap.sailing.selenium.pages.timeslider;
 
+import java.time.Duration;
 import java.util.function.Function;
 
 import org.openqa.selenium.WebDriver;
@@ -38,7 +39,7 @@ public class TimeSliderPO extends PageObject {
     @Override
     protected void initElements() {
         super.initElements();
-        WebDriverWait webDriverWait = new WebDriverWait(driver, 300);
+        WebDriverWait webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(300));
         webDriverWait.until(new Function<WebDriver, Boolean>() {
             @Override
             public Boolean apply(WebDriver t) {
