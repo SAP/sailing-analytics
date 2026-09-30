@@ -3,7 +3,7 @@ package com.sap.sse.landscape.aws;
 import software.amazon.awssdk.services.autoscaling.model.LaunchTemplateSpecification;
 import software.amazon.awssdk.services.ec2.model.InstanceType;
 
-public interface LandscapeConstants {
+public interface AwsLandscapeConstants {
     /**
      * The key <strong>tag</strong>, indicating that an instance only acts as a reverse proxy
      * (ie. it is not hosting other services). SO it can be terminated without risk.

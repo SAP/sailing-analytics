@@ -164,6 +164,7 @@ SAP is at the center of today’s technology revolution, developing innovations 
 ## Projects
 * [[Management Console for Easier Administration|wiki/howto/development/management-console]]
 * [[Cloud Infrastructure Orchestration|wiki/projects/cloud-orchestrator]]
+* [[AI Chatbot with Sailing Literature and API Access|wiki/projects/ai-agent-sailing-knowledge.md]]
 
 ## Events and Planning
 * [[Project Planning (bigger development)|wiki/events/planning]]

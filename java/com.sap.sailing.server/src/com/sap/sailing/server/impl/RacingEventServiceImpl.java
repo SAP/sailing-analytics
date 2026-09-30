@@ -869,6 +869,9 @@ Replicator {
         logger.info("Created " + this);
         this.eventResolverListeners = Collections.newSetFromMap(new ConcurrentHashMap<>());
         this.securityServiceTracker = securityServiceTracker;
+        this.numberOfTrackedRacesToRestore = restoreTrackedRaces
+                ? Long.MAX_VALUE /* set to the real value in restoreTrackedRaces(), staying unhealthy until races loaded */
+                : 0;
         this.numberOfTrackedRacesRestored = new AtomicInteger();
         this.numberOfTrackedRacesRestoredDoneLoading = new AtomicInteger();
         this.numberOfTrackedRacesStillLoading = new AtomicInteger();
@@ -3248,7 +3251,7 @@ Replicator {
     @Override
     public void removeRace(Regatta regatta, RaceDefinition race) throws MalformedURLException, IOException,
             InterruptedException {
-        logger.info("Removing the race " + race + "...");
+        logger.info("Removing the race " + regatta.getName()+ " / " + race + "...");
         final RaceTrackingConnectivityParameters connectivityParams = connectivityParametersByRace.remove(race);
         if (connectivityParams != null) {
             getMongoObjectFactory().removeConnectivityParametersForRaceToRestore(connectivityParams);
