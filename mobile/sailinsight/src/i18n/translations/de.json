@@ -321,6 +321,9 @@
   "error_network_required_snackbar": "Network connection required to perform this action",
   "error_field_invalid_handicap": "Handicap kann nicht 0 sein.",
   "error_device_already_exists": "Dieses Gerät ist bereits für diese Regatta registriert",
+  "error_invalid_invitation": "Diese Regatta-Einladung ist ungültig oder abgelaufen.\nBitte überprüfe den Link bzw. QR-Code und versuche es erneut.",
+  "error_server_busy": "Der Server ist vorübergehend nicht erreichbar.\nBitte versuche es gleich noch einmal.",
+  "error_not_found_on_server": "Die angeforderten Daten wurden auf dem Server nicht gefunden.",
 
   "url_eula": "https://www.sapsailing.com/EULA_Android_SailingBoatTracker.html",
   "url_privacy_policy": "https://wiki.sapsailing.com/wiki/info/mobile/sailinsight-privacy-policy",
