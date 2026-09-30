@@ -223,7 +223,7 @@
       <td>This tutorial explains how to copy course to other race.</td>
     </tr>
     <tr>
-      <td><a href="sailinganalytics/dset-up-course.md">Course set up</a></td>
+      <td><a href="sailinganalytics/set-up-course.md">Course set up</a></td>
       <td>This tutorial explains how to set up course in <strong>AdminConsole</strong>.</td>
     </tr>
   </tbody>
