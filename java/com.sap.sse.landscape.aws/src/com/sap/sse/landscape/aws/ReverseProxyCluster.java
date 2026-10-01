@@ -27,7 +27,7 @@ public interface ReverseProxyCluster<ShardingKey, MetricsT extends ApplicationPr
 
     /**
      * Add one host of the instance type specified to the availability zone {@code az}. Additionally, it is added to the
-     * target groups with {@link LandscapeConstants#ALL_REVERSE_PROXIES}, once it is running, which may be the reason
+     * target groups with {@link AwsLandscapeConstants#ALL_REVERSE_PROXIES}, once it is running, which may be the reason
      * the success message doesn't immediately appear.
      * 
      * @return the host that was added by this request; it will also be part of the response of {@link #getHosts()} now
