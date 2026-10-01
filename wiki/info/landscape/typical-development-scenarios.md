@@ -31,6 +31,8 @@ If any of the already existing boat class map visualizations work for your new c
 
 Mention the new boat class in the release notes, and don't forget to add all new files to your Git index before committing ;-).
 
+See [https://github.com/eclipse-sailing-analytics/sailing-analytics/commit/3e0537753fe9c1f613260e24f1a4a46ed5e17f7d](https://github.com/eclipse-sailing-analytics/sailing-analytics/commit/3e0537753fe9c1f613260e24f1a4a46ed5e17f7d) for an example commit, in this case adding the "Yngling" boat class.
+
 ## Adding an OSGi Bundle
 Make sure you have read [[Workspace, Bundles, Projects|wiki/info/general/workspace-bundles-projects-structure]] before continuing. We distinguish two cases: adding a 3rd-party bundle to the target platform and adding a new development bundle as a Java project.
 
