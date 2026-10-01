@@ -166,6 +166,7 @@ class CompatMap {
         this.polylineFlushFrame = null;
         this.nextPolylineSequence = 1;
         this.cameraChangedSinceIdle = true;
+        this.userOrientationStart = null;
         element.style.position = element.style.position || 'relative';
         element.style.isolation = 'isolate';
         this.overlayLayer = document.createElement('div');
@@ -199,7 +200,7 @@ class CompatMap {
             center: lngLat(initialCenter),
             zoom: toMapLibreZoom(options.zoom ?? 0),
             bearing: options.heading || 0,
-            pitch: 0,
+            pitch: options.tilt || 0,
             attributionControl: false
         });
         addCollapsedAttributionControl(this.map, 'bottom-right');
@@ -251,9 +252,21 @@ class CompatMap {
             this.emit('zoom_changed');
             if (this.userZoomInProgress) this.emit('dragend');
         });
-        this.map.on('rotate', () => this.emit('heading_changed'));
-        // A rotation the user performs themselves outranks a heading still being applied.
-        this.map.on('rotatestart', event => { if (event?.originalEvent) this.pendingHeading = null; });
+        this.map.on('rotate', () => {
+            if (!this.userOrientationStart) this.emit('heading_changed');
+        });
+        this.map.on('pitch', () => {
+            if (!this.userOrientationStart) this.emit('tilt_changed');
+        });
+        const startUserOrientation = event => {
+            if (!event?.originalEvent || this.userOrientationStart) return;
+            this.userOrientationStart = { heading: this.map.getBearing(), tilt: this.map.getPitch() };
+        };
+        this.map.on('rotatestart', event => {
+            if (event?.originalEvent) this.pendingHeading = null;
+            startUserOrientation(event);
+        });
+        this.map.on('pitchstart', startUserOrientation);
         // Google applies a heading instantly, so it always reaches the requested angle. Here the
         // rotation is animated and any camera command arriving mid-flight cancels it, which would
         // strand the map at a partial bearing. Reconcile on idle rather than on moveend: moveend
@@ -274,6 +287,12 @@ class CompatMap {
             this.cameraChangedSinceIdle = false;
             const emitIdle = () => {
                 this.userZoomInProgress = false;
+                const orientationStart = this.userOrientationStart;
+                this.userOrientationStart = null;
+                if (orientationStart) {
+                    if (headingDelta(this.map.getBearing(), orientationStart.heading) >= 0.5) this.emit('heading_changed');
+                    if (Math.abs(this.map.getPitch() - orientationStart.tilt) >= 0.5) this.emit('tilt_changed');
+                }
                 this.emit('bounds_changed');
                 this.emit('idle');
             };
@@ -307,8 +326,9 @@ class CompatMap {
                     });
                 }
                 else this.emit(name, mapEvent);
-                // mousedown avoids MapLibre dragstart re-entry; upgrade if non-drag clicks matter.
-                if (name === 'mousedown') queueMicrotask(() => this.emit('dragstart', mapEvent));
+                // Only primary-button panning uses the drag lifecycle. Right-button camera orientation
+                // stays on the live bounds-change path and settles through heading/tilt events at idle.
+                if (name === 'mousedown' && event.originalEvent?.button !== 2) queueMicrotask(() => this.emit('dragstart', mapEvent));
             });
         }
         let lastContextMenu = 0;
@@ -501,6 +521,8 @@ class CompatMap {
         this.map.rotateTo(degrees, { duration: 500, easing: t => t * (2 - t) });
     }
     getHeading() { return (this.map.getBearing() + 360) % 360; }
+    setTilt(degrees) { this.map.setPitch(degrees); }
+    getTilt() { return this.map.getPitch(); }
     setMapTypeId(mapTypeId) { this.options.mapTypeId = mapTypeId; setSatelliteVisible(this.map, isSatelliteMapType(mapTypeId)); }
     getMapTypeId() { return this.options.mapTypeId || 'roadmap'; }
     setOptions(options = {}) {
@@ -509,7 +531,8 @@ class CompatMap {
         if ('center' in options) camera.center = lngLat(asLngLatLiteral(options.center));
         if ('zoom' in options) camera.zoom = toMapLibreZoom(options.zoom);
         if ('heading' in options) camera.bearing = options.heading;
-        if ('heading' in options && !('center' in options) && !('zoom' in options)) this.setHeading(options.heading);
+        if ('tilt' in options) camera.pitch = options.tilt;
+        if ('heading' in options && !('center' in options) && !('zoom' in options) && !('tilt' in options)) this.setHeading(options.heading);
         else if (Object.keys(camera).length) this.map.jumpTo(camera);
         if ('seaMarksVisible' in options) applyRaceStyle(this.map, options.seaMarksVisible);
         if ('draggable' in options) this.map.dragPan[options.draggable ? 'enable' : 'disable']();
