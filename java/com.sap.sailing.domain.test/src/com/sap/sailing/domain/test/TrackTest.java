@@ -22,6 +22,7 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -269,6 +270,11 @@ public class TrackTest {
         // computation only completes once all three fix additions are known to be about to contend for the cache's
         // write lock; replaces the former fixed Thread.sleep(1000) that merely hoped for this ordering.
         final CyclicBarrier fixThreadsReadyToContend = new CyclicBarrier(4);
+        // Only the first query's stale computation must rendezvous with the three fix-adding threads at the barrier above.
+        // The second query later re-enters computeMaxSpeed(...) after those threads have finished, so it must not await the
+        // barrier (nobody else would ever reach it, deadlocking until the 20s timeout); this flag lets exactly one
+        // computeMaxSpeed(...) invocation wait on the barrier.
+        final AtomicBoolean firstComputeMaxSpeedAwaitsBarrier = new AtomicBoolean(true);
         final DynamicGPSFixMovingTrackImpl<Object> track = new DynamicGPSFixMovingTrackImpl<Object>(new Object(), /* millisecondsOverWhichToAverage */ 30000l) {
             private static final long serialVersionUID = 1L;
             @Override
@@ -278,12 +284,14 @@ public class TrackTest {
                     @Override
                     protected Pair<GPSFixMoving, Speed> computeMaxSpeed(TimePoint from, TimePoint to) {
                         final Pair<GPSFixMoving, Speed> result = super.computeMaxSpeed(from, to);
-                        try {
-                            // wait until all three fix-adding threads have reached the barrier, i.e., are about to
-                            // contend for this cache's write lock, before letting the stale computation complete
-                            fixThreadsReadyToContend.await(20, TimeUnit.SECONDS);
-                        } catch (final InterruptedException | BrokenBarrierException | TimeoutException e) {
-                            throw new RuntimeException(e);
+                        if (firstComputeMaxSpeedAwaitsBarrier.compareAndSet(true, false)) {
+                            try {
+                                // wait until all three fix-adding threads have reached the barrier, i.e., are about to
+                                // contend for this cache's write lock, before letting the stale computation complete
+                                fixThreadsReadyToContend.await(20, TimeUnit.SECONDS);
+                            } catch (final InterruptedException | BrokenBarrierException | TimeoutException e) {
+                                throw new RuntimeException(e);
+                            }
                         }
                         return result;
                     }
