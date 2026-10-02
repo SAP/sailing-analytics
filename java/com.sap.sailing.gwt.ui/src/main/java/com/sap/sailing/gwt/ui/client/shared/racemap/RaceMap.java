@@ -526,6 +526,8 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
      * during an orientation change.
      */
     private boolean orientationChangeInProgress;
+    private boolean resetAutoZoomSettingsAfterCameraChange;
+    private com.google.gwt.user.client.Timer cameraChangeSettledTimer;
     
     private final NumberFormat numberFormatNoDecimal = NumberFormatterFactory.getDecimalFormat(0);
     private final NumberFormat numberFormatOneDecimal = NumberFormatterFactory.getDecimalFormat(1);
@@ -945,8 +947,9 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                 map.getMapTypeRegistry().set(SAILING_ANALYTICS_MAP_TYPE_ID, styledMapType);
                 map.setMapTypeId(getMapTypeId(/* wind up */ false, showSatelliteLayer));
                 map.setSize("100%", "100%");
-                map.addZoomChangeHandler(e->afterZoomOrHeadingChanged());
-                map.addHeadingChangeHandler(e->afterZoomOrHeadingChanged());
+                map.addZoomChangeHandler(e->afterZoomOrOrientationChanged());
+                map.addHeadingChangeHandler(e->afterZoomOrOrientationChanged());
+                map.addTiltChangeHandler(e->afterZoomOrOrientationChanged());
                 map.addDragEndHandler(new DragEndMapHandler() {
                     @Override
                     public void onEvent(DragEndMapEvent event) {
@@ -3899,41 +3902,47 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
         return currentMapBounds.getLowerLeft().getDistance(currentMapBounds.getUpperRight()).scale(2);
     }
 
-    private void afterZoomOrHeadingChanged() {
-        final boolean resetAutoZoomSettings = !autoZoomIn && !autoZoomOut && !orientationChangeInProgress;
+    private void afterZoomOrOrientationChanged() {
+        resetAutoZoomSettingsAfterCameraChange |= !autoZoomIn && !autoZoomOut && !orientationChangeInProgress;
         if (streamletOverlay != null
                 && settings.isShowWindStreamletOverlay()
                 && paywallResolver.hasPermission(SecuredDomainType.TrackedRaceActions.VIEWSTREAMLETS, raceMapLifecycle.getRaceDTO())) {
             streamletOverlay.onDragStart();
         }
-        new com.google.gwt.user.client.Timer() {
-            @Override
-            public void run() {
-                if (resetAutoZoomSettings) {
-                    // stop automatic zoom after a manual zoom event; automatic zoom in zoomMapToNewBounds will
-                    // restore old settings
-                    final List<RaceMapZoomSettings.ZoomTypes> emptyList = Collections.emptyList();
-                    RaceMapZoomSettings clearedZoomSettings = new RaceMapZoomSettings(emptyList,
-                            settings.getZoomSettings().isZoomToSelectedCompetitors());
-                    settings = new RaceMapSettings
-                            .RaceMapSettingsBuilder(settings, raceMapLifecycle.getRaceDTO(), paywallResolver)
-                            .withZoomSettings(clearedZoomSettings)
-                            .build();
-                    simulationOverlay.setVisible(false);
-                    simulationOverlay.setVisible(settings.isShowSimulationOverlay()
-                            && paywallResolver.hasPermission(SecuredDomainType.TrackedRaceActions.SIMULATOR, raceMapLifecycle.getRaceDTO()));
+        if (cameraChangeSettledTimer == null) {
+            cameraChangeSettledTimer = new com.google.gwt.user.client.Timer() {
+                @Override
+                public void run() {
+                    if (resetAutoZoomSettingsAfterCameraChange) {
+                        resetAutoZoomSettingsAfterCameraChange = false;
+                        // stop automatic zoom after a manual zoom event; automatic zoom in zoomMapToNewBounds will
+                        // restore old settings
+                        final List<RaceMapZoomSettings.ZoomTypes> emptyList = Collections.emptyList();
+                        RaceMapZoomSettings clearedZoomSettings = new RaceMapZoomSettings(emptyList,
+                                settings.getZoomSettings().isZoomToSelectedCompetitors());
+                        settings = new RaceMapSettings
+                                .RaceMapSettingsBuilder(settings, raceMapLifecycle.getRaceDTO(), paywallResolver)
+                                .withZoomSettings(clearedZoomSettings)
+                                .build();
+                        simulationOverlay.setVisible(false);
+                        simulationOverlay.setVisible(settings.isShowSimulationOverlay()
+                                && paywallResolver.hasPermission(SecuredDomainType.TrackedRaceActions.SIMULATOR, raceMapLifecycle.getRaceDTO()));
+                    }
+                    if (streamletOverlay != null
+                            && settings.isShowWindStreamletOverlay()
+                            && paywallResolver.hasPermission(SecuredDomainType.TrackedRaceActions.VIEWSTREAMLETS, raceMapLifecycle.getRaceDTO())) {
+                        streamletOverlay.onDragEnd();
+                        streamletOverlay.setCanvasSettings();
+                        streamletOverlay.onBoundsChanged(map.getZoom() != currentZoomLevel);
+                    }
+                    advantageLineLength = getMapDiagonalVisibleDistance();
+                    showAdvantageLineAndUpdateWindLadder(getCompetitorsToShow(), getTimer().getTime(), /* timeForPositionTransitionMillis */ -1 /* (no transition) */);
                 }
-                if (streamletOverlay != null
-                        && settings.isShowWindStreamletOverlay()
-                        && paywallResolver.hasPermission(SecuredDomainType.TrackedRaceActions.VIEWSTREAMLETS, raceMapLifecycle.getRaceDTO())) {
-                    streamletOverlay.onDragEnd();
-                    streamletOverlay.setCanvasSettings();
-                    streamletOverlay.onBoundsChanged(map.getZoom() != currentZoomLevel);
-                }
-                advantageLineLength = getMapDiagonalVisibleDistance();
-                showAdvantageLineAndUpdateWindLadder(getCompetitorsToShow(), getTimer().getTime(), /* timeForPositionTransitionMillis */ -1 /* (no transition) */);
-            }
-        }.schedule(500);
+            };
+        } else {
+            cameraChangeSettledTimer.cancel();
+        }
+        cameraChangeSettledTimer.schedule(500);
     }
     
     public TimeRangeActionsExecutor<CompactBoatPositionsDTO, GPSFixDTOWithSpeedWindTackAndLegTypeIterable, Pair<String, DetailType>> getTimeRangeActionsExecutor() {

@@ -1,6 +1,6 @@
 // GWT adapter: exposes branflake GWT Maps wrapper conventions over the Google-style MapLibre facade.
 // Keep MapLibre provider behavior in google-maps-maplibre-compat.js.
-import { installGoogleMapsCompat } from './google-maps-maplibre-compat.js?v=race-map-feedback-19';
+import { installGoogleMapsCompat } from './google-maps-maplibre-compat.js?v=race-map-feedback-20';
 
 function call(handler, event = {}) {
     if (typeof handler === 'function') handler(event);
@@ -180,6 +180,7 @@ function installGwtWrapperGlobals() {
         setFullscreenControl(value) { this.options.fullscreenControl = value; }
         setIsFractionalZoomEnabled(value) { this.options.isFractionalZoomEnabled = value; }
         setHeading(value) { this.options.heading = value; }
+        setTilt(value) { this.options.tilt = value; }
         setSeaMarksVisible(value) { this.options.seaMarksVisible = value; }
         setRenderingType(value) { this.options.renderingType = value; }
         setDisableDoubleClickZoom(value) { this.options.disableDoubleClickZoom = value; }
@@ -217,6 +218,8 @@ function installGwtWrapperGlobals() {
         panTo(position) { this.ready(() => this.map.panTo(literal(position))); }
         setHeading(degrees) { this.ready(() => this.map.setHeading(degrees)); }
         getHeading() { return this.map ? this.map.getHeading() : (this.options.heading || 0); }
+        setTilt(degrees) { this.ready(() => this.map.setTilt(degrees)); }
+        getTilt() { return this.map ? this.map.getTilt() : (this.options.tilt || 0); }
         getBounds() { return this.map?.getBounds(); }
         triggerResize() { this.ready(() => this.map.resize()); }
         resize() { this.triggerResize(); }
@@ -246,6 +249,7 @@ function installGwtWrapperGlobals() {
         addCenterChangeHandler(handler) { return this.addHandler('center_changed', handler); }
         addZoomChangeHandler(handler) { return this.addHandler('zoom_changed', handler); }
         addHeadingChangeHandler(handler) { return this.addHandler('heading_changed', handler); }
+        addTiltChangeHandler(handler) { return this.addHandler('tilt_changed', handler); }
         addIdleHandler(handler) { return this.addHandler('idle', handler); }
         addResizeHandler(handler) { return this.addHandler('resize', handler); }
         addDragEndHandler(handler) { return this.addHandler('dragend', handler); }
