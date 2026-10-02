@@ -9,8 +9,8 @@ import com.sap.sse.common.Color;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
-import android.support.annotation.DrawableRes;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.DrawableRes;
+import androidx.core.content.ContextCompat;
 
 public abstract class MarkImageHelper {
     protected MarkImageDescriptor defaultCourseMarkDescriptor;

@@ -6,7 +6,7 @@ import com.sap.sailing.racecommittee.app.data.clients.LoadClient;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
+import androidx.loader.content.Loader;
 
 /**
  * Simple wrapper for a {@link DataLoaderCallbacks} creating an {@link ImmediateDataLoader}.

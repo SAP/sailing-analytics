@@ -2,7 +2,7 @@ package com.sap.sailing.racecommittee.app.ui.fragments.raceinfo;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -227,35 +227,28 @@ public class MoreFlagsFragment extends BaseFragment implements MoreFlagItemClick
 
         @Override
         public void onClick(View view) {
-            switch (view.getId()) {
-                case R.id.finish_current:
-                    setFinishTime(MillisecondsTimePoint.now());
-                    break;
-
-                case R.id.date_button: {
-                    final Object tag = mDateButton.getTag();
-                    final Calendar time = tag instanceof Calendar ? (Calendar) tag : Calendar.getInstance();
-                    TimeUtils.showDatePickerDialog(getChildFragmentManager(), time, mEvent);
-                    break;
+            final int id = view.getId();
+            if (id == R.id.finish_current) {
+                setFinishTime(MillisecondsTimePoint.now());
+            } else if (id == R.id.date_button) {
+                final Object tag = mDateButton.getTag();
+                final Calendar time = tag instanceof Calendar ? (Calendar) tag : Calendar.getInstance();
+                TimeUtils.showDatePickerDialog(getChildFragmentManager(), time, mEvent);
+            } else if (id == R.id.finish_custom) {
+                final Object tag = mDateButton.getTag();
+                final Calendar calendar;
+                if (tag instanceof Calendar) {
+                    calendar = (Calendar) tag;
+                } else {
+                    calendar = Calendar.getInstance();
+                    calendar.clear(Calendar.MILLISECOND);
                 }
-                case R.id.finish_custom: {
-                    final Object tag = mDateButton.getTag();
-                    final Calendar calendar;
-                    if (tag instanceof Calendar) {
-                        calendar = (Calendar) tag;
-                    } else {
-                        calendar = Calendar.getInstance();
-                        calendar.clear(Calendar.MILLISECOND);
-                    }
-                    final int year = calendar.get(Calendar.YEAR);
-                    final int month = calendar.get(Calendar.MONTH);
-                    final int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-                    setFinishTime(TimeUtils.getTime(year, month, dayOfMonth, mTimePicker, mSecondPicker));
-                    break;
-                }
-                default:
-                    sendIntent(AppConstants.ACTION_SHOW_MAIN_CONTENT);
-                    break;
+                final int year = calendar.get(Calendar.YEAR);
+                final int month = calendar.get(Calendar.MONTH);
+                final int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+                setFinishTime(TimeUtils.getTime(year, month, dayOfMonth, mTimePicker, mSecondPicker));
+            } else {
+                sendIntent(AppConstants.ACTION_SHOW_MAIN_CONTENT);
             }
         }
 

@@ -11,8 +11,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.SystemClock;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationManagerCompat;
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationManagerCompat;
 import android.util.Pair;
 
 import com.sap.sailing.android.shared.logging.ExLog;
