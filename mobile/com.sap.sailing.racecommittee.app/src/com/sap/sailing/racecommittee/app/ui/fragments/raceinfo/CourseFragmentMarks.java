@@ -1,5 +1,6 @@
 package com.sap.sailing.racecommittee.app.ui.fragments.raceinfo;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import androidx.loader.content.Loader;
 import androidx.appcompat.app.AlertDialog;
@@ -83,6 +84,7 @@ public class CourseFragmentMarks extends CourseFragment
     }
 
     @Override
+    @SuppressLint("MissingInflatedId")
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View layout = inflater.inflate(R.layout.race_schedule_course_marks, container, false);
         mResetButton = layout.findViewById(R.id.resetCourse);

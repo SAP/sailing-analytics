@@ -73,6 +73,9 @@ android {
 }
 
 dependencies {
+    /* Google Play Services */
+    implementation "com.google.android.gms:play-services-maps:${rootProject.ext.play_services_maps}"
+
     /* local dependencies */
     implementation project(':mobile:com.sap.sailing.android.shared')
     /* JVM tests */

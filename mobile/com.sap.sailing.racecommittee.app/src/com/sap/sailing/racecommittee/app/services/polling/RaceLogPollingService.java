@@ -233,7 +233,11 @@ public class RaceLogPollingService extends Service
                         flags = 0;
                     }
                     mPendingIntent = PendingIntent.getService(this, 0, intent, flags);
-                    mAlarm.setExact(AlarmManager.RTC_WAKEUP, time, mPendingIntent);
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || mAlarm.canScheduleExactAlarms()) {
+                        mAlarm.setExact(AlarmManager.RTC_WAKEUP, time, mPendingIntent);
+                    } else {
+                        mAlarm.set(AlarmManager.RTC_WAKEUP, time, mPendingIntent);
+                    }
                 } else {
                     mAlarm.set(AlarmManager.RTC_WAKEUP, time, mPendingIntent);
                 }

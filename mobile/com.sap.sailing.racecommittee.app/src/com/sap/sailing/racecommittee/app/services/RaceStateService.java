@@ -1,11 +1,13 @@
 package com.sap.sailing.racecommittee.app.services;
 
+import android.Manifest;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -13,6 +15,7 @@ import android.os.Looper;
 import android.os.SystemClock;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import android.util.Pair;
 
 import com.sap.sailing.android.shared.logging.ExLog;
@@ -208,7 +211,12 @@ public class RaceStateService extends Service {
                 intents.add(Pair.create(intent, event.getEventName()));
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                getAlarmManager().setExact(AlarmManager.RTC_WAKEUP, event.getTimePoint().asMillis(), intent);
+                final AlarmManager alarmManager = getAlarmManager();
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()) {
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, event.getTimePoint().asMillis(), intent);
+                } else {
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, event.getTimePoint().asMillis(), intent);
+                }
             }
             ExLog.i(RaceStateService.this, TAG, "The alarm " + event.getEventName() + " will be fired at " + event.getTimePoint());
         }
@@ -448,10 +456,14 @@ public class RaceStateService extends Service {
     }
 
     private void updateNotification() {
-        int numRaces = eventScheduler.getNumberOfMonitoredRaces();
-        String content = getString(R.string.service_text_num_races, numRaces);
-        Notification notification = setupNotification(content);
-        NotificationManagerCompat.from(getApplicationContext()).notify(NotificationHelper.getNotificationId(), notification);
+        final int numRaces = eventScheduler.getNumberOfMonitoredRaces();
+        final String content = getString(R.string.service_text_num_races, numRaces);
+        final Notification notification = setupNotification(content);
+        final boolean canPostNotifications = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
+                || ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+        if (canPostNotifications) {
+            NotificationManagerCompat.from(getApplicationContext()).notify(NotificationHelper.getNotificationId(), notification);
+        }
     }
 
     private void registerRace(ManagedRace race) {
