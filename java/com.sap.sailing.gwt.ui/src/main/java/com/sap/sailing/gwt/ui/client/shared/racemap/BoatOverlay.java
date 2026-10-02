@@ -17,6 +17,8 @@ import com.sap.sailing.gwt.ui.shared.racemap.CanvasOverlayV3;
 import com.sap.sse.common.Color;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.impl.DegreeBearingImpl;
+import com.sap.sse.common.impl.MeterDistance;
 
 /**
  * A google map overlay based on a HTML5 canvas for drawing boats (images)
@@ -34,10 +36,7 @@ public class BoatOverlay extends CanvasOverlayV3 {
      */
     private GPSFixDTOWithSpeedWindTackAndLegType boatFix;
 
-    /** 
-     * The rotation angle of the original boat image in degrees
-     */
-    private static double ORIGINAL_BOAT_IMAGE_ROTATIION_ANGLE = 90.0;
+    private static final Distance SCREEN_HEADING_PROBE_DISTANCE = new MeterDistance(100);
 
     private int canvasWidth;
     private int canvasHeight;
@@ -64,6 +63,7 @@ public class BoatOverlay extends CanvasOverlayV3 {
         super(map, zIndex, coordinateSystem);
         this.boatClass = boatDTO.getBoatClass();
         this.color = color;
+        getCanvas().getElement().setAttribute("data-map-oriented", "true");
         boatScaleAndSizePerWorldWidthCache = new HashMap<>();
         boatVectorGraphics = BoatClassVectorGraphicsResolver.resolveBoatClassVectorGraphics(boatClass.getName());
     }
@@ -101,7 +101,12 @@ public class BoatOverlay extends CanvasOverlayV3 {
             final double trueHeadingInDegrees = boatFix.optionalTrueHeading != null
                     ? boatFix.optionalTrueHeading.getDegrees()
                     : (boatFix.speedWithBearing == null ? 0 : boatFix.speedWithBearing.bearingInDegrees);
-            updateDrawingAngleAndSetCanvasRotation(coordinateSystem.mapDegreeBearing(trueHeadingInDegrees - ORIGINAL_BOAT_IMAGE_ROTATIION_ANGLE));
+            final Point headingReferenceInPx = getMapProjection().fromLatLngToDivPixel(coordinateSystem.toLatLng(
+                    boatFix.position.translateRhumb(new DegreeBearingImpl(trueHeadingInDegrees), SCREEN_HEADING_PROBE_DISTANCE)));
+            final double screenDrawingAngle = Math.toDegrees(Math.atan2(
+                    headingReferenceInPx.getY() - boatPositionInPx.getY(),
+                    headingReferenceInPx.getX() - boatPositionInPx.getX()));
+            updateDrawingAngleAndSetCanvasRotation(screenDrawingAngle);
         }
     }
     

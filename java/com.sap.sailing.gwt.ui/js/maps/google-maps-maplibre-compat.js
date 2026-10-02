@@ -259,6 +259,7 @@ class CompatMap {
             if (!this.userOrientationStart) this.emit('tilt_changed');
         });
         const startUserOrientation = event => {
+            this.element.classList.add('compat-map-orienting');
             if (!event?.originalEvent || this.userOrientationStart) return;
             this.userOrientationStart = { heading: this.map.getBearing(), tilt: this.map.getPitch() };
         };
@@ -287,6 +288,7 @@ class CompatMap {
             this.cameraChangedSinceIdle = false;
             const emitIdle = () => {
                 this.userZoomInProgress = false;
+                this.element.classList.remove('compat-map-orienting');
                 const orientationStart = this.userOrientationStart;
                 this.userOrientationStart = null;
                 if (orientationStart) {
@@ -1088,7 +1090,7 @@ function ensureCompatStyles() {
     if (document.getElementById('google-maps-maplibre-compat-styles')) return;
     const style = document.createElement('style');
     style.id = 'google-maps-maplibre-compat-styles';
-    style.textContent = `@keyframes compat-marker-bounce { 0%, 100% { translate: 0 0; } 50% { translate: 0 -14px; } } .compat-marker-bounce { animation: compat-marker-bounce 450ms ease-in-out infinite; }`;
+    style.textContent = `@keyframes compat-marker-bounce { 0%, 100% { translate: 0 0; } 50% { translate: 0 -14px; } } .compat-marker-bounce { animation: compat-marker-bounce 450ms ease-in-out infinite; } .compat-map-orienting [data-map-oriented="true"] { transition: none !important; }`;
     document.head.appendChild(style);
 }
 
