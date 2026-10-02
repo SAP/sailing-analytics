@@ -46,6 +46,18 @@
                 <li>Bug fix: when loading a replica for a primary that already has a non-empty CORS configuration for its replica set,
                     this CORS configuration was not properly applied on the replica, hence not serving the <tt>frame-ancestores</tt>
                     HTTP response header correctly.</li>
+                <li>When a server starts up and is configured to restore tracked races (<tt>-Drestore.tracked.races=true</tt>),
+                    the number of races to restore in the <tt>/gwt/status</tt> output is guaranteed to not start out with value
+                    <tt>0</tt>. Instead, the <tt>MAX_LONG</tt> value is used as initial value if any races are to be restored,
+                    until the actual number of races to restore has been obtained from the database. This way, a server does
+                    stay "unhealthy" / "unavailable" according to <tt>/gwt/status</tt> until the races to restore have been
+                    loaded.</li>
+                <li>Automatic launching of replicas after starting a new primary/master instance now waits for the primary
+                    to finish loading races, using the <tt>waitUntilRacesLoaded=true</tt> query parameter for the
+                    <tt>/gwt/status</tt> health check URL. With this, the bulk load of GPS fixes will be received as
+                    part of the replica's initial load and does not need to go through the replication channel fix-by-fix.
+                    This addresses <a href="https://github.com/eclipse-sailing-analytics/sailing-analytics/issues/6308">issue #6308</a>.
+                    </li>
                 <li>When the <tt>waitUntilRacesLoaded=true</tt> query parameter is used with the <tt>/gwt/status</tt>
                     end point (e.g., for health checks), it is also sufficient to have no more races currently loading
                     (<tt>numberofracesstillloading &lt;= 0</tt>).</li>
