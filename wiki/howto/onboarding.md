@@ -39,38 +39,22 @@ First of all, make sure you've looked at [http://www.amazon.de/Patterns-Elements
    - Request a [Hudson](https://hudson.sapsailing.com) user by sending e-mail to Axel Uhl or Simon Marcel Pamies.
 
 ### Installations
-1. Eclipse IDE for Eclipse Committers, version ["2026-06"](https://www.eclipse.org/downloads/packages/release/2026-06/r/eclipse-ide-eclipse-committers). If you are using a Mac and want to use SAPJVM, this has to be the 64 bit version. This is because SAPJVM is not available for Apple Silicon Macs, and Eclipse's OS architecture must match the JVM architecture. Mac users can install SDKMAN! to manage and install different JDKs. For example Amazon Corretto 8: `sdk install java 8.0.472-amzn`.
+1. Eclipse IDE for Eclipse Committers, version ["2026-09"](https://www.eclipse.org/downloads/packages/release/2026-09/r/eclipse-ide-eclipse-committers). If you are using a Mac and want to use SAPJVM, this has to be the 64 bit version. This is because SAPJVM is not available for Apple Silicon Macs, and Eclipse's OS architecture must match the JVM architecture. Mac users can install SDKMAN! to manage and install different JDKs. For example Amazon Corretto 8: `sdk install java 8.0.472-amzn`.
 2. JDK 1.8 (Java SE 8), ideal is the SAPJVM 1.8: Go to [https://tools.eu1.hana.ondemand.com/#cloud](https://tools.eu1.hana.ondemand.com/#cloud), scroll down to `SAP JVM` select your operating System, extract the downloaded .zip into desired location (e.g. Windows `C:\Program Files\Java`. If you want to make this your default JDK, set the `JAVA_HOME` variable to it. In any case, set the `JAVA8_HOME` variable to it which is required by a few build scripts where certain steps currently are not yet compatible with newer JDK releases. For Gradle builds (currently using Gradle 7.6), such as our Android build process, also install Java 17 and set the `JAVA17_HOME` variable to it.
 3. Git (e.g. Git for Windows v2.18), [http://git-scm.com](http://git-scm.com) / [https://git-for-windows.github.io](https://git-for-windows.github.io) still
 4. Configure git (see [Git repository configuration essentials](#git-repository-configuration-essentials))
 5. MongoDB (at least Release 6.0), download: [https://www.mongodb.com/](https://www.mongodb.com/). You may need to choose the community edition. In addition, install `mongosh`.
 6. RabbitMQ, download from [http://www.rabbitmq.com](http://www.rabbitmq.com). Requires Erlang to be installed. RabbitMQ installer will assist in installing Erlang. Some sources report that there may be trouble with the latest versions of RabbitMQ. In some cases, McAffee seems to block the installation of the latest version on SAP hardware; in other cases connection problems to the newest versions have been reported. We know that version 3.6.8 works well. [https://github.com/rabbitmq/rabbitmq-server/releases/tag/rabbitmq_v3_6_8](https://github.com/rabbitmq/rabbitmq-server/releases/tag/rabbitmq_v3_6_8)
-7.  Maven 3.1.1 (or higher), [http://maven.apache.org](http://maven.apache.org)
-    A setup guide for windows can be found on this webpage: [https://maven.apache.org/guides/getting-started/windows-prerequisites.html](https://maven.apache.org/guides/getting-started/windows-prerequisites.html)
 8.  Forked GWT SDK 2.12.4 release [https://github.com/eclipse-sailing-analytics/gwt-forward-serialization-rpc/releases/download/gwt-2.12.4/gwt-2.12.4.zip](https://github.com/eclipse-sailing-analytics/gwt-forward-serialization-rpc/releases/download/gwt-2.12.4/gwt-2.12.4.zip)). The official releases can be found at [http://www.gwtproject.org/download.html](http://www.gwtproject.org/download.html)
     but shouldn't be used unless we roll back the changes of branch ``bug5077`` or GWT has merged and released the [pull request 9779](https://github.com/gwtproject/gwt/pull/9779).
     Download the GWT SDK and extract it to a location of your preference (e.g. `C:\Program Files\gwt` on Windows or `/opt` on Linux or MacOS/X).
     You will see in section [Tuning the Eclipse Installation](#tuning-the-eclipse-installation)
     below how you announce this GWT SDK to your Eclipse installation.
-9. Standalone Android SDK (see section "Additional steps required for Android projects"). OPTIONALLY: You may additionally install Android Studio ([https://developer.android.com/tools/studio/index.html](https://developer.android.com/tools/studio/index.html)) or IntelliJ IDEA ([https://www.jetbrains.com/idea/download/](https://www.jetbrains.com/idea/download/)).
-    Make sure that the environment variable `ANDROID_HOME` is set (e.g. Windows C:\Users\\**'user'**\AppData\Local\Android\Sdk )
 10. Get the content of the git repository
     Clone the repository to your local file system from `git@github.com:eclipse-sailing-analytics/sailing-analytics.git` or `ssh://trac@sapsailing.com/home/trac/git` User "trac" has all public ssh keys.
 11. Install the eclipse plugins (see [Automatic Eclipse plugin installation](#automatic-eclipse-plugin-installation))
 12. Configure Eclipse (see [Tuning the Eclipse Installation](#tuning-the-eclipse-installation))
-13. Configure Maven to use the correct JRE by following the instructions in the paragraph [maven-setup](#maven-setup)
-14. Follow the instructions in the [development setup](#sap-sailing-analytics-development-setup) to build the project.
-15. The steps for building the project for a deployment can be found in the [Build for deployment](#build-for-deployment) section. This is not needed in the daily development workflow and should only be run when needed. 
-16. Install Ant: https://ant.apache.org/manual/install.html and makes sure to add to path: it is necessary for building gwt.
 17. Chrome or Firefox. Safari does not work reliably with this project.
-
-### Further optional but recommended installations
-
-1. For Windows users, [Cygwin](http://www.cygwin.com/) or a [Git Bash](https://git-scm.com/downloads) may be useful for being able to run any Bash scripts.
-   Please note that when using one of the newer versions of Cygwin, your Cygwin home folder setting might differ from your Windows home folder. This will likely lead to problems when issuing certain commands. For troubleshooting, take a look at the following thread: [https://stackoverflow.com/questions/1494658/how-can-i-change-my-cygwin-home-folder-after-installation](https://stackoverflow.com/questions/1494658/how-can-i-change-my-cygwin-home-folder-after-installation)
-2. Eclipse Mylyn Bugzilla extension
-3. kdiff3 (git tool)
-4. Firebug (javascript & .css debugging, included in Firefox Developer Tools in newer versions of Firefox by default)
 
 ### Git repository configuration essentials
 
@@ -80,12 +64,8 @@ If you are first time git user, don't forget to specify your user metadata. Use 
 
 Depending on the location of your local repository, it's filepaths might be too long for the default settings to handle. Excecute the command `git config --system core.longpaths true` to enable your system wide git installation to handle long file paths.
 
-### Maven Setup
-
-Copy the settings.xml (may be in $GIT_HOME/configuration/maven-settings.xml and $GIT_HOME/configuration/maven-settings-proxy.xml) **and** the toolchains.xml from the top-level git folder to your ~/.m2 directory. Adjust the proxy settings in settings.xml accordingly (suggested settings for inside a corporate network requiring a HTTP proxy for access to external web). Set the paths inside of toolchains.xml to your JDKs depending on where you installed them (this is like setting the compiler for your IDE, but for Maven; This makes it possible to build with the same Maven configuration on every system). Make sure the mvn executable you installed above is in your path. 
-
 ### Automatic Eclipse plugin installation
-The necessary Eclipse plugins can be automatically installed into a newly unzipped version of ["2026-06"](https://www.eclipse.org/downloads/packages/release/2026-06/r/eclipse-ide-eclipse-committers) by using the `pluginsForEclipse2026-06.p2f` file, found in the git repository cloned in _step 11_. To install the plugins open Eclipse and install Software Items from File. (File ⇒ Import ⇒ Install ⇒ Install Software from File). The description file is located at `/configuration/pluginsForEclipse2026-06.p2f`. 
+The necessary Eclipse plugins can be automatically installed into a newly unzipped version of ["2026-06"](https://www.eclipse.org/downloads/packages/release/2026-09/r/eclipse-ide-eclipse-committers) by using the `pluginsForEclipse2026-0.p2f` file, found in the git repository cloned in _step 11_. To install the plugins open Eclipse and install Software Items from File. (File ⇒ Import ⇒ Install ⇒ Install Software from File). The description file is located at `/configuration/pluginsForEclipse2026-09.p2f`. 
 Make sure to select all Plugins (it might not be possible to select Lucene ignore that) and click next. In the pop-up dialog shown next, select the top radio button ("Update my installation to be compatible with the items being installed"). Skip the `Installation details`, accept the licence agreements and click finish. While Eclipse is installing the plugins a pop-up will appear in the background where you need to trust all plugins. Be aware that the installation may take several minutes depending on your Internet connection. 
 
 Be also aware that with this p2f-file it's not possible to update the plugins to newer versions. 
@@ -206,6 +186,23 @@ If git is not in the Path system environment variable, the gradle build will not
 
 ## Further hints
 
+### Optional but recommended installations
+
+1.  Maven 3.9.9 (or higher), [http://maven.apache.org](http://maven.apache.org)
+    A setup guide for windows can be found on this webpage: [https://maven.apache.org/guides/getting-started/windows-prerequisites.html](https://maven.apache.org/guides/getting-started/windows-prerequisites.html) in case you want to build a full release locally
+2. Configure Maven to use the correct JRE by following the instructions in the paragraph [maven-setup](#maven-setup)
+3. The steps for building the project for a deployment can be found in the [Build for deployment](#build-for-deployment) section. This is not needed in the daily development workflow and should only be run when needed. 
+4.  Standalone Android SDK (see section "Additional steps required for Android projects"). OPTIONALLY: You may additionally install Android Studio ([https://developer.android.com/tools/studio/index.html](https://developer.android.com/tools/studio/index.html)) or IntelliJ IDEA ([https://www.jetbrains.com/idea/download/](https://www.jetbrains.com/idea/download/)) in case you want to work on the mobile companion apps from the ``mobile/`` folder
+    Make sure that the environment variable `ANDROID_HOME` is set (e.g. Windows C:\Users\\**'user'**\AppData\Local\Android\Sdk )
+5. Install Ant: https://ant.apache.org/manual/install.html and makes sure to add to path in case you want to build the gwt fork (usually not needed as the fork's release is obtained from Github).
+6. For Windows users, [Cygwin](http://www.cygwin.com/) or a [Git Bash](https://git-scm.com/downloads) may be useful for being able to run any Bash scripts.
+   Please note that when using one of the newer versions of Cygwin, your Cygwin home folder setting might differ from your Windows home folder. This will likely lead to problems when issuing certain commands. For troubleshooting, take a look at the following thread: [https://stackoverflow.com/questions/1494658/how-can-i-change-my-cygwin-home-folder-after-installation](https://stackoverflow.com/questions/1494658/how-can-i-change-my-cygwin-home-folder-after-installation)
+7. kdiff3 or p4merge for resolving Git merge conflicts graphically if you don't want to do this in Eclipse / eGit
+
+### Maven Setup
+
+Copy the settings.xml (may be in $GIT_HOME/configuration/maven-settings.xml and $GIT_HOME/configuration/maven-settings-proxy.xml) **and** the toolchains.xml from the top-level git folder to your ~/.m2 directory. Adjust the proxy settings in settings.xml accordingly (suggested settings for inside a corporate network requiring a HTTP proxy for access to external web). Set the paths inside of toolchains.xml to your JDKs depending on where you installed them (this is like setting the compiler for your IDE, but for Maven; This makes it possible to build with the same Maven configuration on every system). Make sure the mvn executable you installed above is in your path. 
+
 ### Build for deployment
 Open a shell (preferrably a git bash or a cygwin bash), cd to the git workspace's root folder and issue "./configuration/buildAndUpdateProduct.sh build". This should build the software and run all the tests. If you want to avoid the tests being executed, use the -t option. If you only want to build one GWT permutation (Chrome/English), use the -b option. When inside the SAP VPN, add the -p option for proxy use. Run the build script without arguments to get usage hints.
 
@@ -259,8 +256,8 @@ Another struggle can be to install the JVM Profiler Plug-in on ARM based Eclipse
 This applies only if you try to get old "GWT Dev Mode" to work, support for which has ended on very old Firefox version 24.
 Install the GWT Browser Plugin for the GWT Development mode. As of 2016-08-31 Firefox is the only browser supporting the GWT plugin, you have to download Firefox version 24 for it to work. The Plugin can be found on this page: [https://code.google.com/archive/p/google-web-toolkit/downloads](https://code.google.com/archive/p/google-web-toolkit/downloads)
 
-### Create Hudson Job
-If you want a hudson job to run when you push your branch then you can run a script in `configuration` called `createHudsonJobForBug.sh`. For you bug branch titled `bug<bug number>`, create a build job, which will create a release, by running the script like so: `./createHudsonJobForBug.sh <bug number>`.
+### Create Jenkins Job
+If you are a committer on the Eclipse Azimuth Sailing Analytics project and want a Jenkins job to run when you push your branch then you can run a script in `configuration` called `createJenkinsJobForIssue.sh`. For you issue branch titled `bug<issue-number>`, create a build job, which will create a release, by running the script like so: `./createJenkinsJobForIssue.sh <issue-number>`.
 The script will include the issue's summary in its description.
 If on Windows, you may need to disable any web shields in antivirus software, to allow `curl` to function. If on Mac, you may need to install gnu-sed (``gsed``) via Homebrew.
 
