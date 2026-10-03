@@ -3243,21 +3243,83 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
 
     @Override
     public void runWhenDoneLoading(final Runnable runnable) {
+        // Two cooperating listeners settle the outcome exactly once: a status listener on this race
+        // that fires the runnable when the race is considered to have finished loading, and a
+        // regatta race-removal listener that silently cancels (and tears both down) if the race is
+        // removed before it ever finishes loading. Without the removal listener the status listener
+        // would leak for the lifetime of the service when a race is removed while still PREPARED,
+        // LOADING or ERROR (hasFinishedLoading() never becomes true for it), strongly capturing both
+        // the runnable and this TrackedRaceImpl -- the same leak class the bug6241 handling in
+        // RacingEventServiceImpl.RaceAdditionListener.raceRemoved guards against. The one-shot CAS on
+        // settled additionally guarantees the runnable runs at most once per registration even if
+        // status events and the removal race with each other.
+        final AtomicBoolean settled = new AtomicBoolean(false);
+        final TrackedRegatta regatta = getTrackedRegatta();
+        final RaceListener[] regattaListenerHolder = new RaceListener[1];
+        final AbstractRaceChangeListener[] statusListenerHolder = new AbstractRaceChangeListener[1];
+        final Runnable tearDown = () -> {
+            if (statusListenerHolder[0] != null) {
+                removeListener(statusListenerHolder[0]);
+            }
+            if (regattaListenerHolder[0] != null) {
+                regatta.removeRaceListener(regattaListenerHolder[0]);
+            }
+        };
+        final Runnable settleAndFire = () -> {
+            if (settled.compareAndSet(false, true)) {
+                try {
+                    tearDown.run();
+                } finally {
+                    runnable.run();
+                }
+            }
+        };
+        final Runnable settleWithoutFiring = () -> {
+            if (settled.compareAndSet(false, true)) {
+                tearDown.run();
+            }
+        };
+        statusListenerHolder[0] = new AbstractRaceChangeListener() {
+            @Override
+            public void statusChanged(final TrackedRaceStatus newStatus, final TrackedRaceStatus oldStatus) {
+                logger.info("race "+TrackedRaceImpl.this.getRaceIdentifier()+" went from "+oldStatus+" to "+newStatus);
+                if (hasFinishedLoading(newStatus.getStatus())) {
+                    logger.info("race "+TrackedRaceImpl.this.getRaceIdentifier()+" is considered having finished loading; running "+runnable);
+                    settleAndFire.run();
+                }
+            }
+        };
+        regattaListenerHolder[0] = new RaceListener() {
+            @Override
+            public void raceAdded(final TrackedRace trackedRace) {
+                // not interested in additions
+            }
+            @Override
+            public void raceRemoved(final TrackedRace trackedRace) {
+                if (trackedRace == TrackedRaceImpl.this) {
+                    settleWithoutFiring.run();
+                }
+            }
+        };
+        final boolean alreadyDone;
         synchronized (getStatusNotifier()) {
-            if (!hasFinishedLoading()) {
-                addListener(new AbstractRaceChangeListener() {
-                    @Override
-                    public void statusChanged(TrackedRaceStatus newStatus, TrackedRaceStatus oldStatus) {
-                        logger.info("race "+TrackedRaceImpl.this.getRaceIdentifier()+" went from "+oldStatus+" to "+newStatus);
-                        if (hasFinishedLoading(newStatus.getStatus())) {
-                            logger.info("race "+TrackedRaceImpl.this.getRaceIdentifier()+" is considered having finished loading; running "+runnable);
-                            removeListener(this);
-                            runnable.run();
-                        }
-                    }
-                });
+            if (hasFinishedLoading()) {
+                alreadyDone = true;
             } else {
-                runnable.run();
+                alreadyDone = false;
+                addListener(statusListenerHolder[0]);
+            }
+        }
+        if (alreadyDone) {
+            runnable.run();
+        } else {
+            regatta.addRaceListener(regattaListenerHolder[0], Optional.empty(), /* synchronous */ false);
+            // Close the race between the initial check + status-listener registration and the
+            // regatta-listener registration: if we already finished loading in between, fire now.
+            // The CAS on settled makes this safe against concurrent status events that may already
+            // be delivering to statusListenerHolder[0].
+            if (hasFinishedLoading()) {
+                settleAndFire.run();
             }
         }
     }
