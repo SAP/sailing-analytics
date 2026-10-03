@@ -36,7 +36,9 @@ public class BoatOverlay extends CanvasOverlayV3 {
      */
     private GPSFixDTOWithSpeedWindTackAndLegType boatFix;
 
-    private static final Distance SCREEN_HEADING_PROBE_DISTANCE = new MeterDistance(100);
+    // MapCanvasProjection exposes points but no local transform, so nearby probes approximate its affine basis.
+    // Keep this distance short: long probes sample perspective curvature and visibly distort boat proportions.
+    private static final Distance SCREEN_HEADING_PROBE_DISTANCE = new MeterDistance(1);
 
     private int canvasWidth;
     private int canvasHeight;
