@@ -111,7 +111,11 @@ public class BoatOverlay extends CanvasOverlayV3 {
             final double forwardY = headingReferenceInPx.getY() - boatPositionInPx.getY();
             final double starboardX = starboardReferenceInPx.getX() - boatPositionInPx.getX();
             final double starboardY = starboardReferenceInPx.getY() - boatPositionInPx.getY();
-            final double normalization = Math.max(Math.hypot(forwardX, forwardY), Math.hypot(starboardX, starboardY));
+            final double sumOfSquares = forwardX * forwardX + forwardY * forwardY +
+                    starboardX * starboardX + starboardY * starboardY;
+            final double determinant = forwardX * starboardY - forwardY * starboardX;
+            final double normalization = Math.sqrt((sumOfSquares + Math.sqrt(Math.max(0,
+                    sumOfSquares * sumOfSquares - 4 * determinant * determinant))) / 2);
             if (normalization > 0.000001) {
                 updateDrawingMatrixAndSetCanvasTransform(forwardX / normalization, forwardY / normalization,
                         starboardX / normalization, starboardY / normalization);
