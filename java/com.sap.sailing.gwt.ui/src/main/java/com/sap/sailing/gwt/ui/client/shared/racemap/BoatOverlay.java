@@ -103,10 +103,20 @@ public class BoatOverlay extends CanvasOverlayV3 {
                     : (boatFix.speedWithBearing == null ? 0 : boatFix.speedWithBearing.bearingInDegrees);
             final Point headingReferenceInPx = getMapProjection().fromLatLngToDivPixel(coordinateSystem.toLatLng(
                     boatFix.position.translateRhumb(new DegreeBearingImpl(trueHeadingInDegrees), SCREEN_HEADING_PROBE_DISTANCE)));
-            final double screenDrawingAngle = Math.toDegrees(Math.atan2(
-                    headingReferenceInPx.getY() - boatPositionInPx.getY(),
-                    headingReferenceInPx.getX() - boatPositionInPx.getX()));
-            updateDrawingAngleAndSetCanvasRotation(screenDrawingAngle);
+            final Point starboardReferenceInPx = getMapProjection().fromLatLngToDivPixel(coordinateSystem.toLatLng(
+                    boatFix.position.translateRhumb(new DegreeBearingImpl(trueHeadingInDegrees + 90), SCREEN_HEADING_PROBE_DISTANCE)));
+            final double forwardX = headingReferenceInPx.getX() - boatPositionInPx.getX();
+            final double forwardY = headingReferenceInPx.getY() - boatPositionInPx.getY();
+            final double starboardX = starboardReferenceInPx.getX() - boatPositionInPx.getX();
+            final double starboardY = starboardReferenceInPx.getY() - boatPositionInPx.getY();
+            final double normalization = Math.max(Math.hypot(forwardX, forwardY), Math.hypot(starboardX, starboardY));
+            if (normalization > 0.000001) {
+                updateDrawingMatrixAndSetCanvasTransform(forwardX / normalization, forwardY / normalization,
+                        starboardX / normalization, starboardY / normalization);
+            } else {
+                final double screenDrawingAngle = Math.toDegrees(Math.atan2(forwardY, forwardX));
+                updateDrawingAngleAndSetCanvasRotation(screenDrawingAngle);
+            }
         }
     }
     
