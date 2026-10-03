@@ -3902,6 +3902,24 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
         return currentMapBounds.getLowerLeft().getDistance(currentMapBounds.getUpperRight()).scale(2);
     }
 
+    private void synchronizeCoordinateSystemWithMapHeading() {
+        if (!vectorRenderingTypeSupported || map == null) {
+            return;
+        }
+        coordinateSystem.setCoordinateSystem(new RotatedCoordinateSystem(
+                new DegreeBearingImpl(map.getHeading()).add(new DegreeBearingImpl(90))));
+        windSensorOverlays.values().forEach(WindSensorOverlay::draw);
+        courseMarkOverlays.values().forEach(CourseMarkOverlay::draw);
+        combinedWindPanel.redraw();
+        final boolean rotated = coordinateSystem.mapDegreeBearing(0) != 0;
+        trueNorthIndicatorPanel.setVisible(rotated);
+        trueNorthIndicatorButtonButtonGroup.getElement().getStyle().setProperty(
+                "transform", "rotate(" + coordinateSystem.mapDegreeBearing(0) + "deg)");
+        if (rotated) {
+            trueNorthIndicatorPanel.redraw();
+        }
+    }
+
     private void afterZoomOrOrientationChanged() {
         resetAutoZoomSettingsAfterCameraChange |= !autoZoomIn && !autoZoomOut && !orientationChangeInProgress;
         if (streamletOverlay != null
@@ -3913,6 +3931,7 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
             cameraChangeSettledTimer = new com.google.gwt.user.client.Timer() {
                 @Override
                 public void run() {
+                    synchronizeCoordinateSystemWithMapHeading();
                     if (resetAutoZoomSettingsAfterCameraChange) {
                         resetAutoZoomSettingsAfterCameraChange = false;
                         // stop automatic zoom after a manual zoom event; automatic zoom in zoomMapToNewBounds will
