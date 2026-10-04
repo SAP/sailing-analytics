@@ -108,6 +108,7 @@ import com.sap.sse.common.Util.Triple;
 import com.sap.sse.common.impl.KilometersPerHourSpeedImpl;
 import com.sap.sse.common.impl.KnotSpeedImpl;
 import com.sap.sse.common.impl.SecondsDurationImpl;
+import com.sap.sse.gwt.client.async.RetryableActionResult;
 import com.sap.sse.gwt.client.replication.RemoteReplicationService;
 import com.sap.sse.security.shared.HasPermissions;
 import com.sap.sse.security.shared.TypeRelativeObjectIdentifier;
@@ -152,7 +153,7 @@ public interface SailingService extends RemoteService, RemoteReplicationService 
     BearingWithConfidenceDTO getManeuverAngle(BoatClassDTO boatClass, ManeuverType maneuverType, Speed windSpeed)
             throws NotEnoughDataHasBeenAddedException, UnauthorizedException;
 
-    SimulatorResultsDTO getSimulatorResults(LegIdentifier legIdentifier) throws UnauthorizedException;
+    RetryableActionResult<SimulatorResultsDTO> getSimulatorResults(LegIdentifier legIdentifier) throws UnauthorizedException;
 
     RaceboardDataDTO getRaceboardData(String regattaName, String raceName, String leaderboardName,
             String leaderboardGroupName, UUID leaderboardGroupId, UUID eventId) throws UnauthorizedException;
@@ -211,11 +212,11 @@ public interface SailingService extends RemoteService, RemoteReplicationService 
     SwissTimingEventRecordDTO getRacesOfSwissTimingEvent(String eventJsonURL) throws UnauthorizedException, Exception;
 
     Map<CompetitorDTO, List<GPSFixDTOWithSpeedWindTackAndLegType>> getDouglasPoints(
-            RegattaAndRaceIdentifier raceIdentifier, Map<CompetitorDTO, TimeRange> competitorTimeRanges)
+            RegattaAndRaceIdentifier raceIdentifier, Map<String, TimeRange> competitorIdsAsStringsAndTimeRanges)
             throws NoWindException, UnauthorizedException;
 
-    Map<CompetitorDTO, List<ManeuverDTO>> getManeuvers(RegattaAndRaceIdentifier raceIdentifier,
-            Map<CompetitorDTO, TimeRange> competitorTimeRanges) throws NoWindException, UnauthorizedException;
+    Map<String, List<ManeuverDTO>> getManeuvers(RegattaAndRaceIdentifier raceIdentifier,
+            Map<String, TimeRange> competitorIdsAsStringsAndTimeRanges) throws NoWindException, UnauthorizedException;
 
     List<LeaderboardGroupDTO> getLeaderboardGroups(boolean withGeoLocationData) throws UnauthorizedException;
 
@@ -252,6 +253,8 @@ public interface SailingService extends RemoteService, RemoteReplicationService 
     ServerConfigurationDTO getServerConfiguration() throws UnauthorizedException;
 
     List<RemoteSailingServerReferenceDTO> getRemoteSailingServerReferences() throws UnauthorizedException;
+
+    List<EventDTO> getRemoteEvents(String baseUrl, String bearerTokenOrNull) throws Exception;
 
     List<UrlDTO> getResultImportUrls(String resultProviderName) throws UnauthorizedException;
 
@@ -440,7 +443,7 @@ public interface SailingService extends RemoteService, RemoteReplicationService 
      *             is thrown if the leaderboard is not found by name
      */
     PairingListTemplateDTO calculatePairingListTemplate(final int flightCount, final int groupCount,
-            final int competitorCount, final int flightMultiplier, final int tolerance)
+            final int competitorCount, final int flightMultiplier, final int boatChangeFactor)
             throws UnauthorizedException, NotFoundException, IllegalArgumentException;
 
     PairingListDTO getPairingListFromTemplate(String leaderboardName, int flightMultiplier,

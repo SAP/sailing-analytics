@@ -49,7 +49,7 @@ public abstract class EventDialog extends DataEntryDialogWithDateTimeBox<EventDT
     protected CheckBox isPublicCheckBox;
     protected UUID id;
     protected TextBox baseURLEntryField;
-    protected CourseAreaListInlineEditorComposite courseAreaNameList;
+    protected CourseAreaTabComposite courseAreaList;
     protected StringConstantsListEditorComposite leaderboardGroupList;
     protected StringListInlineEditorComposite windFinderSpotCollectionIdsComposite;
     protected Map<String, LeaderboardGroupDTO> availableLeaderboardGroupsByName;
@@ -124,7 +124,7 @@ public abstract class EventDialog extends DataEntryDialogWithDateTimeBox<EventDT
      */
     public EventDialog(EventParameterValidator validator, SailingServiceWriteAsync sailingServiceWrite,
             StringMessages stringMessages, List<LeaderboardGroupDTO> availableLeaderboardGroups,
-            Iterable<LeaderboardGroupDTO> leaderboardGroupsOfEvent, DialogCallback<EventDTO> callback) {
+            Iterable<LeaderboardGroupDTO> leaderboardGroupsOfEvent, Collection<EventDTO> existingEvents, DialogCallback<EventDTO> callback) {
         super(stringMessages.event(), null, stringMessages.ok(), stringMessages.cancel(), validator, callback);
         this.ensureDebugId("eventDialog");
         this.storageServiceAvailable = new FileStorageServiceConnectionTestObservable(sailingServiceWrite);
@@ -146,10 +146,8 @@ public abstract class EventDialog extends DataEntryDialogWithDateTimeBox<EventDT
                 validateAndUpdate();
             }
         };
-        courseAreaNameList = new CourseAreaListInlineEditorComposite(Collections.<CourseAreaDTO> emptyList(),
-                new CourseAreaListInlineEditorComposite.ExpandedUi(stringMessages, IconResources.INSTANCE.removeIcon(), /* suggestValues */
-                        SuggestedCourseAreaNames.suggestedCourseAreaNames, stringMessages.enterCourseAreaName(), 30));
-        courseAreaNameList.addValueChangeHandler(courseAreaValueChangeHandler);
+        courseAreaList = new CourseAreaTabComposite(existingEvents, sailingServiceWrite, stringMessages);
+        courseAreaList.addValueChangeHandler(courseAreaValueChangeHandler);
         List<String> leaderboardGroupNames = new ArrayList<>();
         for (LeaderboardGroupDTO leaderboardGroupDTO: availableLeaderboardGroups) {
             leaderboardGroupNames.add(leaderboardGroupDTO.getName());
@@ -190,7 +188,7 @@ public abstract class EventDialog extends DataEntryDialogWithDateTimeBox<EventDT
         result.endDate = endDateBox.getValue();
         result.isPublic = isPublicCheckBox.getValue();
         result.id = id;
-        final List<CourseAreaDTO> courseAreas = courseAreaNameList.getValue();
+        final List<CourseAreaDTO> courseAreas = courseAreaList.getValue();
         for (ImageDTO image : imagesListComposite.getAllImages()) {
             result.addImage(image);
         }
@@ -241,7 +239,7 @@ public abstract class EventDialog extends DataEntryDialogWithDateTimeBox<EventDT
         final ScrollPanel leaderboardGroupTab = new ScrollPanel(leaderboardGroupList);
         leaderboardGroupTab.ensureDebugId("LeaderboardGroupsTab");
         tabPanel.add(leaderboardGroupTab, stringMessages.leaderboardGroups());
-        final ScrollPanel courseAreasTab = new ScrollPanel(courseAreaNameList);
+        final ScrollPanel courseAreasTab = new ScrollPanel(courseAreaList);
         courseAreasTab.ensureDebugId("CourseAreasTab");
         tabPanel.add(courseAreasTab, stringMessages.courseAreas());
         final ScrollPanel imagesTab = new ScrollPanel(imagesListComposite);

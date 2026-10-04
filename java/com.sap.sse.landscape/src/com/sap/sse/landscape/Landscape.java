@@ -17,7 +17,7 @@ public interface Landscape<ShardingKey> {
     /**
      * The timeout for a host to come up
      */
-    Optional<Duration> WAIT_FOR_HOST_TIMEOUT = Optional.of(Duration.ONE_HOUR.times(2));
+    Optional<Duration> WAIT_FOR_HOST_TIMEOUT = Optional.of(Duration.ONE_HOUR.times(4));
     
     /**
      * The timeout for a running process to respond

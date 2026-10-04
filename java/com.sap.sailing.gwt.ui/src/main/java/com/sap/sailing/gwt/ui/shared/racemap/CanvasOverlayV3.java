@@ -85,9 +85,12 @@ public abstract class CanvasOverlayV3 {
      * with the time set on the canvas element style's <code>transition</code> CSS property.
      */
     private long transitionTimeInMilliseconds;
+
+    private double canvasPositionX;
+    private double canvasPositionY;
     
     /**
-     * Remembers the old drawing angle as passed to {@link #setCanvasRotation()} to minimize rotation angle upon
+     * Remembers the old drawing angle as passed to {@link #setCanvasTransform()} to minimize rotation angle upon
      * the next update. The rotation property will always be animated according to the magnitude of the values. A
      * transition from 5 to 355 will go through 180 and not from 5 to 0==360 and back to 355! Therefore, with 5 being
      * the last rotation angle, the new rotation angle of 355 needs to be converted to -5 to ensure that the transition
@@ -104,6 +107,9 @@ public abstract class CanvasOverlayV3 {
         canvas.getElement().getStyle().setZIndex(zIndex);
         canvas.getElement().getStyle().setCursor(Cursor.POINTER);
         canvas.getElement().getStyle().setPosition(com.google.gwt.dom.client.Style.Position.ABSOLUTE);
+        canvas.getElement().getStyle().setLeft(0, Unit.PX);
+        canvas.getElement().getStyle().setTop(0, Unit.PX);
+        setProperty(canvas.getElement().getStyle(), "transformOrigin", "50% 50%");
         if (canvasId != null) {
             canvas.getElement().setId(canvasId);
         }
@@ -276,17 +282,10 @@ public abstract class CanvasOverlayV3 {
     public void setCanvasPositionAndRotationTransition(long durationInMilliseconds) {
         if (durationInMilliseconds != transitionTimeInMilliseconds) {
             for (String browserTypePrefix : getBrowserTypePrefixes()) {
-                StringBuilder transformPropertyList = new StringBuilder();
-                transformPropertyList.append("left ");
-                transformPropertyList.append(durationInMilliseconds);
-                transformPropertyList.append("ms linear, top ");
-                transformPropertyList.append(durationInMilliseconds);
-                transformPropertyList.append("ms linear, ");
-                transformPropertyList.append(getBrowserSpecificDashedPropertyName(browserTypePrefix, "transform"));
-                transformPropertyList.append(' ');
-                transformPropertyList.append(durationInMilliseconds);
-                transformPropertyList.append("ms linear");
-                canvas.getElement().getStyle().setProperty(getBrowserSpecificPropertyName(browserTypePrefix, "transition"), transformPropertyList.toString());
+                final String transition = getBrowserSpecificDashedPropertyName(browserTypePrefix, "transform") + " " +
+                        durationInMilliseconds + "ms linear";
+                canvas.getElement().getStyle().setProperty(
+                        getBrowserSpecificPropertyName(browserTypePrefix, "transition"), transition);
             }
             transitionTimeInMilliseconds = durationInMilliseconds;
         }
@@ -342,16 +341,17 @@ public abstract class CanvasOverlayV3 {
     private String getBrowserSpecificPropertyName(String browserType, String basePropertyName) {
         final String result;
         if (browserType == null || browserType.isEmpty()) {
-                result = basePropertyName;
+            result = basePropertyName;
         } else {
-                result = browserType+basePropertyName.substring(0, 1).toUpperCase()+basePropertyName.substring(1);
+            result = browserType+basePropertyName.substring(0, 1).toUpperCase()+basePropertyName.substring(1);
         }
         return result;
     }
 
     protected void setCanvasPosition(double x, double y) {
-        canvas.getElement().getStyle().setLeft(x, Unit.PX);
-        canvas.getElement().getStyle().setTop(y, Unit.PX);
+        canvasPositionX = x;
+        canvasPositionY = y;
+        setCanvasTransform();
     }
 
     /**
@@ -364,12 +364,12 @@ public abstract class CanvasOverlayV3 {
         } else {
             drawingAngle = getNewRotationWithMinimalDiff(newBoatDrawingAngle);
         }
-        setCanvasRotation();
+        setCanvasTransform();
     }
     
-    private void setCanvasRotation() {
-        setProperty(canvas.getElement().getStyle(), "transformOrigin", "50% 50%");
-        setProperty(canvas.getElement().getStyle(), "transform", "translateZ(0) rotate(" + drawingAngle + "deg)");
+    private void setCanvasTransform() {
+        setProperty(canvas.getElement().getStyle(), "transform", "translate3d(" + canvasPositionX + "px, " +
+                canvasPositionY + "px, 0) rotate(" + (drawingAngle == null ? 0.0 : drawingAngle) + "deg)");
     }
 
     protected double getNewRotationWithMinimalDiff(double desiredAngle) {

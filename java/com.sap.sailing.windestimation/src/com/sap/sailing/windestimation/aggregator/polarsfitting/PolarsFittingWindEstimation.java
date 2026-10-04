@@ -18,6 +18,7 @@ import com.sap.sailing.domain.tracking.WindWithConfidence;
 import com.sap.sailing.domain.tracking.impl.WindWithConfidenceImpl;
 import com.sap.sailing.windestimation.data.CompetitorTrackWithEstimationData;
 import com.sap.sailing.windestimation.data.ManeuverForEstimation;
+import com.sap.sailing.windestimation.data.SimpleManeuverForEstimation;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Speed;
 import com.sap.sse.common.SpeedWithBearing;
@@ -214,7 +215,7 @@ public class PolarsFittingWindEstimation {
         return windWithConfidence;
     }
 
-    public Speed getWindSpeed(ManeuverForEstimation maneuver, Bearing windCourse) {
+    public Speed getWindSpeed(SimpleManeuverForEstimation maneuver, Bearing windCourse) {
         WindSpeedRange windSpeedRange = null;
         BoatClass boatClass = maneuver.getBoatClass();
         if (maneuver.isClean()) {

@@ -178,6 +178,11 @@ public class TestStoringAndLoadingEventsAndRegattas extends AbstractMongoDBTest 
             public Event getEvent(Serializable id) {
                 return id.equals(loadedEvent.getId()) ? loadedEvent : null;
             }
+
+            @Override
+            public Iterable<Event> getAllEvents() {
+                return Collections.singleton(loadedEvent);
+            }
         }, new LeaderboardGroupResolver() {
             @Override
             public LeaderboardGroup getLeaderboardGroupByName(String leaderboardGroupName) {

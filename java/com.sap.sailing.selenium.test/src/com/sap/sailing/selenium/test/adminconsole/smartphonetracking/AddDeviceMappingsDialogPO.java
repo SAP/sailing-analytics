@@ -1,5 +1,6 @@
 package com.sap.sailing.selenium.test.adminconsole.smartphonetracking;
 
+import java.time.Duration;
 import java.util.regex.Pattern;
 
 import org.openqa.selenium.WebDriver;
@@ -28,13 +29,13 @@ public class AddDeviceMappingsDialogPO extends DataEntryDialogPO {
     }
     
     public TrackedRacesBoatTablePO getBoatsTable() {
-        Wait<WebDriver> wait = new WebDriverWait(driver, 10);
+        Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         WebElement boatsTable = wait.until(ExpectedConditions.presenceOfElementLocated(new BySeleniumId("BoatsTable")));
         return new TrackedRacesBoatTablePO(this.driver, boatsTable);
     }
     
     public TrackedRacesCompetitorTablePO getCompetitorTable() {
-        Wait<WebDriver> wait = new WebDriverWait(driver, 10);
+        Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         WebElement competitorTable = wait.until(ExpectedConditions.presenceOfElementLocated(new BySeleniumId("CompetitorsTable")));
         return new TrackedRacesCompetitorTablePO(this.driver, competitorTable);
     }

@@ -4,7 +4,9 @@ Bundle-Name: Server
 Bundle-SymbolicName: com.sap.sailing.domain.igtimiadapter.server
 Bundle-Version: 1.0.0.qualifier
 Export-Package: com.sap.sailing.domain.igtimiadapter.server,
- com.sap.sailing.domain.igtimiadapter.server.riot
+ com.sap.sailing.domain.igtimiadapter.server.replication;x-friends:="com.sap.sailing.domain.igtimiadapter.test",
+ com.sap.sailing.domain.igtimiadapter.server.riot,
+ com.sap.sailing.domain.igtimiadapter.server.riot.impl;x-friends:="com.sap.sailing.domain.igtimiadapter.test"
 Bundle-Activator: com.sap.sailing.domain.igtimiadapter.server.Activator
 Bundle-Vendor: SAP
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8

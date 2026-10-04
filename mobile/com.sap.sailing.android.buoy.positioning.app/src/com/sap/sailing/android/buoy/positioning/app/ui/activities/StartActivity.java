@@ -3,7 +3,7 @@ package com.sap.sailing.android.buoy.positioning.app.ui.activities;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -44,14 +44,14 @@ public class StartActivity extends AbstractStartActivity<CheckinData> {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case R.id.about:
+        final int id = item.getItemId();
+        if (id == R.id.about) {
             AboutHelper.showInfoActivity(this);
             return true;
-        case R.id.settings:
+        } else if (id == R.id.settings) {
             startActivity(new Intent(this, SettingActivity.class));
             return true;
-        default:
+        } else {
             return super.onOptionsItemSelected(item);
         }
     }

@@ -91,7 +91,7 @@ public class StarbordSideOfStartLineRecognitionTest {
 
         public MockedTrackedRaceImpl() {
             super(null, null, Collections.<Sideline> emptyList(), null, 0, 0, 0, 0, false, OneDesignRankingMetric::new,
-                    mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null);
+                    mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null, /* maneuverRaceFingerprintRegistry */ null);
         }
         
         @Override

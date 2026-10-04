@@ -1,10 +1,62 @@
 
+
 <!DOCTYPE html>
 <html>
 <body>
 <div id="mainContent">
     <h4 class="articleHeadline" id="sailingAnalyticsHeadline">What's New - Sailing Analytics</h4>
       <div class="innerContent">
+         <h5 class="articleSubheadline">October 2026</h5>
+         <ul class="bulletList">
+            <li>Mark passing calculator bug fix: for races with tracking duration longer than ~14 days
+                (often a race accidentally left open and then later catching new fixes that actually wouldn't
+                belong there), the sorting of mark passing candidates in an internal data structure may
+                have failed due to a long/int data type overflow, in effect potentially leading to
+                endless iterations across those mark passings candidates and delaying the start-up of
+                a server process, possibly infinitely.</li>
+         </ul>
+         <h5 class="articleSubheadline">September 2026</h5>
+         <ul class="bulletList">
+            <li>Added boat class Yngling.</li>
+            <li>Added boat classes Onyx, Lacustre and 15m&sup2; SNS.</li>
+            <li>Fix for recently introduced issue in the simulator when used for live smartphone-tracked
+                races. A time point from the mark passing detection turned out to be non-serializable.</li>
+            <li>REST API end point <tt>/sailingserver/api/v1/remoteserverreference</tt> is now publicly
+                available. It lists those other sub-domains and the events that the server on which you
+                invoke this references and re-publishes on its landing page.</li>
+         </ul>
+         <h5 class="articleSubheadline">August 2026</h5>
+         <ul class="bulletList">
+            <li>An event's course area configuration dialog now can copy course areas from other local
+                and remote events. This can be convenient if an event uses the same course area
+                configuration, including their geometries, as another event, e.g., the previous
+                year's episode of that event.</li>
+            <li>Show one decimal place in wind chart tool-tips, so, e.g., a wind speed series tool-tip
+                may read "16.6kts" now.</li>
+            <li>New API method on end point /sailingserver/api/v1/regattas/{regattaname}/races/{racename}/wind_at_position
+                allows clients with the <tt>TRACKED_RACE:EXPORT</tt> permission for the race in question
+                to obtain position-based interpolated wind data taking all non-excluded wind sources available
+                for that race into account, computing a weighted average that matches what is being used for
+                competitor-specific VMG and TWA calculations alike.</li>
+         </ul>
+         <h5 class="articleSubheadline">July 2026</h5>
+         <ul class="bulletList">
+            <li>Introduced configurable average/min/max lines in wind chart</li>
+            <li>Added RS700 boat class data.</li>
+            <li>Improved performance and smoothness of boat animation on map.</li>
+            <li>VMG can now become negative.</li>
+            <li>Fixed dynamic update of tooltip for course middle line.</li>
+         </ul>
+         <h5 class="articleSubheadline">April 2026</h5>
+         <ul class="bulletList">
+            <li>Tables with multi-selection support now have a select/de-select all checkbox in the table header.
+                This comes with general improvements in table selection/de-selection handling.</li>
+            <li>Adding the "Race Rank" column to the leaderboard now consistently adds it after the selection
+                checkbox column and displays it immediately when the settings dialog is confirmed.</li>
+            <li>Users can now opt out of e-mail communication regarding features and community
+                information. This will be honored when sending out such general information about
+                the Sailing Analytics solution.</li>
+         </ul>
          <h5 class="articleSubheadline">March 2026</h5>
          <ul class="bulletList">
             <li>Maneuver analysis now identifies track segments worth looking at with consistency.
@@ -18,8 +70,23 @@
                 maneuver calculation delays for better performance due to fewer re-calculations
                 and reliable results with no difference between live and replay analysis.</li>
             <li>The polar data export service now allows clients to filter the result down to one or
-                more boat classes. See <a href="/polars/webservices/api/polar_data.html">https://dev.sapsailing.com/polars/webservices/api/polar_data.html</a>
+                more boat classes. See <a href="/polars/webservices/api/polar_data.html">https://sapsailing.com/polars/webservices/api/polar_data.html</a>
                 for more details.</li>
+            <li>For standard Low Point scoring (other than those scoring "wins" in the medal series), if
+                there are more than one medal races, there now is standard A8 tie breaking based on those multiple
+                medal races in case two competitors are equal on points and scored equal points in all
+                scoring medal races (other than carry-forward columns in the medal series). If that does
+                not break the tie (meaning the two competitors scored equal total points and equal medal
+                race score sums), tie breaking resorts to the regular A8 scheme which will break the
+                tie based on the scores of all races.</li>
+            <li>The simulator overlay in the "Race Board" will no longer wait synchronously for a simulation
+                result to be available as this may be a long-running calculation. However, if no calculation
+                for the respective leg has been started on the server yet, this will get triggered.
+                Time ticks on the race board's time line will attempt loading the simulation results again.
+                This way, the simulation overlay will show when ready while in playing mode or while moving
+                the time slider. Note, though, that compared to earlier versions the simulation results will
+                not be shown automatically when it was not available initially, unless the time slider is
+                touched or the simulation display is toggled.</li>
          </ul>
          <h5 class="articleSubheadline">December 2025</h5>
          <ul class="bulletList">

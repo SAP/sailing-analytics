@@ -1384,6 +1384,13 @@ public interface TrackedRace
     void setWindEstimation(IncrementalWindEstimation windEstimation);
 
     /**
+     * Returns the currently-installed maneuver-based wind estimation for this race, or
+     * {@code null} if none is installed. Reflects the most recent successful
+     * {@link #setWindEstimation(IncrementalWindEstimation)} call.
+     */
+    IncrementalWindEstimation getWindEstimation();
+
+    /**
      * Obtains a quick, rough summary of the wind conditions during this race, based on a few wind samples at the
      * beginning, in the middle and at the end of the race. This is summarized in a min and max wind speed as well
      * as a single average wind direction.
@@ -1460,6 +1467,64 @@ public interface TrackedRace
      *            must not be {@code null}
      */
     void runWhenDoneLoading(Runnable runnable);
+
+    /**
+     * Runs {@code callback} exactly once, at the first moment when the race's status reaches an
+     * {@link TrackedRaceStatus#getStatus() order} strictly greater than
+     * {@link TrackedRaceStatusEnum#LOADING} (i.e., {@link TrackedRaceStatusEnum#TRACKING},
+     * {@link TrackedRaceStatusEnum#FINISHED}, {@link TrackedRaceStatusEnum#ERROR}, or
+     * {@link TrackedRaceStatusEnum#REMOVED}), <em>provided</em> the race is still a member of its
+     * {@link TrackedRegatta} at that moment. If the race is
+     * {@link TrackedRegatta#removeTrackedRace removed} from its regatta before the status condition
+     * is met, {@code callback} is never invoked and any listeners registered by this method are
+     * torn down. This means an implementation must register a status listener on this race as well
+     * as a race-removal listener on the containing regatta and coordinate them so that both are
+     * removed regardless of which branch settles first.
+     * <p>
+     *
+     * Note the difference to {@link #runWhenDoneLoading(Runnable)}: this method treats any status
+     * strictly beyond LOADING as "done loading," including {@link TrackedRaceStatusEnum#ERROR} and
+     * {@link TrackedRaceStatusEnum#REMOVED} (via status transition), which makes it usable for
+     * races that transition, e.g., directly from {@link TrackedRaceStatusEnum#PREPARED} to
+     * {@link TrackedRaceStatusEnum#TRACKING} without ever entering LOADING.
+     *
+     * @param callback
+     *            must not be {@code null}
+     */
+    void runWhenPastLoading(Runnable callback);
+
+    /**
+     * Executes {@code callback} once a non-{@code null} {@link IncrementalWindEstimation} has been
+     * {@link #setWindEstimation(IncrementalWindEstimation) installed} on this race. If one is
+     * already installed at call time, the callback fires synchronously on the caller's thread;
+     * otherwise the callback is registered and fires on whichever thread first invokes
+     * {@code setWindEstimation} with a non-{@code null} argument.
+     * <p>
+     *
+     * The callback also cancels silently, without firing, if the race is removed before the
+     * estimation is installed (matching the cancellation semantics of
+     * {@link #runWhenPastLoading(Runnable)}), so that callers don't leak resources when a race
+     * disappears during startup or teardown.
+     * <p>
+     *
+     * The default implementation checks {@link #getWindEstimation()} once: if non-{@code null},
+     * the callback fires synchronously; otherwise it is discarded. This is only appropriate for
+     * test doubles and other implementations without a dynamic {@link #setWindEstimation(IncrementalWindEstimation)}
+     * lifecycle. Implementations with such a lifecycle (notably {@code TrackedRaceImpl}) must
+     * override to register the callback and fire it when the estimation is installed.
+     * <p>
+     *
+     * See bug6241: used to sequence maneuver-cache re-typing and persistence after the wind
+     * estimator has been installed and had a chance to produce wind fixes.
+     *
+     * @param callback
+     *            must not be {@code null}
+     */
+    default void runWhenWindEstimationInstalled(Runnable callback) {
+        if (getWindEstimation() != null) {
+            callback.run();
+        }
+    }
 
     /**
      * Executes the {@code callable} under synchronization with the {@link #getStatus() race status}; in other words,

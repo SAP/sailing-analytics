@@ -10,6 +10,7 @@ import com.sap.sse.common.TimePoint;
  *
  */
 public class ManeuverCurveBoundariesImpl implements ManeuverCurveBoundaries {
+    private static final long serialVersionUID = 1097529837L;
     private final TimePoint timePointBefore;
     private final TimePoint timePointAfter;
     private final SpeedWithBearing speedWithBearingBefore;

@@ -91,8 +91,9 @@ public class SecurityDTOFactory {
                 .collect(Collectors.toList());
         userDTO = new UserDTO(user.getName(), user.getEmail(), user.getFullName(), user.getCompany(),
                 user.getLocale() != null ? user.getLocale().toLanguageTag() : null, user.isEmailValidated(),
-                accountDTOs, createRolesDTOs(filteredRoles, fromOriginalToStrippedDownUser,
-                        fromOriginalToStrippedDownUserGroup, securityService, user),
+                user.getDidOptOutOfFeatureAndCommunityEmails(), accountDTOs,
+                createRolesDTOs(filteredRoles, fromOriginalToStrippedDownUser, fromOriginalToStrippedDownUserGroup,
+                        securityService, user),
                 /* default tenant filled in later */ null,
                 getSecuredPermissions(filteredPermissions, user, securityService),
                 createStrippedUserGroupDTOsFromUserGroups(securityService.getUserGroupsOfUser(user),

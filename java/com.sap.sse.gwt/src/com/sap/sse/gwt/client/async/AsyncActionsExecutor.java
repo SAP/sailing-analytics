@@ -5,21 +5,29 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 
-
 /**
  * A executor class making the actual remote call for an {@link AsyncAction}. The class is managing the number of
  * executed actions in order to prevent a server overload. If the amount of actions to be executed exceeds a defined
- * threshold the execution of those actions will be dropped.
+ * threshold the execution of those actions will be dropped.<p>
+ * 
+ * Use {@link RetryableAsyncAction} for calling service methods that return results of type
+ * {@link RetryableActionResult} for automatic re-try behavior. This can be useful when calling
+ * service methods that have to execute long-running calculations before being able to respond
+ * with a useful answer, such as long-running simulator request or lists of maneuvers. It is important
+ * for GWT RPC service methods to not block the calling thread but return swiftly; and if no valid
+ * response is available, then asking the client to retry after some time is the next best thing to
+ * do.
  * 
  * @author c5163874, Simon Marcel Pamies
  */
-public class AsyncActionsExecutor {
+public class AsyncActionsExecutor extends AbstractActionsExecutor {
     private final static Logger logger = Logger.getLogger(AsyncActionsExecutor.class.getName());
     
     private class ExecutionJob<T> implements AsyncCallback<T> {
@@ -69,7 +77,7 @@ public class AsyncActionsExecutor {
         }
     }
     
-    private static final int DEFAULT_MAX_PENDING_CALLS = 10;
+    public static final int DEFAULT_MAX_PENDING_CALLS = 10;
     private static final int DEFAULT_MAX_PENDING_CALLS_PER_TYPE = 4;
     
     /**
@@ -92,7 +100,6 @@ public class AsyncActionsExecutor {
     private final Map<String, Set<Runnable>> runAfterLastActionForCategoryReturned;
     private final Set<Runnable> runAfterLastActionReturned;
     
-    private int numPendingCalls = 0;
     private TimePoint timePointOfFirstExecutorInit = null;
 
     public AsyncActionsExecutor() {
@@ -156,19 +163,20 @@ public class AsyncActionsExecutor {
     }
     
     public int getNumberOfPendingActions() {
-        return numPendingCalls;
+        return numberOfPendingActions;
     }
     
     private void execute(ExecutionJob<?> job) {
         Integer numActionsOfType = actionsPerTypeCounter.computeIfAbsent(job.getType(), j->Integer.valueOf(0));
-        if (numPendingCalls >= maxPendingCalls || (numActionsOfType >= maxPendingCallsPerType)) {
+        if (numberOfPendingActions >= maxPendingCalls || (numActionsOfType >= maxPendingCallsPerType)) {
             final TimePoint now = MillisecondsTimePoint.now();
             final TimePoint timePointToInspectForResetDecision = timePointOfTypeLastBeingExecuted.get(job.getType()) != null ?
                     timePointOfTypeLastBeingExecuted.get(job.getType()) : timePointOfFirstExecutorInit;
             if (timePointToInspectForResetDecision != null &&
                     now.minus(durationAfterToResetQueue).after(timePointToInspectForResetDecision)) {
+                logger.info("Resetting number of pending calls after "+durationAfterToResetQueue+" of no response");
                 // reset the number of pending calls
-                numPendingCalls = 0;
+                numberOfPendingActions = 0;
                 // reset number of pending actions per type - 0 is fine as checkForEmptyCallQueue
                 // will check for a number less than maxPendingCallsPerType to send out the
                 // last job pending for a given type
@@ -193,8 +201,9 @@ public class AsyncActionsExecutor {
             }
         }
         actionsPerTypeCounter.put(job.getType(), numActionsOfType+1);
-        numPendingCalls++;
+        numberOfPendingActions++;
         job.execute();
+        notifyListeners();
     }
 
     private void callCompleted(ExecutionJob<?> job) {
@@ -210,8 +219,12 @@ public class AsyncActionsExecutor {
             }
 
         }
-        numPendingCalls--;
-        if (numPendingCalls == 0) {
+        if (numberOfPendingActions > 0) { // don't let it go negative; we may have reset the queue
+            // and then one or more pending requests may have returned late
+            numberOfPendingActions--;
+        }
+        notifyListeners();
+        if (numberOfPendingActions == 0) {
             runAfterLastActionReturned.forEach(callback->callback.run());
         }
         timePointOfTypeLastBeingExecuted.put(type, MillisecondsTimePoint.now());

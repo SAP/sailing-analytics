@@ -91,7 +91,7 @@ public class TestWindEstimationFromManeuversOnAFew505Races extends OnlineTracTra
     public void testWindEstimationFromManeuversOn505KW2011Race4() throws Exception {
         setUp("event_20110609_KielerWoch-505_race_4");
         Wind average = getManeuverBasedAverageWind();
-        assertEquals(265, average.getFrom().getDegrees(), 10.0);
+        assertEquals(270, average.getFrom().getDegrees(), 10.0);
     }
     
     @Test

@@ -1,4 +1,6 @@
 #!/bin/bash
+# Fetches the latest Jetty 9.4 version from the official Jetty p2 repository, uploads it to sapsailing.com and updates all references in the workspace.
+# Specific components such as apache-jsp and jetty-osgi-boot-jsp are updated to the new version, too, but not from the p2 repo but directly from Maven Central, as the p2 repo does not contain the source bundles.
 VERSION=$( curl https://download.eclipse.org/jetty/updates/jetty-bundles-9.x/ | grep "/jetty/updates/jetty-bundles-9.x" | sed -e 's/^.*> \?\(9\.4\.[0-9]*\.v[0-9]*\)<.*$/\1/' )
 echo "Found version ${VERSION}"
 P2_URL="https://download.eclipse.org/jetty/updates/jetty-bundles-9.x/${VERSION}/"

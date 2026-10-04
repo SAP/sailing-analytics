@@ -84,6 +84,7 @@ import com.sap.sailing.gwt.ui.shared.SwissTimingRaceRecordDTO;
 import com.sap.sailing.gwt.ui.shared.TracTracConfigurationWithSecurityDTO;
 import com.sap.sailing.gwt.ui.shared.TracTracRaceRecordDTO;
 import com.sap.sailing.gwt.ui.shared.TrackFileImportDeviceIdentifierDTO;
+import com.sap.sailing.gwt.ui.shared.TrackingTimesRevocationReportDTO;
 import com.sap.sailing.gwt.ui.shared.TypedDeviceMappingDTO;
 import com.sap.sailing.gwt.ui.shared.UrlDTO;
 import com.sap.sailing.gwt.ui.shared.VenueDTO;
@@ -251,7 +252,7 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
     
     void updateIgtimiDevice(IgtimiDeviceWithSecurityDTO editedObject);
 
-    void removeIgtimiDevice(String serialNumber);
+    void removeIgtimiDevice(long deviceId);
     
     boolean sendGPSOffCommandToIgtimiDevice(String serialNumber) throws IOException;
 
@@ -762,4 +763,6 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
 
     void copyPairingListFromOtherLeaderboard(String sourceLeaderboardName, String targetLeaderboardName, String fromRaceColumnName,
             String toRaceColumnInclusiveName) throws UnauthorizedException, NotFoundException;
+    
+    TrackingTimesRevocationReportDTO revokeExplicitTrackingTimes(String leaderboardName) throws NotFoundException;
 }

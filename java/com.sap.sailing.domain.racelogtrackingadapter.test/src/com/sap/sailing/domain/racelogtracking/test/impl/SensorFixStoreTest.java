@@ -139,7 +139,6 @@ public class SensorFixStoreTest {
         for (int i = 0; i < fixes; i++) {
             addBravoFix(device, FIX_TIMESTAMP + 1, FIX_RIDE_HEIGHT);
         }
-
         List<Double> progressData = new ArrayList<>();
         store.loadFixes((fix) -> {
         }, device, new MillisecondsTimePoint(FIX_TIMESTAMP - 1), new MillisecondsTimePoint(FIX_TIMESTAMP + fixes + 1),

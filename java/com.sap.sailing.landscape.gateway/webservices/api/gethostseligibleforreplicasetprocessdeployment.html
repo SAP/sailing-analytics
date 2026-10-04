@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <link href='../../../../sailing-fontface-1.0.cache.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+    <link href='../../../main.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+    <link rel='icon' href='../../../../sap.ico' type='image/x-icon'>
+    <title>SAP Sailing Analytics Webservices API Version 1.0</title>
+</head>
+<body>
+<h1>SAP Sailing Analytics Webservices API Version 1.0</h1>
+<h2>URL: /sailinglandscape/api/landscape/gethostseligibleforreplicasetprocessdeployment</h2>
+
+<b>Description:</b>
+ <p>Returns the shared hosts that are eligible for deploying an additional process of the given application replica
+ set, i.e., hosts on which the replica set's HTTP port is free and the server directory is available. This is a
+ read-only query typically used to discover candidate hosts before calling
+ <a href="deployreplicatoexistinghost.html">deployreplicatoexistinghost</a> with one of the returned instance IDs. If
+ no eligible host exists, an empty array is returned.</p>
+ <br />
+ <table>
+    <tr>
+        <td>Webservice Type:</td>
+        <td>POST</td>
+    </tr>
+    <tr>
+        <td>Output format:</td>
+        <td>json</td>
+    </tr>
+    <tr>
+        <td>Mandatory query parameters:</td>
+        <td>
+            <div><tt>regionId</tt>, region where the replica set is located, e.g., eu-west-1</div>
+            <div><tt>replicaSetName</tt>, name of the replica set for which eligible deployment hosts are requested; used as the hostname to
+                                 which the domain name is appended, as well as for the database and RabbitMQ exchange name</div>
+        </td>
+    </tr>
+    <tr>
+        <td>Optional form parameters:</td>
+        <td>
+            <div><tt>keyName</tt>, the name of the SSH key to use; must identify an existing SSH key by that name in the region specified
+                          and will be used to log on to existing and new instances using a root ssh connection. If not specified, the
+                          key used to launch an instance will be used for trying to connect to it, and a private key with matching name
+                          for the respective region will be looked up.</div>
+            <div><tt>privateKeyEncryptionPassphrase</tt>, the pass phrase to decrypt the private key for the key specified by the keyName parameter</div>
+            <div><tt>timeoutInMilliseconds</tt>, timeout in milliseconds to wait for responses from nodes when analyzing the replica sets
+                                        existing in the region; if not specified, waiting will not time out.</div>
+        </td>
+    </tr>
+    <tr>
+        <td>Request method:</td>
+        <td>POST</td>
+    </tr>
+    <tr>
+        <td>Example:</td>
+        <td>curl -X POST -d 'regionId=eu-west-2' -d 'replicaSetName=mynewevent' -d 'keyName=Horst' --data-urlencode 'privateKeyEncryptionPassphrase=HorstsSuperSecretPassword' -H 'Authorization: Bearer RwGK+DV38LKjeuDu+Bx87/3blLJHD7Ff+NCLeud9nRQ=' "https://sapsailing.com/sailinglandscape/api/landscape/gethostseligibleforreplicasetprocessdeployment"<br>
+        produces output listing the eligible hosts:<pre>
+            [
+              {
+                "instanceId": "i-0123456789abcdef0",
+                "name": "SL Multi-Server",
+                "availabilityZoneId": "euw2-az1",
+                "availabilityZoneName": "eu-west-2a",
+                "privateAddress": "172.31.36.221",
+                "publicAddress": "18.130.0.1"
+              }
+            ]
+        </pre>
+        </td>
+    </tr>
+</table>
+<div style="height: 1em;"></div>
+<a href="index.html">Back to Web Service Overview</a>
+</body>
+</html>

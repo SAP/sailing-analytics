@@ -16,6 +16,7 @@ import com.sap.sailing.domain.base.Regatta;
 import com.sap.sailing.domain.base.Series;
 import com.sap.sailing.domain.base.impl.RaceColumnInSeriesImpl;
 import com.sap.sailing.domain.common.LeaderboardType;
+import com.sap.sailing.domain.leaderboard.HasCourseAreasListener;
 import com.sap.sailing.domain.leaderboard.RegattaLeaderboard;
 import com.sap.sailing.domain.leaderboard.ResultDiscardingRule;
 import com.sap.sailing.domain.leaderboard.ScoringScheme;
@@ -87,6 +88,16 @@ public class RegattaLeaderboardImpl extends AbstractLeaderboardImpl implements R
     @Override
     public Iterable<CourseArea> getCourseAreas() {
         return regatta.getCourseAreas();
+    }
+    
+    @Override
+    public void addCourseAreaChangeListener(HasCourseAreasListener listener) {
+        regatta.addCourseAreaChangeListener(listener);
+    }
+
+    @Override
+    public void removeCourseAreaChangeListener(HasCourseAreasListener listener) {
+        regatta.removeCourseAreaChangeListener(listener);
     }
 
     /**

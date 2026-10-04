@@ -31,11 +31,6 @@ public abstract class AbstractCompactGPSFixMovingImpl extends AbstractCompactGPS
         public abstract double getKnots();
 
         @Override
-        public Position travelTo(Position pos, TimePoint from, TimePoint to) {
-            return pos.translateGreatCircle(getBearing(), this.travel(from, to));
-        }
-        
-        @Override
         public SpeedWithBearing applyCourseChange(CourseChange courseChange) {
             return AbstractSpeedWithBearingImpl.applyCourseChange(this, courseChange);
         }

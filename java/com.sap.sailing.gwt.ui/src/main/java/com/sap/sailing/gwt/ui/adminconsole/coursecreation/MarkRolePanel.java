@@ -13,10 +13,10 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.BrowserEvents;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.AbstractCellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
+import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -71,7 +71,6 @@ public class MarkRolePanel extends FlowPanel implements FilterablePanelProvider<
         add(buttonAndFilterPanel);
         allMarkRoles = new ArrayList<>();
         buttonAndFilterPanel.addUnsecuredAction(stringMessages.refresh(), new Command() {
-
             @Override
             public void execute() {
                 loadMarkRoles();
@@ -187,8 +186,9 @@ public class MarkRolePanel extends FlowPanel implements FilterablePanelProvider<
                     public int hashCode(MarkRoleDTO t) {
                         return t.getUuid().hashCode();
                     }
-                }, filterableMarkRoles.getAllListDataProvider(), markRolesTable);
-        markRolesTable.addColumn(checkColumn, SafeHtmlUtils.fromSafeConstant("<br/>"));
+                }, filterableMarkRoles.getAllListDataProvider());
+        final Header<Boolean> selectAllHeader = checkColumn.createHeader();
+        markRolesTable.addColumn(checkColumn, selectAllHeader);
         markRolesTable.setColumnWidth(checkColumn, 40, Unit.PX);
         // id
         Column<MarkRoleDTO, String> idColumn = new Column<MarkRoleDTO, String>(new TextCell()) {
@@ -217,8 +217,8 @@ public class MarkRolePanel extends FlowPanel implements FilterablePanelProvider<
                 return markRole.getShortName();
             }
         };
-        nameColumn.setSortable(true);
-        sortHandler.setComparator(nameColumn, new Comparator<MarkRoleDTO>() {
+        shortNameColumn.setSortable(true);
+        sortHandler.setComparator(shortNameColumn, new Comparator<MarkRoleDTO>() {
             public int compare(MarkRoleDTO markRole1, MarkRoleDTO markRole2) {
                 return markRole1.getShortName().compareTo(markRole2.getShortName());
             }

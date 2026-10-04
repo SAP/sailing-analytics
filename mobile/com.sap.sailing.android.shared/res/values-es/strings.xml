@@ -37,7 +37,7 @@
     <!-- QR Code -->
     <string name="notify_user_db_operation_failed">"Error: la operación de la base de datos ha fallado"</string>
     <string name="no_qr_code_popup_title">"¿Sin código QR?"</string>
-    <string name="no_qr_code_popup_message">"Póngase en contacto con la gestión de la carrera si no ha recibido un código QR."</string>
+    <string name="no_qr_code_popup_message">"Póngase en contacto con la gestión de la prueba si no ha recibido un código QR."</string>
     <string name="error_play_store_and_scanning_not_available">"Ni PlayStore ni el escaneado están disponibles."</string>
     <string name="scanning_cancelled">"Escaneado cancelado"</string>
     <string name="error_scanning_qrcode">"Error al escanear el código QR {result-code}"</string>

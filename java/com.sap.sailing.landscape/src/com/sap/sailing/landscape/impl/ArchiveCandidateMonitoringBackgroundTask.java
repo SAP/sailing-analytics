@@ -123,8 +123,8 @@ public class ArchiveCandidateMonitoringBackgroundTask implements Runnable {
      */
     private final String effectiveBearerToken;
     
-    private Iterable<Check> checks;
-    private Iterator<Check> checksIterator;
+    private final Iterable<Check> checks;
+    private final Iterator<Check> checksIterator;
     private Check currentCheck;
     
     public ArchiveCandidateMonitoringBackgroundTask(User currentUser, LandscapeService landscapeService,
@@ -169,9 +169,9 @@ public class ArchiveCandidateMonitoringBackgroundTask implements Runnable {
             } else {
                 rescheduleCurrentCheckAfterFailureOrTimeout();
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.warning("Exception while running check \"" + currentCheck + "\" for candidate " + replicaSet.getMaster().getHost().getHostname() + ": " + e.getMessage());
-            currentCheck.setLastFailureMessage(e.getMessage());
+            currentCheck.setLastFailureMessage(e.getMessage()==null?e.getClass().getSimpleName():e.getMessage());
             try {
                 rescheduleCurrentCheckAfterFailureOrTimeout();
             } catch (MailException e1) {

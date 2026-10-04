@@ -44,7 +44,7 @@ public class Wait {
     /**
      * Keeps evaluating {@code callable} until the result is tested successfully by the {@code successPredicate}, or the
      * timeout, if provided in {@code optionalTimeoutEmptyMeansForever}, has expired. At least one attempt is made,
-     * regarless how small the timeout. Sleeps {@code sleepBetweenAttempts} between subsequent attempts. Note that once
+     * regardless how small the timeout. Sleeps {@code sleepBetweenAttempts} between subsequent attempts. Note that once
      * decided for starting another evaluation, that evaluation may surpass the timeout; but no new evaluation will be
      * started after the timeout has expired. The {@code condition} will be evaluated at least once, even if a timeout
      * of zero seconds has been specified. If no timeout is provided, the method will keep evaluating the

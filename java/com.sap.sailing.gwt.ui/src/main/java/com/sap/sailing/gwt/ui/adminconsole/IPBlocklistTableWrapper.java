@@ -17,6 +17,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.sap.sailing.gwt.ui.client.SailingServiceWriteAsync;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sse.gwt.client.ErrorReporter;
+import com.sap.sse.gwt.client.async.MarkedAsyncCallback;
 import com.sap.sse.gwt.client.celltable.EntityIdentityComparator;
 import com.sap.sse.gwt.client.celltable.RefreshableSelectionModel;
 import com.sap.sse.gwt.client.panels.LabeledAbstractFilterablePanel;
@@ -106,7 +107,7 @@ abstract class IPBlocklistTableWrapper
                     @Override
                     public void onClick(ClickEvent event) {
                         for (IpToTimedLockDTO e : getSelectionModel().getSelectedSet()) {
-                            unlockIP(e.getIp(), new AsyncCallback<Void>() {
+                            unlockIP(e.getIp(), new MarkedAsyncCallback<>(new AsyncCallback<Void>() {
                                 @Override
                                 public void onFailure(Throwable caught) {
                                     errorReporter.reportError(errorMessageOnDataFailureString);
@@ -116,26 +117,27 @@ abstract class IPBlocklistTableWrapper
                                 public void onSuccess(Void result) {
                                     filterField.remove(e);
                                 }
-                            });
+                            }));
                         }
                     }
                 });
     }
 
     private void loadDataAndPopulateTable() {
-        final AsyncCallback<ArrayList<IpToTimedLockDTO>> dataInitializationCallback = new AsyncCallback<ArrayList<IpToTimedLockDTO>>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                errorReporter.reportError(errorMessageOnDataFailureString);
-            }
+        final AsyncCallback<ArrayList<IpToTimedLockDTO>> dataInitializationCallback = new MarkedAsyncCallback<>(
+                new AsyncCallback<ArrayList<IpToTimedLockDTO>>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        errorReporter.reportError(errorMessageOnDataFailureString);
+                    }
 
-            @Override
-            public void onSuccess(ArrayList<IpToTimedLockDTO> result) {
-                filterField.clear();
-                clear();
-                filterField.addAll(result);
-            }
-        };
+                    @Override
+                    public void onSuccess(ArrayList<IpToTimedLockDTO> result) {
+                        filterField.clear();
+                        clear();
+                        filterField.addAll(result);
+                    }
+                });
         fetchData(dataInitializationCallback);
     }
 

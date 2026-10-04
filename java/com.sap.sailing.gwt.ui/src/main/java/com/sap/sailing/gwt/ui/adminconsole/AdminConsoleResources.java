@@ -118,6 +118,9 @@ public interface AdminConsoleResources extends ClientBundle {
 
     @Source("com/sap/sailing/gwt/ui/client/images/compose_mail_small.png")
     ImageResource inviteBuoyTenders();
+
+    @Source("com/sap/sailing/gwt/ui/client/images/eraser-icon.png")
+    ImageResource eraser();
     
     @Source("com/sap/sailing/gwt/ui/client/images/ajax-loader.gif")
     ImageResource loaderGif();

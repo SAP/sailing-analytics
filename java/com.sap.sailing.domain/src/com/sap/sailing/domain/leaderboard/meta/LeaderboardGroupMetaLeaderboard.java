@@ -9,6 +9,7 @@ import com.sap.sailing.domain.base.RaceColumnListener;
 import com.sap.sailing.domain.base.impl.TrackedRaces;
 import com.sap.sailing.domain.common.LeaderboardNameConstants;
 import com.sap.sailing.domain.common.LeaderboardType;
+import com.sap.sailing.domain.leaderboard.HasCourseAreasListener;
 import com.sap.sailing.domain.leaderboard.Leaderboard;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroup;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroupListener;
@@ -97,6 +98,14 @@ public class LeaderboardGroupMetaLeaderboard extends AbstractMetaLeaderboard imp
         return Collections.emptySet();
     }
     
+    @Override
+    public void addCourseAreaChangeListener(HasCourseAreasListener listener) {
+    }
+
+    @Override
+    public void removeCourseAreaChangeListener(HasCourseAreasListener listener) {
+    }
+
     @Override
     public LeaderboardType getLeaderboardType() {
         return LeaderboardType.RegattaMetaLeaderboard;

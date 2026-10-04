@@ -17,6 +17,7 @@ import com.sap.sse.gwt.client.DefaultErrorReporter;
 import com.sap.sse.gwt.client.EntryPointHelper;
 import com.sap.sse.gwt.client.ErrorReporter;
 import com.sap.sse.gwt.client.StringMessages;
+import com.sap.sse.gwt.client.async.MarkedAsyncCallback;
 import com.sap.sse.security.shared.dto.StrippedUserGroupDTO;
 import com.sap.sse.security.shared.dto.UserDTO;
 import com.sap.sse.security.ui.client.DefaultWithSecurityImpl;
@@ -78,7 +79,8 @@ public class ManagementConsoleClientFactoryImpl implements ManagementConsoleClie
     }
 
     protected void checkPublicServerNonPublicUserWarning() {
-        sailingService.getServerConfiguration(new AsyncCallback<ServerConfigurationDTO>() {
+        sailingService.getServerConfiguration(new MarkedAsyncCallback<ServerConfigurationDTO>(
+                new AsyncCallback<ServerConfigurationDTO>() {
             @Override
             public void onFailure(Throwable caught) {
             }
@@ -110,8 +112,8 @@ public class ManagementConsoleClientFactoryImpl implements ManagementConsoleClie
             private void changeDefaultTenantForCurrentUser(final StrippedUserGroupDTO serverTenant) {
                 final UserDTO user = getUserService().getCurrentUser();
                 getUserManagementWriteService().updateUserProperties(user.getName(), user.getFullName(),
-                        user.getCompany(), user.getLocale(), serverTenant.getId().toString(),
-                        new AsyncCallback<UserDTO>() {
+                        user.getCompany(), user.getLocale(), user.getDidOptOutOfFeatureAndCommunityEmails(),
+                        serverTenant.getId().toString(), new AsyncCallback<UserDTO>() {
                             @Override
                             public void onFailure(Throwable caught) {
                                 Window.alert(caught.getMessage());
@@ -123,7 +125,7 @@ public class ManagementConsoleClientFactoryImpl implements ManagementConsoleClie
                             }
                         });
             }
-        });
+        }));
     }
 
     @Override

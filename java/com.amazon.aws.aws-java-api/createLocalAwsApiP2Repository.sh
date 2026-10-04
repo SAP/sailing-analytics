@@ -88,7 +88,7 @@ echo "Building the wrapper bundle..."
 cd ..
 echo "NOT USING ${extra} arguments for Maven to avoid using local target definition already for building local repo"
 echo "In folder $(pwd) using: mvn clean install"
-mvn --batch-mode clean install
+JAVA_HOME=${JAVA8_HOME} mvn --batch-mode clean install
 mkdir -p ${UPDATE_SITE_PROJECT}/plugins/aws-sdk
 rm -rf ${UPDATE_SITE_PROJECT}/plugins/aws-sdk/*
 # Note: the JAR ends up in target/ because the SDK project does not use any parent pom, so
@@ -128,7 +128,7 @@ echo "Patching update site's site.xml..."
 sed -i -e 's/com.amazon.aws.aws-java-api\(\.source\)\?_\([0-9.]*\)\.jar/com.amazon.aws.aws-java-api\1_'${VERSION}'.jar/' -e '/feature url=/s/version="[0-9.]*"/version="'${VERSION}'"/' ${SITE_XML}
 echo "Building update site..."
 echo "In folder $(pwd) using: mvn ${extra} clean install"
-mvn ${extra} clean install
+JAVA_HOME=${JAVA8_HOME} mvn ${extra} clean install
 echo "Patching SDK version ${VERSION} in target platform definition ${TARGET_DEFINITION}..."
 sed -i -e 's/<unit id="com.amazon.aws.aws-java-api.feature.group" version="[0-9.]*"\/>/<unit id="com.amazon.aws.aws-java-api.feature.group" version="'${VERSION}'"\/>/' ${TARGET_DEFINITION}
 echo "You may test your target platform locally by creating race-analysis-p2-local.target by running the script createLocalTargetDef.sh."

@@ -35,7 +35,7 @@ public class TestConnectorsResultImportUrls extends AbstractSeleniumTest {
     }
 
     @SeleniumTestCase
-    public void testUrlInlineDeletion() {
+    public void testUrlInlineDeletion() throws InterruptedException {
         final ResultImportUrlsPanelPO resultImportUrlsPanel = goToResultImportUrlsPanel();
         resultImportUrlsPanel.selectUrlProviderByLabel(TEST_URL_PROVIDER_LABEL);
         // add

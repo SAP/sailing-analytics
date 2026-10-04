@@ -3,6 +3,7 @@ package com.sap.sailing.gwt.ui.shared;
 import java.util.Date;
 
 import com.sap.sailing.domain.common.security.SecuredDomainType;
+import com.sap.sse.common.Named;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.security.shared.HasPermissions;
 import com.sap.sse.security.shared.QualifiedObjectIdentifier;
@@ -12,7 +13,7 @@ import com.sap.sse.security.shared.dto.OwnershipDTO;
 import com.sap.sse.security.shared.dto.SecuredDTO;
 import com.sap.sse.security.shared.dto.SecurityInformationDTO;
 
-public class IgtimiDataAccessWindowWithSecurityDTO implements SecuredDTO {
+public class IgtimiDataAccessWindowWithSecurityDTO implements SecuredDTO, Named {
     private static final long serialVersionUID = 176992188692729118L;
     private SecurityInformationDTO securityInformation = new SecurityInformationDTO();
 

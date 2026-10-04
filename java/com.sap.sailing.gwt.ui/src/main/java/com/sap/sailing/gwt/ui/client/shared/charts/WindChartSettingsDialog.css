@@ -1,0 +1,91 @@
+.statButton {
+    display: inline-block;
+    padding: 2px 6px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #666;
+    background-color: #e8e8e8;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    cursor: pointer;
+    min-width: 30px;
+    text-align: center;
+    margin: 1px;
+    user-select: none;
+}
+
+.statButton:hover {
+    background-color: #d0d0d0;
+}
+
+.statButtonActive {
+    color: #fff;
+    background-color: #2060C0;
+    border-color: #1a4a99;
+}
+
+.statButtonActive:hover {
+    background-color: #1a4a99;
+}
+
+.statButtonIndeterminate {
+    color: #fff;
+    background-color: #7aa3e0;
+    border-color: #5580c0;
+}
+
+.statButtonIndeterminate:hover {
+    background-color: #5580c0;
+}
+
+.statButtonBulkActive {
+    color: #fff;
+    background-color: #F0AB00;
+    border-color: #b07d00;
+}
+
+.statButtonBulkActive:hover {
+    background-color: #b07d00;
+}
+
+.statButtonBulkIndeterminate {
+    color: #fff;
+    background-color: #f5cc55;
+    border-color: #b07d00;
+}
+
+.statButtonBulkIndeterminate:hover {
+    background-color: #d4a800;
+}
+
+.statButtonSectionDisabled {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
+}
+
+.toAllSelectedLabel {
+    padding-left: 4px;
+    font-style: italic;
+    color: #555;
+    font-size: 11px;
+}
+
+.sourceCheckboxIndent {
+    padding-left: 16px;
+}
+
+.accentCheckbox input[type="checkbox"] {
+    accent-color: #F0AB00;
+}
+
+.sectionDivider {
+    border-left: 1px solid #cccccc;
+    margin: 0 8px;
+}
+
+.sourceFillerLabel {
+    color: #aaa;
+    font-size: 12px;
+    padding: 2px 0;
+}

@@ -1,5 +1,6 @@
 package com.sap.sailing.selenium.core;
 
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -80,7 +81,7 @@ public class WindowManager {
         // Open a new window using JavaScript
         ((JavascriptExecutor) driver).executeScript("window.open('about:blank','_blank');");
         // Wait until the new window appears
-        new WebDriverWait(driver, /* seconds */ 5).until(d -> d.getWindowHandles().size() > 1);
+        new WebDriverWait(driver, /* seconds */ Duration.ofSeconds(5)).until(d -> d.getWindowHandles().size() > 1);
         // Identify the new window handle
         String extraWindowHandle = driver.getWindowHandles().stream()
             .filter(handle -> !handle.equals(originalWindowHandle))

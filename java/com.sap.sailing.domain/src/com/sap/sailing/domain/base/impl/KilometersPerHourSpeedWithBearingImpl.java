@@ -5,7 +5,6 @@ import com.sap.sse.common.CourseChange;
 import com.sap.sse.common.Position;
 import com.sap.sse.common.Speed;
 import com.sap.sse.common.SpeedWithBearing;
-import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.impl.AbstractSpeedWithAbstractBearingImpl;
 import com.sap.sse.common.impl.AbstractSpeedWithBearingImpl;
 import com.sap.sse.common.impl.KilometersPerHourSpeedImpl;
@@ -22,11 +21,6 @@ public class KilometersPerHourSpeedWithBearingImpl extends KilometersPerHourSpee
     @Override
     public Bearing getBearing() {
         return bearing;
-    }
-
-    @Override
-    public Position travelTo(Position pos, TimePoint from, TimePoint to) {
-        return pos.translateGreatCircle(getBearing(), this.travel(from, to));
     }
 
     @Override

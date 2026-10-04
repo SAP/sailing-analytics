@@ -12,23 +12,21 @@ import com.sap.sailing.selenium.pages.PageArea;
 import com.sap.sailing.selenium.pages.gwt.ListBoxPO;
 
 public class MediaUploadDialogPO extends PageArea {
-    @FindBy(how = BySeleniumId.class, using = "urlInput")
-    private WebElement urlTextBox;
-    
     @FindBy(how = BySeleniumId.class, using = "cancelButton")
     private WebElement cancelButton;
     
     @FindBy(how = BySeleniumId.class, using = "mimeTypeListBox")
     private List<WebElement> mimeTypeListBoxes;
 
-    public MediaUploadDialogPO(WebDriver driver, WebElement element) {
+    public MediaUploadDialogPO(final WebDriver driver, final WebElement element) {
         super(driver, element);
     }
     
-    public void enterUrl(String url) {
-        urlTextBox.clear();
-        urlTextBox.sendKeys(url);
-        urlTextBox.sendKeys(Keys.TAB);
+    public void enterUrl(final String url) {
+        final WebElement interactableUrlTextBox = waitUntilInteractable(() -> findElementBySeleniumId("urlInput"));
+        interactableUrlTextBox.clear();
+        interactableUrlTextBox.sendKeys(url);
+        interactableUrlTextBox.sendKeys(Keys.TAB);
     }
     
     public void getMimeTypeString(int index, String expectedValue) {

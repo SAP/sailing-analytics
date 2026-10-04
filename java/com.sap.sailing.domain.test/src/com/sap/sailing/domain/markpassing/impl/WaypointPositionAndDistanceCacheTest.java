@@ -79,7 +79,7 @@ public class WaypointPositionAndDistanceCacheTest {
         trackedRace = new DynamicTrackedRaceImpl(trackedRegatta, race, Collections.emptyList(), EmptyWindStore.INSTANCE,
                 /* delayToLiveInMillis */ 8000, /* millisecondsOverWhichToAverageWind */ 30000,
                 /* millisecondsOverWhichToAverageSpeed */ 15000, /* delayForCacheInvalidationOfWindEstimation */ 10000,
-                /* useInternalMarkPassingAlgorithm */ false, OneDesignRankingMetric::new, mock(RaceLogAndTrackedRaceResolver.class), null, /* markPassingRaceFingerprintRegistry */ null);
+                /* useInternalMarkPassingAlgorithm */ false, OneDesignRankingMetric::new, mock(RaceLogAndTrackedRaceResolver.class), null, /* markPassingRaceFingerprintRegistry */ null, /* maneuverRaceFingerprintRegistry */ null);
         timeRangeResolution = Duration.ONE_MINUTE;
         now = new MillisecondsTimePoint(MillisecondsTimePoint.now().asMillis() / timeRangeResolution.asMillis() * timeRangeResolution.asMillis());
         trackedRace.getOrCreateTrack(pinEnd).addGPSFix(new GPSFixImpl(new DegreePosition(0, -0.0000001), now));

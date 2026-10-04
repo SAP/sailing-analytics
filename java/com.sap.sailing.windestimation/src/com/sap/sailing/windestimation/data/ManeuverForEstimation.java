@@ -14,13 +14,8 @@ import com.sap.sse.common.TimePoint;
  * @author Vladislav Chumak (D069712)
  *
  */
-public class ManeuverForEstimation implements Comparable<ManeuverForEstimation> {
+public class ManeuverForEstimation extends SimpleManeuverForEstimationImpl {
 
-    private final TimePoint maneuverTimePoint;
-    private final Position maneuverPosition;
-    private final Bearing middleCourse;
-    private final SpeedWithBearing speedWithBearingBefore;
-    private final SpeedWithBearing speedWithBearingAfter;
     private final double courseChangeInDegrees;
     private final double courseChangeWithinMainCurveInDegrees;
     private final double maxTurningRateInDegreesPerSecond;
@@ -29,7 +24,6 @@ public class ManeuverForEstimation implements Comparable<ManeuverForEstimation> 
     private final double speedLossRatio;
     private final double speedGainRatio;
     private final double lowestSpeedVsExitingSpeedRatio;
-    private final boolean clean;
     private final ManeuverCategory maneuverCategory;
     private final double scaledSpeedBefore;
     private final double scaledSpeedAfter;
@@ -46,11 +40,7 @@ public class ManeuverForEstimation implements Comparable<ManeuverForEstimation> 
             double lowestSpeedVsExitingSpeedRatio, boolean clean, ManeuverCategory maneuverCategory,
             double scaledSpeedBefore, double scaledSpeedAfter, boolean markPassing, BoatClass boatClass,
             boolean markPassingDataAvailable, String competitorName) {
-        this.maneuverTimePoint = maneuverTimePoint;
-        this.maneuverPosition = maneuverPosition;
-        this.middleCourse = middleCourse;
-        this.speedWithBearingBefore = speedWithBearingBefore;
-        this.speedWithBearingAfter = speedWithBearingAfter;
+        super(maneuverTimePoint, maneuverPosition, middleCourse, speedWithBearingBefore, speedWithBearingAfter, clean, boatClass);
         this.courseChangeInDegrees = courseChangeInDegrees;
         this.courseChangeWithinMainCurveInDegrees = courseChangeWithinMainCurveInDegrees;
         this.maxTurningRateInDegreesPerSecond = maxTurningRateInDegreesPerSecond;
@@ -59,7 +49,6 @@ public class ManeuverForEstimation implements Comparable<ManeuverForEstimation> 
         this.speedLossRatio = speedLossRatio;
         this.speedGainRatio = speedGainRatio;
         this.lowestSpeedVsExitingSpeedRatio = lowestSpeedVsExitingSpeedRatio;
-        this.clean = clean;
         this.maneuverCategory = maneuverCategory;
         this.scaledSpeedBefore = scaledSpeedBefore;
         this.scaledSpeedAfter = scaledSpeedAfter;
@@ -67,26 +56,6 @@ public class ManeuverForEstimation implements Comparable<ManeuverForEstimation> 
         this.boatClass = boatClass;
         this.markPassingDataAvailable = markPassingDataAvailable;
         this.competitorName = competitorName;
-    }
-
-    public TimePoint getManeuverTimePoint() {
-        return maneuverTimePoint;
-    }
-
-    public Position getManeuverPosition() {
-        return maneuverPosition;
-    }
-
-    public Bearing getMiddleCourse() {
-        return middleCourse;
-    }
-
-    public SpeedWithBearing getSpeedWithBearingBefore() {
-        return speedWithBearingBefore;
-    }
-
-    public SpeedWithBearing getSpeedWithBearingAfter() {
-        return speedWithBearingAfter;
     }
 
     public double getCourseChangeInDegrees() {
@@ -121,10 +90,6 @@ public class ManeuverForEstimation implements Comparable<ManeuverForEstimation> 
         return lowestSpeedVsExitingSpeedRatio;
     }
 
-    public boolean isClean() {
-        return clean;
-    }
-
     public ManeuverCategory getManeuverCategory() {
         return maneuverCategory;
     }
@@ -154,13 +119,8 @@ public class ManeuverForEstimation implements Comparable<ManeuverForEstimation> 
     }
 
     @Override
-    public int compareTo(ManeuverForEstimation o) {
-        return maneuverTimePoint.compareTo(o.maneuverTimePoint);
-    }
-
-    @Override
     public String toString() {
-        return "Maneuver at " + maneuverTimePoint + ", "
-                + maneuverPosition + ", middleCourse=" + middleCourse + ", courseChangeInDegrees=" + courseChangeInDegrees;
+        return "Maneuver at " + getManeuverTimePoint() + ", "
+                + getManeuverPosition() + ", middleCourse=" + getMiddleCourse() + ", courseChangeInDegrees=" + courseChangeInDegrees;
     }
 }

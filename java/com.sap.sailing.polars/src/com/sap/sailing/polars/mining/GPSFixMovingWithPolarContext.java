@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.sap.sailing.domain.base.BoatClass;
+import com.sap.sailing.domain.base.CPUMeteringType;
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.SpeedWithBearingWithConfidence;
 import com.sap.sailing.domain.common.LegType;
@@ -54,7 +55,9 @@ public class GPSFixMovingWithPolarContext implements LegTypePolarClusterKey, Ang
         this.angleClusterGroup = angleClusterGroup;
         this.windSourcesToExcludeForSpeed = collectWindSourcesToIgnoreForSpeed();
         this.absTrueWindAngle = computeTrueWindAngleAbsolute();
-        this.wind = race.getWindWithConfidence(fix.getPosition(), fix.getTimePoint(), windSourcesToExcludeForSpeed);
+        this.wind = race.getTrackedRegatta().getCPUMeter().callWithCPUMeter(
+                () -> race.getWindWithConfidence(fix.getPosition(), fix.getTimePoint(), windSourcesToExcludeForSpeed),
+                CPUMeteringType.BACKEND_POLARS.name());
         this.boatSpeed = computeBoatSpeed();
     }
 

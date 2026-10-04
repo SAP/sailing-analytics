@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.sap.sailing.domain.base.CourseArea;
 import com.sap.sailing.domain.common.LeaderboardType;
+import com.sap.sailing.domain.leaderboard.HasCourseAreasListener;
 import com.sap.sailing.domain.leaderboard.Leaderboard;
 import com.sap.sailing.domain.leaderboard.ScoringScheme;
 import com.sap.sailing.domain.leaderboard.ThresholdBasedResultDiscardingRule;
@@ -64,6 +65,14 @@ public class FlexibleMetaLeaderboard extends AbstractMetaLeaderboard {
         return Collections.emptySet();
     }
     
+    @Override
+    public void addCourseAreaChangeListener(HasCourseAreasListener listener) {
+    }
+
+    @Override
+    public void removeCourseAreaChangeListener(HasCourseAreasListener listener) {
+    }
+
     @Override
     public LeaderboardType getLeaderboardType() {
         return LeaderboardType.FlexibleMetaLeaderboard;

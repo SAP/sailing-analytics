@@ -5,19 +5,15 @@
     <ui:with field="res" type="com.sap.sailing.gwt.common.client.SharedResources" />
     <ui:with field="local_res" type="com.sap.sailing.gwt.home.shared.partials.multiselection.SuggestedMultiSelectionResources" />
     <g:HTMLPanel addStyleNames="{local_res.css.suggestions}">
-        <div class="{local_res.css.suggestionsHeader}">
-            <span class="{local_res.css.suggestionsHeaderTitle}" ui:field="headerTitleUi" />
-        </div>
         <div class="{local_res.css.suggestionsContent}">
-            <g:FlowPanel ui:field="notificationToggleContainerUi" />
             <div ui:field="contentSeparatorUi" class="{local_res.css.suggestionsContentSeparator}"></div>
             <div class="{local_res.css.suggestionsContentToolbar}">
-                <sp:filter.AbstractFilterWidget addStyleNames="{local_res.css.suggestionsAddFilter}" ui:field="suggestionWidgetUi" />
+                <sp:filter.AbstractFilterWidget addStyleNames="{local_res.css.suggestionsAddFilter}" ui:field="searchUi" />
                 <g:Button addStyleNames="{res.mainCss.button} {res.mainCss.buttonred} {local_res.css.suggestionsRemoveButton}" ui:field="removeAllButtonUi">
                     <ui:text from="{i18n.removeAll}"/>
                 </g:Button>
             </div>
-            <g:FlowPanel addStyleNames="{local_res.css.suggestionsContentTable}" ui:field="itemContainerUi" />
+            <g:FlowPanel addStyleNames="{local_res.css.suggestionsContentTable}" ui:field="selectedItemsUi" />
         </div>
     </g:HTMLPanel>
 </ui:UiBinder> 

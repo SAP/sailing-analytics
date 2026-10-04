@@ -1,8 +1,8 @@
-"NSLocationAlwaysUsageDescription" = "Para poder realizar el rastreo de toda una carrera, es necesario que su teléfono continúe rastreando cuando apague o bloquee la pantalla, lo que ayuda a ahorrar batería y evita tener que parar el proceso de rastreo de forma involuntaria.";
+"NSLocationAlwaysUsageDescription" = "Para poder realizar el rastreo de toda una prueba, es necesario que su teléfono continúe rastreando cuando apague o bloquee la pantalla, lo que ayuda a ahorrar batería y evita tener que parar el proceso de rastreo de forma involuntaria.";
 
-"NSLocationWhenInUseUsageDescription" = "Para poder realizar el rastreo de toda una carrera, es necesario que su teléfono continúe rastreando cuando apague o bloquee la pantalla, lo que ayuda a ahorrar batería y evita tener que parar el proceso de rastreo de forma involuntaria.";
+"NSLocationWhenInUseUsageDescription" = "Para poder realizar el rastreo de toda una prueba, es necesario que su teléfono continúe rastreando cuando apague o bloquee la pantalla, lo que ayuda a ahorrar batería y evita tener que parar el proceso de rastreo de forma involuntaria.";
 
-"NSLocationAlwaysAndWhenInUseUsageDescription" = "Para poder realizar el rastreo de toda una carrera, es necesario que su teléfono continúe rastreando cuando apague o bloquee la pantalla, lo que ayuda a ahorrar batería y evita tener que parar el proceso de rastreo de forma involuntaria.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "Para poder realizar el rastreo de toda una prueba, es necesario que su teléfono continúe rastreando cuando apague o bloquee la pantalla, lo que ayuda a ahorrar batería y evita tener que parar el proceso de rastreo de forma involuntaria.";
 
 "NSCameraUsageDescription" = "La cámara es necesaria para realizar el check in usando el código QR.";
 

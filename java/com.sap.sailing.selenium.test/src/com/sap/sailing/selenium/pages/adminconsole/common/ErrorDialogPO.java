@@ -36,7 +36,7 @@ public class ErrorDialogPO extends PageArea {
             throw new RuntimeException("The expected title '" + titlePart + "' does not match the actual title '"
                     + titleText + "' in the error box.");
         }
-        close.click();
+        close();
     }
     
     public void assertServerResponseContainsTextAndClose(String serverResponsePart) {
@@ -45,7 +45,12 @@ public class ErrorDialogPO extends PageArea {
             throw new RuntimeException("The expected server response '" + serverResponsePart + "' does not match the actual server response '"
                     + serverResponseText + "' in the error box.");
         }
-        close.click();
+        close();
+    }
+
+    private void close() {
+        clickWhenInteractable(() -> findElementBySeleniumId("ErrorDialogCloseButton"));
+        waitForElementNotExistsBySeleniumId(driver, "ErrorDialog");
     }
 
 }

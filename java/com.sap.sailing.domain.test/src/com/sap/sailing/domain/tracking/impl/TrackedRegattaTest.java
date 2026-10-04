@@ -124,6 +124,6 @@ public class TrackedRegattaTest {
         RaceDefinition race1 = new RaceDefinitionImpl(name, course, boatClass, Collections.emptyMap());
         return new DynamicTrackedRaceImpl(regatta, race1, Collections.<Sideline> emptyList(),
                 EmptyWindStore.INSTANCE, 0, 0, 0, /* useMarkPassingCalculator */ false, OneDesignRankingMetric::new,
-                mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null);
+                mock(RaceLogAndTrackedRaceResolver.class), /* trackingConnectorInfo */ null, /* markPassingRaceFingerprintRegistry */ null, /* maneuverRaceFingerprintRegistry */ null);
     }
 }

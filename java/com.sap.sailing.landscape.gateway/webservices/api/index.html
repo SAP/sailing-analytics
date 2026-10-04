@@ -68,13 +68,37 @@ For questions and support please get in touch through <a href="mailto:support@sa
         <td><a href="createapplicationreplicaset.html">/sailinglandscape/api/createapplicationreplicaset</a></td>
         <td>Creates a new application server replica set</td>
     </tr>
+    <tr>
+        <td><a href="upgradeapplicationreplicaset.html">/sailinglandscape/api/upgradeapplicationreplicaset</a></td>
+        <td>Upgrades an existing application server replica set to a different (by default the latest) release</td>
+    </tr>
+    <tr>
+        <td><a href="stopreplicatingandremovemasterfromtargetgroups.html">/sailinglandscape/api/stopreplicatingandremovemasterfromtargetgroups</a></td>
+        <td>Ensures at least one replica exists, stops replication and de-registers the master from its target groups</td>
+    </tr>
 	<tr>
 		<td><a href="movetoarchiveserver.html">/sailinglandscape/api/movetoarchiveserver</a></td>
 		<td>Archives an existing application server replica set's contents</td>
 	</tr>
     <tr>
+        <td><a href="moveallapplicationprocessesawayfrom.html">/sailinglandscape/api/moveallapplicationprocessesawayfrom</a></td>
+        <td>Moves all application processes off a shared multi-instance host onto another instance</td>
+    </tr>
+    <tr>
         <td><a href="removeapplicationreplicaset.html">/sailinglandscape/api/removeapplicationreplicaset</a></td>
         <td>Removes an application server replica set without archiving it</td>
+    </tr>
+    <tr>
+        <td><a href="livecontentcheck.html">/sailinglandscape/api/livecontentcheck</a></td>
+        <td>Checks one or more replica sets for live content (races currently tracked live) without changing anything</td>
+    </tr>
+    <tr>
+        <td><a href="gethostseligibleforreplicasetprocessdeployment.html">/sailinglandscape/api/gethostseligibleforreplicasetprocessdeployment</a></td>
+        <td>Lists the shared hosts eligible for deploying an additional process of a replica set</td>
+    </tr>
+    <tr>
+        <td><a href="deployreplicatoexistinghost.html">/sailinglandscape/api/deployreplicatoexistinghost</a></td>
+        <td>Deploys an additional replica of a replica set onto an existing (possibly shared) host</td>
     </tr>
     <tr>
         <td><a href="usededicatedautoscalingreplicasinsteadofshared.html">/sailinglandscape/api/usededicatedautoscalingreplicasinsteadofshared</a></td>
@@ -83,6 +107,10 @@ For questions and support please get in touch through <a href="mailto:support@sa
     <tr>
         <td><a href="usesinglesharedinsteadofdedicatedautoscalingreplica.html">/sailinglandscape/api/usesinglesharedinsteadofdedicatedautoscalingreplica</a></td>
         <td>Use a replica on a shared instance instead of forcing a dedicated auto-scaling replica.</td>
+    </tr>
+    <tr>
+        <td><a href="changeautoscalingreplicasinstancetype.html">/sailinglandscape/api/changeautoscalingreplicasinstancetype</a></td>
+        <td>Changes the instance type used by a replica set's auto-scaling replicas</td>
     </tr>
     <tr>
         <td><a href="movemastertootherinstance.html">/sailinglandscape/api/movemastertootherinstance</a></td>

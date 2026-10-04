@@ -6,7 +6,7 @@ import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.sap.sailing.gwt.home.shared.app.AbstractPlaceNavigator;
+import com.sap.sailing.landscape.common.SharedLandscapeConstants;
 import com.sap.sse.gwt.client.mvp.ErrorView;
 
 public abstract class AbstractErrorActivity extends AbstractActivity {
@@ -25,7 +25,7 @@ public abstract class AbstractErrorActivity extends AbstractActivity {
         if (currentPlace.isReloadedError()) {
             // When the error place is reloaded, we cannot go to the place where we were coming from.
             // To avoid the reload of the error page itself, we will redirect to the main page instead.
-            Window.Location.assign(AbstractPlaceNavigator.DEFAULT_SAPSAILING_SERVER_URL);
+            Window.Location.assign(SharedLandscapeConstants.DEFAULT_SAILING_SERVER_URL);
         } else {
             final String message = currentPlace.getErrorMessage();
             final String details = currentPlace.getErrorMessageDetail();

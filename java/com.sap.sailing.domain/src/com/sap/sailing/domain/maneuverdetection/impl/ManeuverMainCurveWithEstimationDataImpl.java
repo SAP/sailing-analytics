@@ -14,7 +14,7 @@ import com.sap.sse.common.TimePoint;
  */
 public class ManeuverMainCurveWithEstimationDataImpl extends ManeuverCurveBoundariesImpl
         implements ManeuverMainCurveWithEstimationData {
-
+    private static final long serialVersionUID = -4524731853320916173L;
     private final TimePoint lowestSpeedTimePoint;
     private final TimePoint highestSpeedTimePoint;
     private final TimePoint timePointOfMaxTurningRate;

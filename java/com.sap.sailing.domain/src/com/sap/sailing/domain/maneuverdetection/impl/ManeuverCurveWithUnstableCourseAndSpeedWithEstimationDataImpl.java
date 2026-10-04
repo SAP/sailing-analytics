@@ -9,7 +9,7 @@ import com.sap.sse.common.TimePoint;
 
 public class ManeuverCurveWithUnstableCourseAndSpeedWithEstimationDataImpl extends ManeuverCurveBoundariesImpl
         implements ManeuverCurveWithUnstableCourseAndSpeedWithEstimationData {
-
+    private static final long serialVersionUID = 1227678171850468360L;
     private final SpeedWithBearing averageSpeedWithBearingBefore;
     private final Duration durationFromPreviousManeuverEndToManeuverStart;
     private final SpeedWithBearing averageSpeedWithBearingAfter;

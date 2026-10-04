@@ -3,7 +3,8 @@ package com.sap.sailing.windestimation.windinference;
 import java.util.List;
 
 import com.sap.sailing.domain.tracking.WindWithConfidence;
-import com.sap.sailing.windestimation.data.ManeuverWithEstimatedType;
+import com.sap.sailing.windestimation.data.SimpleManeuverForEstimation;
+import com.sap.sailing.windestimation.data.SimpleManeuverWithEstimatedType;
 import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util.Pair;
@@ -17,6 +18,6 @@ import com.sap.sse.common.Util.Pair;
 public interface WindTrackCalculator {
 
     List<WindWithConfidence<Pair<Position, TimePoint>>> getWindTrackFromManeuverClassifications(
-            List<ManeuverWithEstimatedType> aggregatedManeuverClassifications);
+            List<? extends SimpleManeuverWithEstimatedType<? extends SimpleManeuverForEstimation>> aggregatedManeuverClassifications);
 
 }

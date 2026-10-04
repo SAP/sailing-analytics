@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.jcraft.jsch.JSchException;
@@ -76,6 +77,7 @@ import software.amazon.awssdk.services.route53.model.RRType;
  * @author Axel Uhl (D043530)
  *
  */
+@Disabled("This requires an AWS token in the launch configuration")
 public class TestProcedures {
     private static final Logger logger = Logger.getLogger(TestProcedures.class.getName());
     private static final Optional<Duration> optionalTimeout = Optional.of(Duration.ONE_MINUTE.times(10));

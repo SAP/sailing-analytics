@@ -16,7 +16,6 @@ import com.sap.sailing.domain.common.NauticalSide;
 import com.sap.sailing.domain.common.NoWindException;
 import com.sap.sailing.domain.common.Tack;
 import com.sap.sailing.domain.common.Wind;
-import com.sap.sailing.domain.common.WindSourceType;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.maneuverdetection.ApproximatedFixesCalculator;
 import com.sap.sailing.domain.maneuverdetection.ManeuverDetector;
@@ -55,6 +54,13 @@ import com.sap.sse.common.impl.MillisecondsTimePoint;
  *
  */
 public class ManeuverDetectorImpl extends AbstractManeuverDetectorImpl {
+    
+    /**
+     * This {@link #DETECTOR_VERSION} variable indicates the version of the {@link ManeuverDetector} and must be changed
+     * manually when changing the calculator. It should be changed by adding +1;
+     */
+    public static final int DETECTOR_VERSION = 1;
+
 
     private static final Logger logger = Logger.getLogger(ManeuverDetectorImpl.class.getName());
 
@@ -325,8 +331,7 @@ public class ManeuverDetectorImpl extends AbstractManeuverDetectorImpl {
         }
         TimePoint maneuverTimePoint = maneuverCurve.getMainCurveBoundaries().getTimePoint();
         Position maneuverPosition = track.getEstimatedPosition(maneuverTimePoint, /* extrapolate */false);
-        final Wind wind = trackedRace.getWind(maneuverPosition, maneuverTimePoint,
-                /* exclude */ trackedRace.getWindSources(WindSourceType.MANEUVER_BASED_ESTIMATION));
+        final Wind wind = trackedRace.getWind(maneuverPosition, maneuverTimePoint);
         List<Maneuver> maneuvers = determineManeuversFromManeuverCurve(maneuverCurve.getMainCurveBoundaries(),
                 maneuverCurve.getManeuverCurveWithStableSpeedAndCourseBoundaries(), wind,
                 maneuverCurve.getMarkPassing());

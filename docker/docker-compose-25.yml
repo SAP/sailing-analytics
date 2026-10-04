@@ -1,7 +1,7 @@
 version: "3.10"
 services:
   sailing-analytics:
-    image: "ghcr.io/sap/sailing-analytics:latest-25"
+    image: "ghcr.io/eclipse-sailing-analytics/sailing-analytics:latest-25"
     ports:
       - "8888:8888"
       - "6666:6666"

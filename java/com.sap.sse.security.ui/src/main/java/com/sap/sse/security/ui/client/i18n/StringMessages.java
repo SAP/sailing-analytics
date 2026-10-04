@@ -233,4 +233,5 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages {
     String clientCurrentlyLockedForUserCreation();
     String unlockedSuccessfully();
     String failedToUnlock();
+    String optOutOfFeatureAndCommunityEmails();
 }

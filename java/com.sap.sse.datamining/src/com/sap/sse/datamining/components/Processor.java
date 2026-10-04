@@ -52,4 +52,19 @@ public interface Processor<InputType, ResultType> {
      */
     public AdditionalResultDataBuilder getAdditionalResultData(AdditionalResultDataBuilder additionalDataBuilder);
 
+    /**
+     * Enqueues a callback for the event where this processor has finished processing what it has been
+     * provided so far through calls to {@link #processElement(Object)}. Subclasses, especially those
+     * working with result receivers and thread pools for parallel processing need to check their dependent
+     * processors for having finished as well before invoking the callback.<p>
+     * 
+     * This default implementation immediately invokes the callback, assuming that {@link #processElement(Object)}
+     * is a synchronous method that does not spawn any background processing.
+     * 
+     * @param callbackWhenAllLoadedFixesHaveBeenProcessed must not be {@code null}
+     */
+    default void runWhenFinishedProcessing(Runnable callbackWhenAllLoadedFixesHaveBeenProcessed) {
+        callbackWhenAllLoadedFixesHaveBeenProcessed.run();
+    }
+
 }

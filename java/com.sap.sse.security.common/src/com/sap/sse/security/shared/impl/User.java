@@ -97,6 +97,10 @@ public interface User extends SecurityUser<RoleDefinition, Role, UserGroup> {
      * specific elements as UIs or notification mails.
      */
     Locale getLocale();
+    
+    boolean getDidOptOutOfFeatureAndCommunityEmails();
+    
+    void setDidOptOutOfFeatureAndCommunityEmails(boolean didOptOutOfFeatureAndCommunityEmails);
 
     void setLocale(Locale locale);
 

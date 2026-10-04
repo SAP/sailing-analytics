@@ -35,6 +35,8 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -64,14 +66,15 @@ import com.sap.sailing.domain.abstractlog.race.state.racingprocedure.ReadonlyRac
 import com.sap.sailing.domain.abstractlog.regatta.RegattaLog;
 import com.sap.sailing.domain.abstractlog.regatta.tracking.analyzing.impl.RegattaLogDefinedMarkAnalyzer;
 import com.sap.sailing.domain.base.Boat;
-import com.sap.sailing.domain.base.CPUMeteringType;
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.ControlPoint;
 import com.sap.sailing.domain.base.Course;
 import com.sap.sailing.domain.base.CourseListener;
 import com.sap.sailing.domain.base.DomainFactory;
+import com.sap.sailing.domain.base.Fleet;
 import com.sap.sailing.domain.base.Leg;
 import com.sap.sailing.domain.base.Mark;
+import com.sap.sailing.domain.base.RaceColumn;
 import com.sap.sailing.domain.base.RaceDefinition;
 import com.sap.sailing.domain.base.Regatta;
 import com.sap.sailing.domain.base.RegattaListener;
@@ -112,6 +115,7 @@ import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.common.tracking.SensorFix;
 import com.sap.sailing.domain.confidence.ConfidenceBasedWindAverager;
 import com.sap.sailing.domain.confidence.ConfidenceFactory;
+import com.sap.sailing.domain.leaderboard.Leaderboard;
 import com.sap.sailing.domain.leaderboard.Leaderboard.RankComparableRank;
 import com.sap.sailing.domain.leaderboard.caching.LeaderboardDTOCalculationReuseCache;
 import com.sap.sailing.domain.leaderboard.impl.CompetitorAndRankComparable;
@@ -120,6 +124,9 @@ import com.sap.sailing.domain.maneuverdetection.IncrementalManeuverDetector;
 import com.sap.sailing.domain.maneuverdetection.ManeuverDetector;
 import com.sap.sailing.domain.maneuverdetection.ShortTimeAfterLastHitCache;
 import com.sap.sailing.domain.maneuverdetection.impl.IncrementalManeuverDetectorImpl;
+import com.sap.sailing.domain.maneuverhash.ManeuverRaceFingerprintRegistry;
+import com.sap.sailing.domain.maneuverhash.SerializableManeuverCache;
+import com.sap.sailing.domain.maneuverhash.impl.ManeuverCacheDelegate;
 import com.sap.sailing.domain.markpassingcalculation.MarkPassingCalculator;
 import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprintRegistry;
 import com.sap.sailing.domain.orc.ORCPerformanceCurveRankingMetric;
@@ -128,13 +135,13 @@ import com.sap.sailing.domain.racelog.RaceLogAndTrackedRaceResolver;
 import com.sap.sailing.domain.ranking.OneDesignRankingMetric;
 import com.sap.sailing.domain.ranking.RankingMetric;
 import com.sap.sailing.domain.ranking.RankingMetric.RankingInfo;
+import com.sap.sailing.domain.ranking.RankingMetricConstructor;
 import com.sap.sailing.domain.shared.tracking.AddResult;
 import com.sap.sailing.domain.shared.tracking.LineDetails;
 import com.sap.sailing.domain.shared.tracking.Track;
 import com.sap.sailing.domain.shared.tracking.TrackingConnectorInfo;
 import com.sap.sailing.domain.shared.tracking.impl.LineDetailsImpl;
 import com.sap.sailing.domain.shared.tracking.impl.TimedComparator;
-import com.sap.sailing.domain.ranking.RankingMetricConstructor;
 import com.sap.sailing.domain.tracking.BravoFixTrack;
 import com.sap.sailing.domain.tracking.DynamicSensorFixTrack;
 import com.sap.sailing.domain.tracking.GPSFixTrack;
@@ -172,6 +179,7 @@ import com.sap.sse.common.TimeRange;
 import com.sap.sse.common.Timed;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
+import com.sap.sse.common.Util.Triple;
 import com.sap.sse.common.confidence.BearingWithConfidence;
 import com.sap.sse.common.confidence.BearingWithConfidenceCluster;
 import com.sap.sse.common.confidence.HasConfidence;
@@ -190,9 +198,7 @@ import com.sap.sse.concurrent.NamedReentrantReadWriteLock;
 import com.sap.sse.shared.util.impl.ApproximateTime;
 import com.sap.sse.shared.util.impl.ArrayListNavigableSet;
 import com.sap.sse.util.IdentityWrapper;
-import com.sap.sse.util.SmartFutureCache;
-import com.sap.sse.util.SmartFutureCache.AbstractCacheUpdater;
-import com.sap.sse.util.SmartFutureCache.EmptyUpdateInterval;
+import com.sap.sse.util.ThreadPoolUtil;
 import com.sap.sse.util.impl.FutureTaskWithTracingGet;
 
 import difflib.DiffUtils;
@@ -212,6 +218,24 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
     private static final long serialVersionUID = -4825546964220003507L;
 
     private static final Logger logger = Logger.getLogger(TrackedRaceImpl.class.getName());
+
+    /**
+     * Dedicated executor for {@link #feedAlreadyKnownManeuversToWindEstimation(IncrementalWindEstimation)}
+     * waiter tasks. These tasks call {@code maneuverCache.get(competitor, true)} (with
+     * {@code waitForLatest} set to {@code true}), which may block on maneuver-detection futures
+     * that themselves run on the shared
+     * {@link ThreadPoolUtil#getDefaultBackgroundTaskThreadPoolExecutor()}. If we scheduled the
+     * waiters on that same shared pool, all pool threads would end up blocked in waits while
+     * the detection tasks they wait for sit queued behind them -- a classic pool-starvation
+     * deadlock (observed in CI runs where all "Default background executor" threads were stuck
+     * in FutureTaskWithCancelBlocking.get with 76 queued tasks and no active detection). Using a
+     * separate pool decouples the waiters from the pool that runs the tasks they wait for.
+     * See bug6241.
+     */
+    private static final ScheduledExecutorService feedManeuversToWindEstimationExecutor =
+            ThreadPoolUtil.INSTANCE.createBackgroundTaskThreadPoolExecutor(
+                    Math.max(2, ThreadPoolUtil.INSTANCE.getReasonableThreadPoolSize() / 4),
+                    TrackedRaceImpl.class.getSimpleName() + " feedManeuversToWindEstimation");
 
     private static final long DELAY_FOR_CACHE_CLEARING_IN_MILLISECONDS = 7500;
 
@@ -340,14 +364,14 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
      * computed. Clients wanting to know maneuvers for the competitor outside of this time interval need to (re-)compute
      * them.
      */
-    private transient SmartFutureCache<Competitor, List<Maneuver>, EmptyUpdateInterval> maneuverCache;
-
+    private final SerializableManeuverCache maneuverCache;
+    
     /**
      * The values of this map are used by the {@link #approximate(Competitor, TimePoint, TimePoint)} method and
      * maintain state to accelerate the {@link #approximate(Competitor, TimePoint, TimePoint)} method, also in
      * live scenarios when the contents of the competitors' {@link #tracks} changes dynamically.
      */
-    private final Map<Competitor, CourseChangeBasedTrackApproximation> maneuverApproximators;
+    private final ConcurrentMap<Competitor, CourseChangeBasedTrackApproximation> maneuverApproximators;
 
     private transient ConcurrentMap<TimePoint, Future<Wind>> directionFromStartToNextMarkCache;
 
@@ -439,6 +463,23 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
 
     private transient volatile IncrementalWindEstimation windEstimation;
 
+    /**
+     * Callbacks awaiting the first non-{@code null} {@link #setWindEstimation(IncrementalWindEstimation)}
+     * invocation, registered via {@link #runWhenWindEstimationInstalled(Runnable)}. Guarded by
+     * {@link #windEstimationInstalledCallbacksLock}. Cleared once the wind estimation is installed;
+     * subsequent registrations invoke the callback synchronously on the caller's thread without
+     * adding to this list.
+     */
+    private transient List<Runnable> windEstimationInstalledCallbacks;
+
+    /**
+     * Monitor guarding the {@link #windEstimationInstalledCallbacks} list and the read-then-decide
+     * against {@link #windEstimation} in {@link #runWhenWindEstimationInstalled(Runnable)}.
+     * Reinitialized in {@link #readObject(ObjectInputStream)} on replicas because both this field
+     * and the underlying list are transient.
+     */
+    private transient Object windEstimationInstalledCallbacksLock = new Object();
+
     private transient ShortTimeAfterLastHitCache<Competitor, IncrementalManeuverDetector> maneuverDetectorPerCompetitorCache;
 
     /**
@@ -495,12 +536,13 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
     public TrackedRaceImpl(final TrackedRegatta trackedRegatta, RaceDefinition race, final Iterable<Sideline> sidelines,
             final WindStore windStore, long delayToLiveInMillis, final long millisecondsOverWhichToAverageWind,
             long millisecondsOverWhichToAverageSpeed, long delayForWindEstimationCacheInvalidation,
-            boolean useInternalMarkPassingAlgorithm, RaceLogAndTrackedRaceResolver raceLogResolver, TrackingConnectorInfo trackingConnectorInfo,
-            MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry) {
+            boolean useInternalMarkPassingAlgorithm, RaceLogAndTrackedRaceResolver raceLogResolver,
+            TrackingConnectorInfo trackingConnectorInfo, MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry,
+            ManeuverRaceFingerprintRegistry maneuverRaceFingerprintRegistry) {
         this(trackedRegatta, race, sidelines, windStore, delayToLiveInMillis, millisecondsOverWhichToAverageWind,
                 millisecondsOverWhichToAverageSpeed, delayForWindEstimationCacheInvalidation,
                 useInternalMarkPassingAlgorithm, OneDesignRankingMetric::new, raceLogResolver, trackingConnectorInfo,
-                markPassingRaceFingerprintRegistry);
+                markPassingRaceFingerprintRegistry, maneuverRaceFingerprintRegistry);
     }
 
     /**
@@ -520,7 +562,8 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
             long millisecondsOverWhichToAverageSpeed, long delayForWindEstimationCacheInvalidation,
             boolean useInternalMarkPassingAlgorithm, RankingMetricConstructor rankingMetricConstructor,
             RaceLogAndTrackedRaceResolver raceLogResolver, TrackingConnectorInfo trackingConnectorInfo,
-            MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry) {
+            MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry,
+            ManeuverRaceFingerprintRegistry maneuverRaceFingerprintRegistry) {
         super(race, trackedRegatta, windStore, millisecondsOverWhichToAverageWind);
         distancesFromStarboardSideOfStartLineProjectedOntoLineCache = new ConcurrentHashMap<>();
         distancesFromStarboardSideOfStartLineProjectedOntoLineCacheLastAccessTimes = new ConcurrentHashMap<>();
@@ -547,7 +590,7 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
         this.delayToLiveInMillis = delayToLiveInMillis;
         this.startToNextMarkCacheInvalidationListeners = new ConcurrentHashMap<Mark, TrackedRaceImpl.StartToNextMarkCacheInvalidationListener>();
         this.maneuverDetectorPerCompetitorCache = createManeuverDetectorCache();
-        this.maneuverCache = createManeuverCache();
+        this.maneuverCache = createManeuverCache(maneuverRaceFingerprintRegistry);
         this.markTracks = new ConcurrentHashMap<Mark, GPSFixTrack<Mark, GPSFix>>();
         int i = 0;
         for (Waypoint waypoint : race.getCourse().getWaypoints()) {
@@ -580,12 +623,11 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
         }
         markPassingsForCompetitor = new HashMap<>();
         tracks = new HashMap<>();
-        maneuverApproximators = new HashMap<>();
+        maneuverApproximators = new ConcurrentHashMap<>();
         for (Competitor competitor : race.getCompetitors()) {
             markPassingsForCompetitor.put(competitor, new ConcurrentSkipListSet<MarkPassing>(MarkPassingByTimeComparator.INSTANCE));
             final DynamicGPSFixMovingTrackImpl<Competitor> track = new DynamicGPSFixMovingTrackImpl<Competitor>(competitor, millisecondsOverWhichToAverageSpeed);
             tracks.put(competitor, track);
-            maneuverApproximators.put(competitor, new CourseChangeBasedTrackApproximation(track, race.getBoatOfCompetitor(competitor).getBoatClass(), /* logFixes */ false));
         }
         markPassingsForWaypoint = new ConcurrentHashMap<Waypoint, NavigableSet<MarkPassing>>();
         for (Waypoint waypoint : race.getCourse().getWaypoints()) {
@@ -789,7 +831,14 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
         competitorRankingsLocks = createCompetitorRankingsLockMap();
         directionFromStartToNextMarkCache = new ConcurrentHashMap<>();
         maneuverDetectorPerCompetitorCache = createManeuverDetectorCache();
-        maneuverCache = createManeuverCache();
+        // bug6241: re-establish the "wait for wind estimation to be installed" callback plumbing
+        // on the replica. Both fields are transient; without this initialization,
+        // runWhenWindEstimationInstalled would NPE on the synchronized (windEstimationInstalledCallbacksLock)
+        // block. The list itself starts empty because no callbacks are pending on a fresh replica --
+        // any pending state on the master lives only in the master's memory. windEstimationInstalledCallbacks
+        // is left null and lazily created on first registration in runWhenWindEstimationInstalled.
+        windEstimationInstalledCallbacksLock = new Object();
+        windEstimationInstalledCallbacks = null;
         logger.info("Deserialized race " + getRace().getName());
     }
     
@@ -805,7 +854,7 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
         } catch (PatchFailedException e) {
             throw new RuntimeException(e);
         } // a bit unclean: this also tries to work on the DynamicTrackedRaceImpl which isn't fully initialized yet; see also bug6039
-        triggerManeuverCacheRecalculationForAllCompetitors();  // a bit unclean: this also tries to work on the DynamicTrackedRaceImpl which isn't fully initialized yet; see also bug6039
+        ensureManeuverCacheIsFilledForAllCompetitors();  // a bit unclean: this also tries to work on the DynamicTrackedRaceImpl which isn't fully initialized yet; see also bug6039
     }
 
     /**
@@ -851,30 +900,8 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
                 competitor -> new IncrementalManeuverDetectorImpl(TrackedRaceImpl.this, competitor, windEstimation));
     }
 
-    private SmartFutureCache<Competitor, List<Maneuver>, EmptyUpdateInterval> createManeuverCache() {
-        return new SmartFutureCache<Competitor, List<Maneuver>, EmptyUpdateInterval>(
-                new AbstractCacheUpdater<Competitor, List<Maneuver>, EmptyUpdateInterval>() {
-                    @Override
-                    public List<Maneuver> computeCacheUpdate(Competitor competitor, EmptyUpdateInterval updateInterval)
-                            throws NoWindException {
-                        return getTrackedRegatta().callWithCPUMeterWithException(()->{
-                            Duration averageIntervalBetweenRawFixes = getTrack(competitor).getAverageIntervalBetweenRawFixes();
-                            if (averageIntervalBetweenRawFixes != null) {
-                                ManeuverDetector maneuverDetector;
-                                // FIXME The LowGPSSamplingRateManeuverDetectorImpl doesn't work very well; it recognizes many tacks only as bear-away and doesn't seem to have any noticeable benefits... See ORC Worlds 2019 ORC A Long Offshore
-    //                            if (averageIntervalBetweenRawFixes.asSeconds() >= 30) {
-    //                                maneuverDetector = new LowGPSSamplingRateManeuverDetectorImpl(TrackedRaceImpl.this, competitor);
-    //                            } else {
-                                    maneuverDetector = maneuverDetectorPerCompetitorCache.getValue(competitor);
-    //                            }
-                                List<Maneuver> maneuvers = computeManeuvers(competitor, maneuverDetector);
-                                return maneuvers;
-                            } else {
-                                return Collections.emptyList();
-                            }
-                        }, CPUMeteringType.MANEUVER_DETECTION.name());
-                    }
-                }, /* nameForLocks */ "Maneuver cache for race " + getRace().getName());
+    private ManeuverCacheDelegate createManeuverCache(ManeuverRaceFingerprintRegistry maneuverRaceFingerprintRegistry) {
+        return new ManeuverCacheDelegate(this, maneuverRaceFingerprintRegistry);
     }
 
     /**
@@ -1302,7 +1329,7 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
             if (startOfTracking != null) {
                 timePoint = startOfTracking.asDate();
             } else if (startTime != null) {
-                timePoint = startTime.minus(TimingConstants.PRE_START_PHASE_DURATION_IN_MILLIS).plus(1).asDate();
+                timePoint = startTime.minus(TimingConstants.PRE_START_PHASE_DURATION_IN_MILLIS).plusResolution().asDate();
             }
         }
 
@@ -2881,33 +2908,42 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
 
     @Override
     public Iterable<GPSFixMoving> approximate(Competitor competitor, TimePoint from, TimePoint to) {
-        return maneuverApproximators.get(competitor).approximate(from, to);
+        return maneuverApproximators.computeIfAbsent(competitor,
+                c->new CourseChangeBasedTrackApproximation(getTrack(c), race.getBoatOfCompetitor(c).getBoatClass(), /* logFixes */ false))
+                .approximate(from, to);
     }
     
-    protected void triggerManeuverCacheRecalculationForAllCompetitors() {
+    private void ensureManeuverCacheIsFilledForAllCompetitors() {
+        maneuverCache.ensureFilled();
+    }
+
+    public void triggerManeuverCacheRecalculationForAllCompetitors() {
         if (cachesSuspended) {
             triggerManeuverCacheInvalidationForAllCompetitors = true;
         } else {
-            final List<Competitor> shuffledCompetitors = new ArrayList<>();
-            for (Competitor competitor : (getRace().getCompetitors())) {
-                shuffledCompetitors.add(competitor);
-            }
-            Collections.shuffle(shuffledCompetitors);
-            for (Competitor competitor : shuffledCompetitors) {
+            for (Competitor competitor : getShuffledCompetitors()) {
                 triggerManeuverCacheRecalculation(competitor);
             }
         }
+    }
+
+    public List<Competitor> getShuffledCompetitors() {
+        final List<Competitor> shuffledCompetitors = new ArrayList<>();
+        for (Competitor competitor : (getRace().getCompetitors())) {
+            shuffledCompetitors.add(competitor);
+        }
+        return shuffledCompetitors;
     }
 
     public void triggerManeuverCacheRecalculation(final Competitor competitor) {
         if (cachesSuspended) {
             triggerManeuverCacheInvalidationForAllCompetitors = true;
         } else {
-            maneuverCache.triggerUpdate(competitor, /* updateInterval */null);
+            maneuverCache.recalculate(competitor);
         }
     }
 
-    private List<Maneuver> computeManeuvers(Competitor competitor, ManeuverDetector maneuverDetector)
+    public List<Maneuver> computeManeuvers(Competitor competitor, ManeuverDetector maneuverDetector)
             throws NoWindException {
         logger.finest("computeManeuvers(" + competitor.getName() + ") called in tracked race " + this);
         long startedAt = System.currentTimeMillis();
@@ -2932,8 +2968,8 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
      */
     @Override
     public Iterable<Maneuver> getManeuvers(Competitor competitor, TimePoint from, TimePoint to, boolean waitForLatest) {
-        List<Maneuver> allManeuvers = maneuverCache.get(competitor, waitForLatest);
-        List<Maneuver> result;
+        final List<Maneuver> allManeuvers = maneuverCache.get(competitor, waitForLatest);
+        final List<Maneuver> result;
         if (allManeuvers == null) {
             result = Collections.emptyList();
         } else {
@@ -2944,8 +2980,8 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
 
     @Override
     public Iterable<Maneuver> getManeuvers(Competitor competitor, boolean waitForLatest) {
-        List<Maneuver> allManeuvers = maneuverCache.get(competitor, waitForLatest);
-        List<Maneuver> result;
+        final List<Maneuver> allManeuvers = maneuverCache.get(competitor, waitForLatest);
+        final List<Maneuver> result;
         if (allManeuvers == null) {
             result = Collections.emptyList();
         } else {
@@ -3107,7 +3143,7 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
         if (newStatus.getStatus() == TrackedRaceStatusEnum.LOADING && oldStatus != TrackedRaceStatusEnum.LOADING) {
             suspendAllCachesNotUpdatingWhileLoading();
         } else if (oldStatus == TrackedRaceStatusEnum.LOADING && newStatus.getStatus() != TrackedRaceStatusEnum.LOADING && newStatus.getStatus() != TrackedRaceStatusEnum.REMOVED) {
-            resumeAllCachesNotUpdatingWhileLoading();
+            resumeAllCachesNotUpdatingWhileLoading(); // TODO how sure can we be that at this point all loading is really done? TracTrac receivers, e.g., run in threads with queues, and fixes may still be processed after the status has changed
         }
     }
 
@@ -3125,6 +3161,36 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
         crossTrackErrorCache.suspend();
         maneuverCache.suspend();
     }
+    
+    public void waitForAllRaceLogsAttached() {
+        final Object latchForRaceLogs = new Object();
+        final Iterable<Triple<Leaderboard, RaceColumn, Fleet>> expectedLinks = TrackedRaceImpl.this.getRaceLogResolver()
+                .getColumnsWithRaceLogForTrackedRace(getRaceIdentifier());
+        final int numberOfExpectedRaceLogs = Util.size(expectedLinks);
+        final AbstractRaceChangeListener raceLogAttachedListener = new AbstractRaceChangeListener() {
+            @Override
+            public void raceLogAttached(RaceLog raceLog) {
+                final int numberOfAttachedRaceLogs = Util.size(getAttachedRaceLogs());
+                synchronized (latchForRaceLogs) {
+                    if (numberOfAttachedRaceLogs >= numberOfExpectedRaceLogs) {
+                        latchForRaceLogs.notifyAll();
+                    }
+                }
+            }
+        };
+        this.addListener(raceLogAttachedListener);
+        try {
+            synchronized (latchForRaceLogs) {
+                while (Util.size(getAttachedRaceLogs()) < numberOfExpectedRaceLogs) {
+                    latchForRaceLogs.wait();
+                }
+            }
+        } catch (InterruptedException e) {
+            logger.warning("Interrupted: "+e.getMessage());
+        } finally {
+            removeListener(raceLogAttachedListener);
+        }
+    }
 
     private void resumeAllCachesNotUpdatingWhileLoading() {
         cachesSuspended = false;
@@ -3139,10 +3205,10 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
             markPassingCalculator.resume();
         }
         crossTrackErrorCache.resume();
+        maneuverCache.resume(); // needs to happen before triggering recalculation because this decides about fingerprint matching
         if (triggerManeuverCacheInvalidationForAllCompetitors) {
             triggerManeuverCacheRecalculationForAllCompetitors();
         }
-        maneuverCache.resume();
     }
 
     /**
@@ -3177,21 +3243,241 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
 
     @Override
     public void runWhenDoneLoading(final Runnable runnable) {
+        // Two cooperating listeners settle the outcome exactly once: a status listener on this race
+        // that fires the runnable when the race is considered to have finished loading, and a
+        // regatta race-removal listener that silently cancels (and tears both down) if the race is
+        // removed before it ever finishes loading. Without the removal listener the status listener
+        // would leak for the lifetime of the service when a race is removed while still PREPARED,
+        // LOADING or ERROR (hasFinishedLoading() never becomes true for it), strongly capturing both
+        // the runnable and this TrackedRaceImpl -- the same leak class the bug6241 handling in
+        // RacingEventServiceImpl.RaceAdditionListener.raceRemoved guards against. The one-shot CAS on
+        // settled additionally guarantees the runnable runs at most once per registration even if
+        // status events and the removal race with each other.
+        final AtomicBoolean settled = new AtomicBoolean(false);
+        final TrackedRegatta regatta = getTrackedRegatta();
+        final RaceListener[] regattaListenerHolder = new RaceListener[1];
+        final AbstractRaceChangeListener[] statusListenerHolder = new AbstractRaceChangeListener[1];
+        final Runnable tearDown = () -> {
+            if (statusListenerHolder[0] != null) {
+                removeListener(statusListenerHolder[0]);
+            }
+            if (regattaListenerHolder[0] != null) {
+                regatta.removeRaceListener(regattaListenerHolder[0]);
+            }
+        };
+        final Runnable settleAndFire = () -> {
+            if (settled.compareAndSet(false, true)) {
+                try {
+                    tearDown.run();
+                } finally {
+                    runnable.run();
+                }
+            }
+        };
+        final Runnable settleWithoutFiring = () -> {
+            if (settled.compareAndSet(false, true)) {
+                tearDown.run();
+            }
+        };
+        statusListenerHolder[0] = new AbstractRaceChangeListener() {
+            @Override
+            public void statusChanged(final TrackedRaceStatus newStatus, final TrackedRaceStatus oldStatus) {
+                logger.info("race "+TrackedRaceImpl.this.getRaceIdentifier()+" went from "+oldStatus+" to "+newStatus);
+                if (hasFinishedLoading(newStatus.getStatus())) {
+                    logger.info("race "+TrackedRaceImpl.this.getRaceIdentifier()+" is considered having finished loading; running "+runnable);
+                    settleAndFire.run();
+                }
+            }
+        };
+        regattaListenerHolder[0] = new RaceListener() {
+            @Override
+            public void raceAdded(final TrackedRace trackedRace) {
+                // not interested in additions
+            }
+            @Override
+            public void raceRemoved(final TrackedRace trackedRace) {
+                if (trackedRace == TrackedRaceImpl.this) {
+                    settleWithoutFiring.run();
+                }
+            }
+        };
+        final boolean alreadyDone;
         synchronized (getStatusNotifier()) {
-            if (!hasFinishedLoading()) {
-                addListener(new AbstractRaceChangeListener() {
-                    @Override
-                    public void statusChanged(TrackedRaceStatus newStatus, TrackedRaceStatus oldStatus) {
-                        logger.info("race "+TrackedRaceImpl.this+" went from "+oldStatus+" to "+newStatus);
-                        if (hasFinishedLoading(newStatus.getStatus())) {
-                            logger.info("race "+TrackedRaceImpl.this+" is considered having finished loading; running "+runnable);
-                            removeListener(this);
-                            runnable.run();
-                        }
-                    }
-                });
+            if (hasFinishedLoading()) {
+                alreadyDone = true;
             } else {
-                runnable.run();
+                alreadyDone = false;
+                addListener(statusListenerHolder[0]);
+            }
+        }
+        if (alreadyDone) {
+            runnable.run();
+        } else {
+            regatta.addRaceListener(regattaListenerHolder[0], Optional.empty(), /* synchronous */ false);
+            // Close the race between the initial check + status-listener registration and the
+            // regatta-listener registration: if we already finished loading in between, fire now.
+            // The CAS on settled makes this safe against concurrent status events that may already
+            // be delivering to statusListenerHolder[0].
+            if (hasFinishedLoading()) {
+                settleAndFire.run();
+            }
+        }
+    }
+
+    @Override
+    public void runWhenPastLoading(final Runnable callback) {
+        final int loadingOrder = TrackedRaceStatusEnum.LOADING.getOrder();
+        // Two listeners cooperate to settle the outcome exactly once: a status listener
+        // on this race that fires the callback when the race moves past LOADING, and a
+        // race-removal listener on the containing regatta that silently cancels if the
+        // race is removed first. The one-shot CAS on `settled` guarantees exactly one
+        // branch (fire or cancel) wins; both listeners are removed in either case.
+        // The status-notifier monitor is held only around the initial check and
+        // registration of the status listener so we don't cross-lock with the regatta
+        // when adding the regatta listener; the post-registration re-check catches any
+        // status transition that raced with us.
+        final AtomicBoolean settled = new AtomicBoolean(false);
+        final TrackedRegatta regatta = getTrackedRegatta();
+        final RaceListener[] regattaListenerHolder = new RaceListener[1];
+        final AbstractRaceChangeListener[] statusListenerHolder = new AbstractRaceChangeListener[1];
+        final Runnable tearDown = () -> {
+            if (statusListenerHolder[0] != null) {
+                removeListener(statusListenerHolder[0]);
+            }
+            if (regattaListenerHolder[0] != null) {
+                regatta.removeRaceListener(regattaListenerHolder[0]);
+            }
+        };
+        final Runnable settleAndFire = () -> {
+            if (settled.compareAndSet(false, true)) {
+                try {
+                    tearDown.run();
+                } finally {
+                    callback.run();
+                }
+            }
+        };
+        final Runnable settleWithoutFiring = () -> {
+            if (settled.compareAndSet(false, true)) {
+                tearDown.run();
+            }
+        };
+        statusListenerHolder[0] = new AbstractRaceChangeListener() {
+            @Override
+            public void statusChanged(final TrackedRaceStatus newStatus, final TrackedRaceStatus oldStatus) {
+                if (newStatus.getStatus().getOrder() > loadingOrder) {
+                    settleAndFire.run();
+                }
+            }
+        };
+        regattaListenerHolder[0] = new RaceListener() {
+            @Override
+            public void raceAdded(final TrackedRace trackedRace) {
+                // not interested in additions
+            }
+            @Override
+            public void raceRemoved(final TrackedRace trackedRace) {
+                if (trackedRace == TrackedRaceImpl.this) {
+                    settleWithoutFiring.run();
+                }
+            }
+        };
+        final boolean alreadyPast;
+        synchronized (getStatusNotifier()) {
+            if (getStatus().getStatus().getOrder() > loadingOrder) {
+                alreadyPast = true;
+            } else {
+                alreadyPast = false;
+                addListener(statusListenerHolder[0]);
+            }
+        }
+        if (alreadyPast) {
+            callback.run();
+        } else {
+            regatta.addRaceListener(regattaListenerHolder[0], Optional.empty(), /* synchronous */ false);
+            // Close the race between the initial check + listener registration and the
+            // regatta-listener registration: if we already transitioned in between, fire
+            // now. The CAS on `settled` makes this safe against concurrent status events
+            // that may already be delivering to statusListenerHolder[0].
+            if (getStatus().getStatus().getOrder() > loadingOrder) {
+                settleAndFire.run();
+            }
+        }
+    }
+
+    @Override
+    public void runWhenWindEstimationInstalled(final Runnable callback) {
+        // Same two-cooperating-listeners pattern as runWhenPastLoading, but the "fire" trigger is
+        // the first non-null setWindEstimation call (observed via the callback list drained inside
+        // updateManeuversAndWindWithNewWindEstimation) rather than a status transition. If a wind
+        // estimation is already installed when this method is called, we fire synchronously on the
+        // caller's thread; otherwise we register a callback and a regatta-removal listener so we
+        // silently cancel if the race disappears before installation. See bug6241.
+        final AtomicBoolean settled = new AtomicBoolean(false);
+        final TrackedRegatta regatta = getTrackedRegatta();
+        final RaceListener[] regattaListenerHolder = new RaceListener[1];
+        final Runnable[] installCallbackHolder = new Runnable[1];
+        final Runnable tearDown = () -> {
+            if (installCallbackHolder[0] != null) {
+                synchronized (windEstimationInstalledCallbacksLock) {
+                    if (windEstimationInstalledCallbacks != null) {
+                        windEstimationInstalledCallbacks.remove(installCallbackHolder[0]);
+                    }
+                }
+            }
+            if (regattaListenerHolder[0] != null) {
+                regatta.removeRaceListener(regattaListenerHolder[0]);
+            }
+        };
+        final Runnable settleAndFire = () -> {
+            if (settled.compareAndSet(false, true)) {
+                try {
+                    tearDown.run();
+                } finally {
+                    callback.run();
+                }
+            }
+        };
+        final Runnable settleWithoutFiring = () -> {
+            if (settled.compareAndSet(false, true)) {
+                tearDown.run();
+            }
+        };
+        installCallbackHolder[0] = () -> settleAndFire.run();
+        regattaListenerHolder[0] = new RaceListener() {
+            @Override
+            public void raceAdded(final TrackedRace trackedRace) {
+                // not interested in additions
+            }
+            @Override
+            public void raceRemoved(final TrackedRace trackedRace) {
+                if (trackedRace == TrackedRaceImpl.this) {
+                    settleWithoutFiring.run();
+                }
+            }
+        };
+        final boolean alreadyInstalled;
+        synchronized (windEstimationInstalledCallbacksLock) {
+            if (windEstimation != null) {
+                alreadyInstalled = true;
+            } else {
+                alreadyInstalled = false;
+                if (windEstimationInstalledCallbacks == null) {
+                    windEstimationInstalledCallbacks = new ArrayList<>();
+                }
+                windEstimationInstalledCallbacks.add(installCallbackHolder[0]);
+            }
+        }
+        if (alreadyInstalled) {
+            callback.run();
+        } else {
+            regatta.addRaceListener(regattaListenerHolder[0], Optional.empty(), /* synchronous */ false);
+            // Close the race between the initial check + list append and the regatta-listener
+            // registration: if setWindEstimation ran in that window and drained our callback (or
+            // the field became non-null another way), fire now. The CAS on `settled` makes this
+            // safe against concurrent installations.
+            if (windEstimation != null) {
+                settleAndFire.run();
             }
         }
     }
@@ -3802,7 +4088,6 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
         return legDeterminingDirection;
     }
 
-
     @Override
     public LineDetails getStartLine(TimePoint at) {
         return getLineLengthAndAdvantage(at, getRace().getCourse().getFirstWaypoint());
@@ -4071,27 +4356,176 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
     }
 
     @Override
+    public IncrementalWindEstimation getWindEstimation() {
+        return windEstimation;
+    }
+
+    @Override
     public void setWindEstimation(IncrementalWindEstimation windEstimation) {
-        IncrementalWindEstimation previousWindEstimation = this.windEstimation;
-        if (previousWindEstimation != windEstimation) {
+        final IncrementalWindEstimation previousWindEstimation = this.windEstimation;
+        if (previousWindEstimation != windEstimation) { // bug5959 comment #15: if maneuvers were sent during initial load of RacingEventService and they were based on the IncrementalWindEstimation just received through initial load of WindEstimationFactoryService, don't re-compute those maneuvers!
             updateManeuversAndWindWithNewWindEstimation(windEstimation, previousWindEstimation);
         }
     }
 
     private void updateManeuversAndWindWithNewWindEstimation(IncrementalWindEstimation windEstimation,
             IncrementalWindEstimation previousWindEstimation) {
-        WindSource windSource = new WindSourceImpl(WindSourceType.MANEUVER_BASED_ESTIMATION);
+        final WindSource windSource = new WindSourceImpl(WindSourceType.MANEUVER_BASED_ESTIMATION);
         windTracks.remove(windSource);
         if (windEstimation != null) {
             windTracks.put(windSource, windEstimation.getWindTrack());
         }
         updateWindSourcesByType(windSource);
         this.windEstimation = windEstimation;
-        // TODO Make more efficient by reusing the state of incremental maneuver detectors. The already computed
-        // complete maneuver curves can be fed directly into the windEstimation.
+        // Clear the maneuver-detector cache so future maneuver detections pick up the new
+        // WindEstimationInteraction from the current windEstimation. See also bug6184: maneuver
+        // detection itself does not consume MANEUVER_BASED_ESTIMATION, so the maneuvers won't
+        // change; only the side-channel notification to the wind estimator will now target the
+        // new estimator instance.
         maneuverDetectorPerCompetitorCache.clearCache();
         shortTimeWindCache.clearCache();
-        triggerManeuverCacheRecalculationForAllCompetitors();
+        // bug6241: if a new (non-null) wind estimation is being installed and we already have
+        // maneuvers for this race (either loaded from the persistent maneuver cache, or
+        // previously computed with a null / stale WindEstimationInteraction so they never
+        // reached the current estimator), feed those maneuvers to the new estimator now via
+        // alreadyClassifiedManeuversAvailable. The feed runs on a background task per
+        // competitor so that this method returns quickly and, importantly, does not block the
+        // setter's caller (typically the OSGi service-tracker thread or the
+        // RaceAdditionListener callback thread) on the potentially-slow
+        // maneuverCache.get(_, /* waitForLatest */ true) call that may still be waiting for
+        // maneuver detection to complete.
+        if (windEstimation != null) {
+            feedAlreadyKnownManeuversToWindEstimation(windEstimation);
+            // bug6241: fire "wind estimation installed" callbacks -- for example, from
+            // ManeuverCacheDelegate.resume()'s Path B thread that wants to re-type maneuvers
+            // after the estimator has had a chance to produce wind fixes. Snapshot and clear the
+            // list under the monitor so subsequent runWhenWindEstimationInstalled(...) calls
+            // observe the installed state and invoke synchronously.
+            final List<Runnable> callbacksToFire;
+            synchronized (windEstimationInstalledCallbacksLock) {
+                if (windEstimationInstalledCallbacks != null && !windEstimationInstalledCallbacks.isEmpty()) {
+                    callbacksToFire = new ArrayList<>(windEstimationInstalledCallbacks);
+                    windEstimationInstalledCallbacks.clear();
+                } else {
+                    callbacksToFire = Collections.emptyList();
+                }
+            }
+            for (final Runnable callback : callbacksToFire) {
+                try {
+                    callback.run();
+                } catch (Throwable t) {
+                    logger.log(Level.WARNING,
+                            "runWhenWindEstimationInstalled callback threw for race " + getRaceIdentifier(), t);
+                }
+            }
+        }
+    }
+
+    /**
+     * Schedules a per-competitor background task that reads the competitor's currently-known
+     * maneuvers from {@link #maneuverCache} (waiting, if necessary, for a pending detection to
+     * complete or for the DB-load path to have delivered its results) and, if any are present,
+     * hands them off to {@code newWindEstimation} via
+     * {@link IncrementalWindEstimation#alreadyClassifiedManeuversAvailable(Competitor, Iterable)}.
+     * <p>
+     *
+     * Only invoked when the {@link #maneuverCache} is <em>not</em> updatable via computation
+     * (i.e., the maneuvers were loaded from the persistent cache as
+     * {@link com.sap.sailing.domain.maneuverhash.impl.ManeuversFromDatabase}). In the compute
+     * path -- a {@link com.sap.sailing.domain.maneuverhash.impl.ManeuversFromSmartFutureCache}
+     * -- detection produces the same maneuvers and the maneuver detector will invoke
+     * {@link IncrementalWindEstimation#newManeuverSpotsDetected} on the newly installed
+     * estimator, which drives the NN+HMM graph path and produces the wind fixes with the
+     * proper cross-competitor spatial and temporal proximity awareness. Feeding the same
+     * maneuvers a second time via {@code alreadyClassifiedManeuversAvailable} would produce
+     * per-competitor slices without that MST aggregation and would clobber the correct
+     * fixes through the reconciliation step of {@code applyManeuverClassificationsToWindTrack}
+     * -- see bug6241.
+     * <p>
+     *
+     * The task guards against being obsoleted by a subsequent {@link #setWindEstimation} that
+     * replaces {@code newWindEstimation}: before performing the hand-off it checks that the
+     * race's current {@link #windEstimation} is still the same instance it was scheduled with.
+     */
+    private void feedAlreadyKnownManeuversToWindEstimation(final IncrementalWindEstimation newWindEstimation) {
+        // Gate: only feed maneuvers to the newly-installed estimator when the maneuver cache
+        // is NOT updatable via computation. That is: only when this JVM's cache is a
+        // ManeuversFromDatabase (canBeUpdated() == false), meaning maneuvers were loaded from
+        // the persistent MANEUVERS collection and no maneuver detector on this JVM has (or
+        // will) invoke IncrementalWindEstimation#newManeuverSpotsDetected for them.
+        // <p>
+        //
+        // WHY THIS GATE MUST EXIST -- please leave it in place. Both the DB-load path and the
+        // compute path need the estimator to receive the maneuvers, but they do so through
+        // different channels and mixing them is harmful:
+        // <ul>
+        //   <li>DB-load path (!canBeUpdated()): the maneuvers came from disk. No detector on
+        //   this JVM ever ran, so no {@code newManeuverSpotsDetected} will ever fire for them.
+        //   The only way to get them into the estimator is via
+        //   {@code alreadyClassifiedManeuversAvailable}, which is exactly what this method
+        //   does. Enqueues a {@code PreClassifiedUpdate} per competitor.</li>
+        //
+        //   <li>Compute path (canBeUpdated()): the maneuver detector runs on this JVM (either
+        //   under {@code ManeuverCacheDelegate.resume}'s Path B or during the follow-up
+        //   recompute driven by {@code runWhenWindEstimationInstalled} in the retype-and-store
+        //   choreography of {@code ManeuverCacheDelegate}). Freshly-built detectors,
+        //   constructed AFTER the wind estimator is installed and after
+        //   {@link #updateManeuversAndWindWithNewWindEstimation} cleared
+        //   {@link #maneuverDetectorPerCompetitorCache}, capture the now-non-null
+        //   {@code WindEstimationInteraction} and feed the estimator through the graph path:
+        //   {@code newManeuverSpotsDetected} -> {@code NewSpotsUpdate}. That path correctly
+        //   aggregates ALL competitors' spots into one MST/HMM inference with cross-competitor
+        //   spatial and temporal proximity awareness -- essential for good wind estimates.</li>
+        // </ul>
+        // Feeding the compute-path maneuvers a SECOND time through this method (i.e., not
+        // gating on {@code !canBeUpdated()}) would produce per-competitor
+        // {@code PreClassifiedUpdate} slices of wind fixes without that cross-competitor
+        // aggregation. Worse, the estimator's reconciliation step
+        // {@code applyManeuverClassificationsToWindTrack} then reconciles the wind track down
+        // to whatever the current input batch produced, which for a per-competitor slice
+        // CLOBBERS the correct whole-race track computed by the graph path. Observable as a
+        // large drop in the ratio-of-matching-fixes assertion in
+        // {@code IncrementalMstHmmWindEstimationForTrackedRaceTest} (75% threshold), triggered
+        // by an ordering race between {@link #feedManeuversToWindEstimationExecutor} tasks
+        // and {@code triggerManeuverCacheRecalculationForAllCompetitors} in the test's setUp:
+        // if the feed task runs after the recalc trigger, it double-feeds; if it runs before,
+        // {@code maneuverCache.get(waitForLatest=true)} returns null and the feed is skipped.
+        // <p>
+        //
+        // The bug6241 "hold-back" concern (that after polar-data hold-back the wind estimator
+        // may be installed AFTER a first detection pass has already completed with a captured
+        // null {@code WindEstimationInteraction}) was previously cited as a reason to feed
+        // unconditionally. That concern is now handled explicitly by the retype-and-store
+        // choreography in {@code ManeuverCacheDelegate.computeAndStore}, which registers via
+        // {@code runWhenWindEstimationInstalled} and then re-drives the detector (whose cache
+        // was cleared here at install time) so freshly-built detectors emit spots to the newly
+        // installed estimator through the graph path -- naturally, with cross-competitor
+        // aggregation intact.
+        // <p>
+        //
+        // Safety of the gate: {@code ManeuverCacheDelegate.resume} -- which switches
+        // {@code cacheToUse} between the two variants -- runs synchronously inside the
+        // LOADING-to-post-LOADING transition handler. {@code setWindEstimation} is invoked
+        // AFTER that transition (either by {@code scheduleWindEstimationInstallation} waiting
+        // on {@link #runWhenPastLoading}, or by tests manually sequencing after wind sources
+        // are populated). So by the time we arrive here, {@code maneuverCache.canBeUpdated()}
+        // reliably reflects which path is in use.
+        if (!maneuverCache.canBeUpdated()) {
+            for (final Competitor competitor : getRace().getCompetitors()) {
+                feedManeuversToWindEstimationExecutor.execute(() -> {
+                    try {
+                        final List<Maneuver> maneuvers = maneuverCache.get(competitor, /* waitForLatest */ true);
+                        if (maneuvers != null && !maneuvers.isEmpty()
+                                && TrackedRaceImpl.this.windEstimation == newWindEstimation) {
+                            newWindEstimation.alreadyClassifiedManeuversAvailable(competitor, maneuvers);
+                        }
+                    } catch (Throwable e) {
+                        logger.log(Level.WARNING, "Failed to feed already-known maneuvers of competitor " + competitor
+                                + " into the wind estimation of race " + getRaceIdentifier(), e);
+                    }
+                });
+            }
+        }
     }
 
     /**
@@ -4434,5 +4868,13 @@ public abstract class TrackedRaceImpl extends TrackedRaceWithWindEssentials impl
             result = null;
         }
         return result;
+    }
+
+    public ShortTimeAfterLastHitCache<Competitor, IncrementalManeuverDetector> getManeuverDetectorPerCompetitorCache() {
+        return maneuverDetectorPerCompetitorCache;
+    }
+
+    public void setManeuverRaceFingerprintRegistry(ManeuverRaceFingerprintRegistry maneuverRaceFingerprintRegistry) {
+        maneuverCache.setManeuverRaceFingerprintRegistry(maneuverRaceFingerprintRegistry);
     }
 }

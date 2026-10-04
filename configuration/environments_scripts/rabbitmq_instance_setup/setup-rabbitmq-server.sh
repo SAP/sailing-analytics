@@ -33,9 +33,10 @@ else
   # Wait for RabbitMQ to become available; note that install under apt also means start...
   sleep 10
   sudo rabbitmq-plugins enable rabbitmq_management
-  # Allow guest login from non-localhost IPs:
+  # Allow guest login from non-localhost IPs and specify the heartbeat timeout to 24h / 1d:
   sudo su - -c "cat <<EOF >>/etc/rabbitmq/rabbitmq.conf
 loopback_users = none
+heartbeat = 86400
 EOF
 "
   sudo systemctl restart rabbitmq-server.service
