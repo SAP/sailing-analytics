@@ -842,6 +842,7 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                 mapOptions = null;
             }
         } else {
+            requiresCoordinateSystemUpdateWhenCoursePositionAndWindDirectionIsKnown = false;
             if (map != null) {
                 mapOptions = getMapOptions(/* wind-up */ false, settings.isShowSatelliteLayer(), settings.isShowSeaMarks(), /* populateDefaults */ false);
                 if (vectorRenderingTypeSupported) {
@@ -1615,9 +1616,6 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                                 removeAllMarkDouglasPeuckerpoints();
                             }
                             maneuverMarkersAndLossIndicators.clearAllManeuverMarkers();
-                        }
-                        if (requiresCoordinateSystemUpdateWhenCoursePositionAndWindDirectionIsKnown) {
-                            updateCoordinateSystemFromSettings();
                         }
                         // Do mark specific actions
                         showCourseMarksOnMap(raceMapDataDTO.coursePositions, transitionTimeInMillis);
