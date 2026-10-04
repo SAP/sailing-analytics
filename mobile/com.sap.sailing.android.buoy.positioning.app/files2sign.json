@@ -3,7 +3,7 @@
         {
             "version": "1.4.126",
             "groupid": "com.sap.sailing",
-            "file": "com.sap.sailing.android.buoy.positioning.app-release-unsigned.apk",
+            "file": "com.sap.sailing.android.buoy.positioning.app-unsigned.apk",
             "artifactid": "com.sap.sailing.android.buoy.positioning.app"
         }
     ]
