@@ -1,0 +1,5 @@
+#!/bin/bash
+for i in $( `dirname "${0}"`/findSailingAnalyticsServers ); do
+  echo " *** $i ***"
+  ssh -A root@$i 'cd /home/sailing/servers; for j in `ls`; do echo -n $j; if grep -q REPLICATE_MASTER_SERVLET_HOST=\"security-service.sapsailing.com\" $j/env.sh; then echo -n " (Primary) "; else echo -n " (Replica) "; fi; ( . $j/env.sh >/dev/null 2>&1; echo $SERVER_PORT ); done'
+done
