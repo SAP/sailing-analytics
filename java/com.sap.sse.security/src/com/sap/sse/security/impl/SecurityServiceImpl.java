@@ -1866,7 +1866,7 @@ implements ReplicableSecurityService, ClearStateTestSupport {
             logger.info(authProviderName + " requires Request token first.. obtaining..");
             try {
                 requestToken = service.getRequestToken();
-                logger.info("Got request token: " + requestToken);
+                logger.fine("Obtained request token from provider " + authProviderName);
                 // we must save in the session. It will be required to
                 // get the access token
                 SessionUtils.saveRequestTokenToSession(requestToken);
