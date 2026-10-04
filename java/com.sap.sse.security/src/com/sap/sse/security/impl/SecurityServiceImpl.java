@@ -216,6 +216,16 @@ implements ReplicableSecurityService, ClearStateTestSupport {
 
     private static final String ADMIN_DEFAULT_PASSWORD = "admin";
 
+    /**
+     * Name of the environment variable through which operators can provide the initial password for the
+     * {@link UserStore#ADMIN_USERNAME admin} user that is created when a fresh instance starts with an empty
+     * security store (i.e. one that does not replicate its security service from a master). When set to a
+     * non-blank value, that value is used as the initial admin password and a strong password is enforced;
+     * when unset, the well-known {@link #ADMIN_DEFAULT_PASSWORD} is used for backward compatibility and a
+     * security warning is logged. See GitHub issue #6312.
+     */
+    private static final String ADMIN_INITIAL_PASSWORD_ENV_VAR = "SAILING_ADMIN_INITIAL_PASSWORD";
+
     private final Set<String> migratedHasPermissionTypes = new ConcurrentSkipListSet<>();
 
     private SecurityManager securityManager;
@@ -490,11 +500,25 @@ implements ReplicableSecurityService, ClearStateTestSupport {
             isInitialOrMigration = false;
             if (!store.hasUsers()) {
                 isInitialOrMigration = true;
-                logger.info("No users found, creating default user \""+UserStore.ADMIN_USERNAME+"\" with password \""+ADMIN_DEFAULT_PASSWORD+"\"");
+                final String configuredInitialPassword = System.getenv(ADMIN_INITIAL_PASSWORD_ENV_VAR);
+                final boolean hasConfiguredInitialPassword = configuredInitialPassword != null
+                        && !configuredInitialPassword.trim().isEmpty();
+                final String adminPassword = hasConfiguredInitialPassword ? configuredInitialPassword
+                        : ADMIN_DEFAULT_PASSWORD;
+                if (hasConfiguredInitialPassword) {
+                    logger.info("No users found, creating default user \"" + UserStore.ADMIN_USERNAME
+                            + "\" with the initial password supplied via the " + ADMIN_INITIAL_PASSWORD_ENV_VAR
+                            + " environment variable");
+                } else {
+                    logger.warning("No users found, creating default user \"" + UserStore.ADMIN_USERNAME
+                            + "\" with the well-known default password because the " + ADMIN_INITIAL_PASSWORD_ENV_VAR
+                            + " environment variable is not set. This is insecure; set " + ADMIN_INITIAL_PASSWORD_ENV_VAR
+                            + " to a strong value on fresh instances. Future versions may refuse to start without it.");
+                }
                 final User adminUser = createSimpleUser(UserStore.ADMIN_USERNAME, "nobody@sapsailing.com",
-                        ADMIN_DEFAULT_PASSWORD,
+                        adminPassword,
                         /* fullName */ null, /* company */ null, Locale.ENGLISH, /* validationBaseURL */ null,
-                        null, /* clientIP */ null, /* enforce strong password */ false);
+                        null, /* clientIP */ null, /* enforce strong password */ hasConfiguredInitialPassword);
                 setOwnership(adminUser.getIdentifier(), adminUser, null);
                 Role adminRole = new Role(adminRoleDefinition, /* transitive */ true);
                 addRoleForUserAndSetUserAsOwner(adminUser, adminRole);
