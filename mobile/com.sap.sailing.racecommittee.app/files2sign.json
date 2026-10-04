@@ -3,7 +3,7 @@
         {
             "version": "1.4.126",
             "groupid": "com.sap.sailing",
-            "file": "com.sap.sailing.racecommittee.app-release-unsigned.apk",
+            "file": "com.sap.sailing.racecommittee.app-unsigned.apk",
             "artifactid": "com.sap.sailing.racecommittee.app"
         }
     ]
