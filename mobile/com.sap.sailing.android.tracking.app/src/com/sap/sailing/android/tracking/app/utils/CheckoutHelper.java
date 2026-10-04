@@ -1,7 +1,7 @@
 package com.sap.sailing.android.tracking.app.utils;
 
 import android.net.Uri;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.sap.sailing.android.shared.data.CheckinUrlInfo;
 import com.sap.sailing.android.shared.data.http.HttpJsonPostRequest;

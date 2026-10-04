@@ -88,15 +88,15 @@ public class StartActivity extends AbstractStartActivity<CheckinData> {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case R.id.options_menu_settings:
+        final int id = item.getItemId();
+        if (id == R.id.options_menu_settings) {
             ExLog.i(this, TAG, "Clicked SETTINGS.");
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
-        case R.id.options_menu_info:
+        } else if (id == R.id.options_menu_info) {
             AboutHelper.showInfoActivity(this);
             return true;
-        default:
+        } else {
             return super.onOptionsItemSelected(item);
         }
     }
