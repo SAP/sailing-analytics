@@ -2,7 +2,7 @@ package com.sap.sailing.android.shared.ui.customviews;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.support.v7.widget.AppCompatTextView;
+import androidx.appcompat.widget.AppCompatTextView;
 import android.util.AttributeSet;
 
 public class OpenSansTextView extends AppCompatTextView {

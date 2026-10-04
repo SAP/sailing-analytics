@@ -100,12 +100,12 @@
                 android:id="@+id/tools_layout"
                 layout="@layout/competitor_tools_layout" />
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list_positioning_all"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list_positioning_chosen"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
