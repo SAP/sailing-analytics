@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <link href='../../../../sailing-fontface-1.0.cache.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+    <link href='../../../main.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+    <link rel='icon' href='../../../../sap.ico' type='image/x-icon'>
+    <title>SAP Sailing Analytics Webservices API Version 1.0</title>
+</head>
+<body>
+<h1>SAP Sailing Analytics Webservices API Version 1.0</h1>
+<h2>URL: /sailinglandscape/api/landscape/deployreplicatoexistinghost</h2>
+
+<b>Description:</b>
+ <p>Deploys an additional replica process of an existing application replica set onto an existing host, which may be a
+ shared host running processes of several replica sets. As a precondition, the host must be eligible for the deployment:
+ in particular, the HTTP port used by the replica set must be free on the host and the server directory must be
+ available. If the host is not eligible, the request fails with an error describing the reason (check port and
+ directory). On success, the newly deployed replica process is returned.</p>
+ <br />
+ <table>
+    <tr>
+        <td>Webservice Type:</td>
+        <td>POST</td>
+    </tr>
+    <tr>
+        <td>Output format:</td>
+        <td>json</td>
+    </tr>
+    <tr>
+        <td>Mandatory query parameters:</td>
+        <td>
+            <div><tt>regionId</tt>, region where the replica set and the host are located, e.g., eu-west-1</div>
+            <div><tt>replicaSetName</tt>, name of the replica set a replica of which is to be deployed; used as the hostname to which the
+                                 domain name is appended, as well as for the database and RabbitMQ exchange name</div>
+            <div><tt>hostId</tt>, the AWS instance ID of the existing host on which the new replica process shall be deployed</div>
+        </td>
+    </tr>
+    <tr>
+        <td>Optional form parameters:</td>
+        <td>
+            <div><tt>keyName</tt>, the name of the SSH key to use; must identify an existing SSH key by that name in the region specified
+                          and will be used to log on to existing and new instances using a root ssh connection. If not specified, the
+                          key used to launch an instance will be used for trying to connect to it, and a private key with matching name
+                          for the respective region will be looked up.</div>
+            <div><tt>privateKeyEncryptionPassphrase</tt>, the pass phrase to decrypt the private key for the key specified by the keyName parameter</div>
+            <div><tt>replicaReplicationBearerToken</tt>, the bearer token the new replica will use to replicate its master server; defaults to the
+                                               bearer token of the user authenticated for this request. Note that this requires the
+                                               server processing this request to share the security information from security-service.sapsailing.com, too.</div>
+            <div><tt>memoryInMegabytes</tt>, can be used to specify the absolute amount of heap size used for the Java VM running the replica process; if not
+                                    specified, memoryTotalSizeFactor may be used (see below); if that isn't used either, heap size
+                                    is computed based on the amount of memory available on the instance, not considering any swap space available.</div>
+            <div><tt>memoryTotalSizeFactor</tt>, can be used if memoryInMegabytes is not used; it roughly specifies how many processes are intended to be run on the
+                                        host; e.g., if 4 is specified, approximately 1/4 of the physical memory available (not considering swap space) is
+                                        assigned as the process's heap space. If neither memoryInMegabytes nor memoryTotalSizeFactor are specified then
+                                        the amount of memory is calculated automatically based on the amount of physical memory available on the host.</div>
+            <div><tt>igtimiRiotPort</tt>, the port on which the process shall listen for iGtimi RIOT connections; if not specified, no such port is configured.</div>
+            <div><tt>timeoutInMilliseconds</tt>, timeout in milliseconds to wait for responses from nodes when analyzing the replica sets
+                                        existing in the region; if not specified, waiting will not time out.</div>
+        </td>
+    </tr>
+    <tr>
+        <td>Request method:</td>
+        <td>POST</td>
+    </tr>
+    <tr>
+        <td>Example:</td>
+        <td>curl -X POST -d 'regionId=eu-west-2' -d 'replicaSetName=mynewevent' -d 'hostId=i-0123456789abcdef0' -d 'keyName=Horst' --data-urlencode 'privateKeyEncryptionPassphrase=HorstsSuperSecretPassword' -H 'Authorization: Bearer RwGK+DV38LKjeuDu+Bx87/3blLJHD7Ff+NCLeud9nRQ=' "https://sapsailing.com/sailinglandscape/api/landscape/deployreplicatoexistinghost"<br>
+        produces output describing the deployed replica process:<pre>
+            {
+              "host": {
+                "instanceId": "i-0123456789abcdef0",
+                "name": "SL Multi-Server",
+                "availabilityZoneId": "euw2-az1",
+                "availabilityZoneName": "eu-west-2a",
+                "privateAddress": "172.31.36.221",
+                "publicAddress": "18.130.0.1"
+              },
+              "port": 8081,
+              "serverDirectory": "/opt/sailing/mynewevent"
+            }
+        </pre>
+        </td>
+    </tr>
+</table>
+<div style="height: 1em;"></div>
+<a href="index.html">Back to Web Service Overview</a>
+</body>
+</html>

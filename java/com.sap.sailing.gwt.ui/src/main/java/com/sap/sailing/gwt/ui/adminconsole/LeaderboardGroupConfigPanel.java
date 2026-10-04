@@ -30,6 +30,7 @@ import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.user.cellview.client.AbstractCellTable;
 import com.google.gwt.user.cellview.client.CellTable.Resources;
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Window;
@@ -235,7 +236,7 @@ public class LeaderboardGroupConfigPanel extends AbstractRegattaPanel
                     public int hashCode(StrippedLeaderboardDTO t) {
                         return t.getName().hashCode();
                     }
-                }, leaderboardsFilterablePanel.getAllListDataProvider(), leaderboardsTable);
+                }, leaderboardsFilterablePanel.getAllListDataProvider());
         refreshableLeaderboardsSelectionModel = leaderboardTableSelectionColumn.getSelectionModel();
         leaderboardsTable.setSelectionModel(refreshableLeaderboardsSelectionModel, leaderboardTableSelectionColumn.getSelectionManager());
         leaderboardsFilterablePanel.getTextBox().ensureDebugId("LeaderboardsFilterTextBox");
@@ -279,7 +280,8 @@ public class LeaderboardGroupConfigPanel extends AbstractRegattaPanel
         };
         leaderboardsTable.setWidth("100%");
         leaderboardsTable.addColumnSortHandler(leaderboardsListHandler);
-        leaderboardsTable.addColumn(leaderboardTableSelectionColumn, leaderboardTableSelectionColumn.getHeader());
+        final Header<Boolean> selectAllHeader = leaderboardTableSelectionColumn.createHeader();
+        leaderboardsTable.addColumn(leaderboardTableSelectionColumn, selectAllHeader);
         leaderboardsTable.addColumn(leaderboardsNameColumn, stringMessages.leaderboardName());
         leaderboardsTable.addColumn(leaderboardsRacesColumn, stringMessages.races());
         refreshableLeaderboardsSelectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
@@ -383,9 +385,10 @@ public class LeaderboardGroupConfigPanel extends AbstractRegattaPanel
                             public int hashCode(StrippedLeaderboardDTO t) {
                                 return t.getName().hashCode();
                             }
-                        }, groupDetailsProvider, groupDetailsTable);
+                        }, groupDetailsProvider);
+        final Header<Boolean> groupDetailsSelectAllHeader = groupDetailsTableSelectionColumn.createHeader();
         groupDetailsTable.setWidth("100%");
-        groupDetailsTable.addColumn(groupDetailsTableSelectionColumn, groupDetailsTableSelectionColumn.getHeader());
+        groupDetailsTable.addColumn(groupDetailsTableSelectionColumn, groupDetailsSelectAllHeader);
         groupDetailsTable.addColumn(groupDetailsNameColumn, stringMessages.leaderboardName());
         groupDetailsTable.addColumn(groupDetailsRacesColumn, stringMessages.races());
         refreshableGroupDetailsSelectionModel = groupDetailsTableSelectionColumn.getSelectionModel();
@@ -593,9 +596,10 @@ public class LeaderboardGroupConfigPanel extends AbstractRegattaPanel
                     public int hashCode(LeaderboardGroupDTO t) {
                         return t.getId().hashCode();
                     }
-                }, groupsFilterablePanel.getAllListDataProvider(), groupsTable);
+                }, groupsFilterablePanel.getAllListDataProvider());
+        final Header<Boolean> groupsSelectAllHeader = leaderboardTableSelectionColumn.createHeader();
         groupsTable.setWidth("100%");
-        groupsTable.addColumn(leaderboardTableSelectionColumn, leaderboardTableSelectionColumn.getHeader());
+        groupsTable.addColumn(leaderboardTableSelectionColumn, groupsSelectAllHeader);
         groupsTable.addColumn(groupNameColumn, stringMessages.name());
         groupsTable.addColumn(groupDescriptionColumn, stringMessages.description());
         groupsTable.addColumn(groupDisplayNameColumn, stringMessages.displayName());
@@ -606,7 +610,10 @@ public class LeaderboardGroupConfigPanel extends AbstractRegattaPanel
         groupsTable.addColumnSortHandler(leaderboardGroupsListHandler);
         refreshableGroupsSelectionModel = leaderboardTableSelectionColumn.getSelectionModel();
         removeButton = buttonPanel.addRemoveAction(stringMessages.remove(), refreshableGroupsSelectionModel, true,
-                () -> removeLeaderboardGroups(refreshableGroupsSelectionModel.getSelectedSet()));
+                () -> {
+            final List<LeaderboardGroupDTO> selectedGroups = new ArrayList<>(refreshableGroupsSelectionModel.getSelectedSet());
+            removeLeaderboardGroups(selectedGroups);
+        });
         removeButton.ensureDebugId("RemoveLeaderboardButton");
         refreshableGroupsSelectionModel.addSelectionChangeHandler(event -> groupSelectionChanged());
         groupsTable.setSelectionModel(refreshableGroupsSelectionModel, leaderboardTableSelectionColumn.getSelectionManager());
@@ -737,7 +744,7 @@ public class LeaderboardGroupConfigPanel extends AbstractRegattaPanel
                                         groupToUpdate.setOverallLeaderboardDiscardThresholds(updateDescriptor.getOverallLeaderboardDiscardThresholds());
                                         groupToUpdate.setOverallLeaderboardScoringSchemeType(updateDescriptor.getOverallLeaderboardScoringSchemeType());
                                         availableLeaderboardGroups.set(i, groupToUpdate);
-                                        int displayedIndex = groupsProvider.getList().indexOf(group);
+                                        final int displayedIndex = groupsProvider.getList().indexOf(group);
                                         if (displayedIndex != -1) {
                                             groupsProvider.getList().set(displayedIndex, groupToUpdate);
                                         }
@@ -775,6 +782,10 @@ public class LeaderboardGroupConfigPanel extends AbstractRegattaPanel
                             }
                             @Override
                             public void onSuccess(Void v) {
+                                // tell all other LeaderboardGroupsDisplayers the new full list
+                                // which was updated here in-place.
+                                presenter.getLeaderboardGroupsRefresher().updateAndCallFillForAll(
+                                        availableLeaderboardGroups, getLeaderboardGroupsDisplayer());
                             }
                         }));
     }
@@ -831,15 +842,8 @@ public class LeaderboardGroupConfigPanel extends AbstractRegattaPanel
     }
 
     private void groupSelectionChanged() {
-        Set<LeaderboardGroupDTO> selectedLeaderboardGroups = refreshableGroupsSelectionModel.getSelectedSet();
+        final Set<LeaderboardGroupDTO> selectedLeaderboardGroups = refreshableGroupsSelectionModel.getSelectedSet();
         isSingleGroupSelected = selectedLeaderboardGroups.size() == 1;
-        boolean canDeleteAllSelected = true;
-        for (LeaderboardGroupDTO group : selectedLeaderboardGroups) {
-            if (!userService.hasPermission(group, DefaultActions.DELETE)) {
-                canDeleteAllSelected = false;
-            }
-        }
-        removeButton.setEnabled(!selectedLeaderboardGroups.isEmpty() && canDeleteAllSelected);
         splitPanel.setVisible(isSingleGroupSelected);
         if (isSingleGroupSelected) {
             LeaderboardGroupDTO selectedGroup = selectedLeaderboardGroups.iterator().next();
@@ -937,7 +941,6 @@ public class LeaderboardGroupConfigPanel extends AbstractRegattaPanel
             group.leaderboards.set(index, temp);
             groupDetailsProvider.getList().clear();
             groupDetailsProvider.getList().addAll(group.leaderboards);
-
             updateGroup(group);
         }
     }

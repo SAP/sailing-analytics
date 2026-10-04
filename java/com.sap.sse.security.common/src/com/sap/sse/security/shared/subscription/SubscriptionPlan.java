@@ -2,7 +2,6 @@ package com.sap.sse.security.shared.subscription;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,63 +37,69 @@ public abstract class SubscriptionPlan implements Serializable {
      * BASIC is a dummy category used to define the features in the feature list.
      */
     public enum PlanCategory {
+        NOT_LOGGED_IN("not_logged_in",
+                "features_limited_live_analytics"),
         BASIC("free_subscription_plan",
+                "features_notifications",
                 "features_organize_events",
                 "features_events_with_more_regatta",
                 "features_connect_to_tractrac",
                 "features_imports",
                 "features_media_management",
                 "features_limited_live_analytics",
-                "features_media_tags", 
+                "features_media_tags",
                 "features_scoring"),
-        PREMIUM("premium", 
+        PREMIUM("premium",
+                "features_notifications",
                 "features_organize_events",
                 "features_events_with_more_regatta",
                 "features_connect_to_tractrac",
                 "features_imports",
                 "features_media_management",
                 "features_limited_live_analytics",
-                "features_media_tags", 
-                "features_scoring", 
-                "features_wind_analytics", 
-                "features_maneuver_analytics", 
-                "features_competitor_analytics", 
-                "features_advanced_leaderboard_info", 
-                "features_simulator", 
-                "features_map_analytics"), 
-        DATA_MINING_ARCHIVE("data_mining_archive", 
+                "features_media_tags",
+                "features_scoring",
+                "features_wind_analytics",
+                "features_maneuver_analytics",
+                "features_competitor_analytics",
+                "features_advanced_leaderboard_info",
+                "features_simulator",
+                "features_map_analytics"),
+        DATA_MINING_ARCHIVE("data_mining_archive",
+                "features_notifications",
                 "features_organize_events",
                 "features_events_with_more_regatta",
                 "features_connect_to_tractrac",
                 "features_imports",
                 "features_media_management",
                 "features_limited_live_analytics",
-                "features_media_tags", 
-                "features_scoring", 
-                "features_wind_analytics", 
-                "features_maneuver_analytics", 
-                "features_competitor_analytics", 
-                "features_advanced_leaderboard_info", 
-                "features_simulator", 
-                "features_map_analytics", 
-                "features_data_mining"), 
+                "features_media_tags",
+                "features_scoring",
+                "features_wind_analytics",
+                "features_maneuver_analytics",
+                "features_competitor_analytics",
+                "features_advanced_leaderboard_info",
+                "features_simulator",
+                "features_map_analytics",
+                "features_data_mining"),
         DATA_MINING_ALL("data_mining_all",
+                "features_notifications",
                 "features_organize_events",
                 "features_events_with_more_regatta",
                 "features_connect_to_tractrac",
                 "features_imports",
                 "features_media_management",
                 "features_limited_live_analytics",
-                "features_media_tags", 
-                "features_scoring", 
-                "features_wind_analytics", 
-                "features_maneuver_analytics", 
-                "features_competitor_analytics", 
-                "features_advanced_leaderboard_info", 
-                "features_simulator", 
-                "features_map_analytics", 
-                "features_data_mining", 
-                "features_data_mining_all"), 
+                "features_media_tags",
+                "features_scoring",
+                "features_wind_analytics",
+                "features_maneuver_analytics",
+                "features_competitor_analytics",
+                "features_advanced_leaderboard_info",
+                "features_simulator",
+                "features_map_analytics",
+                "features_data_mining",
+                "features_data_mining_all"),
         TRIAL("trial");
         
         final String id;
@@ -103,7 +108,11 @@ public abstract class SubscriptionPlan implements Serializable {
         
         PlanCategory(String id, String...featureIds) {
             this.id = id;
-            this.featureIds = new HashSet<>(Arrays.asList(featureIds));
+            // Use LinkedHashSet to preserve the declaration order of the feature ids. This order is relied upon
+            // when rendering the feature list in the UI. A plain HashSet happened to yield the same order due to
+            // how GWT translates it to JavaScript, but that was coincidental; LinkedHashSet makes it explicit and
+            // robust against changes in GWT's HashSet implementation.
+            this.featureIds = new LinkedHashSet<>(Arrays.asList(featureIds));
         }
         
         public String getId() {

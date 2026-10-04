@@ -15,6 +15,7 @@ import java.util.Arrays;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
@@ -40,6 +41,7 @@ import com.sap.sse.common.Util;
  *
  */
 public class CompetitorImportTest extends AbstractEventResultJsonServiceTest {
+    @Disabled("ongoing tests at SwissTiming 2026-03-25")
     @Test
     public void simpleCompetitorImportTest() throws FileNotFoundException, IOException, JAXBException, URISyntaxException, SAXException, ParserConfigurationException {
         ResultUrlRegistry resultUrlRegistry = mock(ResultUrlRegistry.class);

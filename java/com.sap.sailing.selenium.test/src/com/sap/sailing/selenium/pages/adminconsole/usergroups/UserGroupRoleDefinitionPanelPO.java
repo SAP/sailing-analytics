@@ -1,7 +1,7 @@
 package com.sap.sailing.selenium.pages.adminconsole.usergroups;
 
 import org.openqa.selenium.By.ByName;
-import org.openqa.selenium.ElementNotSelectableException;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -33,6 +33,8 @@ public class UserGroupRoleDefinitionPanelPO extends PageArea {
     private static final String TABLE_ROLE_NAME_COLUMN = "Role Name";
     @FindBy(how = BySeleniumId.class, using = "AddGroupUserButton")
     private WebElement addRoleButton;
+    @FindBy(how = BySeleniumId.class, using = "RemoveRoleButton")
+    private WebElement removeRoleButton;
     @FindBy(how = BySeleniumId.class, using = "RoleSuggestion")
     private WebElement roleNameInput;
     @FindBy(how = BySeleniumId.class, using = "GroupRoleDefinitionDTOTable")
@@ -69,7 +71,7 @@ public class UserGroupRoleDefinitionPanelPO extends PageArea {
     
     public void clickAddButtonOrThrow() {
         if (!addRoleButton.isEnabled()) {
-            throw new ElementNotSelectableException("Add Button was disabled");
+            throw new ElementNotInteractableException("Add Button was disabled");
         } else {
             addRoleButton.click();
         }
@@ -77,7 +79,7 @@ public class UserGroupRoleDefinitionPanelPO extends PageArea {
     
     public void clickAddButtonAndExpectPermissionError() {
         if (!addRoleButton.isEnabled()) {
-            throw new ElementNotSelectableException("Add Button was disabled");
+            throw new ElementNotInteractableException("Add Button was disabled");
         } else {
             addRoleButton.click();
         }
@@ -85,8 +87,14 @@ public class UserGroupRoleDefinitionPanelPO extends PageArea {
     }
 
     public void removeRole(String name) {
-        final RoleEntryPO findRole = findRole(name);
-        findRole.deleteRole();
+        final RoleEntryPO role = findRole(name);
+        role.select();
+        removeRoleButton.click();
+        waitForAlertContainingMessageAndAccept("The following element(s) will be removed");
+    }
+
+    public void removeRoleViaActionButton(final String name) {
+        findRole(name).deleteRole();
         waitForAlertContainingMessageAndAccept("Do you really want to remove role");
     }
     

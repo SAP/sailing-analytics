@@ -1,5 +1,6 @@
 package com.sap.sse.test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -12,6 +13,8 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
+import com.sap.sse.metering.CPUMeter;
 
 public class CPUTimeMeasurementTest {
     private static final Logger logger = Logger.getLogger(CPUTimeMeasurementTest.class.getName());
@@ -37,6 +40,12 @@ public class CPUTimeMeasurementTest {
         logger.info("work duration with CPU time keeping enabled/disabled: "+durationWithCpuTimeEnabled+"/"+durationWithCpuTimeDisabled
                 +" ("+((double) durationWithCpuTimeEnabled / (double) durationWithCpuTimeDisabled)+")");
         assertFalse((double) durationWithCpuTimeEnabled > 1.5*durationWithCpuTimeDisabled);
+    }
+   
+    @Test
+    public void testCallableResultProperlyReturned() {
+        final int result = CPUMeter.create().callWithCPUMeter(() -> { return 2; });
+        assertEquals(2, result);
     }
     
     @Test

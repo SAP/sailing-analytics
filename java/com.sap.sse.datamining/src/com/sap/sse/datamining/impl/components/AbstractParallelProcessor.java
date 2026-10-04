@@ -1,11 +1,15 @@
 package com.sap.sse.datamining.impl.components;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.subject.Subject;
@@ -19,17 +23,19 @@ public abstract class AbstractParallelProcessor<InputType, ResultType> extends A
                                                                        implements ProcessorInstructionHandler<ResultType> {
 
     private static final Logger LOGGER = Logger.getLogger(AbstractParallelProcessor.class.getName());
-    private static final int SLEEP_TIME_DURING_FINISHING = 100;
+    private static final int SLEEP_TIME_DURING_FINISHING_MILLIS = 100;
 
     private final Processor<ResultType, ?>[] resultReceivers;
     private final ExecutorService executor;
     private final AtomicInteger unfinishedInstructionsCounter;
+    private final Set<Runnable> callbacksWhenNoMoreUnfinishedInstructions;
     
     private boolean isFinished = false;
     private boolean isAborted = false;
 
     public AbstractParallelProcessor(Class<InputType> inputType, Class<ResultType> resultType, ExecutorService executor, Collection<Processor<ResultType, ?>> resultReceivers) {
         super(inputType, resultType);
+        this.callbacksWhenNoMoreUnfinishedInstructions = Collections.newSetFromMap(new ConcurrentHashMap<Runnable, Boolean>());
         this.executor = executor;
         @SuppressWarnings("unchecked")
         final Processor<ResultType, ?>[] resultReceiversAsArray = (Processor<ResultType, ?>[]) new Processor<?, ?>[resultReceivers.size()];
@@ -82,15 +88,72 @@ public abstract class AbstractParallelProcessor<InputType, ResultType> extends A
         }
     }
 
-    @Override
-    public void afterInstructionFinished(ProcessorInstruction<ResultType> instruction) {
-        unfinishedInstructionsCounter.getAndDecrement();
-    }
-    
     protected Processor<ResultType, ?>[] getResultReceivers() {
         return resultReceivers;
     }
     
+    @Override
+    public synchronized void afterInstructionFinished(ProcessorInstruction<ResultType> instruction) {
+        if (unfinishedInstructionsCounter.decrementAndGet() == 0) {
+            for (final Runnable callback : callbacksWhenNoMoreUnfinishedInstructions) {
+                callback.run();
+            }
+            callbacksWhenNoMoreUnfinishedInstructions.clear();
+        }
+    }
+    
+    /**
+     * Enqueues a callback for the event where the {@link #unfinishedInstructionsCounter} on this processor is equal to
+     * or gets decremented to zero and all {@link #resultReceivers} have also called back into a runnable passed now
+     * to their {@link AbstractParallelProcessor#runWhenFinishedProcessing(Runnable)} method.
+     * 
+     * @param callbackWhenAllLoadedFixesHaveBeenProcessed
+     *            must not be {@code null}
+     */
+    @Override
+    public void runWhenFinishedProcessing(final Runnable callbackWhenAllLoadedFixesHaveBeenProcessed) {
+        if (callbackWhenAllLoadedFixesHaveBeenProcessed == null) {
+            throw new NullPointerException("callbackWhenAllLoadedFixesHaveBeenProcessed must not be null");
+        }
+        invokeOrScheduleCallbackForWhenNoMoreUnfinishedInstructions(()->{
+            if (resultReceivers.length == 0) {
+                LOGGER.info("Running callback after done processing and no result receivers: "
+                        +callbackWhenAllLoadedFixesHaveBeenProcessed);
+                callbackWhenAllLoadedFixesHaveBeenProcessed.run();
+            } else {
+                final AtomicInteger resultReceiverCallbackCounter = new AtomicInteger(resultReceivers.length);
+                for (final Processor<ResultType, ?> resultReceiver : resultReceivers) {
+                    resultReceiver.runWhenFinishedProcessing(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (resultReceiverCallbackCounter.decrementAndGet() == 0) {
+                                // this was the last result receiver we were waiting for; trigger callback
+                                LOGGER.info("Running callback after done processing and result receivers finished too: "
+                                        +callbackWhenAllLoadedFixesHaveBeenProcessed);
+                                callbackWhenAllLoadedFixesHaveBeenProcessed.run();
+                            }
+                        }
+                        
+                        @Override
+                        public String toString() {
+                            return callbackWhenAllLoadedFixesHaveBeenProcessed.toString();
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    private void invokeOrScheduleCallbackForWhenNoMoreUnfinishedInstructions(final Runnable callbackWhenAllLoadedFixesHaveBeenProcessed) {
+        synchronized (this) {
+            if (unfinishedInstructionsCounter.get() == 0) {
+                callbackWhenAllLoadedFixesHaveBeenProcessed.run();
+            } else {
+                callbacksWhenNoMoreUnfinishedInstructions.add(callbackWhenAllLoadedFixesHaveBeenProcessed);
+            }
+        }
+    }
+
     /**
      * Forwards the given <code>result</code> to the result receivers, if it's {@link #isResultValid(Object) valid}
      * and if the processor hasn't been {@link #abort() aborted}.
@@ -149,7 +212,7 @@ public abstract class AbstractParallelProcessor<InputType, ResultType> extends A
     protected void sleepUntilAllInstructionsFinished() throws InterruptedException {
         while (areUnfinishedInstructionsLeft() && !isAborted) {
             try {
-                Thread.sleep(SLEEP_TIME_DURING_FINISHING);
+                Thread.sleep(SLEEP_TIME_DURING_FINISHING_MILLIS); // TODO shouldn't this better be handled by wait/notify on unfinishedInstructionsCounter changes?
             } catch (InterruptedException e) {
                 if (!isAborted) {
                     onFailure(e);

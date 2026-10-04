@@ -1,7 +1,7 @@
 package com.sap.sailing.racecommittee.app.data;
 
 import android.content.Context;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import androidx.loader.app.LoaderManager.LoaderCallbacks;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.race.RaceLog;

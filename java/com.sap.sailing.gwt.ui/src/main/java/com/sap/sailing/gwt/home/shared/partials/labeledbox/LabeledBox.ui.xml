@@ -1,0 +1,16 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:with field="local_res"
+		type="com.sap.sailing.gwt.home.shared.partials.multiselection.SuggestedMultiSelectionResources" />
+	<ui:style>
+	
+	</ui:style>
+	<g:HTMLPanel addStyleNames="{local_res.css.suggestions}">
+		<div class="{local_res.css.suggestionsHeader}">
+			<span class="{local_res.css.suggestionsHeaderTitle}"
+				ui:field="headerTitleUi" />
+		</div>
+		<g:Widget ui:field="childUi" />
+	</g:HTMLPanel>
+</ui:UiBinder>

@@ -26,6 +26,7 @@ import com.sap.sse.gwt.client.celltable.TableWrapper;
 import com.sap.sse.gwt.client.panels.LabeledAbstractFilterablePanel;
 import com.sap.sse.security.shared.dto.StrippedRoleDefinitionDTO;
 import com.sap.sse.security.shared.dto.UserGroupDTO;
+import com.sap.sse.security.shared.dto.SecuredDTO;
 import com.sap.sse.security.ui.client.UserManagementWriteServiceAsync;
 import com.sap.sse.security.ui.client.UserService;
 import com.sap.sse.security.ui.client.component.AccessControlledButtonPanel;
@@ -122,14 +123,14 @@ public class GroupRoleDefinitionPanel extends Composite
             }
         });
         addButton.ensureDebugId("AddGroupUserButton");
-        final Button removeButton = buttonPanel.addUpdateAction(stringMessages.removeRole(), () -> {
-            Pair<StrippedRoleDefinitionDTO, Boolean> selectedRole = roleDefinitionTableWrapper.getSelectionModel()
-                    .getSelectedObject();
-            if (selectedRole == null) {
-                Window.alert(stringMessages.youHaveToSelectAUserGroup());
-            } else if (Window.confirm(stringMessages.doYouReallyWantToRemoveRole(selectedRole.getA().getName()))) {
-                UserGroupDTO selectedObject = TableWrapper.getSingleSelectedObjectOrNull(userGroupSelectionModel);
-                if (selectedObject != null) {
+        // Removing a role from a group is semantically an UPDATE to the UserGroup, not a per-role DELETE.
+        final Button removeButton = buttonPanel.addRemoveActionWithParentPermission(stringMessages.removeRole(),
+                roleDefinitionTableWrapper.getSelectionModel(),
+                pair -> pair.getA().getName(),
+                () -> (SecuredDTO) TableWrapper.getSingleSelectedObjectOrNull(userGroupSelectionModel), UPDATE, () -> {
+            final UserGroupDTO selectedObject = TableWrapper.getSingleSelectedObjectOrNull(userGroupSelectionModel);
+            if (selectedObject != null) {
+                for (final Pair<StrippedRoleDefinitionDTO, Boolean> selectedRole : roleDefinitionTableWrapper.getSelectionModel().getSelectedElements()) {
                     userManagementService.removeRoleDefinitionFromUserGroup(selectedObject.getId().toString(),
                             selectedRole.getA().getId().toString(), new AsyncCallback<Void>() {
                                 @Override
@@ -143,14 +144,10 @@ public class GroupRoleDefinitionPanel extends Composite
                                     updateUserGroups();
                                 }
                             });
-                } else {
-                    Window.alert(stringMessages.pleaseSelect());
                 }
             }
         });
-        roleDefinitionTableWrapper.getSelectionModel().addSelectionChangeHandler(event -> removeButton
-                .setEnabled(!roleDefinitionTableWrapper.getSelectionModel().getSelectedSet().isEmpty()));
-        removeButton.setEnabled(false);
+        removeButton.ensureDebugId("RemoveRoleButton");
         buttonPanel.insertWidgetAtPosition(suggestRole, 0);
         return buttonPanel;
     }

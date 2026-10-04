@@ -2,8 +2,8 @@
 source ./../../../configuration/correctFilePathInRelationToCurrentOs.sh
 # generate a target definition pointing to the locally built p2 repo from the race-analysis-p2-remote target defintion
 base="../definitions/race-analysis-p2"
-remote_repo="https://p2.sapsailing.com/p2/sailing/"
-remote_repo_aws_sdk="https://p2.sapsailing.com/p2/aws-sdk/"
+remote_repo="https://download.eclipse.org/sailing-analytics/p2/sailing/"
+remote_repo_aws_sdk="https://download.eclipse.org/sailing-analytics/p2/aws-sdk/"
 # reading the filepath and editing it, so it fits for eclipse
 # currently safely works for cygwin, gitbash and linux
 local_repo=$(correct_file_path  "`readlink -f ../../com.sap.sailing.targetplatform.base/target/repository/`")

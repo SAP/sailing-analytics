@@ -180,8 +180,7 @@ public class MasterDataImportPanel extends VerticalPanel {
                                                     showErrorAlert(result.getErrorMessage());
                                                     changeButtonStateAccordingToApplicationState();
                                                 } else {
-                                                    MasterDataImportObjectCreationCount creationCount = result
-                                                            .getResult();
+                                                    MasterDataImportObjectCreationCount creationCount = result.getResult();
                                                     if (creationCount != null) {
                                                         // Got result, cancel timer
                                                         cancel();

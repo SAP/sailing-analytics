@@ -1,6 +1,7 @@
 package com.sap.sailing.gwt.ui.shared;
 
 import com.sap.sailing.domain.common.security.SecuredDomainType;
+import com.sap.sse.common.Named;
 import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util.Pair;
@@ -12,7 +13,7 @@ import com.sap.sse.security.shared.dto.OwnershipDTO;
 import com.sap.sse.security.shared.dto.SecuredDTO;
 import com.sap.sse.security.shared.dto.SecurityInformationDTO;
 
-public class IgtimiDeviceWithSecurityDTO implements SecuredDTO {
+public class IgtimiDeviceWithSecurityDTO implements SecuredDTO, Named {
     private static final long serialVersionUID = 176992188692729118L;
     private SecurityInformationDTO securityInformation = new SecurityInformationDTO();
 

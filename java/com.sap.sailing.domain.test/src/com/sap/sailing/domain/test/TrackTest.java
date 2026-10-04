@@ -22,6 +22,7 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -265,83 +266,119 @@ public class TrackTest {
     public void testMaxSpeedCacheRaceCondition() throws InterruptedException, BrokenBarrierException, TimeoutException {
         final CyclicBarrier cacheBarrier = new CyclicBarrier(2);
         final CyclicBarrier cacheDone = new CyclicBarrier(2);
-        
-        DynamicGPSFixMovingTrackImpl<Object> track = new DynamicGPSFixMovingTrackImpl<Object>(new Object(), /* millisecondsOverWhichToAverage */ 30000l) {
+        // Tripped by the three fix-adding threads and by the first query's computeMaxSpeed(...) step so that the stale
+        // computation only completes once all three fix additions are known to be about to contend for the cache's
+        // write lock; replaces the former fixed Thread.sleep(1000) that merely hoped for this ordering.
+        final CyclicBarrier fixThreadsReadyToContend = new CyclicBarrier(4);
+        // Only the first query's stale computation must rendezvous with the three fix-adding threads at the barrier above.
+        // The second query later re-enters computeMaxSpeed(...) after those threads have finished, so it must not await the
+        // barrier (nobody else would ever reach it, deadlocking until the 20s timeout); this flag lets exactly one
+        // computeMaxSpeed(...) invocation wait on the barrier.
+        final AtomicBoolean firstComputeMaxSpeedAwaitsBarrier = new AtomicBoolean(true);
+        final DynamicGPSFixMovingTrackImpl<Object> track = new DynamicGPSFixMovingTrackImpl<Object>(new Object(), /* millisecondsOverWhichToAverage */ 30000l) {
             private static final long serialVersionUID = 1L;
-
             @Override
             protected MaxSpeedCache<Object, GPSFixMoving> createMaxSpeedCache() {
                 return new MaxSpeedCache<Object, GPSFixMoving>(this) {
                     private static final long serialVersionUID = 1L;
-
                     @Override
                     protected Pair<GPSFixMoving, Speed> computeMaxSpeed(TimePoint from, TimePoint to) {
-                        Pair<GPSFixMoving, Speed> result = super.computeMaxSpeed(from, to);
-                        try {
-                            Thread.sleep(1000); // just wait a bit; can't lock really because that would cause a deadlock
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
+                        final Pair<GPSFixMoving, Speed> result = super.computeMaxSpeed(from, to);
+                        if (firstComputeMaxSpeedAwaitsBarrier.compareAndSet(true, false)) {
+                            try {
+                                // wait until all three fix-adding threads have reached the barrier, i.e., are about to
+                                // contend for this cache's write lock, before letting the stale computation complete
+                                fixThreadsReadyToContend.await(20, TimeUnit.SECONDS);
+                            } catch (final InterruptedException | BrokenBarrierException | TimeoutException e) {
+                                throw new RuntimeException(e);
+                            }
                         }
                         return result;
                     }
-
                     @Override
                     protected void cache(TimePoint from, TimePoint to, Pair<GPSFixMoving, Speed> fixAtMaxSpeed) {
                         try {
                             cacheBarrier.await();
-                        } catch (InterruptedException | BrokenBarrierException e) {
+                        } catch (final InterruptedException | BrokenBarrierException e) {
                             throw new RuntimeException(e);
                         }
                         super.cache(from, to, fixAtMaxSpeed);
                         try {
                             cacheDone.await();
-                        } catch (InterruptedException | BrokenBarrierException e) {
+                        } catch (final InterruptedException | BrokenBarrierException e) {
                             throw new RuntimeException(e);
                         }
                     }
                 };
             }
         };
-        GPSFixMoving fix1 = new GPSFixMovingImpl(new DegreePosition(0, 0), new MillisecondsTimePoint(0), new KnotSpeedWithBearingImpl(
+        final GPSFixMoving fix1 = new GPSFixMovingImpl(new DegreePosition(0, 0), new MillisecondsTimePoint(0), new KnotSpeedWithBearingImpl(
                 1, new DegreeBearingImpl(123)), /* optionalTrueHeading */ null);
         track.addGPSFix(fix1);
         // The following getMaximumSpeedOverGround call will trigger a computeMaxSpeed(...) and a cache(...) call
-        new Thread(()->
+        final Thread firstQueryThread = new Thread(()->
             assertEquals(1., track.getMaximumSpeedOverGround(new MillisecondsTimePoint(0), new MillisecondsTimePoint(7200000)).
-                getB().getKnots(), 0.01)).start(); // produces a cache entry that ends
-        // now don't release the cacheBarrier as yet but add more fixes
-        new Thread(() -> {
-            GPSFixMoving fix2 = new GPSFixMovingImpl(new DegreePosition(0, 0), new MillisecondsTimePoint(3600000),
+                getB().getKnots(), 0.01)); // produces a cache entry that ends
+        firstQueryThread.start();
+        // now don't release the cacheBarrier as yet but add more fixes; each thread announces at fixThreadsReadyToContend
+        // that it is about to acquire the cache's write lock so the stale computation above can complete deterministically
+        final Thread fix2Thread = new Thread(() -> {
+            final GPSFixMoving fix2 = new GPSFixMovingImpl(new DegreePosition(0, 0), new MillisecondsTimePoint(3600000),
                     new KnotSpeedWithBearingImpl(2, new DegreeBearingImpl(123)), /* optionalTrueHeading */ null);
+            try {
+                fixThreadsReadyToContend.await(20, TimeUnit.SECONDS);
+            } catch (final InterruptedException | BrokenBarrierException | TimeoutException e) {
+                throw new RuntimeException(e);
+            }
             track.addGPSFix(fix2);
-        }).start();
-        new Thread(() -> {
-            GPSFixMoving fix3 = new GPSFixMovingImpl(new DegreePosition(0, 0), new MillisecondsTimePoint(7200000),
+        });
+        fix2Thread.start();
+        final Thread fix3Thread = new Thread(() -> {
+            final GPSFixMoving fix3 = new GPSFixMovingImpl(new DegreePosition(0, 0), new MillisecondsTimePoint(7200000),
                     new KnotSpeedWithBearingImpl(1, new DegreeBearingImpl(123)), /* optionalTrueHeading */ null);
+            try {
+                fixThreadsReadyToContend.await(20, TimeUnit.SECONDS);
+            } catch (final InterruptedException | BrokenBarrierException | TimeoutException e) {
+                throw new RuntimeException(e);
+            }
             track.addGPSFix(fix3);
-        }).start();
-        new Thread(() -> {
-            GPSFixMoving fix4 = new GPSFixMovingImpl(new DegreePosition(0, 0), new MillisecondsTimePoint(10800000),
+        });
+        fix3Thread.start();
+        final Thread fix4Thread = new Thread(() -> {
+            final GPSFixMoving fix4 = new GPSFixMovingImpl(new DegreePosition(0, 0), new MillisecondsTimePoint(10800000),
                     new KnotSpeedWithBearingImpl(1, new DegreeBearingImpl(123)), /* optionalTrueHeading */ null);
+            try {
+                fixThreadsReadyToContend.await(20, TimeUnit.SECONDS);
+            } catch (final InterruptedException | BrokenBarrierException | TimeoutException e) {
+                throw new RuntimeException(e);
+            }
             track.addGPSFix(fix4);
-        }).start();
+        });
+        fix4Thread.start();
         cacheBarrier.await(); // releasing the creation of the cache entry from way above; this would now add a stale entry
         // that would have been invalidated by all the GPS fixes above
-        cacheDone.await(); // wait for the caching to have completed
+        cacheDone.await(); // wait for the caching to have completed; the first query now releases the cache's write lock,
+        // letting the three fix-adding threads perform their invalidations
+        firstQueryThread.join(); // stale entry has been produced; also surfaces any assertion failure from that thread
+        fix2Thread.join(); // ensure all three invalidations have happened-before the second query below
+        fix3Thread.join();
+        fix4Thread.join();
         final double maxSpeed[] = new double[1];
         final CyclicBarrier testDone = new CyclicBarrier(2);
-        new Thread(() -> {
+        final Thread secondQueryThread = new Thread(() -> {
             maxSpeed[0] = track.getMaximumSpeedOverGround(new MillisecondsTimePoint(0), new MillisecondsTimePoint(7200000)).
                     getB().getKnots();
             try {
                 testDone.await();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 throw new RuntimeException(e);
             }
-        }).start();
+        });
+        secondQueryThread.start();
         cacheBarrier.await(20, TimeUnit.SECONDS);
         cacheDone.await(20, TimeUnit.SECONDS);
         testDone.await();
+        secondQueryThread.join();
         assertEquals(2., maxSpeed[0], 0.1);
     }
 
@@ -870,7 +907,7 @@ public class TrackTest {
         track.addGPSFix(fix);
         assertEquals(1, invalidationCalls.size());
         // the lateOutlier's predecessor now is expected to have changed validity again, causing a distance cache invalidation at its time
-        assertEquals(track.getLastFixBefore(timePointOfLastRawFixBeforeLateOutlier).getTimePoint().plus(1), invalidationCalls.iterator().next());
+        assertEquals(track.getLastFixBefore(timePointOfLastRawFixBeforeLateOutlier).getTimePoint().plusResolution(), invalidationCalls.iterator().next());
         assertTrue(timePointForLateOutlier.compareTo(fix.getTimePoint()) < 0);
         // expect the invalidation to have started at the fix before the outlier, leaving the previous result ending at the fix right before the outlier intact
         final com.sap.sse.common.Util.Pair<TimePoint, com.sap.sse.common.Util.Pair<TimePoint, Distance>> stillStillPresentFullIntervalCacheEntry = distanceCache
@@ -1313,7 +1350,7 @@ public class TrackTest {
                 /* bearing deg delta */ 0.1, /* knot speed delta */ 0.1); // fetch again from the cache
         // assuming that all test fixes are within a few milliseconds and the averaging interval is much larger than that,
         // adding a single fix in the middle should invalidate the cache
-        track.add(new GPSFixMovingImpl(gpsFix3.getPosition(), gpsFix3.getTimePoint().plus(1), gpsFix3.getSpeed(), /* optionalTrueHeading */ null));
+        track.add(new GPSFixMovingImpl(gpsFix3.getPosition(), gpsFix3.getTimePoint().plusResolution(), gpsFix3.getSpeed(), /* optionalTrueHeading */ null));
         assertFalse(compactFix3.isEstimatedSpeedCached());
     }
 }

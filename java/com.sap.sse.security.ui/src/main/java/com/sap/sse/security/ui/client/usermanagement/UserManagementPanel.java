@@ -149,7 +149,9 @@ public class UserManagementPanel<TR extends CellTableWithCheckboxResources> exte
         final Set<UserDTO> selectedUsers = userSelectionModel.getSelectedSet();
         final Set<String> selectedUsernames = new HashSet<String>();
         selectedUsers.forEach((u) -> selectedUsernames.add(u.getName()));
-        final boolean didConfirm = Window.confirm(stringMessages.doYouReallyWantToUnlockNUsers(selectedUsers.size()));
+        final boolean didConfirm = Window.confirm(selectedUsers.size() == 1
+                ? stringMessages.doYouReallyWantToUnlockUser(selectedUsernames.iterator().next())
+                : stringMessages.doYouReallyWantToUnlockNUsers(selectedUsers.size()));
         if (didConfirm) {
             // run api, collect results
             final Set<String> successUserNames = new HashSet<String>();

@@ -7,7 +7,7 @@
 # Usage:
 #   ./github-download-release-assets.sh {BEARER_TOKEN} {release-name-prefix} {repository-name}
 # For example:
-#  ./github-download-release-assets.sh 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 main- SAP/sailing-analytics
+#  ./github-download-release-assets.sh main- eclipse-sailing-analytics/sailing-analytics
 # which will download the latest release tar.gz and release-notes.txt of the main branch (main-xxxxxxxxxxx).
 # Note the "-" at the end of the "main-" prefix specifier; this way we're making name
 # clashes with releases whose name happens to start with "main" unlikely. This
@@ -21,8 +21,8 @@ RELEASE_NOTES_TXT_ASSET_ID=$( echo "${RELEASES}" | jq -r 'sort_by(.published_at)
 if [ "$?" -ne "0" ]; then
   echo "No release with prefix ${RELEASE_NAME_PREFIX} found. Not trying to download/upload anything." >&2
 else
-  RELEASE_TAR_GZ_ASSET_ID=$( echo "${RELEASES}" | jq -r 'sort_by(.published_at) | reverse | map(select(.name | startswith("'${RELEASE_NAME_PREFIX}'")))[0].assets[] | select(.content_type=="application/x-tar").id' )
-  RELEASE_FULL_NAME=$( echo "${RELEASES}" | jq -r 'sort_by(.published_at) | reverse | map(select(.name | startswith("'${RELEASE_NAME_PREFIX}'")))[0].assets[] | select(.content_type=="application/x-tar").name' | sed -e 's/\.tar\.gz$//')
+  RELEASE_TAR_GZ_ASSET_ID=$( echo "${RELEASES}" | jq -r 'sort_by(.published_at) | reverse | map(select(.name | startswith("'${RELEASE_NAME_PREFIX}'")))[0].assets[] | select(.content_type as $ct | ["application/x-tar","application/gzip","application/x-gzip","application/x-compressed-tar"] | index($ct)).id' )
+  RELEASE_FULL_NAME=$( echo "${RELEASES}" | jq -r 'sort_by(.published_at) | reverse | map(select(.name | startswith("'${RELEASE_NAME_PREFIX}'")))[0].assets[] | select(.content_type as $ct | ["application/x-tar","application/gzip","application/x-gzip","application/x-compressed-tar"] | index($ct)).name' | sed -e 's/\.tar\.gz$//')
   RELEASE_NAME=$( echo ${RELEASE_FULL_NAME} | sed -e 's/^\(.*\)-\([0-9]*\)$/\1/' )
   RELEASE_TIMESTAMP=$( echo ${RELEASE_FULL_NAME} | sed -e 's/^\(.*\)-\([0-9]*\)$/\2/' )
   echo "Found release ${RELEASE_FULL_NAME} with name ${RELEASE_NAME} and time stamp ${RELEASE_TIMESTAMP}, notes ID is ${RELEASE_NOTES_TXT_ASSET_ID}, tarball ID is ${RELEASE_TAR_GZ_ASSET_ID}" >&2

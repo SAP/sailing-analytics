@@ -17,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.sap.sailing.domain.base.BoatClass;
@@ -70,6 +71,7 @@ import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.impl.MillisecondsDurationImpl;
 import com.sap.sse.concurrent.RunnableWithResultAndException;
 import com.sap.sse.util.SmartFutureCache;
+import com.sap.sse.util.ThreadPoolUtil;
 
 public class SimulationServiceImpl implements SimulationService {
     private static final Logger logger = Logger.getLogger(SimulationService.class.getName());
@@ -124,6 +126,20 @@ public class SimulationServiceImpl implements SimulationService {
     @Override
     public BoatClass getBoatClass(String name) {
         return racingEventService.getBaseDomainFactory().getBoatClass(name);
+    }
+
+    /**
+     * adds the {@link SmartFutureCache#getTaskQueueSize() queue size} of the
+     * {@link SmartFutureCache} underlying the simulator, and the queue size of the
+     * {@link #executor}.
+     */
+    @Override
+    public Optional<Integer> getTaskQueueSize() {
+        final Optional<Integer> queueLength = ThreadPoolUtil.INSTANCE.getQueueLength(scheduler);
+        final Optional<Integer> taskQueueSize = cache.getTaskQueueSize();
+        return taskQueueSize.flatMap(cacheQueueSize->
+                queueLength.map(schedulerQueueSize->
+                    Integer.valueOf(schedulerQueueSize+cacheQueueSize)));
     }
 
     @Override
@@ -383,9 +399,17 @@ public class SimulationServiceImpl implements SimulationService {
 
     @Override
     public SimulationResults getSimulationResults(LegIdentifier legIdentifier) {
-        SimulationResults result = cache.get(legIdentifier, false);
+        SimulationResults result = null;
+        try {
+            result = cache.get(legIdentifier, false);
+            if (result == null) {
+                logger.fine("Simulation Get: Cache Empty: \"" + legIdentifier.toString() + "\"");
+            }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception trying to get simulation results for "+legIdentifier+
+                    "; re-calculating", e);
+        }
         if (result == null) {
-            logger.fine("Simulation Get: Cache Empty: \"" + legIdentifier.toString() + "\"");
             if (!raceListeners.containsKey(legIdentifier.getRegattaName())) {
                 final Regatta regatta = racingEventService.getRegattaByName(legIdentifier.getRegattaName());
                 final DynamicTrackedRegatta trackedRegatta = racingEventService.getTrackedRegatta(regatta);
@@ -413,7 +437,7 @@ public class SimulationServiceImpl implements SimulationService {
             }
             logger.info("Simulation Get: Update Triggered: \"" + legIdentifier.toString() + "\"");
             cache.triggerUpdate(legIdentifier, null);
-            result = cache.get(legIdentifier, true); // take first simulation result that becomes available
+            result = null; // can't wait for the result provided by background thread here as this is invoked by foreground thread
         }
         if (result == null) {
             logger.fine("Simulation Get: Null-Result: \"" + legIdentifier.toString() + "\"");

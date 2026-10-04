@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.HeadingElement;
-import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -113,6 +112,10 @@ public class SubscriptionCard extends Composite {
                         }
                         currentPrice = subscriptionPrice;
                         price.addStyleName(SELECTED_STYLE);
+                        final boolean isButtonAvailable = button.isVisible();
+                        if (isButtonAvailable) {
+                            triggerSubscription();
+                        }
                     }
                 });
                 if (!subscriptionPrice.getDisablePlan()) {
@@ -168,24 +171,16 @@ public class SubscriptionCard extends Composite {
         case ONETIMELOCK:
             addStyleName(OWNED_STYLE);
             highlightHeader.add(new Label(i18n.subscriptionOneTimePlanLockedText()));
-            button.getElement().getStyle().setDisplay(Display.NONE);
+            button.setVisible(false);
             break;
         case FREE:
             addStyleName(FREE_STYLE);
             button.setText(i18n.signInOrUp());
-            if (loggedIn) {
-                button.getElement().getStyle().setDisplay(Display.NONE);
-            } else {
-                button.getElement().getStyle().setDisplay(Display.BLOCK);
-            }
+            button.setVisible(!loggedIn);
             eventBus.addHandler(AuthenticationContextEvent.TYPE, event->{
-                AuthenticationContext authContext = event.getCtx();
+                final AuthenticationContext authContext = event.getCtx();
                 // make it point to the current server if the user has CREATE_OBJECT permission there
-                if (authContext.isLoggedIn()) {
-                    button.getElement().getStyle().setDisplay(Display.NONE);
-                } else {
-                    button.getElement().getStyle().setDisplay(Display.BLOCK);
-                }
+                button.setVisible(!authContext.isLoggedIn());
             });
         default:
             break;
@@ -210,6 +205,10 @@ public class SubscriptionCard extends Composite {
 
     @UiHandler("button")
     void onClick(ClickEvent e) {
+        triggerSubscription();
+    }
+
+    private void triggerSubscription() {
         subscriptionCallback.accept(currentPrice);
     }
 

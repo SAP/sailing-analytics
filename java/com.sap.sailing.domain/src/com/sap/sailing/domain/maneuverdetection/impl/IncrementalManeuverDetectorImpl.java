@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.common.NauticalSide;
 import com.sap.sailing.domain.common.Wind;
-import com.sap.sailing.domain.common.WindSourceType;
 import com.sap.sailing.domain.common.tracking.GPSFixMoving;
 import com.sap.sailing.domain.maneuverdetection.ApproximatedFixesCalculator;
 import com.sap.sailing.domain.maneuverdetection.IncrementalApproximatedFixesCalculator;
@@ -258,8 +257,7 @@ public class IncrementalManeuverDetectorImpl extends ManeuverDetectorImpl implem
             // maneuver spot calculation => recalculate maneuvers of existing maneuver curve
             CompleteManeuverCurve maneuverCurve = currentExistingManeuverSpot.getManeuverCurve();
             WindMeasurement windMeasurement = currentExistingManeuverSpot.getWindMeasurement();
-            Wind wind = trackedRace.getWind(windMeasurement.getPosition(), windMeasurement.getTimePoint(),
-                    /* exclude */ trackedRace.getWindSources(WindSourceType.MANEUVER_BASED_ESTIMATION));
+            Wind wind = trackedRace.getWind(windMeasurement.getPosition(), windMeasurement.getTimePoint());
             List<Maneuver> maneuvers = determineManeuversFromManeuverCurve(maneuverCurve.getMainCurveBoundaries(),
                     maneuverCurve.getManeuverCurveWithStableSpeedAndCourseBoundaries(), wind,
                     maneuverCurve.getMarkPassing());

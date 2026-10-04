@@ -1,12 +1,22 @@
+<p align="center">
+  <img src="azimuth_logo.png" alt="Sailing Analytics">
+</p>
+
 # Sailing Analytics
+
+[![REUSE status](https://api.reuse.software/badge/github.com/eclipse-sailing-analytics/sailing-analytics)](https://api.reuse.software/info/github.com/eclipse-sailing-analytics/sailing-analytics)
+[![CodeQL](https://github.com/eclipse-sailing-analytics/sailing-analytics/workflows/CodeQL/badge.svg)](https://github.com/eclipse-sailing-analytics/sailing-analytics/security/code-scanning)
+[![GitHub license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://raw.githubusercontent.com/eclipse-sailing-analytics/sailing-analytics/main/LICENSE)
+[![Downloads](https://img.shields.io/badge/download-all%20releases-brightgreen.svg)](https://github.com/eclipse-sailing-analytics/sailing-analytics/releases/)
+[![Container image](https://img.shields.io/badge/container-ghcr.io%2Feclipse--sailing--analytics%2Fsailing--analytics-2496ED?logo=docker&logoColor=white)](https://github.com/eclipse-sailing-analytics/sailing-analytics/pkgs/container/sailing-analytics)
 
 ## About this Project
 
-The Sailing Analytics, formerly known as the "SAP Sailing Analytics," are a solution for portraying and analyzing sailing regattas, supporting training scenarios, and powering the vast archive at https://sapsailing.com. The solution consists of a cloud application with a web-based user interface, as well as three companion apps that integrate with the cloud application. This repository has the code for the cloud-based web application, and two of the three mobile apps (Buoy Pinger and Race Manager). The third companion app (Sail Insight) is found in [another repository](https://github.com/SAP/sailing-analytics-sail-insight).
+The Eclipse Azimuth Sailing Analytics project, formerly known as the "SAP Sailing Analytics," provides a solution for portraying and analyzing sailing regattas, supporting training scenarios, and powering the vast archive at https://sapsailing.com. The solution consists of a cloud application with a web-based user interface, as well as three companion apps that integrate with the cloud application. This repository has the code for the cloud-based web application, and two of the three mobile apps (Buoy Pinger and Race Manager). The third companion app (Sail Insight) is found in [another repository](https://github.com/SAP/sailing-analytics-sail-insight).
 
 ## Description
 
-This is the software running the SAP Sailing Analytics platform as seen on [sapsailing.com](https://sapsailing.com). By having this under an open-source license, all interested parties can use this software, extend or modify it, host it in their cloud or on-premise environments, use it to run beautiful events with it, and keep it available to the sailing community.
+This is the software running the Eclipse Azimuth Sailing Analytics platform as seen on [sapsailing.com](https://sapsailing.com). By having this under an open-source license, all interested parties can use this software, extend or modify it, host it in their cloud or on-premise environments, use it to run beautiful events with it, and keep it available to the sailing community.
 
 Sailing provided the perfect platform for SAP to showcase solutions and help the sport run like never before. SAP’s involvement in the sport has transformed the sailing experience by providing tools, which:
 
@@ -22,7 +32,7 @@ More background information is available in the project's Wiki which is currentl
 
 To run the latest release build (currently available for linux/amd64 and linux/arm64 architectures), try this:
 ```
-    wget "https://github.com/SAP/sailing-analytics/raw/refs/heads/main/docker/docker-compose.yml"
+    wget "https://github.com/eclipse-sailing-analytics/sailing-analytics/raw/refs/heads/main/docker/docker-compose.yml"
     docker-compose up
 ```
 Based on the ``docker/docker-compose.yml`` definition you should end up with three running Docker containers:
@@ -33,15 +43,14 @@ Based on the ``docker/docker-compose.yml`` definition you should end up with thr
 Try a request to [``http://127.0.0.1:8888/index.html``](http://127.0.0.1:8888/index.html) or [``http://127.0.0.1:8888/gwt/status``](http://127.0.0.1:8888/gwt/status) to see if things worked. The default login to your local administration console at [``http://127.0.0.1:8888/gwt/AdminConsole.html``](http://127.0.0.1:8888/gwt/AdminConsole.html) uses the user name ``admin`` with password ``admin``.
 
 To use Java 25, use the ``docker-compose-25.yml`` file instead:
-
 ```
-    wget "https://github.com/SAP/sailing-analytics/raw/refs/heads/main/docker/docker-compose-25.yml"
+    wget "https://github.com/eclipse-sailing-analytics/sailing-analytics/raw/refs/heads/main/docker/docker-compose-25.yml"
     docker-compose -f docker-compose-25.yml up
 ```
 
 ## Requirements
 
-The software can be run on any Linux or Windows machine with ``bash`` installed; it has also been compiled successfully for the ARM platform and was deployed to a Raspberry Pi computer. As a database, MongoDB is required, tested with releases 4.4, 5.0, 6.0, and 7.0. For use in a replicated scenario (scale-out, high availability), RabbitMQ is required. A simple Docker Compose set-up can be used to tie these three components together, e.g., for a quick local test and to familiarize yourself with the application, as Docker images are produced on a regular basis.
+The software can be run on any Linux, MacOS or Windows machine with ``bash`` installed; it has also been compiled successfully for the ARM platform and was deployed to a Raspberry Pi computer. As a database, MongoDB is required, tested with releases 4.4, 5.0, 6.0, and 7.0. For use in a replicated scenario (scale-out, high availability), RabbitMQ is required. A simple Docker Compose set-up can be used to tie these three components together, e.g., for a quick local test and to familiarize yourself with the application, as Docker images are produced on a regular basis.
 
 Compute node and database sizing depends on several aspects of your workloads, such as whether live or replay data is to be served, how many different classes with separate leaderboard are racing concurrently, how many competitors are racing in each class, or how many concurrent viewers produce how many requests and which type (e.g., analytical, data mining, or watching a live race).
 
@@ -61,7 +70,6 @@ The project welcomes contributions in the form of pull requests, for example, en
 
 The issue tracker at [https://bugzilla.sapsailing.com](https://bugzilla.sapsailing.com) is currently used for any sort of issue and enhancement request tracking. Help to migrate this smoothly to Github Issues would be much appreciated, ideally keeping issue numbers stable due to many references to those Bugzilla bug numbers, be it in the source code, the Wiki, or the build infrastructure.
 
-
 ## Code of Conduct
 
 We as members, contributors, and leaders pledge to make participation in our community a harassment-free experience for everyone. By participating in this project, you agree to abide by its [Code of Conduct](https://github.com/SAP/.github/blob/main/CODE_OF_CONDUCT.md) at all times.
@@ -74,7 +82,7 @@ See [here](https://www.sapsailing.com/gwt/Home.html#/imprint/:) for a list of co
 
 ## Building and Running
 
-Builds usually run on [GitHub Actions](https://github.com/SAP/sailing-analytics/actions/workflows/release.yml) upon every push. A few repository secrets ensure that the build process has the permissions it needs. Pushes to the ``main``, ``docker-25`` and ``releases/*`` branches also publish a [release](https://github.com/SAP/sailing-analytics/releases) after a successful build.
+Builds usually run on [GitHub Actions](https://github.com/eclipse-sailing-analytics/sailing-analytics/actions/workflows/release.yml) upon every push. A few repository secrets ensure that the build process has the permissions it needs. Pushes to the ``main``, ``docker-25`` and ``releases/*`` branches also publish a [release](https://github.com/eclipse-sailing-analytics/sailing-analytics/releases) after a successful build.
 
 There are two options for building, detailed below; for both, you need to fulfill a few prerequisites.
 
@@ -152,7 +160,6 @@ The build runs integration tests against [geonames.org](https://geonames.org). U
 ### Get the GitHub Actions build to work in your forked repository
 
 Assign the IDs and secrets from the prerequisites to repository secrets in your forked repository as follows:
-
 ```
 AWS_S3_TEST_S3ACCESSID: {your-S3-test-bucket-upload-token-ID}
 AWS_S3_TEST_S3ACCESSKEY: {key-for-your-S3-token}
@@ -208,12 +215,11 @@ which produces a tarball under ``dist/{release-name}-{timestamp}/{release-name}-
 
 Run the ``buildAndUpdateProduct.sh`` without any arguments to see the sub-commands and options available.
 
-
 ## Downloading, Installing and Running an Official Release
 
 You need to have Java 8 installed. Get one from, e.g., [here](https://tools.eu1.hana.ondemand.com/#cloud). Either ensure that this JVM's ``java`` executable in on the ``PATH`` or set ``JAVA_HOME`` appropriately.
 
-At [https://github.com/SAP/sailing-analytics/releases](https://github.com/SAP/sailing-analytics/releases) you find official product builds. To fetch and install one of them, make an empty directory, change into it and run the ``refreshInstance.sh`` command, e.g., like this:
+At [https://github.com/eclipse-sailing-analytics/sailing-analytics/releases](https://github.com/eclipse-sailing-analytics/sailing-analytics/releases) you find official product builds. To fetch and install one of them, make an empty directory, change into it and run the ``refreshInstance.sh`` command, e.g., like this:
 ```
     mkdir sailinganalytics
     cd sailinganalytics
@@ -242,7 +248,7 @@ Connect to your server at ``http://localhost:8888`` and find its administration 
 
 ## Docker
 
-To build a docker image, try ``docker/makeImageForLatestRelease``. The upload to the default Github Package Registry (``ghcr.io``) will usually fail unless you are a collaborator for that repository, but you should see a local image tagged ``ghcr.io/sap/sailing-analytics:...`` resulting from the build. To run that docker image, try something like
+To build a docker image, try ``docker/makeImageForLatestRelease``. The upload to the default Github Package Registry (``ghcr.io``) will usually fail unless you are a collaborator for that repository, but you should see a local image tagged ``ghcr.io/eclipse-sailing-analytics/sailing-analytics:...`` resulting from the build. To run that docker image, try something like
 ```
     docker run -d -e "MEMORY=4g" -e "MONGODB_URI=mongodb://my.mongohost.org?replicaSet=rs0&retryWrites=true" -P <yourimage>
 ```
@@ -270,7 +276,7 @@ to connect to the server's OSGi console.
 
 Alternatively, use an "environment" definition that sets useful defaults, e.g., like this:
 ```
-    docker run -P -it --rm -e "SERVER_NAME=test77" -e "USE_ENVIRONMENT=live-master-server" -e "REPLICATE_MASTER_BEARER_TOKEN=BRxGpF0nr68Z4m/f13/MgiYhdRB3xoDCYd+rLc17rTs=" ghcr.io/sap/sailing-analytics:latest \
+    docker run -P -it --rm -e "SERVER_NAME=test77" -e "USE_ENVIRONMENT=live-master-server" -e "REPLICATE_MASTER_BEARER_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" ghcr.io/eclipse-sailing-analytics/sailing-analytics:latest \
         bash -c "rm env.sh; echo \"
 SERVER_NAME=test77
 USE_ENVIRONMENT=live-master-server

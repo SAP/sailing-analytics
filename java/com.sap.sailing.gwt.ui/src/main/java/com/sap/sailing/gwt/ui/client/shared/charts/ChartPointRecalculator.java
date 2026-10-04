@@ -9,7 +9,6 @@ public final class ChartPointRecalculator {
     public static Point stayClosestToPreviousPoint(Point previousPoint, Point newPoint) {
         double previousY = previousPoint.getY().doubleValue();
         double newY = newPoint.getY().doubleValue();
-
         double bestNewY = newY;
         boolean hasBeenMoved;
         do {
@@ -25,7 +24,6 @@ public final class ChartPointRecalculator {
                 hasBeenMoved = true;
             }
         } while (hasBeenMoved);
-        
         return new Point(newPoint.getX(), bestNewY);
     }
     

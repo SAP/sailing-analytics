@@ -154,7 +154,91 @@ public interface PolarDataService {
     BearingWithConfidence<Void> getManeuverAngle(BoatClass boatClass, ManeuverType maneuverType, Speed windSpeed)
             throws NotEnoughDataHasBeenAddedException;
     
-    void raceFinishedLoading(TrackedRace race);
+    void raceFinishedLoading(TrackedRace race, Runnable callbackWhenRaceChangingToTrackingOfFinishedStatus);
+
+    /**
+     * Registers {@code callback} to fire once the polar-data loading pipeline has fully drained.
+     * <p>
+     *
+     * IMPORTANT — this waits for a <em>global</em> drain, not a per-race one. The loading pipeline
+     * is shared across all races, so the callback fires only when the fixes of <em>every</em>
+     * race ingested so far (not just {@code race}) have been processed. The {@code race} parameter
+     * does <em>not</em> scope the wait to that race; it only gates <em>when</em> the callback is
+     * allowed to start observing the drain, via two conditions that both must hold before the
+     * callback is attached to the pipeline's drain:
+     * <ol>
+     *   <li>{@code race}'s fixes have actually been ingested into the pipeline (i.e.
+     *   {@link #raceFinishedLoading(TrackedRace, Runnable)} has run for it). Without this gate the
+     *   callback could fire on a pipeline that is merely momentarily idle because this race's
+     *   fixes haven't been queued yet, producing an incomplete polar model for {@code race}.</li>
+     *   <li>{@link #markLoadingOfAllRacesToRestoreStarted()} has been signalled, so a transient
+     *   idle window between two startup races' ingestion bursts is not mistaken for a real
+     *   drain.</li>
+     * </ol>
+     * The consequence is intended: a caller waiting on {@code race} effectively waits for the
+     * whole loaded-fix backlog to be processed, which on a cold start of a large archive can be
+     * substantial (the estimator install for an early race waits behind every other race's polar
+     * ingestion). This "wait for everything" behavior is deliberate — we want the polar model to
+     * reflect all loaded data before any maneuver-based wind estimation is installed — and the
+     * mild sequentiality it implies is accepted. It is <em>not</em> a per-race isolation
+     * guarantee; do not rely on this firing as soon as only {@code race}'s own fixes are done.
+     * <p>
+     *
+     * Unlike {@link #raceFinishedLoading(TrackedRace, Runnable)}, this method does <em>not</em>
+     * ingest the race's fixes; it only observes the pipeline. It is safe to call multiple times
+     * for the same race, and before or after {@link #raceFinishedLoading} has been called for it.
+     * See bug6241.
+     *
+     * @param callback
+     *            must not be {@code null}
+     */
+    void runWhenPolarLoadingFinishedFor(TrackedRace race, Runnable callback);
+
+    /**
+     * Releases any state the polar data service holds for {@code race}, allowing a removed race
+     * and its tracks to be garbage-collected. Callers of
+     * {@link #runWhenPolarLoadingFinishedFor(TrackedRace, Runnable)} MUST call this when the race
+     * is removed from its regatta / the racing event service: a callback parked for a race whose
+     * polar loading never completes is held strongly (and typically captures the race strongly
+     * itself), so without this call the race and all of its tracks would be pinned for the
+     * lifetime of the service. In this codebase the call is wired through
+     * {@code RacingEventServiceImpl.RaceAdditionListener.raceRemoved(TrackedRace)}.
+     * <p>
+     *
+     * Idempotent and safe to call for a race the service never tracked. See bug6241.
+     *
+     * @param race
+     *            the race to forget; must not be {@code null}
+     */
+    void raceRemoved(TrackedRace race);
+
+    /**
+     * Signals to this polar data service that its client has finished enumerating and triggering
+     * loading for every race that will be restored during startup. From this point on the client
+     * makes no further ingestion promises, so any transient idle window on the loading pipeline
+     * is a genuine drain of everything ingested so far. Callbacks registered via
+     * {@link #runWhenPolarLoadingFinishedFor(TrackedRace, Runnable)} whose race is already
+     * ingested but which arrived before this signal fire on the next drain after this call.
+     * <p>
+     *
+     * The signal is about the enumeration/triggering side only: it does <em>not</em> imply that
+     * the enumerated races have already progressed past {@code LOADING} — some may still be
+     * loading, some may take a long time, some may never leave {@code LOADING} at all. The
+     * signal only promises that no new startup races will show up unannounced.
+     * <p>
+     *
+     * Whether calling this method has any effect depends on how the implementation was
+     * constructed. Implementations built for the gated (production) mode hold
+     * {@link #runWhenPolarLoadingFinishedFor} callbacks until this signal arrives; implementations
+     * built in the default non-gated mode ignore this call. It is always safe to call regardless
+     * of the implementation's mode.
+     * <p>
+     *
+     * Idempotent: subsequent calls after the first are logged (in gated mode) or silently
+     * ignored (in non-gated mode).
+     * See bug6241.
+     */
+    void markLoadingOfAllRacesToRestoreStarted();
 
     /**
      * See {@link #getAverageSpeedWithBearing(BoatClass, Speed, LegType, Tack, boolean)}

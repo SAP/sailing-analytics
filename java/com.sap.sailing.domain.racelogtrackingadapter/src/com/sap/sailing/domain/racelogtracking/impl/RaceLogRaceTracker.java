@@ -60,6 +60,7 @@ import com.sap.sailing.domain.common.abstractlog.TimePointSpecificationFoundInLo
 import com.sap.sailing.domain.common.racelog.RaceLogRaceStatus;
 import com.sap.sailing.domain.common.racelog.tracking.RaceLogTrackingState;
 import com.sap.sailing.domain.common.racelog.tracking.RaceNotCreatedException;
+import com.sap.sailing.domain.maneuverhash.ManeuverRaceFingerprintRegistry;
 import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprintRegistry;
 import com.sap.sailing.domain.racelog.RaceLogAndTrackedRaceResolver;
 import com.sap.sailing.domain.racelogtracking.RaceLogTrackingAdapter;
@@ -102,13 +103,16 @@ public class RaceLogRaceTracker extends AbstractRaceTrackerBaseImpl<RaceLogConne
     private final RaceLogAndTrackedRaceResolver raceLogResolver;
     private final TrackedRegattaRegistry trackedRegattaRegistry;
     private final MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry;
+    private final ManeuverRaceFingerprintRegistry maneuverRaceFingerprintRegistry;
 
     private volatile DynamicTrackedRace trackedRace;
     private final RaceTrackingHandler raceTrackingHandler;
 
     public RaceLogRaceTracker(DynamicTrackedRegatta regatta, RaceLogConnectivityParams params, WindStore windStore,
             RaceLogAndTrackedRaceResolver raceLogResolver, RaceLogConnectivityParams connectivityParams,
-            TrackedRegattaRegistry trackedRegattaRegistry, RaceTrackingHandler raceTrackingHandler, MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry) {
+            TrackedRegattaRegistry trackedRegattaRegistry, RaceTrackingHandler raceTrackingHandler,
+            MarkPassingRaceFingerprintRegistry markPassingRaceFingerprintRegistry,
+            ManeuverRaceFingerprintRegistry maneuverRaceFingerprintRegistry) {
         super(params);
         this.trackedRegattaRegistry = trackedRegattaRegistry;
         this.params = params;
@@ -116,6 +120,7 @@ public class RaceLogRaceTracker extends AbstractRaceTrackerBaseImpl<RaceLogConne
         this.trackedRegatta = regatta;
         this.raceLogResolver = raceLogResolver;
         this.markPassingRaceFingerprintRegistry = markPassingRaceFingerprintRegistry;
+        this.maneuverRaceFingerprintRegistry = maneuverRaceFingerprintRegistry;
         this.raceTrackingHandler = raceTrackingHandler;
         // add log listeners
         for (AbstractLog<?, ?> log : params.getLogHierarchy()) {
@@ -223,7 +228,10 @@ public class RaceLogRaceTracker extends AbstractRaceTrackerBaseImpl<RaceLogConne
     protected void onStop(boolean preemptive, boolean willBeRemoved) {
         RaceLog raceLog = params.getRaceLog();
         final Pair<TimePointSpecificationFoundInLog, TimePointSpecificationFoundInLog> trackingTimes = new TrackingTimesFinder(raceLog).analyze();
-        if (!trackedRegatta.getRegatta().isControlTrackingFromStartAndFinishTimes() &&
+        // if willBeRemoved is true, this is probably a replication start or a server shut-down and not
+        // just a user stopping the tracking of a single race; therefore, don't capture the current time
+        // as the end-of-tracking if willBeRemoved==true. See also bug6228
+        if (!willBeRemoved && !trackedRegatta.getRegatta().isControlTrackingFromStartAndFinishTimes() &&
                 (trackingTimes == null || trackingTimes.getB() == null || trackingTimes.getB().getTimePoint() == null)) {
             // seems the first time tracking for this race is stopped; enter "now" as end of tracking
             // into the race log
@@ -352,10 +360,11 @@ public class RaceLogRaceTracker extends AbstractRaceTrackerBaseImpl<RaceLogConne
             raceColumn.setRaceIdentifier(fleet, trackedRegatta.getRegatta().getRaceIdentifier(raceDef));
             trackedRace = raceTrackingHandler.createTrackedRace(trackedRegatta, raceDef, sidelines, windStore,
                     params.getDelayToLiveInMillis(), WindTrack.DEFAULT_MILLISECONDS_OVER_WHICH_TO_AVERAGE_WIND,
-                    boatClass.getApproximateManeuverDurationInMilliseconds(), null, /*useMarkPassingCalculator*/ true, raceLogResolver,
+                    boatClass.getApproximateManeuverDurationInMilliseconds(), /* raceDefinitionSetToUpdate */ null,
+                    /* useMarkPassingCalculator */ true, raceLogResolver,
                     /* Not needed because the RaceTracker is not active on a replica */ Optional.empty(),
                     new TrackingConnectorInfoImpl(RaceLogTrackingAdapter.NAME, RaceLogTrackingAdapter.DEFAULT_URL, /* no webUrl */ null),
-                    markPassingRaceFingerprintRegistry);
+                    markPassingRaceFingerprintRegistry, maneuverRaceFingerprintRegistry);
             notifyRaceCreationListeners();
             logger.info(String.format("Started tracking race-log race (%s)", raceLog));
             // this wakes up all waiting race handles

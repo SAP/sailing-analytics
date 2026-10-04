@@ -281,7 +281,8 @@ public class AdminConsoleActivity extends AbstractActivity implements AdminConso
     }
 
     protected void checkPublicServerNonPublicUserWarning() {
-        sailingService.getServerConfiguration(new AsyncCallback<ServerConfigurationDTO>() {
+        sailingService.getServerConfiguration(new MarkedAsyncCallback<ServerConfigurationDTO>(
+                new AsyncCallback<ServerConfigurationDTO>() {
             @Override
             public void onFailure(Throwable caught) {
             }
@@ -311,8 +312,8 @@ public class AdminConsoleActivity extends AbstractActivity implements AdminConso
             private void changeDefaultTenantForCurrentUser(final StrippedUserGroupDTO serverTenant) {
                 final UserDTO user = clientFactory.getUserService().getCurrentUser();
                 clientFactory.getUserManagementWriteService().updateUserProperties(user.getName(), user.getFullName(),
-                        user.getCompany(), user.getLocale(), serverTenant.getId().toString(),
-                        new AsyncCallback<UserDTO>() {
+                        user.getCompany(), user.getLocale(), user.getDidOptOutOfFeatureAndCommunityEmails(),
+                        serverTenant.getId().toString(), new AsyncCallback<UserDTO>() {
                             @Override
                             public void onFailure(Throwable caught) {
                                 Window.alert(caught.getMessage());
@@ -324,7 +325,7 @@ public class AdminConsoleActivity extends AbstractActivity implements AdminConso
                             }
                         });
             }
-        }); 
+        })); 
     }
 
     @Override

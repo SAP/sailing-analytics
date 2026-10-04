@@ -2,8 +2,8 @@ package com.sap.sailing.racecommittee.app.ui.fragments.lists;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import androidx.annotation.Nullable;
+import androidx.loader.app.LoaderManager.LoaderCallbacks;
 import android.text.TextUtils;
 
 import com.sap.sailing.domain.base.EventBase;

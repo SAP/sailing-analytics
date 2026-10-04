@@ -7,6 +7,7 @@ import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
 import com.sap.sailing.domain.common.RegattaIdentifier;
 import com.sap.sailing.domain.common.RegattaName;
 import com.sap.sailing.domain.common.security.SecuredDomainType;
+import com.sap.sailing.domain.leaderboard.HasCourseAreas;
 import com.sap.sailing.domain.leaderboard.HasRaceColumnsAndRegattaLike;
 import com.sap.sailing.domain.leaderboard.ScoringScheme;
 import com.sap.sailing.domain.ranking.RankingMetricConstructor;
@@ -34,7 +35,7 @@ import com.sap.sse.security.shared.WithQualifiedObjectIdentifier;
  *
  */
 public interface Regatta
-        extends NamedWithID, IsRegattaLike, HasRaceColumnsAndRegattaLike, WithQualifiedObjectIdentifier, HasCPUMeter {
+        extends NamedWithID, IsRegattaLike, HasRaceColumnsAndRegattaLike, WithQualifiedObjectIdentifier, HasCPUMeter, HasCourseAreas {
 
     /**
      * As taken from the Racing Rules of Sailing:
@@ -68,6 +69,7 @@ public interface Regatta
      *         {@code null}, but may be empty; callers need to {@code synchronize} on the object returned
      *         if they want to iterate.
      */
+    @Override
     Iterable<CourseArea> getCourseAreas();
 
     /**

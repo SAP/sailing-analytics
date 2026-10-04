@@ -1,0 +1,9 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
+    <ui:with field="i18n" type="com.sap.sailing.gwt.ui.client.StringMessages" />
+    <ui:with field="res" type="com.sap.sailing.gwt.home.shared.partials.checkboxtile.CheckBoxTileResources" />
+    <g:HTMLPanel addStyleNames="{res.css.container}">
+       <g:Label addStyleNames="{res.css.label}" ui:field="labelUi"/>
+       <g:CheckBox addStyleNames="{res.css.checkbox}" ui:field="toggleButtonUi" />
+    </g:HTMLPanel>
+</ui:UiBinder> 

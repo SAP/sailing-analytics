@@ -15,7 +15,7 @@ import com.sap.sse.common.TimePoint;
  *
  */
 public class ManeuverMainCurveDetailsWithBearingSteps extends ManeuverCurveBoundariesImpl {
-
+    private static final long serialVersionUID = 5448900675868938268L;
     private final TimePoint timePoint;
     private final double maxTurningRateInDegreesPerSecond;
     private final SpeedWithBearingStepsIterable speedWithBearingSteps;

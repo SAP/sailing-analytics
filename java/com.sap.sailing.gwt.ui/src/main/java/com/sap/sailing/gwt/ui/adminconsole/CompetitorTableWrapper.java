@@ -93,11 +93,11 @@ public class CompetitorTableWrapper<S extends RefreshableSelectionModel<Competit
                 new EntityIdentityComparator<CompetitorDTO>() {
                     @Override
                     public boolean representSameEntity(CompetitorDTO dto1, CompetitorDTO dto2) {
-                        return dto1.getIdAsString().equals(dto2.getIdAsString());
+                        return Util.equalsWithNull(dto1.getIdAsString(), dto2.getIdAsString());
                     }
                     @Override
                     public int hashCode(CompetitorDTO t) {
-                        return t.getIdAsString().hashCode();
+                        return t.getIdAsString() != null ? t.getIdAsString().hashCode() : 0;
                     }
                 });
         this.competitorsRefresher = competitorsRefresher;
@@ -462,22 +462,22 @@ public class CompetitorTableWrapper<S extends RefreshableSelectionModel<Competit
                             competitorsRefresher.addIfNotContainedElseReplace(updatedCompetitor, new EntityIdentityComparator<CompetitorDTO>() {
                                 @Override
                                 public boolean representSameEntity(CompetitorDTO dto1, CompetitorDTO dto2) {
-                                    return dto1.getIdAsString().equals(dto2.getIdAsString());
+                                    return Util.equalsWithNull(dto1.getIdAsString(), dto2.getIdAsString());
                                 }
                                 @Override
                                 public int hashCode(CompetitorDTO t) {
-                                    return t.getIdAsString().hashCode();
+                                    return t.getIdAsString() != null ? t.getIdAsString().hashCode() : 0;
                                 }
                             });
                             if (boatsRefresher != null) {
                                 boatsRefresher.addIfNotContainedElseReplace(updatedCompetitor.getBoat(), new EntityIdentityComparator<BoatDTO>() {
                                     @Override
                                     public boolean representSameEntity(BoatDTO dto1, BoatDTO dto2) {
-                                        return dto1.getIdAsString().equals(dto2.getIdAsString());
+                                        return Util.equalsWithNull(dto1.getIdAsString(), dto2.getIdAsString());
                                     }
                                     @Override
                                     public int hashCode(BoatDTO t) {
-                                        return t.getIdAsString().hashCode();
+                                        return t.getIdAsString() != null ? t.getIdAsString().hashCode() : 0;
                                     }
                                 });
                                 boatsRefresher.callAllFill();
@@ -542,11 +542,11 @@ public class CompetitorTableWrapper<S extends RefreshableSelectionModel<Competit
                             competitorsRefresher.addIfNotContainedElseReplace(updatedCompetitor, new EntityIdentityComparator<CompetitorDTO>() {
                                 @Override
                                 public boolean representSameEntity(CompetitorDTO dto1, CompetitorDTO dto2) {
-                                    return dto1.getIdAsString().equals(dto2.getIdAsString());
+                                    return Util.equalsWithNull(dto1.getIdAsString(), dto2.getIdAsString());
                                 }
                                 @Override
                                 public int hashCode(CompetitorDTO t) {
-                                    return t.getIdAsString().hashCode();
+                                    return t.getIdAsString() != null ? t.getIdAsString().hashCode() : 0;
                                 }
                             });
                         }

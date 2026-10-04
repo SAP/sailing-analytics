@@ -94,7 +94,6 @@ public class CreateAndTrackWithRaceLogTest extends RaceLogTrackingTestHelper {
     private RaceLogTrackingAdapter adapter;
     private Regatta regatta;
     private SensorFixStore sensorFixStore;
-
     private long time = 0;
 
     @BeforeEach

@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import com.sap.sailing.domain.abstractlog.regatta.RegattaLog;
@@ -27,6 +29,7 @@ import com.sap.sailing.domain.common.CompetitorRegistrationType;
 import com.sap.sailing.domain.common.LeaderboardType;
 import com.sap.sailing.domain.leaderboard.FlexibleLeaderboard;
 import com.sap.sailing.domain.leaderboard.FlexibleRaceColumn;
+import com.sap.sailing.domain.leaderboard.HasCourseAreasListener;
 import com.sap.sailing.domain.leaderboard.ScoringScheme;
 import com.sap.sailing.domain.leaderboard.ThresholdBasedResultDiscardingRule;
 import com.sap.sailing.domain.racelog.RaceLogStore;
@@ -93,6 +96,8 @@ public class FlexibleLeaderboardImpl extends AbstractLeaderboardImpl implements 
      */
     private final IsRegattaLike regattaLikeHelper;
 
+    private transient Set<HasCourseAreasListener> courseAreaChangeListeners;
+
     public FlexibleLeaderboardImpl(String name, ThresholdBasedResultDiscardingRule resultDiscardingRule,
             ScoringScheme scoringScheme, CourseArea courseArea) {
         this(EmptyRaceLogStore.INSTANCE, EmptyRegattaLogStore.INSTANCE,
@@ -111,6 +116,7 @@ public class FlexibleLeaderboardImpl extends AbstractLeaderboardImpl implements 
             ScoringScheme scoringScheme, Iterable<CourseArea> courseAreas) {
         super(resultDiscardingRule);
         assert courseAreas != null;
+        this.courseAreaChangeListeners = Collections.newSetFromMap(new ConcurrentHashMap<>());
         this.cpuMeter = CompositeCPUMetrics.create();
         this.scoringScheme = scoringScheme;
         if (name == null) {
@@ -148,6 +154,7 @@ public class FlexibleLeaderboardImpl extends AbstractLeaderboardImpl implements 
         ois.defaultReadObject();
         raceLogStore = EmptyRaceLogStore.INSTANCE;
         cpuMeter = CompositeCPUMetrics.create();
+        this.courseAreaChangeListeners = Collections.newSetFromMap(new ConcurrentHashMap<>());
         for (RaceColumn column : getRaceColumns()) {
             column.setRaceLogInformation(raceLogStore, new FlexibleLeaderboardAsRegattaLikeIdentifier(this));
             final TrackedRace trackedRace = column.getTrackedRace(defaultFleet);
@@ -339,12 +346,26 @@ public class FlexibleLeaderboardImpl extends AbstractLeaderboardImpl implements 
 
     @Override
     public void setCourseAreas(Iterable<CourseArea> newCourseAreas) {
+        final Iterable<CourseArea> oldCourseAreas = this.courseAreas;
         synchronized (this.courseAreas) {
             this.courseAreas.clear();
             Util.addAll(newCourseAreas, this.courseAreas);
         }
+        for (HasCourseAreasListener listener : courseAreaChangeListeners) {
+            listener.courseAreasChanged(this, oldCourseAreas, newCourseAreas);
+        }
     }
     
+    @Override
+    public void addCourseAreaChangeListener(HasCourseAreasListener listener) {
+        courseAreaChangeListeners.add(listener);
+    }
+
+    @Override
+    public void removeCourseAreaChangeListener(HasCourseAreasListener listener) {
+        courseAreaChangeListeners.remove(listener);
+    }
+
     @Override
     public IsRegattaLike getRegattaLike() {
         return regattaLikeHelper;

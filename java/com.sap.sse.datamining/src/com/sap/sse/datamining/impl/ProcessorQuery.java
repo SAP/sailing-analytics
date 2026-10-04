@@ -76,7 +76,6 @@ public abstract class ProcessorQuery<ResultType, DataSourceType> implements Quer
         state = QueryState.NOT_STARTED;
         this.resultType = resultType;
         this.additionalData = additionalData;
-
         resultReceiver = new ProcessResultReceiver();
         firstProcessor = createChainAndReturnFirstProcessor(resultReceiver);
     }

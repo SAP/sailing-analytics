@@ -10,7 +10,7 @@
     <string name="set_position_disabled_gps">"Habilitar GPS\npara configurar la posición"</string>
     <string name="set_position_no_gps_yet">"Esperando a la conexión del GPS"</string>
     <string name="reset_position">"Restablecer posición"</string>
-    <string name="getting_marks">"Obteniendo marcas de la carrera..."</string>
+    <string name="getting_marks">"Obteniendo marcas de la prueba..."</string>
     <string name="set">"fijado"</string>
     <string name="unknown">"n/a"</string>
     <string name="not_set">"sin fijar"</string>

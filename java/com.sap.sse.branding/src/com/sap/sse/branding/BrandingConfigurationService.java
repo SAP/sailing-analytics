@@ -140,7 +140,8 @@ public interface BrandingConfigurationService {
         FOLLOW_GITHUB("followGitHub"),
         
         GITHUB_LINK("gitHubLink"),
-
+        
+        GITHUB_PAGES_LINK("gitHubPagesLink"),
 
         /**
          * If you place the value of the property identified by this constant into a {@code script} tag in a HTML/JSP page, it will

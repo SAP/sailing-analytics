@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
+import java.time.Duration;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -120,7 +121,7 @@ public class TestAutoPlay extends AbstractSeleniumTest {
         assertTrue(url.contains("name=BMW+Cup+(J80)"), "Url does not contain proper name " + url);
         AutoPlayLeaderboardView autoplayPage = page.goToAutoPlayClassicUrl(getWebDriver(), url);
         LeaderboardTablePO leaderBoard = autoplayPage.getLeaderBoardWithData();
-        final List<String> races = new WebDriverWait(getWebDriver(), 20).until(new Function<WebDriver, List<String>>() {
+        final List<String> races = new WebDriverWait(getWebDriver(), Duration.ofSeconds(20)).until(new Function<WebDriver, List<String>>() {
             @Override
             public List<String> apply(WebDriver arg0) {
                 try {

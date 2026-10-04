@@ -20,6 +20,7 @@ Require-Bundle:
  com.sap.sailing.polars.datamining,
  com.sap.sailing.server.gateway.serialization.shared.android,
  com.sap.sailing.server.gateway.serialization,
+ com.sap.sailing.server.interface,
  com.sap.sse.datamining,
  com.sap.sse.datamining.annotations,
  com.sap.sse.datamining.shared,

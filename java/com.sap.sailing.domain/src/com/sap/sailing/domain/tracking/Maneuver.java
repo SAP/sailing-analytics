@@ -5,7 +5,11 @@ import com.sap.sailing.domain.common.NauticalSide;
 import com.sap.sailing.domain.common.Tack;
 import com.sap.sailing.domain.common.tracking.GPSFix;
 import com.sap.sailing.domain.maneuverdetection.impl.ManeuverDetectorImpl;
+import com.sap.sailing.domain.tracking.impl.ManeuverWithCoarseGrainedBoundariesImpl;
+import com.sap.sailing.domain.tracking.impl.ManeuverWithMainCurveBoundariesImpl;
+import com.sap.sailing.domain.tracking.impl.ManeuverWithStableSpeedAndCourseBoundariesImpl;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Position;
 import com.sap.sse.common.Speed;
 import com.sap.sse.common.SpeedWithBearing;
 import com.sap.sse.common.TimePoint;
@@ -38,6 +42,26 @@ import com.sap.sse.datamining.annotations.Statistic;
  *
  */
 public interface Maneuver extends GPSFix {
+    static Maneuver create(String simpleClassName, ManeuverType type, Tack newTack, Position position, TimePoint timePoint,
+            ManeuverCurveBoundaries mainCurveBoundaries,
+            ManeuverCurveBoundaries maneuverCurveWithStableSpeedAndCourseBoundaries,
+            double maxTurningRateInDegreesPerSecond, MarkPassing markPassing, ManeuverLoss maneuverLoss) {
+        final Maneuver result;
+        if (simpleClassName.equals(ManeuverWithCoarseGrainedBoundariesImpl.class.getSimpleName())) {
+            result = new ManeuverWithCoarseGrainedBoundariesImpl(type, newTack, position, timePoint, mainCurveBoundaries);
+        } else if (simpleClassName.equals(ManeuverWithMainCurveBoundariesImpl.class.getSimpleName())) {
+            result = new ManeuverWithMainCurveBoundariesImpl(type, newTack, position, timePoint, mainCurveBoundaries,
+                    maneuverCurveWithStableSpeedAndCourseBoundaries, maxTurningRateInDegreesPerSecond, markPassing,
+                    maneuverLoss);
+        } else if (simpleClassName.equals(ManeuverWithStableSpeedAndCourseBoundariesImpl.class.getSimpleName())) {
+            result = new ManeuverWithStableSpeedAndCourseBoundariesImpl(type, newTack, position, timePoint, mainCurveBoundaries,
+                    maneuverCurveWithStableSpeedAndCourseBoundaries, maxTurningRateInDegreesPerSecond, markPassing,
+                    maneuverLoss);
+        } else {
+            throw new IllegalArgumentException("Unsupported Maneuver implementation with simple class name: " + simpleClassName);
+        }
+        return result;
+    }
     /**
      * Gets the type of this maneuver, e.g. whether its a tack, jibe and etc. The maneuver type is determined
      * considering the boat's course change, wind bearing and marks.

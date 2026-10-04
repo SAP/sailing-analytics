@@ -282,28 +282,28 @@
          id="org.eclipse.jetty.apache-jsp"
          download-size="0"
          install-size="0"
-         version="9.4.57.v20241219"
+         version="9.4.58.v20250814"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.apache-jsp.source"
          download-size="0"
          install-size="0"
-         version="9.4.57.v20241219"
+         version="9.4.58.v20250814"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.osgi.boot.jsp"
          download-size="0"
          install-size="0"
-         version="9.4.57.v20241219"
+         version="9.4.58.v20250814"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.jetty.osgi.boot.jsp.source"
          download-size="0"
          install-size="0"
-         version="9.4.57.v20241219"
+         version="9.4.58.v20250814"
          unpack="false"/>
 
    <plugin

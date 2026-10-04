@@ -123,7 +123,7 @@ Velum software is fully-compatible with ISAF and ORC scoring rules and can impor
 ***
 Corrected time is calculated as follows:
 
-Corrected time = Elapsed time â€“ (ToD * Distance)
+Corrected time = Elapsed time – (ToD * Distance)
 
 With Time-on-Distance (ToD) scoring, the coefficient of time allowance of one boat will not change with wind velocity, but will change with the length of the course. One boat will always give to another the same handicap in sec/mi, and it is easy to calculate the difference in elapsed time between two boats needed to determine a winner in corrected time.
 
@@ -182,7 +182,7 @@ Where is it shown in the certificate ?
 **Performance Line:**
 **Corrected time is calculated as follows:**
 
-**Corrected time = (PLT * Elapsed time) â€“ (PLD * Distance)**
+**Corrected time = (PLT * Elapsed time) – (PLD * Distance)**
 
 With the time coefficient PLT and distance coefficient PLD, two boats may be rated differently in light or heavy wind conditions, and it is possible that one boat is giving a handicap to another in light wind conditions, while the opposite may be true in heavy wind conditions.
  

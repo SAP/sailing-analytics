@@ -207,6 +207,7 @@ import com.sap.sailing.domain.common.racelog.tracking.DoesNotHaveRegattaLogExcep
 import com.sap.sailing.domain.common.racelog.tracking.MarkAlreadyUsedInRaceException;
 import com.sap.sailing.domain.common.racelog.tracking.NotDenotableForRaceLogTrackingException;
 import com.sap.sailing.domain.common.racelog.tracking.NotDenotedForRaceLogTrackingException;
+import com.sap.sailing.domain.common.racelog.tracking.TrackingTimesRevocationErrorCode;
 import com.sap.sailing.domain.common.security.SecuredDomainType;
 import com.sap.sailing.domain.common.security.SecuredDomainType.EventActions;
 import com.sap.sailing.domain.common.tagging.RaceLogNotFoundException;
@@ -288,6 +289,7 @@ import com.sap.sailing.gwt.ui.shared.SwissTimingRaceRecordDTO;
 import com.sap.sailing.gwt.ui.shared.TracTracConfigurationWithSecurityDTO;
 import com.sap.sailing.gwt.ui.shared.TracTracRaceRecordDTO;
 import com.sap.sailing.gwt.ui.shared.TrackFileImportDeviceIdentifierDTO;
+import com.sap.sailing.gwt.ui.shared.TrackingTimesRevocationReportDTO;
 import com.sap.sailing.gwt.ui.shared.TypedDeviceMappingDTO;
 import com.sap.sailing.gwt.ui.shared.UrlDTO;
 import com.sap.sailing.gwt.ui.shared.VenueDTO;
@@ -2123,9 +2125,9 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
     }
 
     @Override
-    public void removeIgtimiDevice(String serialNumber) {
+    public void removeIgtimiDevice(long deviceId) {
         final RiotServer riotServer = getRiotServer();
-        final Device existingDevice = riotServer.getDeviceBySerialNumber(serialNumber);
+        final Device existingDevice = riotServer.getDeviceById(deviceId);
         if (existingDevice != null) {
             getSecurityService().checkPermissionAndDeleteOwnershipForObjectRemoval(existingDevice, () -> {
                 riotServer.removeDevice(existingDevice.getId());
@@ -3321,7 +3323,7 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
         final TimePoint startTrackingTimePoint = MillisecondsTimePoint.now();
         // this ensures that the events consistently have different timepoints to ensure a consistent result of the state analysis
         // that's why we can't just call adapter.denoteRaceForRaceLogTracking
-        final TimePoint denotationTimePoint = startTrackingTimePoint.minus(1);
+        final TimePoint denotationTimePoint = startTrackingTimePoint.minusResolution();
         raceLog.add(new RaceLogDenoteForTrackingEventImpl(denotationTimePoint,
                 author, raceLog.getCurrentPassId(), trackedRaceName, regatta.getBoatClass(), UUID.randomUUID()));
         raceLog.add(new RaceLogStartTrackingEventImpl(startTrackingTimePoint, author, raceLog.getCurrentPassId()));
@@ -4194,5 +4196,24 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
         // their own listener-based replication scheme.
         getRaceLogTrackingAdapter().copyPairingListFromOtherLeaderboard((RegattaLeaderboard) sourceLeaderboard,
                 (RegattaLeaderboard) targetLeaderboard, fromRaceColumnName, toRaceColumnInclusiveName);
+    }
+
+    @Override
+    public TrackingTimesRevocationReportDTO revokeExplicitTrackingTimes(String leaderboardName) throws NotFoundException {
+        final Leaderboard leaderboard = getLeaderboardByName(leaderboardName);
+        getService().getSecurityService().checkCurrentUserUpdatePermission(leaderboard);
+        final TrackingTimesRevocationReportDTO result;
+        if (leaderboard instanceof RegattaLeaderboard) {
+            final Regatta regatta = ((RegattaLeaderboard) leaderboard).getRegatta();
+            if (regatta.isControlTrackingFromStartAndFinishTimes()) {
+                result = new TrackingTimesRevocationReportDTO(getRaceLogTrackingAdapter().revokeExplicitTrackingTimes(
+                        (RegattaLeaderboard) leaderboard, /* raceLogResolver */ getService()));
+            } else {
+                result = new TrackingTimesRevocationReportDTO(TrackingTimesRevocationErrorCode.NO_AUTOMATED_TRACKING_TIMES);
+            }
+        } else {
+           result = new TrackingTimesRevocationReportDTO(TrackingTimesRevocationErrorCode.NO_REGATTA_LEADERBOARD);
+        }
+        return result;
     }
 }

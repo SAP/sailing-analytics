@@ -125,11 +125,15 @@ import com.sap.sailing.domain.leaderboard.RegattaLeaderboardWithOtherTieBreaking
 import com.sap.sailing.domain.leaderboard.ResultDiscardingRule;
 import com.sap.sailing.domain.leaderboard.SettableScoreCorrection;
 import com.sap.sailing.domain.leaderboard.ThresholdBasedResultDiscardingRule;
+import com.sap.sailing.domain.maneuverhash.ManeuverRaceFingerprint;
 import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprint;
 import com.sap.sailing.domain.persistence.FieldNames;
 import com.sap.sailing.domain.persistence.MongoObjectFactory;
 import com.sap.sailing.domain.racelog.RaceLogIdentifier;
 import com.sap.sailing.domain.regattalike.RegattaLikeIdentifier;
+import com.sap.sailing.domain.tracking.Maneuver;
+import com.sap.sailing.domain.tracking.ManeuverCurveBoundaries;
+import com.sap.sailing.domain.tracking.ManeuverLoss;
 import com.sap.sailing.domain.tracking.MarkPassing;
 import com.sap.sailing.domain.tracking.RaceTrackingConnectivityParameters;
 import com.sap.sailing.domain.tracking.RaceTrackingConnectivityParametersHandler;
@@ -167,6 +171,7 @@ import com.sap.sse.shared.media.VideoDescriptor;
 
 public class MongoObjectFactoryImpl implements MongoObjectFactory {
     private static Logger logger = Logger.getLogger(MongoObjectFactoryImpl.class.getName());
+    private static final int MANEUVERS_PER_PAGE = 1000;
     private final MongoDatabase database;
     private final CompetitorWithBoatRefJsonSerializer competitorWithBoatRefSerializer = CompetitorWithBoatRefJsonSerializer.create(/* serializeNonPublicCompetitorFields */ true);
     private final CompetitorJsonSerializer competitorSerializer = CompetitorJsonSerializer.create(
@@ -2031,5 +2036,149 @@ public class MongoObjectFactoryImpl implements MongoObjectFactory {
         final Document query = new Document();
         DomainObjectFactoryImpl.addRaceIdentifierToQuery(query, raceIdentifier);
         markPassingCollection.deleteOne(query);
+    }
+
+    private Document storeManeuverLoss(ManeuverLoss maneuverLoss) {
+        final Document maneuverLossDoc = new Document();
+        maneuverLossDoc.put(FieldNames.MANEUVER_DISTANCE_SAILED_POMA.name(), maneuverLoss.getDistanceSailedProjectedOnMiddleManeuverAngle().getMeters());
+        maneuverLossDoc.put(FieldNames.MANEUVER_DISTANCE_SAILED_INMPOMA.name(), maneuverLoss.getDistanceSailedIfNotManeuveringProjectedOnMiddleManeuverAngle().getMeters());
+        maneuverLossDoc.put(FieldNames.MANEUVER_START_POSITION_LAT_RAD.name(), maneuverLoss.getManeuverStartPosition().getLatRad());
+        maneuverLossDoc.put(FieldNames.MANEUVER_START_POSITION_LNG_RAD.name(), maneuverLoss.getManeuverStartPosition().getLngRad());
+        maneuverLossDoc.put(FieldNames.MANEUVER_END_POSITION_LAT_RAD.name(), maneuverLoss.getManeuverEndPosition().getLatRad());
+        maneuverLossDoc.put(FieldNames.MANEUVER_END_POSITION_LNG_RAD.name(), maneuverLoss.getManeuverEndPosition().getLngRad());
+        maneuverLossDoc.put(FieldNames.MANEUVER_SPEED_WITH_BEARING_BEFORE_DEGREES.name(), maneuverLoss.getSpeedWithBearingBefore().getBearing().getDegrees());
+        maneuverLossDoc.put(FieldNames.MANEUVER_SPEED_WITH_BEARING_BEFORE_SPEED.name(), maneuverLoss.getSpeedWithBearingBefore().getKnots());
+        maneuverLossDoc.put(FieldNames.MIDDLE_MAEUVER_ANGLE.name(), maneuverLoss.getMiddleManeuverAngle().getDegrees());
+        maneuverLossDoc.put(FieldNames.MANEUVER_LOSS_DURATION.name(), maneuverLoss.getManeuverDuration().asMillis());
+        return maneuverLossDoc;
+    }
+
+    private Document storeMainCurveBoundaries(ManeuverCurveBoundaries f, Document d) {
+        d.put(FieldNames.MANEUVER_TIMEPOINT_BEFORE.name(), f.getTimePointBefore().asMillis());
+        d.put(FieldNames.MANEUVER_TIMEPOINT_AFTER.name(), f.getTimePointAfter().asMillis());
+        d.put(FieldNames.MANEUVER_SPEED_WITH_BEARING_BEFORE_DEGREES.name(), f.getSpeedWithBearingBefore().getBearing().getDegrees());
+        d.put(FieldNames.MANEUVER_SPEED_WITH_BEARING_BEFORE_SPEED.name(), f.getSpeedWithBearingBefore().getKnots());
+        d.put(FieldNames.MANEUVER_SPEED_WITH_BEARING_AFTER_DEGREES.name(), f.getSpeedWithBearingAfter().getBearing().getDegrees());
+        d.put(FieldNames.MANEUVER_SPEED_WITH_BEARING_AFTER_SPEED_IN_KNOTS.name(), f.getSpeedWithBearingAfter().getKnots());
+        d.put(FieldNames.MANEUVER_DIRECTION_CHANGE_IN_DEGREES.name(), f.getDirectionChangeInDegrees());
+        d.put(FieldNames.MANEUVER_LOWEST_SPEED_IN_KNOTS.name(), f.getLowestSpeed().getKnots());
+        d.put(FieldNames.MANEUVER_HIGHEST_SPEED_IN_KNOTS.name(), f.getHighestSpeed().getKnots());
+        return d;
+    }
+
+    @Override
+    public void storeManeuvers(RaceIdentifier raceIdentifier, ManeuverRaceFingerprint fingerprint, Course course, Map<Competitor, List<Maneuver>> maneuvers) {
+        final MongoCollection<Document> maneuverCollection = database.getCollection(CollectionNames.MANEUVERS.name());
+        final JSONObject fingerprintjson = fingerprint.toJson();
+        final Document fingerprintDoc = Document.parse(fingerprintjson.toString());
+        if (maneuvers != null) {
+            for (final Entry<Competitor, List<Maneuver>> e : maneuvers.entrySet()) {
+                final List<Maneuver> competitorManeuvers = e.getValue() != null ? e.getValue() : new ArrayList<>();
+                final int pageCount = Math.max(1, (int) Math.ceil((double) competitorManeuvers.size() / MANEUVERS_PER_PAGE));
+                if (pageCount > 1) {
+                    logger.warning("Competitor " + e.getKey().getName() + " in race " + raceIdentifier
+                            + " has " + competitorManeuvers.size() + " maneuvers, splitting into " + pageCount
+                            + " documents of up to " + MANEUVERS_PER_PAGE + " maneuvers each (bug 6226).");
+                }
+                for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+                    final int from = pageIndex * MANEUVERS_PER_PAGE;
+                    final int to = Math.min(from + MANEUVERS_PER_PAGE, competitorManeuvers.size());
+                    storeCompetitorManeuvers(maneuverCollection, raceIdentifier, fingerprintDoc, course, e.getKey(), competitorManeuvers.subList(from, to), pageIndex);
+                }
+            }
+        }
+    }
+
+    private void storeCompetitorManeuvers(MongoCollection<Document> maneuverCollection, RaceIdentifier raceIdentifier,
+            Document fingerprintDoc, Course course, Competitor competitor, List<Maneuver> competitorManeuvers, final int pageIndex) {
+        final Document query = new Document();
+        DomainObjectFactoryImpl.addRaceIdentifierToQuery(query, raceIdentifier);
+        query.put(FieldNames.COMPETITOR_ID.name(), competitor.getId());
+        query.put(FieldNames.MANEUVER_PAGE_INDEX.name(), pageIndex);
+        final Document result = new Document();
+        result.put(FieldNames.MANEUVER_FINGERPRINT.name(), fingerprintDoc);
+        storeRaceIdentifier(result, raceIdentifier);
+        result.put(FieldNames.COMPETITOR_ID.name(), competitor.getId());
+        result.put(FieldNames.MANEUVER_PAGE_INDEX.name(), pageIndex);
+        final List<Document> maneuverList = new ArrayList<>();
+        for (final Maneuver maneuver : competitorManeuvers) {
+            maneuverList.add(generateManeuverDoc(maneuver, course));
+        }
+        result.put(FieldNames.MANEUVERS.name(), maneuverList);
+        try {
+            maneuverCollection.replaceOne(query, result, new ReplaceOptions().upsert(true));
+        } catch (org.bson.BsonMaximumSizeExceededException e) {
+            logger.log(Level.WARNING, "Maneuver document for competitor "+competitor.getName()+
+                    " in race "+raceIdentifier+
+                    " got too big; we identified "+competitorManeuvers.size()+
+                    " maneuvers for that competitor alone. What about bug 6226?", e);
+            throw e;
+        }
+    }
+
+    private Document generateManeuverDoc(Maneuver maneuver, Course course) {
+        final Document maneuverDoc = new Document();
+        maneuverDoc.put(FieldNames.SIMPLE_CLASS_NAME.name(), maneuver.getClass().getSimpleName());
+        maneuverDoc.put(FieldNames.TYPE.name(), maneuver.getType().name());
+        maneuverDoc.put(FieldNames.TACK.name(), maneuver.getNewTack()==null?null:maneuver.getNewTack().name());
+        maneuverDoc.put(FieldNames.POSITION_LAT_RAD.name(), maneuver.getPosition().getLatRad());
+        maneuverDoc.put(FieldNames.POSITION_LNG_RAD.name(), maneuver.getPosition().getLngRad());
+        maneuverDoc.put(FieldNames.TIMEPOINT.name(), maneuver.getTimePoint().asMillis());
+        final Document mainCurveBoundariesDoc = new Document();
+        maneuverDoc.put(FieldNames.MAIN_CURVE_BOUNDARIES.name(), storeMainCurveBoundaries(maneuver.getMainCurveBoundaries(), mainCurveBoundariesDoc));
+        final Document maeuverCurveWithStableSpeedAndBoundariesDoc = new Document();
+        maneuverDoc.put(FieldNames.MANEUVER_CURVE_WITH_STABLE_SPEED_AND_COURSE_BOUNDERIES.name(), storeMainCurveBoundaries(maneuver.getManeuverCurveWithStableSpeedAndCourseBoundaries(), maeuverCurveWithStableSpeedAndBoundariesDoc));
+        maneuverDoc.put(FieldNames.MAX_TURNING_RATE_IN_DEGREE_PER_SECOUND.name(), maneuver.getMaxTurningRateInDegreesPerSecond());
+        maneuverDoc.put(FieldNames.INDEX_OF_PASSED_WAYPOINT.name(), maneuver.getMarkPassing() == null ? -1 : course.getIndexOfWaypoint(maneuver.getMarkPassing().getWaypoint()));
+        maneuverDoc.put(FieldNames.TIME_AS_MILLIS.name(), maneuver.getDuration().asMillis());
+        maneuverDoc.put(FieldNames.MANEUVER_LOSS.name(), maneuver.getManeuverLoss() == null ? null : storeManeuverLoss(maneuver.getManeuverLoss()));
+        return maneuverDoc;
+    }
+
+    @Override
+    public void removeManeuvers(RaceIdentifier raceIdentifier) {
+        final MongoCollection<Document> maneuverCollection = database.getCollection(CollectionNames.MANEUVERS.name());
+        final Document query = new Document();
+        DomainObjectFactoryImpl.addRaceIdentifierToQuery(query, raceIdentifier);
+        maneuverCollection.deleteMany(query);
+    }
+
+    public void migrateOldFormatManeuversToNewFormat() {
+        final MongoCollection<Document> maneuverCollection = database.getCollection(CollectionNames.MANEUVERS.name());
+        final List<Document> documentsToMigrate = new ArrayList<>();
+        for (final Document doc : maneuverCollection.find()) {
+            // important 1
+            final boolean isInOldFormat = doc.get(FieldNames.COMPETITOR_ID.name()) == null;
+            if (isInOldFormat) {
+                documentsToMigrate.add(doc);
+            }
+        }
+        for (final Document oldDoc : documentsToMigrate) {
+            migrateOldFormatDocument(maneuverCollection, oldDoc);
+        }
+    }
+
+    private void migrateOldFormatDocument(MongoCollection<Document> maneuverCollection, Document oldDoc) {
+        final Document fingerprintDoc = (Document) oldDoc.get(FieldNames.MANEUVER_FINGERPRINT.name());
+        final List<Document> competitorsArray = oldDoc.getList(FieldNames.MANEUVERS.name(), Document.class);
+        if (competitorsArray != null && !competitorsArray.isEmpty()) {
+            for (final Document competitorDoc : competitorsArray) {
+                final Serializable competitorId = competitorDoc.get(FieldNames.COMPETITOR_ID.name(), Serializable.class);
+                final List<Document> maneuversForCompetitor = competitorDoc.getList(FieldNames.MANEUVERS.name(), Document.class);
+                final Document newDoc = new Document();
+                copyRaceIdentifierFields(oldDoc, newDoc);
+                newDoc.put(FieldNames.COMPETITOR_ID.name(), competitorId);
+                newDoc.put(FieldNames.MANEUVER_FINGERPRINT.name(), fingerprintDoc);
+                newDoc.put(FieldNames.MANEUVERS.name(), maneuversForCompetitor);
+                maneuverCollection.insertOne(newDoc);
+            }
+            maneuverCollection.deleteOne(new Document("_id", oldDoc.get("_id")));
+        }
+    }
+
+    private void copyRaceIdentifierFields(Document source, Document target) {
+        target.put(FieldNames.EVENT_NAME.name(), source.get(FieldNames.EVENT_NAME.name()));
+        target.put(FieldNames.RACE_NAME.name(), source.get(FieldNames.RACE_NAME.name()));
+        target.put(FieldNames.FLEET_NAME.name(), source.get(FieldNames.FLEET_NAME.name()));
     }
 }

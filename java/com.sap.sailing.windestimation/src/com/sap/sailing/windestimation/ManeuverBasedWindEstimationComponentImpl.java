@@ -9,6 +9,8 @@ import com.sap.sailing.windestimation.data.CompetitorTrackWithEstimationData;
 import com.sap.sailing.windestimation.data.ManeuverForEstimation;
 import com.sap.sailing.windestimation.data.ManeuverWithEstimatedType;
 import com.sap.sailing.windestimation.data.RaceWithEstimationData;
+import com.sap.sailing.windestimation.data.SimpleManeuverForEstimation;
+import com.sap.sailing.windestimation.data.SimpleManeuverWithEstimatedType;
 import com.sap.sailing.windestimation.model.classifier.maneuver.ManeuverClassifiersCache;
 import com.sap.sailing.windestimation.model.classifier.maneuver.ManeuverWithProbabilisticTypeClassification;
 import com.sap.sailing.windestimation.preprocessing.PreprocessingPipeline;
@@ -76,7 +78,7 @@ public class ManeuverBasedWindEstimationComponentImpl<InputType>
 
     @Override
     public List<WindWithConfidence<Pair<Position, TimePoint>>> estimateWindTrackAfterManeuverClassificationsAggregation(
-            List<ManeuverWithEstimatedType> improvedManeuverClassifications) {
+            List<? extends SimpleManeuverWithEstimatedType<? extends SimpleManeuverForEstimation>> improvedManeuverClassifications) {
         List<WindWithConfidence<Pair<Position, TimePoint>>> windTrack = windTrackCalculator
                 .getWindTrackFromManeuverClassifications(improvedManeuverClassifications);
         return windTrack;

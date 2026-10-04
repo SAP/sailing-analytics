@@ -13,6 +13,7 @@ import org.apache.shiro.authz.UnauthorizedException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.sap.sailing.domain.base.Fleet;
 import com.sap.sailing.domain.base.RaceColumn;
+import com.sap.sailing.domain.base.Regatta;
 import com.sap.sailing.domain.common.CompetitorDescriptor;
 import com.sap.sailing.domain.common.CompetitorRegistrationType;
 import com.sap.sailing.domain.common.DataImportProgress;
@@ -41,6 +42,7 @@ import com.sap.sailing.domain.common.orc.ORCCertificate;
 import com.sap.sailing.domain.common.orc.impl.ORCPerformanceCurveLegImpl;
 import com.sap.sailing.domain.common.security.SecuredDomainType;
 import com.sap.sailing.domain.common.security.SecuredDomainType.EventActions;
+import com.sap.sailing.domain.leaderboard.RegattaLeaderboard;
 import com.sap.sailing.expeditionconnector.ExpeditionDeviceConfiguration;
 import com.sap.sailing.gwt.ui.adminconsole.RaceLogSetTrackingTimesDTO;
 import com.sap.sailing.gwt.ui.adminconsole.RemoteSailingServerEventsSelectionDialog;
@@ -70,6 +72,7 @@ import com.sap.sailing.gwt.ui.shared.SwissTimingRaceRecordDTO;
 import com.sap.sailing.gwt.ui.shared.TracTracConfigurationWithSecurityDTO;
 import com.sap.sailing.gwt.ui.shared.TracTracRaceRecordDTO;
 import com.sap.sailing.gwt.ui.shared.TrackFileImportDeviceIdentifierDTO;
+import com.sap.sailing.gwt.ui.shared.TrackingTimesRevocationReportDTO;
 import com.sap.sailing.gwt.ui.shared.TypedDeviceMappingDTO;
 import com.sap.sailing.gwt.ui.shared.UrlDTO;
 import com.sap.sailing.gwt.ui.shared.VenueDTO;
@@ -583,7 +586,7 @@ public interface SailingServiceWriteAsync extends FileStorageManagementGwtServic
 
     void updateIgtimiDevice(IgtimiDeviceWithSecurityDTO editedObject, AsyncCallback<Void> asyncCallback);
 
-    void removeIgtimiDevice(String deviceSerialNumber, AsyncCallback<Void> asyncCallback);
+    void removeIgtimiDevice(long id, AsyncCallback<Void> asyncCallback);
 
     void importWindFromIgtimi(List<RaceDTO> selectedRaces, boolean correctByDeclination,
             String optionalBearerTokenOrNull, AsyncCallback<Map<RegattaAndRaceIdentifier, Integer>> asyncCallback);
@@ -776,4 +779,18 @@ public interface SailingServiceWriteAsync extends FileStorageManagementGwtServic
     
     void copyPairingListFromOtherLeaderboard(String sourceLeaderboardName, String targetLeaderboardName, String fromRaceColumnName,
             String toRaceColumnInclusiveName, AsyncCallback<Void> asyncCallback);
+
+    /**
+     * For the leaderboard identified by {@code leaderboardName}, revokes the explicit tracking times for all its
+     * {@link RaceColumn}/{@link Fleet} combinations where the race log of that slot has a valid race start time and
+     * valid finishing/finished times ("blue flag") in the Race Log. Multiple revocation events may be required because
+     * due to priorities and time order, some tracking time events may "shadow" other such events that become valid
+     * after revoking the one currently valid. The process continues until no more valid start/end tracking events exist
+     * in that race log.
+     * <p>
+     * 
+     * Precondition: The leaderboard must be a {@link RegattaLeaderboard}, and the corresponding regatta must be in more
+     * {@link Regatta#isControlTrackingFromStartAndFinishTimes()}
+     */
+    void revokeExplicitTrackingTimes(String leaderboardName, AsyncCallback<TrackingTimesRevocationReportDTO> asyncCallback);
 }

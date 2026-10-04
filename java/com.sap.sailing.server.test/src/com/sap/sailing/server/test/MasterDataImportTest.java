@@ -128,6 +128,7 @@ import com.sap.sailing.domain.persistence.racelog.tracking.MongoSensorFixStoreFa
 import com.sap.sailing.domain.racelog.tracking.EmptySensorFixStore;
 import com.sap.sailing.domain.racelog.tracking.SensorFixStore;
 import com.sap.sailing.domain.racelog.tracking.test.mock.MockSmartphoneImeiServiceFinderFactory;
+import com.sap.sailing.domain.racelogtracking.impl.PingDeviceIdentifierImpl;
 import com.sap.sailing.domain.racelogtracking.impl.SmartphoneImeiIdentifierImpl;
 import com.sap.sailing.domain.ranking.OneDesignRankingMetric;
 import com.sap.sailing.domain.test.TrackBasedTest;
@@ -558,6 +559,112 @@ public class MasterDataImportTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Reproduces the "pinged mark" defect from bug6227: a {@link PingDeviceIdentifierImpl} mapped to a
+     * {@link Competitor} over a single-instant, inclusive time range {@code [t, t]} (i.e.
+     * {@link RegattaLogDeviceMappingEvent#getFrom() from} {@code ==}
+     * {@link RegattaLogDeviceMappingEvent#getToInclusive() toInclusive}) with exactly one sensor fix stored at
+     * {@code t}. On export, {@code TopLevelMasterData.addRangeIfMappingEvent} builds
+     * {@code TimeRange.create(from, toInclusive)}; because a {@link com.sap.sse.common.TimeRange} treats its
+     * upper bound as exclusive, {@code from == toInclusive} yields an empty range which
+     * {@link com.sap.sse.common.MultiTimeRange} silently discards. The device is therefore never streamed and its
+     * single fix never reaches the importing instance. This test asserts that the fix arrives, and thus fails
+     * until the inclusive-to-exclusive conversion is fixed.
+     */
+    @Test
+    public void testMasterDataImportPingedMarkSingleInstantFix() throws MalformedURLException, IOException,
+            InterruptedException, ClassNotFoundException {
+        final MockSmartphoneImeiServiceFinderFactory serviceFinderFactory = new MockSmartphoneImeiServiceFinderFactory();
+        final RacingEventServiceImpl sourceService = Mockito
+                .spy(new RacingEventServiceImpl(null, MongoSensorFixStoreFactory.INSTANCE.getMongoGPSFixStore(
+                        PersistenceFactory.INSTANCE.getDefaultMongoObjectFactory(serviceFinderFactory),
+                        PersistenceFactory.INSTANCE.getDefaultDomainObjectFactory(), serviceFinderFactory,
+                        ReadConcern.MAJORITY, WriteConcern.MAJORITY), serviceFinderFactory));
+        Mockito.doReturn(securityService).when(sourceService).getSecurityService();
+        final Event event = sourceService.addEvent(TEST_EVENT_NAME, /* eventDescription */null, eventStartDate,
+                eventEndDate, "testVenue", false, eventUUID);
+        final UUID courseAreaUUID = UUID.randomUUID();
+        final CourseArea courseArea = sourceService.getBaseDomainFactory().getOrCreateCourseArea(courseAreaUUID,
+                "testArea", /* centerPosition */ null, /* radius */ null);
+        event.getVenue().addCourseArea(courseArea);
+        final String raceColumnName = "T1";
+        final List<String> raceColumnNames = new ArrayList<>();
+        raceColumnNames.add(raceColumnName);
+        final List<String> emptyRaceColumnNamesList = Collections.emptyList();
+        final List<Series> series = new ArrayList<>();
+        final List<Fleet> fleets = new ArrayList<>();
+        final FleetImpl testFleet1 = new FleetImpl("testFleet1");
+        fleets.add(testFleet1);
+        series.add(new SeriesImpl("testSeries", false, /* isFleetsCanRunInParallel */ true, fleets,
+                emptyRaceColumnNamesList, sourceService));
+        final UUID regattaUUID = UUID.randomUUID();
+        final Regatta regatta = sourceService.createRegatta(
+                RegattaImpl.getDefaultName(TEST_REGATTA_NAME, TEST_BOAT_CLASS_NAME), TEST_BOAT_CLASS_NAME,
+                /* canBoatsOfCompetitorsChangePerRace */ true, CompetitorRegistrationType.CLOSED,
+                /* registrationLinkSecret */ null, /* startDate */ null, /* endDate */ null, regattaUUID, series, true,
+                new LowPoint(), courseAreaUUID, /* buoyZoneRadiusInHullLengths */ 2.0, /* useStartTimeInference */ true,
+                /* controlTrackingFromStartAndFinishTimes */ false,
+                /* autoRestartTrackingUponCompetitorSetChange */ false, OneDesignRankingMetric::new);
+        for (final String name : raceColumnNames) {
+            series.get(0).addRaceColumn(name, sourceService);
+        }
+        final int[] discardRule = { 1, 2, 3, 4 };
+        final Leaderboard leaderboard = sourceService.addRegattaLeaderboard(regatta.getRegattaIdentifier(),
+                "testDisplayName", discardRule);
+        final List<String> leaderboardNames = new ArrayList<>();
+        leaderboardNames.add(leaderboard.getName());
+        final LeaderboardGroup group = sourceService.addLeaderboardGroup(TEST_GROUP_UUID, TEST_GROUP_NAME,
+                "testGroupDesc", /* displayName */ null, false, leaderboardNames, null, null);
+        event.addLeaderboardGroup(group);
+        final UUID competitorUUID = UUID.randomUUID();
+        final Set<DynamicPerson> sailors = new HashSet<>();
+        sailors.add(new PersonImpl("Froderik Poterson", new NationalityImpl("GER"), new Date(645487200000L),
+                "Oberhoschy"));
+        final DynamicTeam team = new TeamImpl("Pros", sailors, /* coach */ null);
+        final CompetitorImpl competitor = new CompetitorImpl(competitorUUID, "Froderik", "KYC", Color.RED, null, null,
+                team, /* timeOnTimeFactor */ null, /* timeOnDistanceAllowancePerNauticalMile */ null, null);
+        // A pinged mark's device: a PING identifier carrying a UUID, mapped over a single-instant inclusive range
+        // [pingInstant, pingInstant] with exactly one fix stored at that instant.
+        final TimePoint pingInstant = new MillisecondsTimePoint(1372489205000L);
+        final DeviceIdentifier pingDevice = new PingDeviceIdentifierImpl(UUID.randomUUID());
+        final RegattaLogDeviceCompetitorMappingEvent pingMappingEvent = new RegattaLogDeviceCompetitorMappingEventImpl(
+                pingInstant, pingInstant, author, UUID.randomUUID(), competitor, pingDevice, /* from */ pingInstant,
+                /* toInclusive */ pingInstant);
+        regatta.getRegattaLog().add(pingMappingEvent);
+        final GPSFix pingFix = new GPSFixMovingImpl(new DegreePosition(54.333, 10.133), pingInstant,
+                new KnotSpeedWithBearingImpl(10, new DegreeBearingImpl(90)), /* optionalTrueHeading */ null);
+        sourceService.getSensorFixStore().storeFix(pingDevice, pingFix);
+        final List<UUID> groupUuidsToExport = new ArrayList<>();
+        groupUuidsToExport.add(group.getId());
+        final RacingEventService destService;
+        final DomainFactory domainFactory;
+        final DummyMasterDataRessource spyResource = spyResource(new DummyMasterDataRessource(), sourceService);
+        Mockito.doReturn(securityService).when(spyResource).getSecurityService();
+        final Response response = spyResource.getMasterDataByLeaderboardGroups(groupUuidsToExport, false, true, false,
+                false);
+        final StreamingOutput streamingOutput = (StreamingOutput) response.getEntity();
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        final UUID randomUUID = UUID.randomUUID();
+        InputStream inputStream = null;
+        try {
+            streamingOutput.write(os);
+            os.flush();
+            deleteAllDataFromDatabase();
+            destService = getDestService(randomUUID, serviceFinderFactory);
+            domainFactory = destService.getBaseDomainFactory();
+            inputStream = new ByteArrayInputStream(os.toByteArray());
+            final MasterDataImporter importer = new MasterDataImporter(domainFactory, destService,
+                    securityService.getCurrentUser(), securityService.getDefaultTenantForCurrentUser());
+            importer.importFromStream(inputStream, randomUUID, false);
+        } finally {
+            os.close();
+            inputStream.close();
+        }
+        final SensorFixStore sensorFixStore = destService.getSensorFixStore();
+        assertEquals(1, sensorFixStore.getNumberOfFixes(pingDevice));
+        verifyFix(pingFix, sensorFixStore, pingInstant, pingInstant, pingDevice);
     }
 
     @Test

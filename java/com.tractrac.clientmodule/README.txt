@@ -1115,7 +1115,7 @@ Build number: 13262
 2) Bugs
 
  - The ICompetitorClass implementation can contain duplicate entries of different implementations. (Reported by
- Juan Salvador P�rez, 16/01/2017)
+ Juan Salvador Pérez, 16/01/2017)
 
 ********************************************
     TracAPI 3.3.0
@@ -1466,7 +1466,7 @@ Build number: 9436
  has a race start time) and FirstControl (if the start of the race happens when the competitor passes for
  the first control). The value by default is RaceStart. At this moment this value only can be managed at an event
  level (in the event manager) but in a future we will add this functionality at a race level (Requested by
- J�rome Soussens, 14/10/2014)
+ Jérome Soussens, 14/10/2014)
  - The method IControlPoint.getPosition is deprecated. Use the IControlPointPositionListener.gotControlPointPosition()
  to know the position of a control point (Reported by Jorge Piera, 28/10/2014)
  - Adding the isNonCompeting() method to the ICompetitor interface. If a competitor is a non competing competitor

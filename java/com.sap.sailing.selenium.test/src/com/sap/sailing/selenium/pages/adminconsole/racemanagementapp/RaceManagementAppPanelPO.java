@@ -31,7 +31,9 @@ public class RaceManagementAppPanelPO extends PageArea {
     }
     
     public DeviceConfigurationDetailsAreaPO getDeviceConfigurationDetails() {
-        DeviceConfigurationEntryPO deviceConfiguration = getLeaderboardTable().getEntries().get(0);
+        final CellTablePO<DeviceConfigurationEntryPO> deviceConfigurationTable = getLeaderboardTable();
+        waitUntil(() -> !deviceConfigurationTable.getEntries().isEmpty());
+        final DeviceConfigurationEntryPO deviceConfiguration = deviceConfigurationTable.getEntries().get(0);
         deviceConfiguration.select();
         return getPO(DeviceConfigurationDetailsAreaPO::new, DEVICE_CONGIGURATION_DETAILS_AREA_ID);
     }

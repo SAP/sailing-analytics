@@ -52,8 +52,7 @@ public class CPUMeterImpl implements CPUMeter {
     @Override
     public <T> T callWithCPUMeter(RunnableWithResult<T> callable, String key) {
         return callWithCPUMeterWithException((RunnableWithResultAndException<T, RuntimeException>) ()->{
-            callable.run();
-            return null;
+            return callable.run();
         }, key);
     }
 

@@ -173,7 +173,7 @@ public class CourseChangeBasedTrackApproximation implements Serializable, GPSTra
          * <p>
          * 
          * This method queues the new fix and only adds it to the window when it is "old enough" to not be influenced
-         * anymore by newer fixes that may still arrive. The influence is measured by half the
+         * anymore by newer fixes that may still arrive. The influence is measured by the
          * {@link GPSFixTrack#getMillisecondsOverWhichToAverageSpeed()} interval. This way, approximation results
          * are more stable but have a delay with regards to the newest fixes known by the track.<p>
          * 
@@ -280,6 +280,12 @@ public class CourseChangeBasedTrackApproximation implements Serializable, GPSTra
                         courseChangeBetweenFixesInWindow.add(new ScalableDouble(courseChangeBetweenPreviousAndNextInDegrees));
                     } else {
                         courseChangeBetweenFixesInWindow.add(insertPosition-1, new ScalableDouble(courseChangeBetweenPreviousAndNextInDegrees));
+                        if (courseChangeBetweenFixesInWindow.size() > insertPosition) { // the node just added isn't the last one; update the next node!
+                            courseChangeBetweenFixesInWindow.remove(insertPosition);
+                            final SpeedWithBearing nextNextSpeed = this.speedForFixesInWindow.get(insertPosition+1);
+                            final double courseChangeBetweenNextAndNextNextInDegrees = nextSpeed.getBearing().getDifferenceTo(nextNextSpeed.getBearing()).getDegrees();
+                            courseChangeBetweenFixesInWindow.add(insertPosition, new ScalableDouble(courseChangeBetweenNextAndNextNextInDegrees));
+                        }
                     }
                     if (windowDuration.compareTo(getMaximumWindowLength()) > 0) {
                         result = tryToExtractManeuverCandidate();
@@ -360,15 +366,35 @@ public class CourseChangeBasedTrackApproximation implements Serializable, GPSTra
          */
         private void removeFirst(int howManyElementsToRemove) {
             assert !window.isEmpty();
+            final int oldSize = window.size();
             for (int i=0; i<howManyElementsToRemove; i++) {
                 window.removeFirst();
                 speedForFixesInWindow.removeFirst();
             }
+            trimQueue();
             windowDuration = window.isEmpty() ? Duration.NULL : window.getFirst().getTimePoint().until(window.getLast().getTimePoint());
             // adjust totalCourseChangeFromBeginningOfWindow by subtracting the first course change from all others
             // and shifting all by one position to the "left"
             if (!courseChangeBetweenFixesInWindow.isEmpty()) {
-                courseChangeBetweenFixesInWindow.removeFirst(howManyElementsToRemove);
+                // when removing the last element from the window, we have no "between fixes" anymore;
+                // courseChangeBetweenFixesInWindow contains one element fewer than window, unless window is
+                // empty in which case courseChangeBetweenFixesInWindow is also empty.
+                courseChangeBetweenFixesInWindow.removeFirst(howManyElementsToRemove==oldSize?
+                        howManyElementsToRemove-1:howManyElementsToRemove);
+            }
+        }
+
+        /**
+         * After having {@link #removeFirst(int) removed} items from the {@link #window}, the {@link #queueOfNewFixes}
+         * may now contain fixes older than the oldest element in {@link #window}. This would violate our assumption that
+         * only fixes at or after the start of the window are added, so we need to "trim" the queue accordingly.
+         */
+        private void trimQueue() {
+            if (!window.isEmpty()) {
+                final TimePoint timePointOfOldestFixInWindow = window.getFirst().getTimePoint();
+                while (!queueOfNewFixes.isEmpty() && queueOfNewFixes.peekFirst().getTimePoint().before(timePointOfOldestFixInWindow)) {
+                    queueOfNewFixes.removeFirst();
+                }
             }
         }
 
@@ -406,7 +432,7 @@ public class CourseChangeBasedTrackApproximation implements Serializable, GPSTra
                     final double absoluteCourseChangeInDegrees = courseChange.divide(maximumCourseChangeToStarboard >= maximumCourseChangeToPort ? 1 : -1); 
                     if (absoluteCourseChangeInDegrees > maximumAbsoluteCourseChangeInCorrectDirection) {
                         maximumAbsoluteCourseChangeInCorrectDirection = absoluteCourseChangeInDegrees;
-                        indexOfMaximumAbsoluteCourseChangeInCorrectDirection = i;
+                        indexOfMaximumAbsoluteCourseChangeInCorrectDirection = i+1; // the course change is to the next fix in window
                     }
                     i++;
                 }
@@ -414,6 +440,7 @@ public class CourseChangeBasedTrackApproximation implements Serializable, GPSTra
             } else {
                 result = null;
             }
+            assert indexOfMaximumAbsoluteCourseChangeInCorrectDirection < window.size();
             return result == null ? null : new Pair<>(result, indexOfMaximumAbsoluteCourseChangeInCorrectDirection);
         }
 

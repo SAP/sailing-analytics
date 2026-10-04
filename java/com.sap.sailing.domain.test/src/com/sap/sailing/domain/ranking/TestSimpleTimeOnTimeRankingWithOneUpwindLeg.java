@@ -102,7 +102,7 @@ public class TestSimpleTimeOnTimeRankingWithOneUpwindLeg {
                 /* delay for wind estimation cache invalidation */ 0, /*useMarkPassingCalculator*/ false,
                 tr->new TimeOnTimeAndDistanceRankingMetric(tr,
                         timeOnTimeFactors, // time-on-time
-                        c->new MillisecondsDurationImpl((long) (1000.*timeOnDistanceFactors.apply(c)))), mock(RaceLogAndTrackedRaceResolver.class), null, /* markPassingRaceFingerprintRegistry */ null);
+                        c->new MillisecondsDurationImpl((long) (1000.*timeOnDistanceFactors.apply(c)))), mock(RaceLogAndTrackedRaceResolver.class), null, /* markPassingRaceFingerprintRegistry */ null, /* maneuverRaceFingerprintRegistry */ null);
         // in this simplified artificial course, the top mark is exactly north of the right leeward gate
         DegreePosition topPosition = new DegreePosition(1, 0);
         trackedRace.getOrCreateTrack(left).addGPSFix(new GPSFixImpl(new DegreePosition(0, -0.000001), timePointForFixes));

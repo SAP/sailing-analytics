@@ -1,5 +1,7 @@
 package com.sap.sailing.selenium.pages.common;
 
+import java.time.Duration;
+
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -63,11 +65,11 @@ public abstract class DataEntryDialogPO extends PageArea {
     public void pressOk(boolean acceptAlert, boolean waitForAjaxRequests) {
         // This generically triggers revalidation in dialogs to ensure that the ok button gets enabled
         ((JavascriptExecutor) driver).executeScript("!!document.activeElement ? document.activeElement.blur() : 0");
-        Wait<WebDriver> wait = new WebDriverWait(driver, 20);
+        Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         // click OK
         wait.until(ExpectedConditions.elementToBeClickable(okButton)).click();        
         if (acceptAlert) {
-            final Alert alert = new WebDriverWait(driver, DEFAULT_WAIT_TIMEOUT_SECONDS)
+            final Alert alert = new WebDriverWait(driver, Duration.ofSeconds(DEFAULT_WAIT_TIMEOUT_SECONDS))
                     .until(ExpectedConditions.alertIsPresent());
             alert.accept();
         }

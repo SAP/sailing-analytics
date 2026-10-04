@@ -177,7 +177,7 @@ public abstract class AbstractCompetitorRaceChart<SettingsType extends ChartSett
                 .setPlotBorderWidth(0)
                 .setCredits(new Credits().setEnabled(false));
         chart.setStyleName(chartsCss.chartStyle());
-        ChartUtil.useCheckboxesToShowAndHide(chart);
+        ChartUtil.useCheckboxesToShowAndHide(chart, () -> {});
         
         if (allowTimeAdjust) {
             chart.setClickEventHandler(new ChartClickEventHandler() {

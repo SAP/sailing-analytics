@@ -61,6 +61,10 @@ public class SpeedRegressionPerAngleClusterProcessor implements
      */
     private transient ConcurrentMap<BoatClass, Set<PolarsChangedListener>> listeners;
 
+    private boolean isFinished;
+
+    private boolean isAborted;
+
     public SpeedRegressionPerAngleClusterProcessor(ClusterGroup<Bearing> angleClusterGroup) {
         this.angleClusterGroup = angleClusterGroup;
     }
@@ -110,7 +114,6 @@ public class SpeedRegressionPerAngleClusterProcessor implements
 
     @Override
     public boolean canProcessElements() {
-        // TODO Auto-generated method stub
         return true;
     }
 
@@ -147,7 +150,7 @@ public class SpeedRegressionPerAngleClusterProcessor implements
      * regression for boatspeed over windspeed. We don't know the thresholds or centers of the angle clusters here, so
      * we roughly interpolate by taking 10 values from angle-5 deg to angle+5 deg and average the speeds.
      * 
-     * At the time of writing the size of each angle range is 5� so this method provides a pretty smooth interpolation.
+     * At the time of writing the size of each angle range is 5° so this method provides a pretty smooth interpolation.
      */
     public SpeedWithConfidence<Void> estimateBoatSpeed(BoatClass boatClass, Speed windSpeed, Bearing trueWindAngle)
             throws NotEnoughDataHasBeenAddedException {
@@ -269,41 +272,40 @@ public class SpeedRegressionPerAngleClusterProcessor implements
 
     @Override
     public Class<GroupedDataEntry<GPSFixMovingWithPolarContext>> getInputType() {
-        // TODO Auto-generated method stub
-        return null;
+        @SuppressWarnings("unchecked")
+        final Class<GroupedDataEntry<GPSFixMovingWithPolarContext>> result = (Class<GroupedDataEntry<GPSFixMovingWithPolarContext>>) (Class<?>) GroupedDataEntry.class;
+        return result;
     }
 
     @Override
     public Class<Void> getResultType() {
         // No result type here, since this is a special case of a processor. It's the end of the pipe so to say.
-        return null;
+        return Void.class;
     }
 
     @Override
     public void finish() throws InterruptedException {
-        // Nothing to do here
+        isFinished = true;
     }
 
     @Override
     public boolean isFinished() {
-        return false;
+        return isFinished;
     }
 
     @Override
     public void abort() {
-        // TODO Auto-generated method stub
+        isAborted = true;
     }
 
     @Override
     public boolean isAborted() {
-        // TODO Auto-generated method stub
-        return false;
+        return isAborted;
     }
 
     @Override
     public AdditionalResultDataBuilder getAdditionalResultData(AdditionalResultDataBuilder additionalDataBuilder) {
-        // TODO Auto-generated method stub
-        return null;
+        return additionalDataBuilder;
     }
 
     public ClusterGroup<Bearing> getAngleCluster() {
