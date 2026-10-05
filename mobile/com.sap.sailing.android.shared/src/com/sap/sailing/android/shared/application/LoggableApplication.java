@@ -7,11 +7,13 @@ import com.sap.sailing.android.shared.R;
 import com.sap.sailing.android.shared.logging.ExLog;
 import com.sap.sailing.android.shared.logging.LifecycleLogger;
 import com.sap.sailing.android.shared.logging.LoggingExceptionHandler;
+import com.sap.sailing.android.shared.ui.utils.SystemBarInsetsHandler;
 import com.sap.sailing.android.shared.util.PrefUtils;
 
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import io.branch.referral.Branch;
 
 /**
@@ -51,7 +53,9 @@ public class LoggableApplication extends Application {
             Branch.enableLogging();
         }
         Branch.getAutoInstance(this);
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            registerActivityLifecycleCallbacks(new SystemBarInsetsHandler());
+        }
     }
 
     public static void restartApp(Context context) {
