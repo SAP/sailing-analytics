@@ -2,7 +2,7 @@ package com.sap.sailing.racecommittee.app.ui.fragments.raceinfo;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
+import androidx.annotation.IdRes;
 
 import com.sap.sailing.android.shared.util.AppUtils;
 import com.sap.sailing.android.shared.util.BroadcastManager;
