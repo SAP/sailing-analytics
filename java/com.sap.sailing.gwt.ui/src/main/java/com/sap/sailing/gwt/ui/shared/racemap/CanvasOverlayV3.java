@@ -97,6 +97,7 @@ public abstract class CanvasOverlayV3 {
      * goes through 0.<p>
      */
     private Double drawingAngle;
+    private double[] drawingMatrix;
 
     public CanvasOverlayV3(MapWidget map, int zIndex, String canvasId, CoordinateSystem coordinateSystem) {
         this.transitionTimeInMilliseconds = -1; // no animated position transition initially
@@ -398,6 +399,7 @@ public abstract class CanvasOverlayV3 {
      * <code>newBoatDrawingAngle</code> is minimal.
      */
     protected void updateDrawingAngleAndSetCanvasRotation(double newBoatDrawingAngle) {
+        drawingMatrix = null;
         if (drawingAngle == null) {
             drawingAngle = newBoatDrawingAngle;
         } else {
@@ -405,10 +407,22 @@ public abstract class CanvasOverlayV3 {
         }
         setCanvasTransform();
     }
+
+    protected void updateDrawingMatrixAndSetCanvasTransform(double a, double b, double c, double d) {
+        drawingAngle = null;
+        drawingMatrix = new double[] { a, b, c, d };
+        setCanvasTransform();
+    }
     
     private void setCanvasTransform() {
-        setProperty(canvas.getElement().getStyle(), "transform", "translate3d(" + canvasPositionX + "px, " +
-                canvasPositionY + "px, 0) rotate(" + (drawingAngle == null ? 0.0 : drawingAngle) + "deg)");
+        if (drawingMatrix == null) {
+            setProperty(canvas.getElement().getStyle(), "transform", "translate3d(" + canvasPositionX + "px, " +
+                    canvasPositionY + "px, 0) rotate(" + (drawingAngle == null ? 0.0 : drawingAngle) + "deg)");
+        } else {
+            setProperty(canvas.getElement().getStyle(), "transform", "translate3d(" + canvasPositionX + "px, " +
+                    canvasPositionY + "px, 0) matrix(" + drawingMatrix[0] + ", " + drawingMatrix[1] + ", " +
+                    drawingMatrix[2] + ", " + drawingMatrix[3] + ", 0, 0)");
+        }
     }
 
     protected double getNewRotationWithMinimalDiff(double desiredAngle) {
