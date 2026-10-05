@@ -1,6 +1,7 @@
 apply plugin: "com.android.application"
 
 android {
+    namespace packageName
     buildToolsVersion rootProject.ext.buildTools
     compileSdkVersion rootProject.ext.compileSdk
 
@@ -9,22 +10,8 @@ android {
         targetCompatibility rootProject.ext.targetCompatibilityVersion
     }
 
-    /**
-     * Copies apk into www apps directory and create version file
-     */
-    applicationVariants.all { variant ->
-        variant.outputs.all { output ->
-            outputFileName = new File(outputFileName.replace("-$variant.buildType.name", ""))
-        }
-        variant.assemble.doLast { assemble ->
-            // Create version file
-            def versionFile = new File(rootProject.ext.destinationFolder, "$packageName" + ".version")
-            versionFile.text = "$packageName" + ".apk=$appVersionCode-$variant.buildType.name"
-            copy {
-                from variant.outputs*.outputFile
-                into rootProject.ext.destinationFolder
-            }
-        }
+    buildFeatures {
+        buildConfig true
     }
 
     defaultConfig {
@@ -78,9 +65,10 @@ android {
         }
     }
 
-    packagingOptions {
-        exclude "LICENSE.txt"
-        exclude ".readme"
+    packaging {
+        resources {
+            excludes += ["LICENSE.txt", ".readme"]
+        }
     }
 }
 
@@ -89,12 +77,81 @@ dependencies {
     implementation "com.android.support:recyclerview-v7:${rootProject.ext.support}"
     implementation "com.android.support:customtabs:${rootProject.ext.support}"
 
+    /* Google Play Services */
+    implementation "com.google.android.gms:play-services-location:${rootProject.ext.play_services_location}"
+
     /* local dependencies */
     implementation project(":mobile:com.sap.sailing.android.shared")
 
     /* JVM tests */
     testImplementation "junit:junit:${rootProject.ext.junit}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockito}"
+}
+
+/**
+ * Copies the built APK into the www apps directory as "<packageName>.apk" and writes a
+ * "<packageName>.version" file next to it. Replaces the removed applicationVariants/outputFileName
+ * Variant API (AGP 8) with the androidComponents Artifacts API: the task consumes the APK
+ * SingleArtifact and resolves the concrete file through the BuiltArtifactsLoader.
+ */
+abstract class CopyApkToWww extends DefaultTask {
+    @InputFiles
+    abstract DirectoryProperty getApkDirectory()
+
+    @Internal
+    abstract Property<com.android.build.api.variant.BuiltArtifactsLoader> getBuiltArtifactsLoader()
+
+    @Input
+    abstract Property<String> getPackageName()
+
+    @Input
+    abstract Property<String> getAppVersionCode()
+
+    @Input
+    abstract Property<String> getBuildTypeName()
+
+    @OutputDirectory
+    abstract DirectoryProperty getDestinationFolder()
+
+    @TaskAction
+    void copyApk() {
+        final def builtArtifacts = builtArtifactsLoader.get().load(apkDirectory.get())
+        final boolean loaded = builtArtifacts != null
+        if (loaded) {
+            final File destDir = destinationFolder.get().asFile
+            destDir.mkdirs()
+            final File targetApk = new File(destDir, packageName.get() + ".apk")
+            builtArtifacts.elements.each { element ->
+                project.copy {
+                    from element.outputFile
+                    into destDir
+                    rename { targetApk.name }
+                }
+            }
+            final File versionFile = new File(destDir, packageName.get() + ".version")
+            versionFile.text = packageName.get() + ".apk=" + appVersionCode.get() + "-" + buildTypeName.get()
+        } else {
+            throw new GradleException("Could not load built APK artifacts from " + apkDirectory.get())
+        }
+    }
+}
+
+androidComponents {
+    final String appPackageName = packageName
+    final String appVersionCodeValue = appVersionCode
+    onVariants(selector().all()) { variant ->
+        final def copyTask = tasks.register("copy${variant.name.capitalize()}ApkToWww", CopyApkToWww) {
+            it.apkDirectory.set(variant.artifacts.get(com.android.build.api.artifact.SingleArtifact.APK.INSTANCE))
+            it.builtArtifactsLoader.set(variant.artifacts.getBuiltArtifactsLoader())
+            it.packageName.set(appPackageName)
+            it.appVersionCode.set(appVersionCodeValue)
+            it.buildTypeName.set(variant.buildType)
+            it.destinationFolder.set(new File(rootProject.ext.destinationFolder))
+        }
+        tasks.matching { it.name == "assemble${variant.name.capitalize()}" }.configureEach {
+            it.finalizedBy(copyTask)
+        }
+    }
 }
 
 // Custom tasks
