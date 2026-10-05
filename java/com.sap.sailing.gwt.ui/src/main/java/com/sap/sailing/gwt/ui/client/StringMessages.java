@@ -2614,4 +2614,5 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     String noAutomatedTrackingTimes(String leaderboardName);
     String unknownError(String name);
     String pendingServerOperations(Integer numberOfPendingServerOperations);
+    String masterDataImportOnlyFromTrustedDomains(String trustedDomains, String host);
 }
