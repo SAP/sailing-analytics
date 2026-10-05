@@ -6,7 +6,7 @@ ruby "3.2.8"
 
 gem "gollum", "5.3.2"
 
-gem "sinatra", "2.2.4"
+gem "sinatra", "4.2.0"
 gem "sinatra-contrib", "2.2.4"
 
 gem "rack", "2.2.9"
