@@ -6,7 +6,7 @@ import com.sap.sailing.android.shared.ui.customviews.OpenSansToolbar;
 
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.view.Menu;
 
 public class AboutActivity extends BaseActivity {
