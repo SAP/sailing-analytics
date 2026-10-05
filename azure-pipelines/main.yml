@@ -47,7 +47,7 @@ extends:
     testLaneName: 'test'
     # requestAuthentication: true  # enable if fetching dependencies from Artifactory or Nexus
     appCenterSlug: 'sapsailing/sapsailing-android-apps'
-    jdkVersion: 17
+    jdkVersion: 21
     androidVersion: 35
     # We are building more than one app from our repository; we will use branches
     # to determine which app is to be built/released/signed
