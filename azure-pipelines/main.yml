@@ -49,7 +49,7 @@ extends:
     # requestAuthentication: true  # enable if fetching dependencies from Artifactory or Nexus
     appCenterSlug: 'sapsailing/sapsailing-android-apps'
     jdkVersion: 21
-    androidVersion: 35
+    androidVersion: 36
     # We are building more than one app from our repository; we will use branches
     # to determine which app is to be built/released/signed
     # Default: Buoy Pinger App
