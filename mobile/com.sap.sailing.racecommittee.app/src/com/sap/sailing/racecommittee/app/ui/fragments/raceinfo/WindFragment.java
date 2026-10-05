@@ -50,6 +50,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -172,10 +173,9 @@ public class WindFragment extends BaseFragment
         // initialize the googleApiClient for location requests
         apiClient = LocationServices.getFusedLocationProviderClient(requireContext());
         settingsClient = LocationServices.getSettingsClient(requireContext());
-        locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(FIVE_SEC);
-        locationRequest.setFastestInterval(EVERY_POSITION_CHANGE);
+        locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, FIVE_SEC)
+                .setMinUpdateIntervalMillis(EVERY_POSITION_CHANGE)
+                .build();
         locationSettingsRequest = new LocationSettingsRequest.Builder()
                 .addLocationRequest(locationRequest)
                 .build();

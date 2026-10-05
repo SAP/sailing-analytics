@@ -59,8 +59,8 @@ ext {
 
     support = "27.1.1"
     play_services_maps = "17.0.1"
-    play_services_location = "12.0.1"
-    play_services_vision = "12.0.1"
+    play_services_location = "21.0.1"
+    play_services_vision = "19.0.0"
 
     license_dialog = "1.8.0"
 
