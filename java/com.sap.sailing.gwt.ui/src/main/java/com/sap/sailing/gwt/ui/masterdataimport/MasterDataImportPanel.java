@@ -32,6 +32,7 @@ import com.sap.sailing.domain.common.MasterDataImportObjectCreationCount;
 import com.sap.sailing.gwt.ui.adminconsole.places.AdminConsoleView.Presenter;
 import com.sap.sailing.gwt.ui.client.SailingServiceWriteAsync;
 import com.sap.sailing.gwt.ui.client.StringMessages;
+import com.sap.sailing.landscape.common.SharedLandscapeConstants;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.filter.impl.KeywordMatcher;
@@ -289,9 +290,15 @@ public class MasterDataImportPanel extends VerticalPanel {
     }
 
     protected void fireIdRequestsAndFillLists() {
-        String host = hostBox.getText();
-        if (host != null && !host.isEmpty()) {
-            fireLgIdRequestAndFillList(host);
+        final String host = hostBox.getText();
+        final elemental2.dom.URL url = new elemental2.dom.URL(host);
+        if (!SharedLandscapeConstants.isTrustedDomain(url.host)) {
+            Notification.notify(stringMessages.masterDataImportOnlyFromTrustedDomains(
+                    SharedLandscapeConstants.TRUSTED_DOMAINS.toString(), url.host), NotificationType.ERROR);
+        } else {
+            if (host != null && !host.isEmpty()) {
+                fireLgIdRequestAndFillList(host);
+            }
         }
     }
 
@@ -374,7 +381,6 @@ public class MasterDataImportPanel extends VerticalPanel {
 
     private void setFilterHandler(final TextBox filterBox) {
         filterBox.addKeyUpHandler(new KeyUpHandler() {
-            
             @Override
             public void onKeyUp(KeyUpEvent event) {
                 filterLeaderboardGroupList();
@@ -398,11 +404,13 @@ public class MasterDataImportPanel extends VerticalPanel {
                 return Collections.singleton(t);
             } 
         };
-        Map<String, String> filteredMap = allLeaderboardGroupsNameAndIdsMap.entrySet().stream()
-                .filter(entry -> matcher.matches(filterTexts, entry.getValue()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        fillLeaderboardGroupListBox(filteredMap);
-        changeButtonStateAccordingToApplicationState();
+        if (allLeaderboardGroupsNameAndIdsMap != null) {
+            Map<String, String> filteredMap = allLeaderboardGroupsNameAndIdsMap.entrySet().stream()
+                    .filter(entry -> matcher.matches(filterTexts, entry.getValue()))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            fillLeaderboardGroupListBox(filteredMap);
+            changeButtonStateAccordingToApplicationState();
+        }
     }
 
     private void fillLeaderboardGroupListBox(Map<String, String> leaderboardGroupsMap) {

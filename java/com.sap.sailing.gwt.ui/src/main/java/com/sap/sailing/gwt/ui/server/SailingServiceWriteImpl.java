@@ -300,6 +300,7 @@ import com.sap.sailing.gwt.ui.shared.courseCreation.CourseTemplateDTO;
 import com.sap.sailing.gwt.ui.shared.courseCreation.MarkPropertiesDTO;
 import com.sap.sailing.gwt.ui.shared.courseCreation.MarkRoleDTO;
 import com.sap.sailing.gwt.ui.shared.courseCreation.MarkTemplateDTO;
+import com.sap.sailing.landscape.common.SharedLandscapeConstants;
 import com.sap.sailing.server.hierarchy.SailingHierarchyOwnershipUpdater;
 import com.sap.sailing.server.interfaces.RacingEventService;
 import com.sap.sailing.server.operationaltransformation.AbstractLeaderboardGroupOperation;
@@ -405,6 +406,7 @@ import com.sap.sse.security.shared.impl.SecuredSecurityTypes.ServerActions;
 import com.sap.sse.security.shared.impl.UserGroup;
 import com.sap.sse.security.ui.server.SecurityDTOUtil;
 import com.sap.sse.security.ui.shared.SuccessInfo;
+import com.sap.sse.security.util.RemoteServerUtil;
 import com.sap.sse.shared.media.ImageDescriptor;
 import com.sap.sse.shared.media.VideoDescriptor;
 import com.sap.sse.shared.util.impl.UUIDHelper;
@@ -1792,7 +1794,7 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
     public UUID importMasterData(final String urlAsString, final UUID[] leaderboardGroupIds, final boolean override,
             final boolean compress, final boolean exportWind, final boolean exportDeviceConfigurations,
             String targetServerUsername, String targetServerPassword,
-            final boolean exportTrackedRacesAndStartTracking) {
+            final boolean exportTrackedRacesAndStartTracking) throws MalformedURLException {
         final UUID importOperationId = UUID.randomUUID();
         getSecurityService().checkCurrentUserServerPermission(ServerActions.CAN_IMPORT_MASTERDATA);
         final String targetServerBearerToken;
@@ -1800,6 +1802,10 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
             targetServerBearerToken = getSecurityService().getOrCreateAccessToken(getSecurityService().getCurrentUser().getName());
         } else {
             targetServerBearerToken = null;
+        }
+        final URL url = RemoteServerUtil.createBaseUrl(urlAsString);
+        if (!SharedLandscapeConstants.isTrustedDomain(url.getHost())) {
+            throw new IllegalArgumentException("not a trusted domain; valid domains are: "+SharedLandscapeConstants.TRUSTED_DOMAINS);
         }
         // Create a progress indicator for as long as the server gets data from the other server.
         // As soon as the server starts the import operation, a progress object will be built on every server
