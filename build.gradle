@@ -39,8 +39,8 @@ allprojects {
     version = "1.0.0-SNAPSHOT"
 
     tasks.withType(JavaCompile) {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
         options.encoding = "UTF-8"
     }
     defaultTasks "clean", "assemble"
@@ -54,8 +54,8 @@ ext {
     minSdk = 16
     targetSdk = 36
 
-    sourceCompatibilityVersion = JavaVersion.VERSION_1_8
-    targetCompatibilityVersion = JavaVersion.VERSION_1_8
+    sourceCompatibilityVersion = JavaVersion.VERSION_17
+    targetCompatibilityVersion = JavaVersion.VERSION_17
 
     support = "27.1.1"
     play_services_maps = "17.0.1"
