@@ -115,12 +115,12 @@
   </colgroup>
   <tbody>
     <tr>
-      <td><a href="sailinganalytics/tracking-race-player.md">Tracking Race Player Overview</a></td>
-      <td>The video below gives an excellent overview of the main functionality of the SAP Race Player which is accessible on a per-race basis via the “Races/Tracking” tab of a regatta.</td>
-    </tr>
-    <tr>
       <td><a href="sailinganalytics/sign-up.md">Signing up for a user account</a></td>
       <td>This tutorial will show you how to sign up for a user account at the <strong>SAP Sailing Analytics</strong>.</td>
+    </tr>
+    <tr>
+      <td><a href="sailinganalytics/default-creation-group.md">Default creation group</a></td>
+      <td>This episode shows how to set a default <em>creation group</em> in user details with <strong>the SAP Sailing Analytics</strong>.</td>
     </tr>
     <tr>
       <td><a href="sailinganalytics/into-to-backend.md">Introduction to Analytics Backend</a></td>
@@ -131,12 +131,36 @@
       <td>This tutorial shows you how to create an event with the SAP Analytics <em>Administration Console</em> on <a href="https://my.sapsailing.com/gwt/Home.html">my.sapsailing.com</a>.</td>
     </tr>
     <tr>
-      <td><a href="sailinganalytics/video-tracking-management.md">Add &amp; align Youtube videos</a></td>
-      <td>This tutorial shows how to add and align <em>Youtube videos</em> to the <strong>tracking timeline</strong>.</td>
-    </tr>
-    <tr>
       <td><a href="sailinganalytics/create-regattas.md">Create complex regattas</a></td>
       <td>This tutorial shows how to create <strong>more complex regattas</strong>.</td>
+    </tr>
+    <tr>
+      <td><a href="sailinganalytics/set-up-regattas.md">Set up multiple regattas</a></td>
+      <td>This tutorial shows how to set up <em>multiple regattas</em> or <em>classes events</em> with the <strong>SAP Sailing Analytics</strong>.</td>
+    </tr>
+    <tr>
+      <td><a href="../eventmanagers/smartphone-tracking.md">Set up smart phone tracking</a></td>
+      <td>This tutorial shows how to set up <em>smart phone tracking</em> with the <strong>SAP Sailing Analytics</strong>.</td>
+    </tr>
+    <tr>
+      <td><a href="sailinganalytics/set-up-course.md">Course set up</a></td>
+      <td>This tutorial explains how to set up course in <strong>AdminConsole</strong>.</td>
+    </tr>
+    <tr>
+      <td><a href="sailinganalytics/copy-course-to-race.md">Copy course to race</a></td>
+      <td>This tutorial explains how to copy course to other race.</td>
+    </tr>
+    <tr>
+      <td><a href="sailinganalytics/sailing-race-manager.md">Work with Race Manager app</a></td>
+      <td>This tutorial explains how to work with <strong>the SAP Sailing Race Manager Application</strong>.</td>
+    </tr>
+    <tr>
+      <td><a href="sailinganalytics/race-manager-connection.md">Connect Race Manager to event</a></td>
+      <td>This tutorial shows how to connect <strong>the Race Manager Application</strong> to an <em>event</em>.</td>
+    </tr>
+    <tr>
+      <td><a href="sailinganalytics/video-tracking-management.md">Add &amp; align Youtube videos</a></td>
+      <td>This tutorial shows how to add and align <em>Youtube videos</em> to the <strong>tracking timeline</strong>.</td>
     </tr>
     <tr>
       <td><a href="sailinganalytics/competitors-data-management.md">Edit scores/results</a></td>
@@ -159,10 +183,6 @@
       <td>This tutorial shows how to configure <strong>wind settings.</strong>.</td>
     </tr>
     <tr>
-      <td><a href="sailinganalytics/set-up-regattas.md">Set up multiple regattas</a></td>
-      <td>This tutorial shows how to set up <em>multiple regattas</em> or <em>classes events</em> with the <strong>SAP Sailing Analytics</strong>.</td>
-    </tr>
-    <tr>
       <td><a href="sailinganalytics/leaderboard-groups-explanation.md">Leaderboard groups explained</a></td>
       <td>This tutorial explains how <em>Leaderboard Groups</em> work in <strong>the SAP Sailing Analytics</strong>.</td>
     </tr>
@@ -175,14 +195,6 @@
       <td>This tutorial shows how to work with <em>course areas</em> in <strong>SAP Sailing Analytics</strong>.</td>
     </tr>
     <tr>
-      <td><a href="sailinganalytics/sailing-race-manager.md">Work with Race Manager app</a></td>
-      <td>This tutorial explains how to work with <strong>the SAP Sailing Race Manager Application</strong>.</td>
-    </tr>
-    <tr>
-      <td><a href="sailinganalytics/race-manager-connection.md">Connect Race Manager to event</a></td>
-      <td>This tutorial shows how to connect <strong>the Race Manager Application</strong> to an <em>event</em>.</td>
-    </tr>
-    <tr>
       <td><a href="sailinganalytics/edit-results.md">Editing results</a></td>
       <td>This tutorial explains how to <em>edit</em> results with <strong>the SAP Sailing Race Manager Application</strong>.</td>
     </tr>
@@ -193,10 +205,6 @@
     <tr>
       <td><a href="sailinganalytics/security-system.md">Security system intro</a></td>
       <td>This episode serves as an introduction to the <em>security system</em> of the <strong>SAP Sailing Analytics</strong>.</td>
-    </tr>
-    <tr>
-      <td><a href="sailinganalytics/default-creation-group.md">Default creation group</a></td>
-      <td>This episode shows how to set a default <em>creation group</em> in user details with <strong>the SAP Sailing Analytics</strong>.</td>
     </tr>
     <tr>
       <td><a href="sailinganalytics/make-group-public.md">Make group public</a></td>
@@ -219,12 +227,8 @@
       <td>This tutorial gives an introduction to <strong>the SAP Sailing Analytics Data Mining Tool</strong>.</td>
     </tr>
     <tr>
-      <td><a href="sailinganalytics/copy-course-to-race.md">Copy course to race</a></td>
-      <td>This tutorial explains how to copy course to other race.</td>
-    </tr>
-    <tr>
-      <td><a href="sailinganalytics/set-up-course.md">Course set up</a></td>
-      <td>This tutorial explains how to set up course in <strong>AdminConsole</strong>.</td>
+      <td><a href="sailinganalytics/tracking-race-player.md">Tracking Race Player Overview</a></td>
+      <td>The video below gives an excellent overview of the main functionality of the SAP Race Player which is accessible on a per-race basis via the “Races/Tracking” tab of a regatta.</td>
     </tr>
   </tbody>
 </table>
