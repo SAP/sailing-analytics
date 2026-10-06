@@ -140,7 +140,7 @@
     </tr>
     <tr>
       <td><a href="../eventmanagers/smartphone-tracking.md">Set up smart phone tracking</a></td>
-      <td>This tutorial shows how to set up <em>smart phone tracking/em> with the <strong>SAP Sailing Analytics</strong>.</td>
+      <td>This tutorial shows how to set up <em>smart phone tracking</em> with the <strong>SAP Sailing Analytics</strong>.</td>
     </tr>
     <tr>
       <td><a href="sailinganalytics/set-up-course.md">Course set up</a></td>
