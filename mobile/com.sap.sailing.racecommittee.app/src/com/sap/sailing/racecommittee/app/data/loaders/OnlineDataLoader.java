@@ -12,8 +12,8 @@ import com.sap.sailing.racecommittee.app.data.handlers.DataHandler;
 import com.sap.sailing.racecommittee.app.data.parsers.DataParser;
 
 import android.content.Context;
-import android.support.v4.content.AsyncTaskLoader;
-import android.support.v4.content.Loader;
+import androidx.loader.content.AsyncTaskLoader;
+import androidx.loader.content.Loader;
 
 /**
  * <p>

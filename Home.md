@@ -125,6 +125,7 @@ SAP is at the center of today’s technology revolution, developing innovations 
 
 * [[Onboarding|wiki/howto/onboarding]]
 * [[Managing Events with the AdminConsole|wiki/howto/adminconsoleinstructions]]
+* [[Setting up Smartphone Tracking for your Event|wiki/howto/eventmanagers/smartphone-tracking]]
 * [[Importing Sessions from Expedition|wiki/howto/expeditionimport]]
 * [[Checking our DBs for a user record by e-mail|wiki/howto/privacy]]
 * [[Managing ORC Polar Curve Regattas (formerly "Performance Curve Scoring")|wiki/howto/setup-orc-regatta]]

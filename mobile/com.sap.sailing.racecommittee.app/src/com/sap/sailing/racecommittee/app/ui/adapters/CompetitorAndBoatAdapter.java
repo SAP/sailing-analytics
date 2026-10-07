@@ -1,7 +1,7 @@
 package com.sap.sailing.racecommittee.app.ui.adapters;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +17,7 @@ import com.sap.sailing.racecommittee.app.ui.utils.CompetitorUtils;
 import java.util.List;
 import java.util.Map;
 
-import static android.support.v7.widget.RecyclerView.NO_POSITION;
+import static androidx.recyclerview.widget.RecyclerView.NO_POSITION;
 
 public class CompetitorAndBoatAdapter extends RecyclerView.Adapter<CompetitorAndBoatAdapter.ViewHolder> {
 

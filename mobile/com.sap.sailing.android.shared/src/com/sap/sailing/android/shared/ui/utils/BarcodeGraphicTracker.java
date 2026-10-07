@@ -20,7 +20,7 @@ import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.barcode.Barcode;
 
 import android.content.Context;
-import android.support.annotation.UiThread;
+import androidx.annotation.UiThread;
 
 /**
  * Generic tracker which is used for tracking or reading a barcode (and can really be used for any type of item). This

@@ -13,13 +13,13 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.2'
-        classpath "org.ajoberstar:grgit:2.3.0"
+        classpath 'com.android.tools.build:gradle:8.13.2'
+        classpath "org.ajoberstar.grgit:grgit-core:5.3.0"
     }
 }
 
 plugins {
-    id 'org.ajoberstar.grgit' version '2.3.0'
+    id 'org.ajoberstar.grgit' version '5.3.0'
 }
 
 allprojects {
@@ -39,8 +39,8 @@ allprojects {
     version = "1.0.0-SNAPSHOT"
 
     tasks.withType(JavaCompile) {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
         options.encoding = "UTF-8"
     }
     defaultTasks "clean", "assemble"
@@ -49,16 +49,18 @@ allprojects {
 // dependency versions for all sub modules
 ext {
     // regular
-    buildTools = "30.0.3"
-    compileSdk = 33
+    buildTools = "36.0.0"
+    compileSdk = 36
     minSdk = 16
-    targetSdk = 35
+    targetSdk = 36
 
-    sourceCompatibilityVersion = JavaVersion.VERSION_1_8
-    targetCompatibilityVersion = JavaVersion.VERSION_1_8
+    sourceCompatibilityVersion = JavaVersion.VERSION_17
+    targetCompatibilityVersion = JavaVersion.VERSION_17
 
     support = "27.1.1"
-    play_services = "12.0.1"
+    play_services_maps = "17.0.1"
+    play_services_location = "21.0.1"
+    play_services_vision = "19.0.0"
 
     license_dialog = "1.8.0"
 

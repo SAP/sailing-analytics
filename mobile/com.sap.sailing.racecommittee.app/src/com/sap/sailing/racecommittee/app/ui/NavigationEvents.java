@@ -1,6 +1,6 @@
 package com.sap.sailing.racecommittee.app.ui;
 
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

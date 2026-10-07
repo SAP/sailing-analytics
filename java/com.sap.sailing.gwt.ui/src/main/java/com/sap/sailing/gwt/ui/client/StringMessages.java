@@ -2617,4 +2617,5 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     String unknownError(String name);
     String pendingServerOperations(Integer numberOfPendingServerOperations);
     String errorObtainingMapType(String message);
+    String masterDataImportOnlyFromTrustedDomains(String trustedDomains, String host);
 }

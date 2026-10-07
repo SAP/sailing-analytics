@@ -1,7 +1,7 @@
 package com.sap.sailing.android.shared.ui.activities;
 
 import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 
 import com.sap.sailing.android.shared.R;
 import com.sap.sailing.android.shared.data.BaseCheckinData;

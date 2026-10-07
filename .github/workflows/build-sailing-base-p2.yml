@@ -30,6 +30,14 @@ jobs:
           distribution: 'temurin' # See 'Supported distributions' for available options
           java-version: '17'
           mvn-toolchain-id: 'JavaSE-17'
+      - name: Pin Apache Maven to 3.9.16
+        # Tycho 4.0.x requires the Maven 3.9.x line; the GitHub runner image's default
+        # Maven floats and bumped to 3.10.0, which breaks Tycho's Sisu/Guice component
+        # wiring. Pin a known-good 3.9.x so the build no longer depends on the runner
+        # image's default.
+        uses: stCarolas/setup-maven@12eb41b233df95d49b0c11fc1b5bc8312e5d4ce0 # v5.1
+        with:
+          maven-version: 3.9.16
       - shell: bash
         env: # Or as an environment variable
           TMP: /mnt/tmp

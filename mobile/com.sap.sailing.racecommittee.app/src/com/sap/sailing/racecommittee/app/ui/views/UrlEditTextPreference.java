@@ -2,8 +2,8 @@ package com.sap.sailing.racecommittee.app.ui.views;
 
 import android.content.Context;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.v7.preference.EditTextPreference;
+import androidx.annotation.NonNull;
+import androidx.preference.EditTextPreference;
 import android.util.AttributeSet;
 
 public class UrlEditTextPreference extends EditTextPreference {

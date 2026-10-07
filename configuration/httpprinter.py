@@ -2,7 +2,7 @@
 
 import socket 
 
-host = '' 
+host = '127.0.0.1'
 port = 50000
 backlog = 5 
 size = 1024 
