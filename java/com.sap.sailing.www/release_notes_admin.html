@@ -23,6 +23,15 @@
         <div class="mainContent">
           <h2 class="releaseHeadline">Release Notes - Administration Console</h2>
           <div class="innerContent">
+          <h2 class="articleSubheadline">October 2026</h2>
+          <ul class="bulletList">
+                <li>Bug fix: a replica could hang indefinitely during its initial load from a primary when a
+                    deserialized regatta already contained races. Registering the race-addition listener
+                    triggered a catch-up notification that re-entered listener registration on the same regatta,
+                    deadlocking a <tt>ConcurrentHashMap</tt> update on itself. Replica startup and operator-initiated
+                    replication from a non-empty primary are affected. This is now fixed; catch-up notifications are
+                    dispatched after the listener registration completes.</li>
+          </ul>
           <h2 class="articleSubheadline">September 2026</h2>
           <ul class="bulletList">
                 <li>Master data import (MDI) now uses noticeably less memory and is a little faster, especially when
