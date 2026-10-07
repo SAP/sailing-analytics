@@ -35,7 +35,7 @@ if [ $# != 0 ]; then
     fi
   fi
   pushd "${OPENFREEMAP_GIT}"
-  ./linux_host/deploy_linux_host.py --config bake --host ${SERVER} --user ec2-user
+  ./linux_host/deploy_linux_host.py --config bake --host ${SERVER} --user ec2-user --bake
   popd
   rm -rf "${OPENFREEMAP_GIT}"
   scp "${0}" ec2-user@${SERVER}:
