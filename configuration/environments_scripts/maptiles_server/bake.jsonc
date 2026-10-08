@@ -45,7 +45,7 @@
   // Optional: serve the newest runs already present locally without ever
   // contacting the upstream deployed-version endpoint or downloading tiles.
   // Use for instances seeded from another host (golden AMI / copied runs).
-  "local_versions": false,
+  "local_versions": true,
 
   // Optional: redirect requests to the tile server root path (/).
   // Omit to show a plain text OpenFreeMap tile server message.
