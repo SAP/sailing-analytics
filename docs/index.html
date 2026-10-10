@@ -738,8 +738,23 @@
     }
     .rev-modal__close:hover { background: rgba(0,0,0,.12); color: var(--text); }
 
+
+    /* Review maintenance: one adaptive layout for short and long feedback. */
+    .rev-card { width: min(340px, calc(100vw - 48px)); }
+    .rev-card:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+    .rev-modal { max-width: min(760px, calc(100vw - 32px)); min-height: 240px; }
+    .rev-modal__photo { width: clamp(150px, 30%, 230px); align-self: stretch; }
+    .rev-modal__photo img { object-position: center 20%; }
+    .rev-modal__content { padding: 36px 30px 26px; }
+    @media (max-width: 620px) {
+      .rev-modal { flex-direction: column; overflow-y: auto; max-height: 90dvh; }
+      .rev-modal__photo { width: 100%; height: 190px; flex: 0 0 190px; }
+      .rev-modal__photo img { object-fit: cover; }
+      .rev-modal__content { padding: 24px 22px; overflow: visible; }
+    }
+
     /* ════════════ FOOTER ════════════ */
-    .footer { background: #0a1929; color: rgba(255,255,255,.6); padding: 56px 0 28px; }
+    .footer { background: var(--dark); color: rgba(255,255,255,.6); padding: 56px 0 28px; }
     .footer__grid {
       display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
       gap: 48px; margin-bottom: 48px;
@@ -974,81 +989,7 @@
 
   <div class="reviews__ticker-wrap">
     <div class="reviews__ticker" id="rev-ticker">
-
-      <div class="rev-card" data-modal="rmod-frank" onclick="openRevModal('rmod-frank')">
-        <div class="rev-card__quote-mark">&ldquo;</div>
-        <div class="rev-card__body-wrap"><p class="rev-card__body">With SAP's return to processing tracked data at Travemünder Woche 2026, 42 races across 9 boat classes could be processed in a graphically appealing way and presented attractively for the interested public. An excellent instrument for our participants to analyse their own performance - a genuine added value!</p><span class="rev-card__chevron">&#8964;</span></div>
-        <div class="rev-card__footer">
-
-          <img class="rev-card__avatar rev-card__avatar--top" src="source/frank_scharffe.png" alt="Frank Schärffe">
-          <div><div class="rev-card__name">Frank Schärffe</div><div class="rev-card__role">Managing Director</div><div class="rev-card__org">Travemünder Woche gGmbH</div></div>
-        </div>
-      </div>
-
-      <div class="rev-card" data-modal="rmod-sven" onclick="openRevModal('rmod-sven')">
-        <div class="rev-card__quote-mark">&ldquo;</div>
-        <div class="rev-card__body-wrap"><p class="rev-card__body">SAP Sailing Analytics is an extremely helpful tool for Kieler Woche in many respects. Not only the analysis itself, but also the presentation and the depth of information behind it help us convey sailing in near real-time in a way that is broadly understandable and exciting.</p><span class="rev-card__chevron">&#8964;</span></div>
-        <div class="rev-card__footer">
-
-          <img class="rev-card__avatar rev-card__avatar--face" src="source/Sven Christensen-0fc6b9f9.png" alt="Sven Christensen">
-          <div><div class="rev-card__name">Sven Christensen</div><div class="rev-card__role">CEO, Point of Sailing</div><div class="rev-card__org">Kieler Woche</div></div>
-        </div>
-      </div>
-
-      <div class="rev-card" data-modal="rmod-stanislaw" onclick="openRevModal('rmod-stanislaw')">
-        <div class="rev-card__quote-mark">&ldquo;</div>
-        <div class="rev-card__body-wrap"><p class="rev-card__body">As the organizers of the Polish Sailing League, integrating SAP Sailing Analytics has been a complete game-changer for our fast-paced regattas. The system's live tracking effortlessly translates complex tactical decisions into an engaging, easily digestible experience for our fans and commentators.</p><span class="rev-card__chevron">&#8964;</span></div>
-        <div class="rev-card__footer">
-
-          <img class="rev-card__avatar rev-card__avatar--top" src="source/stanislav_konarzewski.jpg" alt="Stanisław Konarzewski">
-          <div><div class="rev-card__name">Stanisław Konarzewski</div><div class="rev-card__role">Marketing &amp; Communication Manager</div><div class="rev-card__org">Polish Sailing League</div></div>
-        </div>
-      </div>
-
-      <div class="rev-card" data-modal="rmod-jack" onclick="openRevModal('rmod-jack')">
-        <div class="rev-card__quote-mark">&ldquo;</div>
-        <div class="rev-card__body-wrap"><p class="rev-card__body">SAP Sailing Analytics strikes a unique balance of being accessible to any average club racer on a budget, and powerful enough to satisfy the most complex regatta or performance analytics far better than its competitors.</p><span class="rev-card__chevron">&#8964;</span></div>
-        <div class="rev-card__footer">
-          <div class="rev-card__avatar-placeholder">J</div>
-          <div><div class="rev-card__name">Jack V.</div><div class="rev-card__role">Pacific Northwest Sailor</div><div class="rev-card__org">Sidney North Saanich YC</div></div>
-        </div>
-      </div>
-
-      <div class="rev-card">
-        <div class="rev-card__quote-mark">&ldquo;</div>
-        <div class="rev-card__body-wrap"><p class="rev-card__body">The live race tracker kept our entire membership glued to the screen during the championship weekend. Incredibly easy to configure from the committee boat.</p></div>
-        <div class="rev-card__footer">
-          <div class="rev-card__avatar-placeholder">A</div>
-          <div><div class="rev-card__name">Anna Bergström</div><div class="rev-card__role">Club Commodore</div><div class="rev-card__org">Gothenburg Sailing Society</div></div>
-        </div>
-      </div>
-
-      <div class="rev-card">
-        <div class="rev-card__quote-mark">&ldquo;</div>
-        <div class="rev-card__body-wrap"><p class="rev-card__body">Finally a tool that lets our coaches review every tack and gybe after the race. The data mining view is exactly what we needed for athlete development.</p></div>
-        <div class="rev-card__footer">
-          <div class="rev-card__avatar-placeholder">T</div>
-          <div><div class="rev-card__name">Thomas Müller</div><div class="rev-card__role">Head Coach</div><div class="rev-card__org">Bodensee Sailing Academy</div></div>
-        </div>
-      </div>
-
-      <div class="rev-card">
-        <div class="rev-card__quote-mark">&ldquo;</div>
-        <div class="rev-card__body-wrap"><p class="rev-card__body">We used it for a 200-boat offshore race and it handled everything flawlessly. The tracking coverage and update frequency impressed even our most skeptical committee members.</p></div>
-        <div class="rev-card__footer">
-          <div class="rev-card__avatar-placeholder">R</div>
-          <div><div class="rev-card__name">Rachel O'Brien</div><div class="rev-card__role">Race Director</div><div class="rev-card__org">Cork Harbour Regatta</div></div>
-        </div>
-      </div>
-
-      <div class="rev-card">
-        <div class="rev-card__quote-mark">&ldquo;</div>
-        <div class="rev-card__body-wrap"><p class="rev-card__body">The broadcast overlay integration was seamless. Our commentators had everything they needed on screen and the audience engagement went through the roof.</p></div>
-        <div class="rev-card__footer">
-          <div class="rev-card__avatar-placeholder">L</div>
-          <div><div class="rev-card__name">Lucas Fontaine</div><div class="rev-card__role">Broadcast Producer</div><div class="rev-card__org">Sailing France TV</div></div>
-        </div>
-      </div>
+      <!-- Cards are generated from REVIEWS below. Add future feedback there only. -->
 
     </div>
   </div>
@@ -1296,82 +1237,19 @@
   </div>
 </section>
 
-<div class="rev-modal-overlay" id="rmod-frank" onclick="closeRevModal(event, 'rmod-frank')">
-  <div class="rev-modal" style="max-width:760px;">
-    <button class="rev-modal__close" onclick="closeRevModal(null,'rmod-frank')">&times;</button>
-    <div class="rev-modal__photo" style="width:260px;">
-      <img src="source/frank_scharffe.png" alt="Frank Schärffe" style="object-position:center 12%;">
-    </div>
+<!-- Review dialog is populated automatically from REVIEWS. -->
+<div class="rev-modal-overlay" id="review-dialog" role="presentation">
+  <div class="rev-modal" role="dialog" aria-modal="true" aria-labelledby="review-dialog-name">
+    <button type="button" class="rev-modal__close" aria-label="Close review">&times;</button>
+    <div class="rev-modal__photo" id="review-dialog-photo"></div>
     <div class="rev-modal__content">
-      <div class="rev-modal__quote-mark">&ldquo;</div>
-      <p class="rev-modal__body">With SAP's return to processing tracked data at Travemünder Woche 2026, 42 races across 9 boat classes could be processed in a graphically appealing way and presented attractively for the interested public. An excellent instrument for our participants to analyse their own performance - a genuine added value! For the sailing-enthusiast public, the data was incorporated into the live broadcast on an LED large screen and provided excellent background information for the commentary - overall, we were able to make the regatta sport of Travemünder Woche more viewer-friendly!</p>
-      <div class="rev-modal__footer">
-        <div>
-          <div class="rev-card__name">Frank Schärffe</div>
-          <div class="rev-card__role">Managing Director</div>
-          <div class="rev-card__org">Travemünder Woche gGmbH</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="rev-modal-overlay" id="rmod-sven" onclick="closeRevModal(event, 'rmod-sven')">
-  <div class="rev-modal">
-    <button class="rev-modal__close" onclick="closeRevModal(null,'rmod-sven')">&times;</button>
-    <div class="rev-modal__photo">
-      <img src="source/Sven Christensen-0fc6b9f9.png" alt="Sven Christensen" style="object-position:center 15%;">
-    </div>
-    <div class="rev-modal__content">
-      <div class="rev-modal__quote-mark">&ldquo;</div>
-      <p class="rev-modal__body">SAP Sailing Analytics is an extremely helpful tool for Kieler Woche in many respects. Not only the analysis itself, but also the presentation and the depth of information behind it help us convey sailing in near real-time in a way that is broadly understandable and exciting. Beyond that, the data provides participants and coaches with valuable opportunities to analyse performance and decisions.</p>
-      <div class="rev-modal__footer">
-        <div>
-          <div class="rev-card__name">Sven Christensen</div>
-          <div class="rev-card__role">CEO, Point of Sailing - Sailing promotion &amp; staging</div>
-          <div class="rev-card__org">Kieler Woche</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="rev-modal-overlay" id="rmod-stanislaw" onclick="closeRevModal(event, 'rmod-stanislaw')">
-  <div class="rev-modal" style="max-width:760px;">
-    <button class="rev-modal__close" onclick="closeRevModal(null,'rmod-stanislaw')">&times;</button>
-    <div class="rev-modal__photo" style="width:210px;">
-      <img src="source/stanislav_konarzewski.jpg" alt="Stanisław Konarzewski" style="object-position:45% 22%;">
-    </div>
-    <div class="rev-modal__content">
-      <div class="rev-modal__quote-mark">&ldquo;</div>
-      <p class="rev-modal__body">As the organizers of the Polish Sailing League, integrating SAP Sailing Analytics has been a complete game-changer for our fast-paced regattas. The system's live tracking, complete with real-time data, effortlessly translates complex tactical decisions into an engaging, easily digestible experience for our fans and commentators. In a format featuring back-to-back flights, the automated, real-time scoring is invaluable; leaderboards update instantly, eliminating manual calculation delays and ensuring absolute accuracy. From an operational standpoint, the platform is intuitive and easy to use. Deploying the GPS units across our one-design fleet adds no friction to our morning routines, while the Race Committee backend makes virtual course setting and safety monitoring seamless. Combined with the in-depth post-race analytics, SAP Sailing is much more than just a tracking tool - it is a robust, indispensable platform that has fundamentally elevated the professionalism, operational efficiency, and broadcast quality of our entire league.</p>
-      <div class="rev-modal__footer">
-        <div>
-          <div class="rev-card__name">Stanisław Konarzewski</div>
-          <div class="rev-card__role">Marketing &amp; Communication Manager</div>
-          <div class="rev-card__org">Polish Sailing League</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="rev-modal-overlay" id="rmod-jack" onclick="closeRevModal(event, 'rmod-jack')">
-  <div class="rev-modal">
-    <button class="rev-modal__close" onclick="closeRevModal(null,'rmod-jack')">&times;</button>
-    <div class="rev-modal__photo">
-      <div class="rev-modal__photo-placeholder">J</div>
-    </div>
-    <div class="rev-modal__content">
-      <div class="rev-modal__quote-mark">&ldquo;</div>
-      <p class="rev-modal__body">SAP Sailing Analytics strikes a unique balance of being accessible to any average club racer on a budget, and powerful enough to satisfy the most complex regatta or performance analytics far better than its competitors. We use it for all sorts of events and are always discovering new and interesting features to take advantage of.</p>
-      <div class="rev-modal__footer">
-        <div>
-          <div class="rev-card__name">Jack V.</div>
-          <div class="rev-card__role">Pacific Northwest Sailor</div>
-          <div class="rev-card__org">Sidney North Saanich Yacht Club</div>
-        </div>
-      </div>
+      <div class="rev-modal__quote-mark" aria-hidden="true">&ldquo;</div>
+      <p class="rev-modal__body" id="review-dialog-quote"></p>
+      <div class="rev-modal__footer"><div>
+        <div class="rev-card__name" id="review-dialog-name"></div>
+        <div class="rev-card__role" id="review-dialog-role"></div>
+        <div class="rev-card__org" id="review-dialog-org"></div>
+      </div></div>
     </div>
   </div>
 </div>
@@ -1409,15 +1287,6 @@
           <li><a href="#reviews">Reviews</a></li>
           <li><a href="https://www.sapsailing.com/gwt/Home.html" target="_blank" rel="noopener">Application</a></li>
           <li><a href="https://github.com/SAP/sailing-analytics/releases" target="_blank" rel="noopener">Releases</a></li>
-        </ul>
-      </div>
-
-      <div class="footer__col">
-        <h4>Community</h4>
-        <ul>
-          <li><a href="https://github.com/eclipse-sailing-analytics/sailing-analytics" target="_blank" rel="noopener">GitHub</a></li>
-          <li><a href="https://github.com/eclipse-sailing-analytics/sailing-analytics/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a></li>
-          <li><a href="https://wiki.sapsailing.com/wiki/howto/tutorials/home.md" target="_blank" rel="noopener">Support</a></li>
         </ul>
       </div>
 
@@ -1821,15 +1690,116 @@
       ]},
   ];
 
-  // Hero video — normal speed
-  (function() {
-    const vid = document.querySelector('.hero__bg video');
-    if (vid) {
-      vid.playbackRate = 1.0;
+  // ══════════ EDIT ONLY THE REVIEWS ARRAY ══════════
+  // Add another { id, name, role, org, quote, photo?, photoPosition? } entry.
+  // Photos live in source/. No manual HTML cards, modal sizes or handlers needed.
+  // photoPosition (optional) is CSS object-position, e.g. 'center 20%'.
+  const REVIEWS = [
+    {"id": "frank", "name": "Frank Schärffe", "role": "Managing Director", "org": "Travemünder Woche gGmbH", "photo": "source/frank_scharffe.png", "photoPosition": "center 12%", "quote": "With SAP's return to processing tracked data at Travemünder Woche 2026, 42 races across 9 boat classes could be processed in a graphically appealing way and presented attractively for the interested public. An excellent instrument for our participants to analyse their own performance - a genuine added value! For the sailing-enthusiast public, the data was incorporated into the live broadcast on an LED large screen and provided excellent background information for the commentary - overall, we were able to make the regatta sport of Travemünder Woche more viewer-friendly!"},
+    {"id": "sven-christensen", "name": "Sven Christensen", "role": "CEO, Point of Sailing - Sailing promotion & staging", "org": "Kieler Woche", "photo": "source/sven_christensen.png", "photoPosition": "center 15%", "quote": "SAP Sailing Analytics is an extremely helpful tool for Kieler Woche in many respects. Not only the analysis itself, but also the presentation and the depth of information behind it help us convey sailing in near real-time in a way that is broadly understandable and exciting. Beyond that, the data provides participants and coaches with valuable opportunities to analyse performance and decisions."},
+    {"id": "stanislaw", "name": "Stanisław Konarzewski", "role": "Marketing & Communication Manager", "org": "Polish Sailing League", "photo": "source/stanislav_konarzewski.jpg", "photoPosition": "45% 22%", "quote": "As the organizers of the Polish Sailing League, integrating SAP Sailing Analytics has been a complete game-changer for our fast-paced regattas. The system's live tracking, complete with real-time data, effortlessly translates complex tactical decisions into an engaging, easily digestible experience for our fans and commentators. In a format featuring back-to-back flights, the automated, real-time scoring is invaluable; leaderboards update instantly, eliminating manual calculation delays and ensuring absolute accuracy. From an operational standpoint, the platform is intuitive and easy to use. Deploying the GPS units across our one-design fleet adds no friction to our morning routines, while the Race Committee backend makes virtual course setting and safety monitoring seamless. Combined with the in-depth post-race analytics, SAP Sailing is much more than just a tracking tool - it is a robust, indispensable platform that has fundamentally elevated the professionalism, operational efficiency, and broadcast quality of our entire league."},
+    {"id": "jack", "name": "Jack V.", "role": "Pacific Northwest Sailor", "org": "Sidney North Saanich Yacht Club", "quote": "SAP Sailing Analytics strikes a unique balance of being accessible to any average club racer on a budget, and powerful enough to satisfy the most complex regatta or performance analytics far better than its competitors. We use it for all sorts of events and are always discovering new and interesting features to take advantage of."},
+    {"id": "sven-jurgensen", "name": "Sven Jürgensen", "role": "Chairman, Wir sind Wir Inclusion in Sailing e.V.", "org": "Helga Cup", "photo": "source/sven_jurgensen.png", "photoPosition": "center 22%", "quote": "More than 20 J/70 boats, well over 60 crews, three racing groups: results, tracking, live broadcasts, commentary and analyses for the crews are almost unimaginable at the Helga Cup without SAP Sailing Analytics. The teams even use data from previous years to prepare specifically for the regatta."}
+  ];
+
+  (function initReviews() {
+    const ticker = document.getElementById('rev-ticker');
+    const dialog = document.getElementById('review-dialog');
+    const photoBox = document.getElementById('review-dialog-photo');
+    const close = dialog.querySelector('.rev-modal__close');
+    let previousFocus = null;
+    let selected = null;
+
+    function avatar(review, large) {
+      if (review.photo) {
+        const img = document.createElement('img');
+        img.src = review.photo;
+        img.alt = review.name;
+        img.loading = large ? 'eager' : 'lazy';
+        img.style.objectPosition = review.photoPosition || 'center 20%';
+        if (!large) img.className = 'rev-card__avatar';
+        return img;
+      }
+      const placeholder = document.createElement('div');
+      placeholder.className = large ? 'rev-modal__photo-placeholder' : 'rev-card__avatar-placeholder';
+      placeholder.textContent = review.name.charAt(0).toUpperCase();
+      return placeholder;
     }
+
+    function openReview(review) {
+      selected = review;
+      previousFocus = document.activeElement;
+      document.getElementById('review-dialog-quote').textContent = review.quote;
+      document.getElementById('review-dialog-name').textContent = review.name;
+      document.getElementById('review-dialog-role').textContent = review.role || '';
+      document.getElementById('review-dialog-org').textContent = review.org || '';
+      photoBox.replaceChildren(avatar(review, true));
+      dialog.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      close.focus();
+    }
+    function closeReview() {
+      dialog.classList.remove('open');
+      document.body.style.overflow = '';
+      if (previousFocus) previousFocus.focus();
+      selected = null;
+    }
+    close.addEventListener('click', closeReview);
+    dialog.addEventListener('click', e => { if (e.target === dialog) closeReview(); });
+    document.addEventListener('keydown', e => {
+      if (!selected) return;
+      if (e.key === 'Escape') { e.stopPropagation(); closeReview(); }
+      if (e.key === 'Tab') {
+        // Only one dialog control: do not let keyboard focus escape the dialog.
+        e.preventDefault(); close.focus();
+      }
+    });
+
+    REVIEWS.forEach(review => {
+      const card = document.createElement('div');
+      card.className = 'rev-card';
+      card.tabIndex = 0;
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-label', 'Read full feedback from ' + review.name);
+      const mark = document.createElement('div');
+      mark.className = 'rev-card__quote-mark';
+      mark.setAttribute('aria-hidden','true');
+      mark.textContent = '“';
+      const wrap = document.createElement('div');
+      wrap.className = 'rev-card__body-wrap';
+      const body = document.createElement('p');
+      body.className = 'rev-card__body';
+      body.textContent = review.quote;
+      const chevron = document.createElement('span');
+      chevron.className = 'rev-card__chevron';
+      chevron.setAttribute('aria-hidden', 'true');
+      chevron.textContent = '⌄';
+      wrap.append(body, chevron);
+      const footer = document.createElement('div');
+      footer.className = 'rev-card__footer';
+      const details = document.createElement('div');
+      [['rev-card__name',review.name],['rev-card__role',review.role],['rev-card__org',review.org]].forEach(([cls,val])=>{
+        const field=document.createElement('div');field.className=cls;field.textContent=val||'';details.appendChild(field);
+      });
+      footer.append(avatar(review,false),details);
+      card.append(mark,wrap,footer);
+      card.addEventListener('click',()=>openReview(review));
+      card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openReview(review);}});
+      ticker.appendChild(card);
+    });
+    function updateTruncation() {
+      ticker.querySelectorAll('.rev-card').forEach(card => {
+        const wrap = card.querySelector('.rev-card__body-wrap');
+        const body = card.querySelector('.rev-card__body');
+        wrap.classList.toggle('overflows', body.scrollHeight > wrap.clientHeight + 4);
+      });
+    }
+    requestAnimationFrame(updateTruncation);
+    window.addEventListener('load',updateTruncation);
+    window.addEventListener('resize',updateTruncation);
   })();
 
-  // ── Solutions carousel ────────────────────────────────────────────────────
+  // ── Solutions carousel ┈───────────────────────────────────────────────────
   (function() {
     const track = document.getElementById('sol-track');
     const dotsEl = document.getElementById('sol-dots');
@@ -1969,16 +1939,7 @@
           body.appendChild(div);
         })
         .catch(function() {
-          var div = document.createElement('div');
-          div.className = 'accordion-loading';
-          div.appendChild(document.createTextNode('Could not load changelog — '));
-          var a = document.createElement('a');
-          a.href = body.dataset.src;
-          a.target = '_blank';
-          a.textContent = 'view source file';
-          div.appendChild(a);
-          body.innerHTML = '';
-          body.appendChild(div);
+          body.innerHTML = '<div class="accordion-loading">Could not load changelog - <a href="' + body.dataset.src + '" target="_blank">view source file</a></div>';
         });
     }
   }
@@ -2021,37 +1982,10 @@
     }
   }
 
-  function openRevModal(id) {
-    document.getElementById(id).classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeRevModal(event, id) {
-    if (event && event.target !== document.getElementById(id)) return;
-    document.getElementById(id).classList.remove('open');
-    document.body.style.overflow = '';
-  }
-  // Show fade + chevron only when text actually overflows
-  window.addEventListener('load', function() {
-    document.querySelectorAll('.rev-card').forEach(function(card) {
-      var wrap = card.querySelector('.rev-card__body-wrap');
-      var body = card.querySelector('.rev-card__body');
-      if (wrap && body && body.scrollHeight > wrap.clientHeight + 4) {
-        wrap.classList.add('overflows');
-      }
-    });
-  });
-
   (function() {
     var wrap = document.querySelector('.reviews__ticker-wrap');
     if (!wrap) return;
     var isDragging = false, startX, scrollLeft;
-    function wrapScroll() {
-      var ticker = document.getElementById('rev-ticker');
-      if (!ticker) return;
-      var half = ticker.scrollWidth / 2;
-      if (wrap.scrollLeft >= half) wrap.scrollLeft -= half;
-      else if (wrap.scrollLeft < 0) wrap.scrollLeft += half;
-    }
     wrap.addEventListener('mousedown', function(e) {
       isDragging = true;
       startX = e.pageX - wrap.offsetLeft;
@@ -2067,44 +2001,85 @@
       e.preventDefault();
       var x = e.pageX - wrap.offsetLeft;
       wrap.scrollLeft = scrollLeft - (x - startX);
-      wrapScroll();
     });
-    wrap.addEventListener('scroll', wrapScroll);
   })();
 
-  function revTickerStep(dir) {
-    var wrap = document.querySelector('.reviews__ticker-wrap');
-    var ticker = document.getElementById('rev-ticker');
-    if (!wrap || !ticker) return;
-    var card = wrap.querySelector('.rev-card');
-    var cardW = card ? card.offsetWidth + 24 : 364;
-    var totalW = ticker.scrollWidth / 2;
-    wrap.scrollLeft += dir * cardW;
-    // wrap around
-    if (wrap.scrollLeft <= 0 && dir < 0) {
-      wrap.scrollLeft = totalW + wrap.scrollLeft;
-    } else if (wrap.scrollLeft >= totalW && dir > 0) {
-      wrap.scrollLeft = wrap.scrollLeft - totalW;
+  // Infinite review carousel
+(function () {
+  const wrap = document.querySelector('.reviews__ticker-wrap');
+  const ticker = document.getElementById('rev-ticker');
+  if (!wrap || !ticker) return;
+
+  const originals = Array.from(ticker.querySelectorAll('.rev-card'));
+  const count = originals.length;
+  if (!count) return;
+
+  // Duplicate cards before and after the originals.
+  // This allows scrolling in either direction indefinitely.
+  originals.forEach(card => ticker.appendChild(card.cloneNode(true)));
+  originals.slice().reverse().forEach(card => {ticker.insertBefore(card.cloneNode(true), ticker.firstChild);});
+  const allCards = Array.from(ticker.querySelectorAll('.rev-card'));
+
+  allCards.forEach((card, index) => {
+    if (index >= count && index < count * 2) return;
+
+    const original = originals[index % count];
+    card.addEventListener('click', () => original.click());
+    card.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        original.click();
+      }
+    });
+  });
+  const cardWidth = () => originals[0].offsetWidth + 24;
+  const sectionWidth = () =>
+    ticker.children[count * 2].offsetLeft -
+    ticker.children[count].offsetLeft;
+
+  // Start at the original set of cards.
+  wrap.style.scrollBehavior = 'auto';
+  wrap.scrollLeft = sectionWidth();
+
+  // Keep the scroll position within the middle copy.
+  // All three copies have the same card order.
+  let resetting = false;
+
+  wrap.addEventListener('scroll', () => {
+    if (resetting) return;
+
+    const width = sectionWidth();
+    const position = wrap.scrollLeft;
+
+    // Reset only when leaving the middle copy.
+    if (position < width || position >= width * 2) {
+      resetting = true;
+
+      const previousBehavior = wrap.style.scrollBehavior;
+      wrap.style.scrollBehavior = 'auto';
+
+      wrap.scrollLeft = position < width
+        ? position + width
+        : position - width;
+
+      requestAnimationFrame(() => {
+        wrap.style.scrollBehavior = previousBehavior;
+        resetting = false;
+      });
     }
-  }
+  });
 
-  (function() {
-    var ticker = document.getElementById('rev-ticker');
-    if (!ticker) return;
-    var origCards = Array.from(ticker.querySelectorAll('.rev-card'));
-    origCards.forEach(function(c) {
-      var clone = c.cloneNode(true);
-      clone.setAttribute('aria-hidden', 'true');
-      ticker.appendChild(clone);
+  window.revTickerStep = function (dir) {
+    wrap.scrollBy({
+      left: dir * cardWidth(),
+      behavior: 'smooth'
     });
-    // start at middle so both prev and next work immediately
-    var wrap = document.querySelector('.reviews__ticker-wrap');
-    if (wrap) wrap.scrollLeft = 0;
-  })();
+  };
+})();
 
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-      document.querySelectorAll('.modal-overlay.open, .rev-modal-overlay.open').forEach(function(m) {
+      document.querySelectorAll('.modal-overlay.open').forEach(function(m) {
         m.classList.remove('open');
       });
       document.body.style.overflow = '';
