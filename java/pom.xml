@@ -36,7 +36,7 @@
          When adjusting tycho-version here, also make sure to adjust it accordingly
          in java/com.amazon.aws.aws-java-api/pom.xml
      -->
-    <tycho-version>4.0.12</tycho-version>
+    <tycho-version>5.0.4</tycho-version>
     <toolchains-version>3.2.0</toolchains-version>
     <gwt.version>2.12.4</gwt.version>
     <!-- gwt-maven-plugin is typically in sync with the GWT version. But sometimes versions need extra time after a new GWT release. -->
@@ -310,7 +310,7 @@
          for Tycho that have been removed from JavaSE-11 if not building for Android -->
     <id>with-java11-non-android-relevant</id>
     <activation>
-      <jdk>[9.0,21.0)</jdk>
+      <jdk>[9.0,)</jdk>
     </activation>
     <build>
       <plugins>

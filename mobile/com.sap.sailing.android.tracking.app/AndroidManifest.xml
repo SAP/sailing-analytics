@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.sap.sailing.android.tracking.app">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-sdk />
 
@@ -144,7 +143,7 @@
             android:authorities="com.sap.sailing.android.tracking.app.provider.db"
             android:exported="false" />
         <provider
-                android:name="android.support.v4.content.FileProvider"
+                android:name="androidx.core.content.FileProvider"
                 android:authorities="${applicationId}.fileprovider"
                 android:grantUriPermissions="true"
                 android:exported="false">

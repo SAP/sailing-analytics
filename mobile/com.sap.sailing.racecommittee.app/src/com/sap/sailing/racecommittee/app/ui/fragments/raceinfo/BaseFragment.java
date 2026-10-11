@@ -1,8 +1,8 @@
 package com.sap.sailing.racecommittee.app.ui.fragments.raceinfo;
 
-import android.support.annotation.IdRes;
-import android.support.annotation.IntDef;
-import android.support.v4.app.FragmentTransaction;
+import androidx.annotation.IdRes;
+import androidx.annotation.IntDef;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.sap.sailing.racecommittee.app.AppConstants;
 import com.sap.sailing.racecommittee.app.R;

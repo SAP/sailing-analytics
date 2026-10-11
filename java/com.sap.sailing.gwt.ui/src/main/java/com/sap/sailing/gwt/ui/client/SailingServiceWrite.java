@@ -280,7 +280,7 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
 
     UUID importMasterData(String host, UUID[] leaderboardGroupIds, boolean override, boolean compress, boolean exportWind,
             boolean exportDeviceConfigurations, String targetServerUsername, String targetServerPassword,
-            boolean exportTrackedRacesAndStartTracking) throws UnauthorizedException;
+            boolean exportTrackedRacesAndStartTracking) throws Exception;
 
     RegattaDTO createRegatta(String regattaName, String boatClassName, boolean canBoatsOfCompetitorsChangePerRace,
             CompetitorRegistrationType competitorRegistrationType, String registrationLinkSecret, Date startDate,

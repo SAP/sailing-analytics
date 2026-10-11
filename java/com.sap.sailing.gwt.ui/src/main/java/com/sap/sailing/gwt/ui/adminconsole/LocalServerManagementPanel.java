@@ -39,6 +39,7 @@ import com.sap.sse.gwt.client.IconResources;
 import com.sap.sse.gwt.client.Notification;
 import com.sap.sse.gwt.client.Notification.NotificationType;
 import com.sap.sse.gwt.client.ServerInfoDTO;
+import com.sap.sse.gwt.client.async.MarkedAsyncCallback;
 import com.sap.sse.gwt.client.controls.listedit.GenericStringListEditorComposite.ExpandedUi;
 import com.sap.sse.gwt.client.controls.listedit.StringListEditorComposite;
 import com.sap.sse.security.shared.HasPermissions;
@@ -55,6 +56,13 @@ import com.sap.sse.security.ui.client.component.editacl.EditACLDialog;
 import com.sap.sse.security.ui.shared.IpToTimedLockDTO;
 
 public class LocalServerManagementPanel extends SimplePanel {
+    /**
+     * Ajax category used to mark the {@link SailingServiceWriteAsync#updateServerConfiguration} RPC so that Selenium
+     * tests can wait for its completion via {@code window.PENDING_AJAX_CALLS}. The value is a shared contract with the
+     * corresponding page object {@code LocalServerPO}.
+     */
+    private static final String CATEGORY_SERVER_CONFIGURATION_UPDATE = "updateServerConfiguration";
+
     private final SailingServiceWriteAsync sailingService;
     private final ErrorReporter errorReporter;
     private final StringMessages stringMessages;
@@ -267,23 +275,21 @@ public class LocalServerManagementPanel extends SimplePanel {
                 : null;
         final ServerConfigurationDTO serverConfig = new ServerConfigurationDTO(isStandaloneServerCheckbox.getValue(),
                 publicServer, selfServiceServer, null);
-        isSelfServiceServerCheckbox.getElement().setAttribute("updating", "true");
-        sailingService.updateServerConfiguration(serverConfig, new AsyncCallback<Void>() {
+        final MarkedAsyncCallback<Void> callback = new MarkedAsyncCallback<>(new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
                 Notification.notify(stringMessages.updatedServerSetupError(), NotificationType.ERROR);
                 errorReporter.reportError(caught.getMessage());
                 refreshServerConfiguration();
-                isSelfServiceServerCheckbox.getElement().setAttribute("updating", "false");
             }
 
             @Override
             public void onSuccess(Void result) {
                 Notification.notify(stringMessages.updatedServerSetup(), NotificationType.SUCCESS);
                 refreshServerConfiguration();
-                isSelfServiceServerCheckbox.getElement().setAttribute("updating", "false");
             }
-        });
+        }, CATEGORY_SERVER_CONFIGURATION_UPDATE);
+        sailingService.updateServerConfiguration(serverConfig, callback);
     }
 
     public void refreshServerConfiguration() {

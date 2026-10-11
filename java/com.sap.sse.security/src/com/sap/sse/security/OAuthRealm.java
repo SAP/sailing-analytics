@@ -88,8 +88,7 @@ public class OAuthRealm extends AbstractCompositeAuthorizingRealm {
         if (authProvider != ClientUtils.DEFAULT) {
             service = getOAuthService(authProvider);
             verifier = new Verifier(credential.getVerifier());
-            logger.info("Requesting access token with requestToken: " + requestToken);
-            logger.info("verifier=" + verifier);
+            logger.fine("Requesting access token from provider " + authProviderName);
             try {
                 accessToken = service.getAccessToken(requestToken, verifier);
             } catch (Exception e) {
@@ -99,10 +98,7 @@ public class OAuthRealm extends AbstractCompositeAuthorizingRealm {
                 logger.severe("Could not get Access Token for " + authProviderName);
                 throw new AuthenticationException("Could not get Access Token");
             }
-            logger.info("Got the access token: " + accessToken);
-            logger.info(" Token: " + accessToken.getToken());
-            logger.info(" Secret: " + accessToken.getSecret());
-            logger.info(" Raw: " + accessToken.getRawResponse());
+            logger.info("Obtained access token from provider " + authProviderName);
         }
         // if (authProvider == ClientUtils.INSTAGRAM)
         // {

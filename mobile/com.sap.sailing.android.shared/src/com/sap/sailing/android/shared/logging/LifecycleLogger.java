@@ -2,7 +2,7 @@ package com.sap.sailing.android.shared.logging;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 
 /**
  * Logger to track all activity and fragment lifecycle events.

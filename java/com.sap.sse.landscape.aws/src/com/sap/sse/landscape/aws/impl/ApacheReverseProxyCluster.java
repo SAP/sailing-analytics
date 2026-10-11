@@ -11,7 +11,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.sap.sse.landscape.aws.LandscapeConstants;
+import com.sap.sse.landscape.aws.AwsLandscapeConstants;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
@@ -77,8 +77,8 @@ public class ApacheReverseProxyCluster<ShardingKey, MetricsT extends Application
                         landscape) -> new AwsInstanceImpl<ShardingKey>(instanceId, availabilityZone, privateIpAddress,
                                 launchTimePoint, landscape),
                 getAmiId(az.getRegion()), instanceType, az, keyName, getSecurityGroups(az.getRegion()),
-                Optional.of(Tags.with(StartAwsHost.NAME_TAG_NAME, name).and(LandscapeConstants.DISPOSABLE_PROXY, "")
-                        .and(LandscapeConstants.REVERSE_PROXY_TAG_NAME, "")),
+                Optional.of(Tags.with(StartAwsHost.NAME_TAG_NAME, name).and(AwsLandscapeConstants.DISPOSABLE_PROXY, "")
+                        .and(AwsLandscapeConstants.REVERSE_PROXY_TAG_NAME, "")),
                 "");
         addHost(host);
         Wait.wait(() -> host.getInstance().state().name().equals(InstanceStateName.RUNNING), (result) -> result, true,
@@ -86,9 +86,9 @@ public class ApacheReverseProxyCluster<ShardingKey, MetricsT extends Application
                 "Is instance in the running state check");
         for (TargetGroup<ShardingKey> targetGroup : getLandscape().getTargetGroups(az.getRegion())) {
             targetGroup.getTagDescriptions().forEach(description -> description.tags().forEach(tag -> {
-                if (tag.key().equals(LandscapeConstants.ALL_REVERSE_PROXIES)) {
+                if (tag.key().equals(AwsLandscapeConstants.ALL_REVERSE_PROXIES)) {
                     final ApplicationLoadBalancer<ShardingKey> loadBalancer = targetGroup.getLoadBalancer();
-                    if (loadBalancer != null && loadBalancer.getArn().contains(LandscapeConstants.NLB_ARN_CONTAINS)) {
+                    if (loadBalancer != null && loadBalancer.getArn().contains(AwsLandscapeConstants.NLB_ARN_CONTAINS)) {
                         getLandscape().addIpTargetToTargetGroup(targetGroup, Collections.singleton(host));
                         logger.info("Added " + host.getPrivateAddress().getHostAddress() + " to NLB target group"
                                 + targetGroup.getTargetGroupArn());
@@ -124,9 +124,9 @@ public class ApacheReverseProxyCluster<ShardingKey, MetricsT extends Application
                     final TagDescription tagDescription = tagDescriptions.next();
                     if (tagDescription.hasTags()) {
                         tagDescription.tags().forEach(tag -> {
-                            if (tag.key().equals(LandscapeConstants.ALL_REVERSE_PROXIES) && targetGroup.getRegisteredTargets().containsKey(instanceFromHost)) {
+                            if (tag.key().equals(AwsLandscapeConstants.ALL_REVERSE_PROXIES) && targetGroup.getRegisteredTargets().containsKey(instanceFromHost)) {
                                 targetGroupsHostResidesIn.add(targetGroup);
-                                if (loadBalancerArn.contains(LandscapeConstants.NLB_ARN_CONTAINS)) {
+                                if (loadBalancerArn.contains(AwsLandscapeConstants.NLB_ARN_CONTAINS)) {
                                     getLandscape().removeIpTargetFromTargetGroup(targetGroup, Collections.singleton(instanceFromHost));
                                 } else {
                                     targetGroup.removeTarget(instanceFromHost);
@@ -162,7 +162,7 @@ public class ApacheReverseProxyCluster<ShardingKey, MetricsT extends Application
      * Gets the latest image in the current region with the correct tag for creating a reverse proxy.
      */
     private MachineImage getAmiId(Region region) {
-        return getLandscape().getLatestImageWithType(region, LandscapeConstants.IMAGE_TYPE_REVERSE_PROXY);
+        return getLandscape().getLatestImageWithType(region, AwsLandscapeConstants.IMAGE_TYPE_REVERSE_PROXY);
     }
 
     @Override

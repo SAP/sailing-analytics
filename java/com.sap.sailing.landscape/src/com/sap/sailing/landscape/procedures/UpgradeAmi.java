@@ -35,6 +35,7 @@ import com.sap.sse.landscape.aws.orchestration.StartEmptyServer;
 import com.sap.sse.landscape.orchestration.Procedure;
 import com.sap.sse.shared.util.Wait;
 
+import software.amazon.awssdk.services.ec2.model.ArchitectureValues;
 import software.amazon.awssdk.services.ec2.model.BlockDeviceMapping;
 import software.amazon.awssdk.services.ec2.model.ImageState;
 import software.amazon.awssdk.services.ec2.model.Instance;
@@ -164,7 +165,9 @@ implements Procedure<ShardingKey>, StartFromSailingAnalyticsImage {
 
         @Override
         protected InstanceType getInstanceType() {
-            return super.getInstanceType() == null ? InstanceType.T2_MEDIUM : super.getInstanceType();
+            return super.getInstanceType() == null
+                    ? getMachineImage().getArchitecture() == ArchitectureValues.X86_64 ? InstanceType.T3_MEDIUM : InstanceType.T4_G_MEDIUM
+                    : super.getInstanceType();
         }
 
         /**

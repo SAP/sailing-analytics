@@ -9,7 +9,7 @@ import com.sap.sse.common.Util;
 
 import android.content.Context;
 import android.database.DataSetObserver;
-import android.support.annotation.LayoutRes;
+import androidx.annotation.LayoutRes;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;

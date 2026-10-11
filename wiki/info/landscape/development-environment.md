@@ -4,31 +4,35 @@
 
 Here, we describe the process for doing simple standard development for the Sailing Analytics project, with a focus on how we handle Git w.r.t. branches, Bugzilla, Hudson-CI, and Github Actions. Other development scenarios you'll find described in more depth [[here|wiki/info/landscape/typical-development-scenarios]].
 
-## Git, Bugzilla, and Our Branches
-Our main Git repository lives at github.com/SAP/sailing-analytics. Its ``main`` branch is mirrored to ssh://trac@sapsailing.com/home/trac/git periodically.
+## Git, Issues (formerly Bugzilla), and Our Branches
+Being an Eclipse Foundation project (Eclipse Azimuth Sailing Analytics), the main Git repository lives at [https://github.com/eclipse-sailing-analytics/sailing-analytics](https://github.com/eclipse-sailing-analytics/sailing-analytics). A "downstream" repository with SAP specifics exists at [https://github.com/SAP/sailing-analytics](https://github.com/SAP/sailing-analytics). Its ``main`` branch is also mirrored to ssh://trac@sapsailing.com/home/trac/git periodically and powers our Wiki at [https://wiki.sapsailing.com](https://wiki.sapsailing.com).
+
+Changes should usually happen in the Eclipse upstream repository. They can then be pulled by the downstream repo on a regular basis. Should changes be truly SAP-specific, they may happen in the downstream repository only.
+
+Issue tracking happens primarily in the upstream repositry as [Github Issues](https://github.com/eclipse-sailing-analytics/sailing-analytics/issues). (Historic note: We used Bugzilla for issue tracking before we migrated to Github. The latest issue natively created there was number 6248. The old Bugzilla content is still [available read-only](https://old-bugzilla.sapsailing.com) for the time being but may disappear in the future. Migrated issues carry a link to the original Bugzilla item. For now there is an automatic redirect for https://bugzilla.sapsailing.com which points to the migrated Github issues.) 
 
 Small, minor, obvious and non-disruptive developments are usually carried out immediately on our ``main`` branch.
 
 Everything else should follow the pattern
-- create Bugzilla issue (e.g., issue #12345)
-- create branch for Bugzilla issue ``bug12345``, typically branching from latest ``main`` tip
-- create Hudson job for branch using ``configuration/createHudsonJobForBug.sh 12345``
+- create Github issue (e.g., issue #12345)
+- create branch for issue ``bug12345``, typically branching from latest ``main`` tip
+- create Jenkins job for branch using ``configuration/createJenkinsJobForIssue.sh 12345``
 - make your changes on your branch and commit and push regularly
-- pushing triggers the [release workflow](https://github.com/SAP/sailing-analytics/actions/workflows/release.yml) which runs a build with tests
-- when the workflow has finished, it triggers your Hudson job which collects the [build and test results](https://hudson.sapsailing.com/job/bug12345)
-- be verbose and document your changes, progress, hold-ups and problems on your Bugzilla issue
-- when build is "green," suggest your branch for review; so far we do this informally by assigning the Bugzilla issue to the reviewer and in a comment asking for review; in the future, we may want to use Github Pull Requests for this
-- after your branch has been merged into ``main``, disable your Hudson build job for your branch, comment about the merge in Bugzilla and resolve the Bugzilla item, usually as "FIXED".
+- pushing triggers the [release workflow](https://github.com/eclipse-sailing-analytics/sailing-analytics/actions/workflows/release.yml) which runs a build with tests
+- when the workflow has finished, it triggers your Jenkins job which collects the [build and test results](https://ci.eclipse.org/sailing-analytics)
+- be verbose and document your changes, progress, hold-ups and problems on your Github issue
+- when build is "green," create a Pull Request (PR) and assign reviewers as appropriate
+- after your branch has been merged into ``main``, delete your Jenkins build job for your branch, comment about the merge on the issue and close the issue
 - the ``main`` branch will then build a new release that you can roll out into the production landscape
-- in case of changes to i18n-related message properties files, merge ``main`` into ``translation`` which triggers the translation process; the completed translations will arrive as pushes to the ``translations`` branch, triggering another ``release`` workflow, and---if successful---an automated merge into ``main`` with the corresponding build/release process happens, based on the [translation Hudson job](https://hudson.sapsailing.com/job/translation/configure)'s special logic
-- a successful ``main`` build (still on Java 8) will lead to an automatic merge into one or more branches for newer Java releases (such as ``docker-24``) with the corresponding build/release process
+- in case of changes to i18n-related message properties files, merge ``main`` into ``translation`` and push ``translation`` to the downstream repository, which triggers the translation process; the completed translations will arrive as pushes to the ``translations`` branch, triggering another ``release`` workflow, and---if successful---an automated push to upstream ``translation`` with the corresponding build/release process happens, based on the [translation Hudson job](https://hudson.sapsailing.com/job/translation/configure)'s and upstream [translation Jenkins job](https://ci.eclipse.org/sailing-analytics/view/Active%20Jobs/job/translation/) special logic
+- a successful ``main`` build (still on Java 8) will lead to an automatic merge into one or more branches for newer Java releases (such as ``docker-25``) with the corresponding build/release process
 
 Be eager to equip your features and functions with tests. There should be enough examples to learn from. For UI testing, use Selenium (see the ``java/com.sap.sailing.selenium.test`` project).
 
 ### Exceptionally Building Without Running Tests, More/Fewer CPUs, and With Release
-Ideally, the build should be run including the test cases. However, for exceptional cases you can trigger a build using the ``release`` workflow in Github Actions manually and can choose to ignore tests, change the number of CPUs to use for the build, and run the build with an OSGi target platform built according to the specifications of the branch you're building from.
+Ideally, the build should be run including the test cases. However, for exceptional cases you can trigger a build using the ``release`` workflow in Github Actions manually on the SAP downstream repo and can choose to ignore tests, change the number of CPUs to use for the build, and run the build with an OSGi target platform built according to the specifications of the branch you're building from.
 
-Furthermore, if you push your branch, say ``bug12345`` to ``releases/bug12345`` then the Github Actions build triggered by the push will also build and publish a release (currently published on [https://releases.sapsailing.com](https://releases.sapsailing.com)) named after your branch. You can use such as release, e.g., to deploy it to a staging server such as [https://dev.sapsailing.com](https://dev.sapsailing.com).
+Furthermore, if you push your branch, say ``bug12345`` to ``releases/bug12345`` then the Github Actions build triggered by the push will also build and publish a release (see [https://github.com/eclipse-sailing-analytics/sailing-analytics/releases](https://github.com/eclipse-sailing-analytics/sailing-analytics/releases) for upstream and [https://github.com/SAP/sailing-analytics/releases](https://github.com/SAP/sailing-analytics/releases) for downstream releases). You can use such as release, e.g., to deploy it to a staging server such as [https://dev.sapsailing.com](https://dev.sapsailing.com) or roll it out to a production landscape. Note, that ``sapsailing.com`` currently uses downstream releases.
 
 ## Eclipse Setup, Required Plug-Ins
 The Eclipse setup is explained in our [[Onboarding|wiki/howto/onboarding]] description.

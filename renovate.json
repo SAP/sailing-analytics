@@ -21,6 +21,10 @@
       ]
     }
   ],
-  "enabledManagers": [ "bundler" ],
-  "baseBranches": [ "hyperspace" ]
+  "enabledManagers": [
+    "bundler"
+  ],
+  "baseBranchPatterns": [
+    "hyperspace"
+  ]
 }

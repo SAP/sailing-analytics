@@ -2,7 +2,7 @@ package com.sap.sailing.android.shared.ui.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v4.widget.ResourceCursorAdapter;
+import androidx.cursoradapter.widget.ResourceCursorAdapter;
 
 public abstract class AbstractRegattaAdapter extends ResourceCursorAdapter {
 

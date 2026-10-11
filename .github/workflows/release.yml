@@ -189,6 +189,14 @@ jobs:
           distribution: 'temurin' # See 'Supported distributions' for available options
           java-version: '25'
           mvn-toolchain-id: 'JavaSE-25'
+      - name: Pin Apache Maven to 3.9.16
+        # Tycho 4.0.x requires the Maven 3.9.x line; the GitHub runner image's default
+        # Maven floats and bumped to 3.10.0, which breaks Tycho's Sisu/Guice component
+        # wiring ("No implementation for MavenTargetLocationFactory was bound"). Pin a
+        # known-good 3.9.x so the build no longer depends on the runner image's default.
+        uses: stCarolas/setup-maven@12eb41b233df95d49b0c11fc1b5bc8312e5d4ce0 # v5.1
+        with:
+          maven-version: 3.9.16
       - name: Setup Android SDK
         uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
         with:

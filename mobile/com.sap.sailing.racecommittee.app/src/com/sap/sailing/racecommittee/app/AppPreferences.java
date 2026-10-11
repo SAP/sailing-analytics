@@ -6,11 +6,10 @@ import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
 import android.provider.Settings.Secure;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.sap.sailing.android.shared.logging.ExLog;
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
@@ -23,6 +22,8 @@ import com.sap.sailing.racecommittee.app.domain.coursedesign.CourseLayouts;
 import com.sap.sailing.racecommittee.app.domain.coursedesign.NumberOfRounds;
 import com.sap.sailing.racecommittee.app.domain.coursedesign.TrapezoidCourseLayouts;
 import com.sap.sailing.racecommittee.app.domain.coursedesign.WindWardLeeWardCourseLayouts;
+import com.sap.sse.common.Position;
+import com.sap.sse.common.impl.DegreePosition;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -340,10 +341,10 @@ public class AppPreferences {
         return Double.longBitsToDouble(windSpeedAsLong);
     }
 
-    public LatLng getWindPosition() {
-        double lat = Double.longBitsToDouble(helper.getLong(HIDDEN_PREFERENCE_WIND_LAT, 0));
-        double lng = Double.longBitsToDouble(helper.getLong(HIDDEN_PREFERENCE_WIND_LNG, 0));
-        return new LatLng(lat, lng);
+    public Position getWindPosition() {
+        final double lat = Double.longBitsToDouble(helper.getLong(HIDDEN_PREFERENCE_WIND_LAT, 0));
+        final double lng = Double.longBitsToDouble(helper.getLong(HIDDEN_PREFERENCE_WIND_LNG, 0));
+        return new DegreePosition(lat, lng);
     }
 
     public boolean isPollingActive() {
@@ -491,9 +492,9 @@ public class AppPreferences {
         helper.getEditor().putLong(HIDDEN_PREFERENCE_WIND_SPEED, windSpeedAsLong).commit();
     }
 
-    public void setWindPosition(LatLng latLng) {
-        long lat = Double.doubleToLongBits(latLng.latitude);
-        long lng = Double.doubleToLongBits(latLng.longitude);
+    public void setWindPosition(Position pos) {
+        final long lat = Double.doubleToLongBits(pos.getLatDeg());
+        final long lng = Double.doubleToLongBits(pos.getLngDeg());
         helper.getEditor().putLong(HIDDEN_PREFERENCE_WIND_LAT, lat).putLong(HIDDEN_PREFERENCE_WIND_LNG, lng).commit();
     }
 

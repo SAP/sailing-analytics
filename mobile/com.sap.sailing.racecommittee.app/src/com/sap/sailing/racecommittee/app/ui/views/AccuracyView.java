@@ -4,8 +4,8 @@ import com.sap.sailing.racecommittee.app.R;
 import com.sap.sailing.racecommittee.app.utils.ThemeHelper;
 
 import android.content.Context;
-import android.support.annotation.ColorRes;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.ColorRes;
+import androidx.core.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;

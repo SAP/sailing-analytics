@@ -133,7 +133,7 @@ public class RaceStatusAnalyzerTest extends PassAwareRaceLogAnalyzerTest<RaceSta
         analyzer = new RaceStatusAnalyzer(mock(RaceLogResolver.class), raceLog, new RaceStatusAnalyzer.Clock() {
             @Override
             public TimePoint now() {
-                return startTime.minus(1);
+                return startTime.minusResolution();
             }
         }, racingProcedure);
         when(racingProcedure.isStartphaseActive(any(TimePoint.class), any(TimePoint.class))).thenReturn(false);

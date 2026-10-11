@@ -8,10 +8,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.AlertDialog;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -353,17 +353,13 @@ public class LoginBackdrop extends Fragment implements BackPressListener {
                 }
                 popupMenu.inflate(R.menu.login_menu);
                 popupMenu.setOnMenuItemClickListener(item -> {
-                    switch (item.getItemId()) {
-                        case R.id.technical_info:
-                            openInfo();
-                            break;
-
-                        case R.id.settings_button:
-                            openSettings();
-                            break;
-
-                        default:
-                            refreshData();
+                    final int id = item.getItemId();
+                    if (id == R.id.technical_info) {
+                        openInfo();
+                    } else if (id == R.id.settings_button) {
+                        openSettings();
+                    } else {
+                        refreshData();
                     }
                     return true;
                 });

@@ -21,6 +21,7 @@ import com.sap.sse.landscape.ProcessConfigurationVariable;
 import com.sap.sse.landscape.Release;
 import com.sap.sse.landscape.ReleaseRepository;
 import com.sap.sse.landscape.RotatingFileBasedLog;
+import com.sap.sse.landscape.common.shared.LandscapeConstants;
 import com.sap.sse.landscape.mongodb.Database;
 import com.sap.sse.replication.ReplicationServletActions;
 import com.sap.sse.shared.util.Wait;
@@ -35,7 +36,7 @@ public interface ApplicationProcess<ShardingKey, MetricsT extends ApplicationPro
 ProcessT extends ApplicationProcess<ShardingKey, MetricsT, ProcessT>>
 extends Process<RotatingFileBasedLog, MetricsT> {
     
-    String HEALTH_CHECK_PATH = "/gwt/status";
+    String HEALTH_CHECK_PATH = "/gwt/status?"+LandscapeConstants.WAIT_FOR_HEALTHY_UNTIL_RACES_LOADED+"=true";
     
     static Logger logger = Logger.getLogger(ApplicationProcess.class.getName());
     static String REPLICATION_STATUS_POST_URL_PATH_AND_QUERY = ReplicationServletActions.REPLICATION_SERVLET_BASE_PATH+"?"+ReplicationServletActions.ACTION_PARAMETER_NAME+"="+

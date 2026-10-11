@@ -111,6 +111,10 @@ public class LeaderboardConfigurationPanelPO extends PageArea {
         RegattaLeaderboardCreateDialogPO dialog = startCreatingRegattaLeaderboard();
         dialog.selectRegatta(regatta);
         dialog.pressOk();
+        // The regatta leaderboard is named after the regatta (see RegattaDescriptor.toString()). Wait until the new row
+        // has been rendered into the leaderboards cell table so that a subsequent getLeaderboardDetails() call does not
+        // race the AJAX round-trip and return null. This mirrors createFlexibleLeaderboard() above.
+        waitUntil(() -> findLeaderboard(regatta.toString()) != null);
     }
     
     public void deleteLeaderboard(String leaderboard) {

@@ -1,9 +1,9 @@
 package com.sap.sailing.racecommittee.app.ui.activities;
 
 import android.os.Bundle;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 
 import com.sap.sailing.android.shared.logging.ExLog;
 import com.sap.sailing.racecommittee.app.R;

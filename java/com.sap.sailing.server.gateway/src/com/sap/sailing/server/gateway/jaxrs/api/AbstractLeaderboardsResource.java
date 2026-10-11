@@ -247,7 +247,7 @@ public abstract class AbstractLeaderboardsResource extends AbstractSailingServer
                                     if (i.hasNext()) {
                                         TimePoint earliestMarkPassingTimePoint = i.next().getTimePoint();
                                         if (result == null || earliestMarkPassingTimePoint.before(result)) {
-                                            result = earliestMarkPassingTimePoint.minus(1);
+                                            result = earliestMarkPassingTimePoint.minusResolution();
                                         }
                                     }
                                 } finally {

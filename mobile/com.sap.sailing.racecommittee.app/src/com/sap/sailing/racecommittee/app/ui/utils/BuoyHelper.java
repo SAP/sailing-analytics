@@ -11,7 +11,7 @@ import com.sap.sse.common.Util.Triple;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 
 public class BuoyHelper {

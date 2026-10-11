@@ -87,7 +87,7 @@ public class S3FixStorageStructure {
      */
     public S3FixStorageListRequest getSingleFixesRequestForTimeRange(final DeviceIdentifier deviceIdentifier,
             final TimeRange timeRange) {
-        final String keyStartAfter = generateKeyForSingleFix(deviceIdentifier, timeRange.from().minus(1));
+        final String keyStartAfter = generateKeyForSingleFix(deviceIdentifier, timeRange.from().minusResolution());
         final String keyToEnd = generateKeyForSingleFix(deviceIdentifier, timeRange.to());
         final String commonPrefix = getCommonPrefix(keyStartAfter, keyToEnd);
         return new S3FixStorageListRequest(commonPrefix, keyStartAfter, SINGLE_FIX_BATCH_SIZE);

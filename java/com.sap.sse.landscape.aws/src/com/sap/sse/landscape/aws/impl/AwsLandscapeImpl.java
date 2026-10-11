@@ -64,7 +64,7 @@ import com.sap.sse.landscape.aws.AwsInstance;
 import com.sap.sse.landscape.aws.AwsLandscape;
 import com.sap.sse.landscape.aws.AwsLandscapeState;
 import com.sap.sse.landscape.aws.HostSupplier;
-import com.sap.sse.landscape.aws.LandscapeConstants;
+import com.sap.sse.landscape.aws.AwsLandscapeConstants;
 import com.sap.sse.landscape.aws.ReverseProxyCluster;
 import com.sap.sse.landscape.aws.Tags;
 import com.sap.sse.landscape.aws.TargetGroup;
@@ -361,7 +361,7 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
         final ApplicationLoadBalancer<ShardingKey> result = new ApplicationLoadBalancerImpl<>(region, response.loadBalancers().iterator().next(), this);
         createLoadBalancerHttpListener(result);
         createLoadBalancerHttpsListener(result);
-        getWafACLsByTagAndAssociateWithALB(LandscapeConstants.WEB_ACL_PURPOSE_TAG, LandscapeConstants.WEB_ACL_GEOBLOCKING_PURPOSE, result.getArn(), awsRegion);
+        getWafACLsByTagAndAssociateWithALB(AwsLandscapeConstants.WEB_ACL_PURPOSE_TAG, AwsLandscapeConstants.WEB_ACL_GEOBLOCKING_PURPOSE, result.getArn(), awsRegion);
         return result;
     }
     
@@ -390,7 +390,7 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
                 .describeSubnets(b -> b.filters(Filter.builder().name("vpc-id").values(vpcId).build(),
                         Filter.builder().name("availability-zone-id").values(az.getId()).build()))
                 .subnets().stream().filter(subnet -> !subnet.tags().stream().map(tag -> tag.key())
-                        .collect(Collectors.toList()).contains(LandscapeConstants.NO_INSTANCE_DEPLOYMENT))
+                        .collect(Collectors.toList()).contains(AwsLandscapeConstants.NO_INSTANCE_DEPLOYMENT))
                 .iterator().next();
     }
 
@@ -443,7 +443,7 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
         final int httpsPort = 443;
         final ReverseProxyCluster<ShardingKey, MetricsT, ProcessT, RotatingFileBasedLog> reverseProxy = getReverseProxyCluster(alb.getRegion());
         final HashMap<String, String> tagKeyandValue = new HashMap<>();
-        tagKeyandValue.put(LandscapeConstants.ALL_REVERSE_PROXIES, "");
+        tagKeyandValue.put(AwsLandscapeConstants.ALL_REVERSE_PROXIES, "");
         final TargetGroup<ShardingKey> defaultTargetGroup = createTargetGroup(alb.getRegion(), DEFAULT_TARGET_GROUP_PREFIX + alb.getName() + "-" + ProtocolEnum.HTTP.name(),
                 httpPort, reverseProxy.getHealthCheckPath(), /* healthCheckPort */ httpPort, alb.getArn(), alb.getVpcId(), tagKeyandValue);
         setTargetGroupHealthCheckPath(defaultTargetGroup, reverseProxy.getTargetGroupHealthCheckPath(defaultTargetGroup.getTargetGroupArn()));
@@ -574,7 +574,7 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
                 subnet -> securityGroupVpcId.map(vpcId -> vpcId.equals(subnet.vpcId())).orElse(subnet.defaultForAz())
                         && Util.contains(Util.map(azs, az -> az.getId()), subnet.availabilityZoneId())
                         && subnet.tags().stream().map(tag -> tag.key())
-                                .filter(key -> key.equals(LandscapeConstants.NO_INSTANCE_DEPLOYMENT)).count() == 0);
+                                .filter(key -> key.equals(AwsLandscapeConstants.NO_INSTANCE_DEPLOYMENT)).count() == 0);
         // Checks whether the subnet vpcId matches the vpcId of the security group. In the cases they are not equal, or the security group vpc is not found, instead it checks that the subnet is the default for the AZ.
         // AND, it checks whether the subnet is in any of the AZs passed in the parameter.
         // AND it checks that the subnet is actually usable for deployment (eg. subnets may be used exclusively for lambda NAT gateways).
@@ -1260,7 +1260,7 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
     public <MetricsT extends ApplicationProcessMetrics, ProcessT extends AwsApplicationProcess<ShardingKey, MetricsT, ProcessT>>
     ReverseProxyCluster<ShardingKey, MetricsT, ProcessT, RotatingFileBasedLog> getReverseProxyCluster(com.sap.sse.landscape.Region region) {
         ApacheReverseProxyCluster<ShardingKey, MetricsT, ProcessT, RotatingFileBasedLog> reverseProxyCluster = new ApacheReverseProxyCluster<>(this);
-        for (final AwsInstance<ShardingKey> reverseProxyHost : getRunningHostsWithTag(region, LandscapeConstants.REVERSE_PROXY_TAG_NAME, AwsInstanceImpl::new)) {
+        for (final AwsInstance<ShardingKey> reverseProxyHost : getRunningHostsWithTag(region, AwsLandscapeConstants.REVERSE_PROXY_TAG_NAME, AwsInstanceImpl::new)) {
             reverseProxyCluster.addHost(reverseProxyHost);
         }
         return reverseProxyCluster;
@@ -1270,7 +1270,7 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
     public <MetricsT extends ApplicationProcessMetrics, ProcessT extends AwsApplicationProcess<ShardingKey, MetricsT, ProcessT>>
     ReverseProxyCluster<ShardingKey, MetricsT, ProcessT, RotatingFileBasedLog> getCentralReverseProxy(com.sap.sse.landscape.Region region) {
         ApacheReverseProxyCluster<ShardingKey, MetricsT, ProcessT, RotatingFileBasedLog> reverseProxyCluster = new ApacheReverseProxyCluster<>(this);
-        for (final AwsInstance<ShardingKey> reverseProxyHost : getRunningHostsWithTag(region, LandscapeConstants.CENTRAL_REVERSE_PROXY_TAG_NAME, AwsInstanceImpl::new)) {
+        for (final AwsInstance<ShardingKey> reverseProxyHost : getRunningHostsWithTag(region, AwsLandscapeConstants.CENTRAL_REVERSE_PROXY_TAG_NAME, AwsInstanceImpl::new)) {
             reverseProxyCluster.addHost(reverseProxyHost);
         }
         Iterator<AwsInstance<ShardingKey>>  iterator = reverseProxyCluster.getHosts().iterator();
@@ -1383,14 +1383,14 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
     public SecurityGroup getDefaultSecurityGroupForApplicationHosts(com.sap.sse.landscape.Region region) {
         return getSecurityGroupByName(SAILING_APP_SECURITY_GROUP_NAME, region).orElseGet(()->{
             final List<SecurityGroup> securityGroups = new ArrayList<>();
-            securityGroups.addAll(getSecurityGroupByTag(LandscapeConstants.SAILING_APPLICATION_SG_TAG, region));
+            securityGroups.addAll(getSecurityGroupByTag(AwsLandscapeConstants.SAILING_APPLICATION_SG_TAG, region));
             return securityGroups.isEmpty() ? null : securityGroups.get(0);
         });
     }
 
     @Override
     public Iterable<SecurityGroup> getDefaultSecurityGroupsForReverseProxy(com.sap.sse.landscape.Region region) {
-        return getSecurityGroupByTag(LandscapeConstants.REVERSE_PROXY_SG_TAG, region);
+        return getSecurityGroupByTag(AwsLandscapeConstants.REVERSE_PROXY_SG_TAG, region);
     }
 
     public List<SecurityGroup> getSecurityGroupByTag(String tag, com.sap.sse.landscape.Region region) {
@@ -1417,7 +1417,7 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
 
     @Override
     public Iterable<SecurityGroup> getDefaultSecurityGroupsForMongoDBHosts(com.sap.sse.landscape.Region region) {
-        return getSecurityGroupByTag(LandscapeConstants.MONGO_SG_TAG, region);
+        return getSecurityGroupByTag(AwsLandscapeConstants.MONGO_SG_TAG, region);
     }
 
     @Override
@@ -1970,7 +1970,7 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
     @Override
     public CompletableFuture<Iterable<LaunchTemplateVersion>> getLaunchTemplateDefaultVersionsAsync(com.sap.sse.landscape.Region region) {
         final Set<LaunchTemplateVersion> result = new HashSet<>();
-        return getEc2AsyncClient(getRegion(region)).describeLaunchTemplateVersionsPaginator(b->b.versions(LandscapeConstants.DEFAULT_LAUNCH_TEMPLATE_VERSION_NAME)).subscribe(response->
+        return getEc2AsyncClient(getRegion(region)).describeLaunchTemplateVersionsPaginator(b->b.versions(AwsLandscapeConstants.DEFAULT_LAUNCH_TEMPLATE_VERSION_NAME)).subscribe(response->
             result.addAll(response.launchTemplateVersions())).handle((v, e)->Collections.unmodifiableCollection(result));
     }
     
@@ -2102,7 +2102,7 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
         final Ec2Client ec2Client = getEc2Client(getRegion(region));
         final LaunchTemplateVersion oldLaunchTemplateVersion = ec2Client.describeLaunchTemplateVersions(b->b
                 .launchTemplateName(oldLaunchTemplate.launchTemplateName())
-                .versions(LandscapeConstants.DEFAULT_LAUNCH_TEMPLATE_VERSION_NAME)).launchTemplateVersions().iterator().next();
+                .versions(AwsLandscapeConstants.DEFAULT_LAUNCH_TEMPLATE_VERSION_NAME)).launchTemplateVersions().iterator().next();
         final String oldUserData = new String(Base64.getDecoder().decode(oldLaunchTemplateVersion.launchTemplateData().userData().getBytes()));
         final String newUserData = oldUserData.replaceFirst(
                 "(?m)^"+DefaultProcessConfigurationVariables.INSTALL_FROM_RELEASE.name()+"=(.*)$",
@@ -2112,7 +2112,7 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
     }
     
     private CreateLaunchTemplateVersionRequest.Builder copyLaunchTemplateVersionToCreateRequestBuilder(LaunchTemplate launchTemplateToCreateNewVersionFor, com.sap.sse.landscape.Region region) {
-        return CreateLaunchTemplateVersionRequest.builder().launchTemplateId(launchTemplateToCreateNewVersionFor.launchTemplateId()).sourceVersion(LandscapeConstants.DEFAULT_LAUNCH_TEMPLATE_VERSION_NAME);
+        return CreateLaunchTemplateVersionRequest.builder().launchTemplateId(launchTemplateToCreateNewVersionFor.launchTemplateId()).sourceVersion(AwsLandscapeConstants.DEFAULT_LAUNCH_TEMPLATE_VERSION_NAME);
     }
 
     @Override
@@ -2196,7 +2196,7 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
                     .targetGroupARNs(publicTargetGroup.getTargetGroupArn())
                     .launchTemplate(LaunchTemplateSpecification.builder()
                             .launchTemplateName(launchTemplateName)
-                            .version(LandscapeConstants.DEFAULT_LAUNCH_TEMPLATE_VERSION_NAME).build());
+                            .version(AwsLandscapeConstants.DEFAULT_LAUNCH_TEMPLATE_VERSION_NAME).build());
             tags.ifPresent(t -> {
                 final List<software.amazon.awssdk.services.autoscaling.model.Tag> awsTags = new ArrayList<>();
                 for (final Entry<String, String> tag : t) {
@@ -2277,7 +2277,7 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
                 .autoScalingGroupName(autoScalingGroupName)
                 .availabilityZones(availabilityZones)
                 .targetGroupARNs(targetGroup.getTargetGroupArn())
-                .launchTemplate(ltb->ltb.launchTemplateId(launchTemplateId).version(LandscapeConstants.DEFAULT_LAUNCH_TEMPLATE_VERSION_NAME));
+                .launchTemplate(ltb->ltb.launchTemplateId(launchTemplateId).version(AwsLandscapeConstants.DEFAULT_LAUNCH_TEMPLATE_VERSION_NAME));
             final List<software.amazon.awssdk.services.autoscaling.model.Tag> awsTags = new ArrayList<>();
             final List<software.amazon.awssdk.services.autoscaling.model.TagDescription> parentTags = autoScalingParent.getAutoScalingGroup().tags();
             for (final software.amazon.awssdk.services.autoscaling.model.TagDescription parentTag : parentTags) {

@@ -2,7 +2,7 @@ package com.sap.sailing.racecommittee.app.ui.utils;
 
 import java.lang.ref.WeakReference;
 
-import android.support.v4.view.ViewConfigurationCompat;
+import androidx.core.view.ViewConfigurationCompat;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;

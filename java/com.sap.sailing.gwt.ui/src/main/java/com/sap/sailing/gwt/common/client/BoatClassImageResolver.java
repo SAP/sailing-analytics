@@ -184,6 +184,7 @@ public class BoatClassImageResolver {
         boatClassIconsMap.put(BoatClassMasterdata.WINGFOIL.getDisplayName(), imageResources.WingfoilIcon());
         boatClassIconsMap.put(BoatClassMasterdata.X_332.getDisplayName(), imageResources.X332Icon());
         boatClassIconsMap.put(BoatClassMasterdata.X_99.getDisplayName(), imageResources.X99Icon());
+        boatClassIconsMap.put(BoatClassMasterdata.YNGLING.getDisplayName(), imageResources.YnglingIcon());
         boatClassIconsMap.put(BoatClassMasterdata.ZOOM8.getDisplayName(), imageResources.Zoom8Icon());
         boatClassIconsMap.put(BoatClassMasterdata.RUNNING.getDisplayName(), imageResources.RunningIcon());
     }

@@ -8,8 +8,8 @@ import android.content.ServiceConnection;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -118,22 +118,22 @@ public class RegattaActivity extends AbstractRegattaActivity<CheckinData> {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case R.id.refresh:
+        final int id = item.getItemId();
+        if (id == R.id.refresh) {
             ExLog.i(this, TAG, "Clicked REFRESH.");
-            CheckinManager manager = new CheckinManager(checkinUrl, this);
+            final CheckinManager manager = new CheckinManager(checkinUrl, this);
             manager.callServerAndGenerateCheckinData();
             return true;
-        case R.id.check_out:
+        } else if (id == R.id.check_out) {
             displayCheckoutConfirmationDialog();
             return true;
-        case R.id.about:
+        } else if (id == R.id.about) {
             AboutHelper.showInfoActivity(this);
             return true;
-        case R.id.settings:
+        } else if (id == R.id.settings) {
             startActivity(new Intent(this, SettingActivity.class));
             return true;
-        default:
+        } else {
             return super.onOptionsItemSelected(item);
         }
     }

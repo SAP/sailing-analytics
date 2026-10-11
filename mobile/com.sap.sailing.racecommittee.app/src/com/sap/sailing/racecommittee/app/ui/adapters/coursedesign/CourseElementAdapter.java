@@ -13,8 +13,8 @@ import com.sap.sailing.racecommittee.app.ui.utils.MarkImageHelper;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -261,19 +261,16 @@ public class CourseElementAdapter extends BaseDraggableSwipeAdapter<RecyclerView
 
         @Override
         public void onClick(View v) {
-            switch (v.getId()) {
-            case R.id.column_left:
+            final int id = v.getId();
+            if (id == R.id.column_left) {
                 mItemClickListener.showMarkDialog(TOUCH_LEFT_AREA, mItems.get(getAdapterPosition()));
-                break;
-            case R.id.column_right:
+            } else if (id == R.id.column_right) {
                 if (addItem.getVisibility() == View.GONE) {
                     mItemClickListener.showMarkDialog(TOUCH_RIGHT_AREA, mItems.get(getAdapterPosition()));
                 }
-                break;
-            case R.id.rounding_direction:
+            } else if (id == R.id.rounding_direction) {
                 mItemClickListener.onItemEditClick(TOUCH_TYPE_AREA, mItems.get(getAdapterPosition()));
-                break;
-            default:
+            } else {
                 mItemClickListener.showMarkDialog(TOUCH_TYPE_AREA, null);
             }
         }

@@ -62,6 +62,7 @@ public class BoatClassVectorGraphicsResolver {
                 BoatClassMasterdata.VO60, BoatClassMasterdata.VO65, BoatClassMasterdata.IMOCA,
                 BoatClassMasterdata.HANSE_418, BoatClassMasterdata.SALONA_46, BoatClassMasterdata.SRS,
                 BoatClassMasterdata.ONYX, BoatClassMasterdata.LACUSTRE, BoatClassMasterdata._15M2_SNS,
+                BoatClassMasterdata.YNGLING,
                 BoatClassMasterdata.FAREAST28R);
         BoatClassVectorGraphics dinghyWithSpinnaker = new DinghyWithSpinnakerVectorGraphics(BoatClassMasterdata._420,
                 BoatClassMasterdata._470, BoatClassMasterdata._5O5, BoatClassMasterdata.CADET, BoatClassMasterdata.FLYING_DUTCHMAN,

@@ -1,6 +1,6 @@
 package com.sap.sailing.racecommittee.app.ui.utils;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.InputType;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;

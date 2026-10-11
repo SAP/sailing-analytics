@@ -1,7 +1,7 @@
 package com.sap.sailing.racecommittee.app.ui.adapters.dragandswipelist;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.Collections;
 import java.util.List;

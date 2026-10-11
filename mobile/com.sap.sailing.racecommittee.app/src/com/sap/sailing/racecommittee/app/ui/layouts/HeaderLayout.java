@@ -6,7 +6,7 @@ import com.sap.sailing.racecommittee.app.R;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.StringRes;
+import androidx.annotation.StringRes;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 import android.widget.TextView;

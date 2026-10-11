@@ -3,7 +3,7 @@ package com.sap.sailing.racecommittee.app.ui.views;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.TypedValue;

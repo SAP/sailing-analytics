@@ -286,20 +286,37 @@ public abstract class TrackedRegattaImpl implements TrackedRegatta {
         // the same listener; no dedicated lock on raceListeners is needed.
         lockTrackedRacesForRead();
         try {
+            // The mapping function only creates and registers the executor; it must NOT dispatch the
+            // catch-up raceAdded events, because for a synchronous executor that dispatch runs inline on
+            // this thread while computeIfAbsent still holds the reservation node for this key. A listener
+            // callback that in turn calls addRaceListener (e.g. runWhenDoneLoading registering a
+            // race-removal listener on this same regatta) would then re-enter computeIfAbsent on the same
+            // ConcurrentHashMap and self-deadlock on the reservation node (the CHM contract forbids the
+            // mapping function from modifying the map). We therefore capture the catch-up work in a holder
+            // and dispatch it AFTER computeIfAbsent returns, with the entry fully installed. The holder is
+            // populated only when a new entry was actually created, preserving the duplicate-registration
+            // collapse. The read lock on trackedRacesLock is still held during the dispatch, so ordering
+            // relative to enqueEvent is unchanged.
+            final Runnable[] catchUpHolder = new Runnable[1];
             raceListeners.computeIfAbsent(listener, listenerToAdd -> {
                 final RunnableExecutor eventQueue = synchronous ? new SynchronousRunnableExecutor() : new AsynchronousRunnableExecutor();
                 final List<TrackedRace> trackedRacesCopy = new ArrayList<>();
                 Util.addAll(getTrackedRaces(), trackedRacesCopy);
                 threadLocalTransporter.ifPresent(ThreadLocalTransporter::rememberThreadLocalStates);
-                eventQueue.addWork(() -> {
-                    withBeforeAndAfterHandling(threadLocalTransporter, () -> {
-                        for (TrackedRace trackedRace : trackedRacesCopy) {
-                            listenerToAdd.raceAdded(trackedRace);
-                        }
+                catchUpHolder[0] = () -> {
+                    eventQueue.addWork(() -> {
+                        withBeforeAndAfterHandling(threadLocalTransporter, () -> {
+                            for (TrackedRace trackedRace : trackedRacesCopy) {
+                                listenerToAdd.raceAdded(trackedRace);
+                            }
+                        });
                     });
-                });
+                };
                 return eventQueue;
             });
+            if (catchUpHolder[0] != null) {
+                catchUpHolder[0].run();
+            }
         } finally {
             unlockTrackedRacesAfterRead();
         }

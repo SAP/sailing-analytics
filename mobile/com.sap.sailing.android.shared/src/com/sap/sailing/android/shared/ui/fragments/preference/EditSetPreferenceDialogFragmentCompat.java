@@ -1,9 +1,9 @@
 package com.sap.sailing.android.shared.ui.fragments.preference;
 
 import android.os.Bundle;
-import android.support.v7.preference.DialogPreference;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceDialogFragmentCompat;
+import androidx.preference.DialogPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceDialogFragmentCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;

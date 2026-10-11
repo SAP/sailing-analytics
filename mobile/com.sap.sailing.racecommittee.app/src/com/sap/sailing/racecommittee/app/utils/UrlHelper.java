@@ -7,7 +7,7 @@ import java.util.List;
 import com.sap.sse.common.Util;
 
 import android.net.Uri;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 public class UrlHelper {
     public static URL generateUrl(String baseURL, String path, List<Util.Pair<String, Object>> params)

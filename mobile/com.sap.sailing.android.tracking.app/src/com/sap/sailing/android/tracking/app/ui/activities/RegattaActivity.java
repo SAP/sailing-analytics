@@ -10,8 +10,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -159,26 +159,26 @@ public class RegattaActivity extends AbstractRegattaActivity<CheckinData>
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case R.id.options_menu_settings:
+        final int id = item.getItemId();
+        if (id == R.id.options_menu_settings) {
             ExLog.i(this, TAG, "Clicked SETTINGS.");
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
-        case R.id.options_menu_checkout:
+        } else if (id == R.id.options_menu_checkout) {
             ExLog.i(this, TAG, "Clicked CHECKOUT.");
             displayCheckoutConfirmationDialog();
             return true;
-        case R.id.options_menu_add_team_image:
+        } else if (id == R.id.options_menu_add_team_image) {
             ExLog.i(this, TAG, "Clicked ADD TEAM IMAGE");
             getRegattaFragment().showChooseExistingPictureOrTakeNewPhotoAlert();
             return true;
-        case R.id.options_menu_refresh:
+        } else if (id == R.id.options_menu_refresh) {
             manager.callServerAndGenerateCheckinData();
             return true;
-        case R.id.options_menu_info:
+        } else if (id == R.id.options_menu_info) {
             AboutHelper.showInfoActivity(this);
             return true;
-        default:
+        } else {
             return super.onOptionsItemSelected(item);
         }
     }

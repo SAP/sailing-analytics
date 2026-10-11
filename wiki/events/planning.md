@@ -22,7 +22,7 @@ The links above lead to short write-ups of the respective business case behind t
 
 ## Project Candidates
 
-[[Smartphone Tracking|wiki/howto/misc/smartphone-tracking-general]]
+[[Smartphone Tracking|wiki/info/mobile/smartphone-tracking-general]]
 
 [[User Management|wiki/planning/usermanagement]]
 

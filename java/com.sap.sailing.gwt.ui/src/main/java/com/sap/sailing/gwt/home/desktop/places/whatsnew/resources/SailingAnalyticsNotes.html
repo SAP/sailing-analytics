@@ -6,11 +6,24 @@
 <div id="mainContent">
     <h4 class="articleHeadline" id="sailingAnalyticsHeadline">What's New - Sailing Analytics</h4>
       <div class="innerContent">
+         <h5 class="articleSubheadline">October 2026</h5>
+         <ul class="bulletList">
+            <li>Mark passing calculator bug fix: for races with tracking duration longer than ~14 days
+                (often a race accidentally left open and then later catching new fixes that actually wouldn't
+                belong there), the sorting of mark passing candidates in an internal data structure may
+                have failed due to a long/int data type overflow, in effect potentially leading to
+                endless iterations across those mark passings candidates and delaying the start-up of
+                a server process, possibly infinitely.</li>
+         </ul>
          <h5 class="articleSubheadline">September 2026</h5>
          <ul class="bulletList">
+            <li>Added boat class Yngling.</li>
             <li>Added boat classes Onyx, Lacustre and 15m&sup2; SNS.</li>
             <li>Fix for recently introduced issue in the simulator when used for live smartphone-tracked
                 races. A time point from the mark passing detection turned out to be non-serializable.</li>
+            <li>REST API end point <tt>/sailingserver/api/v1/remoteserverreference</tt> is now publicly
+                available. It lists those other sub-domains and the events that the server on which you
+                invoke this references and re-publishes on its landing page.</li>
          </ul>
          <h5 class="articleSubheadline">August 2026</h5>
          <ul class="bulletList">

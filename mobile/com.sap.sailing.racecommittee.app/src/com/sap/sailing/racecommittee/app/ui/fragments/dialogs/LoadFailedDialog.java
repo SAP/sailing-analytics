@@ -3,7 +3,7 @@ package com.sap.sailing.racecommittee.app.ui.fragments.dialogs;
 import com.sap.sailing.racecommittee.app.R;
 
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 
 public class LoadFailedDialog extends FragmentAttachedDialogFragment {
     private static final String ARGS_ERROR_MSG = LoadFailedDialog.class.getName() + ".errorMessage";

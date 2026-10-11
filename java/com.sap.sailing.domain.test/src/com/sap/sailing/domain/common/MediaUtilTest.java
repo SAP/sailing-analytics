@@ -35,14 +35,14 @@ public class MediaUtilTest {
     @Test
     public void testCompareDatesFirstGreaterSecond() throws Exception {
         TimePoint date1 = MillisecondsTimePoint.now();
-        TimePoint date2 = date1.minus(1);
+        TimePoint date2 = date1.minusResolution();
         assertTrue(MediaUtil.compareDatesAllowingNull(date1, date2) > 0);
     }
     
     @Test
     public void testCompareDatesSecondGreaterFirst() throws Exception {
         TimePoint date1 = MillisecondsTimePoint.now();
-        TimePoint date2 = date1.plus(1);
+        TimePoint date2 = date1.plusResolution();
         assertTrue(MediaUtil.compareDatesAllowingNull(date1, date2) < 0);
     }
     
@@ -77,7 +77,7 @@ public class MediaUtilTest {
     @Test
     public void testEqualsDatesNotEqual() throws Exception {
         TimePoint date1 = MillisecondsTimePoint.now();
-        TimePoint date2 = date1.plus(1);
+        TimePoint date2 = date1.plusResolution();
         assertFalse(MediaUtil.equalsDatesAllowingNull(date1, date2));
     }
     

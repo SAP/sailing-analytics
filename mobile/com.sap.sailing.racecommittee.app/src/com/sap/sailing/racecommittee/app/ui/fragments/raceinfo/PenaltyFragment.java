@@ -5,14 +5,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.content.Loader;
-import android.support.v4.util.ObjectsCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.Nullable;
+import androidx.loader.content.Loader;
+import androidx.core.util.ObjectsCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -451,27 +451,16 @@ public class PenaltyFragment extends BaseFragment
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         OrderBy orderBy = OrderBy.SAILING_NUMBER;
-        switch (item.getItemId()) {
-            case R.id.by_short_name:
-                orderBy = OrderBy.COMPETITOR_SHORT_NAME;
-                break;
-
-            case R.id.by_name:
-                orderBy = OrderBy.COMPETITOR_NAME;
-                break;
-
-            case R.id.by_start:
-                orderBy = OrderBy.START_LINE;
-                break;
-
-            case R.id.by_goal:
-                orderBy = OrderBy.FINISH_LINE;
-                loadLeaderboardResult();
-                break;
-
-            default:
-                break;
-
+        final int id = item.getItemId();
+        if (id == R.id.by_short_name) {
+            orderBy = OrderBy.COMPETITOR_SHORT_NAME;
+        } else if (id == R.id.by_name) {
+            orderBy = OrderBy.COMPETITOR_NAME;
+        } else if (id == R.id.by_start) {
+            orderBy = OrderBy.START_LINE;
+        } else if (id == R.id.by_goal) {
+            orderBy = OrderBy.FINISH_LINE;
+            loadLeaderboardResult();
         }
         mAdapter.setOrderedBy(orderBy);
         return true;

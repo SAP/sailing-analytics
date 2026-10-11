@@ -10,7 +10,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.SystemClock;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.sap.sailing.android.shared.logging.ExLog;
@@ -233,7 +233,11 @@ public class RaceLogPollingService extends Service
                         flags = 0;
                     }
                     mPendingIntent = PendingIntent.getService(this, 0, intent, flags);
-                    mAlarm.setExact(AlarmManager.RTC_WAKEUP, time, mPendingIntent);
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || mAlarm.canScheduleExactAlarms()) {
+                        mAlarm.setExact(AlarmManager.RTC_WAKEUP, time, mPendingIntent);
+                    } else {
+                        mAlarm.set(AlarmManager.RTC_WAKEUP, time, mPendingIntent);
+                    }
                 } else {
                     mAlarm.set(AlarmManager.RTC_WAKEUP, time, mPendingIntent);
                 }

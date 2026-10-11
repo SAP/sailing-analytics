@@ -8,6 +8,10 @@ Your WebSearch tool is broken, don't use it. Instead fetch https://duckduckgo.co
 
 Make sure to research the topic/question well and thoroughly instead of just answering quickly and superficially.
 
+## Eclipse AssistAI MCP Server Use
+
+Check for MCP server installations such as "eclipse-coder", "eclipse-ide", "eclipse-runner" and "eclipse-git" and prefer those over the default "Update" and bash-based file search / grep tools. They are more powerful, understand Java and OSGi including call graph and type information, offer powerful refactoring support, are quicker, probably consume fewer tokens, and most importantly keep the Eclipse workspace in sync.
+
 ## Java Coding Style Preferences
 
 ### Auto-Formatting

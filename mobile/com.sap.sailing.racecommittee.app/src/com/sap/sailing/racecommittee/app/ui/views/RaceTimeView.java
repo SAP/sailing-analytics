@@ -1,7 +1,7 @@
 package com.sap.sailing.racecommittee.app.ui.views;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 
 import com.sap.sailing.domain.abstractlog.race.state.RaceState;
@@ -10,7 +10,7 @@ import com.sap.sailing.racecommittee.app.utils.TickSingleton;
 import com.sap.sailing.racecommittee.app.utils.TimeUtils;
 import com.sap.sse.common.TimePoint;
 
-public class RaceTimeView extends android.support.v7.widget.AppCompatTextView {
+public class RaceTimeView extends androidx.appcompat.widget.AppCompatTextView {
 
     private TimePoint startTime;
     private TickListener listener;

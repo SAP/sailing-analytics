@@ -5,7 +5,7 @@ import com.sap.sse.common.Color;
 
 import android.content.Context;
 import android.graphics.drawable.LayerDrawable;
-import android.support.annotation.DrawableRes;
+import androidx.annotation.DrawableRes;
 
 public class MarkImageDescriptor {
     private final int drawableId;

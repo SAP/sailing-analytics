@@ -310,7 +310,7 @@ public class MasterDataImporterMediaTest {
         createRacingEventService(existingMediaTrack);
 
         MediaTrack mediaTrackToImport = new MediaTrack(existingMediaTrack.dbId, existingMediaTrack.title,
-                existingMediaTrack.url, existingMediaTrack.startTime.plus(1), existingMediaTrack.duration, mimeType, existingMediaTrack.assignedRaces);
+                existingMediaTrack.url, existingMediaTrack.startTime.plusResolution(), existingMediaTrack.duration, mimeType, existingMediaTrack.assignedRaces);
         assertThat(existingMediaTrack.startTime, is(not(mediaTrackToImport.startTime)));
 
         mediaTracksToImport.add(mediaTrackToImport);

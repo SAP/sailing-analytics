@@ -6,8 +6,8 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -323,14 +323,11 @@ public class ProtestTimeDialogFragment extends AttachedDialogFragment implements
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.nav_prev:
-                viewPanel(MOVE_DOWN);
-                break;
-
-            case R.id.nav_next:
-                viewPanel(MOVE_UP);
-                break;
+        final int id = v.getId();
+        if (id == R.id.nav_prev) {
+            viewPanel(MOVE_DOWN);
+        } else if (id == R.id.nav_next) {
+            viewPanel(MOVE_UP);
         }
     }
 

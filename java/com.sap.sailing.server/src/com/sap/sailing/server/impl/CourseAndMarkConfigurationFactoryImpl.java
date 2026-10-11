@@ -566,7 +566,7 @@ public class CourseAndMarkConfigurationFactoryImpl implements CourseAndMarkConfi
                         .add(new RegattaLogCloseOpenEndedDeviceMappingEventImpl(
                                 timePointForDefinitionOfMarksAndDeviceMappings, author,
                                 existingDeviceMapping.getRegattaLogEvent().getId(),
-                                timePointForDefinitionOfMarksAndDeviceMappings.minus(1)));
+                                timePointForDefinitionOfMarksAndDeviceMappings.minusResolution()));
             }
         }
     }

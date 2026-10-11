@@ -7,7 +7,7 @@ import com.sap.sailing.android.shared.logging.ExLog;
 import com.sap.sailing.android.shared.logging.LifecycleLogger;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 public abstract class LoggableActivity extends AppCompatActivity {
     private static final String TAG = LoggableActivity.class.getName();
