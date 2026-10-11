@@ -8,7 +8,7 @@ import com.sap.sailing.server.interfaces.RacingEventServiceOperation;
  * Updates the persisted health state for a media URL attached to an event.
  */
 public abstract class UpdateEventMediaHealth extends AbstractEventOperation<Void> {
-    private static final long serialVersionUID = 6923230063351853605L;
+    private static final long serialVersionUID = 2814759036548190723L;
 
     protected final String mediaUrl;
     protected final boolean missing;

@@ -27,6 +27,27 @@ class ImageUrlHealthChecker {
         this.timeout = timeout;
     }
 
+    boolean isUrlReachable(URL url) {
+        URLConnection connection = null;
+        boolean result;
+        try {
+            connection = HttpUrlConnectionHelper.redirectConnection(url, timeout, urlConnection -> urlConnection.setConnectTimeout((int) timeout.asMillis()));
+            if (connection instanceof HttpURLConnection) {
+                final int responseCode = ((HttpURLConnection) connection).getResponseCode();
+                result = responseCode >= HttpURLConnection.HTTP_OK && responseCode < HttpURLConnection.HTTP_MULT_CHOICE;
+            } else {
+                result = true;
+            }
+        } catch (IOException e) {
+            result = false;
+        } finally {
+            if (connection instanceof HttpURLConnection) {
+                ((HttpURLConnection) connection).disconnect();
+            }
+        }
+        return result;
+    }
+
     boolean isImageAvailable(URL imageUrl) {
         URLConnection connection = null;
         boolean result;

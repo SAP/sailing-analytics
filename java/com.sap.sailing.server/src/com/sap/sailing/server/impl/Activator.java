@@ -260,7 +260,7 @@ public class Activator implements BundleActivator {
                 }
                 for (final VideoDescriptor video : event.getVideos()) {
                     checkMediaDescriptor(event, video, "Video", availabilityByUrl,
-                            url -> imageUrlHealthChecker.isImageAvailable(url),
+                            url -> imageUrlHealthChecker.isUrlReachable(url),
                             (id, url, missing, sent) -> new UpdateEventVideoHealth(id, url, missing, sent),
                             securityService, eventService);
                 }

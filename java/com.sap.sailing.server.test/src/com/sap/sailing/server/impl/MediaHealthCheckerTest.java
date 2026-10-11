@@ -39,6 +39,7 @@ import org.mockito.ArgumentCaptor;
 import com.sap.sailing.domain.base.Event;
 import com.sap.sailing.server.interfaces.RacingEventService;
 import com.sap.sailing.server.operationaltransformation.UpdateEventImageHealth;
+import com.sap.sailing.server.operationaltransformation.UpdateEventVideoHealth;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.mail.MailException;
 import com.sap.sse.i18n.ResourceBundleStringMessages;
@@ -49,9 +50,11 @@ import com.sap.sse.security.shared.QualifiedObjectIdentifier;
 import com.sap.sse.security.shared.impl.Ownership;
 import com.sap.sse.security.shared.impl.User;
 import com.sap.sse.shared.media.ImageDescriptor;
+import com.sap.sse.shared.media.VideoDescriptor;
 
 public class MediaHealthCheckerTest {
     private static final String VALID_IMAGE_PATH = "/image";
+    private static final String VALID_VIDEO_PATH = "/video";
     private static final String REDIRECT_PATH = "/redirect";
     private static final String HTTP_ERROR_PATH = "/not-found";
     private static final String HTML_PATH = "/html";
@@ -260,6 +263,69 @@ public class MediaHealthCheckerTest {
         verifyImageHealthUpdate(eventService, event, imageUrl, /* missing */ true, /* notificationSent */ false);
     }
 
+    @Test
+    public void testValidVideoUrlIsReachable() throws Exception {
+        assertTrue(new ImageUrlHealthChecker().isUrlReachable(getUrl(VALID_VIDEO_PATH)));
+    }
+
+    @Test
+    public void testHttpErrorVideoUrlIsNotReachable() throws Exception {
+        assertFalse(new ImageUrlHealthChecker().isUrlReachable(getUrl(HTTP_ERROR_PATH)));
+    }
+
+    @Test
+    public void testBrokenEventVideoNotifiesOwnerAndPersistsState() throws Exception {
+        final URL videoUrl = new URL("http://example.com/race.mp4");
+        final Event event = mockEventWithVideo("Event", videoUrl, /* missing */ false, /* notificationSent */ false);
+        final SecurityService securityService = mock(SecurityService.class);
+        mockOwnership(securityService, event, "owner");
+        final TestVideoUrlHealthChecker videoUrlHealthChecker = new TestVideoUrlHealthChecker(false);
+        final RacingEventService eventService = mock(RacingEventService.class);
+        createActivatorWithOwnerNotificationEnabled(true).checkMedia(Collections.singleton(event),
+                securityService, videoUrlHealthChecker, eventService);
+        verify(securityService, times(1)).sendMail(eq("owner"), anyString(), anyString());
+        verifyVideoHealthUpdate(eventService, event, videoUrl, /* missing */ true, /* notificationSent */ true);
+    }
+
+    @Test
+    public void testAlreadyMissingAndNotifiedVideoDoesNotNotifyAgain() throws Exception {
+        final URL videoUrl = new URL("http://example.com/race.mp4");
+        final Event event = mockEventWithVideo("Event", videoUrl, /* missing */ true, /* notificationSent */ true);
+        final SecurityService securityService = mock(SecurityService.class);
+        mockOwnership(securityService, event, "owner");
+        final TestVideoUrlHealthChecker videoUrlHealthChecker = new TestVideoUrlHealthChecker(false);
+        final RacingEventService eventService = mock(RacingEventService.class);
+        createActivatorWithOwnerNotificationEnabled(true).checkMedia(Collections.singleton(event),
+                securityService, videoUrlHealthChecker, eventService);
+        verify(securityService, never()).sendMail(anyString(), anyString(), anyString());
+        verify(eventService, never()).apply(any(UpdateEventVideoHealth.class));
+    }
+
+    @Test
+    public void testRecoveredEventVideoClearsPersistedState() throws Exception {
+        final URL videoUrl = new URL("http://example.com/race.mp4");
+        final Event event = mockEventWithVideo("Event", videoUrl, /* missing */ true, /* notificationSent */ true);
+        final SecurityService securityService = mock(SecurityService.class);
+        final TestVideoUrlHealthChecker videoUrlHealthChecker = new TestVideoUrlHealthChecker(true);
+        final RacingEventService eventService = mock(RacingEventService.class);
+        createActivatorWithOwnerNotificationEnabled(true).checkMedia(Collections.singleton(event),
+                securityService, videoUrlHealthChecker, eventService);
+        verify(securityService, never()).sendMail(anyString(), anyString(), anyString());
+        verifyVideoHealthUpdate(eventService, event, videoUrl, /* missing */ false, /* notificationSent */ false);
+    }
+
+    @Test
+    public void testHealthyEventVideoWithCleanStateIsNotUpdated() throws Exception {
+        final URL videoUrl = new URL("http://example.com/race.mp4");
+        final Event event = mockEventWithVideo("Event", videoUrl, /* missing */ false, /* notificationSent */ false);
+        final SecurityService securityService = mock(SecurityService.class);
+        final TestVideoUrlHealthChecker videoUrlHealthChecker = new TestVideoUrlHealthChecker(true);
+        final RacingEventService eventService = mock(RacingEventService.class);
+        createActivatorWithOwnerNotificationEnabled(true).checkMedia(Collections.singleton(event),
+                securityService, videoUrlHealthChecker, eventService);
+        verify(eventService, never()).apply(any(UpdateEventVideoHealth.class));
+    }
+
     private Event mockEvent(String name, URL imageUrl, boolean missing, boolean notificationSent) {
         final Event event = mock(Event.class);
         final ImageDescriptor image = mock(ImageDescriptor.class);
@@ -275,6 +341,21 @@ public class MediaHealthCheckerTest {
         return event;
     }
 
+    private Event mockEventWithVideo(String name, URL videoUrl, boolean missing, boolean notificationSent) {
+        final Event event = mock(Event.class);
+        final VideoDescriptor video = mock(VideoDescriptor.class);
+        when(event.getId()).thenReturn(UUID.randomUUID());
+        when(event.getIdentifier()).thenReturn(mock(QualifiedObjectIdentifier.class));
+        when(event.getName()).thenReturn(name);
+        when(event.getImages()).thenReturn(Collections.emptyList());
+        when(event.getVideos()).thenReturn(Collections.singleton(video));
+        when(video.getURL()).thenReturn(videoUrl);
+        when(video.getTags()).thenReturn(Arrays.asList("Stage"));
+        when(video.isMissing()).thenReturn(missing);
+        when(video.isMissingMailNotificationSent()).thenReturn(notificationSent);
+        return event;
+    }
+
     private void verifyImageHealthUpdate(RacingEventService eventService, Event event, URL imageUrl,
             boolean missing, boolean notificationSent) {
         final ArgumentCaptor<UpdateEventImageHealth> operationCaptor =
@@ -283,6 +364,14 @@ public class MediaHealthCheckerTest {
         final RacingEventService target = mock(RacingEventService.class);
         operationCaptor.getValue().internalApplyTo(target);
         verify(target, times(1)).updateEventImageHealth(event.getId(), imageUrl.toString(), missing, notificationSent);
+    }
+
+    private void verifyVideoHealthUpdate(RacingEventService eventService, Event event, URL videoUrl, boolean missing, boolean notificationSent) {
+        final ArgumentCaptor<UpdateEventVideoHealth> operationCaptor = ArgumentCaptor.forClass(UpdateEventVideoHealth.class);
+        verify(eventService, times(1)).apply(operationCaptor.capture());
+        final RacingEventService target = mock(RacingEventService.class);
+        operationCaptor.getValue().internalApplyTo(target);
+        verify(target, times(1)).updateEventVideoHealth(event.getId(), videoUrl.toString(), missing, notificationSent);
     }
 
     private void mockOwnership(SecurityService securityService, Event event, String username) {
@@ -323,6 +412,19 @@ public class MediaHealthCheckerTest {
 
         private int getNumberOfChecks() {
             return numberOfChecks;
+        }
+    }
+
+    private static class TestVideoUrlHealthChecker extends ImageUrlHealthChecker {
+        private final boolean videoReachable;
+
+        private TestVideoUrlHealthChecker(boolean videoReachable) {
+            this.videoReachable = videoReachable;
+        }
+
+        @Override
+        boolean isUrlReachable(URL url) {
+            return videoReachable;
         }
     }
 
@@ -379,6 +481,9 @@ public class MediaHealthCheckerTest {
             switch (path) {
             case VALID_IMAGE_PATH:
                 writeImage(outputStream);
+                break;
+            case VALID_VIDEO_PATH:
+                writeResponse(outputStream, "200 OK", "Content-Type: video/mp4\r\n", new byte[0]);
                 break;
             case REDIRECT_PATH:
                 writeResponse(outputStream, "302 Found", "Location: " + VALID_IMAGE_PATH + "\r\n", new byte[0]);
