@@ -1930,7 +1930,17 @@
           body.appendChild(div);
         })
         .catch(function() {
-          body.innerHTML = '<div class="accordion-loading">Could not load changelog - <a href="' + body.dataset.src + '" target="_blank">view source file</a></div>';
+          body.innerHTML = '';
+          const loading = document.createElement('div');
+          loading.className = 'accordion-loading';
+          loading.appendChild(document.createTextNode('Could not load changelog - '));
+          const link = document.createElement('a');
+          link.href = body.dataset.src || '#';
+          link.target = '_blank';
+          link.rel = 'noopener';
+          link.textContent = 'view source file';
+          loading.appendChild(link);
+          body.appendChild(loading);
         });
     }
   }
