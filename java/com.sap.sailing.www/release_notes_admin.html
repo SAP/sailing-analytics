@@ -31,6 +31,12 @@
                     deadlocking a <tt>ConcurrentHashMap</tt> update on itself. Replica startup and operator-initiated
                     replication from a non-empty primary are affected. This is now fixed; catch-up notifications are
                     dispatched after the listener registration completes.</li>
+                <li>Image and video links are now checked for availability on a regular basis (currently once per day).
+                    Media owners are informed by e-mail now about broken links. Broken links will be flagged and will
+                    not be shown anymore. Those media will continue to be checked, and in case they re-appear under their
+                    original URL, the will again be displayed. See
+                    <a href="https://github.com/eclipse-sailing-analytics/sailing-analytics/issues/6202">issue #6202</a>.
+                    </li> 
           </ul>
           <h2 class="articleSubheadline">September 2026</h2>
           <ul class="bulletList">
