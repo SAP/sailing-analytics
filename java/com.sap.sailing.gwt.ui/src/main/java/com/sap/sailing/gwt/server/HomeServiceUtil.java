@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
@@ -69,8 +68,8 @@ public final class HomeServiceUtil {
     private static final int MINIMUM_IMAGE_HEIGHT_FOR_SAILING_PHOTOGRAPHY_IN_PIXELS = 500;
     
     public static String findEventThumbnailImageUrlAsString(EventBase event) {
-        ImageDescriptor url = findEventThumbnailImage(event);
-        return url == null ? null : url.getURL().toString();
+        ImageDescriptor image = findEventThumbnailImage(event);
+        return image == null || image.isMissing() ? null : image.getURL().toString();
     }
     
     public static boolean isSingleRegatta(Event event) {
@@ -134,41 +133,31 @@ public final class HomeServiceUtil {
     
     public static String getFeaturedImageUrlAsString(EventBase event) {
         ImageDescriptor image = getFeaturedImage(event);
-        return image == null ? null : image.getURL().toString();
+        return image == null || image.isMissing() ? null : image.getURL().toString();
     }
     
     public static String getStageImageURLAsString(final EventBase event) {
         ImageDescriptor image = getStageImage(event);
-        return image == null ? null : image.getURL().toString();
+        return image == null || image.isMissing() ? null : image.getURL().toString();
     }
     
     public static ImageDescriptor getStageImage(final EventBase event) {
         return event.findImageWithTag(MediaTagConstants.STAGE.getName());
     }
 
-    public static List<String> getPhotoGalleryImageURLsAsString(EventBase event) {
-        List<ImageDescriptor> urls = getPhotoGalleryImages(event);
-        List<String> result = new ArrayList<String>(urls.size());
-        for (ImageDescriptor url : urls) {
-            result.add(url.getURL().toString());
-        }
-        return result;
+    public static Iterable<String> getPhotoGalleryImageURLsAsString(EventBase event) {
+        return Util.map(getPhotoGalleryImages(event), url->url.getURL().toString());
     }
 
-    public static List<ImageDescriptor> getPhotoGalleryImages(EventBase event) {
-        return event.findImagesWithTag(MediaTagConstants.GALLERY.getName());
+    public static Iterable<ImageDescriptor> getPhotoGalleryImages(EventBase event) {
+        return Util.filter(event.findImagesWithTag(MediaTagConstants.GALLERY.getName()), image->!image.isMissing());
     }
     
-    public static List<ImageDescriptor> getSailingLovesPhotographyImages(EventBase event) {
-        final List<ImageDescriptor> acceptedImages = new LinkedList<>();
-        for (ImageDescriptor candidateImageUrl : event.getImages()) {
-            if (candidateImageUrl.hasSize() && candidateImageUrl.getHeightInPx() > MINIMUM_IMAGE_HEIGHT_FOR_SAILING_PHOTOGRAPHY_IN_PIXELS) {
-                if (candidateImageUrl.hasTag(MediaTagConstants.STAGE.getName()) || candidateImageUrl.hasTag(MediaTagConstants.GALLERY.getName())) {
-                    acceptedImages.add(candidateImageUrl);
-                }
-            }
-        }
-        return acceptedImages;
+    public static Iterable<ImageDescriptor> getSailingLovesPhotographyImages(EventBase event) {
+        return Util.filter(event.getImages(), candidateImageUrl->
+            !candidateImageUrl.isMissing() && candidateImageUrl.hasSize()
+                    && candidateImageUrl.getHeightInPx() > MINIMUM_IMAGE_HEIGHT_FOR_SAILING_PHOTOGRAPHY_IN_PIXELS
+                    && (candidateImageUrl.hasTag(MediaTagConstants.STAGE.getName()) || candidateImageUrl.hasTag(MediaTagConstants.GALLERY.getName())));
     }
 
     public static int calculateCompetitorsCount(Leaderboard sl) {
@@ -203,7 +192,7 @@ public final class HomeServiceUtil {
     }
     
     public static boolean hasPhotos(Event event) {
-        return event.hasImageWithTag(MediaTagConstants.GALLERY.getName());
+        return !Util.isEmpty(getPhotoGalleryImages(event));
     }
     
     public static boolean hasVideos(Event event) {
