@@ -5521,7 +5521,7 @@ public class SailingServiceImpl extends ResultCachingProxiedRemoteServiceServlet
                     regattaRegistrationLinkSecret);
             if (skipSecuritychecks || getService().getSecurityService().hasCurrentUserReadPermission(event)) {
                 ImageDescriptor logoImage = event.findImageWithTag(MediaTagConstants.LOGO.getName());
-                ImageDTO logo = logoImage != null ? HomeServiceUtil.convertToImageDTO(logoImage) : null;
+                ImageDTO logo = logoImage != null && !logoImage.isMissing() ? HomeServiceUtil.convertToImageDTO(logoImage) : null;
                 String name = HomeServiceUtil.getEventDisplayName(event);
                 String location = HomeServiceUtil.getLocation(event);
                 if ((location == null || location.isEmpty()) && event.getVenue() != null) {

@@ -1865,6 +1865,8 @@ public class MongoObjectFactoryImpl implements MongoObjectFactory {
         result.put(FieldNames.IMAGE_COPYRIGHT.name(), image.getCopyright());
         result.put(FieldNames.IMAGE_WIDTH_IN_PX.name(), image.getWidthInPx());
         result.put(FieldNames.IMAGE_HEIGHT_IN_PX.name(), image.getHeightInPx());
+        result.put(FieldNames.IMAGE_MISSING.name(), image.isMissing());
+        result.put(FieldNames.IMAGE_MISSING_MAIL_NOTIFICATION_SENT.name(), image.isMissingMailNotificationSent());
         storeTimePoint(image.getCreatedAtDate(), result, FieldNames.IMAGE_CREATEDATDATE);
         BasicDBList tags = new BasicDBList();
         for (String tag : image.getTags()) {
@@ -1884,6 +1886,8 @@ public class MongoObjectFactoryImpl implements MongoObjectFactory {
         result.put(FieldNames.VIDEO_MIMETYPE.name(), video.getMimeType() != null ? video.getMimeType().name() : null);
         result.put(FieldNames.VIDEO_COPYRIGHT.name(), video.getCopyright());
         result.put(FieldNames.VIDEO_LENGTH_IN_SECONDS.name(), video.getLengthInSeconds());
+        result.put(FieldNames.VIDEO_MISSING.name(), video.isMissing());
+        result.put(FieldNames.VIDEO_MISSING_MAIL_NOTIFICATION_SENT.name(), video.isMissingMailNotificationSent());
         storeTimePoint(video.getCreatedAtDate(), result, FieldNames.VIDEO_CREATEDATDATE);
         BasicDBList tags = new BasicDBList();
         for (String tag : video.getTags()) {

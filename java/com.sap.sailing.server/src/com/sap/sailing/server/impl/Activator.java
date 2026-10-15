@@ -2,11 +2,20 @@ package com.sap.sailing.server.impl;
 
 import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,6 +35,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import com.sap.sailing.competitorimport.CompetitorProvider;
 import com.sap.sailing.domain.abstractlog.race.analyzing.impl.RaceLogResolver;
+import com.sap.sailing.domain.base.Event;
 import com.sap.sailing.domain.base.MasterDataImportClassLoaderService;
 import com.sap.sailing.domain.base.RaceDefinition;
 import com.sap.sailing.domain.base.Regatta;
@@ -55,7 +65,10 @@ import com.sap.sailing.server.impl.preferences.model.StoredDataMiningQueryPrefer
 import com.sap.sailing.server.impl.preferences.model.StoredDataMiningReportPreferences;
 import com.sap.sailing.server.impl.preferences.model.TrackedEventPreferences;
 import com.sap.sailing.server.interfaces.RacingEventService;
+import com.sap.sailing.server.interfaces.RacingEventServiceOperation;
 import com.sap.sailing.server.notification.impl.SailingNotificationServiceImpl;
+import com.sap.sailing.server.operationaltransformation.UpdateEventImageHealth;
+import com.sap.sailing.server.operationaltransformation.UpdateEventVideoHealth;
 import com.sap.sailing.server.preferences.SailorProfilePreferences;
 import com.sap.sailing.server.security.EventManagerRole;
 import com.sap.sailing.server.security.SailingViewerRole;
@@ -65,8 +78,11 @@ import com.sap.sailing.server.gateway.interfaces.SailingServerFactory;
 import com.sap.sailing.shared.server.SharedSailingData;
 import com.sap.sse.branding.BrandingConfigurationService;
 import com.sap.sse.classloading.ServiceTrackerCustomizerForClassLoaderSupplierRegistrations;
+import com.sap.sse.common.Duration;
 import com.sap.sse.common.TypeBasedServiceFinder;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.mail.MailException;
+import com.sap.sse.i18n.ResourceBundleStringMessages;
 import com.sap.sse.mail.MailService;
 import com.sap.sse.mail.queue.MailQueue;
 import com.sap.sse.mail.queue.impl.ExecutorMailQueue;
@@ -79,18 +95,30 @@ import com.sap.sse.security.SecurityService;
 import com.sap.sse.security.SecurityUrlPathProvider;
 import com.sap.sse.security.interfaces.PreferenceConverter;
 import com.sap.sse.security.shared.HasPermissionsProvider;
+import com.sap.sse.security.shared.OwnershipAnnotation;
 import com.sap.sse.security.shared.RoleDefinition;
 import com.sap.sse.security.shared.ServerAdminRole;
 import com.sap.sse.security.shared.SubscriptionPlanProvider;
+import com.sap.sse.security.shared.impl.User;
 import com.sap.sse.security.shared.subscription.AllDataMiningRole;
 import com.sap.sse.security.shared.subscription.ArchiveDataMiningRole;
 import com.sap.sse.security.util.GenericJSONPreferenceConverter;
+import com.sap.sse.shared.media.ImageDescriptor;
+import com.sap.sse.shared.media.MediaDescriptor;
+import com.sap.sse.shared.media.VideoDescriptor;
 import com.sap.sse.util.ClearStateTestSupport;
 import com.sap.sse.util.ServiceTrackerFactory;
+import com.sap.sse.util.ThreadPoolUtil;
 
 public class Activator implements BundleActivator {
 
     private static final Logger logger = Logger.getLogger(Activator.class.getName());
+    
+    private static final Duration EVENT_MEDIA_CHECK_INITIAL_DELAY = Duration.ONE_MINUTE;
+
+    private static final Duration EVENT_MEDIA_CHECK_INTERVAL = Duration.ONE_DAY;
+
+    static final String EVENT_MEDIA_OWNER_NOTIFICATION_ENABLED_PROPERTY_NAME = "eventMediaHealthCheck.ownerNotification.enabled";
 
     private static final String CLEAR_PERSISTENT_COMPETITORS_PROPERTY_NAME = "persistentcompetitors.clear";
     
@@ -107,8 +135,14 @@ public class Activator implements BundleActivator {
     private final boolean clearPersistentCompetitors;
     
     private final boolean restoreTrackedRaces;
+    
+    private final boolean eventMediaOwnerNotificationEnabled;
+
+    private final ResourceBundleStringMessages messages;
 
     private Set<ServiceRegistration<?>> registrations = new HashSet<>();
+
+    private ScheduledFuture<?> eventMediaHealthCheckTask;
 
     private ObjectName mBeanName;
 
@@ -135,12 +169,22 @@ public class Activator implements BundleActivator {
     private ServiceTracker<SailingServerFactory, SailingServerFactory> sailingServerFactoryTracker;
     
     public Activator() {
+        this(ResourceBundleStringMessages.create(SailingNotificationServiceImpl.STRING_MESSAGES_BASE_NAME,
+                Activator.class.getClassLoader(), StandardCharsets.UTF_8.name()));
+    }
+
+    public Activator(ResourceBundleStringMessages messages) {
         clearPersistentCompetitors = Boolean
                 .valueOf(System.getProperty(CLEAR_PERSISTENT_COMPETITORS_PROPERTY_NAME, "" + false));
         restoreTrackedRaces = Boolean
                 .valueOf(System.getProperty(RESTORE_TRACKED_RACES_PROPERTY_NAME, "" + false));
+        eventMediaOwnerNotificationEnabled = Boolean.valueOf(
+                System.getProperty(EVENT_MEDIA_OWNER_NOTIFICATION_ENABLED_PROPERTY_NAME, "" + false));
+        this.messages = messages;
         logger.log(Level.INFO,
                 "setting " + CLEAR_PERSISTENT_COMPETITORS_PROPERTY_NAME + " to " + clearPersistentCompetitors);
+        logger.log(Level.INFO, "setting " + EVENT_MEDIA_OWNER_NOTIFICATION_ENABLED_PROPERTY_NAME + " to "
+                + eventMediaOwnerNotificationEnabled);
         // there is exactly one instance of the racingEventService in the whole server
     }
 
@@ -201,8 +245,134 @@ public class Activator implements BundleActivator {
     public static BundleContext getContext() {
         return context;
     }
+    
+    void checkMedia(Iterable<Event> events, SecurityService securityService,
+            ImageUrlHealthChecker imageUrlHealthChecker, RacingEventService eventService) {
+        // only run this on a RacingEventService primary node, not on replicas
+        if (eventService.getMasterDescriptor() == null) {
+            final Map<String, Boolean> availabilityByUrl = new HashMap<>();
+            for (final Event event : events) {
+                for (final ImageDescriptor image : event.getImages()) {
+                    checkMediaDescriptor(event, image, "Image", availabilityByUrl,
+                            url -> imageUrlHealthChecker.isImageAvailable(url),
+                            (id, url, missing, sent) -> new UpdateEventImageHealth(id, url, missing, sent),
+                            securityService, eventService);
+                }
+                for (final VideoDescriptor video : event.getVideos()) {
+                    checkMediaDescriptor(event, video, "Video", availabilityByUrl,
+                            url -> imageUrlHealthChecker.isUrlReachable(url),
+                            (id, url, missing, sent) -> new UpdateEventVideoHealth(id, url, missing, sent),
+                            securityService, eventService);
+                }
+            }
+        }
+    }
+
+    private void checkMediaDescriptor(Event event, MediaDescriptor media, String mediaType,
+            Map<String, Boolean> availabilityByUrl,
+            Function<URL, Boolean> checker,
+            MediaHealthOperationFactory operationFactory,
+            SecurityService securityService, RacingEventService eventService) {
+        final URL mediaUrl = media.getURL();
+        if (mediaUrl != null) {
+            final String mediaUrlAsString = mediaUrl.toString();
+            Boolean available = availabilityByUrl.get(mediaUrlAsString);
+            if (available == null) {
+                available = checker.apply(mediaUrl);
+                availabilityByUrl.put(mediaUrlAsString, available);
+            }
+            if (available) {
+                if (media.isMissing() || media.isMissingMailNotificationSent()) {
+                    eventService.apply(operationFactory.create(event.getId(), mediaUrlAsString,
+                            /* missing */ false, /* missingMailNotificationSent */ false));
+                }
+            } else {
+                boolean notificationSent = media.isMissingMailNotificationSent();
+                if (!notificationSent) {
+                    notificationSent = notifyEventOwnerAboutBrokenMedia(event, media, mediaType, securityService);
+                }
+                if (!media.isMissing() || media.isMissingMailNotificationSent() != notificationSent) {
+                    eventService.apply(operationFactory.create(event.getId(), mediaUrlAsString,
+                            /* missing */ true, notificationSent));
+                }
+            }
+        }
+    }
+
+    interface MediaHealthOperationFactory {
+        RacingEventServiceOperation<?> create(UUID eventId, String mediaUrl, boolean missing, boolean missingMailNotificationSent);
+    }
+
+    private void checkEventMedia() {
+        try {
+            final SecurityService securityService = securityServiceTracker.getInitializedService(0);
+            if (securityService != null) {
+                checkMedia(racingEventService.getAllEvents(), securityService, new ImageUrlHealthChecker(),
+                        racingEventService);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.log(Level.WARNING, "Interrupted while checking event media", e);
+        } catch (RuntimeException e) {
+            logger.log(Level.SEVERE, "Could not check event media", e);
+        }
+    }
+
+    private void scheduleEventMediaHealthChecks() {
+        eventMediaHealthCheckTask = ThreadPoolUtil.INSTANCE.getDefaultBackgroundTaskThreadPoolExecutor()
+                .scheduleAtFixedRate(this::checkEventMedia, EVENT_MEDIA_CHECK_INITIAL_DELAY.asMillis(),
+                        EVENT_MEDIA_CHECK_INTERVAL.asMillis(), TimeUnit.MILLISECONDS);
+    }
+
+    private boolean notifyEventOwnerAboutBrokenMedia(Event event, MediaDescriptor media, String mediaType,
+            SecurityService securityService) {
+        boolean result;
+        final String mediaUrl = media.getURL().toString();
+        final String mediaTags = getMediaTagsAsString(media);
+        final OwnershipAnnotation ownership = securityService.getOwnership(event.getIdentifier());
+        final User owner = ownership == null ? null : ownership.getAnnotation().getUserOwner();
+        if (owner == null) {
+            logger.warning("Cannot notify owner about broken " + mediaType + " " + mediaUrl + " with tags " + mediaTags
+                    + " for event " + event.getName() + " because the event has no user owner");
+            result = false;
+        } else {
+            final Locale locale = owner.getLocaleOrDefault();
+            final String subject = messages.get(locale, "broken"+mediaType+"MediaSubject", event.getName());
+            final String body = messages.get(locale, "broken"+mediaType+"MediaBody", event.getName(), mediaUrl, mediaTags);
+            if (!eventMediaOwnerNotificationEnabled) {
+                logger.warning("Would notify owner " + owner.getName() + " about broken " + mediaType + " " + mediaUrl
+                        + " with tags " + mediaTags + " for event " + event.getName() + "; enable with -D"
+                        + EVENT_MEDIA_OWNER_NOTIFICATION_ENABLED_PROPERTY_NAME + "=true");
+                result = false;
+            } else {
+                try {
+                    securityService.sendMail(owner.getName(), subject, body);
+                    result = true;
+                } catch (MailException e) {
+                    logger.log(Level.SEVERE, "Could not notify owner " + owner.getName() + " about broken " + mediaType
+                            + " " + mediaUrl + " with tags " + mediaTags + " for event " + event.getName(), e);
+                    result = false;
+                }
+            }
+        }
+        return result;
+    }
+
+    private String getMediaTagsAsString(MediaDescriptor media) {
+        final StringBuilder result = new StringBuilder();
+        for (String tag : media.getTags()) {
+            if (result.length() > 0) {
+                result.append(", ");
+            }
+            result.append(tag);
+        }
+        return result.length() == 0 ? "<none>" : result.toString();
+    }
 
     public void stop(BundleContext context) throws Exception {
+        if (eventMediaHealthCheckTask != null) {
+            eventMediaHealthCheckTask.cancel(/* mayInterruptIfRunning */ true);
+        }
         masterDataImportClassLoaderServiceTracker.close();
         if (extenderBundleTracker != null) {
             extenderBundleTracker.close();
@@ -368,6 +538,7 @@ public class Activator implements BundleActivator {
         // load has been finished in case this is a replica with auto-replication.
         racingEventService.ensureOwnerships();
         racingEventService.migrateCompetitorNotificationPreferencesWithCompetitorNames();
+        scheduleEventMediaHealthChecks();
     }
 
     private class PolarDataServiceTrackerCustomizer
