@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.StreamSupport;
 
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
@@ -17,8 +16,9 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import com.sap.sailing.domain.common.orc.ORCCertificate;
 import com.sap.sailing.domain.orc.ORCPublicCertificateDatabase.CertificateFamily;
 import com.sap.sailing.domain.orc.ORCPublicCertificateDatabase.CertificateHandle;
-import com.sap.sailing.domain.orc.ORCPublicCertificateDatabase.CountryOverview;
 import com.sap.sailing.domain.orc.impl.ORCPublicCertificateDatabaseImpl;
+import com.sap.sse.common.CountryCode;
+import com.sap.sse.common.CountryCodeFactory;
 import com.sap.sse.common.Util;
 
 /***
@@ -40,6 +40,7 @@ import com.sap.sse.common.Util;
 public class FailIfNoValidOrcCertificateRule implements BeforeTestExecutionCallback {
     private static final Logger logger = Logger.getLogger(FailIfNoValidOrcCertificateRule.class.getName());
     private static final int NUMBER_OF_CERTIFICATES_TO_PROBE = 3;
+    private static final String PROBE_COUNTRY_IOC_CODE = "GER";
     
     private static List<ORCCertificate> availableCerts;
     private static boolean certificateExists;
@@ -48,24 +49,26 @@ public class FailIfNoValidOrcCertificateRule implements BeforeTestExecutionCallb
         certificateExists = false;
         availableCerts = new ArrayList<>();
         final ORCPublicCertificateDatabase db = new ORCPublicCertificateDatabaseImpl();
-        CountryOverview countryWithMostValidCertificates;
         try {
-            countryWithMostValidCertificates = StreamSupport
-                    .stream(db.getCountriesWithValidCertificates().spliterator(), /* parallel */ false)
-                    .max((c1, c2) -> c1.getCertCount() - c2.getCertCount()).get();
-            Iterable<CertificateHandle> certificateHandles = Util.filter(db.search(countryWithMostValidCertificates.getIssuingCountry(),
-                    countryWithMostValidCertificates.getVPPYear(), null, null, null, null, /* includeInvalid */ false),
-                    certHandle->certHandle.getFamily() != CertificateFamily.ORC_LIGHT); // exclude LITE certificates
+            final CountryCode probeCountry = CountryCodeFactory.INSTANCE
+                    .getFromThreeLetterIOCName(PROBE_COUNTRY_IOC_CODE);
+            final Iterable<CertificateHandle> certificateHandles = Util.filter(
+                    db.search(probeCountry, /* yearOfIssuance */ null, /* referenceNumber */ null,
+                            /* yachtName */ null, /* sailNumber */ null, /* boatClassName */ null,
+                            /* includeInvalid */ false),
+                    certHandle -> certHandle.getFamily() != CertificateFamily.ORC_LIGHT); // exclude LITE certificates
             final List<CertificateHandle> randomSubset = new ArrayList<>();
             Util.addAll(certificateHandles, randomSubset);
             Collections.shuffle(randomSubset);
-            Iterable<ORCCertificate> orcCertificates = db.getCertificates(randomSubset.subList(0, NUMBER_OF_CERTIFICATES_TO_PROBE));
+            final List<CertificateHandle> probeHandles = randomSubset.subList(0,
+                    Math.min(NUMBER_OF_CERTIFICATES_TO_PROBE, randomSubset.size()));
+            final Iterable<ORCCertificate> orcCertificates = db.getCertificates(probeHandles);
             orcCertificates.forEach(availableCerts::add);
             if (orcCertificates.iterator().hasNext()) {
                 certificateExists = true;
             }
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, "Problem trying to fetch certificates tests");
+        } catch (final Exception ex) {
+            logger.log(Level.WARNING, "Problem trying to fetch certificates tests", ex);
         }
     }
 
