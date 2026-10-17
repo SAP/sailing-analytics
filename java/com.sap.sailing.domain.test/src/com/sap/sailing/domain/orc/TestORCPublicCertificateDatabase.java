@@ -164,7 +164,7 @@ public class TestORCPublicCertificateDatabase {
         final ORCCertificate result = db.searchForUpdate(oldHandle);
         if (result != null) {
             assertEquals(oldHandle.getIssuingCountry(), result.getIssuingCountry());
-            assertFalse(oldHandle.getIssueDate().after(result.getIssueDate()));
+            assertEquals(oldHandle.getReferenceNumber(), result.getReferenceNumber());
         } else {
             logger.warning("Couldn't find an update to certificate with reference number "+oldHandle.getReferenceNumber()+
                     " anymore. Consider updating this test case to using a different certificate that still has a valid update.");
