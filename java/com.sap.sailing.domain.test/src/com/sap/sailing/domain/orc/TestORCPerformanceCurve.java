@@ -12,7 +12,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.apache.commons.math.ArgumentOutsideDomainException;
 import org.apache.commons.math.FunctionEvaluationException;
@@ -47,8 +46,6 @@ import com.sap.sse.common.impl.NauticalMileDistance;
  */
 @ExtendWith(FailIfNoValidOrcCertificateRule.class)
 public class TestORCPerformanceCurve {
-    private static final Logger logger = Logger.getLogger(TestORCPerformanceCurve.class.getName());
-    
     private static ORCPerformanceCurveCourse alturaCourse;
     private static ORCCertificatesCollection importerLocal;
     private static ORCCertificatesCollection importerWithSpecificBins;
