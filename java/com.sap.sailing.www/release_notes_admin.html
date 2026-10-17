@@ -25,6 +25,16 @@
           <div class="innerContent">
           <h2 class="articleSubheadline">October 2026</h2>
           <ul class="bulletList">
+                <li>ORC certificate retrieval has been migrated to ORC's new key-based web API at
+                    <tt>sas.orc.org</tt>, because ORC decommissioned the previous public certificate endpoints
+                    that the server used before. Certificate search, download and the per-country overview behave
+                    as they did previously; there is no functional change for operators beyond the configuration
+                    requirement below. <strong>Self-hosting administrators must now configure an ORC API key</strong>:
+                    set the <tt>ORC_API_KEY</tt> environment variable for the server process to a valid key obtained
+                    from ORC. Without it, all ORC certificate lookups fail, so ORC Performance Curve / Polar Curve
+                    Scoring regattas can no longer import or refresh certificates. On the SAP-hosted landscape this
+                    key is already provisioned. See
+                    <a href="https://github.com/eclipse-sailing-analytics/sailing-analytics/issues/6319">issue #6319</a>.</li>
                 <li>Bug fix: a replica could hang indefinitely during its initial load from a primary when a
                     deserialized regatta already contained races. Registering the race-addition listener
                     triggered a catch-up notification that re-entered listener registration on the same regatta,
