@@ -5733,7 +5733,7 @@ public class SailingServiceImpl extends ResultCachingProxiedRemoteServiceServlet
             String referenceNumber, String yachtName, String sailNumber, String boatClassName) throws Exception {
         final ORCPublicCertificateDatabase db = ORCPublicCertificateDatabase.INSTANCE;
         final Set<ORCCertificate> result = new HashSet<>();
-        final Iterable<CertificateHandle> searchResult = db.search(country, yearOfIssuance, referenceNumber, yachtName, sailNumber, boatClassName, /* includeInvalid */ false);
+        final Iterable<CertificateHandle> searchResult = db.search(country, yearOfIssuance, referenceNumber, yachtName, sailNumber, boatClassName);
         Util.addAll(
                 db.getCertificates(searchResult),
                 result);

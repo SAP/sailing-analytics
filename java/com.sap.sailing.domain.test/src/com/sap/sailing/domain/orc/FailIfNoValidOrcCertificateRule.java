@@ -57,8 +57,7 @@ public class FailIfNoValidOrcCertificateRule implements BeforeTestExecutionCallb
                     .max((c1, c2) -> c1.getCertCount() - c2.getCertCount()).get();
             final Iterable<CertificateHandle> certificateHandles = Util.filter(
                     db.search(countryWithMostValidCertificates.getIssuingCountry(),
-                            countryWithMostValidCertificates.getVPPYear(), null, null, null, null,
-                            /* includeInvalid */ false),
+                            countryWithMostValidCertificates.getVPPYear(), null, null, null, null),
                     certHandle -> certHandle.getFamily() != CertificateFamily.ORC_LIGHT); // exclude LITE certificates
             final List<CertificateHandle> randomSubset = new ArrayList<>();
             Util.addAll(certificateHandles, randomSubset);

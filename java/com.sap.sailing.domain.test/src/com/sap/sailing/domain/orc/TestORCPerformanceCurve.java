@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +30,10 @@ import com.sap.sailing.domain.common.orc.impl.ORCPerformanceCurveCourseImpl;
 import com.sap.sailing.domain.common.orc.impl.ORCPerformanceCurveLegImpl;
 import com.sap.sailing.domain.orc.impl.ORCCertificatesJsonImporter;
 import com.sap.sailing.domain.orc.impl.ORCPerformanceCurveImpl;
+import com.sap.sailing.domain.orc.impl.ORCPublicCertificateDatabaseImpl;
 import com.sap.sse.common.Bearing;
+import com.sap.sse.common.CountryCode;
+import com.sap.sse.common.CountryCodeFactory;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.Speed;
@@ -55,8 +57,6 @@ public class TestORCPerformanceCurve {
     private static ORCCertificatesCollection importerOnline;
     
     private static final String RESOURCES = "resources/orc/";
-    private static final String API_KEY_ENV_VARIABLE_NAME = "ORC_API_KEY";
-    private static final String API_BASE_URL = "https://sas.orc.org/api/";
     
     @BeforeAll
     public static void initialize() throws IOException, ParseException {
@@ -74,15 +74,15 @@ public class TestORCPerformanceCurve {
         // Local File new format with specific TWA/TWS bins:
         final File fileWithSpecificBins = new File(RESOURCES + "newFormatCertificate.json");
         importerWithSpecificBins = new ORCCertificatesJsonImporter().read(new FileInputStream(fileWithSpecificBins));
-        // Online File: a bulk GER download via the key-based sas.orc.org API. The key is read from the ORC_API_KEY
-        // environment variable (the same variable the adapter uses); it must be present, so a missing key FAILS the
-        // test setup rather than silently skipping. The key is never logged.
-        final String apiKey = System.getenv(API_KEY_ENV_VARIABLE_NAME);
-        assertNotNull(apiKey, "The " + API_KEY_ENV_VARIABLE_NAME
-                + " environment variable must be set for the online ORC certificate import test.");
-        final String bulkDownloadUrl = API_BASE_URL + apiKey + "/DownRMS?CountryId=GER&ext=json";
+        // Online File: a bulk GER download via the key-based sas.orc.org API. All endpoint and key handling lives in
+        // the adapter; the test only asks it for the bulk certificate stream so there is no duplicated URL construction
+        // or env-var/key logic here. The adapter reads the ORC_API_KEY environment variable and throws when it is
+        // absent, so a missing key FAILS this setup rather than silently skipping, and the key is never logged.
+        final CountryCode ger = CountryCodeFactory.INSTANCE.getFromThreeLetterIOCName("GER");
         logger.info("Trying to read bulk GER certificates from the key-based ORC API");
-        importerOnline = new ORCCertificatesJsonImporter().read(new URL(bulkDownloadUrl).openStream());
+        importerOnline = new ORCCertificatesJsonImporter().read(
+                ((ORCPublicCertificateDatabaseImpl) ORCPublicCertificateDatabase.INSTANCE)
+                        .openBulkCertificatesJsonStream(ger));
     }
     
     @Test

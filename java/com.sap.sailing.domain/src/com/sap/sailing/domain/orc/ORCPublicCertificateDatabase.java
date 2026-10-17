@@ -22,10 +22,9 @@ import com.sap.sse.common.Util;
  * (see {@code https://sas.orc.org/api-docs.php}). It can search for certificates by a number of criteria, among them
  * the issuing country, sail number, ORC reference number, or boat name. Those search results are represented as
  * {@link CertificateHandle} objects, obtained from the {@code activecerts} endpoint through the
- * {@link #search(CountryCode, Integer, String, String, String, String, boolean)} method. The {@code includeInvalid}
- * parameter is retained for API compatibility; the {@code activecerts} endpoint returns active (valid) certificates
- * only, so every handle returned is {@link CertificateHandle#isValid() valid} and resolvable into a full
- * {@link ORCCertificate} via {@link #getCertificate(String, CertificateFamily)} (which uses the
+ * {@link #search(CountryCode, Integer, String, String, String, String)} method. The {@code activecerts} endpoint
+ * returns active (valid) certificates only, so every handle returned is {@link CertificateHandle#isValid() valid} and
+ * resolvable into a full {@link ORCCertificate} via {@link #getCertificate(String, CertificateFamily)} (which uses the
  * {@code DownBoatRMS_byrefno} endpoint) or {@link #getCertificates(Iterable)}.
  * <p>
  * The per-country/family overview including the certificate counts and VPP years is obtained from the {@code RMS}
@@ -205,19 +204,22 @@ public interface ORCPublicCertificateDatabase {
      * results based on that criterion. You can use "%" as wildcards in the {@code yachtName}, {@code sailNumber} and
      * {@code boatClassName} parameters.
      * <p>
-     * 
-     * @param includeInvalid
-     *            If {@code true}, handles may have {@link CertificateHandle#isValid()}{@code == false}, meaning that
-     *            such a handle cannot be resolved to a {@link ORCCertificate} using any of
-     *            {@link #getCertificate(String)}, {@link #getCertificates(Iterable)} and
-     *            {@link #getCertificates(CertificateHandle...)}. If {@code false}, only valid certificate handles
-     *            will be returned that should all be resolvable into an {@link ORCCertificate} with any of the methods
-     *            listed above.
-     * 
+     * This search runs against the {@code activecerts} endpoint and therefore returns <em>currently active
+     * certificates only</em>; inactive, expired or superseded certificates are never returned, regardless of the
+     * criteria. In particular, searching by {@code referenceNumber} here will <em>not</em> find an inactive
+     * certificate even though the reference number identifies it exactly. The only way this adapter reaches an
+     * inactive certificate is to download it by its reference number through
+     * {@link #getCertificate(String, CertificateFamily)} (backed by the {@code DownBoatRMS_byrefno} endpoint, which
+     * serves a certificate whether or not it is still active); {@link #getCertificateHandle(String)} does the same to
+     * obtain a {@link CertificateHandle}. There is no search over inactive certificates in this adapter. Every handle
+     * returned by this method is {@link CertificateHandle#isValid() valid} and resolvable into an
+     * {@link ORCCertificate} via {@link #getCertificate(String, CertificateFamily)} or
+     * {@link #getCertificates(Iterable)}.
+     *
      * @return never {@code null}; an object which may be {@link Util#isEmpty() empty}.
      */
     Iterable<CertificateHandle> search(CountryCode country, Integer yearOfIssuance, String referenceNumber,
-            String yachtName, String sailNumber, String boatClassName, boolean includeInvalid) throws Exception;
+            String yachtName, String sailNumber, String boatClassName) throws Exception;
     
     Iterable<ORCCertificate> getCertificates(Iterable<CertificateHandle> handles) throws Exception;
     
@@ -226,7 +228,7 @@ public interface ORCPublicCertificateDatabase {
     }
     
     default CertificateHandle getCertificateHandle(String referenceNumber) throws Exception {
-        return search(null, null, referenceNumber, null, null, null, /* includeInvalid */ true).iterator().next();
+        return search(null, null, referenceNumber, null, null, null).iterator().next();
     }
     
     ORCCertificate searchForUpdate(ORCCertificate certificate) throws Exception;

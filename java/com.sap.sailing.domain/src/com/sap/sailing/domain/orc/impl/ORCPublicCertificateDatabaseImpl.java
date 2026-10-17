@@ -79,6 +79,7 @@ public class ORCPublicCertificateDatabaseImpl implements ORCPublicCertificateDat
     private static final String ENDPOINT_ACTIVECERTS = "activecerts";
     private static final String ENDPOINT_RMS = "RMS";
     private static final String ENDPOINT_DOWNBOATRMS_BYREFNO = "DownBoatRMS_byrefno";
+    private static final String ENDPOINT_DOWNRMS = "DownRMS";
     private static final String EXT_JSON = "ext=json";
 
     private static final String DATA_KEY = "data";
@@ -352,8 +353,7 @@ public class ORCPublicCertificateDatabaseImpl implements ORCPublicCertificateDat
 
     @Override
     public Iterable<CertificateHandle> search(final CountryCode issuingCountry, final Integer yearOfIssuance,
-            final String referenceNumber, final String yachtName, final String sailNumber, final String boatClassName,
-            final boolean includeInvalid /* retained for API compatibility; activecerts returns valid certs only */)
+            final String referenceNumber, final String yachtName, final String sailNumber, final String boatClassName)
             throws IOException {
         final Set<CertificateHandle> result = new HashSet<>();
         final List<String> queryParts = new ArrayList<>();
@@ -418,6 +418,29 @@ public class ORCPublicCertificateDatabaseImpl implements ORCPublicCertificateDat
         return result;
     }
 
+    /**
+     * Resolves a certificate handle directly from its reference number through the {@code DownBoatRMS_byrefno} download
+     * endpoint rather than through the active-certificate {@link #search(CountryCode, Integer, String, String, String,
+     * String, boolean) search}. The {@code activecerts} search only ever returns currently active certificates, whereas
+     * this endpoint also serves inactive/expired certificates, so this override preserves the pre-key-API behavior that
+     * a handle could be obtained for any certificate addressable by its reference number. Returns {@code null} if no
+     * certificate exists for the given reference number.
+     */
+    @Override
+    public CertificateHandle getCertificateHandle(final String referenceNumber) throws IOException {
+        final ORCCertificate certificate = getCertificate(referenceNumber, CertificateFamily.UNKNOWN);
+        return certificate == null ? null : handleFromCertificate(certificate);
+    }
+
+    private CertificateHandle handleFromCertificate(final ORCCertificate certificate) {
+        final Double gph = certificate.getGPH() == null ? null : certificate.getGPH().asSeconds();
+        return new CertificateHandleImpl(certificate.getIssuingCountry(), certificate.getFileId(), gph,
+                /* sssid */ null, /* datInGID */ null, certificate.getReferenceNumber(), CertificateFamily.UNKNOWN,
+                certificate.getBoatName(), certificate.getSailNumber(), certificate.getBoatClassName(),
+                /* designer */ null, /* builder */ null, /* yearBuilt */ null, certificate.getIssueDate(),
+                /* certType */ null, /* oneDesign */ null, /* isProvisional */ Boolean.FALSE, /* isValid */ Boolean.TRUE);
+    }
+
     @Override
     public ORCCertificate searchForUpdate(final CertificateHandle certificateHandle) throws IOException {
         return searchForUpdate(certificateHandle.getReferenceNumber());
@@ -455,6 +478,19 @@ public class ORCPublicCertificateDatabaseImpl implements ORCPublicCertificateDat
             throw new IOException("Failed to parse ORC certificate JSON", e);
         }
         return result;
+    }
+
+    /**
+     * Opens a stream on the bulk per-country certificate download provided by the {@code DownRMS} endpoint for the
+     * given {@code country}, in the JSON format consumed by {@link ORCCertificatesJsonImporter#read(InputStream)}. All
+     * endpoint knowledge (base URL, endpoint name, {@code ext} parameter) and the API key live in this implementation
+     * only; the key is read from the {@value #API_KEY_ENV_VARIABLE_NAME} environment variable and never logged. This
+     * method is exported to the test bundle via an {@code x-friends} restriction so that tests can obtain the online
+     * bulk stream without duplicating the URL construction or the key handling.
+     */
+    public InputStream openBulkCertificatesJsonStream(final CountryCode country) throws IOException {
+        return httpGetStream(endpointUrl(requireApiKey(), ENDPOINT_DOWNRMS,
+                KEY_COUNTRY_ID + "=" + encode(country.getThreeLetterIOCCode()) + "&" + EXT_JSON));
     }
 
     private CertificateHandle parseHandleFromActiveCertRow(final JSONObject row) throws DateTimeParseException {
@@ -723,13 +759,13 @@ public class ORCPublicCertificateDatabaseImpl implements ORCPublicCertificateDat
      */
     private Iterable<CertificateHandle> fuzzySearchVaryingBoatClassName(final String yachtName, final String sailNumber, final BoatClass boatClass) throws Exception {
         String successfulBoatClassName = boatClass==null?null:boatClass.getName();
-        Iterable<CertificateHandle> certificateHandles = search(/* issuingCountry */ null, /* yearOfIssuance */ null, /* referenceNumber */ null, yachtName, sailNumber, successfulBoatClassName, /* includeInvalid */ false);
+        Iterable<CertificateHandle> certificateHandles = search(/* issuingCountry */ null, /* yearOfIssuance */ null, /* referenceNumber */ null, yachtName, sailNumber, successfulBoatClassName);
         if (!containsValidHandle(certificateHandles) && successfulBoatClassName != null) {
             if (yachtName != null || sailNumber != null) {
                 logger.fine(()->"Nothing found; removing boat class name restriction "+boatClass.getName());
                 // try without boat class restriction
                 successfulBoatClassName = null;
-                certificateHandles = search(/* issuingCountry */ null, /* yearOfIssuance */ null, /* referenceNumber */ null, yachtName, sailNumber, successfulBoatClassName, /* includeInvalid */ false);
+                certificateHandles = search(/* issuingCountry */ null, /* yearOfIssuance */ null, /* referenceNumber */ null, yachtName, sailNumber, successfulBoatClassName);
             } else {
                 logger.fine(()->"No current certificates found for boat class "+boatClass.getName()+
                         " but yacht name and sail number are not specified either; giving up.");

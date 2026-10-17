@@ -34,6 +34,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.sap.sailing.domain.base.impl.BoatClassImpl;
 import com.sap.sailing.domain.common.orc.ORCCertificate;
+import com.sap.sailing.domain.orc.ORCPublicCertificateDatabase.CertificateFamily;
 import com.sap.sailing.domain.orc.ORCPublicCertificateDatabase.CertificateHandle;
 import com.sap.sailing.domain.orc.impl.ORCPublicCertificateDatabaseImpl;
 import com.sap.sse.common.Util;
@@ -41,12 +42,21 @@ import com.sap.sse.common.Util;
 @ExtendWith(FailIfNoValidOrcCertificateRule.class)
 public class TestORCPublicCertificateDatabase {
     private static final Logger logger = Logger.getLogger(TestORCPublicCertificateDatabase.class.getName());
+    // A known reference number for the boat SOULMATE. The certificate is no longer active, so it can only be reached
+    // through the DownBoatRMS_byrefno endpoint (getCertificate / searchForUpdate), not through the active-certificate
+    // search. The former active-certificate search tests that used to key on this boat now live in
+    // TestORCActiveCertificateSearch against a currently active certificate.
+    private static final String SOULMATE_REF_NO = "FRA00013881";
+    private static final String SOULMATE_YACHT_NAME = "SOULMATE";
+    private static final String SOULMATE_BOAT_CLASS = "MOSQUITO 85";
+    private static final String SOULMATE_SAIL_NUMBER = "DEN-   13";
+    private static final double SOULMATE_GPH_SECONDS = 662.4;
 
     private ORCPublicCertificateDatabase db;
     private Map<String, Date> dateComparisonMap = new LinkedHashMap<String, Date>();
     private List<String> dateFailureCases = Arrays.asList("2019-02-21T10:44GMT+2","2019-02-21T10:38+0800","2019-02-21T10:38+08:00",
             "2019-02-21T10:38-08","2019-02-21T10:38Z","2019-02-21T10z","2019-02-21T10:38z");
-
+    
     @BeforeEach
     public void setUp() {
         db = new ORCPublicCertificateDatabaseImpl();
@@ -57,6 +67,7 @@ public class TestORCPublicCertificateDatabase {
         dateComparisonMap.put("2019-02-21T10:38:59Z", Date.from(ZonedDateTime.parse("2019-02-21T10:38:59Z").toInstant()));
         //                dateComparisonMap.put("2019-02-21T12:00:00.000GMT+2", Date.from(ZonedDateTime.of(2019, 2, 21, 10, 38, 59, 0, ZoneId.systemDefault()).toInstant()));
         //        //        dateComparisonMap.put("2019-02-21T15:00:00.000 GMT-2", Date.from(ZonedDateTime.of(2019, 2, 21, 10, 38, 59, 0, ZoneId.systemDefault()).toInstant()));
+        dateComparisonMap.put("2019-02-21T10:38:59Z", Date.from(ZonedDateTime.parse("2019-02-21T10:38:59Z").toInstant()));
         dateComparisonMap.put("2019-02-21T10:38:55.000-0800", 
                 Date.from(ZonedDateTime.parse("2019-02-21T10:38:55.000-0800", DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")).toInstant())
                 );
@@ -90,83 +101,28 @@ public class TestORCPublicCertificateDatabase {
                 );
     }
 
-    /**
-     * Picks a live reference number from the certificates probed by {@link FailIfNoValidOrcCertificateRule} and returns
-     * the corresponding {@link CertificateHandle}. Fails the test when no seed handle can be obtained, which would
-     * indicate a broken search rather than a legitimate empty result.
-     */
-    private CertificateHandle pickSeedHandle() throws Exception {
-        final Collection<ORCCertificate> probed = FailIfNoValidOrcCertificateRule.getAvailableCerts();
-        assertFalse(probed.isEmpty(), "No ORC certificates could be probed; cannot seed the search tests.");
-        final ORCCertificate seedCertificate = probed.iterator().next();
-        final CertificateHandle handle = db.getCertificateHandle(seedCertificate.getReferenceNumber());
-        assertNotNull(handle, "Unable to obtain a handle for seed reference number " + seedCertificate.getReferenceNumber());
-        return handle;
-    }
-
-    @FailIfNoValidOrcCertificates
     @Test
     public void testSimpleSearchByRefNo() throws Exception {
-        final String referenceNumber = pickSeedHandle().getReferenceNumber();
-        final Iterable<CertificateHandle> result = db.search(/* country */ null, /* yearOfIssuance */ null,
-                /* referenceNumber */ referenceNumber, /* yachtName */ null, /* sailNumber */ null,
-                /* boatClassName */ null, /* includeInvalid */ true);
-        assertEquals(1, Util.size(result));
-        assertEquals(referenceNumber, result.iterator().next().getReferenceNumber());
+        final ORCCertificate certificate = db.getCertificate(SOULMATE_REF_NO, CertificateFamily.ORC);
+        assertSoulmate(SOULMATE_REF_NO, certificate);
     }
 
-    @FailIfNoValidOrcCertificates
-    @Test
-    public void testSearchByYachtNameAndSailNumberAndYear() throws Exception {
-        final CertificateHandle seed = pickSeedHandle();
-        final Iterable<CertificateHandle> result = db.search(/* country */ null,
-                /* yearOfIssuance */ LocalDate.now().getYear(), /* referenceNumber */ null,
-                /* yachtName */ seed.getYachtName(), /* sailNumber */ seed.getSailNumber(), /* boatClassName */ null,
-                /* includeInvalid */ true);
-        boolean found = false;
-        for (final CertificateHandle handle : result) {
-            if (handle.getReferenceNumber().equals(seed.getReferenceNumber())) {
-                found = true;
-            }
-        }
-        assertTrue(found, "Search by yacht name and sail number did not return the seed certificate " + seed.getReferenceNumber());
-    }
-
-    @FailIfNoValidOrcCertificates
-    @Test
-    public void testSearchByYachtName() throws Exception {
-        final CertificateHandle seed = pickSeedHandle();
-        final Iterable<CertificateHandle> result = db.search(/* country */ null, /* yearOfIssuance */ null,
-                /* referenceNumber */ null, /* yachtName */ seed.getYachtName(), /* sailNumber */ null,
-                /* boatClassName */ null, /* includeInvalid */ true);
-        boolean found = false;
-        for (final CertificateHandle handle : result) {
-            if (handle.getReferenceNumber().equals(seed.getReferenceNumber())) {
-                found = true;
-            }
-        }
-        assertTrue(found, "Search by yacht name did not return the seed certificate " + seed.getReferenceNumber());
-    }
-
-    @FailIfNoValidOrcCertificates
     @Test
     public void testCertificateHandleAPI() throws Exception {
-        final String referenceNumber = pickSeedHandle().getReferenceNumber();
-        final CertificateHandle result = db.getCertificateHandle(referenceNumber);
-        assertEquals(referenceNumber, result.getReferenceNumber());
-        assertNotNull(result.getIssueDate());
+        final CertificateHandle handle = db.getCertificateHandle(SOULMATE_REF_NO);
+        assertSoulmate(SOULMATE_REF_NO, handle);
     }
 
-    @FailIfNoValidOrcCertificates
     @Test
     public void testCertificateUpdate() throws Exception {
-        final CertificateHandle oldHandle = pickSeedHandle();
-        final ORCCertificate result = db.searchForUpdate(oldHandle);
+        final ORCCertificate oldCertificate = db.getCertificate(SOULMATE_REF_NO, CertificateFamily.ORC);
+        assertSoulmate(SOULMATE_REF_NO, oldCertificate);
+        final ORCCertificate result = db.searchForUpdate(oldCertificate);
         if (result != null) {
-            assertEquals(oldHandle.getIssuingCountry(), result.getIssuingCountry());
-            assertEquals(oldHandle.getReferenceNumber(), result.getReferenceNumber());
+            assertEquals(oldCertificate.getIssuingCountry(), result.getIssuingCountry());
+            assertFalse(oldCertificate.getIssueDate().after(result.getIssueDate()));
         } else {
-            logger.warning("Couldn't find an update to certificate with reference number "+oldHandle.getReferenceNumber()+
+            logger.warning("Couldn't find an update to certificate with reference number "+SOULMATE_REF_NO+
                     " anymore. Consider updating this test case to using a different certificate that still has a valid update.");
         }
     }
@@ -178,23 +134,52 @@ public class TestORCPublicCertificateDatabase {
         // some certificates seem to be lacking a GPH value; can't use those for this test; we're explicitly excluding LITE certificates already...
         for (final ORCCertificate cert : certificates) {
             if (cert.getGPH() != null) {
-                final Iterable<CertificateHandle> certHandles = db.search(/* country */ cert.getIssuingCountry(),
-                        LocalDate.now().getYear(), /* referenceNumber */ null, cert.getBoatName(), cert.getSailNumber(),
-                        /*
-                         * boat class name; could be set to cert.getBoatClassName() but there are deviations in ORC DBs
-                         * and query API, so leaving null:
-                         */ null, /* includeInvalid */ false);
-                final Optional<CertificateHandle> certificateHandle = Optional
-                        .ofNullable(certHandles.iterator().hasNext() ? certHandles.iterator().next() : null);
+                Iterable<CertificateHandle> certHandles = db.search(/* country */ null, LocalDate.now().getYear(), /* referenceNumber */ null, cert.getBoatName(),
+                        cert.getSailNumber(), /*
+                                               * boat class name; could be set to cert.getBoatClassName() but there are
+                                               * deviations in ORC DBs and query API, so leaving null:
+                                               */ null);
+                if (Util.isEmpty(certHandles)) {
+                    // there were certs; get one from the previous year
+                    certHandles = db.search(null, LocalDate.now().getYear()-1, null, cert.getBoatName(),
+                            cert.getSailNumber(), /*
+                                                   * boat class name; could be set to cert.getBoatClassName() but there are
+                                                   * deviations in ORC DBs and query API, so leaving null:
+                                                   */ null);
+                }
+                if (Util.isEmpty(certHandles)) {
+                    // there were certs; try searching by reference number
+                    certHandles = db.search(null, LocalDate.now().getYear(), cert.getReferenceNumber(), /* boat name may have deviated due to special characters */ null,
+                            cert.getSailNumber(), /*
+                                                   * boat class name; could be set to cert.getBoatClassName() but there are
+                                                   * deviations in ORC DBs and query API, so leaving null:
+                                                   */ null);
+                }
+                if (Util.isEmpty(certHandles)) {
+                    // still nothing? Then try by reference number in previous year:
+                    certHandles = db.search(null, LocalDate.now().getYear()-1, cert.getReferenceNumber(), /* boat name may have deviated due to special characters */ null,
+                            cert.getSailNumber(), /*
+                                                   * boat class name; could be set to cert.getBoatClassName() but there are
+                                                   * deviations in ORC DBs and query API, so leaving null:
+                                                   */ null);
+                }
+                Optional<CertificateHandle> certificateHandle = Optional.ofNullable(certHandles.iterator().hasNext() ? certHandles.iterator().next() : null);
                 assertTrue(certificateHandle.isPresent(), "No certificate found for handle "+certificateHandle+
                                 " extracted from certificates "+certificates);
                 final String referenceNumber = certificateHandle.get().getReferenceNumber();
                 final CertificateHandle handle = db.getCertificateHandle(referenceNumber);
                 final ORCCertificate result = db.getCertificate(referenceNumber, handle.getFamily());
                 assertNotNull(result, "Unable to load certificate for reference number "+referenceNumber+" from handle "+certificateHandle);
-                // The activecerts search result handle carries no GPH; the GPH is only populated on the full certificate
-                // download, so assert against the downloaded certificate's GPH instead.
+                // The active-certificate search result handle carries no GPH; the GPH is only populated on the full
+                // certificate download, so assert that the downloaded certificate carries a GPH rather than comparing
+                // it to the handle's (absent) GPH.
                 assertNotNull(result.getGPH(), "No GPH on downloaded certificate "+referenceNumber);
+                // Use some tolerance as we found differences as much as 5s between the dxtDate in the handle coming from the search result
+                // and the IssueDate field in the JSON. Both suggest to report millisecond accuracy, but dxtDate always seems to have the
+                // milliseconds as "000" explaining many sub-second differences. But in some cases differences were significantly bigger.
+                assertEquals(handle.getIssueDate().asMillis(), result.getIssueDate().asMillis(), 10000.0, "Issue dates of certificate with reference number "+referenceNumber+
+                                " varies between current year result handle ("+handle.getIssueDate()+") and certificate ("+
+                                result.getIssueDate()+").");
                 assertEquals(handle.getSailNumber(), result.getSailNumber());
                 return;
             } else {
@@ -203,7 +188,7 @@ public class TestORCPublicCertificateDatabase {
         }
         fail("No certificate found with a valid GPH; that seems very suspicious and lets this test case fail.");
     }
-
+    
     @FailIfNoValidOrcCertificates
     @Test
     public void testParallelFuzzySearch() throws InterruptedException, ExecutionException {
@@ -219,7 +204,7 @@ public class TestORCPublicCertificateDatabase {
         }
         assertTrue(isYearFound);
     }
-
+    
     @Test
     public void testParseDateSuccessCases() {
         for (String date : dateComparisonMap.keySet()) {
@@ -227,7 +212,7 @@ public class TestORCPublicCertificateDatabase {
             assertEquals(convertedDate, dateComparisonMap.get(date));
         }
     }
-
+    
     @Test
     public void testShould() throws Exception {
         assertThrows(DateTimeParseException.class, ()->{
@@ -236,6 +221,26 @@ public class TestORCPublicCertificateDatabase {
                 Assertions.fail(dateString + " is parsable");
             }
         });
+    }
+
+    private void assertSoulmate(final String referenceNumber, final ORCCertificate certificate) {
+        assertNotNull(certificate, "Unable to load certificate with reference number " + referenceNumber);
+        assertEquals(referenceNumber, certificate.getReferenceNumber());
+        assertEquals(SOULMATE_YACHT_NAME, certificate.getBoatName());
+        assertEquals(SOULMATE_BOAT_CLASS, certificate.getBoatClassName());
+        assertEquals(SOULMATE_SAIL_NUMBER, certificate.getSailNumber());
+        assertEquals("FRA", certificate.getIssuingCountry().getThreeLetterIOCCode());
+        assertEquals(SOULMATE_GPH_SECONDS, certificate.getGPH().asSeconds(), 0.05);
+    }
+
+    private void assertSoulmate(final String referenceNumber, final CertificateHandle handle) {
+        assertNotNull(handle, "Unable to load certificate handle with reference number " + referenceNumber);
+        assertEquals(referenceNumber, handle.getReferenceNumber());
+        assertEquals(SOULMATE_YACHT_NAME, handle.getYachtName());
+        assertEquals(SOULMATE_BOAT_CLASS, handle.getBoatClassName());
+        assertEquals(SOULMATE_SAIL_NUMBER, handle.getSailNumber());
+        assertEquals("FRA", handle.getIssuingCountry().getThreeLetterIOCCode());
+        assertEquals(SOULMATE_GPH_SECONDS, handle.getGPH(), 0.05);
     }
 
     private boolean assertFoundYear(final Set<ORCCertificate> certificates, int year) {
