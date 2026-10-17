@@ -62,13 +62,36 @@ import com.sap.sse.util.LaxRedirectStrategyForAllRedirectResponseCodes;
  * <p>
  * The following endpoints are used:
  * <ul>
- * <li>{@code activecerts} for {@link #search(CountryCode, Integer, String, String, String, String, boolean) searching}
+ * <li>{@code activecerts} for {@link #search(CountryCode, Integer, String, String, String, String) searching}
  * certificate handles by optional, AND-combined criteria (country, VPP year, reference number, yacht name, sail number,
  * boat class name). With no criteria it returns every active certificate.</li>
  * <li>{@code RMS} for the per-country/family {@link #getCountriesWithValidCertificates() overview} including the
  * certificate counts and VPP years.</li>
  * <li>{@code DownBoatRMS_byrefno} for downloading a single full {@link ORCCertificate} by its reference number.</li>
  * </ul>
+ * <p>
+ * Note that {@code activecerts} returns <em>active</em> certificates only, so {@link #search} never surfaces an
+ * inactive, expired or superseded certificate. The only way this adapter reaches an inactive certificate is to download
+ * it by reference number via {@code DownBoatRMS_byrefno} (which serves a certificate whether or not it is still active),
+ * i.e. the reference number must already be known.
+ * <p>
+ * Should a future requirement call for <em>discovering</em> inactive certificates by boat identity (name/sail/class)
+ * rather than by a known reference number, the ORC API offers a two-hop path that is <em>not</em> wired into this
+ * adapter today:
+ * <ol>
+ * <li>{@code country-fleet} (scoped by {@code CountryId}, optionally fleet/class) lists one row per boat using its
+ * newest certificate <em>whether active or not</em>, and so can surface boats whose latest certificate is inactive. Its
+ * rows carry summary/identity fields only ({@code CountryId}, {@code dxtName}, {@code YachtName}, {@code SailNo},
+ * {@code VPPYear}, {@code Class}, {@code Designer}, {@code Builder}); in particular they carry <em>no</em>
+ * {@code RefNo} and no GPH/rating payload. The per-certificate key they do carry is {@code dxtName} (the certificate
+ * file name).</li>
+ * <li>{@code DownBoatRMS} (not {@code DownBoatRMS_byrefno}) accepts a {@code dxtName} (among other LIKE criteria) and
+ * returns the full certificate, including {@code RefNo} and GPH, whether active or not. Because {@code country-fleet}
+ * yields no {@code RefNo}, the {@code DownBoatRMS_byrefno} path cannot be reached from a {@code country-fleet} row; the
+ * bridge is {@code dxtName}, resolved through {@code DownBoatRMS}.</li>
+ * </ol>
+ * Wiring this up would additionally require a handle representation keyed on {@code dxtName} rather than
+ * {@code RefNo}, since the current handle-to-certificate resolution is {@code RefNo}-keyed.
  */
 public class ORCPublicCertificateDatabaseImpl implements ORCPublicCertificateDatabase {
     private static final Logger logger = Logger.getLogger(ORCPublicCertificateDatabaseImpl.class.getName());
