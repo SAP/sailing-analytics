@@ -1,7 +1,6 @@
 package com.sap.sailing.domain.orc;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Date;
@@ -11,11 +10,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.DOMException;
-import org.xml.sax.SAXException;
-
 import com.sap.sailing.domain.base.BoatClass;
 import com.sap.sailing.domain.common.orc.ORCCertificate;
 import com.sap.sailing.domain.orc.impl.ORCPublicCertificateDatabaseImpl;
@@ -24,80 +18,22 @@ import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 
 /**
- * An interface to {@code data.orc.org}, mostly the search functionality at
- * {@code https://data.orc.org/public/WPub.dll?action=SrchCert&xslp=scert.php}. It can search for certificates by a
- * number of criteria, among them the issuing country, sail number, ORC reference number, or boat name. Those search
- * results are represented as {@link CertificateHandle} objects. Such handles can also be obtained for certificates that
- * are not currently valid. See the {@code includeInvalid} parameter of the
- * {@link #search(CountryCode, Integer, String, String, String, String, boolean)} method. However, handles for
- * {@link CertificateHandle#isValid() invalid} certificates cannot be resolved into {@link ORCCertificate} objects
- * through {@link #getCertificates(Iterable)} or {@link #getCertificates(CertificateHandle...)} because the database
- * returns full certificates only if they are valid.
+ * An interface to the ORC public certificate database at {@code https://sas.orc.org} through its key-based JSON API
+ * (see {@code https://sas.orc.org/api-docs.php}). It can search for certificates by a number of criteria, among them
+ * the issuing country, sail number, ORC reference number, or boat name. Those search results are represented as
+ * {@link CertificateHandle} objects, obtained from the {@code activecerts} endpoint through the
+ * {@link #search(CountryCode, Integer, String, String, String, String, boolean)} method. The {@code includeInvalid}
+ * parameter is retained for API compatibility; the {@code activecerts} endpoint returns active (valid) certificates
+ * only, so every handle returned is {@link CertificateHandle#isValid() valid} and resolvable into a full
+ * {@link ORCCertificate} via {@link #getCertificate(String, CertificateFamily)} (which uses the
+ * {@code DownBoatRMS_byrefno} endpoint) or {@link #getCertificates(Iterable)}.
  * <p>
- * 
- * As the web site emits XML documents as search results, those can be parsed and turned into handles to certificates.
- * An example output (excerpt):
- * 
- * <pre>
-&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;?xml-stylesheet type="text/xsl" href="public.php?content=ListCert.php" ?&gt;
-&lt;ROOT&gt;
-  &lt;DATA&gt;
-    &lt;ROW RowNum="1"&gt;
-      &lt;CountryId&gt;GRE&lt;/CountryId&gt;
-      &lt;SSSID&gt;61576&lt;/SSSID&gt;
-      &lt;DatInGID&gt;{8C8F3E75-4926-4A30-B0C8-08D36774B1F4}&lt;/DatInGID&gt;
-      &lt;dxtID&gt;4793&lt;/dxtID&gt;
-      &lt;RefNo&gt;GRE00000701&lt;/RefNo&gt;
-      &lt;dxtName&gt;GR1329.dxt&lt;/dxtName&gt;
-      &lt;YachtName&gt;*AXION ESTI&lt;/YachtName&gt;
-      &lt;SailNo&gt;GRE-1329&lt;/SailNo&gt;
-      &lt;Class&gt;SUN ODYSSEY 32&lt;/Class&gt;
-      &lt;Designer&gt;&lt;/Designer&gt;
-      &lt;Builder&gt;JEANNEAU&lt;/Builder&gt;
-      &lt;dxtDate&gt;2009-05-12T23:09:58.000&lt;/dxtDate&gt;
-      &lt;CertType&gt;3&lt;/CertType&gt;
-      &lt;VPPVer&gt;&lt;/VPPVer&gt;
-      &lt;VPPYear&gt;2009&lt;/VPPYear&gt;
-      &lt;IsOd&gt;False&lt;/IsOd&gt;
-      &lt;GPH&gt;786.1&lt;/GPH&gt;
-      &lt;Age&gt;1993&lt;/Age&gt;
-      &lt;Override&gt;&lt;/Override&gt;
-      &lt;Provisional&gt;False&lt;/Provisional&gt;
-      &lt;Selected&gt;False&lt;/Selected&gt;
-      &lt;CanSelect&gt;False&lt;/CanSelect&gt;
-    &lt;/ROW&gt;
-    &lt;ROW RowNum="2"&gt;
-      &lt;CountryId&gt;GRE&lt;/CountryId&gt;
-      &lt;SSSID&gt;15709&lt;/SSSID&gt;
-      &lt;DatInGID&gt;{C790AAFA-9861-435B-BEBE-0606BAFE2721}&lt;/DatInGID&gt;
-      &lt;dxtID&gt;&lt;/dxtID&gt;
-      &lt;RefNo&gt;&lt;/RefNo&gt;
-      &lt;dxtName&gt;GR1329.dat&lt;/dxtName&gt;
-      &lt;YachtName&gt;*AXION ESTI&lt;/YachtName&gt;
-      &lt;SailNo&gt;GRE-1329&lt;/SailNo&gt;
-      &lt;Class&gt;SUN ODYSSEY 32&lt;/Class&gt;
-      &lt;Designer&gt;&lt;/Designer&gt;
-      &lt;Builder&gt;JEANNEAU&lt;/Builder&gt;
-      &lt;dxtDate&gt;2008-09-18T15:29:36.000&lt;/dxtDate&gt;
-      &lt;CertType&gt;0&lt;/CertType&gt;
-      &lt;VPPVer&gt;&lt;/VPPVer&gt;
-      &lt;VPPYear&gt;2008&lt;/VPPYear&gt;
-      &lt;IsOd&gt;False&lt;/IsOd&gt;
-      &lt;GPH&gt;&lt;/GPH&gt;
-      &lt;Age&gt;1998&lt;/Age&gt;
-      &lt;Override&gt;&lt;/Override&gt;
-      &lt;Provisional&gt;False&lt;/Provisional&gt;
-      &lt;Selected&gt;False&lt;/Selected&gt;
-      &lt;CanSelect&gt;False&lt;/CanSelect&gt;
-    &lt;/ROW&gt;
-  &lt;/ROOT&gt;
-&lt;/DATA&gt;
- * </pre>
- * 
- * This also shows that some query results do not provide a valid link to a downloadable copy of the certificate. Those
- * are automatically removed from the results here.
- * 
+ * The per-country/family overview including the certificate counts and VPP years is obtained from the {@code RMS}
+ * endpoint through {@link #getCountriesWithValidCertificates()}.
+ * <p>
+ * The API key is read from the {@code ORC_API_KEY} environment variable and placed into the request path
+ * ({@code https://sas.orc.org/api/{key}/<endpoint>}); it is never logged.
+ *
  * @author Axel Uhl (D043530)
  *
  */
@@ -137,25 +73,16 @@ public interface ORCPublicCertificateDatabase {
     }
     
     /**
-     * Data about valid certificates in a country, as obtained, e.g., from http://data.orc.org/public/WPub.dll/RMS. Such
-     * a record, in its original XML representation, looks like this:
-     * 
-     * <pre>
-      &lt;CountryId&gt;AUS&lt;/CountryId&gt;
-      &lt;Family&gt;&lt;/Family&gt;
-      &lt;CertType&gt;3&lt;/CertType&gt;
-      &lt;VPPYear&gt;2020&lt;/VPPYear&gt;
-      &lt;CertCount&gt;161&lt;/CertCount&gt;
-      &lt;CountryName&gt;Australia&lt;/CountryName&gt;
-      &lt;LastUpdate&gt;2021-01-08T08:12:57.000Z&lt;/LastUpdate&gt;
-      &lt;CertName&gt;Club&lt;/CertName&gt;
-      &lt;RMSCode&gt;CLUB&lt;/RMSCode&gt;
-     * </pre>
-     * 
+     * Data about valid certificates in a country, as obtained from the {@code RMS} endpoint
+     * ({@code https://sas.orc.org/api/{key}/RMS}). Such a record, as one object in the returned {@code data.rows}
+     * array, carries the fields {@code CountryId}, {@code Family} (numeric, 1-6), {@code CertType},
+     * {@code VPPYear}, {@code CertCount}, {@code CountryName}, {@code LastUpdate} (ISO), {@code CertName} and
+     * {@code RMSCode}.
+     * <p>
+     * Note: Family 6 (ORC Light) certificates generally lack GPH and Performance Curve data required for PCS
+     * calculations.
+     *
      * Mappings of family and type work as follows:
-     * 
-     * Used for parsing the ORC public API (WPub.dll) RMS/JSON outputs. Note: Family 6 (ORC Light) certificates
-     * generally lack GPH and Performance Curve data required for PCS calculations.
      *
      * <table border="1">
      * <caption>ORC Family and Certificate Type Codes</caption>
@@ -348,6 +275,5 @@ public interface ORCPublicCertificateDatabase {
     
     Date parseDate(final String dateString) throws DateTimeParseException;
 
-    Iterable<CountryOverview> getCountriesWithValidCertificates()
-            throws SAXException, IOException, ParserConfigurationException, DOMException, ParseException;
+    Iterable<CountryOverview> getCountriesWithValidCertificates() throws IOException;
 }
