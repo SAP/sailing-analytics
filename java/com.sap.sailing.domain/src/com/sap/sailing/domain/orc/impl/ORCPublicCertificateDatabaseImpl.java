@@ -357,6 +357,27 @@ public class ORCPublicCertificateDatabaseImpl implements ORCPublicCertificateDat
     }
 
     /**
+     * Opens an authenticated HTTP GET stream to the per-country bulk certificate JSON action
+     * {@code ?action=DownRMS&CountryId=<CC>&ext=json}, built from this class's own endpoint constants so that no caller
+     * has to restate the ORC {@code WPub.dll} host, path or query shape. The returned raw stream still carries the
+     * byte-order mark the ORC responses are prefixed with; callers are expected to feed it to
+     * {@link ORCCertificatesJsonImporter#read(InputStream)}, which strips the BOM via
+     * {@link AbstractORCCertificatesImporter#getReaderForInputStream(InputStream)}. The {@code .impl} package is
+     * exported with an {@code x-friends} restriction, so this method is reachable only from the declared friend bundles
+     * such as {@code com.sap.sailing.domain.test}.
+     */
+    public InputStream openBulkCertificatesJsonStream(final CountryCode country) throws IOException {
+        final String url = BULK_CERTIFICATES_DOWNLOAD_URL + "&" + COUNTRY_ID_KEY + "=" + country.getThreeLetterIOCCode()
+                + "&" + EXT_JSON;
+        final HttpClient client = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategyForAllRedirectResponseCodes()).build();
+        final HttpGet getRequest = new HttpGet(url);
+        addAuthorizationHeader(getRequest);
+        logger.fine(()->"Opening ORC bulk certificate JSON stream from "+url);
+        final InputStream content = client.execute(getRequest).getEntity().getContent();
+        return content;
+    }
+
+    /**
      * Maps one {@code rms} row of the ORC {@code WPub.dll} JSON response to a {@link CertificateHandle}. The JSON keys
      * differ from the historic XML element names: {@code NatAuth} carries the IOC country code (formerly
      * {@code CountryId}), {@code BIN} serves as the {@link CertificateHandle#getFileId() file id} (formerly
