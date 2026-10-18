@@ -288,6 +288,8 @@ public class TestStoringAndLoadingEventsAndRegattas extends AbstractMongoDBTest 
         image1.addTag("Tag1");
         image1.addTag("Tag2");
         image1.addTag("Tag3");
+        image1.setMissing(true);
+        image1.setMissingMailNotificationSent(true);
         event.addImage(image1);
 
         ImageDescriptor image2 = new ImageDescriptorImpl(new URL("http://some.host/with/some/file2.jpg"), MillisecondsTimePoint.now());
@@ -310,6 +312,8 @@ public class TestStoringAndLoadingEventsAndRegattas extends AbstractMongoDBTest 
         assertEquals(imageWidth, loadedImage1.getWidthInPx());
         assertEquals(imageHeight, loadedImage1.getHeightInPx());
         assertEquals(3, Util.size(loadedImage1.getTags()));
+        assertTrue(loadedImage1.isMissing());
+        assertTrue(loadedImage1.isMissingMailNotificationSent());
     }
 
     @Test
@@ -343,6 +347,8 @@ public class TestStoringAndLoadingEventsAndRegattas extends AbstractMongoDBTest 
         video1.addTag("Tag1");
         video1.addTag("Tag2");
         video1.addTag("Tag3");
+        video1.setMissing(true);
+        video1.setMissingMailNotificationSent(true);
         event.addVideo(video1);
 
         VideoDescriptor video2 = new VideoDescriptorImpl(new URL("http://some.host/with/some/file2.ogg"), MimeType.ogg, MillisecondsTimePoint.now());
@@ -365,6 +371,8 @@ public class TestStoringAndLoadingEventsAndRegattas extends AbstractMongoDBTest 
         assertEquals(videoSubtitle, loadedVideo1.getSubtitle());
         assertEquals(createdAt, loadedVideo1.getCreatedAtDate());
         assertEquals(3, Util.size(loadedVideo1.getTags()));
+        assertTrue(loadedVideo1.isMissing());
+        assertTrue(loadedVideo1.isMissingMailNotificationSent());
     }
 
     @Test

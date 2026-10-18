@@ -39,7 +39,7 @@ public abstract class StageTeaser extends Composite implements LazyLoadable {
 
     @Override
     public void doInitializeLazyComponents() {
-        final String stageImageUrl = event.getThumbnailImageURL() != null ? event.getThumbnailImageURL() : 
+        final String stageImageUrl = event.getThumbnailImageURL() != null ? event.getThumbnailImageURL() :
                 SharedHomeResources.INSTANCE.defaultStageEventTeaserImage().getSafeUri().asString();
         final String backgroundImage = "url(" + stageImageUrl + ")";
         teaserImage.getStyle().setBackgroundImage(backgroundImage);
