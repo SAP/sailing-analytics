@@ -376,6 +376,7 @@ import com.sap.sse.security.shared.impl.UserGroup;
 import com.sap.sse.security.util.RemoteServerUtil;
 import com.sap.sse.shared.classloading.ClassLoaderRegistry;
 import com.sap.sse.shared.media.ImageDescriptor;
+import com.sap.sse.shared.media.MediaDescriptor;
 import com.sap.sse.shared.media.VideoDescriptor;
 import com.sap.sse.util.ClearStateTestSupport;
 import com.sap.sse.util.HttpUrlConnectionHelper;
@@ -4085,6 +4086,37 @@ Replicator {
         // TODO consider use diffutils to compute diff between old and new leaderboard groups list and apply the patch
         // to keep changes minimial
         mongoObjectFactory.storeEvent(event);
+    }
+    
+    private <MD extends MediaDescriptor >void updateEventMediaHealth(UUID eventId, String mediaUrl, boolean missing, boolean missingMailNotificationSent, Function<Event, Iterable<MD>> mediaProvider) {
+        final Event event = eventsById.get(eventId);
+        if (event == null) {
+            throw new IllegalArgumentException("Sailing event with ID " + eventId + " does not exist.");
+        }
+        boolean mediumFound = false;
+        for (final MediaDescriptor medium : mediaProvider.apply(event)) {
+            if (medium.getURL() != null && mediaUrl.equals(medium.getURL().toString())) {
+                medium.setMissing(missing);
+                medium.setMissingMailNotificationSent(missingMailNotificationSent);
+                mediumFound = true;
+            }
+        }
+        if (mediumFound) {
+            mongoObjectFactory.storeEvent(event);
+        } else {
+            logger.warning("Could not update media health for URL " + mediaUrl + " because it is not attached to event "
+                    + event.getName());
+        }
+    }
+
+    @Override
+    public void updateEventImageHealth(UUID eventId, String imageUrl, boolean missing, boolean missingMailNotificationSent) {
+        updateEventMediaHealth(eventId, imageUrl, missing, missingMailNotificationSent, Event::getImages);
+    }
+
+    @Override
+    public void updateEventVideoHealth(UUID eventId, String videoUrl, boolean missing, boolean missingMailNotificationSent) {
+        updateEventMediaHealth(eventId, videoUrl, missing, missingMailNotificationSent, Event::getVideos);
     }
 
     @Override
