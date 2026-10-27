@@ -1,10 +1,13 @@
 package com.sap.sailing.domain.orc.impl;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -12,7 +15,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,24 +32,15 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.http.HttpMessage;
+import org.apache.commons.io.ByteOrderMark;
+import org.apache.commons.io.input.BOMInputStream;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicNameValuePair;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import com.sap.sailing.domain.base.BoatClass;
 import com.sap.sailing.domain.common.BoatClassMasterdata;
@@ -59,34 +52,79 @@ import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.util.LaxRedirectStrategyForAllRedirectResponseCodes;
-import com.sap.sse.util.XmlUtil;
 
+/**
+ * Accesses the ORC public certificate database through the key-based JSON API at
+ * {@code https://sas.orc.org/api/{key}/<endpoint>} (see {@code https://sas.orc.org/api-docs.php}). The API key is
+ * read from the {@value #API_KEY_ENV_VARIABLE_NAME} environment variable and is placed into the request path; it is
+ * never logged. If the environment variable is not set, the request methods throw an {@link IOException} so that
+ * misconfiguration surfaces as a failure rather than a silent skip.
+ * <p>
+ * The following endpoints are used:
+ * <ul>
+ * <li>{@code activecerts} for {@link #search(CountryCode, Integer, String, String, String, String) searching}
+ * certificate handles by optional, AND-combined criteria (country, VPP year, reference number, yacht name, sail number,
+ * boat class name). With no criteria it returns every active certificate.</li>
+ * <li>{@code RMS} for the per-country/family {@link #getCountriesWithValidCertificates() overview} including the
+ * certificate counts and VPP years.</li>
+ * <li>{@code DownBoatRMS_byrefno} for downloading a single full {@link ORCCertificate} by its reference number.</li>
+ * </ul>
+ * <p>
+ * Note that {@code activecerts} returns <em>active</em> certificates only, so {@link #search} never surfaces an
+ * inactive, expired or superseded certificate. The only way this adapter reaches an inactive certificate is to download
+ * it by reference number via {@code DownBoatRMS_byrefno} (which serves a certificate whether or not it is still active),
+ * i.e. the reference number must already be known.
+ * <p>
+ * Should a future requirement call for <em>discovering</em> inactive certificates by boat identity (name/sail/class)
+ * rather than by a known reference number, the ORC API offers a two-hop path that is <em>not</em> wired into this
+ * adapter today:
+ * <ol>
+ * <li>{@code country-fleet} (scoped by {@code CountryId}, optionally fleet/class) lists one row per boat using its
+ * newest certificate <em>whether active or not</em>, and so can surface boats whose latest certificate is inactive. Its
+ * rows carry summary/identity fields only ({@code CountryId}, {@code dxtName}, {@code YachtName}, {@code SailNo},
+ * {@code VPPYear}, {@code Class}, {@code Designer}, {@code Builder}); in particular they carry <em>no</em>
+ * {@code RefNo} and no GPH/rating payload. The per-certificate key they do carry is {@code dxtName} (the certificate
+ * file name).</li>
+ * <li>{@code DownBoatRMS} (not {@code DownBoatRMS_byrefno}) accepts a {@code dxtName} (among other LIKE criteria) and
+ * returns the full certificate, including {@code RefNo} and GPH, whether active or not. Because {@code country-fleet}
+ * yields no {@code RefNo}, the {@code DownBoatRMS_byrefno} path cannot be reached from a {@code country-fleet} row; the
+ * bridge is {@code dxtName}, resolved through {@code DownBoatRMS}.</li>
+ * </ol>
+ * Wiring this up would additionally require a handle representation keyed on {@code dxtName} rather than
+ * {@code RefNo}, since the current handle-to-certificate resolution is {@code RefNo}-keyed.
+ */
 public class ORCPublicCertificateDatabaseImpl implements ORCPublicCertificateDatabase {
     private static final Logger logger = Logger.getLogger(ORCPublicCertificateDatabaseImpl.class.getName());
-    private static final String USER_NAME = "Sailing_Analytics@sap.com";
-    private static final String CREDENTIALS = "QUdIVUJU";
-    
-    private static final String ACTION_PARAM_NAME = "action";
-    private static final String ACTION_PARAM_VALUE_LIST_CERT = "ListCert";
-    private static final String XSLP_PARAM_NAME = "xslp";
-    private static final String XSLP_PARAM_VALUE_LIST_CERT = "ListCert.php";
-    private static final String COUNTRY_PARAM_NAME = "CountryId";
-    private static final String VPP_YEAR_PARAM_NAME = "VPPYear";
-    private static final String REF_NO_PARAM_NAME = "RefNo";
-    private static final String YACHT_NAME_PARAM_NAME = "YachtName";
-    private static final String SAIL_NUMBER_PARAM_NAME = "SailNo";
-    private static final String BOAT_CLASS_PARAM_NAME = "Class";
-    
-    private static final NameValuePair ACTION_PARAM = new BasicNameValuePair(ACTION_PARAM_NAME, ACTION_PARAM_VALUE_LIST_CERT);
-    private static final NameValuePair XSLP_PARAM = new BasicNameValuePair(XSLP_PARAM_NAME, XSLP_PARAM_VALUE_LIST_CERT);
-    private static final String SEARCH_URL = "http://data.orc.org/public/WPub.dll";
-    private static final String COUNTRY_OVERVIEW_URL = SEARCH_URL+"/RMS";
-    private static final String SINGLE_CERTIFICATE_DOWNLOAD_URL = SEARCH_URL+"?action=DownBoatRMS";
-    // For possible future use: to download all certificates of, e.g., a country in one go, use the following action:
-    // private static final String MANY_CERTIFICATES_DOWNLOAD_URL = SEARCH_URL+"?action=DownRMS";
-    private static final String ROOT_ELEMENT = "ROOT";
-    private static final String DATA_ELEMENT = "DATA";
-    private static final String ROW_ELEMENT = "ROW";
+
+    private static final String API_KEY_ENV_VARIABLE_NAME = "ORC_API_KEY";
+    private static final String API_BASE_URL = "https://sas.orc.org/api/";
+
+    private static final String ENDPOINT_ACTIVECERTS = "activecerts";
+    private static final String ENDPOINT_RMS = "RMS";
+    private static final String ENDPOINT_DOWNBOATRMS_BYREFNO = "DownBoatRMS_byrefno";
+    private static final String ENDPOINT_DOWNRMS = "DownRMS";
+    private static final String EXT_JSON = "ext=json";
+
+    private static final String DATA_KEY = "data";
+    private static final String ROWS_KEY = "rows";
+    private static final String ERRORS_KEY = "errors";
+
+    private static final String KEY_COUNTRY_ID = "CountryId";
+    private static final String KEY_REF_NO = "RefNo";
+    private static final String KEY_DXT_DATE = "dxtDate";
+    private static final String KEY_DXT_NAME = "dxtName";
+    private static final String KEY_YACHT_NAME = "YachtName";
+    private static final String KEY_SAIL_NO = "SailNo";
+    private static final String KEY_CLASS = "Class";
+    private static final String KEY_FAMILY = "Family";
+    private static final String KEY_CERT_TYPE = "CertType";
+    private static final String KEY_IS_OD = "IsOd";
+    private static final String KEY_VPP_YEAR = "VPPYear";
+    private static final String KEY_CERT_COUNT = "CertCount";
+    private static final String KEY_LAST_UPDATE = "LastUpdate";
+    private static final String KEY_CERT_NAME = "CertName";
+    private static final String KEY_RMS_CODE = "RMSCode";
+
     private static final String DXT_SUFFIX = ".dxt";
 
     private static final DateTimeFormatter[] DATE_FORMATTERS = 
@@ -335,225 +373,287 @@ public class ORCPublicCertificateDatabaseImpl implements ORCPublicCertificateDat
                     ", isValid=" + isValid + "]";
         }
     }
-    
+
     @Override
-    public Iterable<CertificateHandle> search(CountryCode issuingCountry, Integer yearOfIssuance, String referenceNumber,
-            String yachtName, String sailNumber, String boatClassName, boolean includeInvalid) throws Exception {
-        final Set<ORCPublicCertificateDatabase.CertificateHandle> result = new HashSet<>(); 
-        final HttpClient client = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategyForAllRedirectResponseCodes()).build();
-        final List<NameValuePair> params = new ArrayList<>();
-        params.add(ACTION_PARAM);
-        params.add(XSLP_PARAM);
-        params.add(new BasicNameValuePair(COUNTRY_PARAM_NAME, issuingCountry==null?"*":issuingCountry.getThreeLetterIOCCode()));
-        params.add(new BasicNameValuePair(VPP_YEAR_PARAM_NAME, yearOfIssuance==null?"0":yearOfIssuance.toString()));
-        if (referenceNumber != null) {
-            params.add(new BasicNameValuePair(REF_NO_PARAM_NAME, referenceNumber));
+    public Iterable<CertificateHandle> search(final CountryCode issuingCountry, final Integer yearOfIssuance,
+            final String referenceNumber, final String yachtName, final String sailNumber, final String boatClassName)
+            throws IOException {
+        final Set<CertificateHandle> result = new HashSet<>();
+        final List<String> queryParts = new ArrayList<>();
+        if (referenceNumber != null && !referenceNumber.trim().isEmpty()) {
+            queryParts.add(KEY_REF_NO + "=" + encode(referenceNumber.trim()));
+        }
+        if (issuingCountry != null) {
+            queryParts.add(KEY_COUNTRY_ID + "=" + encode(issuingCountry.getThreeLetterIOCCode()));
+        }
+        if (yearOfIssuance != null) {
+            queryParts.add(KEY_VPP_YEAR + "=" + yearOfIssuance);
         }
         if (yachtName != null) {
-            params.add(new BasicNameValuePair(YACHT_NAME_PARAM_NAME, yachtName));
+            queryParts.add(KEY_YACHT_NAME + "=" + encode(yachtName));
         }
         if (sailNumber != null) {
-            params.add(new BasicNameValuePair(SAIL_NUMBER_PARAM_NAME, sailNumber));
+            queryParts.add(KEY_SAIL_NO + "=" + encode(sailNumber));
         }
         if (boatClassName != null) {
-            params.add(new BasicNameValuePair(BOAT_CLASS_PARAM_NAME, boatClassName));
+            queryParts.add(KEY_CLASS + "=" + encode(boatClassName));
         }
-        final UrlEncodedFormEntity parametersEntity = new UrlEncodedFormEntity(params);
-        final HttpPost postRequest = new HttpPost(SEARCH_URL);
-        postRequest.setEntity(parametersEntity);
-        addAuthorizationHeader(postRequest);
-        logger.fine(()->"Searching for "+params+"...");
-        final HttpResponse processorResponse = client.execute(postRequest);
-        final InputStream content = processorResponse.getEntity().getContent();
-        final DocumentBuilder builder = XmlUtil.getSecureDocumentBuilderFactory().newDocumentBuilder();
-        final Document document = builder.parse(content);
-        final NodeList dataNodes = document.getElementsByTagName(ROOT_ELEMENT).item(0).getChildNodes();
-        for (int dataNodeIndex=0; dataNodeIndex<dataNodes.getLength(); dataNodeIndex++) {
-            final Node dataNode = dataNodes.item(dataNodeIndex);
-            if (dataNode.getNodeName().equals(DATA_ELEMENT)) {
-                final NodeList rowNodes = dataNode.getChildNodes();
-                for (int rowNodeIndex=0; rowNodeIndex<rowNodes.getLength(); rowNodeIndex++) {
-                    final Node rowNode = rowNodes.item(rowNodeIndex);
-                    if (rowNode.getNodeName().equals(ROW_ELEMENT)) {
-                        final CertificateHandle certificateHandle = parseHandle(rowNode);
-                        // certificates can only be obtained if they are currently valid, so ignore expired ones
-                        if (includeInvalid || certificateHandle.isValid()) {
-                            result.add(certificateHandle);
-                        }
-                    }
-                }
-            }
+        final String query = queryParts.isEmpty() ? null : String.join("&", queryParts);
+        final JSONObject root = httpGetJson(endpointUrl(requireApiKey(), ENDPOINT_ACTIVECERTS, query));
+        for (final JSONObject row : dataRows(root)) {
+            result.add(parseHandleFromActiveCertRow(row));
         }
-        logger.fine(()->"Search for "+params+" returned "+result.size()+" results");
+        logger.fine(() -> "Search on " + ENDPOINT_ACTIVECERTS + " with query " + query + " returned " + result.size()
+                + " results");
         return result;
     }
 
     @Override
-    public Iterable<CountryOverview> getCountriesWithValidCertificates()
-            throws SAXException, IOException, ParserConfigurationException, DOMException, ParseException {
-        final Set<ORCPublicCertificateDatabase.CountryOverview> result = new HashSet<>();
-        final HttpClient client = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategyForAllRedirectResponseCodes()).build();
-        final List<NameValuePair> params = new ArrayList<>();
-        final HttpGet getRequest = new HttpGet(COUNTRY_OVERVIEW_URL);
-        addAuthorizationHeader(getRequest);
-        logger.fine(()->"Searching for "+params+"...");
-        final HttpResponse processorResponse = client.execute(getRequest);
-        final InputStream content = processorResponse.getEntity().getContent();
-        final DocumentBuilder builder = XmlUtil.getSecureDocumentBuilderFactory().newDocumentBuilder();
-        final Document document = builder.parse(content);
-        final NodeList dataNodes = document.getElementsByTagName(ROOT_ELEMENT).item(0).getChildNodes();
-        for (int dataNodeIndex=0; dataNodeIndex<dataNodes.getLength(); dataNodeIndex++) {
-            final Node dataNode = dataNodes.item(dataNodeIndex);
-            if (dataNode.getNodeName().equals(DATA_ELEMENT)) {
-                final NodeList rowNodes = dataNode.getChildNodes();
-                for (int rowNodeIndex=0; rowNodeIndex<rowNodes.getLength(); rowNodeIndex++) {
-                    final Node rowNode = rowNodes.item(rowNodeIndex);
-                    if (rowNode.getNodeName().equals(ROW_ELEMENT)) {
-                        final CountryOverview countryOverview = parseCountryOverview(rowNode);
-                        if (countryOverview.getVPPYear() != null) {
-                            result.add(countryOverview);
-                        }
+    public Iterable<CountryOverview> getCountriesWithValidCertificates() throws IOException {
+        final Set<CountryOverview> result = new HashSet<>();
+        final JSONObject root = httpGetJson(endpointUrl(requireApiKey(), ENDPOINT_RMS, null));
+        for (final JSONObject row : dataRows(root)) {
+            final CountryOverview countryOverview = parseCountryOverviewFromRmsRow(row);
+            if (countryOverview.getVPPYear() != null) {
+                result.add(countryOverview);
+            }
+        }
+        logger.fine(() -> "Overview on " + ENDPOINT_RMS + " returned " + result.size() + " results");
+        return result;
+    }
+
+    @Override
+    public ORCCertificate getCertificate(final String referenceNumber, final CertificateFamily family)
+            throws IOException {
+        logger.fine("Obtaining certificate for reference number " + referenceNumber);
+        ORCCertificate result;
+        try {
+            result = getSingleCertificate(ENDPOINT_DOWNBOATRMS_BYREFNO,
+                    KEY_REF_NO + "=" + encode(referenceNumber) + "&" + EXT_JSON);
+        } catch (final Exception e) {
+            logger.log(Level.WARNING, "Error trying to find ORC certificate with reference number " + referenceNumber,
+                    e);
+            result = null;
+        }
+        if (result == null) {
+            logger.info("Couldn't find ORC certificate with reference number " + referenceNumber);
+        }
+        return result;
+    }
+
+    /**
+     * Resolves a certificate handle directly from its reference number through the {@code DownBoatRMS_byrefno} download
+     * endpoint rather than through the active-certificate {@link #search(CountryCode, Integer, String, String, String,
+     * String, boolean) search}. The {@code activecerts} search only ever returns currently active certificates, whereas
+     * this endpoint also serves inactive/expired certificates, so this override preserves the pre-key-API behavior that
+     * a handle could be obtained for any certificate addressable by its reference number. Returns {@code null} if no
+     * certificate exists for the given reference number.
+     */
+    @Override
+    public CertificateHandle getCertificateHandle(final String referenceNumber) throws IOException {
+        final ORCCertificate certificate = getCertificate(referenceNumber, CertificateFamily.UNKNOWN);
+        return certificate == null ? null : handleFromCertificate(certificate);
+    }
+
+    private CertificateHandle handleFromCertificate(final ORCCertificate certificate) {
+        final Double gph = certificate.getGPH() == null ? null : certificate.getGPH().asSeconds();
+        return new CertificateHandleImpl(certificate.getIssuingCountry(), certificate.getFileId(), gph,
+                /* sssid */ null, /* datInGID */ null, certificate.getReferenceNumber(), CertificateFamily.UNKNOWN,
+                certificate.getBoatName(), certificate.getSailNumber(), certificate.getBoatClassName(),
+                /* designer */ null, /* builder */ null, /* yearBuilt */ null, certificate.getIssueDate(),
+                /* certType */ null, /* oneDesign */ null, /* isProvisional */ Boolean.FALSE, /* isValid */ Boolean.TRUE);
+    }
+
+    @Override
+    public ORCCertificate searchForUpdate(final CertificateHandle certificateHandle) throws IOException {
+        return searchForUpdate(certificateHandle.getReferenceNumber());
+    }
+
+    @Override
+    public ORCCertificate searchForUpdate(final ORCCertificate certificate) throws IOException {
+        return searchForUpdate(certificate.getReferenceNumber());
+    }
+
+    private ORCCertificate searchForUpdate(final String existingCertificateRefNo) throws IOException {
+        logger.fine("Looking for update of certificate with reference number " + existingCertificateRefNo);
+        final ORCCertificate result = getSingleCertificate(ENDPOINT_DOWNBOATRMS_BYREFNO,
+                KEY_REF_NO + "=" + encode(existingCertificateRefNo) + "&" + EXT_JSON);
+        if (result == null) {
+            logger.info("Couldn't find any valid certificate for that boat");
+        } else {
+            if (result.getReferenceNumber().equals(existingCertificateRefNo)) {
+                logger.info("Found no new certificate; the one with reference number " + existingCertificateRefNo
+                        + " is still valid.");
+            } else {
+                logger.info("Found update for " + existingCertificateRefNo + ": " + result);
+            }
+        }
+        return result;
+    }
+
+    private ORCCertificate getSingleCertificate(final String endpoint, final String query) throws IOException {
+        final ORCCertificate result;
+        try {
+            final Iterable<ORCCertificate> certificates = new ORCCertificatesJsonImporter()
+                    .read(httpGetStream(endpointUrl(requireApiKey(), endpoint, query))).getCertificates();
+            result = certificates.iterator().hasNext() ? certificates.iterator().next() : null;
+        } catch (final org.json.simple.parser.ParseException e) {
+            throw new IOException("Failed to parse ORC certificate JSON", e);
+        }
+        return result;
+    }
+
+    /**
+     * Opens a stream on the bulk per-country certificate download provided by the {@code DownRMS} endpoint for the
+     * given {@code country}, in the JSON format consumed by {@link ORCCertificatesJsonImporter#read(InputStream)}. All
+     * endpoint knowledge (base URL, endpoint name, {@code ext} parameter) and the API key live in this implementation
+     * only; the key is read from the {@value #API_KEY_ENV_VARIABLE_NAME} environment variable and never logged. This
+     * method is exported to the test bundle via an {@code x-friends} restriction so that tests can obtain the online
+     * bulk stream without duplicating the URL construction or the key handling.
+     */
+    public InputStream openBulkCertificatesJsonStream(final CountryCode country) throws IOException {
+        return httpGetStream(endpointUrl(requireApiKey(), ENDPOINT_DOWNRMS,
+                KEY_COUNTRY_ID + "=" + encode(country.getThreeLetterIOCCode()) + "&" + EXT_JSON));
+    }
+
+    private CertificateHandle parseHandleFromActiveCertRow(final JSONObject row) throws DateTimeParseException {
+        final CountryCode issuingCountry = countryFromIoc(asTrimmedString(row.get(KEY_COUNTRY_ID)));
+        final String dxtName = asString(row.get(KEY_DXT_NAME));
+        final String fileId = dxtName != null && dxtName.toLowerCase().endsWith(DXT_SUFFIX)
+                ? dxtName.substring(0, dxtName.length() - DXT_SUFFIX.length())
+                : dxtName;
+        final Integer familyId = asInteger(row.get(KEY_FAMILY));
+        final CertificateFamily family = familyId == null ? CertificateFamily.UNKNOWN
+                : Optional.ofNullable(CertificateFamily.fromId(familyId)).orElse(CertificateFamily.UNKNOWN);
+        final String dxtDate = asTrimmedString(row.get(KEY_DXT_DATE));
+        final TimePoint issueDate = dxtDate == null ? null : new MillisecondsTimePoint(parseDate(dxtDate));
+        return new CertificateHandleImpl(issuingCountry, fileId, /* gph */ null, /* sssid */ null, /* datInGID */ null,
+                asTrimmedString(row.get(KEY_REF_NO)), family, asString(row.get(KEY_YACHT_NAME)),
+                asString(row.get(KEY_SAIL_NO)), asString(row.get(KEY_CLASS)), /* designer */ null, /* builder */ null,
+                /* yearBuilt */ null, issueDate, asInteger(row.get(KEY_CERT_TYPE)), asBoolean(row.get(KEY_IS_OD)),
+                /* isProvisional */ Boolean.FALSE, /* isValid */ Boolean.TRUE);
+    }
+
+    private CountryOverview parseCountryOverviewFromRmsRow(final JSONObject row) throws DateTimeParseException {
+        final CountryCode issuingCountry = countryFromIoc(asTrimmedString(row.get(KEY_COUNTRY_ID)));
+        final Integer familyId = asInteger(row.get(KEY_FAMILY));
+        final CertificateFamily family = familyId == null ? null : CertificateFamily.fromId(familyId);
+        final String lastUpdate = asTrimmedString(row.get(KEY_LAST_UPDATE));
+        final Integer certCount = asInteger(row.get(KEY_CERT_COUNT));
+        return new CountryOverviewImpl(issuingCountry, family, asInteger(row.get(KEY_CERT_TYPE)),
+                asInteger(row.get(KEY_VPP_YEAR)), certCount == null ? 0 : certCount.intValue(),
+                lastUpdate == null ? null : TimePoint.of(parseDate(lastUpdate)), asTrimmedString(row.get(KEY_CERT_NAME)),
+                asTrimmedString(row.get(KEY_RMS_CODE)));
+    }
+
+    private static CountryCode countryFromIoc(final String iocCode) {
+        return iocCode == null ? null : CountryCodeFactory.INSTANCE.getFromThreeLetterIOCName(iocCode);
+    }
+
+    private static String encode(final String value) {
+        final String result;
+        try {
+            result = URLEncoder.encode(value, StandardCharsets.UTF_8.name());
+        } catch (final java.io.UnsupportedEncodingException e) {
+            throw new IllegalStateException("UTF-8 is always supported", e);
+        }
+        return result;
+    }
+
+    private String endpointUrl(final String key, final String endpoint, final String query) {
+        return API_BASE_URL + key + "/" + endpoint + (query == null ? "" : "?" + query);
+    }
+
+    private static String requireApiKey() throws IOException {
+        final String key = System.getenv(API_KEY_ENV_VARIABLE_NAME);
+        if (key == null || key.trim().isEmpty()) {
+            throw new IOException("The " + API_KEY_ENV_VARIABLE_NAME
+                    + " environment variable is not set; cannot access the ORC public certificate API.");
+        }
+        return key;
+    }
+
+    private InputStream httpGetStream(final String url) throws IOException {
+        final HttpClient client = HttpClientBuilder.create()
+                .setRedirectStrategy(new LaxRedirectStrategyForAllRedirectResponseCodes()).build();
+        final HttpResponse response = client.execute(new HttpGet(url));
+        return response.getEntity().getContent();
+    }
+
+    private JSONObject httpGetJson(final String url) throws IOException {
+        final JSONObject root;
+        try (final BOMInputStream bomInputStream = new BOMInputStream(httpGetStream(url))) {
+            final ByteOrderMark bom = bomInputStream.getBOM();
+            final String charsetName = bom == null ? StandardCharsets.UTF_8.name() : bom.getCharsetName();
+            final Reader reader = new BufferedReader(
+                    new InputStreamReader(new BufferedInputStream(bomInputStream), charsetName));
+            final Object parsed = new JSONParser().parse(reader);
+            root = parsed instanceof JSONObject ? (JSONObject) parsed : new JSONObject();
+        } catch (final org.json.simple.parser.ParseException e) {
+            throw new IOException("Failed to parse ORC API JSON response", e);
+        }
+        final Object errors = root.get(ERRORS_KEY);
+        if (errors instanceof JSONArray && !((JSONArray) errors).isEmpty()) {
+            throw new IOException("ORC API returned errors: " + errors);
+        }
+        return root;
+    }
+
+    private static Iterable<JSONObject> dataRows(final JSONObject root) {
+        final List<JSONObject> result = new ArrayList<>();
+        final Object data = root.get(DATA_KEY);
+        if (data instanceof JSONObject) {
+            final Object rows = ((JSONObject) data).get(ROWS_KEY);
+            if (rows instanceof JSONArray) {
+                for (final Object row : (JSONArray) rows) {
+                    if (row instanceof JSONObject) {
+                        result.add((JSONObject) row);
                     }
                 }
             }
         }
-        logger.fine(()->"Search for "+params+" returned "+result.size()+" results");
         return result;
     }
-    
-    private CountryOverview parseCountryOverview(Node rowNode) throws DOMException, ParseException {
-        final DateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.mmmX");
-        CountryCode issuingCountry = null;
-        CertificateFamily family = null;
-        Integer certType = null;
-        Integer vppYear = null;
-        int certCount = 0;
-        TimePoint lastUpdate = null;
-        String certName = null;
-        String rmsCode = null;
-        for (int i=0; i<rowNode.getChildNodes().getLength(); i++) {
-            final Node child = rowNode.getChildNodes().item(i);
-            switch (child.getNodeName()) {
-            case "CountryId":
-                issuingCountry = CountryCodeFactory.INSTANCE.getFromThreeLetterIOCName(child.getTextContent().trim());
-                break;
-            case "Family":
-                family = Util.hasLength(child.getTextContent().trim()) ? CertificateFamily.fromId(Integer.valueOf(child.getTextContent().trim())) : null;
-                break;
-            case "CertType":
-                certType = child.getTextContent().trim().isEmpty() ? null : Integer.valueOf(child.getTextContent().trim());
-                break;
-            case "VPPYear":
-                vppYear = child.getTextContent().trim().isEmpty() ? null : Integer.valueOf(child.getTextContent().trim());
-                break;
-            case "CertCount":
-                certCount = Integer.valueOf(child.getTextContent().trim()).intValue();
-                break;
-            case "LastUpdate":
-                lastUpdate = TimePoint.of(isoDateFormat.parse(child.getTextContent().trim()));
-                break;
-            case "CertName":
-                certName = child.getTextContent().trim();
-                break;
-            case "RMSCode":
-                rmsCode = child.getTextContent().trim();
-                break;
-            }
-        }
-        return new CountryOverviewImpl(issuingCountry, family, certType, vppYear, certCount, lastUpdate, certName, rmsCode);
+
+    private static String asString(final Object value) {
+        return value == null ? null : value.toString();
     }
 
-    private void addAuthorizationHeader(final HttpMessage httpMessage) {
-        httpMessage.addHeader("Authorization", "Basic "+new String(Base64.getEncoder().encode((USER_NAME+":"+getDecodedCredentials()).getBytes())));
+    private static String asTrimmedString(final Object value) {
+        final String string = value == null ? null : value.toString().trim();
+        return string == null || string.isEmpty() ? null : string;
     }
 
-    private CertificateHandle parseHandle(Node rowNode) throws DOMException, ParseException {
-        assert rowNode.getNodeName().equals(ROW_ELEMENT);
-        CountryCode issuingCountry = null;
-        String fileId = null;
-        String sssid = null;
-        Double gph = null;
-        UUID datInGID = null;
-        String referenceNumber = null;
-        CertificateFamily family = CertificateFamily.UNKNOWN;
-        String yachtName = null;
-        String sailNumber = null;
-        String boatClassName = null;
-        String designer = null;
-        String builder = null;
-        Integer yearBuilt = null;
-        Integer certType = null;
-        TimePoint issueDate = null;
-        Boolean isOneDesign = null;
-        Boolean isProvisional = null;
-        Boolean isValid = null;
-        for (int i=0; i<rowNode.getChildNodes().getLength(); i++) {
-            final Node child = rowNode.getChildNodes().item(i);
-            switch (child.getNodeName()) {
-            case "CountryId":
-                issuingCountry = CountryCodeFactory.INSTANCE.getFromThreeLetterIOCName(child.getTextContent().trim());
-                break;
-            case "SSSID":
-                sssid = child.getTextContent();
-                break;
-            case "GPH":
-                gph = child.getTextContent().trim().isEmpty() ? null : Double.valueOf(child.getTextContent().trim());
-                break;
-            case "DatInGID":
-                datInGID = UUID.fromString(child.getTextContent().trim().replaceAll("[{}]", ""));
-                break;
-            case "RefNo":
-                referenceNumber = child.getTextContent().trim();
-                break;
-            case "Family":
-                family = child.getTextContent().trim().isEmpty() ? CertificateFamily.UNKNOWN : CertificateFamily.fromId(Integer.valueOf(child.getTextContent().trim()));
-                break;
-            case "YachtName":
-                yachtName = child.getTextContent();
-                break;
-            case "SailNo":
-                sailNumber = child.getTextContent();
-                break;
-            case "Class":
-                boatClassName = child.getTextContent();
-                break;
-            case "Designer":
-                designer = child.getTextContent();
-                break;
-            case "Builder":
-                builder = child.getTextContent();
-                break;
-            case "dxtDate":
-                issueDate = new MillisecondsTimePoint(parseDate(child.getTextContent())); // assume UTC
-                break;
-            case "dxtName":
-                final String fileIdWithOptionalDxtSuffix = child.getTextContent();
-                fileId = fileIdWithOptionalDxtSuffix.toLowerCase().endsWith(DXT_SUFFIX) ?
-                        fileIdWithOptionalDxtSuffix.substring(0, fileIdWithOptionalDxtSuffix.length()-DXT_SUFFIX.length()) :
-                            fileIdWithOptionalDxtSuffix;
-                break;
-            case "CertType":
-                certType = Integer.valueOf(child.getTextContent().trim());
-                break;
-            case "Age":
-                yearBuilt = child.getTextContent().trim().isEmpty() ? null : Integer.valueOf(child.getTextContent().trim());
-                break;
-            case "IsOd":
-                isOneDesign = Boolean.valueOf(child.getTextContent());
-                break;
-            case "Provisional":
-                isProvisional = Boolean.valueOf(child.getTextContent());
-                break;
-            case "CanSelect":
-                isValid = Boolean.valueOf(child.getTextContent());
-                break;
+    private static Integer asInteger(final Object value) {
+        Integer result;
+        if (value instanceof Number) {
+            result = ((Number) value).intValue();
+        } else {
+            final String string = asTrimmedString(value);
+            if (string == null) {
+                result = null;
+            } else {
+                try {
+                    result = Integer.valueOf(string);
+                } catch (final NumberFormatException e) {
+                    result = null;
+                }
             }
         }
-        return new CertificateHandleImpl(issuingCountry, fileId, gph, sssid, datInGID, referenceNumber, family==null?CertificateFamily.UNKNOWN:family,
-                yachtName, sailNumber, boatClassName, designer, builder, yearBuilt, issueDate, certType, isOneDesign,
-                isProvisional, isValid);
+        return result;
     }
-    
+
+    private static Boolean asBoolean(final Object value) {
+        final Boolean result;
+        if (value instanceof Boolean) {
+            result = (Boolean) value;
+        } else {
+            final String string = asTrimmedString(value);
+            result = string == null ? null : Boolean.valueOf(string);
+        }
+        return result;
+    }
+
     @Override
     public Date parseDate(final String dateString) throws DateTimeParseException {
         Optional<LocalDateTime> parsedDateWithoutZone = Arrays.asList(DATE_FORMATTERS).stream()
@@ -586,71 +686,6 @@ public class ORCPublicCertificateDatabaseImpl implements ORCPublicCertificateDat
         }
         logger.fine("Date is not parsable by any of the format :" + dateString);
         throw new DateTimeParseException("Date is not parsable by any of the format", dateString, 0);
-    }
-
-    @Override
-    public ORCCertificate searchForUpdate(CertificateHandle certificateHandle)
-            throws ClientProtocolException, IOException, org.json.simple.parser.ParseException {
-        return searchForUpdate(certificateHandle.getIssuingCountry(), certificateHandle.getFileId(), certificateHandle.getReferenceNumber());
-    }
-
-    @Override
-    public ORCCertificate searchForUpdate(ORCCertificate certificate)
-            throws ClientProtocolException, IOException, org.json.simple.parser.ParseException {
-        return searchForUpdate(certificate.getIssuingCountry(), certificate.getFileId(), certificate.getReferenceNumber());
-    }
-
-    private ORCCertificate searchForUpdate(final CountryCode issuingCountry, final String fileId,
-            final String existingCertificateRefNo)
-            throws IOException, org.json.simple.parser.ParseException, ClientProtocolException {
-        logger.fine("Looking for update of certificate with reference number "+existingCertificateRefNo);
-        final String queryParameters = "ext=json&CountryId=" + issuingCountry.getThreeLetterIOCCode()+
-                "&dxtName="+fileId+".dxt";
-        final ORCCertificate result = getSingleCertificate(queryParameters);
-        if (result == null) {
-            logger.info("Couldn't find any valid certificate for that boat");
-        } else {
-            if (result.getReferenceNumber().equals(existingCertificateRefNo)) {
-                logger.info("Found no new certificate; the one with reference number "+existingCertificateRefNo+
-                        " is still valid.");
-            } else {
-                logger.info("Found update for "+existingCertificateRefNo+": "+result);
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public ORCCertificate getCertificate(String referenceNumber, CertificateFamily family) throws Exception {
-        final String queryParameters = "ext=json&RefNo="+referenceNumber+"&family="+family.getFamilyQueryParamValue();
-        logger.fine("Obtaining certificate for reference number "+referenceNumber);
-        ORCCertificate result;
-        try {
-            result = getSingleCertificate(queryParameters);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Error trying to find ORC certificate with reference number "+referenceNumber, e);
-            result = null;
-        }
-        if (result == null) {
-            logger.info("Couldn't find ORC certificate with reference number "+referenceNumber);
-        }
-        return result;
-    }
-
-    private ORCCertificate getSingleCertificate(final String queryParameters)
-            throws IOException, org.json.simple.parser.ParseException, ClientProtocolException {
-        final HttpGet getRequest = new HttpGet(SINGLE_CERTIFICATE_DOWNLOAD_URL+"&"+queryParameters);
-        final HttpClient client = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategyForAllRedirectResponseCodes()).build();
-        addAuthorizationHeader(getRequest);
-        final Iterable<ORCCertificate> certificates = new ORCCertificatesJsonImporter().read(client.execute(getRequest).getEntity().getContent())
-                .getCertificates();
-        final ORCCertificate result;
-        if (certificates.iterator().hasNext()) {
-            result = certificates.iterator().next();
-        } else {
-            result = null;
-        }
-        return result;
     }
 
     public Iterable<ORCCertificate> getCertificates(Iterable<CertificateHandle> handles) throws Exception {
@@ -747,13 +782,13 @@ public class ORCPublicCertificateDatabaseImpl implements ORCPublicCertificateDat
      */
     private Iterable<CertificateHandle> fuzzySearchVaryingBoatClassName(final String yachtName, final String sailNumber, final BoatClass boatClass) throws Exception {
         String successfulBoatClassName = boatClass==null?null:boatClass.getName();
-        Iterable<CertificateHandle> certificateHandles = search(/* issuingCountry */ null, /* yearOfIssuance */ null, /* referenceNumber */ null, yachtName, sailNumber, successfulBoatClassName, /* includeInvalid */ false);
+        Iterable<CertificateHandle> certificateHandles = search(/* issuingCountry */ null, /* yearOfIssuance */ null, /* referenceNumber */ null, yachtName, sailNumber, successfulBoatClassName);
         if (!containsValidHandle(certificateHandles) && successfulBoatClassName != null) {
             if (yachtName != null || sailNumber != null) {
                 logger.fine(()->"Nothing found; removing boat class name restriction "+boatClass.getName());
                 // try without boat class restriction
                 successfulBoatClassName = null;
-                certificateHandles = search(/* issuingCountry */ null, /* yearOfIssuance */ null, /* referenceNumber */ null, yachtName, sailNumber, successfulBoatClassName, /* includeInvalid */ false);
+                certificateHandles = search(/* issuingCountry */ null, /* yearOfIssuance */ null, /* referenceNumber */ null, yachtName, sailNumber, successfulBoatClassName);
             } else {
                 logger.fine(()->"No current certificates found for boat class "+boatClass.getName()+
                         " but yacht name and sail number are not specified either; giving up.");
@@ -799,9 +834,5 @@ public class ORCPublicCertificateDatabaseImpl implements ORCPublicCertificateDat
             }
         }
         return result;
-    }
-
-    private static String getDecodedCredentials() {
-        return new String(Base64.getDecoder().decode(CREDENTIALS));
     }
 }
