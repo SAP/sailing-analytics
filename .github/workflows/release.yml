@@ -224,7 +224,7 @@ jobs:
       - shell: bash
         env: # Or as an environment variable
           TMP: /mnt/tmp
-          # These five are consumed only at TEST runtime. For a compile-only run
+          # These six are consumed only at TEST runtime. For a compile-only run
           # (skip_tests) they resolve to '' so the real secret values are never
           # placed in the process environment where reviewed-but-fork-authored
           # code could read them. The full build (skip_tests false) gets them all.
@@ -232,6 +232,7 @@ jobs:
           AWS_S3_TEST_S3ACCESSKEY: ${{ steps.mode.outputs.skip_tests == 'true' && '' || secrets.AWS_S3_TEST_S3ACCESSKEY }}
           GEONAMES_ORG_USERNAMES: ${{ steps.mode.outputs.skip_tests == 'true' && '' || secrets.GEONAMES_ORG_USERNAMES }}
           GOOGLE_MAPS_AUTHENTICATION_PARAMS: ${{ steps.mode.outputs.skip_tests == 'true' && '' || secrets.GOOGLE_MAPS_AUTHENTICATION_PARAMS }}
+          ORC_API_KEY: ${{ steps.mode.outputs.skip_tests == 'true' && '' || secrets.ORC_API_KEY }}
           POLAR_DATA_BASE_URL: ${{ vars.POLAR_DATA_BASE_URL }}
           POLAR_DATA_BEARER_TOKEN: ${{ steps.mode.outputs.skip_tests == 'true' && '' || secrets.POLAR_DATA_BEARER_TOKEN }}
           APP_PARAMETERS: "-Daws.region=eu-west-1"
