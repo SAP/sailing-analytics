@@ -33,6 +33,10 @@ public abstract class AbstractMediaDescriptor implements MediaDescriptor, Serial
     protected Set<String> tags = new LinkedHashSet<String>();
 
     protected URL url;
+
+    protected boolean missing;
+
+    protected boolean missingMailNotificationSent;
     
     protected Locale locale;
 
@@ -55,6 +59,26 @@ public abstract class AbstractMediaDescriptor implements MediaDescriptor, Serial
     @Override
     public URL getURL() {
         return url;
+    }
+
+    @Override
+    public boolean isMissing() {
+        return missing;
+    }
+
+    @Override
+    public void setMissing(boolean missing) {
+        this.missing = missing;
+    }
+
+    @Override
+    public boolean isMissingMailNotificationSent() {
+        return missingMailNotificationSent;
+    }
+
+    @Override
+    public void setMissingMailNotificationSent(boolean missingMailNotificationSent) {
+        this.missingMailNotificationSent = missingMailNotificationSent;
     }
 
     @Override
