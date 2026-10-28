@@ -188,7 +188,7 @@ public interface LandscapeManagementWriteServiceAsync {
             AsyncCallback<SailingApplicationReplicaSetDTO<String>> callback);
 
     void checkForLiveContent(String regionId,
-            Iterable<SailingApplicationReplicaSetDTO<String>> applicationReplicaSets, String bearerToken,
+            ArrayList<SailingApplicationReplicaSetDTO<String>> applicationReplicaSets, String bearerToken,
             String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
             AsyncCallback<LiveContentCheckResult> callback);
 

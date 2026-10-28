@@ -162,3 +162,8 @@ if [ -n "${MAP_PROVIDER_TILESERVER_AUTH_TTL}" ]; then
   ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -Dmap.provider.tileserver.auth.ttl=${MAP_PROVIDER_TILESERVER_AUTH_TTL}"
 fi
 export GITHUB_TOKEN
+# Export the ORC public-certificate API key so the Java VM can read it via System.getenv("ORC_API_KEY").
+# configuration/secrets sets it as a plain (non-exported) shell variable, which the java child process would
+# not otherwise inherit. Unlike the other ORC-adjacent credentials it is passed as an environment variable
+# rather than a -D system property so that it is not exposed on the process command line (ps auxww).
+export ORC_API_KEY

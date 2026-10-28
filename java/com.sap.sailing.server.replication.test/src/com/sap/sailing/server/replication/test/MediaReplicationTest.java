@@ -3,7 +3,9 @@ package com.sap.sailing.server.replication.test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -11,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,6 +34,7 @@ import org.mockito.Mockito;
 import com.mongodb.ConnectionString;
 import com.sap.sailing.domain.base.CompetitorAndBoatStore;
 import com.sap.sailing.domain.base.DomainFactory;
+import com.sap.sailing.domain.base.Event;
 import com.sap.sailing.domain.base.Regatta;
 import com.sap.sailing.domain.base.impl.DomainFactoryImpl;
 import com.sap.sailing.domain.common.RaceIdentifier;
@@ -51,6 +55,9 @@ import com.sap.sailing.domain.tracking.impl.EmptyWindStore;
 import com.sap.sailing.server.impl.RacingEventServiceImpl;
 import com.sap.sailing.server.interfaces.RacingEventService;
 import com.sap.sailing.server.masterdata.MasterDataImporter;
+import com.sap.sailing.server.operationaltransformation.CreateEvent;
+import com.sap.sailing.server.operationaltransformation.UpdateEventImageHealth;
+import com.sap.sailing.server.operationaltransformation.UpdateEventVideoHealth;
 import com.sap.sailing.shared.server.gateway.jaxrs.AbstractSailingServerResource;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
@@ -70,6 +77,11 @@ import com.sap.sse.security.shared.impl.SecuredSecurityTypes.ServerActions;
 import com.sap.sse.security.shared.impl.User;
 import com.sap.sse.security.shared.impl.UserGroupImpl;
 import com.sap.sse.shared.util.Wait;
+
+import com.sap.sse.shared.media.ImageDescriptor;
+import com.sap.sse.shared.media.VideoDescriptor;
+import com.sap.sse.shared.media.impl.ImageDescriptorImpl;
+import com.sap.sse.shared.media.impl.VideoDescriptorImpl;
 
 public class MediaReplicationTest extends AbstractServerReplicationTest {
     @SuppressWarnings("unchecked")
@@ -342,6 +354,57 @@ public class MediaReplicationTest extends AbstractServerReplicationTest {
                 Optional.of(Duration.ONE_SECOND.times(5)), Duration.ONE_SECOND);
         final Iterable<MediaTrack> targetTracksReplica = replica.getAllMediaTracks();
         compareTracks(trackOnSource, targetTracksReplica);
+    }
+    
+    @Test
+    public void testEventImageHealthStateReplication() throws Exception {
+        final ImageDescriptor image = new ImageDescriptorImpl(new URL("http://example.com/event.jpg"), TimePoint.now());
+        final Event event = master.apply(new CreateEvent("Event", "Description", TimePoint.now(),
+                TimePoint.now().plus(Duration.ONE_DAY), "Venue", /* isPublic */ true, UUID.randomUUID(),
+                /* officialWebsiteURL */ null, /* baseURL */ null, Collections.emptyMap(),
+                Collections.singleton(image), Collections.emptyList(), Collections.emptyList()));
+        waitSomeTime();
+        ImageDescriptor replicatedImage = replica.getEvent(event.getId()).getImages().iterator().next();
+        assertFalse(replicatedImage.isMissing());
+        assertFalse(replicatedImage.isMissingMailNotificationSent());
+        master.apply(new UpdateEventImageHealth(event.getId(), image.getURL().toString(),
+                /* missing */ true, /* missingMailNotificationSent */ true));
+        waitSomeTime();
+        replicatedImage = replica.getEvent(event.getId()).getImages().iterator().next();
+        assertTrue(replicatedImage.isMissing());
+        assertTrue(replicatedImage.isMissingMailNotificationSent());
+        master.apply(new UpdateEventImageHealth(event.getId(), image.getURL().toString(),
+                /* missing */ false, /* missingMailNotificationSent */ false));
+        waitSomeTime();
+        replicatedImage = replica.getEvent(event.getId()).getImages().iterator().next();
+        assertFalse(replicatedImage.isMissing());
+        assertFalse(replicatedImage.isMissingMailNotificationSent());
+    }
+
+    @Test
+    public void testEventVideoHealthStateReplication() throws Exception {
+        final VideoDescriptor video = new VideoDescriptorImpl(new URL("http://example.com/event.mp4"),
+                MimeType.mp4, TimePoint.now());
+        final Event event = master.apply(new CreateEvent("Event", "Description", TimePoint.now(),
+                TimePoint.now().plus(Duration.ONE_DAY), "Venue", /* isPublic */ true, UUID.randomUUID(),
+                /* officialWebsiteURL */ null, /* baseURL */ null, Collections.emptyMap(),
+                Collections.emptyList(), Collections.singleton(video), Collections.emptyList()));
+        waitSomeTime();
+        VideoDescriptor replicatedVideo = replica.getEvent(event.getId()).getVideos().iterator().next();
+        assertFalse(replicatedVideo.isMissing());
+        assertFalse(replicatedVideo.isMissingMailNotificationSent());
+        master.apply(new UpdateEventVideoHealth(event.getId(), video.getURL().toString(),
+                /* missing */ true, /* missingMailNotificationSent */ true));
+        waitSomeTime();
+        replicatedVideo = replica.getEvent(event.getId()).getVideos().iterator().next();
+        assertTrue(replicatedVideo.isMissing());
+        assertTrue(replicatedVideo.isMissingMailNotificationSent());
+        master.apply(new UpdateEventVideoHealth(event.getId(), video.getURL().toString(),
+                /* missing */ false, /* missingMailNotificationSent */ false));
+        waitSomeTime();
+        replicatedVideo = replica.getEvent(event.getId()).getVideos().iterator().next();
+        assertFalse(replicatedVideo.isMissing());
+        assertFalse(replicatedVideo.isMissingMailNotificationSent());
     }
 
     private void compareTracks(MediaTrack trackOnSource, Iterable<MediaTrack> targetTracksMaster) {

@@ -492,6 +492,18 @@ public interface RacingEventService extends TrackedRegattaRegistry, RegattaFetch
             Iterable<String> windFinderReviewedSpotCollectionIds);
 
     /**
+     * Updates the persisted health state for all images of the event whose URL matches <code>imageUrl</code>. Does not
+     * replicate automatically; see {@link com.sap.sailing.server.operationaltransformation.UpdateEventImageHealth}.
+     */
+    void updateEventImageHealth(UUID eventId, String imageUrl, boolean missing, boolean missingMailNotificationSent);
+
+    /**
+     * Updates the persisted health state for all videos of the event whose URL matches <code>videoUrl</code>. Does not
+     * replicate automatically; see {@link com.sap.sailing.server.operationaltransformation.UpdateEventVideoHealth}.
+     */
+    void updateEventVideoHealth(UUID eventId, String videoUrl, boolean missing, boolean missingMailNotificationSent);
+    
+    /**
      * Renames a sailing event. If a sailing event by the name <code>oldName</code> does not exist in {@link #getEvents()},
      * or if a event with the name <code>newName</code> already exists, an {@link IllegalArgumentException} is thrown.
      * If the method completes normally, the rename has been successful, and the event previously obtained by calling

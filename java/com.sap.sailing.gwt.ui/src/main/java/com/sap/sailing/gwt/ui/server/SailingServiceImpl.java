@@ -5521,7 +5521,7 @@ public class SailingServiceImpl extends ResultCachingProxiedRemoteServiceServlet
                     regattaRegistrationLinkSecret);
             if (skipSecuritychecks || getService().getSecurityService().hasCurrentUserReadPermission(event)) {
                 ImageDescriptor logoImage = event.findImageWithTag(MediaTagConstants.LOGO.getName());
-                ImageDTO logo = logoImage != null ? HomeServiceUtil.convertToImageDTO(logoImage) : null;
+                ImageDTO logo = logoImage != null && !logoImage.isMissing() ? HomeServiceUtil.convertToImageDTO(logoImage) : null;
                 String name = HomeServiceUtil.getEventDisplayName(event);
                 String location = HomeServiceUtil.getLocation(event);
                 if ((location == null || location.isEmpty()) && event.getVenue() != null) {
@@ -5733,7 +5733,7 @@ public class SailingServiceImpl extends ResultCachingProxiedRemoteServiceServlet
             String referenceNumber, String yachtName, String sailNumber, String boatClassName) throws Exception {
         final ORCPublicCertificateDatabase db = ORCPublicCertificateDatabase.INSTANCE;
         final Set<ORCCertificate> result = new HashSet<>();
-        final Iterable<CertificateHandle> searchResult = db.search(country, yearOfIssuance, referenceNumber, yachtName, sailNumber, boatClassName, /* includeInvalid */ false);
+        final Iterable<CertificateHandle> searchResult = db.search(country, yearOfIssuance, referenceNumber, yachtName, sailNumber, boatClassName);
         Util.addAll(
                 db.getCertificates(searchResult),
                 result);
