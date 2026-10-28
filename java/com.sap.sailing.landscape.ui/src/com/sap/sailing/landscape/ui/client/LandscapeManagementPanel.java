@@ -1585,7 +1585,7 @@ public class LandscapeManagementPanel extends SimplePanel {
                         // conflict means forcing that very set. The reactive back-end guard below stays as a fallback
                         // for a surprise race that begins after the pre-flight check.
                         landscapeManagementService.checkForLiveContent(regionId,
-                                Collections.singleton(applicationReplicaSetToArchive),
+                                new ArrayList<>(Collections.singleton(applicationReplicaSetToArchive)),
                                 bearerTokensAndWhetherToRemoveReplicaSet.getBearerTokenOrNullForApplicationReplicaSetToArchive(),
                                 sshKeyManagementPanel.getSelectedKeyPair() == null ? null : sshKeyManagementPanel.getSelectedKeyPair().getName(),
                                 sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,

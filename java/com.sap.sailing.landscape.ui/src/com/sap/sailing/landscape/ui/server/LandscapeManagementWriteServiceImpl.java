@@ -959,7 +959,7 @@ public class LandscapeManagementWriteServiceImpl extends ResultCachingProxiedRem
 
     @Override
     public LiveContentCheckResult checkForLiveContent(final String regionId,
-            final Iterable<SailingApplicationReplicaSetDTO<String>> applicationReplicaSets, final String bearerToken,
+            final ArrayList<SailingApplicationReplicaSetDTO<String>> applicationReplicaSets, final String bearerToken,
             final String optionalKeyName, final byte[] privateKeyEncryptionPassphrase) throws Exception {
         checkLandscapeManageAwsPermission();
         final AwsRegion region = new AwsRegion(regionId, getLandscape());
