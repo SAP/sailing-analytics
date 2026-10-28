@@ -231,6 +231,7 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
      * rotated and translated versions of the map, implementing the "wind-up" view.
      */
     private DelegateCoordinateSystem coordinateSystem;
+    private Double synchronizedMapHeading;
     
     /**
      * Tells whether the {@link RenderingType#VECTOR} is supported on the current platform / browser.
@@ -1013,6 +1014,7 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                 map.addBoundsChangeHandler(new BoundsChangeMapHandler() {
                     @Override
                     public void onEvent(BoundsChangeMapEvent event) {
+                        synchronizeCoordinateSystemWithMapHeadingDuringCameraMove();
                         double newZoomLevel = map.getZoom();
                         if (!isAutoZoomInProgress() && (newZoomLevel != currentZoomLevel)) {
                             removeTransitions();
@@ -3900,20 +3902,53 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
         return currentMapBounds.getLowerLeft().getDistance(currentMapBounds.getUpperRight()).scale(2);
     }
 
+    private boolean installActualMapHeading() {
+        final boolean changed;
+        if (vectorRenderingTypeSupported && map != null) {
+            final double mapHeading = map.getHeading();
+            changed = synchronizedMapHeading == null ||
+                    Math.abs(synchronizedMapHeading - mapHeading) > 0.000001;
+            if (changed) {
+                coordinateSystem.setCoordinateSystem(new RotatedCoordinateSystem(
+                        new DegreeBearingImpl(mapHeading).add(new DegreeBearingImpl(90))));
+                synchronizedMapHeading = mapHeading;
+            }
+        } else {
+            changed = false;
+        }
+        return changed;
+    }
+
+    private void redrawMapHeadingIndicators() {
+        combinedWindPanel.redraw();
+        final boolean rotated = coordinateSystem.mapDegreeBearing(0) != 0;
+        trueNorthIndicatorPanel.setVisible(rotated);
+        trueNorthIndicatorButtonButtonGroup.getElement().getStyle().setProperty(
+                "transform", "rotate(" + coordinateSystem.mapDegreeBearing(0) + "deg)");
+        if (rotated) {
+            trueNorthIndicatorPanel.redraw();
+        }
+    }
+
+    private void synchronizeCoordinateSystemWithMapHeadingDuringCameraMove() {
+        final double previousMapHeading = synchronizedMapHeading == null ? map.getHeading() : synchronizedMapHeading;
+        if (installActualMapHeading()) {
+            if (streamletOverlay != null
+                    && settings.isShowWindStreamletOverlay()
+                    && paywallResolver.hasPermission(SecuredDomainType.TrackedRaceActions.VIEWSTREAMLETS,
+                            raceMapLifecycle.getRaceDTO())) {
+                streamletOverlay.onMapHeadingChanged(previousMapHeading, map.getHeading());
+            }
+            redrawMapHeadingIndicators();
+        }
+    }
+
     private void synchronizeCoordinateSystemWithMapHeading() {
         if (vectorRenderingTypeSupported && map != null) {
-            coordinateSystem.setCoordinateSystem(new RotatedCoordinateSystem(
-                    new DegreeBearingImpl(map.getHeading()).add(new DegreeBearingImpl(90))));
+            installActualMapHeading();
             windSensorOverlays.values().forEach(WindSensorOverlay::draw);
             courseMarkOverlays.values().forEach(CourseMarkOverlay::draw);
-            combinedWindPanel.redraw();
-            final boolean rotated = coordinateSystem.mapDegreeBearing(0) != 0;
-            trueNorthIndicatorPanel.setVisible(rotated);
-            trueNorthIndicatorButtonButtonGroup.getElement().getStyle().setProperty(
-                    "transform", "rotate(" + coordinateSystem.mapDegreeBearing(0) + "deg)");
-            if (rotated) {
-                trueNorthIndicatorPanel.redraw();
-            }
+            redrawMapHeadingIndicators();
         }
     }
 

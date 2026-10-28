@@ -73,6 +73,7 @@ public class WindStreamletsRaceboardOverlay extends MovingCanvasOverlay implemen
     private final NumberFormat numberFormatOneDecimal = NumberFormatterFactory.getDecimalFormat(1);
     private ElementStyleMutationObserver observer;
     private boolean dragging = false;
+    private Double mapHeadingAtOrientationStart;
     private boolean isAttached = false, startObserverWhenAttached = false;
     private boolean timeChangedSinceLastUpdate = true;
 
@@ -375,8 +376,21 @@ public class WindStreamletsRaceboardOverlay extends MovingCanvasOverlay implemen
         swarm.pause(500 / animationIntervalMillis); // pause animation for two seconds
     }
 
+    public void onMapHeadingChanged(double previousMapHeading, double mapHeading) {
+        if (mapHeadingAtOrientationStart == null) {
+            mapHeadingAtOrientationStart = previousMapHeading;
+        }
+        onDragStart();
+        updateDrawingAngleAndSetCanvasRotation(mapHeadingAtOrientationStart - mapHeading);
+    }
+
     public void onDragEnd() {
         dragging = false;
+        if (mapHeadingAtOrientationStart != null) {
+            mapHeadingAtOrientationStart = null;
+            updateDrawingAngleAndSetCanvasRotation(0);
+            swarm.onBoundsChanged(/* zoomChanged */ true, /* swarmPause */ 1);
+        }
     }
 
     public void onBoundsChanged(boolean zoomChanged) {
