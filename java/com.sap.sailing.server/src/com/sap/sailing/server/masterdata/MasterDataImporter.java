@@ -50,6 +50,7 @@ import com.sap.sse.util.ObjectInputStreamResolvingAgainstCache.ResolveListener;
 public class MasterDataImporter {
     private final static Logger logger = Logger.getLogger(MasterDataImporter.class.getName());
     private static final int BATCH_SIZE_FOR_IMPORTING_FIXES = 5000;
+    private static final int BATCH_SIZE_FOR_IMPORTING_WIND_FIXES = 5000;
     /**
      * Overall-progress milestones for a master-data import, in the {@code [0, 1]} range reported through
      * {@link RacingEventService#createOrUpdateDataImportProgressWithReplication}. They are laid out as a single
@@ -236,30 +237,33 @@ public class MasterDataImporter {
         } else {
             final int expectedWindTrackCount = objectInputStream.readInt();
             int windTracksDone = 0;
-            Object next = objectInputStream.readObject();
-            while (next != null) {
-                final WindTrackMasterData windMasterData = (WindTrackMasterData) next;
+            Object nextHeader = objectInputStream.readObject();
+            while (nextHeader != null) {
+                final WindTrackMasterData windMasterData = (WindTrackMasterData) nextHeader;
                 final DummyTrackedRace trackedRaceWithNameAndId = new DummyTrackedRace(windMasterData.getRaceName(),
                         windMasterData.getRaceId());
                 final WindTrack windTrackToWriteTo = racingEventService.getWindStore().getWindTrack(
                         windMasterData.getRegattaName(), trackedRaceWithNameAndId, windMasterData.getWindSource(), 0,
                         -1);
-                final WindTrack windTrackToReadFrom = windMasterData.getWindTrack();
-                final List<Wind> fixesToAdd = new ArrayList<>();
-                windTrackToReadFrom.lockForRead();
-                try {
-                    for (final Wind fix : windTrackToReadFrom.getRawFixes()) {
-                        final Wind existingFix = windTrackToWriteTo.getFirstRawFixAtOrAfter(fix.getTimePoint());
-                        if (existingFix == null || !existingFix.equals(fix)) {
-                            fixesToAdd.add(fix);
-                        } else {
-                            logger.fine("Didn't add wind fix in import, because equal fix was already there.");
+                final List<Wind> fixesToAdd = new ArrayList<>(BATCH_SIZE_FOR_IMPORTING_WIND_FIXES);
+                Object nextFix = objectInputStream.readObject();
+                while (nextFix != null) {
+                    final Wind fix = (Wind) nextFix;
+                    final Wind existingFix = windTrackToWriteTo.getFirstRawFixAtOrAfter(fix.getTimePoint());
+                    if (existingFix == null || !existingFix.equals(fix)) {
+                        fixesToAdd.add(fix);
+                        if (fixesToAdd.size() == BATCH_SIZE_FOR_IMPORTING_WIND_FIXES) {
+                            windTrackToWriteTo.add(fixesToAdd);
+                            fixesToAdd.clear();
                         }
+                    } else {
+                        logger.fine("Didn't add wind fix in import, because equal fix was already there.");
                     }
-                } finally {
-                    windTrackToReadFrom.unlockAfterRead();
+                    nextFix = objectInputStream.readObject();
                 }
-                windTrackToWriteTo.add(fixesToAdd);
+                if (!fixesToAdd.isEmpty()) {
+                    windTrackToWriteTo.add(fixesToAdd);
+                }
                 windTracksDone++;
                 logger.info("Done with wind track #"+windTracksDone+" of "+expectedWindTrackCount);
                 if (expectedWindTrackCount > 0) {
@@ -268,7 +272,7 @@ public class MasterDataImporter {
                             PROGRESS_GRAPH_APPLIED + PROGRESS_WIND_TRACKS_BAND_WIDTH * fractionDone,
                             DataImportSubProgress.IMPORT_WIND_TRACKS, fractionDone);
                 }
-                next = objectInputStream.readObject();
+                nextHeader = objectInputStream.readObject();
             }
         }
     }
