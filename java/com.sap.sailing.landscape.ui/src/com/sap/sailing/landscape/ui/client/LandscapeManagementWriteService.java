@@ -122,7 +122,7 @@ public interface LandscapeManagementWriteService extends RemoteService {
             boolean useDynamicLoadBalancer, String optionalDomainName, boolean forceDNSUpdate) throws Exception;
     
     LiveContentCheckResult checkForLiveContent(String regionId,
-            Iterable<SailingApplicationReplicaSetDTO<String>> applicationReplicaSets, String bearerToken,
+            ArrayList<SailingApplicationReplicaSetDTO<String>> applicationReplicaSets, String bearerToken,
             String optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception;
 
     LiveContentAwareOperationResult<SailingApplicationReplicaSetDTO<String>> upgradeApplicationReplicaSet(
