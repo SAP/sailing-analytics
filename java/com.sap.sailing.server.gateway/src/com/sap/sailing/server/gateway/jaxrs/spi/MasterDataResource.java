@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPOutputStream;
 
@@ -246,6 +247,9 @@ public class MasterDataResource extends AbstractSailingServerResource {
                         masterData.setMasterDataExportFlagOnRaceColumns(true);
                         // Actual start of streaming
                         writeObjects(competitorIds, masterData, objectOutputStream);
+                    } catch (Exception e) {
+                        logger.log(Level.SEVERE, "Exception while writing master data to output stream", e);
+                        throw e;
                     } finally {
                         objectOutputStream.close();
                         masterData.setMasterDataExportFlagOnRaceColumns(false);
@@ -308,16 +312,22 @@ public class MasterDataResource extends AbstractSailingServerResource {
      */
     private void writeObjects(final List<Serializable> competitorIds, final TopLevelMasterData masterData,
             ObjectOutputStream objectOutputStream) throws IOException {
+        logger.info("writing competitor IDs...");
         // Reader counterpart: MasterDataImporter.importFromStream reads these three objects back in this exact order.
         objectOutputStream.writeObject(competitorIds);
+        logger.info("writing regattas...");
         objectOutputStream.writeObject(masterData.getAllRegattas());
+        logger.info("writing master data...");
         objectOutputStream.writeObject(masterData);
         // Reader counterpart: MasterDataImporter.importWindTracks reads the Integer count, the WindTrackMasterData
         // objects, and the terminating null sentinel written by writeWindTracks below.
+        logger.info("writing wind tracks...");
         writeWindTracks(masterData, objectOutputStream);
         // Reader counterpart: MasterDataImporter.importRaceLogTrackingGPSFixes reads the per-device sections and the
         // terminating null sentinels written by writeRaceLogTrackingFixes below.
+        logger.info("writing sensor/GPS fixes...");
         writeRaceLogTrackingFixes(masterData, objectOutputStream);
+        logger.info("Done writing master data and tracks");
     }
 
     /**
@@ -342,9 +352,11 @@ public class MasterDataResource extends AbstractSailingServerResource {
             throws IOException {
         final Set<WindTrackMasterData> windTrackMasterDataForStreaming = masterData.getWindTrackMasterDataForStreaming();
         objectOutputStream.writeInt(windTrackMasterDataForStreaming.size());
+        int i=0;
         for (final WindTrackMasterData windTrackMasterData : windTrackMasterDataForStreaming) {
             objectOutputStream.writeObject(windTrackMasterData);
             objectOutputStream.reset();
+            logger.info("Wrote "+(++i)+" wind tracks of "+windTrackMasterDataForStreaming.size());
         }
         objectOutputStream.writeObject(null);
     }
@@ -380,8 +392,9 @@ public class MasterDataResource extends AbstractSailingServerResource {
             final ObjectOutputStream objectOutputStream) throws IOException {
         final SensorFixStore sensorFixStore = masterData.getSensorFixStore();
         try {
-            for (final Entry<DeviceIdentifier, MultiTimeRange> deviceRange : masterData.getRaceLogTrackingDeviceRanges()
-                    .entrySet()) {
+            final Map<DeviceIdentifier, MultiTimeRange> raceLogTrackingDeviceRanges = masterData.getRaceLogTrackingDeviceRanges();
+            final int[] i= new int[1];
+            for (final Entry<DeviceIdentifier, MultiTimeRange> deviceRange : raceLogTrackingDeviceRanges.entrySet()) {
                 final DeviceIdentifier device = deviceRange.getKey();
                 objectOutputStream.writeObject(device);
                 final int[] fixesSinceLastReset = new int[] { 0 };
@@ -395,12 +408,15 @@ public class MasterDataResource extends AbstractSailingServerResource {
                                 fixesSinceLastReset[0] = 0;
                             }
                         } catch (final IOException e) {
+                            logger.log(Level.SEVERE, "Exception while trying to write fixes; had written " + i[0] + " of "
+                                    + raceLogTrackingDeviceRanges.size() + " collections so far");
                             throw new WriteFixException(e);
                         }
                     }, device, range.from(), range.to(), false);
                 }
                 objectOutputStream.writeObject(null);
                 objectOutputStream.reset();
+                logger.info("Wrote "+(++i[0])+" fix collections of "+raceLogTrackingDeviceRanges.size());
             }
             objectOutputStream.writeObject(null);
         } catch (final WriteFixException e) {

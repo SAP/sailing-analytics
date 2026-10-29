@@ -101,6 +101,7 @@ public class MasterDataImporter {
      */
     public Map<LeaderboardGroup, ? extends Iterable<Event>> importFromStream(InputStream inputStream, UUID importOperationId, boolean override)
             throws IOException, ClassNotFoundException {
+        logger.info("Preparing master data import stream for import "+importOperationId);
         ObjectInputStreamResolvingAgainstCache<DomainFactory> objectInputStream = racingEventService
                 .getBaseDomainFactory()
                 .createObjectInputStreamResolvingAgainstThisFactory(inputStream, new ResolveListener() {
@@ -130,13 +131,16 @@ public class MasterDataImporter {
             // Writer counterpart: MasterDataResource.writeObjects writes these three objects (competitorIds, all
             // regattas, then the fix-free and wind-free TopLevelMasterData graph) in exactly this order; the wind and
             // sensor-fix sections that follow the graph are read below by importWindTracks / importRaceLogTrackingGPSFixes.
+            logger.info("Reading competitor IDs for import "+importOperationId);
             @SuppressWarnings("unchecked")
             final List<Serializable> competitorIds = (List<Serializable>) objectInputStream.readObject();
             if (override) {
                 setAllowCompetitorsDataToBeReset(competitorIds);
             }
+            logger.info("Reading regattas for import "+importOperationId);
             // Deserialize Regattas to make sure that Regattas are deserialized before Series
             objectInputStream.readObject();
+            logger.info("Reading master data for import "+importOperationId);
             topLevelMasterData = (TopLevelMasterData) objectInputStream.readObject();
         } finally {
             RegattaImpl.setOngoingMasterDataImport(null);
@@ -173,9 +177,11 @@ public class MasterDataImporter {
         try {
             racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId, PROGRESS_GRAPH_APPLIED,
                     DataImportSubProgress.IMPORT_WIND_TRACKS, 0);
+            logger.info("Reading wind tracks for import "+importOperationId);
             importWindTracks(objectInputStream, importOperationId);
             racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId, PROGRESS_WIND_TRACKS_DONE,
                     DataImportSubProgress.IMPORT_SENSOR_FIXES, 0);
+            logger.info("Reading GPS/senros fixes for import "+importOperationId);
             importRaceLogTrackingGPSFixes(objectInputStream, importOperationId,
                     topLevelMasterData.getRaceLogTrackingDeviceRanges().size());
         } finally {
@@ -255,6 +261,7 @@ public class MasterDataImporter {
                 }
                 windTrackToWriteTo.add(fixesToAdd);
                 windTracksDone++;
+                logger.info("Done with wind track #"+windTracksDone+" of "+expectedWindTrackCount);
                 if (expectedWindTrackCount > 0) {
                     final double fractionDone = (double) windTracksDone / expectedWindTrackCount;
                     racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId,
@@ -303,6 +310,7 @@ public class MasterDataImporter {
             Object device = objectInputStream.readObject();
             while (device != null) {
                 final DeviceIdentifier deviceIdentifier = (DeviceIdentifier) device;
+                logger.info("Importing fixes for device "+deviceIdentifier+" for import "+importOperationId+" ("+devicesDone+"/"+numberOfDeviceSections+")");
                 final Collection<Timed> fixesToAddAsBatch = new ArrayList<>(BATCH_SIZE_FOR_IMPORTING_FIXES);
                 Object fix = objectInputStream.readObject();
                 while (fix != null) {
