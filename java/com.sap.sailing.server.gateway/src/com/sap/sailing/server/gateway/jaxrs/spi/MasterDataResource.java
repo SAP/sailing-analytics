@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPOutputStream;
 
@@ -35,6 +36,7 @@ import com.sap.sailing.domain.base.Regatta;
 import com.sap.sailing.domain.base.configuration.DeviceConfiguration;
 import com.sap.sailing.domain.base.impl.CompetitorSerializationCustomizer;
 import com.sap.sailing.domain.common.DeviceIdentifier;
+import com.sap.sailing.domain.common.Wind;
 import com.sap.sailing.domain.common.media.MediaTrack;
 import com.sap.sailing.domain.leaderboard.Leaderboard;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroup;
@@ -44,6 +46,7 @@ import com.sap.sailing.domain.masterdataimport.WindTrackMasterData;
 import com.sap.sailing.domain.racelog.tracking.SensorFixStore;
 import com.sap.sailing.domain.tracking.RaceTrackingConnectivityParameters;
 import com.sap.sailing.domain.tracking.TrackedRace;
+import com.sap.sailing.domain.tracking.WindTrack;
 import com.sap.sailing.server.gateway.interfaces.MasterDataImportConstants;
 import com.sap.sailing.shared.server.gateway.jaxrs.AbstractSailingServerResource;
 import com.sap.sse.common.MultiTimeRange;
@@ -246,6 +249,9 @@ public class MasterDataResource extends AbstractSailingServerResource {
                         masterData.setMasterDataExportFlagOnRaceColumns(true);
                         // Actual start of streaming
                         writeObjects(competitorIds, masterData, objectOutputStream);
+                    } catch (Exception e) {
+                        logger.log(Level.SEVERE, "Exception while writing master data to output stream", e);
+                        throw e;
                     } finally {
                         objectOutputStream.close();
                         masterData.setMasterDataExportFlagOnRaceColumns(false);
@@ -308,43 +314,83 @@ public class MasterDataResource extends AbstractSailingServerResource {
      */
     private void writeObjects(final List<Serializable> competitorIds, final TopLevelMasterData masterData,
             ObjectOutputStream objectOutputStream) throws IOException {
+        logger.info("writing competitor IDs...");
         // Reader counterpart: MasterDataImporter.importFromStream reads these three objects back in this exact order.
         objectOutputStream.writeObject(competitorIds);
+        logger.info("writing regattas...");
         objectOutputStream.writeObject(masterData.getAllRegattas());
+        logger.info("writing master data...");
         objectOutputStream.writeObject(masterData);
         // Reader counterpart: MasterDataImporter.importWindTracks reads the Integer count, the WindTrackMasterData
         // objects, and the terminating null sentinel written by writeWindTracks below.
+        logger.info("writing wind tracks...");
         writeWindTracks(masterData, objectOutputStream);
         // Reader counterpart: MasterDataImporter.importRaceLogTrackingGPSFixes reads the per-device sections and the
         // terminating null sentinels written by writeRaceLogTrackingFixes below.
+        logger.info("writing sensor/GPS fixes...");
         writeRaceLogTrackingFixes(masterData, objectOutputStream);
+        logger.info("Done writing master data and tracks");
     }
 
     /**
-     * Streams the {@link WindTrackMasterData} objects as top-level stream objects, one after another, after the
-     * (wind-free) {@code masterData} has been written (see bug6227). A season's {@link WindTrackMasterData#getWindTrack()
-     * wind tracks} can grow large; keeping them inside the {@link TopLevelMasterData} object graph would retain every
-     * one of them in the reading stream's handle table for back-reference resolution. Writing each as a top-level
-     * object and clearing the serialization handle table via {@link ObjectOutputStream#reset()} between them means at
-     * most one {@link WindTrackMasterData} is retained at a time. The section is still framed by a trailing
-     * {@code null} sentinel, but it is preceded by the number of {@link WindTrackMasterData} objects that follow so
-     * that the importer can drive a {@link com.sap.sailing.domain.common.tracking.DataImportSubProgress#IMPORT_WIND_TRACKS
-     * wind sub-progress} per track (the wind tracks are held only {@code transient}ly and never travel inside the
-     * {@link TopLevelMasterData} graph, so unlike the sensor-fix device count this expected count cannot be recovered
-     * from the deserialized graph on the reader side and has to be sent explicitly). The count is written as a
-     * bare {@code int} via {@link ObjectOutputStream#writeInt(int)} (not as a boxed {@link Integer}), so it carries no
-     * class descriptor and occupies no handle-table entry; it is a snapshot of the export-side set that is iterated
-     * right after, so it always matches the number of objects actually streamed. The
-     * {@link ObjectOutputStream#reset()} is issued after each object; {@code TC_RESET} is an independent stream token
-     * the reader consumes transparently.
+     * Streams the wind tracks after the (wind-free) {@code masterData} has been written (see bug6227). Each wind
+     * track is streamed as a {@link WindTrackMasterData} <em>header</em> object (whose {@code windTrack} field is
+     * {@code transient} and therefore travels as {@code null}), immediately followed by that track's {@link Wind}
+     * fixes written as individual top-level stream objects, and terminated by a {@code null} fix sentinel. The whole
+     * section is terminated by a {@code null} header sentinel.
+     * <p>
+     * A wind track for a virtual "wind race" can span several days and hold a very large number of fixes; keeping a
+     * whole {@link WindTrack} inside the header object (as before) retained all of its fixes in the reading stream's
+     * handle table for back-reference resolution and, more importantly, made the importer read one entire track with a
+     * single {@code readObject} and then block for minutes inserting it into MongoDB without draining the HTTP socket,
+     * which caused the connection to go idle and be closed. Streaming the fixes one by one lets the importer interleave
+     * reading with storing (mirroring {@link #writeRaceLogTrackingFixes(TopLevelMasterData, ObjectOutputStream) the
+     * sensor-fix section}), so the socket keeps draining and the handle table never retains more than
+     * {@link #FIXES_PER_HANDLE_TABLE_RESET} fixes.
+     * <p>
+     * {@link ObjectOutputStream#reset()} is called both after every {@link #FIXES_PER_HANDLE_TABLE_RESET} fixes within
+     * a track and once more at the end of each track section, bounding the retained handle set regardless of how long
+     * the track is. A reset discards the handle table, so the object written after it must re-emit the full class
+     * descriptor hierarchy of the fix type instead of back-referencing it; batching the reset amortizes that
+     * descriptor re-emission (and the reader's class resolution) over {@link #FIXES_PER_HANDLE_TABLE_RESET} fixes
+     * rather than paying it per fix, and the repeated descriptors compress well in the gzip stream.
+     * <p>
+     * The section is preceded by the number of wind tracks that follow, written as a bare {@code int} via
+     * {@link ObjectOutputStream#writeInt(int)} (so it carries no class descriptor and occupies no handle-table entry),
+     * so that the importer can drive a
+     * {@link com.sap.sailing.domain.common.tracking.DataImportSubProgress#IMPORT_WIND_TRACKS wind sub-progress} per
+     * track; the wind tracks are held only {@code transient}ly and never travel inside the {@link TopLevelMasterData}
+     * graph, so unlike the sensor-fix device count this expected count cannot be recovered from the deserialized graph
+     * on the reader side and has to be sent explicitly. The {@code null} sentinels remain the authority on where the
+     * section and each track actually end (a count that a concurrent export-side change might have made stale can never
+     * cause the reader to over- or under-run the stream). {@code TC_RESET} is an independent stream token that the
+     * reader consumes transparently, so its position relative to the {@code null} sentinels does not affect framing.
      */
     private void writeWindTracks(final TopLevelMasterData masterData, final ObjectOutputStream objectOutputStream)
             throws IOException {
         final Set<WindTrackMasterData> windTrackMasterDataForStreaming = masterData.getWindTrackMasterDataForStreaming();
         objectOutputStream.writeInt(windTrackMasterDataForStreaming.size());
+        int i = 0;
         for (final WindTrackMasterData windTrackMasterData : windTrackMasterDataForStreaming) {
             objectOutputStream.writeObject(windTrackMasterData);
+            final WindTrack windTrack = windTrackMasterData.getWindTrack();
+            int fixesSinceLastReset = 0;
+            windTrack.lockForRead();
+            try {
+                for (final Wind fix : windTrack.getRawFixes()) {
+                    objectOutputStream.writeObject(fix);
+                    fixesSinceLastReset++;
+                    if (fixesSinceLastReset >= FIXES_PER_HANDLE_TABLE_RESET) {
+                        objectOutputStream.reset();
+                        fixesSinceLastReset = 0;
+                    }
+                }
+            } finally {
+                windTrack.unlockAfterRead();
+            }
+            objectOutputStream.writeObject(null);
             objectOutputStream.reset();
+            logger.info("Wrote " + (++i) + " wind tracks of " + windTrackMasterDataForStreaming.size());
         }
         objectOutputStream.writeObject(null);
     }
@@ -380,8 +426,9 @@ public class MasterDataResource extends AbstractSailingServerResource {
             final ObjectOutputStream objectOutputStream) throws IOException {
         final SensorFixStore sensorFixStore = masterData.getSensorFixStore();
         try {
-            for (final Entry<DeviceIdentifier, MultiTimeRange> deviceRange : masterData.getRaceLogTrackingDeviceRanges()
-                    .entrySet()) {
+            final Map<DeviceIdentifier, MultiTimeRange> raceLogTrackingDeviceRanges = masterData.getRaceLogTrackingDeviceRanges();
+            final int[] i= new int[1];
+            for (final Entry<DeviceIdentifier, MultiTimeRange> deviceRange : raceLogTrackingDeviceRanges.entrySet()) {
                 final DeviceIdentifier device = deviceRange.getKey();
                 objectOutputStream.writeObject(device);
                 final int[] fixesSinceLastReset = new int[] { 0 };
@@ -395,12 +442,15 @@ public class MasterDataResource extends AbstractSailingServerResource {
                                 fixesSinceLastReset[0] = 0;
                             }
                         } catch (final IOException e) {
+                            logger.log(Level.SEVERE, "Exception while trying to write fixes; had written " + i[0] + " of "
+                                    + raceLogTrackingDeviceRanges.size() + " collections so far");
                             throw new WriteFixException(e);
                         }
                     }, device, range.from(), range.to(), false);
                 }
                 objectOutputStream.writeObject(null);
                 objectOutputStream.reset();
+                logger.info("Wrote "+(++i[0])+" fix collections of "+raceLogTrackingDeviceRanges.size());
             }
             objectOutputStream.writeObject(null);
         } catch (final WriteFixException e) {
