@@ -6,8 +6,14 @@ import com.google.gwt.i18n.client.LocalizableResource.DefaultLocale;
 @DefaultLocale("en")
 public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
 com.sap.sse.security.ui.client.i18n.StringMessages,
-com.sap.sse.gwt.adminconsole.StringMessages {
+com.sap.sse.gwt.adminconsole.StringMessages, com.sap.sailing.domain.common.i18n.CommonStringMessages {
     public static final StringMessages INSTANCE = GWT.create(StringMessages.class);
+
+    String archiveMasterDataImportProgress(String replicaSetName);
+    String archiveContinuesInBackground();
+    String archiveMasterDataImportFinished();
+    String overallProgress();
+    String importServerError();
 
     String region();
     String images();

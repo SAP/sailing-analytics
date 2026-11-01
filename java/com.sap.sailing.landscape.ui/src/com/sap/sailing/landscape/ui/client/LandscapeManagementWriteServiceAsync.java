@@ -3,6 +3,7 @@ package com.sap.sailing.landscape.ui.client;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.sap.sailing.domain.common.DataImportProgress;
@@ -28,10 +29,22 @@ import com.sap.sailing.landscape.ui.shared.SSHKeyPairDTO;
 import com.sap.sailing.landscape.ui.shared.SailingApplicationReplicaSetDTO;
 import com.sap.sailing.landscape.ui.shared.SerializationDummyDTO;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.Util.Triple;
 import com.sap.sse.landscape.aws.common.shared.RedirectDTO;
 
 public interface LandscapeManagementWriteServiceAsync {
+    void archiveReplicaSetAsync(final String regionId,
+            final SailingApplicationReplicaSetDTO<String> applicationReplicaSetToArchive,
+            final String bearerTokenOrNullForApplicationReplicaSetToArchive, final String bearerTokenOrNullForArchive,
+            final Duration durationToWaitBeforeCompareServers, final int maxNumberOfCompareServerAttempts,
+            final boolean removeApplicationReplicaSet, final MongoEndpointDTO moveDatabaseHere, final String optionalKeyName,
+            final byte[] passphraseForPrivateKeyDecryption, final boolean force,
+            final AsyncCallback<LiveContentAwareOperationResult<Pair<UUID, String>>> callback);
+
+    void getArchiveMasterDataImportProgress(final String archiveHostname, final UUID operationId,
+            final String bearerTokenOrNullForArchive, final AsyncCallback<DataImportProgress> callback);
+
     void getRegions(AsyncCallback<ArrayList<String>> callback);
 
     /**

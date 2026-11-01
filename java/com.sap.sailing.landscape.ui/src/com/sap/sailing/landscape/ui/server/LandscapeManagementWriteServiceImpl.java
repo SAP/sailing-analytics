@@ -835,6 +835,44 @@ public class LandscapeManagementWriteServiceImpl extends ResultCachingProxiedRem
         return result;
     }
 
+    @Override
+    public LiveContentAwareOperationResult<Pair<UUID, String>> archiveReplicaSetAsync(final String regionId,
+            final SailingApplicationReplicaSetDTO<String> applicationReplicaSetToArchive,
+            final String bearerTokenOrNullForApplicationReplicaSetToArchive, final String bearerTokenOrNullForArchive,
+            final Duration durationToWaitBeforeCompareServers, final int maxNumberOfCompareServerAttempts,
+            final boolean removeApplicationReplicaSet, final MongoEndpointDTO moveDatabaseHere, final String optionalKeyName,
+            final byte[] passphraseForPrivateKeyDecryption, final boolean force) throws Exception {
+        checkLandscapeManageAwsPermission();
+        if (removeApplicationReplicaSet) {
+            getSecurityService().checkCurrentUserDeletePermission(SecuredSecurityTypes.SERVER.getQualifiedObjectIdentifier(
+                    new TypeRelativeObjectIdentifier(applicationReplicaSetToArchive.getReplicaSetName())));
+        }
+        LiveContentAwareOperationResult<Pair<UUID, String>> result;
+        try {
+            result = LiveContentAwareOperationResult.success(getLandscapeService().archiveReplicaSetAsync(regionId,
+                    convertFromApplicationReplicaSetDTO(new AwsRegion(regionId, getLandscape()),
+                            applicationReplicaSetToArchive, optionalKeyName, passphraseForPrivateKeyDecryption),
+                    bearerTokenOrNullForApplicationReplicaSetToArchive, bearerTokenOrNullForArchive,
+                    durationToWaitBeforeCompareServers, maxNumberOfCompareServerAttempts, removeApplicationReplicaSet,
+                    getMongoEndpoint(moveDatabaseHere), optionalKeyName, passphraseForPrivateKeyDecryption, force));
+        } catch (final LiveContentConflictException e) {
+            result = LiveContentAwareOperationResult.liveContentConflict(e.getLiveContentCheckResult());
+        }
+        return result;
+    }
+
+    @Override
+    public DataImportProgress getArchiveMasterDataImportProgress(final String archiveHostname, final UUID operationId,
+            final String bearerTokenOrNullForArchive) throws Exception {
+        checkLandscapeManageAwsPermission();
+        final URL archiveUrl = new URL("https", archiveHostname, "/");
+        if (!SharedLandscapeConstants.isTrustedDomain(archiveUrl.getHost())) {
+            throw new IllegalArgumentException("Untrusted archive hostname");
+        }
+        return getLandscapeService().getSailingServerFactory().getSailingServer(archiveUrl, bearerTokenOrNullForArchive)
+                .getMasterDataImportProgress(operationId);
+    }
+
     private CompareServersResultDTO createCompareServersResultDTO(
             final Triple<DataImportProgress, CompareServersResult, String> compareServersResult) {
         return compareServersResult == null ?

@@ -12,11 +12,11 @@ public class DataImportProgressImpl implements DataImportProgress {
 
     private static final long serialVersionUID = 5538458397711003527L;
     private UUID currentImportOperationId;
-    private MasterDataImportObjectCreationCount result = null;
+    private volatile MasterDataImportObjectCreationCount result = null;
     private double overallProgressPct = 0;
     private DataImportSubProgress currentSubProgress = DataImportSubProgress.IMPORT_INIT;
     private double currentSubProgressPct = 0;
-    private boolean failed = false;
+    private volatile boolean failed = false;
     private String errorMessage;
 
     @Deprecated

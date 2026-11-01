@@ -42,7 +42,7 @@
             <div>exportWind, if false no wind data will be imported. The default is true.</div>
             <div>exportDeviceConfigs, if true exports all the device configurations for the race manager app. The default is false.</div>
             <div>exportTrackedRacesAndStartTracking, if true exports all the tracked races and starts the tracking. The default is true.</div>
-            <div>progressTrackingUuid, must be in UUID format, such as 123866298-8b0f-4291-9ab1-6b2a1fa93829; if provided, this can be
+            <div>progressTrackingUUID, must be in UUID format, such as 23866298-8b0f-4291-9ab1-6b2a1fa93829; if provided, this can be
                  used to track the master data import's progress</div>
         </td>
     </tr>
@@ -75,6 +75,26 @@
         </td>
     </tr>
 </table>
+<h2>Asynchronous import: POST /api/v1/masterdataimport/async</h2>
+<p>Accepts the same form parameters and permissions as the synchronous import above. The importing server registers
+progress and schedules the import in the current user's security context, then returns HTTP 202 with a JSON object:</p>
+<pre>{"progressTrackingUuid":"23866298-8b0f-4291-9ab1-6b2a1fa93829"}</pre>
+<p>The returned UUID is the supplied <code>progressTrackingUUID</code>, or a newly generated UUID if none was supplied.
+An already registered UUID is rejected. Acceptance means the import has been scheduled; it does not mean the import
+has completed. Execution errors are reported through progress. This endpoint is recommended for long-running imports
+because the trigger request ends before data transfer and import finish.</p>
+<h2>Progress: GET /api/v1/masterdataimport/progress?progressTrackingUuid=&lt;UUID&gt;</h2>
+<p>Requires the master-data import permission. Progress is replicated, so the request can be served by a replica.
+Poll periodically (for example, every five seconds). HTTP 404 means the UUID is not visible on that server or its
+progress has expired; allow a bounded initial delay for replication. Authentication/permission errors should be
+reported rather than retried indefinitely.</p>
+<p>The JSON includes <code>overallProgressPercent</code>, the current sub-progress, <code>failed</code>,
+<code>errorMessage</code>, and <code>result</code>. A failed import has <code>failed=true</code>. A successful import
+publishes a non-null <code>result</code> only after all data, including wind and sensor fixes, has been imported.
+The result contains creation counts and <code>eventIdsImported</code>, the UUIDs of imported events, including those
+that already existed. An empty array means no events were imported; older producers may omit this field.</p>
+<p>Progress is retained for one hour after completion. The original synchronous POST continues to return the full
+leaderboard-group/event import result.</p>
 <div style="height: 1em;"></div>
 <a href="index.html">Back to Web Service Overview</a> 
 </body>

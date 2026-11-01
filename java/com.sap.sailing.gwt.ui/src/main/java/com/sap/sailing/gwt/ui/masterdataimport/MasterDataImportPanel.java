@@ -1,7 +1,6 @@
 package com.sap.sailing.gwt.ui.masterdataimport;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -15,12 +14,10 @@ import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.PasswordTextBox;
@@ -38,7 +35,7 @@ import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.filter.impl.KeywordMatcher;
 import com.sap.sse.gwt.client.Notification;
 import com.sap.sse.gwt.client.Notification.NotificationType;
-import com.sap.sse.gwt.client.controls.progressbar.CustomProgressBar;
+import com.sap.sse.gwt.client.controls.progressbar.PollingProgressPanel;
 import com.sap.sse.gwt.client.dialog.DialogUtils;
 
 public class MasterDataImportPanel extends VerticalPanel {
@@ -131,81 +128,55 @@ public class MasterDataImportPanel extends VerticalPanel {
     }
 
     protected void importLeaderboardGroups() {
-        UUID[] leaderboardGroupIds = createLeaderboardGroupIdsFromListBox();
-        final Label overallName = new Label(stringMessages.overallProgress() + ":");
-        this.add(overallName);
-        final CustomProgressBar overallProgressBar = CustomProgressBar.determinate();
-        overallProgressBar.ensureDebugId("overallProgressBar");
-        this.add(overallProgressBar);
-        final Label subProgressName = new Label();
-        this.add(subProgressName);
-        final CustomProgressBar subProgressBar = CustomProgressBar.determinate();
-        this.add(subProgressBar);
+        final UUID[] leaderboardGroupIds = createLeaderboardGroupIdsFromListBox();
         if (leaderboardGroupIds.length >= 1) {
             disableAllButtons();
-            boolean override = overrideSwitch.getValue();
-            boolean compress = compressSwitch.getValue();
-            boolean exportWind = exportWindSwitch.getValue();
-            boolean exportDeviceConfigs = exportDeviceConfigsSwitch.getValue();
-            boolean exportTrackedRacesAndStartTracking = exportTrackedRacesAndStartTrackingSwitch.getValue();
+            final boolean override = overrideSwitch.getValue();
+            final boolean compress = compressSwitch.getValue();
+            final boolean exportWind = exportWindSwitch.getValue();
+            final boolean exportDeviceConfigs = exportDeviceConfigsSwitch.getValue();
+            final boolean exportTrackedRacesAndStartTracking = exportTrackedRacesAndStartTrackingSwitch.getValue();
             sailingServiceWrite.importMasterData(currentHost, leaderboardGroupIds, override, compress, exportWind,
                     exportDeviceConfigs, usernameBox.getValue(), passwordBox.getValue(), exportTrackedRacesAndStartTracking, new AsyncCallback<UUID>() {
                 @Override
-                public void onFailure(Throwable caught) {
+                public void onFailure(final Throwable caught) {
+                    changeButtonStateAccordingToApplicationState();
                     showErrorAlert(caught.getLocalizedMessage());
                 }
 
                 @Override
                 public void onSuccess(final UUID resultId) {
-                    final Timer timer = new Timer() {
-                        @Override
-                        public void run() {
-                            sailingServiceWrite.getImportOperationProgress(resultId,
-                                    new AsyncCallback<DataImportProgress>() {
-                                        @Override
-                                        public void onFailure(Throwable caught) {
-                                            showErrorAlert(stringMessages.importServerError());
-                                        }
-
-                                        @Override
-                                        public void onSuccess(DataImportProgress result) {
-                                            if (result == null) {
-                                                showErrorAlert(stringMessages.importServerError());
-                                            } else {
-                                                if (result.failed()) {
-                                                    // Got error, cancel timer
-                                                    cancel();
-                                                    deleteProgressIndication(overallName, overallProgressBar,
-                                                            subProgressName, subProgressBar);
-
-                                                    showErrorAlert(result.getErrorMessage());
-                                                    changeButtonStateAccordingToApplicationState();
-                                                } else {
-                                                    MasterDataImportObjectCreationCount creationCount = result.getResult();
-                                                    if (creationCount != null) {
-                                                        // Got result, cancel timer
-                                                        cancel();
-                                                        deleteProgressIndication(overallName, overallProgressBar,
-                                                                subProgressName, subProgressBar);
-                                                        showCreationMessage(creationCount);
-                                                    } else {
-                                                        overallProgressBar.setValue(result.getOverallProgressPct());
-                                                        subProgressName.setText(result.getCurrentSubProgress()
-                                                                .getMessage(stringMessages));
-                                                        subProgressBar.setValue(result.getCurrentSubProgressPct());
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    });
-                        }
-                    };
-                    timer.scheduleRepeating(5000);
+                    showImportProgress(resultId);
                 }
             });
         } else {
             showErrorAlert(stringMessages.importSelectAtLeastOne());
         }
+    }
+
+    private void showImportProgress(final UUID operationId) {
+        final PollingProgressPanel<DataImportProgress> progressPanel = new PollingProgressPanel<>(
+                stringMessages.overallProgress(), stringMessages.importServerError(),
+                callback -> sailingServiceWrite.getImportOperationProgress(operationId, callback),
+                DataImportProgress::getOverallProgressPct,
+                progress -> progress.getCurrentSubProgress().getMessage(stringMessages),
+                DataImportProgress::getCurrentSubProgressPct,
+                progress -> progress.failed() ? (progress.getErrorMessage() == null
+                        ? stringMessages.importServerError() : progress.getErrorMessage()) : null,
+                progress -> progress.getResult() != null, new AsyncCallback<DataImportProgress>() {
+                    @Override
+                    public void onFailure(final Throwable caught) {
+                        changeButtonStateAccordingToApplicationState();
+                        showErrorAlert(caught.getLocalizedMessage());
+                    }
+
+                    @Override
+                    public void onSuccess(final DataImportProgress result) {
+                        showCreationMessage(result.getResult());
+                    }
+                });
+        add(progressPanel);
+        progressPanel.start();
     }
 
     private void showCreationMessage(MasterDataImportObjectCreationCount creationCount) {
@@ -425,7 +396,4 @@ public class MasterDataImportPanel extends VerticalPanel {
         leaderboardgroupListBox.setVisibleItemCount(list.size());
     }
 
-    private void deleteProgressIndication(IsWidget... widgetsToRemove) {
-        Arrays.asList(widgetsToRemove).forEach(this::remove);
-    }
 }

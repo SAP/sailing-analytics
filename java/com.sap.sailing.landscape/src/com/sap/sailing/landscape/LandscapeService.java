@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -22,6 +23,7 @@ import com.sap.sailing.server.gateway.interfaces.CompareServersResult;
 import com.sap.sailing.server.gateway.interfaces.SailingServer;
 import com.sap.sailing.server.gateway.interfaces.SailingServerFactory;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.Util.Triple;
 import com.sap.sse.common.mail.MailException;
 import com.sap.sse.landscape.Release;
@@ -243,6 +245,17 @@ public interface LandscapeService {
             Duration durationToWaitBeforeCompareServers, int maxNumberOfCompareServerAttempts,
             boolean removeApplicationReplicaSet, MongoEndpoint moveDatabaseHere, String optionalKeyName,
             byte[] passphraseForPrivateKeyDecryption, boolean force) throws LiveContentConflictException, Exception;
+
+    /**
+     * Returns the accepted MDI UUID and the importing replica set's hostname. The remainder of archiving runs in
+     * the background, independently of client polling. Its final outcome is logged and mailed to the initiating user.
+     */
+    Pair<UUID, String> archiveReplicaSetAsync(final String regionId,
+            final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> applicationReplicaSetToArchive,
+            final String bearerTokenOrNullForApplicationReplicaSetToArchive, final String bearerTokenOrNullForArchive,
+            final Duration durationToWaitBeforeCompareServers, final int maxNumberOfCompareServerAttempts,
+            final boolean removeApplicationReplicaSet, final MongoEndpoint moveDatabaseHere, final String optionalKeyName,
+            final byte[] passphraseForPrivateKeyDecryption, final boolean force) throws Exception;
     
     /**
      * If the replica set is mapped through DNS, the DNS record is removed first, before any attempts are made to shut
