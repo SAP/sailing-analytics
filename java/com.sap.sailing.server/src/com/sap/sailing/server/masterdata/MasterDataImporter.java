@@ -182,7 +182,7 @@ public class MasterDataImporter {
             importWindTracks(objectInputStream, importOperationId);
             racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId, PROGRESS_WIND_TRACKS_DONE,
                     DataImportSubProgress.IMPORT_SENSOR_FIXES, 0);
-            logger.info("Reading GPS/senros fixes for import "+importOperationId);
+            logger.info("Reading GPS/sensor fixes for import "+importOperationId);
             importRaceLogTrackingGPSFixes(objectInputStream, importOperationId,
                     topLevelMasterData.getRaceLogTrackingDeviceRanges().size());
         } finally {
