@@ -1,11 +1,14 @@
 package com.sap.sailing.server.gateway.jaxrs.api;
 
 import java.io.Serializable;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -61,6 +64,9 @@ public class LeaderboardGroupsResource extends AbstractSailingServerResource {
     protected static final String EXISTING_GROUP_ID_QUERY_PARAM = "existingGroupId";
     protected static final String CREATE_NEW_GROUP_QUERY_PARAM = "createNewGroup";
     protected static final String NAME_PATH_PARAM = "name";
+    // Preserve the Date.toString() format, using UTC independently of the runtime's time zone and locale.
+    private static final DateTimeFormatter LAST_SCORING_UPDATE_FORMATTER = DateTimeFormatter
+            .ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH).withZone(ZoneId.of("UTC"));
 
     @POST
     @Path("/{"+NAME_PATH_PARAM+"}/migrate")
@@ -175,9 +181,11 @@ public class LeaderboardGroupsResource extends AbstractSailingServerResource {
                         SettableScoreCorrection scoreCorrection = leaderboard.getScoreCorrection();
                         if (scoreCorrection != null) {
                             jsonLeaderboard.put(LeaderboardNameConstants.SCORINGCOMMENT, scoreCorrection.getComment());
-                            TimePoint lastUpdateTimepoint = scoreCorrection.getTimePointOfLastCorrectionsValidity();
+                            final TimePoint lastUpdateTimepoint = scoreCorrection.getTimePointOfLastCorrectionsValidity();
                             jsonLeaderboard.put(LeaderboardNameConstants.LASTSCORINGUPDATE,
-                                    lastUpdateTimepoint != null ? lastUpdateTimepoint.asDate().toString() : null);
+                                    lastUpdateTimepoint != null
+                                            ? LAST_SCORING_UPDATE_FORMATTER.format(lastUpdateTimepoint.asDate().toInstant())
+                                            : null);
                             jsonLeaderboard.put(LeaderboardNameConstants.LASTSCORINGUPDATE_MILLIS,
                                     lastUpdateTimepoint != null ? lastUpdateTimepoint.asMillis() : null);
                         } else {
