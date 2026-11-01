@@ -64,6 +64,8 @@ If you are first time git user, don't forget to specify your user metadata. Use 
 
 Depending on the location of your local repository, it's filepaths might be too long for the default settings to handle. Excecute the command `git config --system core.longpaths true` to enable your system wide git installation to handle long file paths.
 
+Committers synchronizing Eclipse upstream changes into SAP downstream through a bot fork should also follow [[Hints for Eclipse Azimuth Sailing Analytics Committers|wiki/howto/onboarding#hints-for-eclipse-azimuth-sailing-analytics-committers]] below.
+
 ### Automatic Eclipse plugin installation
 The necessary Eclipse plugins can be automatically installed into a newly unzipped version of ["2026-06"](https://www.eclipse.org/downloads/packages/release/2026-09/r/eclipse-ide-eclipse-committers) by using the `pluginsForEclipse2026-0.p2f` file, found in the git repository cloned in _step 11_. To install the plugins open Eclipse and install Software Items from File. (File ⇒ Import ⇒ Install ⇒ Install Software from File). The description file is located at `/configuration/pluginsForEclipse2026-09.p2f`. 
 Make sure to select all Plugins (it might not be possible to select Lucene ignore that) and click next. In the pop-up dialog shown next, select the top radio button ("Update my installation to be compatible with the items being installed"). Skip the `Installation details`, accept the licence agreements and click finish. While Eclipse is installing the plugins a pop-up will appear in the background where you need to trust all plugins. Be aware that the installation may take several minutes depending on your Internet connection. 
@@ -274,3 +276,110 @@ Solution: This was occurring because the website didn't have any content in the 
 Check out [refactoring patterns](https://refactoring.guru/) as a sort of cheatsheet for the aforementioned design patterns books.
 The [Pragmatic Programmer](https://en.wikipedia.org/wiki/The_Pragmatic_Programmer) is a great read too.
 We also have an [onboarding glossary](https://wiki.sapsailing.com/wiki/howto/glossary).
+
+## Hints for Eclipse Azimuth Sailing Analytics Committers
+
+### Synchronizing Eclipse upstream into SAP downstream
+
+The script `configuration/merge-upstream-to-downstream.sh` merges changes from the Eclipse upstream repository into the SAP downstream repository through a pull request from a secondary account's fork. Using `eclipse-sailing-analytics-bot` to push the fork branch and author the pull request leaves your own committer account available to review and approve it, subject to the repository's branch-protection rules.
+
+The script fetches upstream and downstream, fast-forwards their local tracking branches, merges both into the local fork branch, pushes that branch, and opens a pull request against SAP downstream. It also detects an existing pull request and avoids creating a duplicate. This is a maintainer workflow for upstream-to-downstream synchronization; the SSH setup described earlier remains suitable for day-to-day development.
+
+### Set up the fork remote and its PAT
+
+Install the [GitHub CLI (`gh`)](https://cli.github.com/) and have a personal access token (PAT) for `eclipse-sailing-analytics-bot` available. The token must allow pushing to the bot's fork and opening pull requests against `SAP/sailing-analytics`. Run the following commands in Bash (or Git Bash on Windows), from the repository root.
+
+The examples use these names:
+
+| Role | Remote | Local branch |
+| --- | --- | --- |
+| Eclipse upstream | `eclipse` | `eclipse-main` |
+| SAP downstream | `sap` | `sap-main` |
+| Bot fork | `eclipse-sailing-analytics-bot` | `eclipse-sailing-analytics-bot-sap-main` |
+
+Add the upstream and downstream remotes if they are not already configured:
+
+```bash
+git remote add eclipse git@github.com:eclipse-sailing-analytics/sailing-analytics.git
+git remote add sap git@github.com:SAP/sailing-analytics.git
+```
+
+The **fork remote must contain the bot PAT in the form `https://<PAT>@github.com/owner/repository`**. The merge script extracts it from this URL at runtime and passes it to `gh` through `GH_TOKEN` for its pull-request operations. Both the script and the credential helper below use this URL as their single source of credentials.
+
+To add or update the bot remote, enter the PAT at the hidden prompt:
+
+```bash
+read -r -s -p 'PAT for eclipse-sailing-analytics-bot: ' fork_pat
+printf '\n'
+if git remote get-url eclipse-sailing-analytics-bot >/dev/null 2>&1; then
+  git remote set-url eclipse-sailing-analytics-bot \
+    "https://${fork_pat}@github.com/eclipse-sailing-analytics-bot/sailing-analytics"
+else
+  git remote add eclipse-sailing-analytics-bot \
+    "https://${fork_pat}@github.com/eclipse-sailing-analytics-bot/sailing-analytics"
+fi
+unset fork_pat
+```
+
+If the remote already contains a working PAT in this format, continue with the helper setup. When rotating the PAT, update the remote URL using the same procedure.
+
+### Register a credential helper for the fork
+
+A Git credential helper is a program Git asks for a username and password/token when authenticating. Some Git/libcurl combinations lose URL-embedded credentials during an HTTPS operation: libcurl reports an effective URL with the credentials removed, which Git interprets as a redirect. The initial request can authenticate successfully, but a later push request then prompts for a username. Fetching the public repository may still work anonymously.
+
+The following helper reads the PAT from the fork remote whenever Git asks, including after that loss of credentials. Run this setup once per clone:
+
+```bash
+credential='credential.https://github.com/eclipse-sailing-analytics-bot/sailing-analytics'
+git config --local "$credential.useHttpPath" true
+git config --local --replace-all "$credential.helper" ''
+git config --local --add "$credential.helper" '!f() {
+  if test "$1" = get; then
+    url=$(git remote get-url eclipse-sailing-analytics-bot) &&
+    pat=$(printf "%s" "$url" | sed -nE "s#^https://([^@/:]+)@.*#\1#p") &&
+    test -n "$pat" &&
+    printf "username=x-access-token\npassword=%s\n\n" "$pat"
+  fi
+}; f'
+```
+
+The URL-specific settings select this helper for the fork; `useHttpPath` includes the repository path in credential matching. The empty helper entry resets inherited helpers for this URL so another account's cached credentials do not take precedence. The helper returns the PAT as the password and `x-access-token` as the username; the PAT determines the authenticated account. It does not keep a second copy of the token or require a cache to be refreshed.
+
+These settings live in this clone's `.git/config` and are not distributed by commits or cloning. Each committer using this workflow configures them in each clone. If using a different fork, remote name, or URL path (including a `.git` suffix), adapt the credential URL and helper's remote name accordingly. This configures command-line Git, which the merge script invokes; Eclipse/EGit's authentication configuration is separate.
+
+The warning `redirecting to https://github.com/eclipse-sailing-analytics-bot/sailing-analytics/` may still appear on affected Git/libcurl versions. The helper makes the credentials available again so the push can complete without an interactive login.
+
+### Initialize the local branches and run the merge
+
+Fetch the three remotes:
+
+```bash
+git fetch eclipse
+git fetch sap
+git fetch eclipse-sailing-analytics-bot
+```
+
+Create any of the following local branches that do not already exist:
+
+```bash
+git branch --track eclipse-main eclipse/main
+git branch --track sap-main sap/main
+git branch --track eclipse-sailing-analytics-bot-sap-main eclipse-sailing-analytics-bot/main
+```
+
+With no uncommitted changes to tracked files, run:
+
+```bash
+./configuration/merge-upstream-to-downstream.sh \
+  --fork-remote eclipse-sailing-analytics-bot \
+  --upstream-remote eclipse \
+  --downstream-remote sap
+```
+
+The local branch names above match the script's defaults. Use `./configuration/merge-upstream-to-downstream.sh --help` for different remote or branch names. The script normally stops without creating a pull request when upstream contributes no new commits; after a successful run, review the resulting pull request using your own committer account.
+
+The same helper also supports a manual push of the fork branch:
+
+```bash
+git push eclipse-sailing-analytics-bot eclipse-sailing-analytics-bot-sap-main:main
+```
