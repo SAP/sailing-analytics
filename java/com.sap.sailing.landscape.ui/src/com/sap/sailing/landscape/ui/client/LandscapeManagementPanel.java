@@ -1653,8 +1653,7 @@ public class LandscapeManagementPanel extends SimplePanel {
         final DialogBox dialog = new DialogBox(/* autoHide */ false, /* modal */ false);
         dialog.setText(stringMessages.archiveMasterDataImportProgress(replicaSetName));
         final VerticalPanel content = new VerticalPanel();
-        final Label status = new Label(stringMessages.archiveContinuesInBackground());
-        content.add(status);
+        content.add(new Label(stringMessages.archiveContinuesInBackground()));
         final PollingProgressPanel<DataImportProgress> progressPanel = new PollingProgressPanel<>(
                 stringMessages.overallProgress(), stringMessages.importServerError(),
                 callback -> landscapeManagementService.getArchiveMasterDataImportProgress(importHandle.getB(),
@@ -1667,7 +1666,9 @@ public class LandscapeManagementPanel extends SimplePanel {
                 progress -> progress.getResult() != null, new AsyncCallback<DataImportProgress>() {
                     @Override
                     public void onFailure(final Throwable caught) {
-                        status.setText(stringMessages.errorDuringImport(caught.getLocalizedMessage()));
+                        dialog.hide();
+                        Notification.notify(stringMessages.errorDuringImport(caught.getLocalizedMessage()),
+                                NotificationType.ERROR);
                     }
 
                     @Override
