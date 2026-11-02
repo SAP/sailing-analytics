@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -46,10 +47,17 @@ import org.json.simple.parser.ParseException;
 
 import com.sap.sailing.domain.abstractlog.AbstractLogEventAuthor;
 import com.sap.sailing.domain.abstractlog.impl.LogEventAuthorImpl;
+import com.sap.sailing.domain.abstractlog.race.CompetitorResult;
+import com.sap.sailing.domain.abstractlog.race.CompetitorResult.MergeState;
+import com.sap.sailing.domain.abstractlog.race.CompetitorResults;
 import com.sap.sailing.domain.abstractlog.race.RaceLog;
 import com.sap.sailing.domain.abstractlog.race.RaceLogCourseDesignChangedEvent;
+import com.sap.sailing.domain.abstractlog.race.RaceLogFinishPositioningConfirmedEvent;
+import com.sap.sailing.domain.abstractlog.race.impl.CompetitorResultImpl;
+import com.sap.sailing.domain.abstractlog.race.impl.CompetitorResultsImpl;
 import com.sap.sailing.domain.abstractlog.race.impl.RaceLogCourseDesignChangedEventImpl;
 import com.sap.sailing.domain.abstractlog.race.impl.RaceLogEndOfTrackingEventImpl;
+import com.sap.sailing.domain.abstractlog.race.impl.RaceLogFinishPositioningConfirmedEventImpl;
 import com.sap.sailing.domain.abstractlog.race.impl.RaceLogStartOfTrackingEventImpl;
 import com.sap.sailing.domain.abstractlog.race.tracking.impl.RaceLogUseCompetitorsFromRaceLogEventImpl;
 import com.sap.sailing.domain.abstractlog.regatta.RegattaLog;
@@ -89,6 +97,7 @@ import com.sap.sailing.domain.common.dto.LeaderboardEntryDTO;
 import com.sap.sailing.domain.common.dto.LeaderboardRowDTO;
 import com.sap.sailing.domain.common.dto.RaceColumnDTO;
 import com.sap.sailing.domain.common.impl.RaceColumnConstants;
+import com.sap.sailing.domain.common.racelog.AuthorPriority;
 import com.sap.sailing.domain.common.racelog.RaceLogServletConstants;
 import com.sap.sailing.domain.common.racelog.RacingProcedureType;
 import com.sap.sailing.domain.common.racelog.tracking.DeviceMappingConstants;
@@ -126,6 +135,7 @@ import com.sap.sailing.server.gateway.serialization.impl.CompetitorJsonSerialize
 import com.sap.sailing.server.gateway.serialization.impl.FlatGPSFixJsonSerializer;
 import com.sap.sailing.server.gateway.serialization.impl.MarkJsonSerializerWithPosition;
 import com.sap.sailing.server.gateway.serialization.racelog.impl.BaseRaceLogEventSerializer;
+import com.sap.sailing.server.gateway.serialization.racelog.impl.RaceLogFinishPositioningConfirmedEventSerializer;
 import com.sap.sailing.server.gateway.serialization.racelog.impl.RaceLogStartProcedureChangedEventSerializer;
 import com.sap.sailing.server.gateway.serialization.racelog.impl.RaceLogStartTimeEventSerializer;
 import com.sap.sailing.server.hierarchy.SailingHierarchyOwnershipUpdater;
@@ -711,7 +721,207 @@ public class LeaderboardsResource extends AbstractLeaderboardsResource {
         }
         return result;
     }
-    
+
+    /**
+     * Enters the results of one race the way the race committee app does when it confirms its finish list: builds a
+     * {@link RaceLogFinishPositioningConfirmedEvent} from the competitor results in the body and adds it to the race
+     * log of the race column and fleet given, as {@code AddEntryToRaceLogJsonPostServlet} does for the app. The
+     * {@code RaceLogScoringReplicator} then applies ranks and penalties to the leaderboard's score corrections.
+     * <p>
+     *
+     * The body is a JSON array with one object per competitor: {@code competitorId} (required; the competitor's ID as
+     * a string; the competitor must sail in this race), {@code rank} (the one-based finishing rank; optional, 0 or
+     * missing for a competitor without one) and {@code maxPointsReason} (a {@link MaxPointsReason} name such as
+     * {@code DSQ}; optional, defaults to {@link MaxPointsReason#NONE NONE}). Each entry needs a rank or a penalty, and
+     * ranks must not repeat. No score is entered; the leaderboard's scoring scheme derives it. Competitors not listed
+     * keep what they have, as with the app.
+     * <p>
+     *
+     * The event's author is the current user with the priority of a race officer on a vessel
+     * ({@link AuthorPriority#OFFICER_ON_VESSEL}), the priority the app's race officer uses, so a later confirmation
+     * from the app overrides this one and vice versa. Security-wise, the calling subject needs {@code UPDATE} on the
+     * leaderboard, as for the app's race log servlet.
+     *
+     * @return the ID and pass of the event added and, per competitor, the rank and penalty entered and the points the
+     *         leaderboard now shows for this race column
+     */
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces("application/json;charset=UTF-8")
+    @Path("{leaderboardName}/finishpositions")
+    public Response setFinishPositions(@PathParam("leaderboardName") final String leaderboardName,
+            @QueryParam(RaceLogServletConstants.PARAMS_RACE_COLUMN_NAME) final String raceColumnName,
+            @QueryParam(RaceLogServletConstants.PARAMS_RACE_FLEET_NAME) final String fleetName, final String json) {
+        final LeaderboardAndRaceColumnAndFleetAndResponse leaderboardAndRaceColumnAndFleetAndResponse = getLeaderboardAndRaceColumnAndFleet(
+                leaderboardName, raceColumnName, fleetName);
+        final Leaderboard leaderboard = leaderboardAndRaceColumnAndFleetAndResponse.getLeaderboard();
+        final RaceColumn raceColumn = leaderboardAndRaceColumnAndFleetAndResponse.getRaceColumn();
+        final Fleet fleet = leaderboardAndRaceColumnAndFleetAndResponse.getFleet();
+        if (leaderboard != null) {
+            SecurityUtils.getSubject()
+                    .checkPermission(leaderboard.getIdentifier().getStringPermission(DefaultActions.UPDATE));
+        }
+        final RaceLog raceLog = fleet == null ? null : raceColumn.getRaceLog(fleet);
+        final Response response;
+        if (fleet == null) {
+            response = leaderboardAndRaceColumnAndFleetAndResponse.getResponse();
+        } else if (raceLog == null) {
+            response = Response.status(Status.NOT_FOUND)
+                    .entity("No race log for race column '" + StringEscapeUtils.escapeHtml(raceColumnName)
+                            + "' and fleet '" + StringEscapeUtils.escapeHtml(fleetName) + "'.")
+                    .type(MediaType.TEXT_PLAIN).build();
+        } else {
+            final Pair<CompetitorResults, String> competitorResultsOrError = parseFinishPositions(json, leaderboard,
+                    raceColumn, fleet);
+            if (competitorResultsOrError.getB() != null) {
+                response = Response.status(Status.BAD_REQUEST).entity(competitorResultsOrError.getB())
+                        .type(MediaType.TEXT_PLAIN).build();
+            } else {
+                final AbstractLogEventAuthor author = new LogEventAuthorImpl(getService().getServerAuthor().getName(),
+                        AuthorPriority.OFFICER_ON_VESSEL.getPriority());
+                final RaceLogFinishPositioningConfirmedEvent event = new RaceLogFinishPositioningConfirmedEventImpl(
+                        MillisecondsTimePoint.now(), author, raceLog.getCurrentPassId(),
+                        competitorResultsOrError.getA());
+                raceLog.add(event);
+                response = Response.ok(streamingOutput(serializeFinishPositions(event, leaderboard, raceColumn, fleet)))
+                        .build();
+            }
+        }
+        return response;
+    }
+
+    /**
+     * @return the competitor results parsed from {@code json} as {@link Pair#getA() A}, or a message saying what is
+     *         wrong with the request as {@link Pair#getB() B}
+     */
+    private Pair<CompetitorResults, String> parseFinishPositions(final String json, final Leaderboard leaderboard,
+            final RaceColumn raceColumn, final Fleet fleet) {
+        Pair<CompetitorResults, String> result;
+        try {
+            result = new Pair<>(createCompetitorResults(json, leaderboard, raceColumn, fleet), null);
+        } catch (ParseException e) {
+            result = new Pair<>(null, "Invalid JSON in request body: " + e);
+        } catch (IllegalArgumentException e) {
+            result = new Pair<>(null, e.getMessage());
+        }
+        return result;
+    }
+
+    private CompetitorResults createCompetitorResults(final String json, final Leaderboard leaderboard,
+            final RaceColumn raceColumn, final Fleet fleet) throws ParseException {
+        final Object body = json == null || json.trim().isEmpty() ? null : JSONValue.parseWithException(json);
+        if (!(body instanceof JSONArray) || ((JSONArray) body).isEmpty()) {
+            throw new IllegalArgumentException("The body must be a non-empty JSON array of objects with "
+                    + RaceLogFinishPositioningConfirmedEventSerializer.FIELD_COMPETITOR_ID + ", "
+                    + RaceLogFinishPositioningConfirmedEventSerializer.FIELD_RANK + " and "
+                    + RaceLogFinishPositioningConfirmedEventSerializer.FIELD_SCORE_CORRECTIONS_MAX_POINTS_REASON + ".");
+        }
+        final Map<String, Competitor> competitorsInRace = new HashMap<>();
+        for (final Competitor competitor : leaderboard.getAllCompetitors(raceColumn, fleet)) {
+            competitorsInRace.put(competitor.getId().toString(), competitor);
+        }
+        final Set<Competitor> competitorsSeen = new HashSet<>();
+        final CompetitorResults competitorResults = new CompetitorResultsImpl();
+        for (final Object entry : (JSONArray) body) {
+            final JSONObject finishPosition = entry instanceof JSONObject ? (JSONObject) entry : null;
+            final Object competitorId = finishPosition == null ? null
+                    : finishPosition.get(RaceLogFinishPositioningConfirmedEventSerializer.FIELD_COMPETITOR_ID);
+            final Competitor competitor = competitorId == null ? null : competitorsInRace.get(competitorId.toString());
+            if (competitorId == null) {
+                throw new IllegalArgumentException("Each entry needs a "
+                        + RaceLogFinishPositioningConfirmedEventSerializer.FIELD_COMPETITOR_ID + ".");
+            } else if (competitor == null) {
+                throw new IllegalArgumentException("Competitor '" + StringEscapeUtils.escapeHtml(competitorId.toString())
+                        + "' does not sail in race column '" + StringEscapeUtils.escapeHtml(raceColumn.getName())
+                        + "', fleet '" + StringEscapeUtils.escapeHtml(fleet.getName()) + "'.");
+            } else if (!competitorsSeen.add(competitor)) {
+                throw new IllegalArgumentException("Competitor '" + StringEscapeUtils.escapeHtml(competitorId.toString())
+                        + "' is listed more than once.");
+            } else {
+                final int rank = getOneBasedRank(competitor,
+                        finishPosition.get(RaceLogFinishPositioningConfirmedEventSerializer.FIELD_RANK));
+                final MaxPointsReason maxPointsReason = getMaxPointsReason(competitor, finishPosition
+                        .get(RaceLogFinishPositioningConfirmedEventSerializer.FIELD_SCORE_CORRECTIONS_MAX_POINTS_REASON));
+                if (rank == 0 && maxPointsReason == MaxPointsReason.NONE) {
+                    throw new IllegalArgumentException("Competitor '" + StringEscapeUtils.escapeHtml(competitorId.toString())
+                            + "' needs a rank or a maxPointsReason other than NONE.");
+                }
+                final Boat boat = leaderboard.getBoatOfCompetitor(competitor, raceColumn, fleet);
+                competitorResults.add(new CompetitorResultImpl(competitor.getId(), competitor.getName(),
+                        competitor.getShortName(), boat == null ? null : boat.getName(),
+                        boat == null ? null : boat.getSailID(), rank, maxPointsReason, /* score */ null,
+                        /* finishingTime */ null, /* comment */ null, MergeState.OK));
+            }
+        }
+        if (competitorResults.hasConflicts()) {
+            throw new IllegalArgumentException("Two competitors have the same rank.");
+        }
+        return competitorResults;
+    }
+
+    private int getOneBasedRank(final Competitor competitor, final Object rank) {
+        final int result;
+        if (rank == null) {
+            result = 0;
+        } else if (rank instanceof Number && ((Number) rank).doubleValue() == ((Number) rank).longValue()
+                && ((Number) rank).longValue() >= 0 && ((Number) rank).longValue() <= Integer.MAX_VALUE) {
+            result = ((Number) rank).intValue();
+        } else {
+            throw new IllegalArgumentException("Invalid rank '" + StringEscapeUtils.escapeHtml(rank.toString())
+                    + "' for competitor '" + StringEscapeUtils.escapeHtml(competitor.getId().toString())
+                    + "'; use a non-negative integer.");
+        }
+        return result;
+    }
+
+    private MaxPointsReason getMaxPointsReason(final Competitor competitor, final Object maxPointsReasonName) {
+        final MaxPointsReason result;
+        if (maxPointsReasonName == null) {
+            result = MaxPointsReason.NONE;
+        } else {
+            final Optional<MaxPointsReason> maxPointsReason = Arrays.stream(MaxPointsReason.values())
+                    .filter(reason -> reason.name().equals(maxPointsReasonName)).findAny();
+            if (!maxPointsReason.isPresent()) {
+                throw new IllegalArgumentException("Unknown maxPointsReason '"
+                        + StringEscapeUtils.escapeHtml(maxPointsReasonName.toString()) + "' for competitor '"
+                        + StringEscapeUtils.escapeHtml(competitor.getId().toString()) + "'; use one of "
+                        + Arrays.toString(MaxPointsReason.values()) + ".");
+            }
+            result = maxPointsReason.get();
+        }
+        return result;
+    }
+
+    private JSONObject serializeFinishPositions(final RaceLogFinishPositioningConfirmedEvent event,
+            final Leaderboard leaderboard, final RaceColumn raceColumn, final Fleet fleet) {
+        final TimePoint now = MillisecondsTimePoint.now();
+        final JSONObject result = new JSONObject();
+        result.put("leaderboard", leaderboard.getName());
+        result.put(RaceLogServletConstants.PARAMS_RACE_COLUMN_NAME, raceColumn.getName());
+        result.put(RaceLogServletConstants.PARAMS_RACE_FLEET_NAME, fleet.getName());
+        result.put("eventId", event.getId().toString());
+        result.put("passId", event.getPassId());
+        final JSONArray jsonFinishPositions = new JSONArray();
+        for (final CompetitorResult competitorResult : event.getPositionedCompetitorsIDsNamesMaxPointsReasons()) {
+            final Competitor competitor = leaderboard
+                    .getCompetitorByIdAsString(competitorResult.getCompetitorId().toString());
+            final JSONObject jsonFinishPosition = new JSONObject();
+            jsonFinishPosition.put(RaceLogFinishPositioningConfirmedEventSerializer.FIELD_COMPETITOR_ID,
+                    competitorResult.getCompetitorId().toString());
+            jsonFinishPosition.put(RaceLogFinishPositioningConfirmedEventSerializer.FIELD_COMPETITOR_NAME,
+                    competitorResult.getName());
+            jsonFinishPosition.put(RaceLogFinishPositioningConfirmedEventSerializer.FIELD_RANK,
+                    competitorResult.getOneBasedRank());
+            jsonFinishPosition.put(RaceLogFinishPositioningConfirmedEventSerializer.FIELD_SCORE_CORRECTIONS_MAX_POINTS_REASON,
+                    competitorResult.getMaxPointsReason().name());
+            jsonFinishPosition.put("totalPoints",
+                    competitor == null ? null : leaderboard.getTotalPoints(competitor, raceColumn, now));
+            jsonFinishPositions.add(jsonFinishPosition);
+        }
+        result.put("finishPositions", jsonFinishPositions);
+        return result;
+    }
+
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{leaderboardName}/starttracking")
