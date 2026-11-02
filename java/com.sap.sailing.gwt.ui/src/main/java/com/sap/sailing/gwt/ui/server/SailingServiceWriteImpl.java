@@ -413,7 +413,6 @@ import com.sap.sse.shared.util.impl.UUIDHelper;
 import com.sap.sse.util.HttpUrlConnectionHelper;
 import com.sap.sse.util.ImageConverter;
 import com.sap.sse.util.ImageConverter.ImageWithMetadata;
-import com.sap.sse.util.ThreadPoolUtil;
 
 public class SailingServiceWriteImpl extends SailingServiceImpl implements SailingServiceWrite {
 
