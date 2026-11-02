@@ -861,7 +861,6 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     String importUrlInvalid(String url);
     String importGetLeaderboardsFailed(String host, String errorMessage);
     String importNoDataReturned();
-    String importServerError();
     String importOverrideSwitchLabel();
     String importSelectedLeaderboardGroups();
     String importSelectAtLeastOne();
@@ -1101,7 +1100,6 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     String setClosingTimePoint();
     String startOfTimeRangeMustLieBeforeEnd();
     String start();
-    String overallProgress();
     String showAddedScores();
     String ratio();
     String importWind();

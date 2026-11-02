@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -28,6 +29,8 @@ import java.util.logging.Logger;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpResponseException;
 import org.apache.shiro.authz.AuthorizationException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
@@ -653,6 +656,10 @@ public class LandscapeServiceImpl implements LandscapeService {
             final byte[] passphraseForPrivateKeyDecryption, final boolean force) throws Exception {
         final CompletableFuture<Pair<UUID, String>> importStarted = new CompletableFuture<>();
         final byte[] passphrase = passphraseForPrivateKeyDecryption == null ? null : passphraseForPrivateKeyDecryption.clone();
+        final User user = getSecurityService().getCurrentUser();
+        final Locale locale = user == null ? Locale.ENGLISH : user.getLocaleOrDefault();
+        final ResourceBundleStringMessages stringMessages = ResourceBundleStringMessages.create(STRING_MESSAGES_BASE_NAME,
+                getClass().getClassLoader(), StandardCharsets.UTF_8.name());
         ThreadPoolUtil.INSTANCE.getDefaultBackgroundTaskThreadPoolExecutor().execute(
                 ThreadPoolUtil.INSTANCE.associateWithSubjectIfAny(() -> {
                     String outcome;
@@ -662,15 +669,15 @@ public class LandscapeServiceImpl implements LandscapeService {
                                 bearerTokenOrNullForArchive, durationToWaitBeforeCompareServers, maxNumberOfCompareServerAttempts,
                                 removeApplicationReplicaSet, moveDatabaseHere, optionalKeyName, passphrase, force,
                                 importStarted::complete);
-                        outcome = describeArchiveResult(result);
+                        outcome = describeArchiveResult(result, locale, stringMessages);
                     } catch (final Throwable e) {
                         importStarted.completeExceptionally(e);
                         logger.log(Level.SEVERE, "Archiving " + applicationReplicaSetToArchive + " failed", e);
-                        outcome = e.toString();
+                        outcome = stringMessages.get(locale, "ArchiveReplicaSetFailed", e.toString());
                     }
                     if (!importStarted.isCompletedExceptionally()) {
                         try {
-                            sendMailToCurrentUser("ArchiveReplicaSetOutcomeSubject", "ArchiveReplicaSetOutcomeBody",
+                            sendMailToUser(user, "ArchiveReplicaSetOutcomeSubject", "ArchiveReplicaSetOutcomeBody",
                                     applicationReplicaSetToArchive.getName(), outcome);
                         } catch (final Exception e) {
                             logger.log(Level.WARNING, "Could not mail archiving outcome: " + outcome, e);
@@ -690,21 +697,31 @@ public class LandscapeServiceImpl implements LandscapeService {
         return result;
     }
 
-    private String describeArchiveResult(final Triple<DataImportProgress, CompareServersResult, String> result) {
+    static String describeArchiveResult(final Triple<DataImportProgress, CompareServersResult, String> result,
+            final Locale locale, final ResourceBundleStringMessages stringMessages) {
         final String outcome;
         if (result.getA() == null || result.getA().failed() || result.getA().getResult() == null) {
-            outcome = "Master data import failed: " + (result.getA() == null ? "No progress available" : result.getA().getErrorMessage());
+            outcome = stringMessages.get(locale, "ArchiveReplicaSetImportFailed", result.getA() == null
+                    ? stringMessages.get(locale, "ArchiveReplicaSetNoProgress") : result.getA().getErrorMessage());
         } else if (result.getB() != null && result.getB().hasDiffs()) {
-            outcome = "Server comparison found differences: " + result.getB().getADiffs() + "; " + result.getB().getBDiffs();
+            outcome = stringMessages.get(locale, "ArchiveReplicaSetDifferences", result.getB().getServerA(),
+                    serializeDiffs(result.getB().getADiffs()), result.getB().getServerB(),
+                    serializeDiffs(result.getB().getBDiffs()));
         } else if (result.getC() != null) {
-            outcome = "Database archiving failed: " + result.getC();
+            outcome = stringMessages.get(locale, "ArchiveReplicaSetDatabaseFailed", result.getC());
         } else if (result.getB() == null && result.getA().getResult().getLeaderboardGroupCount() != 0) {
-            outcome = "Server comparison did not produce a result";
+            outcome = stringMessages.get(locale, "ArchiveReplicaSetComparisonMissing");
         } else {
-            outcome = "Archiving completed successfully";
+            outcome = stringMessages.get(locale, "ArchiveReplicaSetSucceeded");
         }
         logger.info(outcome);
         return outcome;
+    }
+
+    private static String serializeDiffs(final Iterable<JSONObject> diffs) {
+        final JSONArray result = new JSONArray();
+        diffs.forEach(result::add);
+        return result.toJSONString();
     }
 
     private Triple<DataImportProgress, CompareServersResult, String> archiveReplicaSet(final String regionId,

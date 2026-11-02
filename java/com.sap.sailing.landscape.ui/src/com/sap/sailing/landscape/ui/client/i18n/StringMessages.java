@@ -6,7 +6,7 @@ import com.google.gwt.i18n.client.LocalizableResource.DefaultLocale;
 @DefaultLocale("en")
 public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
 com.sap.sse.security.ui.client.i18n.StringMessages,
-com.sap.sse.gwt.adminconsole.StringMessages, com.sap.sailing.domain.common.i18n.CommonStringMessages {
+com.sap.sse.gwt.adminconsole.StringMessages, com.sap.sailing.domain.common.i18n.DataImportProgressMessages {
     public static final StringMessages INSTANCE = GWT.create(StringMessages.class);
 
     String archiveMasterDataImportProgress(String replicaSetName);

@@ -155,14 +155,16 @@ public class MasterDataImportPanel extends VerticalPanel {
     }
 
     private void showImportProgress(final UUID operationId) {
+        final com.sap.sailing.landscape.ui.client.i18n.StringMessages importMessages =
+                com.sap.sailing.landscape.ui.client.i18n.StringMessages.INSTANCE;
         final PollingProgressPanel<DataImportProgress> progressPanel = new PollingProgressPanel<>(
-                stringMessages.overallProgress(), stringMessages.importServerError(),
+                importMessages.overallProgress(), importMessages.importServerError(),
                 callback -> sailingServiceWrite.getImportOperationProgress(operationId, callback),
                 DataImportProgress::getOverallProgressPct,
-                progress -> progress.getCurrentSubProgress().getMessage(stringMessages),
+                progress -> progress.getCurrentSubProgress().getMessage(importMessages),
                 DataImportProgress::getCurrentSubProgressPct,
                 progress -> progress.failed() ? (progress.getErrorMessage() == null
-                        ? stringMessages.importServerError() : progress.getErrorMessage()) : null,
+                        ? importMessages.importServerError() : progress.getErrorMessage()) : null,
                 progress -> progress.getResult() != null, new AsyncCallback<DataImportProgress>() {
                     @Override
                     public void onFailure(final Throwable caught) {

@@ -32,6 +32,7 @@ Export-Package: com.google.gwt.user.client.rpc.core.com.sap.sailing.landscape.co
  com.google.gwt.user.client.rpc.core.com.sap.sse.landscape.aws.common.shared,
  com.google.gwt.user.client.rpc.core.com.sap.sse.landscape.common.shared,
  com.sap.sailing.landscape.ui.client,
+ com.sap.sailing.landscape.ui.client.i18n,
  com.sap.sailing.landscape.ui.server,
  com.sap.sailing.landscape.ui.shared
 Bundle-ActivationPolicy: lazy
