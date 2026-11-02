@@ -1672,7 +1672,9 @@ public class LandscapeManagementPanel extends SimplePanel {
 
                     @Override
                     public void onSuccess(final DataImportProgress result) {
-                        status.setText(stringMessages.archiveMasterDataImportFinished());
+                        dialog.hide();
+                        MasterDataImportNotification.notifySuccess(result.getResult(), stringMessages,
+                                stringMessages.archiveMasterDataImportFinished());
                     }
                 });
         content.add(progressPanel);

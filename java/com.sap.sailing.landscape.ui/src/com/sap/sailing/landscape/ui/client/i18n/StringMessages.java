@@ -195,4 +195,6 @@ com.sap.sse.gwt.adminconsole.StringMessages, com.sap.sailing.domain.common.i18n.
     String archiveMasterDataImportFinished();
     String overallProgress();
     String importServerError();
+    String importSuccess(int leaderboardGroups, int leaderboards, int events, int regattas, int mediaTracksImported, int importedTrackedRaces);
+    String importSuccessOverwriteInfo();
 }

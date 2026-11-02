@@ -30,6 +30,7 @@ import com.sap.sailing.gwt.ui.adminconsole.places.AdminConsoleView.Presenter;
 import com.sap.sailing.gwt.ui.client.SailingServiceWriteAsync;
 import com.sap.sailing.gwt.ui.client.StringMessages;
 import com.sap.sailing.landscape.common.SharedLandscapeConstants;
+import com.sap.sailing.landscape.ui.client.MasterDataImportNotification;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.filter.impl.KeywordMatcher;
@@ -182,13 +183,12 @@ public class MasterDataImportPanel extends VerticalPanel {
         progressPanel.start();
     }
 
-    private void showCreationMessage(MasterDataImportObjectCreationCount creationCount) {
-        int leaderboardsCreated = creationCount.getLeaderboardCount();
-        int leaderboardGroupsCreated = creationCount.getLeaderboardGroupCount();
-        int eventsCreated = creationCount.getEventCount();
-        int regattasCreated = creationCount.getRegattaCount();
-        int mediaTracksImported = creationCount.getMediaTrackCount();
-        int trackedRacesImported = creationCount.getTrackedRacesCount();
+    private void showCreationMessage(final MasterDataImportObjectCreationCount creationCount) {
+        final int leaderboardsCreated = creationCount.getLeaderboardCount();
+        final int leaderboardGroupsCreated = creationCount.getLeaderboardGroupCount();
+        final int eventsCreated = creationCount.getEventCount();
+        final int regattasCreated = creationCount.getRegattaCount();
+        final int mediaTracksImported = creationCount.getMediaTrackCount();
         if (regattasCreated > 0) {
             presenter.getRegattasRefresher().reloadAndCallFillAll();
         }
@@ -204,9 +204,8 @@ public class MasterDataImportPanel extends VerticalPanel {
         if (mediaTracksImported > 0) {
             presenter.getMediaTracksRefresher().reloadAndCallFillAll();
         }
-        final Iterable<String> overwrittenRegattas = creationCount.getNamesOfOverwrittenRegattaNames();
-        showSuccessAlert(leaderboardsCreated, leaderboardGroupsCreated, eventsCreated, regattasCreated,
-                mediaTracksImported, trackedRacesImported, overwrittenRegattas);
+        MasterDataImportNotification.notifySuccess(creationCount,
+                com.sap.sailing.landscape.ui.client.i18n.StringMessages.INSTANCE);
         changeButtonStateAccordingToApplicationState();
     }
 
@@ -236,21 +235,6 @@ public class MasterDataImportPanel extends VerticalPanel {
             }
         }
         return count;
-    }
-
-    protected void showSuccessAlert(int leaderboardsCreated, int leaderboardGroupsCreated, int eventsCreated,
-            int regattasCreated, int mediaTracksImported, int trackedRacesImported, Iterable<String> overwrittenRegattas) {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(stringMessages.importSuccess(leaderboardGroupsCreated, leaderboardsCreated, eventsCreated,
-                regattasCreated, mediaTracksImported, trackedRacesImported));
-        if (!Util.isEmpty(overwrittenRegattas)) {
-            buffer.append("\n\n" + stringMessages.importSuccessOverwriteInfo() + "\n");
-            for (String regattaName : overwrittenRegattas) {
-                buffer.append(regattaName + "\n");
-            }
-        }
-        Notification.notify(buffer.toString(), NotificationType.SUCCESS);
-
     }
 
     private UUID[] createLeaderboardGroupIdsFromListBox() {
