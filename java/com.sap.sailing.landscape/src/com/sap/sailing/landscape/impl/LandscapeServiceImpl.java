@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -74,6 +75,7 @@ import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.Util.Triple;
 import com.sap.sse.common.mail.MailException;
+import com.sap.sse.common.util.Holder;
 import com.sap.sse.i18n.ResourceBundleStringMessages;
 import com.sap.sse.landscape.DefaultProcessConfigurationVariables;
 import com.sap.sse.landscape.InboundReplicationConfiguration;
@@ -644,7 +646,7 @@ public class LandscapeServiceImpl implements LandscapeService {
         return archiveReplicaSet(regionId, applicationReplicaSetToArchive, bearerTokenOrNullForApplicationReplicaSetToArchive,
                 bearerTokenOrNullForArchive, durationToWaitBeforeCompareServers, maxNumberOfCompareServerAttempts,
                 removeApplicationReplicaSet, moveDatabaseHere, optionalKeyName, passphraseForPrivateKeyDecryption, force,
-                /* importStarted */ ignored -> { });
+                /* importStarted */ ignored -> {});
     }
 
     @Override
@@ -656,32 +658,17 @@ public class LandscapeServiceImpl implements LandscapeService {
             final byte[] passphraseForPrivateKeyDecryption, final boolean force) throws Exception {
         final CompletableFuture<Pair<UUID, String>> importStarted = new CompletableFuture<>();
         final byte[] passphrase = passphraseForPrivateKeyDecryption == null ? null : passphraseForPrivateKeyDecryption.clone();
-        final User user = getSecurityService().getCurrentUser();
-        final Locale locale = user == null ? Locale.ENGLISH : user.getLocaleOrDefault();
-        final ResourceBundleStringMessages stringMessages = ResourceBundleStringMessages.create(STRING_MESSAGES_BASE_NAME,
-                getClass().getClassLoader(), StandardCharsets.UTF_8.name());
         ThreadPoolUtil.INSTANCE.getDefaultBackgroundTaskThreadPoolExecutor().execute(
                 ThreadPoolUtil.INSTANCE.associateWithSubjectIfAny(() -> {
-                    String outcome;
                     try {
-                        final Triple<DataImportProgress, CompareServersResult, String> result = archiveReplicaSet(regionId,
+                        archiveReplicaSet(regionId,
                                 applicationReplicaSetToArchive, bearerTokenOrNullForApplicationReplicaSetToArchive,
                                 bearerTokenOrNullForArchive, durationToWaitBeforeCompareServers, maxNumberOfCompareServerAttempts,
                                 removeApplicationReplicaSet, moveDatabaseHere, optionalKeyName, passphrase, force,
                                 importStarted::complete);
-                        outcome = describeArchiveResult(result, locale, stringMessages);
                     } catch (final Throwable e) {
                         importStarted.completeExceptionally(e);
                         logger.log(Level.SEVERE, "Archiving " + applicationReplicaSetToArchive + " failed", e);
-                        outcome = stringMessages.get(locale, "ArchiveReplicaSetFailed", e.toString());
-                    }
-                    if (!importStarted.isCompletedExceptionally()) {
-                        try {
-                            sendMailToUser(user, "ArchiveReplicaSetOutcomeSubject", "ArchiveReplicaSetOutcomeBody",
-                                    applicationReplicaSetToArchive.getName(), outcome);
-                        } catch (final Exception e) {
-                            logger.log(Level.WARNING, "Could not mail archiving outcome: " + outcome, e);
-                        }
                     }
                 }));
         final Pair<UUID, String> result;
@@ -695,6 +682,22 @@ public class LandscapeServiceImpl implements LandscapeService {
             throw e;
         }
         return result;
+    }
+
+    private void sendArchiveOutcomeMail(final Iterable<User> recipients, final String replicaSetName,
+            final Triple<DataImportProgress, CompareServersResult, String> result, final Throwable failure) {
+        for (final User user : recipients) {
+            try {
+                final ResourceBundleStringMessages stringMessages = ResourceBundleStringMessages.create(STRING_MESSAGES_BASE_NAME,
+                        getClass().getClassLoader(), StandardCharsets.UTF_8.name());
+                final Locale locale = user.getLocaleOrDefault();
+                final String outcome = failure == null ? describeArchiveResult(result, locale, stringMessages)
+                        : stringMessages.get(locale, "ArchiveReplicaSetFailed", failure.toString());
+                sendMailToUser(user, "ArchiveReplicaSetOutcomeSubject", "ArchiveReplicaSetOutcomeBody", replicaSetName, outcome);
+            } catch (final Exception e) {
+                logger.log(Level.WARNING, "Could not mail archiving outcome for " + replicaSetName + " to " + user.getName(), e);
+            }
+        }
     }
 
     static String describeArchiveResult(final Triple<DataImportProgress, CompareServersResult, String> result,
@@ -722,6 +725,30 @@ public class LandscapeServiceImpl implements LandscapeService {
         final JSONArray result = new JSONArray();
         diffs.forEach(result::add);
         return result.toJSONString();
+    }
+
+    /**
+     * Retains the last comparison response when the retry deadline expires so its differences can be returned and
+     * emailed to the initiating user. {@link Wait#wait} otherwise discards that response by throwing a timeout.
+     * If no attempt produced a response, the timeout includes the comparison context for the failure email.
+     */
+    static CompareServersResult compareServersWithRetries(final Callable<CompareServersResult> comparison,
+            final Duration timeout, final Duration sleepBetweenAttempts, final String logMessage) throws Exception {
+        final Holder<CompareServersResult> lastResult = new Holder<>(/* value */ null);
+        try {
+            Wait.wait(() -> {
+                lastResult.value = comparison.call();
+                return lastResult.value;
+            }, result -> !result.hasDiffs(), /* retryOnException */ true, Optional.of(timeout), sleepBetweenAttempts,
+                    Level.INFO, logMessage);
+        } catch (final TimeoutException e) {
+            if (lastResult.value == null) {
+                final TimeoutException failure = new TimeoutException(logMessage + ": no comparison result received");
+                failure.initCause(e);
+                throw failure;
+            }
+        }
+        return lastResult.value;
     }
 
     private Triple<DataImportProgress, CompareServersResult, String> archiveReplicaSet(final String regionId,
@@ -758,6 +785,16 @@ public class LandscapeServiceImpl implements LandscapeService {
         final SailingServer archive = sailingServerFactory.getSailingServer(new URL("https", hostnameOfArchive, "/"), bearerTokenOrNullForArchive);
         final SailingServer failoverArchive = sailingServerFactory.getSailingServer(new URL("https", SharedLandscapeConstants.ARCHIVE_FAILOVER_ADDRESS, "/"), bearerTokenOrNullForArchive);
         logger.info("Importing master data from "+from+" to "+archive);
+        // Snapshot recipients before removing the source replica set also removes its ownership and permissions.
+        final Map<String, User> outcomeMailRecipients = new HashMap<>();
+        getSecurityService().getUsersToInformAboutReplicaSet(archiveReplicaSet.getServerName(), Optional.of(ServerActions.CAN_IMPORT_MASTERDATA))
+                .forEach(user -> outcomeMailRecipients.put(user.getName(), user));
+        getSecurityService().getUsersToInformAboutReplicaSet(applicationReplicaSetToArchive.getServerName(), Optional.of(ServerActions.CAN_EXPORT_MASTERDATA))
+                .forEach(user -> outcomeMailRecipients.put(user.getName(), user));
+        final User initiatingUser = getSecurityService().getCurrentUser();
+        if (initiatingUser != null) {
+            outcomeMailRecipients.put(initiatingUser.getName(), initiatingUser);
+        }
         sendMailToReplicaSetOwner(archiveReplicaSet, "StartingToArchiveReplicaSetIntoSubject", "StartingToArchiveReplicaSetIntoBody", Optional.of(ServerActions.CAN_IMPORT_MASTERDATA));
         sendMailToReplicaSetOwner(applicationReplicaSetToArchive, "StartingToArchiveReplicaSetSubject", "StartingToArchiveReplicaSetBody", Optional.of(ServerActions.CAN_EXPORT_MASTERDATA));
         // Note: if from.getLeaderboardGroupIds() returns an empty set, "all" leaderboards will be imported by the MDI which again is the empty set.
@@ -765,80 +802,89 @@ public class LandscapeServiceImpl implements LandscapeService {
         // was done would implicitly compare all leaderboard groups, resulting in the entire archive server content being the "diff."
         archive.importMasterDataAsync(from, from.getLeaderboardGroupIds(), /* override */ true, /* compress */ true,
                 /* import wind */ true, /* import device configurations */ false, /* import tracked races and start tracking */ true, Optional.of(idForProgressTracking));
-        importStarted.accept(new Pair<>(idForProgressTracking, hostnameOfArchive));
-        final DataImportProgress mdiProgress = waitForMDICompletionOrError(archive, idForProgressTracking, /* log message */ "MDI from "+hostnameFromWhichToArchive+" into "+hostnameOfArchive);
-        final CompareServersResult compareServersResult;
-        final String mongoDbArchivingErrorMessage;
-        if (mdiProgress != null && !mdiProgress.failed() && mdiProgress.getResult() != null) {
-            logger.info("MDI from "+hostnameFromWhichToArchive+" info "+hostnameOfArchive+" succeeded. Waiting "+durationToWaitBeforeCompareServers+" before starting to compare content...");
-            if (Util.isEmpty(from.getLeaderboardGroupIds())) {
-                logger.info("Empty set of leaderboard groups imported. Not making any comparison.");
-                compareServersResult = null;
-            } else {
-                Thread.sleep(durationToWaitBeforeCompareServers.asMillis());
-                logger.info("Comparing contents now...");
-                compareServersResult = Wait.wait(()->from.compareServers(Optional.empty(), archive, Optional.of(from.getLeaderboardGroupIds())),
-                        csr->!csr.hasDiffs(), /* retryOnException */ true, Optional.of(durationToWaitBeforeCompareServers.times(maxNumberOfCompareServerAttempts)),
-                        durationToWaitBeforeCompareServers, Level.INFO, "Comparing leaderboard groups with IDs "+Util.joinStrings(", ", from.getLeaderboardGroupIds())+
-                        " between importing server "+hostnameOfArchive+" and exporting server "+hostnameFromWhichToArchive);
-            }
-            if (Util.isEmpty(from.getLeaderboardGroupIds()) || compareServersResult != null) {
-                if (Util.isEmpty(from.getLeaderboardGroupIds()) || !compareServersResult.hasDiffs()) {
-                    logger.info("No differences found during comparing server contents. Moving on...");
-                    final Set<UUID> eventIDs = new HashSet<>();
-                    if (mdiProgress.getResult().getEventIdsImported() == null) {
-                        throw new IllegalStateException("MDI completion did not supply imported event IDs. Aborting archiving of " + from);
-                    }
-                    Util.addAll(mdiProgress.getResult().getEventIdsImported(), eventIDs);
-                    final ReverseProxy<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>, RotatingFileBasedLog> reverseProxyCluster =
-                            getLandscape().getCentralReverseProxy(region);
-                    // TODO bug5311: when refactoring this for general scope migration, moving to a dedicated replica set will not require this
-                    // TODO bug5311: when refactoring this for general scope migration, moving into a cold storage server other than ARCHIVE will require ALBToReverseProxyRedirectMapper instead
-                    checkForLiveContentUnlessForced(applicationReplicaSetToArchive, bearerTokenOrNullForApplicationReplicaSetToArchive, force);
-                    logger.info("Adding reverse proxy rules for migrated content pointing to ARCHIVE");
-                    defaultRedirect.accept(new ALBToReverseProxyArchiveRedirectMapper<>(
-                            reverseProxyCluster, hostnameFromWhichToArchive, Optional.ofNullable(optionalKeyName), passphraseForPrivateKeyDecryption));
-                    if (removeApplicationReplicaSet) {
-                        logger.info("Removing remote sailing server references to "+from+" from archive server "+archive);
-                        try {
-                            archive.removeRemoteServerReference(from);
-                            failoverArchive.removeRemoteServerReference(from);
-                        } catch (Exception e) {
-                            logger.log(Level.INFO, "Exception trying to remove remote server reference to "+from+
-                                    "; probably such a reference didn't exist");
+        Triple<DataImportProgress, CompareServersResult, String> result = null;
+        Throwable failure = null;
+        try {
+            importStarted.accept(new Pair<>(idForProgressTracking, hostnameOfArchive));
+            final DataImportProgress mdiProgress = waitForMDICompletionOrError(archive, idForProgressTracking, /* log message */ "MDI from "+hostnameFromWhichToArchive+" into "+hostnameOfArchive);
+            final CompareServersResult compareServersResult;
+            final String mongoDbArchivingErrorMessage;
+            if (mdiProgress != null && !mdiProgress.failed() && mdiProgress.getResult() != null) {
+                logger.info("MDI from "+hostnameFromWhichToArchive+" info "+hostnameOfArchive+" succeeded. Waiting "+durationToWaitBeforeCompareServers+" before starting to compare content...");
+                if (Util.isEmpty(from.getLeaderboardGroupIds())) {
+                    logger.info("Empty set of leaderboard groups imported. Not making any comparison.");
+                    compareServersResult = null;
+                } else {
+                    Thread.sleep(durationToWaitBeforeCompareServers.asMillis());
+                    logger.info("Comparing contents now...");
+                    compareServersResult = compareServersWithRetries(
+                            () -> from.compareServers(/* a */ Optional.empty(), archive, Optional.of(from.getLeaderboardGroupIds())),
+                            durationToWaitBeforeCompareServers.times(maxNumberOfCompareServerAttempts),
+                            durationToWaitBeforeCompareServers, "Comparing leaderboard groups with IDs "+Util.joinStrings(", ", from.getLeaderboardGroupIds())+
+                            " between importing server "+hostnameOfArchive+" and exporting server "+hostnameFromWhichToArchive);
+                }
+                if (Util.isEmpty(from.getLeaderboardGroupIds()) || compareServersResult != null) {
+                    if (Util.isEmpty(from.getLeaderboardGroupIds()) || !compareServersResult.hasDiffs()) {
+                        logger.info("No differences found during comparing server contents. Moving on...");
+                        final Set<UUID> eventIDs = new HashSet<>();
+                        if (mdiProgress.getResult().getEventIdsImported() == null) {
+                            throw new IllegalStateException("MDI completion did not supply imported event IDs. Aborting archiving of " + from);
                         }
-                        logger.info("Removing the application replica set archived ("+from+") was requested");
-                        mongoDbArchivingErrorMessage = removeApplicationReplicaSetInternal(regionId, applicationReplicaSetToArchive, moveDatabaseHere, optionalKeyName, passphraseForPrivateKeyDecryption);
+                        Util.addAll(mdiProgress.getResult().getEventIdsImported(), eventIDs);
+                        final ReverseProxy<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>, RotatingFileBasedLog> reverseProxyCluster =
+                                getLandscape().getCentralReverseProxy(region);
+                        // TODO bug5311: when refactoring this for general scope migration, moving to a dedicated replica set will not require this
+                        // TODO bug5311: when refactoring this for general scope migration, moving into a cold storage server other than ARCHIVE will require ALBToReverseProxyRedirectMapper instead
+                        checkForLiveContentUnlessForced(applicationReplicaSetToArchive, bearerTokenOrNullForApplicationReplicaSetToArchive, force);
+                        logger.info("Adding reverse proxy rules for migrated content pointing to ARCHIVE");
+                        defaultRedirect.accept(new ALBToReverseProxyArchiveRedirectMapper<>(
+                                reverseProxyCluster, hostnameFromWhichToArchive, Optional.ofNullable(optionalKeyName), passphraseForPrivateKeyDecryption));
+                        if (removeApplicationReplicaSet) {
+                            logger.info("Removing remote sailing server references to "+from+" from archive server "+archive);
+                            try {
+                                archive.removeRemoteServerReference(from);
+                                failoverArchive.removeRemoteServerReference(from);
+                            } catch (Exception e) {
+                                logger.log(Level.INFO, "Exception trying to remove remote server reference to "+from+
+                                        "; probably such a reference didn't exist");
+                            }
+                            logger.info("Removing the application replica set archived ("+from+") was requested");
+                            mongoDbArchivingErrorMessage = removeApplicationReplicaSetInternal(regionId, applicationReplicaSetToArchive, moveDatabaseHere, optionalKeyName, passphraseForPrivateKeyDecryption);
+                        } else {
+                            mongoDbArchivingErrorMessage = null;
+                            logger.info("Removing remote sailing server references to events on "+from+" with IDs "+eventIDs+" from archive server "+archive);
+                            archive.removeRemoteServerEventReferences(from, eventIDs);
+                        }
                     } else {
                         mongoDbArchivingErrorMessage = null;
-                        logger.info("Removing remote sailing server references to events on "+from+" with IDs "+eventIDs+" from archive server "+archive);
-                        archive.removeRemoteServerEventReferences(from, eventIDs);
+                        logger.severe("Even after "+maxNumberOfCompareServerAttempts+" attempts and waiting a total of "+
+                                durationToWaitBeforeCompareServers.times(maxNumberOfCompareServerAttempts)+
+                                " there were the following differences between exporting server "+hostnameFromWhichToArchive+
+                                " and importing server "+hostnameOfArchive+":\nDifferences on "+compareServersResult.getServerA()+": "+serializeDiffs(compareServersResult.getADiffs())+
+                                "\nDifferences on "+compareServersResult.getServerB()+": "+serializeDiffs(compareServersResult.getBDiffs())+
+                                "\nNot proceeding further. You need to resolve the issues manually.");
                     }
                 } else {
                     mongoDbArchivingErrorMessage = null;
                     logger.severe("Even after "+maxNumberOfCompareServerAttempts+" attempts and waiting a total of "+
                             durationToWaitBeforeCompareServers.times(maxNumberOfCompareServerAttempts)+
-                            " there were the following differences between exporting server "+hostnameFromWhichToArchive+
-                            " and importing server "+hostnameOfArchive+":\nDifferences on importing side: "+compareServersResult.getADiffs()+
-                            "\nDifferences on exporting side: "+compareServersResult.getBDiffs()+
-                            "\nNot proceeding further. You need to resolve the issues manually.");
+                            " the comparison of servers "+hostnameOfArchive+" and "+hostnameFromWhichToArchive+
+                            " did not produce a result. Not proceeding. You have to resolve the issue manually.");
                 }
             } else {
+                logger.severe("The Master Data Import (MDI) from "+hostnameFromWhichToArchive+" into "+hostnameOfArchive+
+                        " did not work"+(mdiProgress != null ? mdiProgress.getErrorMessage() : " (no result at all)"));
+                compareServersResult = null;
                 mongoDbArchivingErrorMessage = null;
-                logger.severe("Even after "+maxNumberOfCompareServerAttempts+" attempts and waiting a total of "+
-                        durationToWaitBeforeCompareServers.times(maxNumberOfCompareServerAttempts)+
-                        " the comparison of servers "+hostnameOfArchive+" and "+hostnameFromWhichToArchive+
-                        " did not produce a result. Not proceeding. You have to resolve the issue manually.");
             }
-        } else {
-            logger.severe("The Master Data Import (MDI) from "+hostnameFromWhichToArchive+" into "+hostnameOfArchive+
-                    " did not work"+(mdiProgress != null ? mdiProgress.getErrorMessage() : " (no result at all)"));
-            compareServersResult = null;
-            mongoDbArchivingErrorMessage = null;
+            result = new Util.Triple<>(mdiProgress, compareServersResult, mongoDbArchivingErrorMessage);
+        } catch (final Exception | Error e) {
+            failure = e;
+            throw e;
+        } finally {
+            sendArchiveOutcomeMail(outcomeMailRecipients.values(), applicationReplicaSetToArchive.getName(), result, failure);
         }
-        sendMailToReplicaSetOwner(archiveReplicaSet, "FinishedToArchiveReplicaSetIntoSubject", "FinishedToArchiveReplicaSetIntoBody", Optional.of(ServerActions.CAN_IMPORT_MASTERDATA));
-        sendMailToReplicaSetOwner(applicationReplicaSetToArchive, "FinishedToArchiveReplicaSetSubject", "FinishedToArchiveReplicaSetBody", Optional.of(ServerActions.CAN_EXPORT_MASTERDATA));
-        return new Util.Triple<>(mdiProgress, compareServersResult, mongoDbArchivingErrorMessage);
+        return result;
     }
 
     private void terminateReplicasNotManagedByAutoScalingGroup(AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> applicationReplicaSet,

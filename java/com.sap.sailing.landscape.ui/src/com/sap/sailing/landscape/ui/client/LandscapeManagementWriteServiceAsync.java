@@ -33,9 +33,6 @@ import com.sap.sse.common.Util.Pair;
 import com.sap.sse.landscape.aws.common.shared.RedirectDTO;
 
 public interface LandscapeManagementWriteServiceAsync {
-    void getArchiveMasterDataImportProgress(final String archiveHostname, final UUID operationId,
-            final String bearerTokenOrNullForArchive, final AsyncCallback<DataImportProgress> callback);
-
     void getRegions(AsyncCallback<ArrayList<String>> callback);
 
     /**
@@ -215,15 +212,22 @@ public interface LandscapeManagementWriteServiceAsync {
     void getReleases(AsyncCallback<ArrayList<ReleaseDTO>> asyncCallback);
 
     /**
+     * The {@code callback} receives the {@link UUID} of the import operation that can be used to
+     * {@link #getArchiveMasterDataImportProgress(String, UUID, String, AsyncCallback) query import progress}; the
+     * {@link String} in the second component of the result describes the host name of the archive replica set into
+     * which the archiving happens. This string can be used as the {@code archiveHostname} argument of
+     * {@link #getArchiveMasterDataImportProgress(String, UUID, String, AsyncCallback)}.
+     *
      * @param force
      *            when {@code false} (the recommended default), the operation first checks whether the affected replica
      *            set currently serves live content (e.g., a race that is being tracked live). If live content is found,
      *            the archiving is not carried out and the {@code callback} instead receives a
-     *            {@link LiveContentAwareOperationResult} that is not {@link LiveContentAwareOperationResult#isSuccessful()
-     *            successful} and whose {@link LiveContentAwareOperationResult#getLiveContentCheckResult() live-content
-     *            check result} describes what live content was detected, so the user can decide whether to proceed
-     *            anyway. When {@code true}, this safety check is skipped and archiving proceeds regardless of any live
-     *            content, potentially disrupting a live race.
+     *            {@link LiveContentAwareOperationResult} that is not
+     *            {@link LiveContentAwareOperationResult#isSuccessful() successful} and whose
+     *            {@link LiveContentAwareOperationResult#getLiveContentCheckResult() live-content check result}
+     *            describes what live content was detected, so the user can decide whether to proceed anyway. When
+     *            {@code true}, this safety check is skipped and archiving proceeds regardless of any live content,
+     *            potentially disrupting a live race.
      */
     void archiveReplicaSetAsync(final String regionId,
             final SailingApplicationReplicaSetDTO<String> applicationReplicaSetToArchive,
@@ -232,6 +236,9 @@ public interface LandscapeManagementWriteServiceAsync {
             final boolean removeApplicationReplicaSet, final MongoEndpointDTO moveDatabaseHere, final String optionalKeyName,
             final byte[] passphraseForPrivateKeyDecryption, final boolean force,
             final AsyncCallback<LiveContentAwareOperationResult<Pair<UUID, String>>> callback);
+
+    void getArchiveMasterDataImportProgress(final String archiveHostname, final UUID operationId,
+            final String bearerTokenOrNullForArchive, final AsyncCallback<DataImportProgress> callback);
 
     void deployApplicationToExistingHost(String replicaSetName, AwsInstanceDTO hostToDeployTo,
             String replicaInstanceType, boolean dynamicLoadBalancerMapping, String releaseNameOrNullForLatestMaster,

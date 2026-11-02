@@ -2,13 +2,17 @@ package com.sap.sailing.landscape.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.concurrent.TimeoutException;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -19,6 +23,7 @@ import com.sap.sailing.domain.common.DataImportProgress;
 import com.sap.sailing.domain.common.impl.DataImportProgressImpl;
 import com.sap.sailing.domain.common.impl.MasterDataImportObjectCreationCountImpl;
 import com.sap.sailing.server.gateway.interfaces.CompareServersResult;
+import com.sap.sse.common.Duration;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Triple;
 import com.sap.sse.i18n.ResourceBundleStringMessages;
@@ -119,6 +124,46 @@ public class ArchiveReplicaSetOutcomeTest {
                 completedImport(/* withLeaderboardGroup */ false), /* b */ null, /* c */ null);
         assertEquals("Archiving completed successfully", describe(result, Locale.US));
         assertEquals("Archivierung erfolgreich abgeschlossen", describe(result, Locale.GERMANY));
+    }
+
+    @Test
+    public void testComparisonTimeoutPreservesDifferencesForMail() throws Exception {
+        final JSONObject diff = new JSONObject();
+        diff.put("event", "Missing from archive");
+        final CompareServersResult comparison = comparison(Util.map(Collections.singletonList(diff), value -> value),
+                Collections.emptyList());
+        final CompareServersResult lastResult = LandscapeServiceImpl.compareServersWithRetries(() -> comparison,
+                Duration.ofMillis(/* millis */ 0), Duration.ofMillis(/* millis */ 0), "source -> archive");
+        assertSame(comparison, lastResult);
+        final Triple<DataImportProgress, CompareServersResult, String> result = new Triple<>(
+                completedImport(/* withLeaderboardGroup */ true), lastResult, /* c */ null);
+        for (final Locale locale : Arrays.asList(Locale.US, Locale.GERMANY)) {
+            final String body = stringMessages.get(locale, "ArchiveReplicaSetOutcomeBody", "source", describe(result, locale));
+            assertTrue(body.contains("Server source:\n[" + diff.toJSONString() + "]"));
+            assertTrue(body.contains("Server archive:\n[]"));
+            assertFalse(body.contains("TimeoutException"));
+        }
+    }
+
+    @Test
+    public void testComparisonWithoutDifferencesSucceeds() throws Exception {
+        final CompareServersResult comparison = comparison(Collections.emptyList(), Collections.emptyList());
+        assertSame(comparison, LandscapeServiceImpl.compareServersWithRetries(() -> comparison,
+                Duration.ofMillis(/* millis */ 0), Duration.ofMillis(/* millis */ 0), "source -> archive"));
+    }
+
+    @Test
+    public void testComparisonWithoutResponseKeepsContextForFailureMail() {
+        final TimeoutException failure = assertThrows(TimeoutException.class,
+                () -> LandscapeServiceImpl.compareServersWithRetries(() -> {
+                    throw new IOException("Comparison server unavailable");
+                }, Duration.ofMillis(/* millis */ 0), Duration.ofMillis(/* millis */ 0), "source -> archive"));
+        for (final Locale locale : Arrays.asList(Locale.US, Locale.GERMANY)) {
+            final String outcome = stringMessages.get(locale, "ArchiveReplicaSetFailed", failure.toString());
+            final String body = stringMessages.get(locale, "ArchiveReplicaSetOutcomeBody", "source", outcome);
+            assertTrue(body.contains("source -> archive"));
+            assertTrue(body.contains("no comparison result received"));
+        }
     }
 
     private String describe(final Triple<DataImportProgress, CompareServersResult, String> result, final Locale locale) {

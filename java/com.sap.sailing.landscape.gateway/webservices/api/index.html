@@ -77,9 +77,13 @@ For questions and support please get in touch through <a href="mailto:support@sa
         <td>Ensures at least one replica exists, stops replication and de-registers the master from its target groups</td>
     </tr>
 	<tr>
-		<td><a href="movetoarchiveserver.html">/sailinglandscape/api/movetoarchiveserver</a></td>
-		<td>Archives an existing application server replica set's contents</td>
+		<td><a href="movetoarchiveserver.html">/sailinglandscape/api/landscape/movetoarchiveserver</a></td>
+		<td>Archives an existing application server replica set's contents synchronously; long-running, so prefer the asynchronous variant to avoid timeouts</td>
 	</tr>
+    <tr>
+        <td><a href="movetoarchiveserverAsync.html">/sailinglandscape/api/landscape/movetoarchiveserver/async</a></td>
+        <td>Starts archiving and returns an import progress handle; preferred for long-running archiving to avoid timeouts</td>
+    </tr>
     <tr>
         <td><a href="moveallapplicationprocessesawayfrom.html">/sailinglandscape/api/moveallapplicationprocessesawayfrom</a></td>
         <td>Moves all application processes off a shared multi-instance host onto another instance</td>

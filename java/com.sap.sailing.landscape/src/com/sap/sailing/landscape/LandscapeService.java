@@ -229,12 +229,22 @@ public interface LandscapeService {
             SailingAnalyticsProcess<String>>> applicationReplicaSets, String bearerToken) throws Exception;
 
     /**
+     * Archives synchronously. This can take a long time; prefer {@link #archiveReplicaSetAsync} to avoid client or
+     * proxy timeouts. After import acceptance, the final outcome, including server comparison differences or failures,
+     * is emailed once per user to the initiating user, both replica set owners, and users with master-data export
+     * permission on the source or import permission on the archive. Only verified email addresses are used.
+     * <p>
+     *
+     * The {@link Triple#getC() third} component of the result returned is an optional error message describing an error
+     * that occurred when archiving the replica set's MongoDB was requested ({@code mongoDbArchivingErrorMessage}), or
+     * {@code null} if that wasn't requested or no error occurred during DB archiving.
+     *
      * @param force
      *            when {@code false} (the recommended default), the affected replica set is first checked for live
      *            content (e.g., a race that is being tracked live). If live content is found, archiving is not carried
-     *            out and a {@link LiveContentConflictException} carrying the {@link LiveContentCheckResult} is thrown so
-     *            the caller can decide whether to proceed anyway. When {@code true}, this safety check is skipped and
-     *            archiving proceeds regardless of any live content, potentially disrupting a live race.
+     *            out and a {@link LiveContentConflictException} carrying the {@link LiveContentCheckResult} is thrown
+     *            so the caller can decide whether to proceed anyway. When {@code true}, this safety check is skipped
+     *            and archiving proceeds regardless of any live content, potentially disrupting a live race.
      * @throws LiveContentConflictException
      *             if {@code force} is {@code false} and the affected replica set is found to be serving live content;
      *             it carries the {@link LiveContentCheckResult} describing the detected content
@@ -248,7 +258,9 @@ public interface LandscapeService {
 
     /**
      * Returns the accepted MDI UUID and the importing replica set's hostname. The remainder of archiving runs in
-     * the background, independently of client polling. Its final outcome is logged and mailed to the initiating user.
+     * the background, independently of client polling. Its final outcome, including server comparison differences,
+     * is logged and mailed to the same recipients as {@link #archiveReplicaSet}, once per user with a verified email
+     * address. Failures after import acceptance are also emailed.
      */
     Pair<UUID, String> archiveReplicaSetAsync(final String regionId,
             final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> applicationReplicaSetToArchive,
