@@ -60,7 +60,6 @@ import com.sap.sailing.landscape.ui.shared.AmazonMachineImageDTO;
 import com.sap.sailing.landscape.ui.shared.AvailabilityZoneDTO;
 import com.sap.sailing.landscape.ui.shared.AwsInstanceDTO;
 import com.sap.sailing.landscape.ui.shared.AwsShardDTO;
-import com.sap.sailing.landscape.ui.shared.CompareServersResultDTO;
 import com.sap.sailing.landscape.ui.shared.LeaderboardNameDTO;
 import com.sap.sailing.landscape.ui.shared.MongoEndpointDTO;
 import com.sap.sailing.landscape.ui.shared.MongoProcessDTO;
@@ -72,7 +71,6 @@ import com.sap.sailing.landscape.ui.shared.SSHKeyPairDTO;
 import com.sap.sailing.landscape.ui.shared.SailingAnalyticsProcessDTO;
 import com.sap.sailing.landscape.ui.shared.SailingApplicationReplicaSetDTO;
 import com.sap.sailing.landscape.ui.shared.SerializationDummyDTO;
-import com.sap.sailing.server.gateway.interfaces.CompareServersResult;
 import com.sap.sailing.server.gateway.interfaces.SailingServer;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
@@ -92,9 +90,9 @@ import com.sap.sse.landscape.aws.ApplicationProcessHost;
 import com.sap.sse.landscape.aws.AwsApplicationReplicaSet;
 import com.sap.sse.landscape.aws.AwsInstance;
 import com.sap.sse.landscape.aws.AwsLandscape;
+import com.sap.sse.landscape.aws.AwsLandscapeConstants;
 import com.sap.sse.landscape.aws.AwsShard;
 import com.sap.sse.landscape.aws.HostSupplier;
-import com.sap.sse.landscape.aws.AwsLandscapeConstants;
 import com.sap.sse.landscape.aws.TargetGroup;
 import com.sap.sse.landscape.aws.common.shared.PlainRedirectDTO;
 import com.sap.sse.landscape.aws.common.shared.RedirectDTO;
@@ -806,36 +804,6 @@ public class LandscapeManagementWriteServiceImpl extends ResultCachingProxiedRem
     }
     
     @Override
-    public LiveContentAwareOperationResult<Triple<DataImportProgress, CompareServersResultDTO, String>> archiveReplicaSet(
-            String regionId, SailingApplicationReplicaSetDTO<String> applicationReplicaSetToArchive,
-            String bearerTokenOrNullForApplicationReplicaSetToArchive, String bearerTokenOrNullForArchive,
-            Duration durationToWaitBeforeCompareServers, int maxNumberOfCompareServerAttempts,
-            boolean removeApplicationReplicaSet, MongoEndpointDTO moveDatabaseHere, String optionalKeyName,
-            byte[] passphraseForPrivateKeyDecryption, boolean force) throws Exception {
-        checkLandscapeManageAwsPermission();
-        if (removeApplicationReplicaSet) {
-            getSecurityService().checkCurrentUserDeletePermission(SecuredSecurityTypes.SERVER.getQualifiedObjectIdentifier(
-                    new TypeRelativeObjectIdentifier(applicationReplicaSetToArchive.getReplicaSetName())));
-        }
-        LiveContentAwareOperationResult<Triple<DataImportProgress, CompareServersResultDTO, String>> result;
-        try {
-            final Triple<DataImportProgress, CompareServersResult, String> archiveResult = getLandscapeService()
-                    .archiveReplicaSet(regionId,
-                            convertFromApplicationReplicaSetDTO(new AwsRegion(regionId, getLandscape()),
-                                    applicationReplicaSetToArchive, optionalKeyName, passphraseForPrivateKeyDecryption),
-                            bearerTokenOrNullForApplicationReplicaSetToArchive, bearerTokenOrNullForArchive,
-                            durationToWaitBeforeCompareServers, maxNumberOfCompareServerAttempts,
-                            removeApplicationReplicaSet, getMongoEndpoint(moveDatabaseHere), optionalKeyName,
-                            passphraseForPrivateKeyDecryption, force);
-            result = LiveContentAwareOperationResult.success(new Triple<>(archiveResult.getA(),
-                    createCompareServersResultDTO(archiveResult), archiveResult.getC()));
-        } catch (LiveContentConflictException e) {
-            result = LiveContentAwareOperationResult.liveContentConflict(e.getLiveContentCheckResult());
-        }
-        return result;
-    }
-
-    @Override
     public LiveContentAwareOperationResult<Pair<UUID, String>> archiveReplicaSetAsync(final String regionId,
             final SailingApplicationReplicaSetDTO<String> applicationReplicaSetToArchive,
             final String bearerTokenOrNullForApplicationReplicaSetToArchive, final String bearerTokenOrNullForArchive,
@@ -873,16 +841,6 @@ public class LandscapeManagementWriteServiceImpl extends ResultCachingProxiedRem
                 .getMasterDataImportProgress(operationId);
     }
 
-    private CompareServersResultDTO createCompareServersResultDTO(
-            final Triple<DataImportProgress, CompareServersResult, String> compareServersResult) {
-        return compareServersResult == null ?
-                null :
-                new CompareServersResultDTO(compareServersResult.getB()==null?null:compareServersResult.getB().getServerA(),
-                                            compareServersResult.getB()==null?null:compareServersResult.getB().getServerB(),
-                                            compareServersResult.getB()==null?null:compareServersResult.getB().getADiffs().toString(),
-                                            compareServersResult.getB()==null?null:compareServersResult.getB().getBDiffs().toString());
-    }
-    
     @Override
     public LiveContentAwareOperationResult<String> removeApplicationReplicaSet(String regionId,
             SailingApplicationReplicaSetDTO<String> applicationReplicaSetToRemove, MongoEndpointDTO moveDatabaseHere,
