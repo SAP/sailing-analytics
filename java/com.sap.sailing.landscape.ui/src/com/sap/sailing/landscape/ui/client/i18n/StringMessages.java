@@ -9,12 +9,6 @@ com.sap.sse.security.ui.client.i18n.StringMessages,
 com.sap.sse.gwt.adminconsole.StringMessages, com.sap.sailing.domain.common.i18n.DataImportProgressMessages {
     public static final StringMessages INSTANCE = GWT.create(StringMessages.class);
 
-    String archiveMasterDataImportProgress(String replicaSetName);
-    String archiveContinuesInBackground();
-    String archiveMasterDataImportFinished();
-    String overallProgress();
-    String importServerError();
-
     String region();
     String images();
     String imageType();
@@ -196,4 +190,9 @@ com.sap.sse.gwt.adminconsole.StringMessages, com.sap.sailing.domain.common.i18n.
     String successfullySwitchedToNewArchiveCandidate(String replicaSetName);
     String activateArchiveCandidate();
     String reallySwitchToNewArchiveCandidate();
+    String archiveMasterDataImportProgress(String replicaSetName);
+    String archiveContinuesInBackground();
+    String archiveMasterDataImportFinished();
+    String overallProgress();
+    String importServerError();
 }
