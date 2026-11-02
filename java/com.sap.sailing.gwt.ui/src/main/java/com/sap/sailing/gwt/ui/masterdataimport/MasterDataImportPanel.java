@@ -175,6 +175,7 @@ public class MasterDataImportPanel extends VerticalPanel {
                         showCreationMessage(result.getResult());
                     }
                 });
+        progressPanel.setWidth("100%");
         add(progressPanel);
         progressPanel.start();
     }
