@@ -24,7 +24,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.jcraft.jsch.ChannelSftp;
@@ -44,10 +43,10 @@ import com.sap.sse.common.Duration;
 import com.sap.sse.common.Util;
 import com.sap.sse.landscape.Landscape;
 import com.sap.sse.landscape.Release;
-import com.sap.sse.landscape.RotatingFileBasedLog;
 import com.sap.sse.landscape.SecurityGroup;
 import com.sap.sse.landscape.application.ApplicationProcess;
 import com.sap.sse.landscape.aws.impl.AwsRegion;
+import com.sap.sse.landscape.aws.impl.CentralApacheReverseProxy;
 import com.sap.sse.landscape.aws.orchestration.CreateDNSBasedLoadBalancerMapping;
 import com.sap.sse.landscape.mongodb.MongoEndpoint;
 import com.sap.sse.landscape.mongodb.impl.DatabaseImpl;
@@ -87,7 +86,7 @@ import software.amazon.awssdk.services.sts.model.Credentials;
  * @author Axel Uhl (D043530)
  *
  */
-@Disabled("Needs AWS key ID, key secret and session token in system properties")
+//@Disabled("Needs AWS key ID, key secret and session token in system properties")
 public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, SailingAnalyticsMetrics, ProcessT>> {
     private static final Logger logger = Logger.getLogger(ConnectivityTest.class.getName());
     private static final Optional<Duration> optionalTimeout = Optional.of(Duration.ONE_MINUTE.times(10));
@@ -124,7 +123,7 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
     
     @Test
     public void testReverseDNSLookup() {
-        assertEquals("mongo0.internal.sapsailing.com", landscape.findHostnamesForIP("172.31.13.233"));
+        assertEquals("mongo0.internal.sapsailing.com", landscape.findHostnamesForIP("172.31.25.153"));
     }
     
     @Test
@@ -200,7 +199,7 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
         assertTrue(testKeyFromBytes.isEncrypted()); // AND AS A CONSEQUENCE THE KEY IS STILL ENCRYPTED!
         // In order to use this to import a valid key existing pair we'll import the last valid key, namely testKeyFromEncryptedBytes:
         landscape.importKeyPair(region, pubKeyBytes, encryptedPrivateKeyFromDecrypted.toByteArray(), AXELS_KEY_NAME);
-        final SshCommandChannel sshChannel = landscape.getCentralReverseProxy(region).getHosts().iterator().next()
+        final SshCommandChannel sshChannel = landscape.getCentralReverseProxy(region).getHost()
                 .createRootSshChannel(optionalTimeout, Optional.of(AXELS_KEY_NAME),
                         AXELS_KEY_PASS.getBytes());
         final String stdout = sshChannel.runCommandAndReturnStdoutAndLogStderr("ls -al", /* stderr prefix */ null, /* stderr log level */ null);
@@ -212,9 +211,9 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
      */
     @Test
     public void testApacheProxyBasics() throws Exception {
-        final ReverseProxyCluster<String, SailingAnalyticsMetrics, ProcessT, RotatingFileBasedLog> proxy = landscape.getCentralReverseProxy(region);
+        final CentralApacheReverseProxy<String, SailingAnalyticsMetrics, ProcessT> proxy = landscape.getCentralReverseProxy(region);
         final String hostname = "kw2021.sapsailing.com";
-        final AwsInstance<String> proxyHost = proxy.getHosts().iterator().next();
+        final AwsInstance<String> proxyHost = proxy.getHost();
         final ProcessT process = createApplicationProcess(proxyHost, "testtest");
         proxy.setEventRedirect(hostname, process, UUID.randomUUID(), Optional.of(AXELS_KEY_NAME), AXELS_KEY_PASS.getBytes());
         final ByteArrayOutputStream configFileContents = new ByteArrayOutputStream();
@@ -538,9 +537,10 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
     
     @Test
     public void testCentralReverseProxyInEuWest2IsAvailable() throws IOException, InterruptedException, JSchException {
-        final ReverseProxyCluster<String, SailingAnalyticsMetrics, ProcessT, ?> proxy = landscape.getCentralReverseProxy(new AwsRegion(Region.EU_WEST_2, landscape));
-        assertEquals(1, Util.size(proxy.getHosts()));
-        final HttpURLConnection healthCheckConnection = (HttpURLConnection) new URL("http://"+proxy.getHosts().iterator().next().getPublicAddress().getCanonicalHostName()+proxy.getHealthCheckPath()).openConnection();
+        final CentralApacheReverseProxy<String, SailingAnalyticsMetrics, ProcessT> proxy = landscape.getCentralReverseProxy(new AwsRegion(Region.EU_WEST_2, landscape));
+        assertNotNull(proxy);
+        assertNotNull(proxy.getHost());
+        final HttpURLConnection healthCheckConnection = (HttpURLConnection) new URL("http://"+proxy.getHost().getPublicAddress().getCanonicalHostName()+proxy.getHealthCheckPath()).openConnection();
         assertEquals(200, healthCheckConnection.getResponseCode());
         healthCheckConnection.disconnect();
     }
