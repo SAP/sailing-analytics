@@ -3,21 +3,27 @@ package com.sap.sailing.server.gateway.test.jaxrs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.shiro.authz.UnauthorizedException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import com.sap.sailing.domain.base.Competitor;
 import com.sap.sailing.domain.base.DomainFactory;
@@ -30,7 +36,10 @@ import com.sap.sailing.domain.base.impl.RegattaImpl;
 import com.sap.sailing.domain.base.impl.SeriesImpl;
 import com.sap.sailing.domain.common.CompetitorRegistrationType;
 import com.sap.sailing.domain.common.ScoringSchemeType;
+import com.sap.sailing.domain.common.security.SecuredDomainType;
+import com.sap.sailing.domain.leaderboard.Leaderboard;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroup;
+import com.sap.sailing.domain.leaderboard.meta.LeaderboardGroupMetaLeaderboard;
 import com.sap.sailing.domain.ranking.OneDesignRankingMetric;
 import com.sap.sailing.domain.test.mock.MockedTrackedRaceWithStartTimeAndRanks;
 import com.sap.sailing.domain.tracking.TrackedRace;
@@ -153,5 +162,35 @@ public class LeaderboardGroupResourceTest extends AbstractJaxRsApiTest {
                 regatta.getName()).getStatus());
         assertEquals(Status.BAD_REQUEST.getStatusCode(), leaderboardGroupsResource.addLeaderboardToLeaderboardGroup(leaderboardGroupName,
                 null).getStatus());
+    }
+
+    @Test
+    public void testCreateLeaderboardGroupRejectsOverallLeaderboardNameCollision() throws Exception {
+        final String seasonName = "Season 2027";
+        final String overallLeaderboardName = LeaderboardGroupMetaLeaderboard.getOverallLeaderboardName(seasonName);
+        final Leaderboard existing = racingEventService.addFlexibleLeaderboard(overallLeaderboardName, null, new int[0],
+                DomainFactory.INSTANCE.createScoringScheme(ScoringSchemeType.LOW_POINT),
+                /* courseAreaIds */ Collections.<Serializable> emptyList());
+        assertEquals(Status.CONFLICT.getStatusCode(), leaderboardGroupsResource.createLeaderboardGroup(seasonName,
+                null, null, null, ScoringSchemeType.LOW_POINT.name(), null).getStatus());
+        assertNull(racingEventService.getLeaderboardGroupByName(seasonName));
+        assertSame(existing, racingEventService.getLeaderboardByName(overallLeaderboardName));
+        // without an overall leaderboard there is no collision
+        assertEquals(Status.OK.getStatusCode(), leaderboardGroupsResource.createLeaderboardGroup(seasonName,
+                null, null, null, null, null).getStatus());
+        assertSame(existing, racingEventService.getLeaderboardByName(overallLeaderboardName));
+    }
+
+    @Test
+    public void testUnauthorizedCreateLeaderboardGroupIsNotWrapped() throws Exception {
+        final String seasonName = "Season nobody may create";
+        Mockito.doThrow(new UnauthorizedException("not permitted")).when(securityService)
+                .setOwnershipCheckPermissionForObjectCreationAndRevertOnError(
+                        Mockito.eq(SecuredDomainType.LEADERBOARD_GROUP), Mockito.any(), Mockito.any(),
+                        Mockito.any(Callable.class));
+        // the exception must reach the JAX-RS exception mapping unchanged (401), not wrapped in a RuntimeException
+        assertThrows(UnauthorizedException.class, () -> leaderboardGroupsResource.createLeaderboardGroup(seasonName,
+                null, null, null, null, null));
+        assertNull(racingEventService.getLeaderboardGroupByName(seasonName));
     }
 }

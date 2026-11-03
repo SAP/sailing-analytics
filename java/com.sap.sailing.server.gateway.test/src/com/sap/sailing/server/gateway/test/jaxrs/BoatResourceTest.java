@@ -2,23 +2,30 @@ package com.sap.sailing.server.gateway.test.jaxrs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.shiro.authz.UnauthorizedException;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import com.sap.sailing.domain.base.BoatClass;
 import com.sap.sailing.domain.base.impl.BoatClassImpl;
 import com.sap.sailing.domain.base.impl.DynamicBoat;
+import com.sap.sailing.domain.common.security.SecuredDomainType;
 import com.sap.sailing.server.gateway.deserialization.impl.BoatJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.Helpers;
+import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.RGBColor;
 import com.sap.sse.rest.StreamingOutputUtil;
 
@@ -89,5 +96,19 @@ public class BoatResourceTest extends AbstractJaxRsApiTest {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), boatsResource.createBoat("Red", "4", "#ff0000", null, null).getStatus());
         assertEquals(Status.BAD_REQUEST.getStatusCode(), boatsResource.createBoat("Red", "4", "red", boatClassName, null).getStatus());
         assertEquals(Status.BAD_REQUEST.getStatusCode(), boatsResource.createBoat(null, null, null, boatClassName, null).getStatus());
+    }
+
+    @Test
+    public void testUnauthorizedCreateBoatLeavesNoBoatClassBehind() throws Exception {
+        final String newBoatClassName = "Boat class nobody may create";
+        final String newBoatId = UUID.randomUUID().toString();
+        final int numberOfBoatClassesBefore = Util.size(racingEventService.getBaseDomainFactory().getBoatClasses());
+        Mockito.doThrow(new UnauthorizedException("not permitted")).when(securityService)
+                .setOwnershipCheckPermissionForObjectCreationAndRevertOnError(Mockito.eq(SecuredDomainType.BOAT),
+                        Mockito.any(), Mockito.any(), Mockito.any(Callable.class));
+        assertThrows(UnauthorizedException.class,
+                () -> boatsResource.createBoat("Black", "1", null, newBoatClassName, newBoatId));
+        assertEquals(numberOfBoatClassesBefore, Util.size(racingEventService.getBaseDomainFactory().getBoatClasses()));
+        assertNull(racingEventService.getCompetitorAndBoatStore().getExistingBoatByIdAsString(newBoatId));
     }
 }

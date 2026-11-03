@@ -107,9 +107,13 @@ public class BoatsResource extends AbstractSailingServerResource {
                     .type(MediaType.TEXT_PLAIN).build();
         } else {
             final Color color = displayColor == null || displayColor.isEmpty() ? null : new RGBColor(displayColor);
-            final BoatClass boatClass = getService().getBaseDomainFactory().getOrCreateBoatClass(boatClassName);
-            final Callable<DynamicBoat> createBoatJob = () -> getService().getBaseDomainFactory().getOrCreateBoat(boatId,
-                    effectiveBoatName, boatClass, sailId, color, /* storePersistently */ true);
+            // The boat class is resolved (and possibly created) only inside the job, which runs after the
+            // permission check, so that an unauthorized request leaves no new boat class behind.
+            final Callable<DynamicBoat> createBoatJob = () -> {
+                final BoatClass boatClass = getService().getBaseDomainFactory().getOrCreateBoatClass(boatClassName);
+                return getService().getBaseDomainFactory().getOrCreateBoat(boatId, effectiveBoatName, boatClass,
+                        sailId, color, /* storePersistently */ true);
+            };
             final DynamicBoat boat = getSecurityService().setOwnershipCheckPermissionForObjectCreationAndRevertOnError(
                     SecuredDomainType.BOAT, BoatImpl.getTypeRelativeObjectIdentifier(boatId), effectiveBoatName,
                     createBoatJob);
