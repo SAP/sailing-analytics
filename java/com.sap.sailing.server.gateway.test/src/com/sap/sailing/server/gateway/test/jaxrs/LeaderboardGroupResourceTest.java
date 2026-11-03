@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -43,8 +42,8 @@ import com.sap.sailing.domain.leaderboard.meta.LeaderboardGroupMetaLeaderboard;
 import com.sap.sailing.domain.ranking.OneDesignRankingMetric;
 import com.sap.sailing.domain.test.mock.MockedTrackedRaceWithStartTimeAndRanks;
 import com.sap.sailing.domain.tracking.TrackedRace;
-import com.sap.sse.common.Util;
 import com.sap.sse.common.TimePoint;
+import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.rest.StreamingOutputUtil;
 
@@ -187,7 +186,7 @@ public class LeaderboardGroupResourceTest extends AbstractJaxRsApiTest {
         Mockito.doThrow(new UnauthorizedException("not permitted")).when(securityService)
                 .setOwnershipCheckPermissionForObjectCreationAndRevertOnError(
                         Mockito.eq(SecuredDomainType.LEADERBOARD_GROUP), Mockito.any(), Mockito.any(),
-                        Mockito.any(Callable.class));
+                        getAnyCallable());
         // the exception must reach the JAX-RS exception mapping unchanged (401), not wrapped in a RuntimeException
         assertThrows(UnauthorizedException.class, () -> leaderboardGroupsResource.createLeaderboardGroup(seasonName,
                 null, null, null, null, null));

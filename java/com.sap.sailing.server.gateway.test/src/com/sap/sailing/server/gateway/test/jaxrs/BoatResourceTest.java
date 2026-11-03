@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.UUID;
-import java.util.concurrent.Callable;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -100,12 +99,12 @@ public class BoatResourceTest extends AbstractJaxRsApiTest {
 
     @Test
     public void testUnauthorizedCreateBoatLeavesNoBoatClassBehind() throws Exception {
-        final String newBoatClassName = "Boat class nobody may create";
+        final String newBoatClassName = "Boat class nobody may create "+UUID.randomUUID().toString();
         final String newBoatId = UUID.randomUUID().toString();
         final int numberOfBoatClassesBefore = Util.size(racingEventService.getBaseDomainFactory().getBoatClasses());
         Mockito.doThrow(new UnauthorizedException("not permitted")).when(securityService)
                 .setOwnershipCheckPermissionForObjectCreationAndRevertOnError(Mockito.eq(SecuredDomainType.BOAT),
-                        Mockito.any(), Mockito.any(), Mockito.any(Callable.class));
+                        Mockito.any(), Mockito.any(), getAnyCallable());
         assertThrows(UnauthorizedException.class,
                 () -> boatsResource.createBoat("Black", "1", null, newBoatClassName, newBoatId));
         assertEquals(numberOfBoatClassesBefore, Util.size(racingEventService.getBaseDomainFactory().getBoatClasses()));
