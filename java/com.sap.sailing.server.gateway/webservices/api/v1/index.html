@@ -220,6 +220,10 @@ For questions and support please get in touch through <a href="mailto:support@sa
 		<td>Gets all leaderboard groups</td>
 	</tr>
 	<tr>
+		<td><a href="leaderboardGroupCreatePostDoc.html">/sailingserver/api/v1/leaderboardgroups</a></td>
+		<td>Creates an empty leaderboard group, optionally with an overall leaderboard (POST)</td>
+	</tr>
+	<tr>
 		<td><a href="leaderboardgroupGetDoc.html">/sailingserver/api/v1/leaderboardgroups/{name}</a></td>
 		<td>Gets the details of a group of leaderboards</td>
 	</tr>
@@ -227,6 +231,10 @@ For questions and support please get in touch through <a href="mailto:support@sa
         <td><a href="leaderboardGroupMigrate.html">/sailingserver/api/v1/leaderboardgroups/{name}/migrate</a></td>
         <td>Migrates an existing leaderboardGroup</td>
     </tr>
+	<tr>
+		<td><a href="leaderboardGroupAddLeaderboardPostDoc.html">/sailingserver/api/v1/leaderboardgroups/{nameOrUUID}/leaderboards</a></td>
+		<td>Adds an existing leaderboard to a leaderboard group (POST)</td>
+	</tr>
 	<tr>
 		<td><a href="leaderboardsGetDoc.html">/sailingserver/api/v1/leaderboards</a></td>
 		<td>Gets all leaderboards</td>
@@ -361,6 +369,10 @@ For questions and support please get in touch through <a href="mailto:support@sa
     <tr>
         <td><a href="boats.html">/sailingserver/api/v1/boats/{id}</a></td>
         <td>Obtains information about a single boat</td>
+    </tr>
+    <tr>
+        <td><a href="boatCreatePostDoc.html">/sailingserver/api/v1/boats</a></td>
+        <td>Creates a boat on its own, without a competitor (POST)</td>
     </tr>
     <tr>
         <td><a href="countrycodes.html">/sailingserver/api/v1/countrycodes</a></td>
