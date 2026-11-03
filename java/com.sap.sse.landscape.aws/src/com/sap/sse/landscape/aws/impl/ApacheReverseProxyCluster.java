@@ -159,6 +159,9 @@ public class ApacheReverseProxyCluster<ShardingKey, MetricsT extends Application
             throw new IllegalStateException(
                     "Trying to remove the last hosts of reverse proxy " + this + ". Use terminate() instead");
         }
+        if (host.equals(centralReverseProxyHost)) {
+            throw new IllegalArgumentException("Cannot remove the central reverse proxy "+host+" from this reverse proxy cluster");
+        }
         AwsInstance<ShardingKey> instanceFromHost = new AwsInstanceImpl<ShardingKey>(host.getInstanceId(),
                 host.getAvailabilityZone(), host.getPrivateAddress(Landscape.WAIT_FOR_PROCESS_TIMEOUT),
                 host.getLaunchTimePoint(), getLandscape());

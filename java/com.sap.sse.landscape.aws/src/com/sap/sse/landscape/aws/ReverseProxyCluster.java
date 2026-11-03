@@ -40,10 +40,11 @@ public interface ReverseProxyCluster<ShardingKey, MetricsT extends ApplicationPr
 
     /**
      * Removes a single host from this reverse proxy, terminating the host. When trying to remove the last remaining
-     * host, an {@link IllegalStateException} will be thrown and the method will not complete the request. Consider
-     * using {@link #terminate()} to terminate all hosts forming this reverse proxy. The instance is
-     * <strong>only</strong> terminated when no longer in the draining state in a target group (typically takes 5
-     * minutes, so expect a delay).
+     * host or trying to remove the {@link #getCentralReverseProxy() central reverse proxy}, an
+     * {@link IllegalStateException} or {@link IllegalArgumentException}, respectively, will be thrown and the method
+     * will not complete the request. Consider using {@link #terminate()} to terminate all hosts forming this reverse
+     * proxy. The instance is <strong>only</strong> terminated when no longer in the draining state in a target group
+     * (typically takes 5 minutes, so expect a delay).
      */
     void removeHost(AwsInstance<ShardingKey> host, Optional<String> optionalKeyName,
             byte[] privateKeyEncryptionPassphrase) throws Exception;
