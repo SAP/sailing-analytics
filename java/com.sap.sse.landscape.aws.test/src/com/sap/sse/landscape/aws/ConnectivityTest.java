@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.jcraft.jsch.ChannelSftp;
@@ -43,8 +44,10 @@ import com.sap.sse.common.Duration;
 import com.sap.sse.common.Util;
 import com.sap.sse.landscape.Landscape;
 import com.sap.sse.landscape.Release;
+import com.sap.sse.landscape.RotatingFileBasedLog;
 import com.sap.sse.landscape.SecurityGroup;
 import com.sap.sse.landscape.application.ApplicationProcess;
+import com.sap.sse.landscape.application.ApplicationProcessMetrics;
 import com.sap.sse.landscape.aws.impl.AwsRegion;
 import com.sap.sse.landscape.aws.impl.CentralApacheReverseProxy;
 import com.sap.sse.landscape.aws.orchestration.CreateDNSBasedLoadBalancerMapping;
@@ -86,7 +89,7 @@ import software.amazon.awssdk.services.sts.model.Credentials;
  * @author Axel Uhl (D043530)
  *
  */
-//@Disabled("Needs AWS key ID, key secret and session token in system properties")
+@Disabled("Needs AWS key ID, key secret and session token in system properties")
 public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, SailingAnalyticsMetrics, ProcessT>> {
     private static final Logger logger = Logger.getLogger(ConnectivityTest.class.getName());
     private static final Optional<Duration> optionalTimeout = Optional.of(Duration.ONE_MINUTE.times(10));
@@ -94,7 +97,7 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
     private static AwsRegion region;
     private static byte[] keyPass;
     private static String AXELS_KEY_PASS;
-    private static final String AXELS_KEY_NAME = "Axel_ed25519";
+    private static final String AXELS_KEY_NAME = "Axel";
     private static final String pathPrefixForShardingKey = "/sse/landscape/test";
     
     @BeforeAll
@@ -221,7 +224,7 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
         sftpChannel.connect((int) optionalTimeout.orElse(Duration.NULL).asMillis());
         final String configFileName = "/etc/httpd/conf.d/"+hostname+".conf";
         sftpChannel.get(configFileName, configFileContents);
-        assertTrue(configFileContents.toString().startsWith("Use Event-SSL "+hostname));
+        assertTrue(configFileContents.toString().startsWith("Use Event "+hostname));
         sftpChannel.getSession().disconnect();
         proxy.removeRedirect(hostname, Optional.of(AXELS_KEY_NAME), AXELS_KEY_PASS.getBytes());
         final SshCommandChannel lsSshChannel = proxyHost.createRootSshChannel(optionalTimeout, Optional.of(AXELS_KEY_NAME), AXELS_KEY_PASS.getBytes());
@@ -448,11 +451,11 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
             InetAddress address = host.getPublicAddress(optionalTimeout);
             assertNotNull(address);
             logger.info("Obtained public IP address "+address);
-            SshCommandChannel shellChannel = host.createRootSshChannel(optionalTimeout, /* optional SSH key name */ Optional.empty(), keyPass);
+            SshCommandChannel shellChannel = host.createSshChannel("ec2-user", optionalTimeout, /* optional SSH key name */ Optional.empty(), keyPass);
             assertNotNull(shellChannel);
             logger.info("Shell channel connected. Waiting for it to become responsive...");
             final String stdout = shellChannel.runCommandAndReturnStdoutAndLogStderr("pwd", /* stderr prefix */ null, /* stderr log level */ Level.WARNING);
-            assertEquals("/root\n", turnAllLineSeparatorsIntoLineFeed(stdout));
+            assertEquals("/home/ec2-user\n", turnAllLineSeparatorsIntoLineFeed(stdout));
             // now try a simple command, checking for the "init" process to be found
             final SshCommandChannel commandChannel = host.createRootSshChannel(Optional.empty(), /* optional SSH key name */ Optional.empty(), keyPass);
             final String processToLookFor = "init";
@@ -543,6 +546,19 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
         final HttpURLConnection healthCheckConnection = (HttpURLConnection) new URL("http://"+proxy.getHost().getPublicAddress().getCanonicalHostName()+proxy.getHealthCheckPath()).openConnection();
         assertEquals(200, healthCheckConnection.getResponseCode());
         healthCheckConnection.disconnect();
+    }
+
+    @Test
+    public void testCentralReverseProxyInEuWest2CannotBeRemovedFromReverseProxyCluster() throws Exception {
+        final ReverseProxyCluster<String, ApplicationProcessMetrics, ?, RotatingFileBasedLog> proxy = landscape.getReverseProxyCluster(new AwsRegion(Region.EU_WEST_2, landscape));
+        assertNotNull(proxy);
+        assertNotNull(proxy.getCentralReverseProxy());
+        try {
+            proxy.removeHost(proxy.getCentralReverseProxy().getHost(), /* optional key name */ Optional.empty(), keyPass);
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            // expected
+            logger.info("Caught expected exception "+e.getMessage());
+        }
     }
 
     @Test
