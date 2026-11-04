@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import javax.ws.rs.core.Response;
 
@@ -155,5 +156,10 @@ public abstract class AbstractJaxRsApiTest {
             result.add(competitor);
         }
         return result;
+    }
+    
+    @SuppressWarnings("unchecked")
+    protected Callable<String> getAnyCallable() {
+        return Mockito.any(Callable.class);
     }
 }

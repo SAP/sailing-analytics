@@ -18,7 +18,6 @@ import com.sap.sailing.domain.leaderboard.Leaderboard;
 import com.sap.sailing.domain.leaderboard.impl.LowPoint;
 import com.sap.sailing.domain.leaderboard.meta.LeaderboardGroupMetaLeaderboard;
 import com.sap.sailing.server.gateway.jaxrs.exceptions.ExceptionManager;
-import com.sap.sailing.server.interfaces.LeaderboardGroupManagement;
 import com.sap.sse.common.ObjectAlreadyExistsException;
 
 public class LeaderboardGroupConflictTest extends AbstractJaxRsApiTest {
@@ -31,18 +30,16 @@ public class LeaderboardGroupConflictTest extends AbstractJaxRsApiTest {
     @Test
     public void overallNameConflictMapsToHttp409() {
         final String groupName = "Conflict " + UUID.randomUUID();
-        final UUID groupId = UUID.randomUUID();
         final String overallName = LeaderboardGroupMetaLeaderboard.getOverallLeaderboardName(groupName);
         final Leaderboard existing = racingEventService.addFlexibleLeaderboard(overallName, "Original",
                 new int[0], new LowPoint(), Collections.emptyList());
         final ObjectAlreadyExistsException conflict = assertThrows(ObjectAlreadyExistsException.class,
-                () -> LeaderboardGroupManagement.createLeaderboardGroup(racingEventService, getSecurityService(),
-                        groupId, groupName, "Description", "Display", /* displayGroupsInReverseOrder */ false,
-                        Collections.emptyList(), new int[0], ScoringSchemeType.LOW_POINT));
+                () -> leaderboardGroupsResource.createLeaderboardGroup(groupName, "Description", "Display",
+                        /* displayGroupsInReverseOrder */ false, ScoringSchemeType.LOW_POINT.name(), Collections.emptyList()));
         final Response response = new ExceptionManager().toResponse(conflict);
         assertEquals(Response.Status.CONFLICT.getStatusCode(), response.getStatus());
         assertEquals(conflict.getMessage(), response.getEntity());
         assertSame(existing, racingEventService.getLeaderboardByName(overallName));
-        assertNull(racingEventService.getLeaderboardGroupByID(groupId));
+        assertNull(racingEventService.getLeaderboardGroupByName(groupName));
     }
 }
