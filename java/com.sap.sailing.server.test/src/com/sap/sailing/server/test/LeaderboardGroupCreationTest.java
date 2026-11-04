@@ -30,6 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import com.sap.sailing.domain.common.ConflictObjectType;
 import com.sap.sailing.domain.common.ScoringSchemeType;
 import com.sap.sailing.domain.common.security.SecuredDomainType;
 import com.sap.sailing.domain.leaderboard.FlexibleLeaderboard;
@@ -381,7 +382,7 @@ public class LeaderboardGroupCreationTest {
                                 rejectedOwnership.set(securityService.getOwnership(overallIdentifier()));
                                 failedActionEntered.countDown();
                                 assertTrue(releaseFailedAction.await(/* timeout */ 30, TimeUnit.SECONDS));
-                                throw new ObjectAlreadyExistsException("Leaderboard group", name);
+                                throw new ObjectAlreadyExistsException(ConflictObjectType.LEADERBOARD_GROUP, name);
                             }))));
             assertTrue(failedActionEntered.await(/* timeout */ 30, TimeUnit.SECONDS));
             final Future<LeaderboardGroup> accepted = executor.submit(() -> subject.execute((Callable<LeaderboardGroup>) () -> {

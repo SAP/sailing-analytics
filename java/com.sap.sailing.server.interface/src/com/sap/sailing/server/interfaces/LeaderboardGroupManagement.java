@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
+import com.sap.sailing.domain.common.ConflictObjectType;
 import com.sap.sailing.domain.common.ScoringSchemeType;
 import com.sap.sailing.domain.common.security.SecuredDomainType;
 import com.sap.sailing.domain.leaderboard.Leaderboard;
@@ -31,7 +32,7 @@ public final class LeaderboardGroupManagement {
             final int[] overallLeaderboardDiscardThresholds, final ScoringSchemeType overallLeaderboardScoringSchemeType) {
         final Runnable validateGroup = () -> {
             if (service.getLeaderboardGroupByID(id) != null) {
-                throw new ObjectAlreadyExistsException("Leaderboard group", id.toString());
+                throw new ObjectAlreadyExistsException(ConflictObjectType.LEADERBOARD_GROUP, id.toString());
             }
             checkGroupNameAvailable(service, name, /* existingGroup */ null);
         };
@@ -91,13 +92,13 @@ public final class LeaderboardGroupManagement {
             final LeaderboardGroup existingGroup) {
         final LeaderboardGroup groupWithName = service.getLeaderboardGroupByName(name);
         if (groupWithName != null && (existingGroup == null || !existingGroup.getName().equals(name))) {
-            throw new ObjectAlreadyExistsException("Leaderboard group", name);
+            throw new ObjectAlreadyExistsException(ConflictObjectType.LEADERBOARD_GROUP, name);
         }
     }
 
     private static void checkOverallNameAvailable(final RacingEventService service, final String name) {
         if (service.getLeaderboardByName(name) != null) {
-            throw new ObjectAlreadyExistsException("Leaderboard", name);
+            throw new ObjectAlreadyExistsException(ConflictObjectType.LEADERBOARD, name);
         }
     }
 

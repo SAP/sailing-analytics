@@ -140,6 +140,7 @@ import com.sap.sailing.domain.base.impl.TeamImpl;
 import com.sap.sailing.domain.common.BoatClassMasterdata;
 import com.sap.sailing.domain.common.CompetitorDescriptor;
 import com.sap.sailing.domain.common.CompetitorRegistrationType;
+import com.sap.sailing.domain.common.ConflictObjectType;
 import com.sap.sailing.domain.common.DataImportProgress;
 import com.sap.sailing.domain.common.DataImportSubProgress;
 import com.sap.sailing.domain.common.DetailType;
@@ -1415,7 +1416,7 @@ Replicator {
         try {
             final Leaderboard existing = leaderboardsByName.get(leaderboard.getName());
             if (existing != null && existing != leaderboard) {
-                throw new ObjectAlreadyExistsException("Leaderboard", leaderboard.getName());
+                throw new ObjectAlreadyExistsException(ConflictObjectType.LEADERBOARD, leaderboard.getName());
             }
             if (existing == null) {
                 leaderboardsByName.put(leaderboard.getName(), leaderboard);
@@ -3547,10 +3548,10 @@ Replicator {
         LockUtil.lockForWrite(leaderboardsByNameLock);
         try {
             if (leaderboardGroupsByName.containsKey(groupName)) {
-                throw new ObjectAlreadyExistsException("Leaderboard group", groupName);
+                throw new ObjectAlreadyExistsException(ConflictObjectType.LEADERBOARD_GROUP, groupName);
             }
             if (leaderboardGroupsByID.containsKey(leaderboardGroupId)) {
-                throw new ObjectAlreadyExistsException("Leaderboard group", leaderboardGroupId.toString());
+                throw new ObjectAlreadyExistsException(ConflictObjectType.LEADERBOARD_GROUP, leaderboardGroupId.toString());
             }
             if (overallLeaderboardScoringSchemeType != null) {
                 checkLeaderboardNameAvailable(LeaderboardGroupMetaLeaderboard.getOverallLeaderboardName(groupName));
@@ -3582,7 +3583,7 @@ Replicator {
 
     private void checkLeaderboardNameAvailable(final String leaderboardName) {
         if (leaderboardsByName.containsKey(leaderboardName)) {
-            throw new ObjectAlreadyExistsException("Leaderboard", leaderboardName);
+            throw new ObjectAlreadyExistsException(ConflictObjectType.LEADERBOARD, leaderboardName);
         }
     }
 
@@ -3592,7 +3593,7 @@ Replicator {
         LockUtil.lockForWrite(leaderboardsByNameLock);
         try {
             if (leaderboardGroupsByID.containsKey(leaderboardGroup.getId())) {
-                throw new ObjectAlreadyExistsException("Leaderboard group", leaderboardGroup.getId().toString());
+                throw new ObjectAlreadyExistsException(ConflictObjectType.LEADERBOARD_GROUP, leaderboardGroup.getId().toString());
             }
             if (leaderboardGroup.hasOverallLeaderboard()) {
                 addLeaderboard(leaderboardGroup.getOverallLeaderboard());
@@ -3650,7 +3651,7 @@ Replicator {
                 throw new IllegalArgumentException("No leaderboard group with ID " + leaderboardGroupId + " found");
             }
             if (leaderboardGroupsByName.containsKey(newName)) {
-                throw new ObjectAlreadyExistsException("Leaderboard group", newName);
+                throw new ObjectAlreadyExistsException(ConflictObjectType.LEADERBOARD_GROUP, newName);
             }
             leaderboardGroupsByName.remove(toRename.getName());
             toRename.setName(newName);
@@ -3673,7 +3674,7 @@ Replicator {
                 throw new IllegalArgumentException("LeaderboardGroup with ID " + leaderboardGroupId + " not found");
             }
             if (!group.getName().equals(newName) && leaderboardGroupsByName.containsKey(newName)) {
-                throw new ObjectAlreadyExistsException("Leaderboard group", newName);
+                throw new ObjectAlreadyExistsException(ConflictObjectType.LEADERBOARD_GROUP, newName);
             }
             if (!group.hasOverallLeaderboard() && overallLeaderboardScoringSchemeType != null) {
                 checkLeaderboardNameAvailable(LeaderboardGroupMetaLeaderboard.getOverallLeaderboardName(newName));
