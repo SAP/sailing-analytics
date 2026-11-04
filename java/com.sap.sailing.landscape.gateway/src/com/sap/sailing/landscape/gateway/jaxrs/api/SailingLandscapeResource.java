@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,6 +46,7 @@ import com.sap.sailing.server.gateway.serialization.impl.CompareServersResultJso
 import com.sap.sailing.server.gateway.serialization.impl.DataImportProgressJsonSerializer;
 import com.sap.sailing.server.gateway.serialization.impl.LiveContentCheckResultJsonSerializer;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.Util.Triple;
 import com.sap.sse.landscape.Landscape;
 import com.sap.sse.landscape.Release;
@@ -87,6 +89,8 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
     private static final String MDI_PROGRESS = "mdiProgress";
     private static final String COMPARE_SERVERS_RESULT = "compareServersResult";
     private static final String ARCHIVE_MONGODB_RESULT = "archiveMongoDBResult";
+    private static final String PROGRESS_TRACKING_UUID = "progressTrackingUuid";
+    private static final String ARCHIVE_HOSTNAME = "archiveHostname";
     private static final String BEARER_TOKEN_FOR_REPLICA_SET_TO_ARCHIVE_FORM_PARAM = "bearerTokenForReplicaSetToArchive";
     private static final String BEARER_TOKEN_FOR_ARCHIVE_FORM_PARAM = "bearerTokenForArchive";
     private static final String MONGO_URI_TO_ARCHIVE_DB_TO_FORM_PARAM = "mongoUriToArchiveDbTo";
@@ -309,23 +313,88 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
         return response;
     }
 
+    /**
+     * Archives a replica set synchronously, including content comparison and any requested database archiving and
+     * replica set removal. This is a long-running request: importing races, waiting between comparison attempts and
+     * cleanup can exceed client or proxy timeouts. Prefer {@link #moveToArchiveServerAsync} and poll import progress.
+     * This endpoint retains its synchronous behavior for existing clients. The outcome, including comparison
+     * differences, is also emailed to the initiating user if that user has a verified email address.
+     *
+     * @return HTTP 200 with {@code mdiProgress}, {@code compareServersResult} and {@code archiveMongoDBResult} after
+     *         archiving finishes; callers must inspect those results for failures. Live content conflicts return
+     *         HTTP 409, and other archiving exceptions return HTTP 400.
+     */
     @Path("/movetoarchiveserver")
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces("application/json;charset=UTF-8")
     public Response moveToArchiveServer(
-            @FormParam(REGION_FORM_PARAM) String regionId,
-            @FormParam(REPLICA_SET_NAME_FORM_PARAM) String replicaSetName,
-            @FormParam(KEY_NAME_FORM_PARAM) String optionalKeyName,
-            @FormParam(PRIVATE_KEY_ENCRYPTION_PASSPHRASE_FORM_PARAM) String privateKeyEncryptionPassphrase,
-            @FormParam(BEARER_TOKEN_FOR_REPLICA_SET_TO_ARCHIVE_FORM_PARAM) String bearerTokenOrNullForApplicationReplicaSetToArchive,
-            @FormParam(BEARER_TOKEN_FOR_ARCHIVE_FORM_PARAM) String bearerTokenOrNullForArchive,
-            @FormParam(TIMEOUT_IN_MILLISECONDS_FORM_PARAM) Long optionalTimeoutInMilliseconds,
-            @FormParam(DURATION_TO_WAIT_BEFORE_COMPARE_SERVERS_IN_MILLISECONDS_FORM_PARAM) @DefaultValue("300000") long durationToWaitBeforeCompareServersInMillis,
-            @FormParam(MAX_NUMBER_OF_COMPARE_SERVER_ATTEMPTS_FORM_PARAM) @DefaultValue("5") int maxNumberOfCompareServerAttempts,
-            @FormParam(REMOVE_APPLICATION_REPLICA_SET_FORM_PARAM) @DefaultValue("true") boolean removeApplicationReplicaSet,
-            @FormParam(MONGO_URI_TO_ARCHIVE_DB_TO_FORM_PARAM) String mongoUriToArchiveDbTo,
-            @FormParam(FORCE_FORM_PARAM) @DefaultValue("false") boolean force) {
+            @FormParam(REGION_FORM_PARAM) final String regionId,
+            @FormParam(REPLICA_SET_NAME_FORM_PARAM) final String replicaSetName,
+            @FormParam(KEY_NAME_FORM_PARAM) final String optionalKeyName,
+            @FormParam(PRIVATE_KEY_ENCRYPTION_PASSPHRASE_FORM_PARAM) final String privateKeyEncryptionPassphrase,
+            @FormParam(BEARER_TOKEN_FOR_REPLICA_SET_TO_ARCHIVE_FORM_PARAM) final String bearerTokenOrNullForApplicationReplicaSetToArchive,
+            @FormParam(BEARER_TOKEN_FOR_ARCHIVE_FORM_PARAM) final String bearerTokenOrNullForArchive,
+            @FormParam(TIMEOUT_IN_MILLISECONDS_FORM_PARAM) final Long optionalTimeoutInMilliseconds,
+            @FormParam(DURATION_TO_WAIT_BEFORE_COMPARE_SERVERS_IN_MILLISECONDS_FORM_PARAM) @DefaultValue("300000") final long durationToWaitBeforeCompareServersInMillis,
+            @FormParam(MAX_NUMBER_OF_COMPARE_SERVER_ATTEMPTS_FORM_PARAM) @DefaultValue("5") final int maxNumberOfCompareServerAttempts,
+            @FormParam(REMOVE_APPLICATION_REPLICA_SET_FORM_PARAM) @DefaultValue("true") final boolean removeApplicationReplicaSet,
+            @FormParam(MONGO_URI_TO_ARCHIVE_DB_TO_FORM_PARAM) final String mongoUriToArchiveDbTo,
+            @FormParam(FORCE_FORM_PARAM) @DefaultValue("false") final boolean force) {
+        return moveToArchiveServer(regionId, replicaSetName, optionalKeyName, privateKeyEncryptionPassphrase,
+                bearerTokenOrNullForApplicationReplicaSetToArchive, bearerTokenOrNullForArchive,
+                optionalTimeoutInMilliseconds, durationToWaitBeforeCompareServersInMillis,
+                maxNumberOfCompareServerAttempts, removeApplicationReplicaSet, mongoUriToArchiveDbTo, force,
+                /* asynchronous */ false);
+    }
+
+    /**
+     * Starts the same archiving workflow as {@code POST /landscape/movetoarchiveserver}, using the same form
+     * parameters, defaults and permissions. This asynchronous pattern is preferred for long-running archiving to
+     * avoid client or proxy timeouts while importing, comparing and cleaning up. The request still waits for
+     * preparation and acceptance of the master data import (MDI) on the archive; it is not an immediate enqueue.
+     * {@code timeoutInMilliseconds} only limits replica set discovery, not the entire request.
+     * <p>
+     * Poll {@code https://<archiveHostname>/sailingserver/api/v1/masterdataimport/progress?progressTrackingUuid=<UUID>}
+     * with credentials that have master-data import permission on the archive. The UUID tracks only the import:
+     * a successful import does not imply completion of content comparison, database archiving or replica set
+     * removal. Archiving continues independently of polling; its final outcome is logged and emailed to the
+     * initiating user if that user has a verified email address.
+     *
+     * @return HTTP 202 with {@code progressTrackingUuid} and {@code archiveHostname} once the archive accepts the
+     *         import. Acceptance does not imply archiving success. Before acceptance, live content conflicts return
+     *         HTTP 409, and other archiving exceptions return HTTP 400.
+     */
+    @Path("/movetoarchiveserver/async")
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces("application/json;charset=UTF-8")
+    public Response moveToArchiveServerAsync(
+            @FormParam(REGION_FORM_PARAM) final String regionId,
+            @FormParam(REPLICA_SET_NAME_FORM_PARAM) final String replicaSetName,
+            @FormParam(KEY_NAME_FORM_PARAM) final String optionalKeyName,
+            @FormParam(PRIVATE_KEY_ENCRYPTION_PASSPHRASE_FORM_PARAM) final String privateKeyEncryptionPassphrase,
+            @FormParam(BEARER_TOKEN_FOR_REPLICA_SET_TO_ARCHIVE_FORM_PARAM) final String bearerTokenOrNullForApplicationReplicaSetToArchive,
+            @FormParam(BEARER_TOKEN_FOR_ARCHIVE_FORM_PARAM) final String bearerTokenOrNullForArchive,
+            @FormParam(TIMEOUT_IN_MILLISECONDS_FORM_PARAM) final Long optionalTimeoutInMilliseconds,
+            @FormParam(DURATION_TO_WAIT_BEFORE_COMPARE_SERVERS_IN_MILLISECONDS_FORM_PARAM) @DefaultValue("300000") final long durationToWaitBeforeCompareServersInMillis,
+            @FormParam(MAX_NUMBER_OF_COMPARE_SERVER_ATTEMPTS_FORM_PARAM) @DefaultValue("5") final int maxNumberOfCompareServerAttempts,
+            @FormParam(REMOVE_APPLICATION_REPLICA_SET_FORM_PARAM) @DefaultValue("true") final boolean removeApplicationReplicaSet,
+            @FormParam(MONGO_URI_TO_ARCHIVE_DB_TO_FORM_PARAM) final String mongoUriToArchiveDbTo,
+            @FormParam(FORCE_FORM_PARAM) @DefaultValue("false") final boolean force) {
+        return moveToArchiveServer(regionId, replicaSetName, optionalKeyName, privateKeyEncryptionPassphrase,
+                bearerTokenOrNullForApplicationReplicaSetToArchive, bearerTokenOrNullForArchive,
+                optionalTimeoutInMilliseconds, durationToWaitBeforeCompareServersInMillis,
+                maxNumberOfCompareServerAttempts, removeApplicationReplicaSet, mongoUriToArchiveDbTo, force,
+                /* asynchronous */ true);
+    }
+
+    private Response moveToArchiveServer(final String regionId, final String replicaSetName, final String optionalKeyName,
+            final String privateKeyEncryptionPassphrase, final String bearerTokenOrNullForApplicationReplicaSetToArchive,
+            final String bearerTokenOrNullForArchive, final Long optionalTimeoutInMilliseconds,
+            final long durationToWaitBeforeCompareServersInMillis, final int maxNumberOfCompareServerAttempts,
+            final boolean removeApplicationReplicaSet, final String mongoUriToArchiveDbTo, final boolean force,
+            final boolean asynchronous) {
         checkLandscapeManageAwsPermission();
         if (removeApplicationReplicaSet) {
             getSecurityService().checkCurrentUserDeletePermission(SecuredSecurityTypes.SERVER.getQualifiedObjectIdentifier(
@@ -333,7 +402,7 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
         }
         Response response;
         final AwsRegion region = new AwsRegion(regionId, getLandscapeService().getLandscape());
-        byte[] passphraseForPrivateKeyDecryption = privateKeyEncryptionPassphrase==null?null:privateKeyEncryptionPassphrase.getBytes();
+        final byte[] passphraseForPrivateKeyDecryption = privateKeyEncryptionPassphrase==null?null:privateKeyEncryptionPassphrase.getBytes();
         final AwsLandscape<String> landscape = getLandscapeService().getLandscape();
         final MongoUriParser<String> mongoUriParser = new MongoUriParser<>(landscape, region);
         try {
@@ -343,6 +412,16 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
                             passphraseForPrivateKeyDecryption);
             if (applicationReplicaSetToArchive == null) {
                 response = badRequest("Application replica set with name " + replicaSetName + " not found in region "+regionId);
+            } else if (asynchronous) {
+                final Pair<UUID, String> importHandle = getLandscapeService().archiveReplicaSetAsync(regionId,
+                        applicationReplicaSetToArchive, bearerTokenOrNullForApplicationReplicaSetToArchive,
+                        bearerTokenOrNullForArchive, Duration.ofMillis(durationToWaitBeforeCompareServersInMillis),
+                        maxNumberOfCompareServerAttempts, removeApplicationReplicaSet, moveDatabaseHere, optionalKeyName,
+                        passphraseForPrivateKeyDecryption, force);
+                final JSONObject result = new JSONObject();
+                result.put(PROGRESS_TRACKING_UUID, importHandle.getA().toString());
+                result.put(ARCHIVE_HOSTNAME, importHandle.getB());
+                response = Response.status(Status.ACCEPTED).entity(streamingOutput(result)).build();
             } else {
                 final Triple<DataImportProgress, CompareServersResult, String> mdiProgressAndCompareServersResult = getLandscapeService().archiveReplicaSet(regionId, applicationReplicaSetToArchive,
                     bearerTokenOrNullForApplicationReplicaSetToArchive, bearerTokenOrNullForArchive,
@@ -354,9 +433,9 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
                 result.put(ARCHIVE_MONGODB_RESULT, mdiProgressAndCompareServersResult.getC());
                 response = Response.ok(streamingOutput(result)).build();
             }
-        } catch (LiveContentConflictException e) {
+        } catch (final LiveContentConflictException e) {
             response = liveContentConflict(e.getLiveContentCheckResult());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             logger.log(Level.SEVERE, "Error trying to archive replica set "+replicaSetName+" in region "+regionId+": "+e.getMessage(), e);
             response = badRequest("Error trying to archive replica set "+replicaSetName+" in region "+regionId+": "+e.getMessage());
         }

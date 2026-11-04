@@ -77,10 +77,17 @@ public interface SailingServer extends SecuredServer {
      */
     LiveContentCheckResult getLiveContent(TimePoint checkedAt) throws Exception;
 
-    MasterDataImportResult importMasterData(SailingServer from, Iterable<UUID> leaderboardGroupIds, boolean override,
-            boolean compress, boolean exportWind, boolean exportDeviceConfigs,
-            boolean exportTrackedRacesAndStartTracking, Optional<UUID> progressTrackingUuid) throws Exception;
-    
+    /**
+     * Imports one or more leaderboard groups with their events, regattas, races, tracking and wind data into this
+     * server/replica set asynchronously. The full import can take more than an hour to complete. This method returns
+     * its tracking UUID once the remote server has accepted the background task. Use
+     * {@link #getMasterDataImportProgress(UUID)} with the returned {@link UUID} to track the import's progress.
+     */
+    UUID importMasterDataAsync(final SailingServer from, final Iterable<UUID> leaderboardGroupIds, final boolean override,
+            final boolean compress, final boolean exportWind, final boolean exportDeviceConfigs,
+            final boolean exportTrackedRacesAndStartTracking, final Optional<UUID> progressTrackingUuid) throws Exception;
+
+    /** Returns {@code null} if progress is not yet visible on the responding replica, or has expired. */
     DataImportProgress getMasterDataImportProgress(UUID progressTrackingUuid) throws Exception;
 
     /**

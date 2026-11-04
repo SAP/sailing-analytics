@@ -247,7 +247,7 @@ public class Activator implements BundleActivator {
     }
     
     void checkMedia(Iterable<Event> events, SecurityService securityService,
-            ImageUrlHealthChecker imageUrlHealthChecker, RacingEventService eventService) {
+            MediaUrlHealthChecker imageUrlHealthChecker, RacingEventService eventService) {
         // only run this on a RacingEventService primary node, not on replicas
         if (eventService.getMasterDescriptor() == null) {
             final Map<String, Boolean> availabilityByUrl = new HashMap<>();
@@ -307,7 +307,7 @@ public class Activator implements BundleActivator {
         try {
             final SecurityService securityService = securityServiceTracker.getInitializedService(0);
             if (securityService != null) {
-                checkMedia(racingEventService.getAllEvents(), securityService, new ImageUrlHealthChecker(),
+                checkMedia(racingEventService.getAllEvents(), securityService, new MediaUrlHealthChecker(),
                         racingEventService);
             }
         } catch (InterruptedException e) {

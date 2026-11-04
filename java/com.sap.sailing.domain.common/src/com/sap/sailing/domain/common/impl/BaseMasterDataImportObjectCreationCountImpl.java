@@ -1,7 +1,10 @@
 package com.sap.sailing.domain.common.impl;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import com.sap.sailing.domain.common.MasterDataImportObjectCreationCount;
 import com.sap.sse.common.Util;
@@ -26,6 +29,7 @@ public class BaseMasterDataImportObjectCreationCountImpl implements MasterDataIm
     private int mediaTrackCount = 0;
     private int trackedRacesCount = 0;
     private Set<String> namedOfOverwrittenRegattas = new HashSet<>();
+    private List<UUID> eventIdsImported;
 
     public BaseMasterDataImportObjectCreationCountImpl() {
     };
@@ -104,5 +108,15 @@ public class BaseMasterDataImportObjectCreationCountImpl implements MasterDataIm
 
     public void addOverwrittenRegattaName(String name) {
         namedOfOverwrittenRegattas.add(name);
+    }
+
+    @Override
+    public Iterable<UUID> getEventIdsImported() {
+        return eventIdsImported;
+    }
+
+    public void setEventIdsImported(final Iterable<UUID> eventIdsImported) {
+        this.eventIdsImported = new ArrayList<>();
+        Util.addAll(eventIdsImported, this.eventIdsImported);
     }
 }
