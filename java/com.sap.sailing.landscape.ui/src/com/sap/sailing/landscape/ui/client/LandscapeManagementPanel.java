@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -25,6 +26,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CaptionPanel;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -50,7 +52,6 @@ import com.sap.sailing.landscape.ui.client.i18n.StringMessages;
 import com.sap.sailing.landscape.ui.shared.AmazonMachineImageDTO;
 import com.sap.sailing.landscape.ui.shared.AvailabilityZoneDTO;
 import com.sap.sailing.landscape.ui.shared.AwsInstanceDTO;
-import com.sap.sailing.landscape.ui.shared.CompareServersResultDTO;
 import com.sap.sailing.landscape.ui.shared.MongoEndpointDTO;
 import com.sap.sailing.landscape.ui.shared.MongoScalingInstructionsDTO;
 import com.sap.sailing.landscape.ui.shared.ProcessDTO;
@@ -62,6 +63,7 @@ import com.sap.sailing.landscape.ui.shared.SailingApplicationReplicaSetDTO;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
+import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.Util.Triple;
 import com.sap.sse.common.util.Holder;
 import com.sap.sse.common.util.NaturalComparator;
@@ -77,6 +79,7 @@ import com.sap.sse.gwt.client.celltable.TableWrapperWithSingleSelectionAndFilter
 import com.sap.sse.gwt.client.controls.IntegerBox;
 import com.sap.sse.gwt.client.controls.busyindicator.BusyIndicator;
 import com.sap.sse.gwt.client.controls.busyindicator.SimpleBusyIndicator;
+import com.sap.sse.gwt.client.controls.progressbar.PollingProgressPanel;
 import com.sap.sse.gwt.client.dialog.ConfirmationDialog;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog.DialogCallback;
@@ -1522,7 +1525,7 @@ public class LandscapeManagementPanel extends SimplePanel {
                     public void ok(ReplicaSetArchivingParameters bearerTokensAndWhetherToRemoveReplicaSet) {
                         applicationReplicaSetsBusy.setBusy(true);
                         final Holder<Consumer<Boolean>> issueRequest = new Holder<>();
-                        issueRequest.value = force -> landscapeManagementService.archiveReplicaSet(regionId, applicationReplicaSetToArchive,
+                        issueRequest.value = force -> landscapeManagementService.archiveReplicaSetAsync(regionId, applicationReplicaSetToArchive,
                                 bearerTokensAndWhetherToRemoveReplicaSet.getBearerTokenOrNullForApplicationReplicaSetToArchive(),
                                 bearerTokensAndWhetherToRemoveReplicaSet.getBearerTokenOrNullForArchive(),
                                 bearerTokensAndWhetherToRemoveReplicaSet.getDurationToWaitBeforeAndBetweenCompareServerAttempts(),
@@ -1532,7 +1535,7 @@ public class LandscapeManagementPanel extends SimplePanel {
                                 sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption() != null
                                     ? sshKeyManagementPanel.getPassphraseForPrivateKeyDecryption().getBytes() : null,
                                 force,
-                                new AsyncCallback<LiveContentAwareOperationResult<Triple<DataImportProgress, CompareServersResultDTO, String>>>() {
+                                new AsyncCallback<LiveContentAwareOperationResult<Pair<UUID, String>>>() {
                             @Override
                             public void onFailure(final Throwable caught) {
                                 applicationReplicaSetsBusy.setBusy(false);
@@ -1540,7 +1543,7 @@ public class LandscapeManagementPanel extends SimplePanel {
                             }
 
                             @Override
-                            public void onSuccess(final LiveContentAwareOperationResult<Triple<DataImportProgress, CompareServersResultDTO, String>> operationResult) {
+                            public void onSuccess(final LiveContentAwareOperationResult<Pair<UUID, String>> operationResult) {
                                 applicationReplicaSetsBusy.setBusy(false);
                                 if (!operationResult.isSuccessful()) {
                                     // The operation was refused because one or more affected replica sets are
@@ -1553,30 +1556,9 @@ public class LandscapeManagementPanel extends SimplePanel {
                                         }
                                     });
                                 } else {
-                                final Triple<DataImportProgress, CompareServersResultDTO, String> result =
-                                        operationResult.getSuccessfulResult();
-                                final String mongoDBArchivingErrorMessage = result.getC();
-                                if (result == null || result.getA() == null || result.getA().failed()) {
-                                    errorReporter.reportError(stringMessages.errorDuringImport(result==null||result.getA()==null?"":result.getA().getErrorMessage()));
-                                } else if (result.getB() == null) {
-                                    errorReporter.reportError(stringMessages.errorWhileComparingServerContent());
-                                } else if (result.getB().hasDiffs()) {
-                                    errorReporter.reportError(stringMessages.differencesInServerContentFound(
-                                            result.getB().getServerAName(), result.getB().getADiffs().toString(),
-                                            result.getB().getServerBName(), result.getB().getBDiffs().toString()));
-                                } else if (mongoDBArchivingErrorMessage != null) {
-                                    errorReporter.reportError(stringMessages.errorArchivingMongoDBTo(
-                                            selectedMongoEndpointForDBArchiving != null ? selectedMongoEndpointForDBArchiving.getReplicaSetName() : "",
-                                            mongoDBArchivingErrorMessage));
-                                }
-                                if (result != null && result.getA() != null && !result.getA().failed()
-                                 && result.getB() != null && !result.getB().hasDiffs()) {
-                                    if (bearerTokensAndWhetherToRemoveReplicaSet.isRemoveApplicationReplicaSet()) {
-                                        applicationReplicaSetsTable.getFilterPanel().remove(applicationReplicaSetToArchive);
-                                    }
-                                    Notification.notify(stringMessages.successfullyArchivedReplicaSet(
-                                            applicationReplicaSetToArchive.getName()), NotificationType.SUCCESS);
-                                }
+                                    showArchiveImportProgress(stringMessages, applicationReplicaSetToArchive.getName(),
+                                            operationResult.getSuccessfulResult(),
+                                            bearerTokensAndWhetherToRemoveReplicaSet.getBearerTokenOrNullForArchive());
                                 }
                             }
                         });
@@ -1664,6 +1646,45 @@ public class LandscapeManagementPanel extends SimplePanel {
                                 : numberOfCompareServersAttemptsBox.getValue());
             }
         }.show();
+    }
+
+    private void showArchiveImportProgress(final StringMessages stringMessages, final String replicaSetName,
+            final Pair<UUID, String> importHandle, final String bearerTokenOrNullForArchive) {
+        final DialogBox dialog = new DialogBox(/* autoHide */ false, /* modal */ false);
+        dialog.setText(stringMessages.archiveMasterDataImportProgress(replicaSetName));
+        final VerticalPanel content = new VerticalPanel();
+        content.add(new Label(stringMessages.archiveContinuesInBackground()));
+        final PollingProgressPanel<DataImportProgress> progressPanel = new PollingProgressPanel<>(
+                stringMessages.overallProgress(), stringMessages.importServerError(),
+                callback -> landscapeManagementService.getArchiveMasterDataImportProgress(importHandle.getB(),
+                        importHandle.getA(), bearerTokenOrNullForArchive, callback),
+                DataImportProgress::getOverallProgressPct,
+                progress -> progress.getCurrentSubProgress().getMessage(stringMessages),
+                DataImportProgress::getCurrentSubProgressPct,
+                progress -> progress.failed() ? (progress.getErrorMessage() == null
+                        ? stringMessages.importServerError() : progress.getErrorMessage()) : null,
+                progress -> progress.getResult() != null, new AsyncCallback<DataImportProgress>() {
+                    @Override
+                    public void onFailure(final Throwable caught) {
+                        dialog.hide();
+                        Notification.notify(stringMessages.errorDuringImport(caught.getLocalizedMessage()),
+                                NotificationType.ERROR);
+                    }
+
+                    @Override
+                    public void onSuccess(final DataImportProgress result) {
+                        dialog.hide();
+                        MasterDataImportNotification.notifySuccess(result.getResult(), stringMessages,
+                                stringMessages.archiveMasterDataImportFinished());
+                    }
+                });
+        content.add(progressPanel);
+        final Button close = new Button(stringMessages.close());
+        close.addClickHandler(event -> dialog.hide());
+        content.add(close);
+        dialog.setWidget(content);
+        dialog.center();
+        progressPanel.start();
     }
     
     private void createDefaultLoadBalancerMappings(final StringMessages stringMessages, String regionId,

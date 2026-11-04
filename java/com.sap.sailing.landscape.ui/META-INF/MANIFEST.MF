@@ -32,10 +32,12 @@ Export-Package: com.google.gwt.user.client.rpc.core.com.sap.sailing.landscape.co
  com.google.gwt.user.client.rpc.core.com.sap.sse.landscape.aws.common.shared,
  com.google.gwt.user.client.rpc.core.com.sap.sse.landscape.common.shared,
  com.sap.sailing.landscape.ui.client,
+ com.sap.sailing.landscape.ui.client.i18n,
  com.sap.sailing.landscape.ui.server,
  com.sap.sailing.landscape.ui.shared
 Bundle-ActivationPolicy: lazy
 Import-Package: com.sap.sailing.domain.common,
+ com.sap.sailing.domain.common.i18n,
  com.sap.sailing.server.gateway.interfaces,
  javax.servlet;version="[3.1.0,4.0.0)",
  javax.servlet.http;version="[3.1.0,4.0.0)",

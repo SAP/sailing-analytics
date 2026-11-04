@@ -3,6 +3,7 @@ package com.sap.sailing.landscape.ui.client;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.sap.sailing.domain.common.DataImportProgress;
@@ -15,7 +16,6 @@ import com.sap.sailing.landscape.ui.shared.AmazonMachineImageDTO;
 import com.sap.sailing.landscape.ui.shared.AvailabilityZoneDTO;
 import com.sap.sailing.landscape.ui.shared.AwsInstanceDTO;
 import com.sap.sailing.landscape.ui.shared.AwsShardDTO;
-import com.sap.sailing.landscape.ui.shared.CompareServersResultDTO;
 import com.sap.sailing.landscape.ui.shared.LeaderboardNameDTO;
 import com.sap.sailing.landscape.ui.shared.MongoEndpointDTO;
 import com.sap.sailing.landscape.ui.shared.MongoScalingInstructionsDTO;
@@ -26,10 +26,21 @@ import com.sap.sailing.landscape.ui.shared.SSHKeyPairDTO;
 import com.sap.sailing.landscape.ui.shared.SailingApplicationReplicaSetDTO;
 import com.sap.sailing.landscape.ui.shared.SerializationDummyDTO;
 import com.sap.sse.common.Duration;
-import com.sap.sse.common.Util.Triple;
+import com.sap.sse.common.Util.Pair;
 import com.sap.sse.landscape.aws.common.shared.RedirectDTO;
 
 public interface LandscapeManagementWriteService extends RemoteService {
+    /** Returns the accepted import UUID and archive hostname; archiving continues on the server. */
+    LiveContentAwareOperationResult<Pair<UUID, String>> archiveReplicaSetAsync(final String regionId,
+            final SailingApplicationReplicaSetDTO<String> applicationReplicaSetToArchive,
+            final String bearerTokenOrNullForApplicationReplicaSetToArchive, final String bearerTokenOrNullForArchive,
+            final Duration durationToWaitBeforeCompareServers, final int maxNumberOfCompareServerAttempts,
+            final boolean removeApplicationReplicaSet, final MongoEndpointDTO moveDatabaseHere, final String optionalKeyName,
+            final byte[] passphraseForPrivateKeyDecryption, final boolean force) throws Exception;
+
+    DataImportProgress getArchiveMasterDataImportProgress(final String archiveHostname, final UUID operationId,
+            final String bearerTokenOrNullForArchive) throws Exception;
+
     ArrayList<String> getRegions();
     
     ArrayList<String> getInstanceTypeNames(boolean canBeDeployedInNlbInstanceBasedTargetGroup);
@@ -131,13 +142,6 @@ public interface LandscapeManagementWriteService extends RemoteService {
             String securityReplicationBearerToken, boolean force) throws Exception;
 
     ArrayList<ReleaseDTO> getReleases();
-
-    LiveContentAwareOperationResult<Triple<DataImportProgress, CompareServersResultDTO, String>> archiveReplicaSet(
-            String regionId, SailingApplicationReplicaSetDTO<String> applicationReplicaSetToArchive,
-            String bearerTokenOrNullForApplicationReplicaSetToArchive, String bearerTokenOrNullForArchive,
-            Duration durationToWaitBeforeCompareServers, int maxNumberOfCompareServerAttempts,
-            boolean removeApplicationReplicaSet, MongoEndpointDTO moveDatabaseHere, String optionalKeyName,
-            byte[] passphraseForPrivateKeyDecryption, boolean force) throws Exception;
 
     SailingApplicationReplicaSetDTO<String> deployApplicationToExistingHost(String replicaSetName,
             AwsInstanceDTO hostToDeployTo, String replicaInstanceType, boolean dynamicLoadBalancerMapping,

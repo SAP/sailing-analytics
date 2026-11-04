@@ -11,10 +11,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -37,12 +37,10 @@ import com.sap.sailing.server.gateway.deserialization.impl.DataImportProgressJso
 import com.sap.sailing.server.gateway.deserialization.impl.EventBaseJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.LeaderboardGroupBaseJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.LiveContentCheckResultJsonDeserializer;
-import com.sap.sailing.server.gateway.deserialization.impl.MasterDataImportResultJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.RemoteSailingServerReferenceJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.TrackingConnectorInfoJsonDeserializer;
 import com.sap.sailing.server.gateway.deserialization.impl.VenueJsonDeserializer;
 import com.sap.sailing.server.gateway.interfaces.CompareServersResult;
-import com.sap.sailing.server.gateway.interfaces.MasterDataImportResult;
 import com.sap.sailing.server.gateway.interfaces.SailingServer;
 import com.sap.sailing.server.gateway.jaxrs.api.CompareServersResource;
 import com.sap.sailing.server.gateway.jaxrs.api.EventsResource;
@@ -61,7 +59,6 @@ import com.sap.sse.security.util.impl.SecuredServerImpl;
 import com.sap.sse.shared.json.JsonDeserializationException;
 
 public class SailingServerImpl extends SecuredServerImpl implements SailingServer {
-    private static final Logger logger = Logger.getLogger(SailingServerImpl.class.getName());
     private final String GATEWAY_URL_PREFIX = "sailingserver/api";
     
     public SailingServerImpl(URL baseUrl, String bearerToken) {
@@ -153,10 +150,32 @@ public class SailingServerImpl extends SecuredServerImpl implements SailingServe
     }
 
     @Override
-    public MasterDataImportResult importMasterData(SailingServer from, Iterable<UUID> leaderboardGroupIds,
-            boolean override, boolean compress, boolean exportWind, boolean exportDeviceConfigs,
-            boolean exportTrackedRacesAndStartTracking, Optional<UUID> progressTrackingUuid) throws ClientProtocolException, IOException, ParseException {
-        final URL mdiUrl = new URL(getBaseUrl(), GATEWAY_URL_PREFIX + MasterDataImportResource.V1_MASTERDATAIMPORT);
+    public UUID importMasterDataAsync(final SailingServer from, final Iterable<UUID> leaderboardGroupIds,
+            final boolean override, final boolean compress, final boolean exportWind, final boolean exportDeviceConfigs,
+            final boolean exportTrackedRacesAndStartTracking, final Optional<UUID> progressTrackingUuid) throws IOException, ParseException {
+        final Pair<Object, Integer> response = postMasterDataImport(from, leaderboardGroupIds, override, compress,
+                exportWind, exportDeviceConfigs, exportTrackedRacesAndStartTracking, progressTrackingUuid);
+        if (response.getB() != 202 || !(response.getA() instanceof JSONObject)) {
+            throw new HttpResponseException(response.getB(), "Master data import was not accepted by " + getBaseUrl());
+        }
+        final Object id = ((JSONObject) response.getA()).get(MasterDataImportResource.PROGRESS_TRACKING_UUID);
+        final UUID result;
+        try {
+            result = UUID.fromString(String.valueOf(id));
+        } catch (final IllegalArgumentException e) {
+            throw new IOException("Invalid import tracking UUID from " + getBaseUrl(), e);
+        }
+        if (progressTrackingUuid.isPresent() && !progressTrackingUuid.get().equals(result)) {
+            throw new IOException("Import tracking UUID does not match the requested UUID");
+        }
+        return result;
+    }
+
+    private Pair<Object, Integer> postMasterDataImport(final SailingServer from, final Iterable<UUID> leaderboardGroupIds,
+            final boolean override, final boolean compress, final boolean exportWind, final boolean exportDeviceConfigs,
+            final boolean exportTrackedRacesAndStartTracking, final Optional<UUID> progressTrackingUuid) throws IOException, ParseException {
+        final URL mdiUrl = new URL(getBaseUrl(), GATEWAY_URL_PREFIX + MasterDataImportResource.V1_MASTERDATAIMPORT
+                + MasterDataImportResource.ASYNC);
         final List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair(MasterDataImportResource.REMOTE_SERVER_URL_FORM_PARAM, from.getBaseUrl().toString()));
         params.add(new BasicNameValuePair(MasterDataImportResource.REMOTE_SERVER_BEARER_TOKEN_FORM_PARAM, from.getBearerToken()));
@@ -172,26 +191,28 @@ public class SailingServerImpl extends SecuredServerImpl implements SailingServe
         final HttpPost importMasterData = new HttpPost(mdiUrl.toString());
         importMasterData.setEntity(EntityBuilder.create()
                 .setContentType(ContentType.APPLICATION_FORM_URLENCODED).setParameters(params).build());
-        final Pair<Object, Integer> responseAndStatus = getJsonParsedResponse(importMasterData);
-        final MasterDataImportResult result;
-        if (responseAndStatus.getB() >= 200 && responseAndStatus.getB() < 300) {
-            logger.info("Received an OK status "+responseAndStatus.getB()+" for MDI from "+from);
-            final JSONObject jsonResponse = (JSONObject) responseAndStatus.getA();
-            result = new MasterDataImportResultJsonDeserializer().deserialize(jsonResponse);
-        } else {
-            logger.warning("Received a non-OK status "+responseAndStatus.getB()+" for MDI from "+from);
-            result = null;
-        }
-        return result;
+        return getJsonParsedResponse(importMasterData);
     }
 
     @Override
-    public DataImportProgress getMasterDataImportProgress(UUID progressTrackingUuid) throws ClientProtocolException, IOException, ParseException {
+    public DataImportProgress getMasterDataImportProgress(final UUID progressTrackingUuid) throws ClientProtocolException, IOException, ParseException {
         final URL progressUrl = new URL(getBaseUrl(), GATEWAY_URL_PREFIX + MasterDataImportResource.V1_MASTERDATAIMPORT + MasterDataImportResource.PROGRESS+
                 "?"+MasterDataImportResource.PROGRESS_TRACKING_UUID+"="+progressTrackingUuid);
         final HttpGet getMasterDataImportProgress = new HttpGet(progressUrl.toString());
-        final JSONObject jsonResponse = (JSONObject) getJsonParsedResponse(getMasterDataImportProgress).getA();
-        return new DataImportProgressJsonDeserializer().deserialize(jsonResponse);
+        final Pair<Object, Integer> response = getJsonParsedResponse(getMasterDataImportProgress);
+        final DataImportProgress result;
+        if (response.getB() == 404) {
+            result = null;
+        } else if (response.getB() == 401 || response.getB() == 403) {
+            throw new SecurityException("Not authorized to read MDI progress on " + getBaseUrl());
+        } else if (response.getB() != 200) {
+            throw new HttpResponseException(response.getB(), "Cannot read MDI progress on " + getBaseUrl());
+        } else if (!(response.getA() instanceof JSONObject)) {
+            throw new IOException("Invalid MDI progress response from " + getBaseUrl());
+        } else {
+            result = new DataImportProgressJsonDeserializer().deserialize((JSONObject) response.getA());
+        }
+        return result;
     }
 
     @Override
