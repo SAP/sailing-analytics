@@ -77,27 +77,27 @@ public class MediaHealthCheckerTest {
 
     @Test
     public void testValidImageIsAvailable() throws Exception {
-        assertTrue(new ImageUrlHealthChecker().isImageAvailable(getUrl(VALID_IMAGE_PATH)));
+        assertTrue(new MediaUrlHealthChecker().isImageAvailable(getUrl(VALID_IMAGE_PATH)));
     }
 
     @Test
     public void testRedirectToValidImageIsAvailable() throws Exception {
-        assertTrue(new ImageUrlHealthChecker().isImageAvailable(getUrl(REDIRECT_PATH)));
+        assertTrue(new MediaUrlHealthChecker().isImageAvailable(getUrl(REDIRECT_PATH)));
     }
 
     @Test
     public void testHttpErrorIsNotAvailable() throws Exception {
-        assertFalse(new ImageUrlHealthChecker().isImageAvailable(getUrl(HTTP_ERROR_PATH)));
+        assertFalse(new MediaUrlHealthChecker().isImageAvailable(getUrl(HTTP_ERROR_PATH)));
     }
 
     @Test
     public void testHtmlResponseIsNotAvailable() throws Exception {
-        assertFalse(new ImageUrlHealthChecker().isImageAvailable(getUrl(HTML_PATH)));
+        assertFalse(new MediaUrlHealthChecker().isImageAvailable(getUrl(HTML_PATH)));
     }
 
     @Test
     public void testReadTimeoutIsNotAvailable() throws Exception {
-        final ImageUrlHealthChecker checker = new ImageUrlHealthChecker(Duration.ONE_SECOND.divide(10));
+        final MediaUrlHealthChecker checker = new MediaUrlHealthChecker(Duration.ONE_SECOND.divide(10));
         assertFalse(checker.isImageAvailable(getUrl(SLOW_IMAGE_PATH)));
     }
 
@@ -105,7 +105,7 @@ public class MediaHealthCheckerTest {
     public void testConnectionFailureIsNotAvailable() throws Exception {
         final URL url = getUrl(VALID_IMAGE_PATH);
         server.stop();
-        assertFalse(new ImageUrlHealthChecker(Duration.ONE_SECOND).isImageAvailable(url));
+        assertFalse(new MediaUrlHealthChecker(Duration.ONE_SECOND).isImageAvailable(url));
     }
 
     @Test
@@ -265,12 +265,12 @@ public class MediaHealthCheckerTest {
 
     @Test
     public void testValidVideoUrlIsReachable() throws Exception {
-        assertTrue(new ImageUrlHealthChecker().isUrlReachable(getUrl(VALID_VIDEO_PATH)));
+        assertTrue(new MediaUrlHealthChecker().isUrlReachable(getUrl(VALID_VIDEO_PATH)));
     }
 
     @Test
     public void testHttpErrorVideoUrlIsNotReachable() throws Exception {
-        assertFalse(new ImageUrlHealthChecker().isUrlReachable(getUrl(HTTP_ERROR_PATH)));
+        assertFalse(new MediaUrlHealthChecker().isUrlReachable(getUrl(HTTP_ERROR_PATH)));
     }
 
     @Test
@@ -396,7 +396,7 @@ public class MediaHealthCheckerTest {
         return outputStream.toByteArray();
     }
 
-    private static class TestImageUrlHealthChecker extends ImageUrlHealthChecker {
+    private static class TestImageUrlHealthChecker extends MediaUrlHealthChecker {
         private final boolean imageAvailable;
         private int numberOfChecks;
 
@@ -415,7 +415,7 @@ public class MediaHealthCheckerTest {
         }
     }
 
-    private static class TestVideoUrlHealthChecker extends ImageUrlHealthChecker {
+    private static class TestVideoUrlHealthChecker extends MediaUrlHealthChecker {
         private final boolean videoReachable;
 
         private TestVideoUrlHealthChecker(boolean videoReachable) {

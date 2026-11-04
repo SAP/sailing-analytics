@@ -40,6 +40,7 @@ public class MasterDataImportResource extends AbstractSailingServerResource {
     public static final String PROGRESS_TRACKING_UUID = "progressTrackingUuid";
     public static final String V1_MASTERDATAIMPORT = "/v1/masterdataimport";
     public static final String PROGRESS = "/progress";
+    public static final String ASYNC = "/async";
     public static final String REMOTE_SERVER_BEARER_TOKEN_FORM_PARAM = "remoteServerBearerToken";
     public static final String REMOTE_SERVER_PASSWORD_FORM_PARAM = "remoteServerPassword";
     public static final String REMOTE_SERVER_USERNAME_FORM_PARAM = "remoteServerUsername";
@@ -53,17 +54,47 @@ public class MasterDataImportResource extends AbstractSailingServerResource {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces("application/json;charset=UTF-8")
-    public Response importMasterData(@FormParam(REMOTE_SERVER_URL_FORM_PARAM) String remoteServerUrlAsString,
-            @FormParam(REMOTE_SERVER_USERNAME_FORM_PARAM) String remoteServerUsername,
-            @FormParam(REMOTE_SERVER_PASSWORD_FORM_PARAM) String remoteServerPassword,
-            @FormParam(REMOTE_SERVER_BEARER_TOKEN_FORM_PARAM) String remoteServerBearerToken,
-            @FormParam(MasterDataImportResultJsonSerializer.LEADERBOARDGROUP_UUID_FORM_PARAM) List<UUID> requestedLeaderboardGroupIds,
-            @FormParam(MasterDataImportResultJsonSerializer.OVERRIDE_FORM_PARAM) @DefaultValue("false") Boolean override,
-            @FormParam(MasterDataImportResultJsonSerializer.COMPRESS_FORM_PARAM) @DefaultValue("true") Boolean compress,
-            @FormParam(MasterDataImportResultJsonSerializer.EXPORT_WIND_FORM_PARAM) @DefaultValue("true") Boolean exportWind,
-            @FormParam(MasterDataImportResultJsonSerializer.EXPORT_DEVICE_CONFIGS_FORM_PARAM) @DefaultValue("false") Boolean exportDeviceConfigs,
-            @FormParam(MasterDataImportResultJsonSerializer.EXPORT_TRACKED_RACES_AND_START_TRACKING_FORM_PARAM) @DefaultValue("true") Boolean exportTrackedRacesAndStartTracking,
-            @FormParam(PROGRESS_TRACKING_UUID_FORM_PARAM) String progressTrackingUuid) throws MalformedURLException {
+    public Response importMasterData(@FormParam(REMOTE_SERVER_URL_FORM_PARAM) final String remoteServerUrlAsString,
+            @FormParam(REMOTE_SERVER_USERNAME_FORM_PARAM) final String remoteServerUsername,
+            @FormParam(REMOTE_SERVER_PASSWORD_FORM_PARAM) final String remoteServerPassword,
+            @FormParam(REMOTE_SERVER_BEARER_TOKEN_FORM_PARAM) final String remoteServerBearerToken,
+            @FormParam(MasterDataImportResultJsonSerializer.LEADERBOARDGROUP_UUID_FORM_PARAM) final List<UUID> requestedLeaderboardGroupIds,
+            @FormParam(MasterDataImportResultJsonSerializer.OVERRIDE_FORM_PARAM) @DefaultValue("false") final Boolean override,
+            @FormParam(MasterDataImportResultJsonSerializer.COMPRESS_FORM_PARAM) @DefaultValue("true") final Boolean compress,
+            @FormParam(MasterDataImportResultJsonSerializer.EXPORT_WIND_FORM_PARAM) @DefaultValue("true") final Boolean exportWind,
+            @FormParam(MasterDataImportResultJsonSerializer.EXPORT_DEVICE_CONFIGS_FORM_PARAM) @DefaultValue("false") final Boolean exportDeviceConfigs,
+            @FormParam(MasterDataImportResultJsonSerializer.EXPORT_TRACKED_RACES_AND_START_TRACKING_FORM_PARAM) @DefaultValue("true") final Boolean exportTrackedRacesAndStartTracking,
+            @FormParam(PROGRESS_TRACKING_UUID_FORM_PARAM) final String progressTrackingUuid) throws MalformedURLException {
+        return importMasterData(remoteServerUrlAsString, remoteServerUsername, remoteServerPassword,
+                remoteServerBearerToken, requestedLeaderboardGroupIds, override, compress, exportWind,
+                exportDeviceConfigs, exportTrackedRacesAndStartTracking, progressTrackingUuid, /* asynchronous */ false);
+    }
+
+    @POST
+    @Path(ASYNC)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces("application/json;charset=UTF-8")
+    public Response importMasterDataAsync(@FormParam(REMOTE_SERVER_URL_FORM_PARAM) final String remoteServerUrlAsString,
+            @FormParam(REMOTE_SERVER_USERNAME_FORM_PARAM) final String remoteServerUsername,
+            @FormParam(REMOTE_SERVER_PASSWORD_FORM_PARAM) final String remoteServerPassword,
+            @FormParam(REMOTE_SERVER_BEARER_TOKEN_FORM_PARAM) final String remoteServerBearerToken,
+            @FormParam(MasterDataImportResultJsonSerializer.LEADERBOARDGROUP_UUID_FORM_PARAM) final List<UUID> requestedLeaderboardGroupIds,
+            @FormParam(MasterDataImportResultJsonSerializer.OVERRIDE_FORM_PARAM) @DefaultValue("false") final Boolean override,
+            @FormParam(MasterDataImportResultJsonSerializer.COMPRESS_FORM_PARAM) @DefaultValue("true") final Boolean compress,
+            @FormParam(MasterDataImportResultJsonSerializer.EXPORT_WIND_FORM_PARAM) @DefaultValue("true") final Boolean exportWind,
+            @FormParam(MasterDataImportResultJsonSerializer.EXPORT_DEVICE_CONFIGS_FORM_PARAM) @DefaultValue("false") final Boolean exportDeviceConfigs,
+            @FormParam(MasterDataImportResultJsonSerializer.EXPORT_TRACKED_RACES_AND_START_TRACKING_FORM_PARAM) @DefaultValue("true") final Boolean exportTrackedRacesAndStartTracking,
+            @FormParam(PROGRESS_TRACKING_UUID_FORM_PARAM) final String progressTrackingUuid) throws MalformedURLException {
+        return importMasterData(remoteServerUrlAsString, remoteServerUsername, remoteServerPassword,
+                remoteServerBearerToken, requestedLeaderboardGroupIds, override, compress, exportWind,
+                exportDeviceConfigs, exportTrackedRacesAndStartTracking, progressTrackingUuid, /* asynchronous */ true);
+    }
+
+    private Response importMasterData(final String remoteServerUrlAsString, final String remoteServerUsername,
+            final String remoteServerPassword, final String remoteServerBearerToken,
+            final List<UUID> requestedLeaderboardGroupIds, final boolean override, final boolean compress,
+            final boolean exportWind, final boolean exportDeviceConfigs, final boolean exportTrackedRacesAndStartTracking,
+            final String progressTrackingUuid, final boolean asynchronous) throws MalformedURLException {
         Response response = null;
         if (!Util.hasLength(remoteServerUrlAsString)) {
             response = badRequest("Remote server URL parameter "+REMOTE_SERVER_URL_FORM_PARAM+" must be present and non-empty");
@@ -74,27 +105,38 @@ public class MasterDataImportResource extends AbstractSailingServerResource {
             } else if (!validateAuthenticationParameters(remoteServerUsername, remoteServerPassword, remoteServerBearerToken)) {
                 response = badRequest("Specify "+REMOTE_SERVER_USERNAME_FORM_PARAM+" and "+REMOTE_SERVER_PASSWORD_FORM_PARAM+" or alternatively "+REMOTE_SERVER_BEARER_TOKEN_FORM_PARAM+" or none of them.");
             } else {
-                final UUID importMasterDataUid = progressTrackingUuid == null ? UUID.randomUUID() : UUID.fromString(progressTrackingUuid);
                 try {
                     getSecurityService().checkCurrentUserServerPermission(ServerActions.CAN_IMPORT_MASTERDATA);
-                    final Map<LeaderboardGroup, ? extends Iterable<Event>> eventsForLeaderboardGroups = getService()
-                            .importMasterData(remoteServerUrlAsString,
-                                    requestedLeaderboardGroupIds.toArray(new UUID[requestedLeaderboardGroupIds.size()]),
-                                    override, compress, exportWind, exportDeviceConfigs, remoteServerUsername,
-                                    remoteServerPassword, remoteServerBearerToken, exportTrackedRacesAndStartTracking,
-                                    importMasterDataUid);
-                    final MasterDataImportResult result = new MasterDataImportResultImpl(
-                            eventsForLeaderboardGroups, remoteServerUrlAsString, override, exportWind,
-                            exportDeviceConfigs, exportTrackedRacesAndStartTracking);
-                    final JSONObject jsonResponse = new MasterDataImportResultJsonSerializer().serialize(result);
-                    response = Response.ok(streamingOutput(jsonResponse)).build();
-                } catch (UnauthorizedException e) {
+                    final UUID importMasterDataUid = progressTrackingUuid == null ? UUID.randomUUID() : UUID.fromString(progressTrackingUuid);
+                    if (asynchronous) {
+                        getService().importMasterDataAsync(remoteServerUrlAsString,
+                                requestedLeaderboardGroupIds.toArray(new UUID[requestedLeaderboardGroupIds.size()]),
+                                override, compress, exportWind, exportDeviceConfigs, remoteServerUsername,
+                                remoteServerPassword, remoteServerBearerToken, exportTrackedRacesAndStartTracking,
+                                importMasterDataUid);
+                        final JSONObject jsonResponse = new JSONObject();
+                        jsonResponse.put(PROGRESS_TRACKING_UUID, importMasterDataUid.toString());
+                        response = Response.status(Status.ACCEPTED).entity(streamingOutput(jsonResponse)).build();
+                    } else {
+                        final Map<LeaderboardGroup, ? extends Iterable<Event>> eventsForLeaderboardGroups = getService()
+                                .importMasterData(remoteServerUrlAsString,
+                                        requestedLeaderboardGroupIds.toArray(new UUID[requestedLeaderboardGroupIds.size()]),
+                                        override, compress, exportWind, exportDeviceConfigs, remoteServerUsername,
+                                        remoteServerPassword, remoteServerBearerToken, exportTrackedRacesAndStartTracking,
+                                        importMasterDataUid);
+                        final MasterDataImportResult result = new MasterDataImportResultImpl(
+                                eventsForLeaderboardGroups, remoteServerUrlAsString, override, exportWind,
+                                exportDeviceConfigs, exportTrackedRacesAndStartTracking);
+                        final JSONObject jsonResponse = new MasterDataImportResultJsonSerializer().serialize(result);
+                        response = Response.ok(streamingOutput(jsonResponse)).build();
+                    }
+                } catch (final UnauthorizedException e) {
                     response = Response.status(Status.UNAUTHORIZED).build();
                     logger.warning(e.getMessage() + " for user: " + getSecurityService().getCurrentUser());
-                } catch (IllegalArgumentException e) {
+                } catch (final IllegalArgumentException e) {
                     response = Response.status(Status.BAD_REQUEST).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
                     logger.warning(e.getMessage());
-                } catch (Throwable e) {
+                } catch (final Throwable e) {
                     response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage())
                             .type(MediaType.TEXT_PLAIN).build();
                     logger.severe(e.toString());
@@ -107,10 +149,13 @@ public class MasterDataImportResource extends AbstractSailingServerResource {
     @GET
     @Path(PROGRESS)
     @Produces("application/json;charset=UTF-8")
-    public Response getProgress(@QueryParam(PROGRESS_TRACKING_UUID) String progressTrackingUuid) {
+    public Response getProgress(@QueryParam(PROGRESS_TRACKING_UUID) final String progressTrackingUuid) {
         Response response;
         try {
             getSecurityService().checkCurrentUserServerPermission(ServerActions.CAN_IMPORT_MASTERDATA);
+            if (!Util.hasLength(progressTrackingUuid)) {
+                throw new IllegalArgumentException("Missing progress tracking UUID");
+            }
             final DataImportProgress progress = getService().getDataImportLock().getProgress(UUID.fromString(progressTrackingUuid));
             if (progress == null) {
                 response = Response.status(Status.NOT_FOUND)
@@ -123,6 +168,8 @@ public class MasterDataImportResource extends AbstractSailingServerResource {
         } catch (UnauthorizedException e) {
             response = Response.status(Status.UNAUTHORIZED).build();
             logger.warning(e.getMessage() + " for user: " + getSecurityService().getCurrentUser());
+        } catch (final IllegalArgumentException e) {
+            response = badRequest("Invalid progress tracking UUID");
         }
         return response;
     }

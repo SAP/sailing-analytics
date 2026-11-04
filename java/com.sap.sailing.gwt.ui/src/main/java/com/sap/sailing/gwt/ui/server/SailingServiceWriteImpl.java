@@ -413,7 +413,6 @@ import com.sap.sse.shared.util.impl.UUIDHelper;
 import com.sap.sse.util.HttpUrlConnectionHelper;
 import com.sap.sse.util.ImageConverter;
 import com.sap.sse.util.ImageConverter.ImageWithMetadata;
-import com.sap.sse.util.ThreadPoolUtil;
 
 public class SailingServiceWriteImpl extends SailingServiceImpl implements SailingServiceWrite {
 
@@ -1793,7 +1792,7 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
     @Override
     public UUID importMasterData(final String urlAsString, final UUID[] leaderboardGroupIds, final boolean override,
             final boolean compress, final boolean exportWind, final boolean exportDeviceConfigurations,
-            String targetServerUsername, String targetServerPassword,
+            final String targetServerUsername, final String targetServerPassword,
             final boolean exportTrackedRacesAndStartTracking) throws MalformedURLException {
         final UUID importOperationId = UUID.randomUUID();
         getSecurityService().checkCurrentUserServerPermission(ServerActions.CAN_IMPORT_MASTERDATA);
@@ -1807,19 +1806,9 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
         if (!SharedLandscapeConstants.isTrustedDomain(url.getHost())) {
             throw new IllegalArgumentException("not a trusted domain; valid domains are: "+SharedLandscapeConstants.TRUSTED_DOMAINS);
         }
-        // Create a progress indicator for as long as the server gets data from the other server.
-        // As soon as the server starts the import operation, a progress object will be built on every server
-        Runnable masterDataImportTask = new Runnable() {
-            @Override
-            public void run() {
-                getService().importMasterData(urlAsString, leaderboardGroupIds, override, compress, exportWind,
-                        exportDeviceConfigurations, targetServerUsername, targetServerPassword, targetServerBearerToken,
-                        exportTrackedRacesAndStartTracking, importOperationId);
-            }
-        };
-        // We need to convey the current user's credentials into the masterDataImportTask for default object ownership and permissions in case no
-        // deviating username and password have been provided:
-        executor.execute(ThreadPoolUtil.INSTANCE.associateWithSubjectIfAny(masterDataImportTask));
+        getService().importMasterDataAsync(urlAsString, leaderboardGroupIds, override, compress, exportWind,
+                exportDeviceConfigurations, targetServerUsername, targetServerPassword, targetServerBearerToken,
+                exportTrackedRacesAndStartTracking, importOperationId);
         return importOperationId;
     }
 

@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -62,9 +61,9 @@ import com.sap.sse.landscape.aws.AwsAutoScalingGroup;
 import com.sap.sse.landscape.aws.AwsAvailabilityZone;
 import com.sap.sse.landscape.aws.AwsInstance;
 import com.sap.sse.landscape.aws.AwsLandscape;
+import com.sap.sse.landscape.aws.AwsLandscapeConstants;
 import com.sap.sse.landscape.aws.AwsLandscapeState;
 import com.sap.sse.landscape.aws.HostSupplier;
-import com.sap.sse.landscape.aws.AwsLandscapeConstants;
 import com.sap.sse.landscape.aws.ReverseProxyCluster;
 import com.sap.sse.landscape.aws.Tags;
 import com.sap.sse.landscape.aws.TargetGroup;
@@ -1259,28 +1258,15 @@ public class AwsLandscapeImpl<ShardingKey> implements AwsLandscape<ShardingKey> 
     @Override
     public <MetricsT extends ApplicationProcessMetrics, ProcessT extends AwsApplicationProcess<ShardingKey, MetricsT, ProcessT>>
     ReverseProxyCluster<ShardingKey, MetricsT, ProcessT, RotatingFileBasedLog> getReverseProxyCluster(com.sap.sse.landscape.Region region) {
-        ApacheReverseProxyCluster<ShardingKey, MetricsT, ProcessT, RotatingFileBasedLog> reverseProxyCluster = new ApacheReverseProxyCluster<>(this);
-        for (final AwsInstance<ShardingKey> reverseProxyHost : getRunningHostsWithTag(region, AwsLandscapeConstants.REVERSE_PROXY_TAG_NAME, AwsInstanceImpl::new)) {
-            reverseProxyCluster.addHost(reverseProxyHost);
-        }
+        ApacheReverseProxyCluster<ShardingKey, MetricsT, ProcessT, RotatingFileBasedLog> reverseProxyCluster = new ApacheReverseProxyCluster<>(this, region);
         return reverseProxyCluster;
     }
     
     @Override
     public <MetricsT extends ApplicationProcessMetrics, ProcessT extends AwsApplicationProcess<ShardingKey, MetricsT, ProcessT>>
-    ReverseProxyCluster<ShardingKey, MetricsT, ProcessT, RotatingFileBasedLog> getCentralReverseProxy(com.sap.sse.landscape.Region region) {
-        ApacheReverseProxyCluster<ShardingKey, MetricsT, ProcessT, RotatingFileBasedLog> reverseProxyCluster = new ApacheReverseProxyCluster<>(this);
-        for (final AwsInstance<ShardingKey> reverseProxyHost : getRunningHostsWithTag(region, AwsLandscapeConstants.CENTRAL_REVERSE_PROXY_TAG_NAME, AwsInstanceImpl::new)) {
-            reverseProxyCluster.addHost(reverseProxyHost);
-        }
-        Iterator<AwsInstance<ShardingKey>>  iterator = reverseProxyCluster.getHosts().iterator();
-        if (iterator.hasNext()) {
-            iterator.next();
-            if (iterator.hasNext()) {
-                throw new IllegalStateException("There should only be one central reverse proxy");
-            }
-        }
-        return reverseProxyCluster;
+    CentralApacheReverseProxy<ShardingKey, MetricsT, ProcessT> getCentralReverseProxy(com.sap.sse.landscape.Region region) {
+        final ReverseProxyCluster<ShardingKey, MetricsT, ProcessT, RotatingFileBasedLog> reverseProxyCluster = getReverseProxyCluster(region);
+        return reverseProxyCluster.getCentralReverseProxy();
     }
 
     @Override

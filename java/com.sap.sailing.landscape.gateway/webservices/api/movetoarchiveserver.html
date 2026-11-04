@@ -15,8 +15,24 @@
  <p>Archives the contents of an application replica set, optionally also its underlying database, and if the result compares equal, removes
  the entire replica set. Optionally, the replica set's database can be moved to a different (e.g., less expensive "cold-storage") MongoDB environment.
  See also <a href="removeapplicationreplicaset.html">here</a> for the steps taken during replica set removal.</p>
+ <p><b>This is a long-running synchronous request.</b> Importing races, waiting between comparison attempts and cleanup
+ can exceed client or proxy timeouts. Prefer the <a href="movetoarchiveserverAsync.html">asynchronous endpoint</a>
+ <tt>POST /sailinglandscape/api/landscape/movetoarchiveserver/async</tt> and poll import progress.
+ This endpoint keeps its synchronous behavior and response format for existing clients.</p>
+ <p>Requires <tt>LANDSCAPE:MANAGE:AWS</tt> and, when <tt>removeApplicationReplicaSet=true</tt>, permission to delete
+ the source <tt>SERVER</tt>. The credentials used on the source and archive must also permit master-data export
+ and import, respectively.</p>
+ <p>Returns HTTP <tt>200 OK</tt> after the workflow finishes, with <tt>mdiProgress</tt>, <tt>compareServersResult</tt>
+ and <tt>archiveMongoDBResult</tt>. Inspect these fields for import failure, content differences or a database archiving
+ error; HTTP 200 alone does not imply successful archiving. Results may be <tt>null</tt> when a step was not performed.
+ Live content conflicts return HTTP <tt>409 Conflict</tt>; missing replica sets and other archiving exceptions return
+ HTTP <tt>400 Bad Request</tt>.</p>
+ <p>After the import has been accepted, the final archiving outcome, including any server comparison differences,
+ is also emailed to the initiating user, both replica set owners, and users with master-data export permission on
+ the source or import permission on the archive. Each user receives one outcome email, in their locale, if their
+ email address is verified. Failures after import acceptance are also emailed.</p>
  <br />
- <table>
+ <table id="parameters">
     <tr>
         <td>Webservice Type:</td>
         <td>POST</td>
@@ -26,7 +42,7 @@
         <td>json</td>
     </tr>
     <tr>
-        <td>Mandatory query parameters:</td>
+        <td>Mandatory form parameters (application/x-www-form-urlencoded):</td>
         <td>
             <div><tt>regionId</tt>, region where to set up the replica set, e.g., eu-west-1</div>
             <div><tt>replicaSetName</tt>, name of the replica set; used as the hostname to which the domain name is appended, as well as
@@ -46,7 +62,8 @@
                                                     If not provided, the bearer token of the subject used to authenticate this request
                                                     is used by default.</div>
             <div><tt>timeoutInMilliseconds</tt>, timeout in milliseconds to wait for responses from nodes when analyzing the replica sets
-                                        existing in the region; if not specified, waiting will not time out.</div>
+                                        existing in the region; if not specified, waiting will not time out.
+                                        This does not limit the duration of the entire archiving request.</div>
             <div><tt>durationToWaitBeforeCompareServersInMilliseconds</tt>, tells how long to wait before starting to compare the content in the archive
                                                                    with the original content after importing. The reason such a wait time
                                                                    can be appropriate is, among other things, that after starting to load all tracked
@@ -57,7 +74,8 @@
             <div><tt>maxNumberOfCompareserverAttempts</tt>, if the comparison started after durationToWaitBeforeCompareServersInMilliseconds fails, this many
                                                    attempts will be made, each after waiting another durationToWaitBeforeCompareServersInMilliseconds.
                                                    Only if these many comparisons all fail will the process be called a failure, and further processing
-                                                   such as removing the replica set or archiving its database will not be executed.</div>
+                                                   such as removing the replica set or archiving its database will not be executed.
+                                                   Defaults to 5 attempts.</div>
             <div><tt>removeApplicationReplicaSet</tt>, boolean value defaulting to true; if true, the original replica set will be
                                               <a href="removeapplicationreplicaset.html">removed</a> if importing and comparing the content worked
                                               successfully.</div>
@@ -89,7 +107,28 @@
         <td>curl -X POST -d 'regionId=eu-west-2' -d 'replicaSetName=axelstest' -d 'keyName=Horst' --data-urlencode 'privateKeyEncryptionPassphrase=HorstsSuperSecretPassword' -H 'Authorization: Bearer RwGK+DV38LKjeuDu+Bx87/3blLJHD7Ff+NCLeud9nRQ=' --data-urlencode 'bearerTokenForReplicaSetToArchive=DE7x+W/dwFKRAxFbJkC/IMafEnJ8kTQF+MUHNVhEwsD4=' --data-urlencode 'bearerTokenForArchive=CHxGpF0nr78Z4m/f28/MgiYhdRB3xoDCYd+rLc37rTt=' --data-urlencode 'mongoUriToArchiveDbTo=mongodb://172.31.36.221/mynewevent?replicaSet=archive&retryWrites=true&readPreference=nearest' "https://sapsailing.com/sailinglandscape/api/landscape/movetoarchiveserver"<br>
         produces output:<pre>
         {
-          "uuidForMdiProgress": "1f07d1cf-0652-4fc3-83bc-a79612a5aa68"
+          "mdiProgress": {
+            "operationId": "1f07d1cf-0652-4fc3-83bc-a79612a5aa68",
+            "overallProgressPercent": 100,
+            "currentSubProgress": "WAITING_FOR_TRACKED_RACES_TO_FINISH_LOADING",
+            "currentSubProgressPercent": 100,
+            "failed": false,
+            "errorMessage": null,
+            "result": {
+              "leaderboardCount": 1,
+              "leaderboardGroupCount": 1,
+              "eventCount": 1,
+              "regattaCount": 1,
+              "mediaTrackCount": 0,
+              "trackedRacesCount": 0,
+              "eventIdsImported": ["067c5d3b-2f11-42b4-8897-2b5cfbff3eeb"]
+            }
+          },
+          "compareServersResult": {
+            "https://axelstest.sapsailing.com/": [],
+            "https://archive.sapsailing.com/": []
+          },
+          "archiveMongoDBResult": null
         }
         </pre>
         </td>

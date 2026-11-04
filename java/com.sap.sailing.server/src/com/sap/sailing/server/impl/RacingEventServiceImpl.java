@@ -4764,10 +4764,10 @@ Replicator {
 
     @Override
     public void setDataImportFailedWithoutReplication(UUID importOperationId, String errorMessage) {
-        DataImportProgress progress = dataImportLock.getProgress(importOperationId);
+        final DataImportProgress progress = getDataImportLock().getProgress(importOperationId);
         if (progress != null) {
-            progress.setFailed();
             progress.setErrorMessage(errorMessage);
+            progress.setFailed();
         }
     }
 
@@ -5608,51 +5608,88 @@ Replicator {
             final String targetServerPassword, final String targetServerBearerToken,
             final boolean exportTrackedRacesAndStartTracking, final UUID importOperationId)
             throws IllegalArgumentException {
-        if (dataImportLock.getProgress(importOperationId) != null) {
-            IllegalArgumentException e = new IllegalArgumentException(
-                    "The UUID for the importOperationId already exists.");
-            logger.log(Level.SEVERE, e.getMessage(), e);
+        registerMasterDataImport(importOperationId);
+        return importMasterDataInternal(urlAsString, leaderboardGroupIds, override, compress, exportWind,
+                exportDeviceConfigurations, targetServerUsername, targetServerPassword, targetServerBearerToken,
+                exportTrackedRacesAndStartTracking, importOperationId);
+    }
+
+    private void registerMasterDataImport(final UUID importOperationId) {
+        if (importOperationId == null) {
+            throw new IllegalArgumentException("An import operation UUID is required");
+        }
+        synchronized (getDataImportLock()) {
+            if (getDataImportLock().getProgress(importOperationId) != null) {
+                throw new IllegalArgumentException("The UUID for the importOperationId already exists.");
+            }
+            createOrUpdateDataImportProgressWithReplication(importOperationId, /* overallProgressPct */ 0.0,
+                    DataImportSubProgress.INIT, /* subProgressPct */ 0.0);
+        }
+    }
+
+    @Override
+    public void importMasterDataAsync(final String urlAsString, final UUID[] leaderboardGroupIds, final boolean override,
+            final boolean compress, final boolean exportWind, final boolean exportDeviceConfigurations,
+            final String targetServerUsername, final String targetServerPassword, final String targetServerBearerToken,
+            final boolean exportTrackedRacesAndStartTracking, final UUID importOperationId) {
+        final UUID[] ids = leaderboardGroupIds.clone();
+        registerMasterDataImport(importOperationId);
+        try {
+            ThreadPoolUtil.INSTANCE.getDefaultBackgroundTaskThreadPoolExecutor().execute(
+                    ThreadPoolUtil.INSTANCE.associateWithSubjectIfAny(() -> {
+                        try {
+                            importMasterDataInternal(urlAsString, ids, override, compress, exportWind,
+                                    exportDeviceConfigurations, targetServerUsername, targetServerPassword,
+                                    targetServerBearerToken, exportTrackedRacesAndStartTracking, importOperationId);
+                        } catch (final Throwable e) {
+                            logger.log(Level.SEVERE, "Asynchronous MDI failed: " + importOperationId, e);
+                        }
+                    }));
+        } catch (final RuntimeException e) {
+            setDataImportFailedWithReplication(importOperationId, e.toString());
+            setDataImportDeleteProgressFromMapTimerWithReplication(importOperationId);
             throw e;
         }
-        final User user = getSecurityService().getCurrentUser();
-        logger.info("Importing master data from "+urlAsString+" for leaderboard groups "+Arrays.toString(leaderboardGroupIds)+
-                " for user "+user.getName()+" with import operation ID "+importOperationId);
-        final String token = getSecurityService().getOrCreateTargetServerBearerToken(urlAsString, targetServerUsername, targetServerPassword, targetServerBearerToken);
-        createOrUpdateDataImportProgressWithReplication(importOperationId, 0.0, DataImportSubProgress.INIT, 0.0);
-        final UserGroup tenant = getSecurityService().getDefaultTenantForCurrentUser();
-        // Create a progress indicator for as long as the server gets data from the other server.
-        // As soon as the server starts the import operation, a progress object will be built on every server
-        long startTime = System.currentTimeMillis();
-        createOrUpdateDataImportProgressWithReplication(importOperationId, 0.01, DataImportSubProgress.CONNECTION_SETUP,
-                0.5);
-        final String query;
-        try {
-            query = createLeaderboardGroupQuery(leaderboardGroupIds, compress, exportWind, exportDeviceConfigurations, exportTrackedRacesAndStartTracking);
-        } catch (UnsupportedEncodingException e1) {
-            throw new RuntimeException(e1);
-        }
+    }
+
+    private Map<LeaderboardGroup, ? extends Iterable<Event>> importMasterDataInternal(final String urlAsString,
+            final UUID[] leaderboardGroupIds, final boolean override, final boolean compress, final boolean exportWind,
+            final boolean exportDeviceConfigurations, final String targetServerUsername,
+            final String targetServerPassword, final String targetServerBearerToken,
+            final boolean exportTrackedRacesAndStartTracking, final UUID importOperationId) {
+        final long startTime = System.currentTimeMillis();
         URLConnection connection = null;
-        URL serverAddress = null;
         InputStream inputStream = null;
+        final Map<LeaderboardGroup, ? extends Iterable<Event>> result;
         try {
+            final User user = getSecurityService().getCurrentUser();
+            logger.info("Importing master data from " + urlAsString + " for leaderboard groups " + Arrays.toString(leaderboardGroupIds)
+                    + " for user " + user.getName() + " with import operation ID " + importOperationId);
+            final String token = getSecurityService().getOrCreateTargetServerBearerToken(urlAsString,
+                    targetServerUsername, targetServerPassword, targetServerBearerToken);
+            final UserGroup tenant = getSecurityService().getDefaultTenantForCurrentUser();
+            createOrUpdateDataImportProgressWithReplication(importOperationId, /* overallProgressPct */ 0.01,
+                    DataImportSubProgress.CONNECTION_SETUP, /* subProgressPct */ 0.5);
+            final String query = createLeaderboardGroupQuery(leaderboardGroupIds, compress, exportWind,
+                    exportDeviceConfigurations, exportTrackedRacesAndStartTracking);
             final String masterDataPath = "/sailingserver/spi/v1/masterdata/leaderboardgroups";
             final URL base = RemoteServerUtil.createBaseUrl(urlAsString);
-            serverAddress = RemoteServerUtil.createRemoteServerUrl(base, masterDataPath, query);
+            final URL serverAddress = RemoteServerUtil.createRemoteServerUrl(base, masterDataPath, query);
             // the response can take a very long time for MDI that include foiling data or such
             connection = HttpUrlConnectionHelper.redirectConnectionWithBearerToken(serverAddress,
-                    Duration.ONE_HOUR.times(2), /* HTTP method */ "POST", token);
-            createOrUpdateDataImportProgressWithReplication(importOperationId, 0.02,
-                    DataImportSubProgress.CONNECTION_ESTABLISH, 0.5);
+                    Duration.ONE_HOUR.times(/* factor */ 2), /* HTTP method */ "POST", token);
+            createOrUpdateDataImportProgressWithReplication(importOperationId, /* overallProgressPct */ 0.02,
+                    DataImportSubProgress.CONNECTION_ESTABLISH, /* subProgressPct */ 0.5);
             if (compress) {
-                InputStream timeoutExtendingInputStream = new TimeoutExtendingInputStream(connection.getInputStream(),
+                final InputStream timeoutExtendingInputStream = new TimeoutExtendingInputStream(connection.getInputStream(),
                         connection);
                 inputStream = new GZIPInputStream(timeoutExtendingInputStream);
             } else {
                 inputStream = new TimeoutExtendingInputStream(connection.getInputStream(), connection);
             }
             final MasterDataImporter importer = new MasterDataImporter(baseDomainFactory, this, user, tenant);
-            return importer.importFromStream(inputStream, importOperationId, override);
-        } catch (Throwable e) {
+            result = importer.importFromStream(inputStream, importOperationId, override);
+        } catch (final Throwable e) {
             // do not assume that RuntimeException is logged properly
             String message = e.getMessage();
             if (connection instanceof HttpURLConnection) {
@@ -5661,7 +5698,7 @@ Replicator {
                             new InputStreamReader(((HttpURLConnection) connection).getErrorStream(),
                                     HttpUrlConnectionHelper.getCharsetFromConnectionOrDefault(connection, "UTF-8")))) {
                     message = bufferedReader.readLine();
-                } catch (Exception exceptionTryingToReadErrorStream) {
+                } catch (final Exception exceptionTryingToReadErrorStream) {
                     // in this case we just stay with the exception's message
                 }
             }
@@ -5671,22 +5708,22 @@ Replicator {
                     + "If the error still occurs, when both servers are running the same version, please report the problem.");
             throw new RuntimeException(e);
         } finally {
-            // close the connection, set all objects to null
+            // Retain terminal progress for polling and release the transfer resources.
             setDataImportDeleteProgressFromMapTimerWithReplication(importOperationId);
-            if (connection != null && connection instanceof HttpURLConnection) {
+            if (connection instanceof HttpURLConnection) {
                 ((HttpURLConnection) connection).disconnect();
             }
-            connection = null;
-            long timeToImport = System.currentTimeMillis() - startTime;
+            final long timeToImport = System.currentTimeMillis() - startTime;
             logger.info(String.format("Took %s ms overall to import master data.", timeToImport));
             try {
                 if (inputStream != null) {
                     inputStream.close();
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 logger.log(Level.INFO, "Couldn't close input stream", e);
             }
         }
+        return result;
     }
 
     private String createLeaderboardGroupQuery(UUID[] leaderboardGroupIds, boolean compress, boolean exportWind,
