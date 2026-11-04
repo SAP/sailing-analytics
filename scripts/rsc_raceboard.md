@@ -4,6 +4,9 @@
 exactly one URL to stdout on success and reports missing/ambiguous matches to
 stderr with a nonzero exit status.
 
+For an HTTP redirect endpoint hosted by AWS Lambda behind an Application Load
+Balancer, see [rsc_raceboard_lambda.md](rsc_raceboard_lambda.md).
+
 ## Run
 
 Requires Python 3.8+ and only the standard library. No package installation or
