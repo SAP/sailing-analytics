@@ -1093,6 +1093,15 @@ public interface RacingEventService extends TrackedRegattaRegistry, RegattaFetch
             String targetServerBearerToken, final boolean exportTrackedRacesAndStartTracking,
             final UUID importOperationId) throws IllegalArgumentException;
 
+    /**
+     * Registers progress before scheduling the import with the current security subject. Returns after acceptance;
+     * failures during execution are reported in the replicated {@link DataImportProgress} for the supplied UUID.
+     */
+    void importMasterDataAsync(final String urlAsString, final UUID[] leaderboardGroupIds, final boolean override,
+            final boolean compress, final boolean exportWind, final boolean exportDeviceConfigurations,
+            final String targetServerUsername, final String targetServerPassword, final String targetServerBearerToken,
+            final boolean exportTrackedRacesAndStartTracking, final UUID importOperationId);
+
     void addOrReplaceExpeditionDeviceConfiguration(UUID deviceConfigurationId, String name, Integer expeditionBoatId);
 
     void removeExpeditionDeviceConfiguration(UUID deviceUuid);

@@ -2,9 +2,12 @@ package com.sap.sse.landscape.aws;
 
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
+
 import com.sap.sse.landscape.Log;
 import com.sap.sse.landscape.application.ApplicationProcess;
 import com.sap.sse.landscape.application.ApplicationProcessMetrics;
+import com.sap.sse.landscape.aws.impl.CentralApacheReverseProxy;
+
 import software.amazon.awssdk.services.ec2.model.InstanceType;
 
 /**
@@ -17,7 +20,7 @@ import software.amazon.awssdk.services.ec2.model.InstanceType;
  *
  */
 public interface ReverseProxyCluster<ShardingKey, MetricsT extends ApplicationProcessMetrics, ProcessT extends ApplicationProcess<ShardingKey, MetricsT, ProcessT>, LogT extends Log>
-        extends ReverseProxy<ShardingKey, MetricsT, ProcessT, LogT> {
+        extends CentralReverseProxy<ShardingKey, MetricsT, ProcessT, LogT> {
     /**
      * A reverse proxy may scale out by adding more hosts.
      * 
@@ -36,17 +39,20 @@ public interface ReverseProxyCluster<ShardingKey, MetricsT extends ApplicationPr
             throws TimeoutException, Exception;
 
     /**
-     * Adds the existing passed host to the cluster. The cluster though lacks longevity because any changes to the host are not reflected in the cluster.
-     */
-    void addHost(AwsInstance<ShardingKey> host);
-
-    /**
      * Removes a single host from this reverse proxy, terminating the host. When trying to remove the last remaining
-     * host, an {@link IllegalStateException} will be thrown and the method will not complete the request. Consider
-     * using {@link #terminate()} to terminate all hosts forming this reverse proxy. The instance is
-     * <strong>only</strong> terminated when no longer in the draining state in a target group (typically takes 5
-     * minutes, so expect a delay).
+     * host or trying to remove the {@link #getCentralReverseProxy() central reverse proxy}, an
+     * {@link IllegalStateException} or {@link IllegalArgumentException}, respectively, will be thrown and the method
+     * will not complete the request. Consider using {@link #terminate()} to terminate all hosts forming this reverse
+     * proxy. The instance is <strong>only</strong> terminated when no longer in the draining state in a target group
+     * (typically takes 5 minutes, so expect a delay).
      */
     void removeHost(AwsInstance<ShardingKey> host, Optional<String> optionalKeyName,
             byte[] privateKeyEncryptionPassphrase) throws Exception;
+
+    /**
+     * @return the "central" reverse proxy of the cluster; that's where the Git configuration for the cluster
+     * lives and where a few additional services are managed and reverse-proxied, such as the Wiki and a
+     * private Docker registry.
+     */
+    CentralApacheReverseProxy<ShardingKey, MetricsT, ProcessT> getCentralReverseProxy();
 }

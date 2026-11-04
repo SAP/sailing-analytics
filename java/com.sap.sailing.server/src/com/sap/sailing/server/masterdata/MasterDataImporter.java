@@ -7,8 +7,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -22,8 +24,8 @@ import com.sap.sailing.domain.base.impl.MasterDataImportInformation;
 import com.sap.sailing.domain.base.impl.RegattaImpl;
 import com.sap.sailing.domain.common.DataImportSubProgress;
 import com.sap.sailing.domain.common.DeviceIdentifier;
-import com.sap.sailing.domain.common.MasterDataImportObjectCreationCount;
 import com.sap.sailing.domain.common.Wind;
+import com.sap.sailing.domain.common.impl.MasterDataImportObjectCreationCountImpl;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixImpl;
 import com.sap.sailing.domain.common.tracking.impl.GPSFixMovingImpl;
 import com.sap.sailing.domain.common.tracking.impl.VeryCompactGPSFixImpl;
@@ -160,7 +162,7 @@ public class MasterDataImporter {
         }
         racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId, PROGRESS_TRANSFER_COMPLETED,
                 DataImportSubProgress.TRANSFER_COMPLETED, 0.5);
-        final MasterDataImportObjectCreationCount creationCount = applyMasterDataImportOperation(topLevelMasterData,
+        final MasterDataImportObjectCreationCountImpl creationCount = applyMasterDataImportOperation(topLevelMasterData,
                 importOperationId, override);
         // The ImportMasterDataOperation applied above deliberately stops short of overall completion (it ends at
         // PROGRESS_GRAPH_APPLIED after waiting for tracked races to load); the wind tracks and the sensor fixes are
@@ -188,6 +190,13 @@ public class MasterDataImporter {
         } finally {
             Thread.currentThread().setContextClassLoader(oldContextClassLoaderForStreamedData);
         }
+        final Set<UUID> eventIdsImported = new HashSet<>();
+        for (final Iterable<Event> events : topLevelMasterData.getEventForLeaderboardGroup().values()) {
+            for (final Event event : events) {
+                eventIdsImported.add(event.getId());
+            }
+        }
+        creationCount.setEventIdsImported(eventIdsImported);
         racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId, PROGRESS_COMPLETE,
                 DataImportSubProgress.IMPORT_SENSOR_FIXES, 1.0, creationCount);
         logger.info("Done importing master data into " + racingEventService);
@@ -383,7 +392,7 @@ public class MasterDataImporter {
      *            {@link TopLevelMasterData#copyAndStripOffDataNotNeededOnReplicas() copy} will be created. The
      *            full version will be applied to the {@link #racingEventService} locally.
      */
-    private MasterDataImportObjectCreationCount applyMasterDataImportOperation(TopLevelMasterData topLevelMasterData,
+    private MasterDataImportObjectCreationCountImpl applyMasterDataImportOperation(TopLevelMasterData topLevelMasterData,
             UUID importOperationId, boolean override) {
         ImportMasterDataOperation strippedOpForReplicas = new ImportMasterDataOperation(
                 topLevelMasterData.copyAndStripOffDataNotNeededOnReplicas(), importOperationId, override, user,

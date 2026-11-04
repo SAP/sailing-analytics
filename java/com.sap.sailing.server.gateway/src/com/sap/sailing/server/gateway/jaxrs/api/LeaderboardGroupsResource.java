@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +13,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.function.Function;
 
 import javax.ws.rs.GET;
@@ -35,20 +37,28 @@ import com.sap.sailing.domain.base.RaceColumn;
 import com.sap.sailing.domain.base.Regatta;
 import com.sap.sailing.domain.base.Series;
 import com.sap.sailing.domain.common.LeaderboardNameConstants;
+import com.sap.sailing.domain.common.ScoringSchemeType;
+import com.sap.sailing.domain.common.security.SecuredDomainType;
 import com.sap.sailing.domain.leaderboard.Leaderboard;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroup;
 import com.sap.sailing.domain.leaderboard.MetaLeaderboard;
 import com.sap.sailing.domain.leaderboard.RegattaLeaderboard;
 import com.sap.sailing.domain.leaderboard.SettableScoreCorrection;
+import com.sap.sailing.domain.leaderboard.ThresholdBasedResultDiscardingRule;
+import com.sap.sailing.domain.leaderboard.impl.LeaderboardGroupImpl;
+import com.sap.sailing.domain.leaderboard.meta.LeaderboardGroupMetaLeaderboard;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.server.gateway.serialization.LeaderboardGroupConstants;
 import com.sap.sailing.server.hierarchy.SailingHierarchyOwnershipUpdater;
+import com.sap.sailing.server.operationaltransformation.CreateLeaderboardGroup;
+import com.sap.sailing.server.operationaltransformation.UpdateLeaderboardGroup;
 import com.sap.sailing.server.util.RaceBoardLinkFactory;
 import com.sap.sailing.shared.server.gateway.jaxrs.AbstractSailingServerResource;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Triple;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
+import com.sap.sse.security.shared.TypeRelativeObjectIdentifier;
 import com.sap.sse.shared.json.JsonDeserializationException;
 import com.sap.sse.shared.util.impl.UUIDHelper;
 
@@ -64,6 +74,13 @@ public class LeaderboardGroupsResource extends AbstractSailingServerResource {
     protected static final String EXISTING_GROUP_ID_QUERY_PARAM = "existingGroupId";
     protected static final String CREATE_NEW_GROUP_QUERY_PARAM = "createNewGroup";
     protected static final String NAME_PATH_PARAM = "name";
+    protected static final String NAME_QUERY_PARAM = "name";
+    protected static final String DESCRIPTION_QUERY_PARAM = "description";
+    protected static final String DISPLAY_NAME_QUERY_PARAM = "displayName";
+    protected static final String DISPLAY_GROUPS_IN_REVERSE_ORDER_QUERY_PARAM = "displayGroupsInReverseOrder";
+    protected static final String OVERALL_LEADERBOARD_SCORING_SCHEME_QUERY_PARAM = "overallLeaderboardScoringScheme";
+    protected static final String OVERALL_LEADERBOARD_DISCARD_THRESHOLDS_QUERY_PARAM = "overallLeaderboardDiscardThresholds";
+    protected static final String LEADERBOARD_NAME_QUERY_PARAM = "leaderboardName";
     // Preserve the Date.toString() format, using UTC independently of the runtime's time zone and locale.
     private static final DateTimeFormatter LAST_SCORING_UPDATE_FORMATTER = DateTimeFormatter
             .ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH).withZone(ZoneId.of("UTC"));
@@ -126,18 +143,9 @@ public class LeaderboardGroupsResource extends AbstractSailingServerResource {
     @Path("{"+NAME_OR_UUID_PATH_PARAM+"}")
     public Response getLeaderboardGroup(@PathParam(NAME_OR_UUID_PATH_PARAM) String leaderboardGroupName) {
         Response response;
-        final Serializable uuid = UUIDHelper.tryUuidConversion(leaderboardGroupName);
-        final LeaderboardGroup leaderboardGroup;
-        if (uuid != leaderboardGroupName) {
-            leaderboardGroup = getService().getLeaderboardGroupByID((UUID) uuid);
-        } else {
-            leaderboardGroup = getService().getLeaderboardGroupByName(leaderboardGroupName);
-        }
+        final LeaderboardGroup leaderboardGroup = getLeaderboardGroupByNameOrId(leaderboardGroupName);
         if (leaderboardGroup == null) {
-            response = Response.status(Status.NOT_FOUND)
-                    .entity("Could not find a leaderboard group with name '"
-                            + StringEscapeUtils.escapeHtml(leaderboardGroupName) + "'.")
-                    .type(MediaType.TEXT_PLAIN).build();
+            response = getLeaderboardGroupNotFoundResponse(leaderboardGroupName);
         } else {
             if (getSecurityService().hasCurrentUserReadPermission(leaderboardGroup)) {
                 final TimePoint timePoint = MillisecondsTimePoint.now();
@@ -292,5 +300,226 @@ public class LeaderboardGroupsResource extends AbstractSailingServerResource {
             }
         }
         return response;
+    }
+
+    /**
+     * Creates an empty leaderboard group, the way the AdminConsole does it. Leaderboards are added to it with
+     * {@link #addLeaderboardToLeaderboardGroup(String, String)}. This lets a client build what a series of regattas
+     * (e.g., one season of a league) usually is: one leaderboard group holding the regatta leaderboards of all its
+     * events, optionally with an overall leaderboard, referenced by each of the events.
+     * <p>
+     * 
+     * Security-wise, the calling subject needs the {@code LEADERBOARD_GROUP:CREATE} permission for the new group, and
+     * if an overall leaderboard is requested, the {@code LEADERBOARD:CREATE} permission for the overall leaderboard.
+     * 
+     * @param leaderboardGroupName
+     *            the unique name of the new group; required
+     * @param description
+     *            the group's description; defaults to the empty string
+     * @param displayName
+     *            the group's display name; optional
+     * @param displayGroupsInReverseOrder
+     *            whether the group's leaderboards are shown in reverse order; defaults to {@code false}
+     * @param overallLeaderboardScoringSchemeName
+     *            name of a {@link ScoringSchemeType}; if provided, an overall leaderboard is created for the group;
+     *            if a leaderboard with the overall leaderboard's name exists already, {@link Status#CONFLICT} is
+     *            returned and nothing is created
+     * @param overallLeaderboardDiscardThresholds
+     *            the discard thresholds of the overall leaderboard; optional
+     * @return a JSON object with the new group's {@code id}, {@code name}, {@code displayName}, {@code description},
+     *         {@code hasOverallLeaderboard}, {@code overallLeaderboardName} (if any) and {@code leaderboards}
+     */
+    @POST
+    @Produces("application/json;charset=UTF-8")
+    public Response createLeaderboardGroup(@QueryParam(NAME_QUERY_PARAM) final String leaderboardGroupName,
+            @QueryParam(DESCRIPTION_QUERY_PARAM) final String description,
+            @QueryParam(DISPLAY_NAME_QUERY_PARAM) final String displayName,
+            @QueryParam(DISPLAY_GROUPS_IN_REVERSE_ORDER_QUERY_PARAM) final Boolean displayGroupsInReverseOrder,
+            @QueryParam(OVERALL_LEADERBOARD_SCORING_SCHEME_QUERY_PARAM) final String overallLeaderboardScoringSchemeName,
+            @QueryParam(OVERALL_LEADERBOARD_DISCARD_THRESHOLDS_QUERY_PARAM) final List<Integer> overallLeaderboardDiscardThresholds) {
+        final Response response;
+        if (leaderboardGroupName == null || leaderboardGroupName.isEmpty()) {
+            response = getBadRequestResponse("Parameter " + NAME_QUERY_PARAM + " is required.");
+        } else if (getService().getLeaderboardGroupByName(leaderboardGroupName) != null) {
+            response = Response.status(Status.CONFLICT)
+                    .entity("A leaderboard group with name '" + StringEscapeUtils.escapeHtml(leaderboardGroupName)
+                            + "' already exists.")
+                    .type(MediaType.TEXT_PLAIN).build();
+        } else if (overallLeaderboardScoringSchemeName != null && !overallLeaderboardScoringSchemeName.isEmpty()
+                && !isValidScoringSchemeType(overallLeaderboardScoringSchemeName)) {
+            response = getBadRequestResponse("Unknown scoring scheme '"
+                    + StringEscapeUtils.escapeHtml(overallLeaderboardScoringSchemeName) + "'; use one of "
+                    + Arrays.toString(ScoringSchemeType.values()) + ".");
+        } else if (overallLeaderboardScoringSchemeName != null && !overallLeaderboardScoringSchemeName.isEmpty()
+                && getService().getLeaderboardByName(
+                        LeaderboardGroupMetaLeaderboard.getOverallLeaderboardName(leaderboardGroupName)) != null) {
+            // the overall leaderboard is named after the group; creating it would replace an existing leaderboard
+            // of that name, so refuse before anything is created
+            response = Response.status(Status.CONFLICT)
+                    .entity("A leaderboard with name '" + StringEscapeUtils.escapeHtml(
+                            LeaderboardGroupMetaLeaderboard.getOverallLeaderboardName(leaderboardGroupName))
+                            + "' already exists; it would be replaced by the group's overall leaderboard.")
+                    .type(MediaType.TEXT_PLAIN).build();
+        } else {
+            final ScoringSchemeType overallLeaderboardScoringSchemeType = overallLeaderboardScoringSchemeName == null
+                    || overallLeaderboardScoringSchemeName.isEmpty() ? null
+                            : ScoringSchemeType.valueOf(overallLeaderboardScoringSchemeName);
+            final int[] overallLeaderboardDiscardThresholdsAsArray = overallLeaderboardDiscardThresholds == null
+                    ? new int[0] : overallLeaderboardDiscardThresholds.stream().mapToInt(i -> i).toArray();
+            final UUID leaderboardGroupId = UUID.randomUUID();
+            final Callable<LeaderboardGroup> createLeaderboardGroupOperation = () -> getService()
+                    .apply(new CreateLeaderboardGroup(leaderboardGroupId, leaderboardGroupName,
+                            description == null ? "" : description, displayName,
+                            displayGroupsInReverseOrder != null && displayGroupsInReverseOrder,
+                            new ArrayList<String>(), overallLeaderboardDiscardThresholdsAsArray,
+                            overallLeaderboardScoringSchemeType));
+            final Callable<LeaderboardGroup> createLeaderboardGroupWithOwnership = () -> getSecurityService()
+                    .setOwnershipCheckPermissionForObjectCreationAndRevertOnError(SecuredDomainType.LEADERBOARD_GROUP,
+                            LeaderboardGroupImpl.getTypeRelativeObjectIdentifier(leaderboardGroupId),
+                            leaderboardGroupName, createLeaderboardGroupOperation);
+            final LeaderboardGroup leaderboardGroup;
+            // if an overall leaderboard is requested, establish its ownership and check its create permission, too,
+            // around the group's creation, the same way the AdminConsole does it
+            if (overallLeaderboardScoringSchemeType != null) {
+                final String overallLeaderboardName = LeaderboardGroupMetaLeaderboard
+                        .getOverallLeaderboardName(leaderboardGroupName);
+                leaderboardGroup = getSecurityService().setOwnershipCheckPermissionForObjectCreationAndRevertOnError(
+                        SecuredDomainType.LEADERBOARD, new TypeRelativeObjectIdentifier(overallLeaderboardName),
+                        overallLeaderboardName, createLeaderboardGroupWithOwnership);
+            } else {
+                try {
+                    leaderboardGroup = createLeaderboardGroupWithOwnership.call();
+                } catch (RuntimeException e) {
+                    // rethrown unchanged so that, e.g., an AuthorizationException maps to 401 as in the other branch
+                    throw e;
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            response = Response.ok(streamingOutput(getLeaderboardGroupSummaryAsJson(leaderboardGroup))).build();
+        }
+        return response;
+    }
+
+    /**
+     * Adds an existing leaderboard to an existing leaderboard group, at the end of the group's leaderboards, using the
+     * same {@link UpdateLeaderboardGroup} operation as the AdminConsole, so persistence and replication work as there.
+     * The group's name, description, display name and overall leaderboard remain unchanged. Adding a leaderboard that
+     * the group already contains changes nothing.
+     * <p>
+     * 
+     * Security-wise, the calling subject needs the {@code UPDATE} permission for the group, the {@code UPDATE}
+     * permission for the group's overall leaderboard if it has one, and the {@code READ} permission for the leaderboard
+     * to add.
+     * 
+     * @param leaderboardGroupNameOrId
+     *            the group's name or ID
+     * @param leaderboardName
+     *            the name of the leaderboard to add; required
+     * @return the group's summary as for {@link #createLeaderboardGroup}
+     */
+    @POST
+    @Produces("application/json;charset=UTF-8")
+    @Path("{" + NAME_OR_UUID_PATH_PARAM + "}/leaderboards")
+    public Response addLeaderboardToLeaderboardGroup(
+            @PathParam(NAME_OR_UUID_PATH_PARAM) final String leaderboardGroupNameOrId,
+            @QueryParam(LEADERBOARD_NAME_QUERY_PARAM) final String leaderboardName) {
+        final Response response;
+        final LeaderboardGroup leaderboardGroup = getLeaderboardGroupByNameOrId(leaderboardGroupNameOrId);
+        final Leaderboard leaderboard = leaderboardName == null ? null
+                : getService().getLeaderboardByName(leaderboardName);
+        if (leaderboardGroup == null) {
+            response = getLeaderboardGroupNotFoundResponse(leaderboardGroupNameOrId);
+        } else if (leaderboardName == null || leaderboardName.isEmpty()) {
+            response = getBadRequestResponse("Parameter " + LEADERBOARD_NAME_QUERY_PARAM + " is required.");
+        } else if (leaderboard == null) {
+            response = Response.status(Status.NOT_FOUND)
+                    .entity("Could not find a leaderboard with name '" + StringEscapeUtils.escapeHtml(leaderboardName)
+                            + "'.")
+                    .type(MediaType.TEXT_PLAIN).build();
+        } else {
+            getSecurityService().checkCurrentUserUpdatePermission(leaderboardGroup);
+            getSecurityService().checkCurrentUserReadPermission(leaderboard);
+            final Leaderboard overallLeaderboard = leaderboardGroup.getOverallLeaderboard();
+            if (overallLeaderboard != null) {
+                getSecurityService().checkCurrentUserUpdatePermission(overallLeaderboard);
+            }
+            // There is no replicable operation that appends a single leaderboard to a group; UpdateLeaderboardGroup
+            // replaces the group's membership with the list it is given. Reading the membership and applying the
+            // update while holding the group's monitor keeps two concurrent calls of this endpoint from losing one
+            // another's leaderboard. This does not serialize against other writers of the group's membership (e.g.,
+            // the AdminConsole's updateLeaderboardGroup), which use the same snapshot-replacing operation.
+            synchronized (leaderboardGroup) {
+                if (!Util.contains(leaderboardGroup.getLeaderboards(), leaderboard)) {
+                    final List<String> leaderboardNames = new ArrayList<>();
+                    for (final Leaderboard leaderboardInGroup : leaderboardGroup.getLeaderboards()) {
+                        leaderboardNames.add(leaderboardInGroup.getName());
+                    }
+                    leaderboardNames.add(leaderboard.getName());
+                    final int[] overallLeaderboardDiscardThresholds = overallLeaderboard != null && overallLeaderboard
+                            .getResultDiscardingRule() instanceof ThresholdBasedResultDiscardingRule
+                                    ? ((ThresholdBasedResultDiscardingRule) overallLeaderboard
+                                            .getResultDiscardingRule()).getDiscardIndexResultsStartingWithHowManyRaces()
+                                    : new int[0];
+                    getService().apply(new UpdateLeaderboardGroup(leaderboardGroup.getId(), leaderboardGroup.getName(),
+                            leaderboardGroup.getDescription() == null ? "" : leaderboardGroup.getDescription(),
+                            leaderboardGroup.getDisplayName(), leaderboardNames, overallLeaderboardDiscardThresholds,
+                            overallLeaderboard == null ? null : overallLeaderboard.getScoringScheme().getType()));
+                }
+            }
+            response = Response.ok(streamingOutput(getLeaderboardGroupSummaryAsJson(leaderboardGroup))).build();
+        }
+        return response;
+    }
+
+    private LeaderboardGroup getLeaderboardGroupByNameOrId(final String leaderboardGroupNameOrId) {
+        final Serializable uuid = UUIDHelper.tryUuidConversion(leaderboardGroupNameOrId);
+        final LeaderboardGroup leaderboardGroup;
+        if (uuid != leaderboardGroupNameOrId) {
+            leaderboardGroup = getService().getLeaderboardGroupByID((UUID) uuid);
+        } else {
+            leaderboardGroup = getService().getLeaderboardGroupByName(leaderboardGroupNameOrId);
+        }
+        return leaderboardGroup;
+    }
+
+    private JSONObject getLeaderboardGroupSummaryAsJson(final LeaderboardGroup leaderboardGroup) {
+        final JSONObject result = new JSONObject();
+        result.put(LeaderboardGroupConstants.ID, leaderboardGroup.getId().toString());
+        result.put(LeaderboardGroupConstants.NAME, leaderboardGroup.getName());
+        result.put(LeaderboardGroupConstants.DISPLAYNAME, leaderboardGroup.getDisplayName());
+        result.put(LeaderboardGroupConstants.DESCRIPTION, leaderboardGroup.getDescription());
+        result.put(LeaderboardGroupConstants.HAS_OVERALL_LEADERBOARD, leaderboardGroup.hasOverallLeaderboard());
+        if (leaderboardGroup.hasOverallLeaderboard()) {
+            result.put(LeaderboardGroupConstants.OVERALL_LEADERBOARD_NAME, leaderboardGroup.getOverallLeaderboardName());
+        }
+        final JSONArray leaderboardNames = new JSONArray();
+        for (final Leaderboard leaderboard : leaderboardGroup.getLeaderboards()) {
+            leaderboardNames.add(leaderboard.getName());
+        }
+        result.put(LeaderboardGroupConstants.LEADERBOARDS, leaderboardNames);
+        return result;
+    }
+
+    private boolean isValidScoringSchemeType(final String scoringSchemeTypeName) {
+        boolean valid;
+        try {
+            ScoringSchemeType.valueOf(scoringSchemeTypeName);
+            valid = true;
+        } catch (IllegalArgumentException e) {
+            valid = false;
+        }
+        return valid;
+    }
+
+    private Response getLeaderboardGroupNotFoundResponse(final String leaderboardGroupNameOrId) {
+        return Response.status(Status.NOT_FOUND)
+                .entity("Could not find a leaderboard group with name '"
+                        + StringEscapeUtils.escapeHtml(leaderboardGroupNameOrId) + "'.")
+                .type(MediaType.TEXT_PLAIN).build();
+    }
+
+    private Response getBadRequestResponse(final String message) {
+        return Response.status(Status.BAD_REQUEST).entity(message).type(MediaType.TEXT_PLAIN).build();
     }
 }

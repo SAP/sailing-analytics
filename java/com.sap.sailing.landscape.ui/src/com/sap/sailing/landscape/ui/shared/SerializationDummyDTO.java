@@ -4,6 +4,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import com.sap.sailing.landscape.common.EventLiveContent;
 import com.sap.sailing.landscape.common.RaceLiveContent;
 import com.sap.sailing.landscape.common.ReplicaSetLiveContent;
+import com.sap.sse.common.Util.Pair;
 
 public class SerializationDummyDTO implements IsSerializable {
     public ProcessDTO mongoProcessDTO;
@@ -13,4 +14,5 @@ public class SerializationDummyDTO implements IsSerializable {
     public EventLiveContent eventLiveContent;
     public RaceLiveContent raceLiveContent;
     public Long lng;
+    public Pair<String, String> pair;
 }
