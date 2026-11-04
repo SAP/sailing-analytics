@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<link href='../../../../sailing-fontface-1.0.cache.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+	<link href='../../../main.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+	<link rel='icon' href='../../../../sap.ico' type='image/x-icon'>
+	<title>SAP Sailing Analytics Webservices API Version 1.0</title>
+</head>
+<body>
+<h1>SAP Sailing Analytics Webservices API Version 1.0</h1>
+<h2>URL: /api/v1/leaderboardgroups</h2>
+
+<b>Description:</b>
+<p>Creates an empty leaderboard group, the way the AdminConsole does it, optionally with an overall leaderboard.
+Leaderboards are added to it with <a href="leaderboardGroupAddLeaderboardPostDoc.html">/api/v1/leaderboardgroups/{nameOrUUID}/leaderboards</a>.
+This lets a client build what a series of regattas (e.g., one season of a league) usually is: one leaderboard group
+holding the regatta leaderboards of all its events, referenced by each of the events (see the
+<tt>leaderboardgroupids</tt> parameter of <a href="eventCreateEvent.html">/api/v1/events/createEvent</a>).
+The request requires the <tt>LEADERBOARD_GROUP:CREATE</tt> permission for the new group and, if an overall leaderboard
+is requested, the <tt>LEADERBOARD:CREATE</tt> permission for the overall leaderboard; the new objects are owned by the
+current user and the user's default group.</p>
+<br/>
+<table>
+	<tr>
+		<td>Webservice Type:</td>
+		<td>REST</td>
+	</tr>
+	<tr>
+		<td>Output format:</td>
+		<td>Json, a summary of the new group: id, name, displayName, description, hasOverallLeaderboard,
+		    overallLeaderboardName (only if the group has an overall leaderboard) and leaderboards (the names of the
+		    group's leaderboards)</td>
+	</tr>
+	<tr>
+		<td>Mandatory parameters:</td>
+		<td>name: the name of the new group; must be unique</td>
+	</tr>
+	<tr>
+		<td>Optional parameters:</td>
+		<td>
+			<div>description: the group's description; defaults to the empty string</div>
+			<div>displayName: the group's display name</div>
+			<div>displayGroupsInReverseOrder: true/false, whether the group's leaderboards are shown in reverse order; defaults to false</div>
+			<div>overallLeaderboardScoringScheme: the name of a scoring scheme type, e.g. <tt>LOW_POINT</tt>; if provided, an overall
+			     leaderboard named "{name} Overall" is created for the group</div>
+			<div>overallLeaderboardDiscardThresholds: multiple int values that define the race column indices where discards
+			     start to be active in the overall leaderboard; defaults to an empty list</div>
+		</td>
+	</tr>
+	<tr>
+		<td>Request method:</td>
+		<td>POST</td>
+	</tr>
+	<tr>
+		<td>Example:</td>
+		<td>
+		<pre>
+		curl -X POST -H "Authorization: Bearer OuknIUZQyADsqcDDEEyvlr+aBIpB4iVBdjdRYJtdO1w=" "http://127.0.0.1:8888/sailingserver/api/v1/leaderboardgroups?name=1.%20Segel-Bundesliga%202026&amp;displayName=2026&amp;overallLeaderboardScoringScheme=LOW_POINT"
+		</pre>
+		produces output
+		<pre>
+		{
+		  "id": "5d1c3a0e-8b7f-4c1e-9f0d-2a6b4e8c7d13",
+		  "name": "1. Segel-Bundesliga 2026",
+		  "displayName": "2026",
+		  "description": "",
+		  "hasOverallLeaderboard": true,
+		  "overallLeaderboardName": "1. Segel-Bundesliga 2026 Overall",
+		  "leaderboards": []
+		}
+		</pre>
+		</td>
+	</tr>
+	<tr>
+		<td>Errors:</td>
+		<td>
+			<div>400 Bad Request: name is missing, or overallLeaderboardScoringScheme is not a known scoring scheme type</div>
+			<div>401 Unauthorized: the current user lacks the permission to create the group or its overall leaderboard</div>
+			<div>409 Conflict: a leaderboard group with this name exists already, or an overall leaderboard is requested and a
+			     leaderboard named "{name} Overall" exists already</div>
+		</td>
+	</tr>
+</table>
+<div style="height: 1em;"></div>
+<a href="index.html">Back to Web Service Overview</a> 
+</body>
+</html>

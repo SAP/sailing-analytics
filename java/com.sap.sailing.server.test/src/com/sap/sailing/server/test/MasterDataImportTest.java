@@ -435,6 +435,7 @@ public class MasterDataImportTest {
                 .getResult();
         Assertions.assertNotNull(creationCount);
         Event eventOnTarget = destService.getEvent(eventUUID);
+        Assertions.assertTrue(Util.contains(creationCount.getEventIdsImported(), eventUUID));
         Assertions.assertNotNull(eventOnTarget);
         LeaderboardGroup leaderboardGroupOnTarget = destService.getLeaderboardGroupByID(TEST_GROUP_UUID);
         Assertions.assertNotNull(leaderboardGroupOnTarget);
@@ -833,6 +834,48 @@ public class MasterDataImportTest {
             }
         };
         return destService;
+    }
+
+    @Test
+    public void testImportedEventIdsIncludeExistingEvents() throws Exception {
+        final Event event = sourceService.addEvent(TEST_EVENT_NAME, /* eventDescription */ null, eventStartDate,
+                eventEndDate, "source venue", /* isPublic */ false, eventUUID);
+        final UUID courseAreaId = UUID.randomUUID();
+        event.getVenue().addCourseArea(sourceService.getBaseDomainFactory().getOrCreateCourseArea(courseAreaId,
+                "course area", /* centerPosition */ null, /* radius */ null));
+        final Regatta regatta = sourceService.createRegatta(TEST_REGATTA_NAME, TEST_BOAT_CLASS_NAME,
+                /* canBoatsOfCompetitorsChangePerRace */ true, CompetitorRegistrationType.CLOSED,
+                /* registrationLinkSecret */ null, /* startDate */ null, /* endDate */ null, UUID.randomUUID(),
+                Collections.emptyList(), /* persistent */ true, new LowPoint(), courseAreaId,
+                /* buoyZoneRadiusInHullLengths */ 2.0, /* useStartTimeInference */ true,
+                /* controlTrackingFromStartAndFinishTimes */ false, /* autoRestartTrackingUponCompetitorSetChange */ false,
+                OneDesignRankingMetric::new);
+        final Leaderboard leaderboard = sourceService.addRegattaLeaderboard(regatta.getRegattaIdentifier(),
+                "leaderboard", new int[0]);
+        final LeaderboardGroup group = sourceService.addLeaderboardGroup(TEST_GROUP_UUID, TEST_GROUP_NAME,
+                "group description", /* displayName */ null, /* displayGroupsInReverseOrder */ false,
+                Collections.singletonList(leaderboard.getName()), /* overallLeaderboardDiscardThresholds */ null,
+                /* scoringScheme */ null);
+        event.addLeaderboardGroup(group);
+        final Response response = masterDataResource.getMasterDataByLeaderboardGroups(Collections.singletonList(TEST_GROUP_UUID),
+                /* compress */ false, /* exportWind */ false, /* exportDeviceConfigs */ false,
+                /* exportTrackedRacesAndStartTracking */ false);
+        final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        ((StreamingOutput) response.getEntity()).write(bytes);
+        deleteAllDataFromDatabase();
+        final UUID operationId = UUID.randomUUID();
+        final RacingEventService destination = getDestService(operationId);
+        final Event existingEvent = destination.addEvent(TEST_EVENT_NAME, /* eventDescription */ null, eventStartDate,
+                eventEndDate, "existing venue", /* isPublic */ false, eventUUID);
+        final MasterDataImporter importer = new MasterDataImporter(destination.getBaseDomainFactory(), destination,
+                securityService.getCurrentUser(), securityService.getDefaultTenantForCurrentUser());
+        try (final ByteArrayInputStream input = new ByteArrayInputStream(bytes.toByteArray())) {
+            importer.importFromStream(input, operationId, /* override */ false);
+        }
+        final MasterDataImportObjectCreationCount result = destination.getDataImportLock().getProgress(operationId).getResult();
+        Assertions.assertEquals(/* expected */ 0, result.getEventCount());
+        Assertions.assertTrue(Util.contains(result.getEventIdsImported(), eventUUID));
+        assertSame(existingEvent, destination.getEvent(eventUUID));
     }
 
     private RacingEventService getDestService(UUID randomUUID, TypeBasedServiceFinderFactory serviceFinderFactory) throws UnknownHostException, MongoException {
