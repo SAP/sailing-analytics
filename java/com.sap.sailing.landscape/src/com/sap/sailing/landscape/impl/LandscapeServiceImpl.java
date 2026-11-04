@@ -92,8 +92,8 @@ import com.sap.sse.landscape.aws.AwsAvailabilityZone;
 import com.sap.sse.landscape.aws.AwsInstance;
 import com.sap.sse.landscape.aws.AwsLandscape;
 import com.sap.sse.landscape.aws.AwsShard;
+import com.sap.sse.landscape.aws.CentralReverseProxy;
 import com.sap.sse.landscape.aws.HostSupplier;
-import com.sap.sse.landscape.aws.ReverseProxy;
 import com.sap.sse.landscape.aws.ReverseProxyCluster;
 import com.sap.sse.landscape.aws.Tags;
 import com.sap.sse.landscape.aws.TargetGroup;
@@ -359,7 +359,7 @@ public class LandscapeServiceImpl implements LandscapeService {
                     + SharedLandscapeConstants.ARCHIVE_SERVER_APPLICATION_REPLICA_SET_NAME + " in region " + regionId);
         }
         final SailingAnalyticsProcess<String> candidate = archiveReplicaSet.getMaster();
-        final ReverseProxy<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>, RotatingFileBasedLog> reverseProxyCluster =
+        final CentralReverseProxy<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>, RotatingFileBasedLog> reverseProxyCluster =
                 getLandscape().getCentralReverseProxy(region);
         final Optional<String> optionalKeyName = Optional.ofNullable(optionalKeyNameOrNull);
         final Pair<String, String> archiveAndFailoverIPs = reverseProxyCluster
@@ -831,7 +831,7 @@ public class LandscapeServiceImpl implements LandscapeService {
                             throw new IllegalStateException("MDI completion did not supply imported event IDs. Aborting archiving of " + from);
                         }
                         Util.addAll(mdiProgress.getResult().getEventIdsImported(), eventIDs);
-                        final ReverseProxy<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>, RotatingFileBasedLog> reverseProxyCluster =
+                        final CentralReverseProxy<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>, RotatingFileBasedLog> reverseProxyCluster =
                                 getLandscape().getCentralReverseProxy(region);
                         // TODO bug5311: when refactoring this for general scope migration, moving to a dedicated replica set will not require this
                         // TODO bug5311: when refactoring this for general scope migration, moving into a cold storage server other than ARCHIVE will require ALBToReverseProxyRedirectMapper instead

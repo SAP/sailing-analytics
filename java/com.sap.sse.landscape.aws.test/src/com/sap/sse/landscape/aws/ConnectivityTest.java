@@ -47,7 +47,9 @@ import com.sap.sse.landscape.Release;
 import com.sap.sse.landscape.RotatingFileBasedLog;
 import com.sap.sse.landscape.SecurityGroup;
 import com.sap.sse.landscape.application.ApplicationProcess;
+import com.sap.sse.landscape.application.ApplicationProcessMetrics;
 import com.sap.sse.landscape.aws.impl.AwsRegion;
+import com.sap.sse.landscape.aws.impl.CentralApacheReverseProxy;
 import com.sap.sse.landscape.aws.orchestration.CreateDNSBasedLoadBalancerMapping;
 import com.sap.sse.landscape.mongodb.MongoEndpoint;
 import com.sap.sse.landscape.mongodb.impl.DatabaseImpl;
@@ -95,7 +97,7 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
     private static AwsRegion region;
     private static byte[] keyPass;
     private static String AXELS_KEY_PASS;
-    private static final String AXELS_KEY_NAME = "Axel_ed25519";
+    private static final String AXELS_KEY_NAME = "Axel";
     private static final String pathPrefixForShardingKey = "/sse/landscape/test";
     
     @BeforeAll
@@ -124,7 +126,7 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
     
     @Test
     public void testReverseDNSLookup() {
-        assertEquals("mongo0.internal.sapsailing.com", landscape.findHostnamesForIP("172.31.13.233"));
+        assertEquals("mongo0.internal.sapsailing.com", landscape.findHostnamesForIP("172.31.25.153"));
     }
     
     @Test
@@ -200,7 +202,7 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
         assertTrue(testKeyFromBytes.isEncrypted()); // AND AS A CONSEQUENCE THE KEY IS STILL ENCRYPTED!
         // In order to use this to import a valid key existing pair we'll import the last valid key, namely testKeyFromEncryptedBytes:
         landscape.importKeyPair(region, pubKeyBytes, encryptedPrivateKeyFromDecrypted.toByteArray(), AXELS_KEY_NAME);
-        final SshCommandChannel sshChannel = landscape.getCentralReverseProxy(region).getHosts().iterator().next()
+        final SshCommandChannel sshChannel = landscape.getCentralReverseProxy(region).getHost()
                 .createRootSshChannel(optionalTimeout, Optional.of(AXELS_KEY_NAME),
                         AXELS_KEY_PASS.getBytes());
         final String stdout = sshChannel.runCommandAndReturnStdoutAndLogStderr("ls -al", /* stderr prefix */ null, /* stderr log level */ null);
@@ -212,9 +214,9 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
      */
     @Test
     public void testApacheProxyBasics() throws Exception {
-        final ReverseProxyCluster<String, SailingAnalyticsMetrics, ProcessT, RotatingFileBasedLog> proxy = landscape.getCentralReverseProxy(region);
+        final CentralApacheReverseProxy<String, SailingAnalyticsMetrics, ProcessT> proxy = landscape.getCentralReverseProxy(region);
         final String hostname = "kw2021.sapsailing.com";
-        final AwsInstance<String> proxyHost = proxy.getHosts().iterator().next();
+        final AwsInstance<String> proxyHost = proxy.getHost();
         final ProcessT process = createApplicationProcess(proxyHost, "testtest");
         proxy.setEventRedirect(hostname, process, UUID.randomUUID(), Optional.of(AXELS_KEY_NAME), AXELS_KEY_PASS.getBytes());
         final ByteArrayOutputStream configFileContents = new ByteArrayOutputStream();
@@ -222,7 +224,7 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
         sftpChannel.connect((int) optionalTimeout.orElse(Duration.NULL).asMillis());
         final String configFileName = "/etc/httpd/conf.d/"+hostname+".conf";
         sftpChannel.get(configFileName, configFileContents);
-        assertTrue(configFileContents.toString().startsWith("Use Event-SSL "+hostname));
+        assertTrue(configFileContents.toString().startsWith("Use Event "+hostname));
         sftpChannel.getSession().disconnect();
         proxy.removeRedirect(hostname, Optional.of(AXELS_KEY_NAME), AXELS_KEY_PASS.getBytes());
         final SshCommandChannel lsSshChannel = proxyHost.createRootSshChannel(optionalTimeout, Optional.of(AXELS_KEY_NAME), AXELS_KEY_PASS.getBytes());
@@ -449,11 +451,11 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
             InetAddress address = host.getPublicAddress(optionalTimeout);
             assertNotNull(address);
             logger.info("Obtained public IP address "+address);
-            SshCommandChannel shellChannel = host.createRootSshChannel(optionalTimeout, /* optional SSH key name */ Optional.empty(), keyPass);
+            SshCommandChannel shellChannel = host.createSshChannel("ec2-user", optionalTimeout, /* optional SSH key name */ Optional.empty(), keyPass);
             assertNotNull(shellChannel);
             logger.info("Shell channel connected. Waiting for it to become responsive...");
             final String stdout = shellChannel.runCommandAndReturnStdoutAndLogStderr("pwd", /* stderr prefix */ null, /* stderr log level */ Level.WARNING);
-            assertEquals("/root\n", turnAllLineSeparatorsIntoLineFeed(stdout));
+            assertEquals("/home/ec2-user\n", turnAllLineSeparatorsIntoLineFeed(stdout));
             // now try a simple command, checking for the "init" process to be found
             final SshCommandChannel commandChannel = host.createRootSshChannel(Optional.empty(), /* optional SSH key name */ Optional.empty(), keyPass);
             final String processToLookFor = "init";
@@ -538,11 +540,25 @@ public class ConnectivityTest<ProcessT extends AwsApplicationProcess<String, Sai
     
     @Test
     public void testCentralReverseProxyInEuWest2IsAvailable() throws IOException, InterruptedException, JSchException {
-        final ReverseProxyCluster<String, SailingAnalyticsMetrics, ProcessT, ?> proxy = landscape.getCentralReverseProxy(new AwsRegion(Region.EU_WEST_2, landscape));
-        assertEquals(1, Util.size(proxy.getHosts()));
-        final HttpURLConnection healthCheckConnection = (HttpURLConnection) new URL("http://"+proxy.getHosts().iterator().next().getPublicAddress().getCanonicalHostName()+proxy.getHealthCheckPath()).openConnection();
+        final CentralApacheReverseProxy<String, SailingAnalyticsMetrics, ProcessT> proxy = landscape.getCentralReverseProxy(new AwsRegion(Region.EU_WEST_2, landscape));
+        assertNotNull(proxy);
+        assertNotNull(proxy.getHost());
+        final HttpURLConnection healthCheckConnection = (HttpURLConnection) new URL("http://"+proxy.getHost().getPublicAddress().getCanonicalHostName()+proxy.getHealthCheckPath()).openConnection();
         assertEquals(200, healthCheckConnection.getResponseCode());
         healthCheckConnection.disconnect();
+    }
+
+    @Test
+    public void testCentralReverseProxyInEuWest2CannotBeRemovedFromReverseProxyCluster() throws Exception {
+        final ReverseProxyCluster<String, ApplicationProcessMetrics, ?, RotatingFileBasedLog> proxy = landscape.getReverseProxyCluster(new AwsRegion(Region.EU_WEST_2, landscape));
+        assertNotNull(proxy);
+        assertNotNull(proxy.getCentralReverseProxy());
+        try {
+            proxy.removeHost(proxy.getCentralReverseProxy().getHost(), /* optional key name */ Optional.empty(), keyPass);
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            // expected
+            logger.info("Caught expected exception "+e.getMessage());
+        }
     }
 
     @Test

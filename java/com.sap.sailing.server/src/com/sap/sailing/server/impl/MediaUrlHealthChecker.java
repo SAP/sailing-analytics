@@ -14,16 +14,16 @@ import javax.imageio.stream.ImageInputStream;
 import com.sap.sse.common.Duration;
 import com.sap.sse.util.HttpUrlConnectionHelper;
 
-class ImageUrlHealthChecker {
+class MediaUrlHealthChecker {
     private static final Duration DEFAULT_TIMEOUT = Duration.ONE_SECOND.times(10);
 
     private final Duration timeout;
 
-    ImageUrlHealthChecker() {
+    MediaUrlHealthChecker() {
         this(DEFAULT_TIMEOUT);
     }
 
-    ImageUrlHealthChecker(Duration timeout) {
+    MediaUrlHealthChecker(Duration timeout) {
         this.timeout = timeout;
     }
 
