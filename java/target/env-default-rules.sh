@@ -146,3 +146,5 @@ export GITHUB_TOKEN
 # not otherwise inherit. Unlike the other ORC-adjacent credentials it is passed as an environment variable
 # rather than a -D system property so that it is not exposed on the process command line (ps auxww).
 export ORC_API_KEY
+# Activate e-mail notifications for broken media links:
+ADDITIONAL_JAVA_ARGS="${ADDITIONAL_JAVA_ARGS} -DeventMediaHealthCheck.ownerNotification.enabled=true"
