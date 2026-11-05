@@ -76,8 +76,14 @@ public class SmartphoneTrackingEventManagementPanelPO extends PageArea {
         return this.waitForPO(MapDevicesDialogPO::new, "regattaLogTrackingDeviceMappingsDialog");
     }
 
-    public void denoteLeaderboardForRaceLogTracking(DataEntryPO aLeaderboard) {
+    public void denoteLeaderboardForRaceLogTracking(final DataEntryPO aLeaderboard) {
         aLeaderboard.clickActionImage(ACTION_DENOTE_FOR_RACELOG_TRACKING);
+        waitForAjaxRequests();
+        final List<WebElement> automaticTrackingTimesDialogs = driver.findElements(
+                new BySeleniumId("AutomaticTrackingTimesDialog"));
+        if (!automaticTrackingTimesDialogs.isEmpty()) {
+            automaticTrackingTimesDialogs.get(/* index */ 0).findElement(new BySeleniumId("CancelButton")).click();
+        }
         findElementBySeleniumId(this.driver, "OkButton").click();
         waitForAjaxRequests();
     }
