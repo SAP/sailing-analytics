@@ -1949,6 +1949,9 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     String windFinderWeatherData();
     String positionEditOnNonTrackingRace();
     String errorCreatingLeaderboardGroup(String name);
+    String errorUpdatingLeaderboardGroup(String name);
+    String overallLeaderboardNameAlreadyExists(String name);
+    String leaderboardGroupNameAlreadyExists(String name);
     String minAbsCourseChangeInDegrees();
     String maxAbsCourseChangeInDegrees();
     String minDurationInSecondsFromPrecedingManeuver();

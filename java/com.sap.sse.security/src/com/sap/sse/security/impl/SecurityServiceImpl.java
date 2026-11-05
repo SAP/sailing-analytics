@@ -94,6 +94,7 @@ import com.nulabinc.zxcvbn.matchers.SlantedKeyboardLoader;
 import com.sap.sse.ServerInfo;
 import com.sap.sse.branding.BrandingConfigurationService;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.ObjectAlreadyExistsException;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.TimedLock;
 import com.sap.sse.common.Util;
@@ -2224,10 +2225,53 @@ implements ReplicableSecurityService, ClearStateTestSupport {
 
     @Override
     public <T> T setOwnershipCheckPermissionForObjectCreationAndRevertOnError(
-            HasPermissions type, TypeRelativeObjectIdentifier typeIdentifier, String securityDisplayName,
-            Callable<T> actionWithResult) {
+            final HasPermissions type, final TypeRelativeObjectIdentifier typeIdentifier, final String securityDisplayName,
+            final Callable<T> actionWithResult) {
         return setOwnershipCheckPermissionForObjectCreationAndRevertOnError(type, typeIdentifier,
-                securityDisplayName, actionWithResult, /* check for SERVER:CREATE_OBJECT */ true);
+                securityDisplayName, () -> {}, actionWithResult, /* doServerCreateObjectCheck */ true,
+                /* revertOwnershipOnConflict */ false);
+    }
+
+    @Override
+    public <T> T setOwnershipCheckPermissionForObjectCreationAndRevertOnError(final HasPermissions type,
+            final TypeRelativeObjectIdentifier typeIdentifier, final String securityDisplayName,
+            final Runnable creationPrecondition, final Callable<T> actionWithResult) {
+        return setOwnershipCheckPermissionForObjectCreationAndRevertOnError(type, typeIdentifier,
+                securityDisplayName, creationPrecondition, actionWithResult, /* doServerCreateObjectCheck */ true,
+                /* revertOwnershipOnConflict */ true);
+    }
+
+    private static final class ObjectCreationLock {
+        private int users;
+    }
+
+    private final Map<QualifiedObjectIdentifier, ObjectCreationLock> objectCreationLocks = new HashMap<>();
+
+    private <T> T setOwnershipCheckPermissionForObjectCreationAndRevertOnError(final HasPermissions type,
+            final TypeRelativeObjectIdentifier typeRelativeIdentifier, final String securityDisplayName,
+            final Runnable creationPrecondition, final Callable<T> actionWithResult,
+            final boolean doServerCreateObjectCheck, final boolean revertOwnershipOnConflict) {
+        final QualifiedObjectIdentifier identifier = type.getQualifiedObjectIdentifier(typeRelativeIdentifier);
+        final ObjectCreationLock lock;
+        synchronized (objectCreationLocks) {
+            lock = objectCreationLocks.computeIfAbsent(identifier, (final QualifiedObjectIdentifier key) -> new ObjectCreationLock());
+            lock.users++;
+        }
+        final T result;
+        try {
+            synchronized (lock) {
+                creationPrecondition.run();
+                result = doSetOwnershipCheckPermissionForObjectCreationAndRevertOnError(identifier,
+                        securityDisplayName, actionWithResult, doServerCreateObjectCheck, revertOwnershipOnConflict);
+            }
+        } finally {
+            synchronized (objectCreationLocks) {
+                if (--lock.users == 0) {
+                    objectCreationLocks.remove(identifier);
+                }
+            }
+        }
+        return result;
     }
 
     /**
@@ -2247,11 +2291,10 @@ implements ReplicableSecurityService, ClearStateTestSupport {
      * considered to have the permission to create the object, the {@code actionWithResult} is invoked, and
      * the object returned by the action is the result of this method.
      */
-    private <T> T setOwnershipCheckPermissionForObjectCreationAndRevertOnError(HasPermissions type,
-            TypeRelativeObjectIdentifier typeRelativeIdentifier, String securityDisplayName, Callable<T> actionWithResult,
-            boolean doServerCreateObjectCheck) {
-        QualifiedObjectIdentifier identifier = type.getQualifiedObjectIdentifier(typeRelativeIdentifier);
-        T result = null;
+    private <T> T doSetOwnershipCheckPermissionForObjectCreationAndRevertOnError(final QualifiedObjectIdentifier identifier,
+            final String securityDisplayName, final Callable<T> actionWithResult, final boolean doServerCreateObjectCheck,
+            final boolean revertOwnershipOnConflict) {
+        final T result;
         boolean didSetOwnership = false;
         try {
             final OwnershipAnnotation preexistingOwnership = getOwnership(identifier);
@@ -2266,7 +2309,7 @@ implements ReplicableSecurityService, ClearStateTestSupport {
             }
             try {
                 SecurityUtils.getSubject().checkPermission(identifier.getStringPermission(DefaultActions.CREATE));
-            } catch (AuthorizationException e) {
+            } catch (final AuthorizationException e) {
                 if (didSetOwnership) {
                     throw e;
                 } else {
@@ -2280,12 +2323,14 @@ implements ReplicableSecurityService, ClearStateTestSupport {
                 }
             }
             result = actionWithResult.call();
-        } catch (AuthorizationException e) {
-            if (didSetOwnership) {
+        } catch (final AuthorizationException | ObjectAlreadyExistsException e) {
+            if (didSetOwnership && (e instanceof AuthorizationException || revertOwnershipOnConflict)) {
                 deleteOwnership(identifier);
             }
             throw e;
-        } catch (Exception e) {
+        } catch (final RuntimeException e) {
+            throw e;
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
         return result;
@@ -2310,7 +2355,7 @@ implements ReplicableSecurityService, ClearStateTestSupport {
     public <T> T setOwnershipWithoutCheckPermissionForObjectCreationAndRevertOnError(HasPermissions type,
             TypeRelativeObjectIdentifier typeIdentifier, String securityDisplayName, Callable<T> actionWithResult) {
         return setOwnershipCheckPermissionForObjectCreationAndRevertOnError(type, typeIdentifier, securityDisplayName,
-                actionWithResult, false);
+                () -> {}, actionWithResult, /* doServerCreateObjectCheck */ false, /* revertOwnershipOnConflict */ false);
     }
 
     @Override
@@ -2399,14 +2444,14 @@ implements ReplicableSecurityService, ClearStateTestSupport {
     }
 
     @Override
-    public <T> T checkPermissionAndDeleteOwnershipForObjectRemoval(QualifiedObjectIdentifier identifier,
-            Callable<T> actionToDeleteObject) {
+    public <T> T checkPermissionAndDeleteOwnershipForObjectRemoval(final QualifiedObjectIdentifier identifier,
+            final Callable<T> actionToDeleteObject) {
         try {
             SecurityUtils.getSubject().checkPermission(identifier.getStringPermission(DefaultActions.DELETE));
             final T result = actionToDeleteObject.call();
             deleteAllDataForRemovedObject(identifier);
             return result;
-        } catch (UnauthorizedException e) {
+        } catch (final RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);

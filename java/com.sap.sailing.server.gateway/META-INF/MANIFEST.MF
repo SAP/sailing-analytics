@@ -76,6 +76,7 @@ Require-Bundle: com.sap.sailing.domain,
 Bundle-ClassPath: .
 Web-ContextPath: /sailingserver
 Export-Package: com.sap.sailing.server.gateway,
+ com.sap.sailing.server.gateway.jaxrs.api;x-friends:="com.sap.sailing.server.replication.test",
  com.sap.sailing.server.gateway.jaxrs.spi,
  com.sap.sailing.server.gateway.windimport.bravo
 Automatic-Module-Name: com.sap.sailing.server.gateway
