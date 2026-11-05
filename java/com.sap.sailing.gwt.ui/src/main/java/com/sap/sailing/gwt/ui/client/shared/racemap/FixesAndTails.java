@@ -1024,8 +1024,9 @@ public class FixesAndTails {
      * <p>
      * 
      * The {@link #earliestTimePointRequested} map is updated, assuming that the requests returned will be sent before
-     * invoking this method again. The two {@link PositionRequest}s returned are added to the {@link #inFlightRequests}
-     * set.
+     * invoking this method again. Neither {@link PositionRequest} is added to {@link #inFlightRequests} here; the caller
+     * must call {@link #registerQuickRequestInFlight(PositionRequest)} and {@link #registerSlowRequestInFlight(PositionRequest)}
+     * only when the corresponding RPCs are actually sent.
      * 
      * @return a pair of {@link PositionRequest} objects; the {@link Pair#getA() first} provides the parameters for a
      *         "quick" request, assuming that only a few positions (up to {@link #MAX_DURATION_FOR_QUICK_REQUESTS}) need
@@ -1106,9 +1107,19 @@ public class FixesAndTails {
         }
         final PositionRequest quick = new PositionRequest(timeRangesForQuickRequest, mustClearCacheForTheseCompetitorIdsAsString, detailType, transitionTimeInMillis);
         final PositionRequest slow = new PositionRequest(timeRangesForSlowRequest, quick); // entangle with quick request
-        inFlightRequests.add(quick);
-        inFlightRequests.add(slow);
         return new Pair<>(quick, slow);
+    }
+
+    void registerQuickRequestInFlight(final PositionRequest quick) {
+        inFlightRequests.add(quick);
+    }
+
+    void registerSlowRequestInFlight(final PositionRequest slow) {
+        inFlightRequests.add(slow);
+    }
+
+    void cancelRequest(final PositionRequest request) {
+        inFlightRequests.remove(request);
     }
 
     /**

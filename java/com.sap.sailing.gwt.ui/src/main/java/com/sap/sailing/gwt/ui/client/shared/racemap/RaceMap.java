@@ -1532,18 +1532,21 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
             competitorsByIdAsString.put(competitor.getIdAsString(), competitor);
         }
         // only update the tails for these competitors
+        fixesAndTails.registerQuickRequestInFlight(quickAndSlowRequest.getA());
         asyncActionsExecutor.execute(new GetRaceMapDataAction(sailingService, timeRangeActionsExecutor, competitorsByIdAsString,
                     race, useNullAsTimePoint() ? null : newTime, fromTimesForQuickCall, toTimesForQuickCall, /* extrapolate */ true,
                     (settings.isShowSimulationOverlay() ? simulationOverlay.getLegIdentifier() : null),
                     raceCompetitorSet.getMd5OfIdsAsStringOfCompetitorParticipatingInRaceInAlphanumericOrderOfTheirID(),
                     newTime, settings.isShowEstimatedDuration(), detailType, leaderboardName, leaderboardGroupName, leaderboardGroupId,
                     // callback to use for alternative GetBoatPositionsAction fired when GetRaceMapDataAction gets dropped:
-                    getBoatPositionsCallback(quickAndSlowRequest.getA(), newTime, transitionTimeInMillis, competitorsToShow, detailType, detailTypeChanged, competitorsByIdAsString)),
+                    getBoatPositionsCallback(quickAndSlowRequest.getA(), newTime, transitionTimeInMillis, competitorsToShow, detailType, detailTypeChanged, competitorsByIdAsString),
+                    () -> fixesAndTails.cancelRequest(quickAndSlowRequest.getA())),
             GET_RACE_MAP_DATA_CATEGORY,
             getRaceMapDataCallback(newTime, transitionTimeInMillis, quickAndSlowRequest.getA(), competitorsToShow,
                                    ++boatPositionRequestIDCounter, isRedraw, detailTypeChanged, detailType, fromTimesForQuickCall, toTimesForQuickCall, competitorsByIdAsString));
         // next, if necessary, do the full thing; the two calls have different action classes, so throttling should not drop one for the other
         if (!fromTimesForNonOverlappingTailsCall.keySet().isEmpty()) {
+            fixesAndTails.registerSlowRequestInFlight(quickAndSlowRequest.getB());
             timeRangeActionsExecutor.execute(new GetBoatPositionsAction(sailingService, race,
                     fromTimesForNonOverlappingTailsCall, toTimesForNonOverlappingTailsCall, /* extrapolate */ true,
                     detailType, leaderboardName, leaderboardGroupName, leaderboardGroupId),
@@ -1560,6 +1563,7 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
         return new GetBoatPositionsCallback(detailType, new AsyncCallback<CompactBoatPositionsDTO>() {
             @Override
             public void onFailure(Throwable t) {
+                fixesAndTails.cancelRequest(positionRequest);
                 errorReporter.reportError("Error obtaining racemap data: " + t.getMessage(), true /*silentMode */);
             }
 
@@ -1588,6 +1592,7 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
         return new MarkedAsyncCallback<>(new AsyncCallback<RaceMapDataDTO>() {
             @Override
             public void onFailure(Throwable caught) {
+                fixesAndTails.cancelRequest(quickRequest);
                 errorReporter.reportError("Error obtaining racemap data: " + caught.getMessage(), true /*silentMode */);
             }
             

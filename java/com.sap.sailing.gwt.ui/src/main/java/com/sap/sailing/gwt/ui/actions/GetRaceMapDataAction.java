@@ -38,6 +38,7 @@ public class GetRaceMapDataAction extends AbstractGetMapRelatedDataAction<RaceMa
     private boolean targetEstimationRequired;
     private final TimeRangeActionsExecutor<CompactBoatPositionsDTO, GPSFixDTOWithSpeedWindTackAndLegTypeIterable, Pair<String, DetailType>> timeRangeActionsExecutor;
     private final GetBoatPositionsCallback getBoatPositionsCallback;
+    private final Runnable cancelQuickRequest;
     
     public GetRaceMapDataAction(SailingServiceAsync sailingService,
             TimeRangeActionsExecutor<CompactBoatPositionsDTO, GPSFixDTOWithSpeedWindTackAndLegTypeIterable, Pair<String, DetailType>> timeRangeActionsExecutor,
@@ -45,7 +46,8 @@ public class GetRaceMapDataAction extends AbstractGetMapRelatedDataAction<RaceMa
             Map<String, Date> to, boolean extrapolate, LegIdentifier simulationLegIdentifier,
             byte[] md5OfIdsAsStringOfCompetitorParticipatingInRaceInAlphanumericOrderOfTheirID, Date timeForEstimation,
             boolean targetEstimationRequired, DetailType detailType, String leaderboardName,
-            String leaderboardGroupName, UUID leaderboardGroupId, GetBoatPositionsCallback getBoatPositionsCallback) {
+            String leaderboardGroupName, UUID leaderboardGroupId, GetBoatPositionsCallback getBoatPositionsCallback,
+            Runnable cancelQuickRequest) {
         super(sailingService, raceIdentifier, from, to, extrapolate, detailType, leaderboardName, leaderboardGroupName, leaderboardGroupId);
         this.timeRangeActionsExecutor = timeRangeActionsExecutor;
         this.competitorsByIdAsString = competitorsByIdAsString;
@@ -55,6 +57,7 @@ public class GetRaceMapDataAction extends AbstractGetMapRelatedDataAction<RaceMa
         this.simulationLegIdentifier = simulationLegIdentifier;
         this.md5OfIdsAsStringOfCompetitorParticipatingInRaceInAlphanumericOrderOfTheirID = md5OfIdsAsStringOfCompetitorParticipatingInRaceInAlphanumericOrderOfTheirID;
         this.getBoatPositionsCallback = getBoatPositionsCallback;
+        this.cancelQuickRequest = cancelQuickRequest;
     }
     
     @Override
@@ -85,6 +88,7 @@ public class GetRaceMapDataAction extends AbstractGetMapRelatedDataAction<RaceMa
     @Override
     public void dropped(AsyncActionsExecutor executor) {
         GWT.log("Executing getBoatPositions(...) call instead of a dropped GetRaceMapDataAction:\n"+getFromByCompetitorIdAsString()+"; "+getToByCompetitorIdAsString());
+        cancelQuickRequest.run();
         // TODO bug5921: if we had the PositionRequest object at hand, we could check if the positions are still required or if they were marked as to be dropped in which case no request would have to be made;
         // We could then compute the getFrom() and getTo() from the PositionRequest which would filter those time ranges that will be dropped anyhow; if empty, no request will need to be sent anymore.
         timeRangeActionsExecutor.execute(new GetBoatPositionsAction(getSailingService(), getRaceIdentifier(),
