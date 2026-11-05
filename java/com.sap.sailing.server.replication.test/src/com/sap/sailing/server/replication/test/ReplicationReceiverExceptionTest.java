@@ -36,6 +36,7 @@ import com.sap.sse.replication.ReplicationMasterDescriptor;
 import com.sap.sse.replication.ReplicationReceiver;
 import com.sap.sse.replication.impl.ReplicationReceiverImpl;
 import com.sap.sse.replication.interfaces.impl.AbstractReplicableWithObjectInputStream;
+import com.sap.sse.util.ObjectInputStreamResolvingAgainstCache;
 
 import net.jpountz.lz4.LZ4BlockOutputStream;
 
@@ -203,7 +204,10 @@ public class ReplicationReceiverExceptionTest {
         @Override
         public ObjectInputStream createObjectInputStreamResolvingAgainstCache(final InputStream input,
                 final Map<String, Class<?>> classLoaderCache) throws IOException {
-            return new ObjectInputStream(input);
+            // Use the receiving replicable's class loader to resolve test operations across OSGi bundle boundaries.
+            return new ObjectInputStreamResolvingAgainstCache<TestReplica>(input, this, /* resolveListener */ null,
+                    classLoaderCache) {
+            };
         }
 
         @Override
