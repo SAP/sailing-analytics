@@ -1,5 +1,6 @@
 package com.sap.sailing.server.gateway.test.jaxrs;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -38,10 +39,14 @@ import com.sap.sailing.domain.common.ScoringSchemeType;
 import com.sap.sailing.domain.common.security.SecuredDomainType;
 import com.sap.sailing.domain.leaderboard.Leaderboard;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroup;
+import com.sap.sailing.domain.leaderboard.ThresholdBasedResultDiscardingRule;
 import com.sap.sailing.domain.leaderboard.meta.LeaderboardGroupMetaLeaderboard;
 import com.sap.sailing.domain.ranking.OneDesignRankingMetric;
 import com.sap.sailing.domain.test.mock.MockedTrackedRaceWithStartTimeAndRanks;
 import com.sap.sailing.domain.tracking.TrackedRace;
+import com.sap.sailing.server.gateway.jaxrs.exceptions.ExceptionManager;
+import com.sap.sailing.server.interfaces.LeaderboardGroupManagement;
+import com.sap.sse.common.ObjectAlreadyExistsException;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
@@ -144,8 +149,12 @@ public class LeaderboardGroupResourceTest extends AbstractJaxRsApiTest {
 
     @Test
     public void testCreateLeaderboardGroupRejectsDuplicateNameAndBadParameters() throws Exception {
-        assertEquals(Status.CONFLICT.getStatusCode(), leaderboardGroupsResource.createLeaderboardGroup(leaderboardGroupName,
-                null, null, null, null, null).getStatus());
+        final ObjectAlreadyExistsException conflict = assertThrows(ObjectAlreadyExistsException.class,
+                () -> leaderboardGroupsResource.createLeaderboardGroup(leaderboardGroupName,
+                        /* description */ null, /* displayName */ null, /* displayGroupsInReverseOrder */ null,
+                        /* overallLeaderboardScoringSchemeName */ null, /* overallLeaderboardDiscardThresholds */ null));
+        assertEquals(Status.CONFLICT.getStatusCode(), new ExceptionManager().toResponse(conflict).getStatus());
+        assertSame(leaderboardGroup, racingEventService.getLeaderboardGroupByName(leaderboardGroupName));
         assertEquals(Status.BAD_REQUEST.getStatusCode(), leaderboardGroupsResource.createLeaderboardGroup(null,
                 null, null, null, null, null).getStatus());
         assertEquals(Status.BAD_REQUEST.getStatusCode(), leaderboardGroupsResource.createLeaderboardGroup("New group",
@@ -170,8 +179,11 @@ public class LeaderboardGroupResourceTest extends AbstractJaxRsApiTest {
         final Leaderboard existing = racingEventService.addFlexibleLeaderboard(overallLeaderboardName, null, new int[0],
                 DomainFactory.INSTANCE.createScoringScheme(ScoringSchemeType.LOW_POINT),
                 /* courseAreaIds */ Collections.<Serializable> emptyList());
-        assertEquals(Status.CONFLICT.getStatusCode(), leaderboardGroupsResource.createLeaderboardGroup(seasonName,
-                null, null, null, ScoringSchemeType.LOW_POINT.name(), null).getStatus());
+        final ObjectAlreadyExistsException conflict = assertThrows(ObjectAlreadyExistsException.class,
+                () -> leaderboardGroupsResource.createLeaderboardGroup(seasonName,
+                        /* description */ null, /* displayName */ null, /* displayGroupsInReverseOrder */ null,
+                        ScoringSchemeType.LOW_POINT.name(), /* overallLeaderboardDiscardThresholds */ null));
+        assertEquals(Status.CONFLICT.getStatusCode(), new ExceptionManager().toResponse(conflict).getStatus());
         assertNull(racingEventService.getLeaderboardGroupByName(seasonName));
         assertSame(existing, racingEventService.getLeaderboardByName(overallLeaderboardName));
         // without an overall leaderboard there is no collision
@@ -186,10 +198,74 @@ public class LeaderboardGroupResourceTest extends AbstractJaxRsApiTest {
         Mockito.doThrow(new UnauthorizedException("not permitted")).when(securityService)
                 .setOwnershipCheckPermissionForObjectCreationAndRevertOnError(
                         Mockito.eq(SecuredDomainType.LEADERBOARD_GROUP), Mockito.any(), Mockito.any(),
-                        getAnyCallable());
+                        Mockito.any(Runnable.class), getAnyCallable());
         // the exception must reach the JAX-RS exception mapping unchanged (401), not wrapped in a RuntimeException
         assertThrows(UnauthorizedException.class, () -> leaderboardGroupsResource.createLeaderboardGroup(seasonName,
                 null, null, null, null, null));
         assertNull(racingEventService.getLeaderboardGroupByName(seasonName));
+    }
+
+    @Test
+    public void testUnauthorizedOverallLeaderboardCreationLeavesNoGroup() {
+        final String seasonName = "Season with forbidden overall leaderboard";
+        Mockito.doThrow(new UnauthorizedException("not permitted")).when(securityService)
+                .setOwnershipCheckPermissionForObjectCreationAndRevertOnError(
+                        Mockito.eq(SecuredDomainType.LEADERBOARD), Mockito.any(), Mockito.any(),
+                        Mockito.any(Runnable.class), getAnyCallable());
+        assertThrows(UnauthorizedException.class, () -> leaderboardGroupsResource.createLeaderboardGroup(seasonName,
+                /* description */ null, /* displayName */ null, /* displayGroupsInReverseOrder */ null,
+                ScoringSchemeType.LOW_POINT.name(), /* overallLeaderboardDiscardThresholds */ null));
+        assertNull(racingEventService.getLeaderboardGroupByName(seasonName));
+        assertNull(racingEventService.getLeaderboardByName(
+                LeaderboardGroupMetaLeaderboard.getOverallLeaderboardName(seasonName)));
+    }
+
+    @Test
+    public void testAppendToRenamedGroupRetainsOverallLeaderboardAndDiscards() {
+        final String originalName = "Original season";
+        final String renamed = "Renamed season";
+        final int[] discards = { 3, 5 };
+        final LeaderboardGroup season = LeaderboardGroupManagement.createLeaderboardGroup(racingEventService,
+                securityService, UUID.randomUUID(), originalName, "Description", "Display",
+                /* displayGroupsInReverseOrder */ true, Collections.emptyList(), discards, ScoringSchemeType.LOW_POINT);
+        final Leaderboard overall = season.getOverallLeaderboard();
+        LeaderboardGroupManagement.updateLeaderboardGroup(racingEventService, securityService, season.getId(), renamed,
+                season.getDescription(), season.getDisplayName(), Collections.emptyList(), discards,
+                ScoringSchemeType.LOW_POINT);
+        final Response response = leaderboardGroupsResource.addLeaderboardToLeaderboardGroup(renamed, regatta.getName());
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertSame(overall, season.getOverallLeaderboard());
+        assertSame(overall, racingEventService.getLeaderboardByName(
+                LeaderboardGroupMetaLeaderboard.getOverallLeaderboardName(originalName)));
+        assertNull(racingEventService.getLeaderboardByName(LeaderboardGroupMetaLeaderboard.getOverallLeaderboardName(renamed)));
+        assertArrayEquals(discards, ((ThresholdBasedResultDiscardingRule) overall.getResultDiscardingRule())
+                .getDiscardIndexResultsStartingWithHowManyRaces());
+        assertEquals(Collections.singletonList(racingEventService.getLeaderboardByName(regatta.getName())),
+                Util.asList(season.getLeaderboards()));
+        assertEquals("Description", season.getDescription());
+        assertEquals("Display", season.getDisplayName());
+    }
+
+    @Test
+    public void testAppendRequiresOverallUpdatePermissionIncludingForDuplicateMembership() {
+        final String seasonName = "Protected season";
+        final LeaderboardGroup season = LeaderboardGroupManagement.createLeaderboardGroup(racingEventService,
+                securityService, UUID.randomUUID(), seasonName, "Description", "Display",
+                /* displayGroupsInReverseOrder */ false, Collections.emptyList(), new int[0], ScoringSchemeType.LOW_POINT);
+        final Leaderboard overall = season.getOverallLeaderboard();
+        Mockito.doThrow(new UnauthorizedException("not permitted")).when(securityService)
+                .checkCurrentUserUpdatePermission(overall);
+        assertThrows(UnauthorizedException.class,
+                () -> leaderboardGroupsResource.addLeaderboardToLeaderboardGroup(seasonName, regatta.getName()));
+        assertTrue(Util.isEmpty(season.getLeaderboards()));
+        assertSame(overall, season.getOverallLeaderboard());
+        Mockito.doNothing().when(securityService).checkCurrentUserUpdatePermission(overall);
+        assertEquals(Status.OK.getStatusCode(), leaderboardGroupsResource
+                .addLeaderboardToLeaderboardGroup(seasonName, regatta.getName()).getStatus());
+        Mockito.doThrow(new UnauthorizedException("not permitted")).when(securityService)
+                .checkCurrentUserUpdatePermission(overall);
+        assertThrows(UnauthorizedException.class,
+                () -> leaderboardGroupsResource.addLeaderboardToLeaderboardGroup(seasonName, regatta.getName()));
+        assertEquals(/* expected */ 1, Util.size(season.getLeaderboards()));
     }
 }

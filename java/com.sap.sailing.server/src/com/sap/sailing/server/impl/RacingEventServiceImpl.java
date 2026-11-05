@@ -140,6 +140,7 @@ import com.sap.sailing.domain.base.impl.TeamImpl;
 import com.sap.sailing.domain.common.BoatClassMasterdata;
 import com.sap.sailing.domain.common.CompetitorDescriptor;
 import com.sap.sailing.domain.common.CompetitorRegistrationType;
+import com.sap.sailing.domain.common.ConflictObjectType;
 import com.sap.sailing.domain.common.DataImportProgress;
 import com.sap.sailing.domain.common.DataImportSubProgress;
 import com.sap.sailing.domain.common.DetailType;
@@ -341,6 +342,7 @@ import com.sap.sse.branding.BrandingConfigurationService;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.ObjectAlreadyExistsException;
 import com.sap.sse.common.PairingListCreationException;
 import com.sap.sse.common.Position;
 import com.sap.sse.common.Speed;
@@ -1409,23 +1411,29 @@ Replicator {
     }
 
     @Override
-    public void addLeaderboard(Leaderboard leaderboard) {
+    public void addLeaderboard(final Leaderboard leaderboard) {
         LockUtil.lockForWrite(leaderboardsByNameLock);
         try {
-            leaderboardsByName.put(leaderboard.getName(), leaderboard);
+            final Leaderboard existing = leaderboardsByName.get(leaderboard.getName());
+            if (existing != null && existing != leaderboard) {
+                throw new ObjectAlreadyExistsException(ConflictObjectType.LEADERBOARD, leaderboard.getName());
+            }
+            if (existing == null) {
+                leaderboardsByName.put(leaderboard.getName(), leaderboard);
+                // RaceColumns of RegattaLeaderboards are tracked via their Regatta.
+                if (leaderboard instanceof FlexibleLeaderboard) {
+                    onRegattaLikeAdded(((FlexibleLeaderboard) leaderboard).getRegattaLike());
+                    leaderboard.addRaceColumnListener(raceLogReplicator);
+                    leaderboard.addRaceColumnListener(raceLogScoringReplicator);
+                }
+                final LeaderboardScoreCorrectionNotifier scoreCorrectionListener = new LeaderboardScoreCorrectionNotifier(leaderboard);
+                scoreCorrectionListenersByLeaderboard.put(leaderboard, scoreCorrectionListener);
+                leaderboard.addScoreCorrectionListener(scoreCorrectionListener);
+                tryToRegisterMBeanForLeaderboard(leaderboard);
+            }
         } finally {
             LockUtil.unlockAfterWrite(leaderboardsByNameLock);
         }
-        // RaceColumns of RegattaLeaderboards are tracked via its Regatta!
-        if (leaderboard instanceof FlexibleLeaderboard) {
-            onRegattaLikeAdded(((FlexibleLeaderboard) leaderboard).getRegattaLike());
-            leaderboard.addRaceColumnListener(raceLogReplicator);
-            leaderboard.addRaceColumnListener(raceLogScoringReplicator);
-        }
-        final LeaderboardScoreCorrectionNotifier scoreCorrectionListener = new LeaderboardScoreCorrectionNotifier(leaderboard);
-        scoreCorrectionListenersByLeaderboard.put(leaderboard, scoreCorrectionListener);
-        leaderboard.addScoreCorrectionListener(scoreCorrectionListener);
-        tryToRegisterMBeanForLeaderboard(leaderboard);
     }
 
     private void tryToRegisterMBeanForLeaderboard(Leaderboard leaderboard) {
@@ -3530,56 +3538,73 @@ Replicator {
     }
 
     @Override
-    public LeaderboardGroup addLeaderboardGroup(UUID leaderboardGroupId, String groupName, String description, String displayName,
-            boolean displayGroupsInReverseOrder, List<String> leaderboardNames,
-            int[] overallLeaderboardDiscardThresholds, ScoringSchemeType overallLeaderboardScoringSchemeType) {
-        ArrayList<Leaderboard> leaderboards = new ArrayList<>();
-        for (String leaderboardName : leaderboardNames) {
-            Leaderboard leaderboard = leaderboardsByName.get(leaderboardName);
-            if (leaderboard == null) {
-                throw new IllegalArgumentException("No leaderboard with name " + leaderboardName + " found");
-            } else {
-                leaderboards.add(leaderboard);
-            }
-        }
-        LeaderboardGroup result = new LeaderboardGroupImpl(leaderboardGroupId, groupName, description, displayName,
-                displayGroupsInReverseOrder, leaderboards);
-        if (overallLeaderboardScoringSchemeType != null) {
-            // create overall leaderboard and its discards settings
-            addOverallLeaderboardToLeaderboardGroup(result,
-                    getBaseDomainFactory().createScoringScheme(overallLeaderboardScoringSchemeType),
-                    overallLeaderboardDiscardThresholds);
-        }
+    public LeaderboardGroup addLeaderboardGroup(final UUID leaderboardGroupId, final String groupName,
+            final String description, final String displayName, final boolean displayGroupsInReverseOrder,
+            final List<String> leaderboardNames, final int[] overallLeaderboardDiscardThresholds,
+            final ScoringSchemeType overallLeaderboardScoringSchemeType) {
+        final LeaderboardGroup result;
+        // Always acquire the group lock before the leaderboard lock for compound changes.
         LockUtil.lockForWrite(leaderboardGroupsByNameLock);
+        LockUtil.lockForWrite(leaderboardsByNameLock);
         try {
             if (leaderboardGroupsByName.containsKey(groupName)) {
-                throw new IllegalArgumentException("Leaderboard group with name " + groupName + " already exists");
+                throw new ObjectAlreadyExistsException(ConflictObjectType.LEADERBOARD_GROUP, groupName);
+            }
+            if (leaderboardGroupsByID.containsKey(leaderboardGroupId)) {
+                throw new ObjectAlreadyExistsException(ConflictObjectType.LEADERBOARD_GROUP, leaderboardGroupId.toString());
+            }
+            if (overallLeaderboardScoringSchemeType != null) {
+                checkLeaderboardNameAvailable(LeaderboardGroupMetaLeaderboard.getOverallLeaderboardName(groupName));
+            }
+            final List<Leaderboard> leaderboards = new ArrayList<>();
+            for (final String leaderboardName : leaderboardNames) {
+                final Leaderboard leaderboard = leaderboardsByName.get(leaderboardName);
+                if (leaderboard == null) {
+                    throw new IllegalArgumentException("No leaderboard with name " + leaderboardName + " found");
+                }
+                leaderboards.add(leaderboard);
+            }
+            result = new LeaderboardGroupImpl(leaderboardGroupId, groupName, description, displayName,
+                    displayGroupsInReverseOrder, leaderboards);
+            if (overallLeaderboardScoringSchemeType != null) {
+                addOverallLeaderboardToLeaderboardGroup(result,
+                        getBaseDomainFactory().createScoringScheme(overallLeaderboardScoringSchemeType),
+                        overallLeaderboardDiscardThresholds);
             }
             leaderboardGroupsByName.put(groupName, Collections.singleton(result));
             leaderboardGroupsByID.put(result.getId(), result);
+            mongoObjectFactory.storeLeaderboardGroup(result);
         } finally {
+            LockUtil.unlockAfterWrite(leaderboardsByNameLock);
             LockUtil.unlockAfterWrite(leaderboardGroupsByNameLock);
         }
-        mongoObjectFactory.storeLeaderboardGroup(result);
         return result;
     }
 
+    private void checkLeaderboardNameAvailable(final String leaderboardName) {
+        if (leaderboardsByName.containsKey(leaderboardName)) {
+            throw new ObjectAlreadyExistsException(ConflictObjectType.LEADERBOARD, leaderboardName);
+        }
+    }
+
     @Override
-    public void addLeaderboardGroupWithoutReplication(LeaderboardGroup leaderboardGroup) {
+    public void addLeaderboardGroupWithoutReplication(final LeaderboardGroup leaderboardGroup) {
         LockUtil.lockForWrite(leaderboardGroupsByNameLock);
+        LockUtil.lockForWrite(leaderboardsByNameLock);
         try {
             if (leaderboardGroupsByID.containsKey(leaderboardGroup.getId())) {
-                throw new IllegalArgumentException("Leaderboard group with ID " + leaderboardGroup.getId() + " already exists");
+                throw new ObjectAlreadyExistsException(ConflictObjectType.LEADERBOARD_GROUP, leaderboardGroup.getId().toString());
+            }
+            if (leaderboardGroup.hasOverallLeaderboard()) {
+                addLeaderboard(leaderboardGroup.getOverallLeaderboard());
             }
             leaderboardGroupsByName.put(leaderboardGroup.getName(), Collections.singleton(leaderboardGroup));
             leaderboardGroupsByID.put(leaderboardGroup.getId(), leaderboardGroup);
+            mongoObjectFactory.storeLeaderboardGroup(leaderboardGroup);
         } finally {
+            LockUtil.unlockAfterWrite(leaderboardsByNameLock);
             LockUtil.unlockAfterWrite(leaderboardGroupsByNameLock);
         }
-        if (leaderboardGroup.hasOverallLeaderboard()) {
-            addLeaderboard(leaderboardGroup.getOverallLeaderboard());
-        }
-        mongoObjectFactory.storeLeaderboardGroup(leaderboardGroup);
     }
 
     @Override
@@ -3626,7 +3651,7 @@ Replicator {
                 throw new IllegalArgumentException("No leaderboard group with ID " + leaderboardGroupId + " found");
             }
             if (leaderboardGroupsByName.containsKey(newName)) {
-                throw new IllegalArgumentException("Leaderboard group with name " + newName + " already exists");
+                throw new ObjectAlreadyExistsException(ConflictObjectType.LEADERBOARD_GROUP, newName);
             }
             leaderboardGroupsByName.remove(toRename.getName());
             toRename.setName(newName);
@@ -3638,15 +3663,35 @@ Replicator {
     }
 
     @Override
-    public void updateLeaderboardGroup(UUID leaderboardGroupId, String newName, String description, String displayName,
-            List<String> leaderboardNames, int[] overallLeaderboardDiscardThresholds,
-            ScoringSchemeType overallLeaderboardScoringSchemeType) {
-        final LeaderboardGroup group = getLeaderboardGroupByID(leaderboardGroupId);
-        if (group == null) {
-            throw new IllegalArgumentException("LeaderboardGroup with ID "+leaderboardGroupId+" not found");
+    public void updateLeaderboardGroup(final UUID leaderboardGroupId, final String newName, final String description,
+            final String displayName, final List<String> leaderboardNames, final int[] overallLeaderboardDiscardThresholds,
+            final ScoringSchemeType overallLeaderboardScoringSchemeType) {
+        LockUtil.lockForWrite(leaderboardGroupsByNameLock);
+        LockUtil.lockForWrite(leaderboardsByNameLock);
+        try {
+            final LeaderboardGroup group = getLeaderboardGroupByID(leaderboardGroupId);
+            if (group == null) {
+                throw new IllegalArgumentException("LeaderboardGroup with ID " + leaderboardGroupId + " not found");
+            }
+            if (!group.getName().equals(newName) && leaderboardGroupsByName.containsKey(newName)) {
+                throw new ObjectAlreadyExistsException(ConflictObjectType.LEADERBOARD_GROUP, newName);
+            }
+            if (!group.hasOverallLeaderboard() && overallLeaderboardScoringSchemeType != null) {
+                checkLeaderboardNameAvailable(LeaderboardGroupMetaLeaderboard.getOverallLeaderboardName(newName));
+            }
+            doUpdateLeaderboardGroup(group, newName, description, displayName, leaderboardNames,
+                    overallLeaderboardDiscardThresholds, overallLeaderboardScoringSchemeType);
+        } finally {
+            LockUtil.unlockAfterWrite(leaderboardsByNameLock);
+            LockUtil.unlockAfterWrite(leaderboardGroupsByNameLock);
         }
+    }
+
+    private void doUpdateLeaderboardGroup(final LeaderboardGroup group, final String newName, final String description,
+            final String displayName, final List<String> leaderboardNames, final int[] overallLeaderboardDiscardThresholds,
+            final ScoringSchemeType overallLeaderboardScoringSchemeType) {
         if (!group.getName().equals(newName)) {
-            renameLeaderboardGroup(leaderboardGroupId, newName);
+            renameLeaderboardGroup(group.getId(), newName);
         }
         if (!description.equals(group.getDescription())) {
             group.setDescriptiom(description);
@@ -3655,13 +3700,13 @@ Replicator {
             group.setDisplayName(displayName);
         }
         group.clearLeaderboards();
-        for (String leaderboardName : leaderboardNames) {
-            Leaderboard leaderboard = getLeaderboardByName(leaderboardName);
+        for (final String leaderboardName : leaderboardNames) {
+            final Leaderboard leaderboard = getLeaderboardByName(leaderboardName);
             if (leaderboard != null) {
                 group.addLeaderboard(leaderboard);
             }
         }
-        Leaderboard overallLeaderboard = group.getOverallLeaderboard();
+        final Leaderboard overallLeaderboard = group.getOverallLeaderboard();
         if (overallLeaderboard != null) {
             if (overallLeaderboardScoringSchemeType == null) {
                 group.setOverallLeaderboard(null);
@@ -3680,8 +3725,10 @@ Replicator {
         updateStoredLeaderboardGroup(group);
     }
 
-    private void addOverallLeaderboardToLeaderboardGroup(LeaderboardGroup leaderboardGroup,
-            ScoringScheme scoringScheme, int[] discardThresholds) {
+    private void addOverallLeaderboardToLeaderboardGroup(final LeaderboardGroup leaderboardGroup,
+            final ScoringScheme scoringScheme, final int[] discardThresholds) {
+        // The caller holds the leaderboard write lock, from validation through registration and persistence.
+        checkLeaderboardNameAvailable(LeaderboardGroupMetaLeaderboard.getOverallLeaderboardName(leaderboardGroup.getName()));
         final Leaderboard overallLeaderboard = new LeaderboardGroupMetaLeaderboard(leaderboardGroup, scoringScheme,
                 new ThresholdBasedResultDiscardingRuleImpl(discardThresholds));
         leaderboardGroup.setOverallLeaderboard(overallLeaderboard);

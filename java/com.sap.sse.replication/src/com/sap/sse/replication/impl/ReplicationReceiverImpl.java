@@ -511,10 +511,18 @@ public class ReplicationReceiverImpl implements ReplicationReceiver, Runnable {
      * no race conditions can occur (such as the task deciding to finish, yet another operation getting added to the queue
      * which hence gets dropped because then the queue would be deleted; or similar "desasters").
      */
-    private synchronized <S, O extends OperationWithResult<S, ?>> void apply(final O operation, Replicable<S, O> replicable) {
+    private synchronized <S, O extends OperationWithResult<S, ?>> void apply(final O operation, final Replicable<S, O> replicable) {
         final int operationCount = ++operationCounter;
         logger.finer(()->""+operationCount+": Applying "+operation);
-        Runnable runnable = () -> replicable.applyReceivedReplicated(operation);
+        // Contain execution failures after deserialization so the remaining message or asynchronous queue is processed.
+        final Runnable runnable = () -> {
+            try {
+                replicable.applyReceivedReplicated(operation);
+            } catch (final Exception e) {
+                logger.log(Level.SEVERE, "Error applying replicated operation " + operation + " to replicable "
+                        + replicable.getId() + ". Continuing with subsequent operations.", e);
+            }
+        };
         if (operation.requiresSynchronousExecution()) {
             runnable.run();
         } else {

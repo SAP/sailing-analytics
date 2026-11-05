@@ -272,6 +272,11 @@ public class MediaHealthCheckerTest {
     public void testHttpErrorVideoUrlIsNotReachable() throws Exception {
         assertFalse(new MediaUrlHealthChecker().isUrlReachable(getUrl(HTTP_ERROR_PATH)));
     }
+    
+    @Test
+    public void testYoutubeVideoReachable() throws Exception {
+        assertTrue(new MediaUrlHealthChecker().isUrlReachable(new URL("https://youtu.be/5ohJe5rcBVM")));
+    }
 
     @Test
     public void testBrokenEventVideoNotifiesOwnerAndPersistsState() throws Exception {

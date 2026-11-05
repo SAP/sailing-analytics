@@ -179,6 +179,8 @@ public interface ReplicableWithObjectInputStream<S, O extends OperationWithResul
                 replicateReplicated(operation);
             }
             return result;
+        } catch (final RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "apply", e);
             throw new RuntimeException(e);
