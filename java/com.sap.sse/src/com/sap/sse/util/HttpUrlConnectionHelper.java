@@ -147,7 +147,8 @@ public class HttpUrlConnectionHelper {
                     optionalOutputStreamConsumer.get().accept(outputStream);
                 }
                 if (connection.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM
-                        || connection.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
+                        || connection.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP
+                        || connection.getResponseCode() == HttpURLConnection.HTTP_SEE_OTHER) {
                     String location = connection.getHeaderField("Location");
                     nextUrl = new URL(nextUrl, location);
                     connection.disconnect();
