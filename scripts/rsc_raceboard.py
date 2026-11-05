@@ -9,7 +9,7 @@ import argparse
 import json
 import re
 import sys
-from typing import Final
+from typing import Callable, Final
 from urllib.error import URLError
 from urllib.parse import quote, urlencode, urlsplit
 from urllib.request import Request, urlopen
@@ -76,10 +76,10 @@ def get_feed_urls(event: dict, explicit_urls: list) -> list:
     return sorted(urls)
 
 
-def get_race_ids(feed_urls: list, rsc: str) -> set:
+def get_race_ids(feed_urls: list, rsc: str, fetch_json: Callable = get_json) -> set:
     race_ids: Final = set()
     for feed_url in feed_urls:
-        feed: Final = get_json(feed_url)
+        feed: Final = fetch_json(feed_url)
         for race in feed["races"]:
             # Parse actual Java Properties semantics, including escapes and continuations.
             try:
@@ -91,13 +91,13 @@ def get_race_ids(feed_urls: list, rsc: str) -> set:
     return race_ids
 
 
-def get_attached_races(event: dict, api: str, group_id, leaderboard_name):
+def get_attached_races(event: dict, api: str, group_id, leaderboard_name, fetch_json: Callable = get_json):
     # Only groups referenced by the requested event are reachable. Group details
     # already embed leaderboards, series, fleets and race-column attachments.
     groups: Final = {group["id"]: group for group in event["leaderboardGroups"]}
     for reference in groups.values():
         if group_id is None or reference["id"] == str(group_id):
-            group: Final = get_json(f"{api}/leaderboardgroups/{quote(reference['id'], safe='')}")
+            group: Final = fetch_json(f"{api}/leaderboardgroups/{quote(reference['id'], safe='')}")
             if group["id"] != reference["id"]:
                 raise ValueError(f"Leaderboard group response does not match requested ID {reference['id']}")
             for leaderboard in group["leaderboards"]:
@@ -126,20 +126,22 @@ def raceboard_url(base_url: str, event_id: str, group: dict, leaderboard: dict, 
     return base_url.rstrip("/") + "/gwt/RaceBoard.html?" + urlencode(parameters)
 
 
-def resolve(args: argparse.Namespace) -> str:
+def resolve(args: argparse.Namespace, fetch_json: Callable = get_json) -> str:
+    """Resolve one viewing context; callers may supply their own JSON transport."""
     server: Final = args.server.rstrip("/")
     api: Final = server + "/sailingserver/api/v1"
     event_id: Final = str(args.event_id)
-    event: Final = get_json(f"{api}/events/{event_id}")
+    event: Final = fetch_json(f"{api}/events/{event_id}")
     if event["id"] != event_id:
         raise ValueError("Event response does not match requested event ID")
     feed_urls: Final = get_feed_urls(event, args.tractrac_url)
-    race_ids: Final = get_race_ids(feed_urls, args.rsc)
+    race_ids: Final = get_race_ids(feed_urls, args.rsc, fetch_json=fetch_json)
     if not race_ids:
         raise ValueError(f"RSC {args.rsc!r} was not found in the TracTrac feeds: {', '.join(feed_urls)}")
     base_url: Final = event.get("baseURL") or server
     matches: Final = {}
-    for group, leaderboard, race in get_attached_races(event, api, args.leaderboard_group, args.leaderboard):
+    for group, leaderboard, race in get_attached_races(
+            event, api, args.leaderboard_group, args.leaderboard, fetch_json=fetch_json):
         race_id: Final = str(UUID(race["raceId"]))
         if race_id in race_ids:
             # Keep different viewing contexts distinct, even for the same tracked

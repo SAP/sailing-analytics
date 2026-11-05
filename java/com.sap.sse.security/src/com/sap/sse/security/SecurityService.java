@@ -457,6 +457,19 @@ public interface SecurityService extends ReplicableWithObjectInputStream<Replica
             String securityDisplayName, Callable<T> createActionReturningCreatedObject);
 
     /**
+     * Like the overload without {@code creationPrecondition}, but validates domain-object absence before
+     * establishing ownership. Validation and creation are serialized with other creation attempts for the
+     * same qualified identifier in this service. The domain action must still enforce uniqueness atomically.
+     * This overload also rolls back ownership established by this invocation on
+     * {@link com.sap.sse.common.ObjectAlreadyExistsException}. The entire callback must be free of domain
+     * changes when propagating that exception, including from nested creation scopes. The overload without
+     * a precondition does not opt into conflict rollback because its callback may have already made changes.
+     */
+    <T> T setOwnershipCheckPermissionForObjectCreationAndRevertOnError(HasPermissions type,
+            TypeRelativeObjectIdentifier typeRelativeObjectIdentifier, String securityDisplayName,
+            Runnable creationPrecondition, Callable<T> createActionReturningCreatedObject);
+
+    /**
      * Like
      * {@link #setOwnershipCheckPermissionForObjectCreationAndRevertOnError(HasPermissions, TypeRelativeObjectIdentifier, String, Callable)},
      * only that the action does not return an object, so this method does not either.
