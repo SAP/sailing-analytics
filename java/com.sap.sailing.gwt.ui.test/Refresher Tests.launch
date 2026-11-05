@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.junit.launchconfig">
+    <stringAttribute key="org.eclipse.jdt.junit.CONTAINER" value=""/>
+    <stringAttribute key="org.eclipse.jdt.junit.TEST_KIND" value="org.eclipse.jdt.junit.loader.junit5"/>
+    <listAttribute key="org.eclipse.jdt.launching.CLASSPATH">
+        <listEntry value="&lt;runtimeClasspathEntry containerPath=&quot;org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8&quot; javaProject=&quot;com.sap.sailing.gwt.ui.test&quot; path=&quot;1&quot; type=&quot;4&quot;/&gt;"/>
+        <listEntry value="&lt;runtimeClasspathEntry internalArchive=&quot;/com.sap.sailing.gwt.ui.test/bin&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;"/>
+        <listEntry value="&lt;runtimeClasspathEntry internalArchive=&quot;/com.sap.sailing.gwt.ui/bin&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;"/>
+        <listEntry value="&lt;runtimeClasspathEntry internalArchive=&quot;/com.sap.sse.gwt/bin&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;"/>
+        <listEntry value="&lt;runtimeClasspathEntry internalArchive=&quot;/com.google.gwt.user/lib/gwt-user.jar&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;"/>
+        <listEntry value="&lt;runtimeClasspathEntry containerPath=&quot;org.eclipse.jdt.junit.JUNIT_CONTAINER/5&quot; javaProject=&quot;com.sap.sailing.gwt.ui.test&quot; path=&quot;3&quot; type=&quot;4&quot;/&gt;"/>
+    </listAttribute>
+    <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
+    <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.sap.sailing.gwt.ui.test.AbstractRefresherTest"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="com.sap.sailing.gwt.ui.test"/>
+</launchConfiguration>

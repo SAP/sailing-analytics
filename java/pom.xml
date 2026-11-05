@@ -215,6 +215,7 @@
         <module>com.sap.sailing.server.trackfiles</module>
         <module>com.sap.sailing.feature.runtime</module>
         <module>com.sap.sailing.gwt.ui</module>
+        <module>com.sap.sailing.gwt.ui.test</module>
         <module>com.sap.sse.branding</module>
         <module>com.sap.sse.branding.test</module>
         <module>com.sap.sse.branding.sap</module>

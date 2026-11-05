@@ -704,31 +704,25 @@ public class SmartphoneTrackingEventManagementPanel extends AbstractLeaderboardC
             // Flexible leaderboards have no associated regatta whose tracking-times setting could be changed.
             chooseRaceNamePrefixAndDenoteForRaceLogTracking(leaderboard, /* regatta */ null);
         } else {
-            sailingServiceWrite.getRegattaByName(leaderboard.regattaName, new AsyncCallback<RegattaDTO>() {
-                @Override
-                public void onFailure(final Throwable caught) {
-                    errorReporter.reportError(stringMessages.errorLoadingRegattaForSmartphoneTracking(
-                            leaderboard.regattaName, caught.getMessage()));
-                }
+            presenter.getRegattasRefresher().callFillAndReloadInitially(regattas -> {
+                final RegattaDTO regatta = Util.stream(regattas)
+                        .filter(candidate -> leaderboard.regattaName.equals(candidate.getName()))
+                        .findFirst().orElse(/* other */ null);
+                if (regatta != null && !regatta.controlTrackingFromStartAndFinishTimes) {
+                    new AutomaticTrackingTimesDialog(stringMessages, regatta.getName(), new DialogCallback<Void>() {
+                        @Override
+                        public void ok(final Void result) {
+                            enableAutomaticTrackingTimes(regatta,
+                                    () -> chooseRaceNamePrefixAndDenoteForRaceLogTracking(leaderboard, regatta));
+                        }
 
-                @Override
-                public void onSuccess(final RegattaDTO regatta) {
-                    if (regatta != null && !regatta.controlTrackingFromStartAndFinishTimes) {
-                        new AutomaticTrackingTimesDialog(stringMessages, regatta.getName(), new DialogCallback<Void>() {
-                            @Override
-                            public void ok(final Void result) {
-                                enableAutomaticTrackingTimes(regatta,
-                                        () -> chooseRaceNamePrefixAndDenoteForRaceLogTracking(leaderboard, regatta));
-                            }
-
-                            @Override
-                            public void cancel() {
-                                chooseRaceNamePrefixAndDenoteForRaceLogTracking(leaderboard, regatta);
-                            }
-                        }).show();
-                    } else {
-                        chooseRaceNamePrefixAndDenoteForRaceLogTracking(leaderboard, regatta);
-                    }
+                        @Override
+                        public void cancel() {
+                            chooseRaceNamePrefixAndDenoteForRaceLogTracking(leaderboard, regatta);
+                        }
+                    }).show();
+                } else {
+                    chooseRaceNamePrefixAndDenoteForRaceLogTracking(leaderboard, regatta);
                 }
             });
         }
