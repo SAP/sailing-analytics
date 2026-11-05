@@ -44,15 +44,15 @@
 #                                still applies. env: MERGE_U2D_FORCE
 #   -h | --help                  show this help and exit
 #
-# So, e.g., `export MERGE_U2D_FORK_REMOTE=aksajhfduwafe` in your .bashrc lets you
-# run the script with no arguments at all.
+# So, e.g., `export MERGE_U2D_FORK_REMOTE=eclipse-sailing-analytics-bot` in your
+# .bashrc lets you run the script with no arguments at all.
 #
 # Example (author's layout, downstream remote actually named "github"):
-#   ./merge-upstream-to-downstream.sh --fork-remote aksajhfduwafe --downstream-remote github \
-#       --local-downstream-branch sap-main --local-fork-branch aksajhfduwafe-sap-main
+#   ./merge-upstream-to-downstream.sh --fork-remote eclipse-sailing-analytics-bot --downstream-remote github \
+#       --local-downstream-branch sap-main --local-fork-branch eclipse-sailing-analytics-bot-sap-main
 #
 #   (Defaults assume the downstream remote is named "sap"; the author's is "github",
-#   so the local-branch names are given explicitly to match sap-main / aksajhfduwafe-sap-main.
+#   so the local-branch names are given explicitly to match sap-main / eclipse-sailing-analytics-bot-sap-main.
 #   Alternatively rename the remote to "sap" and the local-branch defaults line up.)
 
 set -euo pipefail
@@ -62,7 +62,7 @@ set -euo pipefail
 # built-in default. Each var is seeded here from its MERGE_U2D_* environment
 # variable (empty if unset) or the built-in default; the option parser below
 # then overwrites a var ONLY when its flag is actually given. So you can export
-# e.g. MERGE_U2D_FORK_REMOTE=aksajhfduwafe in your .bashrc and run with no args,
+# e.g. MERGE_U2D_FORK_REMOTE=eclipse-sailing-analytics-bot in your .bashrc and run with no args,
 # while still overriding any single value on the command line.
 FORK_REMOTE="${MERGE_U2D_FORK_REMOTE:-}"
 UPSTREAM_REMOTE="${MERGE_U2D_UPSTREAM_REMOTE:-eclipse}"
@@ -86,7 +86,7 @@ never printed.
 
 Precedence for every setting: command-line option > MERGE_U2D_* env var > default.
 Defaults shown below already reflect any MERGE_U2D_* env var currently exported,
-so e.g. \`export MERGE_U2D_FORK_REMOTE=aksajhfduwafe\` lets you run with no args.
+so e.g. \`export MERGE_U2D_FORK_REMOTE=eclipse-sailing-analytics-bot\` lets you run with no args.
 
 Required (unless MERGE_U2D_FORK_REMOTE is set):
   --fork-remote NAME             remote for the fork; its URL holds the PAT
@@ -122,8 +122,8 @@ Other:
   -h, --help                     show this help and exit
 
 Example (downstream remote named "github" rather than the default "sap"):
-  $(basename "$0") --fork-remote aksajhfduwafe --downstream-remote github \\
-      --local-downstream-branch sap-main --local-fork-branch aksajhfduwafe-sap-main
+  $(basename "$0") --fork-remote eclipse-sailing-analytics-bot --downstream-remote github \\
+      --local-downstream-branch sap-main --local-fork-branch eclipse-sailing-analytics-bot-sap-main
 EOF
 }
 

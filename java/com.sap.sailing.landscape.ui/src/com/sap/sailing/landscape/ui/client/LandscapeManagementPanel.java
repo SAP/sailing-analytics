@@ -1757,7 +1757,7 @@ public class LandscapeManagementPanel extends SimplePanel {
      * target groups. If no replica exists, one is launched with the master's release, and the method waits
      * until the replica has reached its healthy state. The replica is then registered in the public target group.<p>
      * 
-     * Then, the {@code ./refreshInstance.sh install-release <release>} command is sent to the master which will
+     * Then, the {@code refreshInstance.sh install-release <release>} command is sent to the master which will
      * download and unpack the new release but will not yet stop the master process. In parallel, the existing
      * default launch template version will be copied and updated with user data reflecting the new release to be used.
      * The auto-scaling group will then use the new default launch template version.<p>
