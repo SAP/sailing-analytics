@@ -11,15 +11,18 @@ import javax.ws.rs.ext.Provider;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import com.sap.sailing.domain.common.NotFoundException;
+import com.sap.sse.common.ObjectAlreadyExistsException;
 
 @Provider
 public class ExceptionManager implements ExceptionMapper<Exception> {
-    public Response toResponse(Exception exception) {
-        Response result;
+    public Response toResponse(final Exception exception) {
+        final Response result;
         try {
             throw exception; 
         } catch (NotFoundException nfe) {
             result = Response.status(Status.NOT_FOUND).entity(nfe.getMessage()).type("text/plain").build();
+        } catch (final ObjectAlreadyExistsException e) {
+            result = Response.status(Status.CONFLICT).entity(e.getMessage()).type("text/plain").build();
         } catch (Exception e) {
             result = Response.status(Status.BAD_REQUEST).entity(e.getMessage()).type("text/plain").build();
         }

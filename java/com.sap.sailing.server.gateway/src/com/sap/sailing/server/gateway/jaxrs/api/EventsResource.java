@@ -72,8 +72,6 @@ import com.sap.sailing.domain.leaderboard.RegattaLeaderboard;
 import com.sap.sailing.domain.leaderboard.ResultDiscardingRule;
 import com.sap.sailing.domain.leaderboard.ScoringScheme;
 import com.sap.sailing.domain.leaderboard.ThresholdBasedResultDiscardingRule;
-import com.sap.sailing.domain.leaderboard.impl.LeaderboardGroupImpl;
-import com.sap.sailing.domain.leaderboard.meta.LeaderboardGroupMetaLeaderboard;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.geocoding.ReverseGeocoder;
 import com.sap.sailing.server.gateway.jaxrs.exceptions.ExceptionManager;
@@ -84,17 +82,19 @@ import com.sap.sailing.server.gateway.serialization.impl.LeaderboardGroupBaseJso
 import com.sap.sailing.server.gateway.serialization.impl.TrackingConnectorInfoJsonSerializer;
 import com.sap.sailing.server.gateway.serialization.impl.VenueJsonSerializer;
 import com.sap.sailing.server.hierarchy.SailingHierarchyOwnershipUpdater;
+import com.sap.sailing.server.interfaces.LeaderboardGroupManagement;
 import com.sap.sailing.server.interfaces.RacingEventService;
 import com.sap.sailing.server.operationaltransformation.AddColumnToSeries;
 import com.sap.sailing.server.operationaltransformation.AddCourseAreas;
+import com.sap.sailing.server.operationaltransformation.AddLeaderboardGroupToEvent;
 import com.sap.sailing.server.operationaltransformation.AddSpecificRegatta;
 import com.sap.sailing.server.operationaltransformation.CreateEvent;
-import com.sap.sailing.server.operationaltransformation.CreateLeaderboardGroup;
 import com.sap.sailing.server.operationaltransformation.CreateRegattaLeaderboard;
 import com.sap.sailing.server.operationaltransformation.RemoveEvent;
 import com.sap.sailing.server.operationaltransformation.RemoveLeaderboard;
 import com.sap.sailing.server.operationaltransformation.RemoveLeaderboardGroup;
 import com.sap.sailing.server.operationaltransformation.RemoveRegatta;
+import com.sap.sailing.server.operationaltransformation.UpdateEvent;
 import com.sap.sailing.server.operationaltransformation.UpdateLeaderboardGroup;
 import com.sap.sailing.server.operationaltransformation.UpdateSeries;
 import com.sap.sailing.server.security.SailingViewerRole;
@@ -113,7 +113,6 @@ import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.security.SecurityService;
 import com.sap.sse.security.shared.HasPermissions.DefaultActions;
 import com.sap.sse.security.shared.RoleDefinition;
-import com.sap.sse.security.shared.TypeRelativeObjectIdentifier;
 import com.sap.sse.security.shared.impl.User;
 import com.sap.sse.security.shared.impl.UserGroup;
 import com.sap.sse.security.shared.impl.WildcardPermissionEncoder;
@@ -371,7 +370,8 @@ public class EventsResource extends AbstractSailingServerResource {
             isPublic = isPublicParam != null ? Boolean.valueOf(isPublicParam) : event.isPublic();
             if (leaderboardGroupIdsListParam.isEmpty()) {
                 // nothing has been provided, not even an empty value; leave unchanged:
-                leaderboardGroupIds = Util.map(event.getLeaderboardGroups(), lg->lg.getId());
+                leaderboardGroupIds = StreamSupport.stream(event.getLeaderboardGroups().spliterator(), /* parallel */ false)
+                        .map(LeaderboardGroup::getId).collect(Collectors.toList());
             } else if (leaderboardGroupIdsListParam.size() == 1 && leaderboardGroupIdsListParam.get(0).isEmpty()) {
                 // one empty occurrence of the sort "leaderboardgroupids=" means clear the value
                 leaderboardGroupIds = Collections.emptyList();
@@ -380,9 +380,9 @@ public class EventsResource extends AbstractSailingServerResource {
             }
             officialWebsiteURL = officialWebsiteURLParam != null ? new URL(officialWebsiteURLParam) : event.getOfficialWebsiteURL();
             baseURL = baseURLParam != null ? new URL(baseURLParam) : event.getBaseURL();
-            getService().updateEvent(id, eventName, eventDescription, startDate, endDate, venueName, isPublic,
+            getService().apply(new UpdateEvent(id, eventName, eventDescription, startDate, endDate, venueName, isPublic,
                     leaderboardGroupIds, officialWebsiteURL, baseURL, event.getSailorsInfoWebsiteURLs(),
-                    event.getImages(), event.getVideos(), event.getWindFinderReviewedSpotsCollectionIds());
+                    event.getImages(), event.getVideos(), event.getWindFinderReviewedSpotsCollectionIds()));
             response = Response.ok().build();
         }
         return response;
@@ -636,20 +636,6 @@ public class EventsResource extends AbstractSailingServerResource {
                             /* autoRestartTrackingUponCompetitorSetChangeParam */ null, /* rankingMetricParam */ rankingMetric,
                             /* leaderboardDiscardThresholdsParam */ leaderboardDiscardThresholdsParam, numberOfRacesParam, canBoatsOfCompetitorsChangePerRace,
                             competitorRegistrationType, localCompetitorRegistrationSecret);
-                    if (leaderboardGroup != null) {
-                        // no security checks for any overall leaderboard required here as we don't manipulate it
-                        // through this service. leaderboardGroup.getOverallLeaderboard() == null will be true, due to
-                        // overallLeaderboardScoringSchemeTypeParam being null in validateAndAddLeaderboardGroup call.
-                        getService().apply(new UpdateLeaderboardGroup(leaderboardGroup.getId(),
-                                leaderboardGroup.getName(),
-                                leaderboardGroup.getDescription(), leaderboardGroup.getDisplayName(),
-                                Collections.singletonList(leaderboard.getName()),
-                                leaderboardGroup.getOverallLeaderboard() == null ? null
-                                        : ((ThresholdBasedResultDiscardingRule) leaderboardGroup.getOverallLeaderboard()
-                                                .getResultDiscardingRule()).getDiscardIndexResultsStartingWithHowManyRaces(),
-                                leaderboardGroup.getOverallLeaderboard() == null ? null
-                                        : leaderboardGroup.getOverallLeaderboard().getScoringScheme().getType()));
-                    }
                 } else {
                     leaderboard = null;
                 }
@@ -671,43 +657,29 @@ public class EventsResource extends AbstractSailingServerResource {
             } else {
                 return doCreationAction.call();
             }
+        } catch (final RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private LeaderboardGroup validateAndAddLeaderboardGroup(UUID eventId, String leaderboardGroupName,
-            String leaderboardGroupDescription, String leaderboardGroupDisplayName,
-            boolean displayGroupsInReverseOrder, List<String> leaderboardNamesParam,
-            List<Integer> overallLeaderboardDiscardThresholdsParam, String overallLeaderboardScoringSchemeTypeParam)
+    private LeaderboardGroup validateAndAddLeaderboardGroup(final UUID eventId, final String leaderboardGroupName,
+            final String leaderboardGroupDescription, final String leaderboardGroupDisplayName,
+            final boolean displayGroupsInReverseOrder, final List<String> leaderboardNamesParam,
+            final List<Integer> overallLeaderboardDiscardThresholdsParam, final String overallLeaderboardScoringSchemeTypeParam)
             throws NotFoundException {
         final UUID leaderboardGroupId = UUID.randomUUID();
         final ScoringSchemeType overallLeaderboardScoringSchemeType = overallLeaderboardScoringSchemeTypeParam == null
                 ? null : getScoringSchemeType(overallLeaderboardScoringSchemeTypeParam);
-        final Callable<LeaderboardGroup> createLeaderboardGroup = ()->{
-            int[] overallLeaderboardDiscardThresholds = overallLeaderboardDiscardThresholdsParam == null ? new int[0] : overallLeaderboardDiscardThresholdsParam.stream().mapToInt(i -> i).toArray();
-            List<String> leaderboardNames = leaderboardNamesParam == null ? new ArrayList<String>() : leaderboardNamesParam;
-            return getService().apply(new CreateLeaderboardGroup(
-                    leaderboardGroupId, leaderboardGroupName, leaderboardGroupDescription, leaderboardGroupDisplayName, displayGroupsInReverseOrder,
-                    leaderboardNames, overallLeaderboardDiscardThresholds, overallLeaderboardScoringSchemeType));
-        };
-        final LeaderboardGroup leaderboardGroup;
-        // if an overall leaderboard is requested, establish ownership and check create permission; roll back if not possible;
-        // otherwise, try to establish the leaderboard group's ownership; if that fails with an AuthorizationException,
-        // the overall leaderboard's ownership is removed again, too.
-        if (overallLeaderboardScoringSchemeType != null) {
-            final String overallLeaderboardName = LeaderboardGroupMetaLeaderboard.getOverallLeaderboardName(leaderboardGroupName);
-            leaderboardGroup = getSecurityService()
-                .setOwnershipCheckPermissionForObjectCreationAndRevertOnError(SecuredDomainType.LEADERBOARD,
-                    new TypeRelativeObjectIdentifier(overallLeaderboardName), overallLeaderboardName,
-                    ()->createLeaderboardGroup.call());
-        } else {
-            leaderboardGroup = getSecurityService()
-                .setOwnershipCheckPermissionForObjectCreationAndRevertOnError(SecuredDomainType.LEADERBOARD_GROUP,
-                        LeaderboardGroupImpl.getTypeRelativeObjectIdentifier(leaderboardGroupId), leaderboardGroupName,
-                        createLeaderboardGroup);
-        }
-        updateEvent(getEvent(eventId), leaderboardGroup);
+        final int[] overallLeaderboardDiscardThresholds = overallLeaderboardDiscardThresholdsParam == null
+                ? new int[0] : overallLeaderboardDiscardThresholdsParam.stream().mapToInt(i -> i).toArray();
+        final List<String> leaderboardNames = leaderboardNamesParam == null ? new ArrayList<>() : leaderboardNamesParam;
+        final LeaderboardGroup leaderboardGroup = LeaderboardGroupManagement.createLeaderboardGroup(getService(),
+                getSecurityService(), leaderboardGroupId, leaderboardGroupName, leaderboardGroupDescription,
+                leaderboardGroupDisplayName, displayGroupsInReverseOrder, leaderboardNames, overallLeaderboardDiscardThresholds,
+                overallLeaderboardScoringSchemeType);
+        addLeaderboardGroupToEvent(getEvent(eventId), leaderboardGroup);
         return leaderboardGroup;
     }
 
@@ -754,16 +726,9 @@ public class EventsResource extends AbstractSailingServerResource {
         return getService().apply(new AddColumnToSeries(new RegattaName(regatta.getName()), seriesName, columnName));
     }
 
-    private void updateEvent(Event event, LeaderboardGroup leaderboardGroup){
+    private void addLeaderboardGroupToEvent(final Event event, final LeaderboardGroup leaderboardGroup) {
         getSecurityService().checkCurrentUserUpdatePermission(event);
-        List<UUID> newLeaderboardGroupIds = new ArrayList<>();
-        StreamSupport.stream(event.getLeaderboardGroups().spliterator(), false)
-                .forEach(lg -> newLeaderboardGroupIds.add(lg.getId()));
-        newLeaderboardGroupIds.add(leaderboardGroup.getId());
-        getService().updateEvent(event.getId(), event.getName(), event.getDescription(), event.getStartDate(),
-                event.getEndDate(), event.getVenue().getName(), event.isPublic(), newLeaderboardGroupIds,
-                event.getOfficialWebsiteURL(), event.getBaseURL(), event.getSailorsInfoWebsiteURLs(), event.getImages(),
-                event.getVideos(), event.getWindFinderReviewedSpotsCollectionIds());
+        getService().apply(new AddLeaderboardGroupToEvent(event.getId(), leaderboardGroup.getId()));
     }
 
     private CourseArea addCourseArea(Event event, String courseAreaName) {
@@ -779,11 +744,11 @@ public class EventsResource extends AbstractSailingServerResource {
 
     private void addLeaderboardToDefaultLeaderboardGroup(final RegattaLeaderboard leaderboard) {
         LeaderboardGroup defaultLeaderboardGroup = null;
-        for (Event event : getService().getAllEvents()) {
-            Iterable<CourseArea> courseAreas = event.getVenue().getCourseAreas();
-            for (CourseArea courseArea : courseAreas) {
-                if (Util.contains(leaderboard.getRegatta().getCourseAreas(), courseArea.getId())) {
-                    for (LeaderboardGroup lg : event.getLeaderboardGroups()) {
+        for (final Event event : getService().getAllEvents()) {
+            final Iterable<CourseArea> courseAreas = event.getVenue().getCourseAreas();
+            for (final CourseArea courseArea : courseAreas) {
+                if (Util.contains(leaderboard.getRegatta().getCourseAreas(), courseArea)) {
+                    for (final LeaderboardGroup lg : event.getLeaderboardGroups()) {
                         // if leaderboard group is default leaderboard group, then add leaderboard
                         if (lg.getName().equals(event.getName())) {
                             defaultLeaderboardGroup = lg;
@@ -793,19 +758,23 @@ public class EventsResource extends AbstractSailingServerResource {
             }
         }
         if (defaultLeaderboardGroup != null) {
-            defaultLeaderboardGroup.addLeaderboard(leaderboard);
-            List<String> leaderboards = stream(defaultLeaderboardGroup.getLeaderboards().spliterator()).map(lg -> lg.getName())
-                    .collect(Collectors.toList());
-
-            ResultDiscardingRule rule = defaultLeaderboardGroup.getOverallLeaderboard()==null?null:defaultLeaderboardGroup.getOverallLeaderboard().getResultDiscardingRule();
-            int[] overallLeaderboardDiscardThresholds = null;
-            if(rule instanceof ThresholdBasedResultDiscardingRule){
-                ThresholdBasedResultDiscardingRule resultDiscardingRule = (ThresholdBasedResultDiscardingRule) rule;
-                overallLeaderboardDiscardThresholds = resultDiscardingRule.getDiscardIndexResultsStartingWithHowManyRaces();
+            final List<String> leaderboards = stream(defaultLeaderboardGroup.getLeaderboards().spliterator())
+                    .map(Leaderboard::getName).collect(Collectors.toList());
+            if (!leaderboards.contains(leaderboard.getName())) {
+                leaderboards.add(leaderboard.getName());
             }
-            getService().updateLeaderboardGroup(defaultLeaderboardGroup.getId(), defaultLeaderboardGroup.getName(), defaultLeaderboardGroup.getDescription(),
-                    defaultLeaderboardGroup.getDisplayName(), leaderboards, overallLeaderboardDiscardThresholds,
-                    defaultLeaderboardGroup.getOverallLeaderboard()==null?null:defaultLeaderboardGroup.getOverallLeaderboard().getScoringScheme().getType());
+            final Leaderboard overallLeaderboard = defaultLeaderboardGroup.getOverallLeaderboard();
+            final ResultDiscardingRule rule = overallLeaderboard == null ? null : overallLeaderboard.getResultDiscardingRule();
+            final int[] overallLeaderboardDiscardThresholds;
+            if (rule instanceof ThresholdBasedResultDiscardingRule) {
+                final ThresholdBasedResultDiscardingRule resultDiscardingRule = (ThresholdBasedResultDiscardingRule) rule;
+                overallLeaderboardDiscardThresholds = resultDiscardingRule.getDiscardIndexResultsStartingWithHowManyRaces();
+            } else {
+                overallLeaderboardDiscardThresholds = null;
+            }
+            getService().apply(new UpdateLeaderboardGroup(defaultLeaderboardGroup.getId(), defaultLeaderboardGroup.getName(),
+                    defaultLeaderboardGroup.getDescription(), defaultLeaderboardGroup.getDisplayName(), leaderboards,
+                    overallLeaderboardDiscardThresholds, overallLeaderboard == null ? null : overallLeaderboard.getScoringScheme().getType()));
         }
     }
 

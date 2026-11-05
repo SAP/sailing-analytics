@@ -23,6 +23,20 @@
         <div class="mainContent">
           <h2 class="releaseHeadline">Release Notes - Administration Console</h2>
           <div class="innerContent">
+          <h2 class="articleSubheadline">November 2026</h2>
+          <ul class="bulletList">
+                <li>Leaderboard-group creation and updates now reject name conflicts, including generated names
+                    such as "Season Overall", before making changes. Existing leaderboards, ownership and access
+                    permissions are preserved when a conflict is rejected.</li>
+                <li>The Admin Console shows clear conflict messages with guidance on resolving
+                    the name clash. Leaderboard-group REST endpoints report these conflicts as HTTP 409 (Conflict).</li>
+                <li>REST event creation and updates now correctly replicate event details, group links and
+                    default-group membership to replicas. Creating a regatta with an existing default group now
+                    also adds its leaderboard to that group. See
+                    <a href="https://github.com/eclipse-sailing-analytics/sailing-analytics/issues/6326">issue #6326</a>.</li>
+                <li>When applying a replicated update fails, the error is logged and subsequent updates continue
+                    to be processed.</li>
+          </ul>
           <h2 class="articleSubheadline">October 2026</h2>
           <ul class="bulletList">
                 <li>ORC certificate retrieval has been migrated to ORC's new key-based web API at
