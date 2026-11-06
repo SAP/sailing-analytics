@@ -13,7 +13,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import java.util.function.Function;
 
 import javax.ws.rs.GET;
@@ -38,27 +37,22 @@ import com.sap.sailing.domain.base.Regatta;
 import com.sap.sailing.domain.base.Series;
 import com.sap.sailing.domain.common.LeaderboardNameConstants;
 import com.sap.sailing.domain.common.ScoringSchemeType;
-import com.sap.sailing.domain.common.security.SecuredDomainType;
 import com.sap.sailing.domain.leaderboard.Leaderboard;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroup;
 import com.sap.sailing.domain.leaderboard.MetaLeaderboard;
 import com.sap.sailing.domain.leaderboard.RegattaLeaderboard;
 import com.sap.sailing.domain.leaderboard.SettableScoreCorrection;
 import com.sap.sailing.domain.leaderboard.ThresholdBasedResultDiscardingRule;
-import com.sap.sailing.domain.leaderboard.impl.LeaderboardGroupImpl;
-import com.sap.sailing.domain.leaderboard.meta.LeaderboardGroupMetaLeaderboard;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sailing.server.gateway.serialization.LeaderboardGroupConstants;
 import com.sap.sailing.server.hierarchy.SailingHierarchyOwnershipUpdater;
-import com.sap.sailing.server.operationaltransformation.CreateLeaderboardGroup;
-import com.sap.sailing.server.operationaltransformation.UpdateLeaderboardGroup;
+import com.sap.sailing.server.interfaces.LeaderboardGroupManagement;
 import com.sap.sailing.server.util.RaceBoardLinkFactory;
 import com.sap.sailing.shared.server.gateway.jaxrs.AbstractSailingServerResource;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Triple;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
-import com.sap.sse.security.shared.TypeRelativeObjectIdentifier;
 import com.sap.sse.shared.json.JsonDeserializationException;
 import com.sap.sse.shared.util.impl.UUIDHelper;
 
@@ -340,62 +334,23 @@ public class LeaderboardGroupsResource extends AbstractSailingServerResource {
         final Response response;
         if (leaderboardGroupName == null || leaderboardGroupName.isEmpty()) {
             response = getBadRequestResponse("Parameter " + NAME_QUERY_PARAM + " is required.");
-        } else if (getService().getLeaderboardGroupByName(leaderboardGroupName) != null) {
-            response = Response.status(Status.CONFLICT)
-                    .entity("A leaderboard group with name '" + StringEscapeUtils.escapeHtml(leaderboardGroupName)
-                            + "' already exists.")
-                    .type(MediaType.TEXT_PLAIN).build();
         } else if (overallLeaderboardScoringSchemeName != null && !overallLeaderboardScoringSchemeName.isEmpty()
                 && !isValidScoringSchemeType(overallLeaderboardScoringSchemeName)) {
             response = getBadRequestResponse("Unknown scoring scheme '"
                     + StringEscapeUtils.escapeHtml(overallLeaderboardScoringSchemeName) + "'; use one of "
                     + Arrays.toString(ScoringSchemeType.values()) + ".");
-        } else if (overallLeaderboardScoringSchemeName != null && !overallLeaderboardScoringSchemeName.isEmpty()
-                && getService().getLeaderboardByName(
-                        LeaderboardGroupMetaLeaderboard.getOverallLeaderboardName(leaderboardGroupName)) != null) {
-            // the overall leaderboard is named after the group; creating it would replace an existing leaderboard
-            // of that name, so refuse before anything is created
-            response = Response.status(Status.CONFLICT)
-                    .entity("A leaderboard with name '" + StringEscapeUtils.escapeHtml(
-                            LeaderboardGroupMetaLeaderboard.getOverallLeaderboardName(leaderboardGroupName))
-                            + "' already exists; it would be replaced by the group's overall leaderboard.")
-                    .type(MediaType.TEXT_PLAIN).build();
         } else {
             final ScoringSchemeType overallLeaderboardScoringSchemeType = overallLeaderboardScoringSchemeName == null
                     || overallLeaderboardScoringSchemeName.isEmpty() ? null
                             : ScoringSchemeType.valueOf(overallLeaderboardScoringSchemeName);
             final int[] overallLeaderboardDiscardThresholdsAsArray = overallLeaderboardDiscardThresholds == null
                     ? new int[0] : overallLeaderboardDiscardThresholds.stream().mapToInt(i -> i).toArray();
-            final UUID leaderboardGroupId = UUID.randomUUID();
-            final Callable<LeaderboardGroup> createLeaderboardGroupOperation = () -> getService()
-                    .apply(new CreateLeaderboardGroup(leaderboardGroupId, leaderboardGroupName,
-                            description == null ? "" : description, displayName,
-                            displayGroupsInReverseOrder != null && displayGroupsInReverseOrder,
-                            new ArrayList<String>(), overallLeaderboardDiscardThresholdsAsArray,
-                            overallLeaderboardScoringSchemeType));
-            final Callable<LeaderboardGroup> createLeaderboardGroupWithOwnership = () -> getSecurityService()
-                    .setOwnershipCheckPermissionForObjectCreationAndRevertOnError(SecuredDomainType.LEADERBOARD_GROUP,
-                            LeaderboardGroupImpl.getTypeRelativeObjectIdentifier(leaderboardGroupId),
-                            leaderboardGroupName, createLeaderboardGroupOperation);
-            final LeaderboardGroup leaderboardGroup;
-            // if an overall leaderboard is requested, establish its ownership and check its create permission, too,
-            // around the group's creation, the same way the AdminConsole does it
-            if (overallLeaderboardScoringSchemeType != null) {
-                final String overallLeaderboardName = LeaderboardGroupMetaLeaderboard
-                        .getOverallLeaderboardName(leaderboardGroupName);
-                leaderboardGroup = getSecurityService().setOwnershipCheckPermissionForObjectCreationAndRevertOnError(
-                        SecuredDomainType.LEADERBOARD, new TypeRelativeObjectIdentifier(overallLeaderboardName),
-                        overallLeaderboardName, createLeaderboardGroupWithOwnership);
-            } else {
-                try {
-                    leaderboardGroup = createLeaderboardGroupWithOwnership.call();
-                } catch (RuntimeException e) {
-                    // rethrown unchanged so that, e.g., an AuthorizationException maps to 401 as in the other branch
-                    throw e;
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            final LeaderboardGroup leaderboardGroup = LeaderboardGroupManagement.createLeaderboardGroup(getService(),
+                    getSecurityService(), UUID.randomUUID(), leaderboardGroupName,
+                    description == null ? "" : description, displayName,
+                    displayGroupsInReverseOrder != null && displayGroupsInReverseOrder,
+                    Collections.emptyList(), overallLeaderboardDiscardThresholdsAsArray,
+                    overallLeaderboardScoringSchemeType);
             response = Response.ok(streamingOutput(getLeaderboardGroupSummaryAsJson(leaderboardGroup))).build();
         }
         return response;
@@ -403,7 +358,7 @@ public class LeaderboardGroupsResource extends AbstractSailingServerResource {
 
     /**
      * Adds an existing leaderboard to an existing leaderboard group, at the end of the group's leaderboards, using the
-     * same {@link UpdateLeaderboardGroup} operation as the AdminConsole, so persistence and replication work as there.
+     * same {@link LeaderboardGroupManagement} helper as the AdminConsole, including permissions and ownership handling.
      * The group's name, description, display name and overall leaderboard remain unchanged. Adding a leaderboard that
      * the group already contains changes nothing.
      * <p>
@@ -438,19 +393,20 @@ public class LeaderboardGroupsResource extends AbstractSailingServerResource {
                             + "'.")
                     .type(MediaType.TEXT_PLAIN).build();
         } else {
-            getSecurityService().checkCurrentUserUpdatePermission(leaderboardGroup);
             getSecurityService().checkCurrentUserReadPermission(leaderboard);
-            final Leaderboard overallLeaderboard = leaderboardGroup.getOverallLeaderboard();
-            if (overallLeaderboard != null) {
-                getSecurityService().checkCurrentUserUpdatePermission(overallLeaderboard);
-            }
             // There is no replicable operation that appends a single leaderboard to a group; UpdateLeaderboardGroup
             // replaces the group's membership with the list it is given. Reading the membership and applying the
-            // update while holding the group's monitor keeps two concurrent calls of this endpoint from losing one
-            // another's leaderboard. This does not serialize against other writers of the group's membership (e.g.,
-            // the AdminConsole's updateLeaderboardGroup), which use the same snapshot-replacing operation.
+            // update under the shared helper's group monitor serializes this append with other requests using the
+            // helper, including the AdminConsole, and keeps the overall leaderboard's state consistent with the update.
             synchronized (leaderboardGroup) {
-                if (!Util.contains(leaderboardGroup.getLeaderboards(), leaderboard)) {
+                final Leaderboard overallLeaderboard = leaderboardGroup.getOverallLeaderboard();
+                if (Util.contains(leaderboardGroup.getLeaderboards(), leaderboard)) {
+                    // Idempotent requests still require update permission, without issuing an unnecessary operation.
+                    getSecurityService().checkCurrentUserUpdatePermission(leaderboardGroup);
+                    if (overallLeaderboard != null) {
+                        getSecurityService().checkCurrentUserUpdatePermission(overallLeaderboard);
+                    }
+                } else {
                     final List<String> leaderboardNames = new ArrayList<>();
                     for (final Leaderboard leaderboardInGroup : leaderboardGroup.getLeaderboards()) {
                         leaderboardNames.add(leaderboardInGroup.getName());
@@ -461,10 +417,11 @@ public class LeaderboardGroupsResource extends AbstractSailingServerResource {
                                     ? ((ThresholdBasedResultDiscardingRule) overallLeaderboard
                                             .getResultDiscardingRule()).getDiscardIndexResultsStartingWithHowManyRaces()
                                     : new int[0];
-                    getService().apply(new UpdateLeaderboardGroup(leaderboardGroup.getId(), leaderboardGroup.getName(),
+                    LeaderboardGroupManagement.updateLeaderboardGroup(getService(), getSecurityService(),
+                            leaderboardGroup.getId(), leaderboardGroup.getName(),
                             leaderboardGroup.getDescription() == null ? "" : leaderboardGroup.getDescription(),
                             leaderboardGroup.getDisplayName(), leaderboardNames, overallLeaderboardDiscardThresholds,
-                            overallLeaderboard == null ? null : overallLeaderboard.getScoringScheme().getType()));
+                            overallLeaderboard == null ? null : overallLeaderboard.getScoringScheme().getType());
                 }
             }
             response = Response.ok(streamingOutput(getLeaderboardGroupSummaryAsJson(leaderboardGroup))).build();

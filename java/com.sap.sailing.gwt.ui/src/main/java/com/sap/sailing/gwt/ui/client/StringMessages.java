@@ -1146,7 +1146,6 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     
     String videoUrl();
     String language();
-    String videoLengthSeconds();
     String thumbnailUrl();
     
     String videosWithCount(int number);
@@ -1462,6 +1461,13 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     String actionAnalyze();
     String inviteSelectedCompetitors();
     String denoteAllRacesForRaceLogTrackingShorctut();
+    String automaticTrackingTimes();
+    String suggestAutomaticTrackingTimes(String regattaName, String settingName);
+    String suggestAutomaticTrackingTimesAlsoDisablesInference(String regattaName, String inferenceSettingName, String trackingSettingName);
+    String applyAutomaticTrackingTimes();
+    String continueWithManualTrackingTimes();
+    String learnMoreAboutRaceManagerApp();
+    String automaticTrackingTimesEnabled(String regattaName);
     String registerCompetitors();
     String registerBoats();
     String createDefaultRegattaLeaderboard();
@@ -1949,6 +1955,9 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     String windFinderWeatherData();
     String positionEditOnNonTrackingRace();
     String errorCreatingLeaderboardGroup(String name);
+    String errorUpdatingLeaderboardGroup(String name);
+    String overallLeaderboardNameAlreadyExists(String name);
+    String leaderboardGroupNameAlreadyExists(String name);
     String minAbsCourseChangeInDegrees();
     String maxAbsCourseChangeInDegrees();
     String minDurationInSecondsFromPrecedingManeuver();
@@ -2287,12 +2296,8 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     String pleaseSelectAValidPassingInstruction();
     String pleaseSelectAValidMarkTemplate();
     String doYouReallyWantToRemoveCourseTemplate(String name);
-    String doYouReallyWantToRemoveCourseTemplates();
-    String doYouReallyWantToRemoveNonVisibleCourseTemplates(String message);
     String couldNotRemoveCourseTemplate(String message);
     String doYouReallyWantToRemoveMarkProperties(String name);
-    String doYouReallyWantToRemoveSeveralMarkProperties();
-    String doYouReallyWantToRemoveNonVisibleMarkProperties(String message);
     String couldNotRemoveMarkProperties(String message);
     String markRoles();
     String filterMarkRoles();
@@ -2371,7 +2376,6 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     String refunded();
     String cancelledAt();
     String nextBillingAt();
-    String currencyValue(double value, String currency);
     String errorLoadingUserSubscription(String errMessage);
     String failedNonRenewingSubscription();
     String errorNonRenewingSubscription(String errMessage);

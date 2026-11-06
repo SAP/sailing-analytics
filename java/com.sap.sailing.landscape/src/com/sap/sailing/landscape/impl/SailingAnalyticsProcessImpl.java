@@ -338,7 +338,7 @@ implements SailingAnalyticsProcess<ShardingKey> {
         getHost().createRootSshChannel(Landscape.WAIT_FOR_PROCESS_TIMEOUT, optionalKeyName, privateKeyEncryptionPassphrase)
             .runCommandAndReturnStdoutAndLogStderr("su -l "+StartSailingAnalyticsHost.SAILING_USER_NAME+" -c \""+
                     "cd "+getServerDirectory(Landscape.WAIT_FOR_PROCESS_TIMEOUT).replaceAll("\"", "\\\\\"")+"; "+
-                    "./refreshInstance.sh install-release "+release.getName()+" && ./stop && ./start"+
+                    "/usr/local/bin/refreshInstance.sh install-release "+release.getName()+" && ./stop && ./start"+
                     "\"", "Refreshing process to release "+release.getName(), Level.INFO);
         this.release = release;
     }
