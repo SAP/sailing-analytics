@@ -2374,7 +2374,6 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     String refunded();
     String cancelledAt();
     String nextBillingAt();
-    String currencyValue(double value, String currency);
     String errorLoadingUserSubscription(String errMessage);
     String failedNonRenewingSubscription();
     String errorNonRenewingSubscription(String errMessage);
