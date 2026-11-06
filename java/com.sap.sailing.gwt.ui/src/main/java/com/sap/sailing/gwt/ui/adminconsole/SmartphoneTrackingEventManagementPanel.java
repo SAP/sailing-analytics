@@ -700,6 +700,64 @@ public class SmartphoneTrackingEventManagementPanel extends AbstractLeaderboardC
     }
     
     private void denoteForRaceLogTracking(final StrippedLeaderboardDTO leaderboard) {
+        if (leaderboard.regattaName == null) {
+            // Flexible leaderboards have no associated regatta whose tracking-times setting could be changed.
+            chooseRaceNamePrefixAndDenoteForRaceLogTracking(leaderboard, /* regatta */ null);
+        } else {
+            presenter.getRegattasRefresher().callFillAndReloadInitially(regattas -> {
+                final RegattaDTO regatta = Util.stream(regattas)
+                        .filter(candidate -> leaderboard.regattaName.equals(candidate.getName()))
+                        .findFirst().orElse(/* other */ null);
+                if (regatta != null && !regatta.controlTrackingFromStartAndFinishTimes) {
+                    new AutomaticTrackingTimesDialog(stringMessages, regatta.getName(), regatta.useStartTimeInference, new DialogCallback<Void>() {
+                        @Override
+                        public void ok(final Void result) {
+                            enableAutomaticTrackingTimes(regatta,
+                                    () -> chooseRaceNamePrefixAndDenoteForRaceLogTracking(leaderboard, regatta));
+                        }
+
+                        @Override
+                        public void cancel() {
+                            chooseRaceNamePrefixAndDenoteForRaceLogTracking(leaderboard, regatta);
+                        }
+                    }).show();
+                } else {
+                    chooseRaceNamePrefixAndDenoteForRaceLogTracking(leaderboard, regatta);
+                }
+            });
+        }
+    }
+
+    private void enableAutomaticTrackingTimes(final RegattaDTO regatta, final Runnable onSuccess) {
+        sailingServiceWrite.updateRegatta(regatta.getRegattaIdentifier(), regatta.startDate, regatta.endDate,
+                Util.mapToArrayList(regatta.courseAreas, CourseAreaDTO::getId), regatta.configuration,
+                regatta.buoyZoneRadiusInHullLengths, /* useStartTimeInference */ false,
+                /* controlTrackingFromStartAndFinishTimes */ true, regatta.autoRestartTrackingUponCompetitorSetChange,
+                regatta.registrationLinkSecret, regatta.competitorRegistrationType,
+                new MarkedAsyncCallback<Void>(new AsyncCallback<Void>() {
+                    @Override
+                    public void onFailure(final Throwable caught) {
+                        errorReporter.reportError(stringMessages.errorUpdatingRegatta(regatta.getName(), caught.getMessage()));
+                    }
+
+                    @Override
+                    public void onSuccess(final Void result) {
+                        // Keep the subsequent course-designer update from restoring the old tracking-times setting.
+                        // Start-time inference and automatic tracking times are mutually exclusive on the server, so
+                        // the update above also cleared inference; mirror that on the cached DTO.
+                        regatta.controlTrackingFromStartAndFinishTimes = true;
+                        regatta.useStartTimeInference = false;
+                        presenter.getRegattasRefresher().reloadAndCallFillAll();
+                        Notification.notify(stringMessages.automaticTrackingTimesEnabled(regatta.getName()),
+                                NotificationType.SUCCESS);
+                        onSuccess.run();
+                    }
+                }));
+    }
+
+    private void chooseRaceNamePrefixAndDenoteForRaceLogTracking(final StrippedLeaderboardDTO leaderboard,
+            final RegattaDTO regatta) {
+        // Choose a custom race-name prefix or null for default leaderboard/column/fleet-based race names.
         final ChooseNameDenoteEventDialog dialog = new ChooseNameDenoteEventDialog(stringMessages, leaderboard,
                 new DialogCallback<String>() {
                     @Override
@@ -708,7 +766,7 @@ public class SmartphoneTrackingEventManagementPanel extends AbstractLeaderboardC
                             @Override
                             public void onSuccess(Void result) {
                                 loadAndRefreshLeaderboard(leaderboard.getName());
-                                updateRegattaConfigDesignerModeToByMarks(leaderboard.regattaName);
+                                updateRegattaConfigDesignerModeToByMarks(regatta);
                                 denoteRacesWithMultipleFleetsToDefineTheirOwnCompetitors(leaderboard.getName(), leaderboard.getRaceList());
                                 raceColumnTableSelectionModel.clear();
                             }
@@ -760,8 +818,7 @@ public class SmartphoneTrackingEventManagementPanel extends AbstractLeaderboardC
         }
     }
     
-    private void updateRegattaConfigDesignerModeToByMarks(final String regattaName) {
-        final RegattaDTO regatta = getRegattaByName(regattaName);
+    private void updateRegattaConfigDesignerModeToByMarks(final RegattaDTO regatta) {
         if (regatta != null) {
             DeviceConfigurationDTO.RegattaConfigurationDTO configuration = regatta.configuration;
             if (configuration == null) {
