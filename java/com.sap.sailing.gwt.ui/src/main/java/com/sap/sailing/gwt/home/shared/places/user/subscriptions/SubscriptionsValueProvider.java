@@ -69,7 +69,7 @@ public class SubscriptionsValueProvider {
     }
 
     public String getRecurringPayment(final SubscriptionDTO subscription) {
-        return i18n.currencyValue(subscription.getReoccuringPaymentValue() / 100, subscription.getCurrencyCode());
+        return i18n.currencyValue(subscription.getReoccuringPaymentValue() / 100.0, subscription.getCurrencyCode());
     }
 
 }
