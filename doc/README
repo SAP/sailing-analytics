@@ -397,9 +397,6 @@ into one in the future.
     		  latdeg and lngdeg parameter occurrences. Specifies
 		  the positions to be translated.
 
-
-    
-
 /moderator 
   action=listevents: shows the events with their races that are
                   currently being tracked by this server instance. The

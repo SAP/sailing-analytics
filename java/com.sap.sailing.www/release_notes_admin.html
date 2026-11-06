@@ -10,7 +10,7 @@
 <body>
     <div class="logoAndTitlePanel">
         <script>
-            if (!${clientConfigurationContext['debrandingActive']}){
+            if ("${clientConfigurationContext['debrandingActive']}" === "false") {
                 document.write("<a class=\"sapLogo\" href=\"https://www.sap.com?campaigncode=CRM-XH21-OSP-Sailing\"><img class=\"sapLogoImage\" src=\"/images/logo-small@2x.png\" alt=\"SAP Website\"/></a>\r\n");
             }
         </script>
@@ -36,6 +36,9 @@
                     <a href="https://github.com/eclipse-sailing-analytics/sailing-analytics/issues/6326">issue #6326</a>.</li>
                 <li>When applying a replicated update fails, the error is logged and subsequent updates continue
                     to be processed.</li>
+                <li>Media link detection (as other re-directs) did not follow HTTP 303 response codes,
+                    leading to false-positive messages about unreachable media, in particular YouTube videos,
+                    which has now been fixed.</li>
           </ul>
           <h2 class="articleSubheadline">October 2026</h2>
           <ul class="bulletList">

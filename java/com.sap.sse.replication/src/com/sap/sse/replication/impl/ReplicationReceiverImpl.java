@@ -503,13 +503,11 @@ public class ReplicationReceiverImpl implements ReplicationReceiver, Runnable {
      * With this, asynchronous operations with equal keys are added to a queue that is specific to that key, and a task per
      * such queue is created.<p>
      * 
-     * The handling of those queues for asynchronous operations makes sure that a task processing the queue is scheduled
-     * with the executor or already running if and only if there are operations in the queue. When the task removes the
-     * last operation from the queue, the queue is removed and the task decides to finish. From this point on, if another
-     * asynchronous operation with that same key arrives, a new queue and subsequently a new task will be created, and the
-     * task will be scheduled with the executor. These steps are performed under the necessary synchronization so that
-     * no race conditions can occur (such as the task deciding to finish, yet another operation getting added to the queue
-     * which hence gets dropped because then the queue would be deleted; or similar "desasters").
+     * {@link OperationQueueByKeyExecutor} keeps each queue registered while its task is scheduled or executing an
+     * operation, even if no further operations are queued. After applying an operation, the task checks for more work
+     * and retires an empty queue under the same monitor used for enqueueing. A concurrent submission therefore either
+     * joins the existing queue before retirement or creates a new queue and task afterwards. Applying operations
+     * happens outside that bookkeeping monitor so operations with different keys can execute concurrently.
      */
     private synchronized <S, O extends OperationWithResult<S, ?>> void apply(final O operation, final Replicable<S, O> replicable) {
         final int operationCount = ++operationCounter;
