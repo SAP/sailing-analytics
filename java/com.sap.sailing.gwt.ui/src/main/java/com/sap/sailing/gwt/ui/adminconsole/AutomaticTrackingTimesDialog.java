@@ -14,14 +14,16 @@ import com.sap.sse.gwt.client.dialog.DataEntryDialog;
 public class AutomaticTrackingTimesDialog extends DataEntryDialog<Void> {
     private final StringMessages stringMessages;
     private final String regattaName;
+    private final boolean currentlyUsesStartTimeInference;
 
     public AutomaticTrackingTimesDialog(final StringMessages stringMessages, final String regattaName,
-            final DialogCallback<Void> callback) {
+            final boolean currentlyUsesStartTimeInference, final DialogCallback<Void> callback) {
         super(stringMessages.automaticTrackingTimes(), /* message */ null,
                 stringMessages.applyAutomaticTrackingTimes(), stringMessages.continueWithManualTrackingTimes(),
                 /* validator */ null, callback);
         this.stringMessages = stringMessages;
         this.regattaName = regattaName;
+        this.currentlyUsesStartTimeInference = currentlyUsesStartTimeInference;
         ensureDebugId("AutomaticTrackingTimesDialog");
     }
 
@@ -34,6 +36,14 @@ public class AutomaticTrackingTimesDialog extends DataEntryDialog<Void> {
         panel.add(new HTML(new SafeHtmlBuilder().appendEscapedLines(
                 stringMessages.suggestAutomaticTrackingTimes(regattaName,
                         stringMessages.controlTrackingFromStartAndFinishTimes())).toSafeHtml()));
+        if (currentlyUsesStartTimeInference) {
+            // The two settings are mutually exclusive on the server, so warn that applying automatic tracking times
+            // will also switch off start-time inference for this regatta.
+            panel.add(new HTML(new SafeHtmlBuilder().appendEscapedLines(
+                    stringMessages.suggestAutomaticTrackingTimesAlsoDisablesInference(regattaName,
+                            stringMessages.useStartTimeInference(),
+                            stringMessages.controlTrackingFromStartAndFinishTimes())).toSafeHtml()));
+        }
         final Anchor raceManagerLink = new Anchor(stringMessages.learnMoreAboutRaceManagerApp(),
                 "https://www.sapsailing.com/gwt/Home.html#SolutionsPlace:navigationTab=RaceManagerApp", "_blank");
         raceManagerLink.getElement().setAttribute("rel", "noopener noreferrer");

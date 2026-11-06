@@ -709,7 +709,7 @@ public class SmartphoneTrackingEventManagementPanel extends AbstractLeaderboardC
                         .filter(candidate -> leaderboard.regattaName.equals(candidate.getName()))
                         .findFirst().orElse(/* other */ null);
                 if (regatta != null && !regatta.controlTrackingFromStartAndFinishTimes) {
-                    new AutomaticTrackingTimesDialog(stringMessages, regatta.getName(), new DialogCallback<Void>() {
+                    new AutomaticTrackingTimesDialog(stringMessages, regatta.getName(), regatta.useStartTimeInference, new DialogCallback<Void>() {
                         @Override
                         public void ok(final Void result) {
                             enableAutomaticTrackingTimes(regatta,
@@ -731,7 +731,7 @@ public class SmartphoneTrackingEventManagementPanel extends AbstractLeaderboardC
     private void enableAutomaticTrackingTimes(final RegattaDTO regatta, final Runnable onSuccess) {
         sailingServiceWrite.updateRegatta(regatta.getRegattaIdentifier(), regatta.startDate, regatta.endDate,
                 Util.mapToArrayList(regatta.courseAreas, CourseAreaDTO::getId), regatta.configuration,
-                regatta.buoyZoneRadiusInHullLengths, regatta.useStartTimeInference,
+                regatta.buoyZoneRadiusInHullLengths, /* useStartTimeInference */ false,
                 /* controlTrackingFromStartAndFinishTimes */ true, regatta.autoRestartTrackingUponCompetitorSetChange,
                 regatta.registrationLinkSecret, regatta.competitorRegistrationType,
                 new MarkedAsyncCallback<Void>(new AsyncCallback<Void>() {
@@ -743,7 +743,10 @@ public class SmartphoneTrackingEventManagementPanel extends AbstractLeaderboardC
                     @Override
                     public void onSuccess(final Void result) {
                         // Keep the subsequent course-designer update from restoring the old tracking-times setting.
+                        // Start-time inference and automatic tracking times are mutually exclusive on the server, so
+                        // the update above also cleared inference; mirror that on the cached DTO.
                         regatta.controlTrackingFromStartAndFinishTimes = true;
+                        regatta.useStartTimeInference = false;
                         presenter.getRegattasRefresher().reloadAndCallFillAll();
                         Notification.notify(stringMessages.automaticTrackingTimesEnabled(regatta.getName()),
                                 NotificationType.SUCCESS);
