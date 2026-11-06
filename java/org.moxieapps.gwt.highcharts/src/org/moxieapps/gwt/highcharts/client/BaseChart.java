@@ -1909,6 +1909,7 @@ public abstract class BaseChart<T> extends Widget {
     // Whether or not to retain the data points associated with each series in local GWT arrays (as
     // well as within the core Highcharts DOM elements)
     private boolean persistent = false;
+    private boolean autoGeneratePointIds = true;
 
     /**
      * By default the data associated with the series of the chart is only maintained within a GWT managed Java
@@ -1945,6 +1946,33 @@ public abstract class BaseChart<T> extends Widget {
      */
     public T setPersistent(boolean persistent) {
         this.persistent = persistent;
+        return returnThis();
+    }
+
+    /**
+     * Whether persistent charts automatically assign IDs to points during serialization.
+     *
+     * @return 'true' by default; see {@link #setAutoGeneratePointIds(boolean)}.
+     */
+    public boolean isAutoGeneratePointIds() {
+        return autoGeneratePointIds;
+    }
+
+    /**
+     * Controls automatic point-ID generation for persistent charts, independently of retaining their data.
+     * Disable this for time series that can be matched by their x values: Highcharts otherwise searches the
+     * entire chart for each point ID during a data update. Configure this before adding points; existing IDs,
+     * including explicitly supplied IDs and IDs needed by {@link Point#setParent(Point)}, are retained.
+     * <p/>
+     * Points without IDs cannot be correlated with their retained counterparts by {@link Series#removePoint(Point)}.
+     * This option does not affect series IDs or {@link #setPersistent(boolean) data retention}.
+     *
+     * @param autoGeneratePointIds 'true' to generate point IDs automatically when persistence is enabled;
+     *                            defaults to 'true' for compatibility.
+     * @return A reference to this {@link BaseChart} instance for convenient method chaining.
+     */
+    public T setAutoGeneratePointIds(final boolean autoGeneratePointIds) {
+        this.autoGeneratePointIds = autoGeneratePointIds;
         return returnThis();
     }
 
@@ -2743,10 +2771,12 @@ public abstract class BaseChart<T> extends Widget {
     }
 
     // Purposefully package scope
-    JSONValue addPointId(Point point, JSONObject options) {
+    JSONValue addPointId(final Point point, final JSONObject options) {
         if (isPersistent()) {
-            String id = point.getId(true);
-            options.put("id", new JSONString(id));
+            final String id = point.getId(isAutoGeneratePointIds());
+            if (id != null) {
+                options.put("id", new JSONString(id));
+            }
         }
         return options;
     }
