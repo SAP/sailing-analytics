@@ -88,6 +88,26 @@ public class SmartphoneTrackingEventManagementPanelPO extends PageArea {
         waitForAjaxRequests();
     }
 
+    public void clickDenoteForRaceLogTracking(final DataEntryPO aLeaderboard) {
+        aLeaderboard.clickActionImage(ACTION_DENOTE_FOR_RACELOG_TRACKING);
+        waitForAjaxRequests();
+    }
+
+    public boolean isAutomaticTrackingTimesDialogShown() {
+        return !driver.findElements(new BySeleniumId("AutomaticTrackingTimesDialog")).isEmpty();
+    }
+
+    public void applyAutomaticTrackingTimesAndFinishDenotation() {
+        // Confirm the automatic-tracking-times suggestion popup; its OK button applies the setting.
+        final WebElement automaticTrackingTimesDialog = findElementBySeleniumId(this.driver,
+                "AutomaticTrackingTimesDialog");
+        automaticTrackingTimesDialog.findElement(new BySeleniumId("OkButton")).click();
+        waitForAjaxRequests();
+        // The race-name prefix dialog follows; confirm it with its default prefix.
+        findElementBySeleniumId(this.driver, "OkButton").click();
+        waitForAjaxRequests();
+    }
+
     public void startTrackingForRace(final String raceName) {
         // Notifications from previous actions may cover the button on CI
         dismissAllExistingNotifications();
