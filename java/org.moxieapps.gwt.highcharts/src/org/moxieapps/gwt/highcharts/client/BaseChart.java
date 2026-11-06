@@ -1909,6 +1909,14 @@ public abstract class BaseChart<T> extends Widget {
     // Whether or not to retain the data points associated with each series in local GWT arrays (as
     // well as within the core Highcharts DOM elements)
     private boolean persistent = false;
+
+    /**
+     * Whether to generate missing point IDs during serialization when {@link #persistent} is enabled.
+     * Defaults to {@code true} for backward compatibility. Disabling this avoids costly ID-based matching
+     * during Highcharts data updates while preserving retained point data and existing IDs.
+     *
+     * @see #setAutoGeneratePointIds(boolean)
+     */
     private boolean autoGeneratePointIds = true;
 
     /**
