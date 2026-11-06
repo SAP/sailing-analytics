@@ -1,6 +1,6 @@
 We want all local variables, fields, and parameters to be declared "final" as far as possible.
 
-We want all literals used as parameters (true, false, numeric literals, Optional.empty() and null) to be prefixed with a comment telling the parameter name.
+We want all literals used as parameters (true, false, numeric literals, Optional.empty() and null) to be prefixed with a comment telling the parameter name. Exception: when a method takes a single parameter and the method name already conveys its semantics (e.g. a lone boolean argument to a setter like setUseStartTimeInference(true)), do not add the comment.
 
 We want a single exit point in any method only, so no multiple "return" statements.
 
