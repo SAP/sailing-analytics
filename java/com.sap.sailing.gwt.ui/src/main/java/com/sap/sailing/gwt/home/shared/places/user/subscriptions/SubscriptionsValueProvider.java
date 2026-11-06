@@ -7,6 +7,9 @@ import java.util.function.BiConsumer;
 
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.i18n.client.CurrencyData;
+import com.google.gwt.i18n.client.CurrencyList;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.resources.client.DataResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.sap.sailing.gwt.common.client.SharedResources;
@@ -68,8 +71,22 @@ public class SubscriptionsValueProvider {
         return subscription.isInTrial() ? subscription.getTrialEnd() : subscription.getCurrentTermEnd();
     }
 
+    /**
+     * Formats the recurring payment amount according to the current locale's conventions for the subscription's
+     * currency, e.g. "€54.78" in English or "54,78 €" in German. For a currency code unknown to GWT, the amount is
+     * followed by the plain currency code, separated by a no-break space, rather than failing.
+     */
     public String getRecurringPayment(final SubscriptionDTO subscription) {
-        return i18n.currencyValue(subscription.getReoccuringPaymentValue() / 100, subscription.getCurrencyCode());
+        final double value = subscription.getReoccuringPaymentValue() / 100.0;
+        final String currencyCode = subscription.getCurrencyCode();
+        final CurrencyData currencyData = currencyCode == null ? null : CurrencyList.get().lookup(currencyCode);
+        final String result;
+        if (currencyData != null) {
+            result = NumberFormat.getCurrencyFormat(currencyData).format(value);
+        } else {
+            result = NumberFormat.getFormat("#0.00").format(value) + (currencyCode == null ? "" : "\u00a0" + currencyCode);
+        }
+        return result;
     }
 
 }

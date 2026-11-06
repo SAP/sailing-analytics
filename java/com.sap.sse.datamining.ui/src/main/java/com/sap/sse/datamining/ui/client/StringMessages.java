@@ -94,17 +94,7 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages {
     String any();
     String and();
     String followingStatisticsAreNotSupportedByAggregatorWarning();
-    String configureQueryParametersDialog();
     String parameterType(String typeName);
-    String allValues();
-    String listOfValues();
-    String containsText();
-    String endsWithText();
-    String startsWithText();
-    String itemsMatchingTextConstraint();
-    String selectItemsAvailableForParameter();
-    String apply();
-    String noMatchingValuesOrNoFilter();
     String filterDimensionValues();
     String pickOrCreateReportParameter();
     String pickOrCreateReportParameterMessage();

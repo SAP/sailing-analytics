@@ -16,6 +16,7 @@ import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardConfig
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardDetailsPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.leaderboard.LeaderboardDetailsPanelPO.RaceDescriptor;
 import com.sap.sailing.selenium.pages.adminconsole.regatta.RegattaDetailsCompositePO;
+import com.sap.sailing.selenium.pages.adminconsole.regatta.RegattaEditDialogPO;
 import com.sap.sailing.selenium.pages.adminconsole.regatta.RegattaListCompositePO.RegattaDescriptor;
 import com.sap.sailing.selenium.pages.adminconsole.regatta.RegattaStructureManagementPanelPO;
 import com.sap.sailing.selenium.pages.adminconsole.regatta.SeriesEditDialogPO;
@@ -59,7 +60,6 @@ public class TestLeaderboardConfiguration extends AbstractSeleniumTest {
             TrackableRaceDescriptor trackableRace = new TrackableRaceDescriptor(EVENT,  raceName, BOAT_CLASS);
             TrackedRaceDescriptor trackedRace = new TrackedRaceDescriptor(this.regatta.toString(), BOAT_CLASS, raceName);
             RaceDescriptor leaderboardRace = new RaceDescriptor(String.format("D%s", i), "Default", false, false, 0);
-            
             this.trackableRaces.add(trackableRace);
             this.trackedRaces.add(trackedRace);
             this.leaderboardRaces.add(leaderboardRace);
@@ -182,28 +182,28 @@ public class TestLeaderboardConfiguration extends AbstractSeleniumTest {
     private void configureLeaderboard() {
         // Open the admin console for some configuration steps
         AdminConsolePage adminConsole = AdminConsolePage.goToPage(getWebDriver(), getContextRoot());
-        
         // Create a regatta with 1 series and 5 races as well as a leaderborad
         RegattaStructureManagementPanelPO regattaStructure = adminConsole.goToRegattaStructure();
         regattaStructure.createRegatta(this.regatta, /* withDefaultLeaderboard */ false);
-        
+        // The races tracked below (IDM 5O5 2013) carry no race start times on the TracTrac side, so the expected
+        // scores only materialize when start times are inferred from the start-line mark passings. New regattas now
+        // default start-time inference off, hence enable it explicitly for this fixture.
+        final RegattaEditDialogPO regattaEditDialog = regattaStructure.getRegattaList().editRegatta(this.regatta);
+        regattaEditDialog.setUseStartTimeInference(true);
+        regattaEditDialog.pressOk();
         RegattaDetailsCompositePO regattaDetails = regattaStructure.getRegattaDetails(this.regatta);
         SeriesEditDialogPO seriesDialog = regattaDetails.editSeries(RegattaStructureManagementPanelPO.DEFAULT_SERIES_NAME);
         seriesDialog.addRaces(1, 5);
         seriesDialog.pressOk();
-        
         regattaDetails.deleteSeries("Default");
-        
         LeaderboardConfigurationPanelPO leaderboardConfiguration = adminConsole.goToLeaderboardConfiguration();
         leaderboardConfiguration.createRegattaLeaderboard(this.regatta);
-        
         // Start the tracking for the races and wait until they are ready to use
         TracTracEventManagementPanelPO tracTracEvents = adminConsole.goToTracTracEvents();
         tracTracEvents.addConnectionAndListTrackableRaces(IDM_5O5_2013_JSON_URL);
         tracTracEvents.setReggataForTracking(this.regatta);
         tracTracEvents.setTrackSettings(false, false, false);
         tracTracEvents.startTrackingForRaces(trackableRaces);
-        
         TrackedRacesListPO trackedRacesList = tracTracEvents.getTrackedRacesList();
         trackedRacesList.waitForTrackedRaces(this.trackedRaces, Status.FINISHED); // TracAPI puts REPLAY races into FINISHED mode when done loading
         trackedRacesList.stopTracking(this.trackedRaces);
