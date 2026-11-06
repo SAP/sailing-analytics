@@ -1146,7 +1146,6 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     
     String videoUrl();
     String language();
-    String videoLengthSeconds();
     String thumbnailUrl();
     
     String videosWithCount(int number);
@@ -2290,12 +2289,8 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     String pleaseSelectAValidPassingInstruction();
     String pleaseSelectAValidMarkTemplate();
     String doYouReallyWantToRemoveCourseTemplate(String name);
-    String doYouReallyWantToRemoveCourseTemplates();
-    String doYouReallyWantToRemoveNonVisibleCourseTemplates(String message);
     String couldNotRemoveCourseTemplate(String message);
     String doYouReallyWantToRemoveMarkProperties(String name);
-    String doYouReallyWantToRemoveSeveralMarkProperties();
-    String doYouReallyWantToRemoveNonVisibleMarkProperties(String message);
     String couldNotRemoveMarkProperties(String message);
     String markRoles();
     String filterMarkRoles();
