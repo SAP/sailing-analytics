@@ -6,7 +6,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -196,23 +195,20 @@ public class ReplicationReceiverImpl implements ReplicationReceiver, Runnable {
      * Starts fetching messages from the {@link #consumer}, uncompresses and de-serializes {@link Operation} objects from
      * the stream and applies them to local {@link Replicable}s.<p>
      * 
-     * Two protocol versions are supported:
-     * <ol>
-     * <li>For backward compatibility, if the compressed stream starts with a regular replicable ID as a string, operations
-     * are expected to be encoded one by one as {@code byte[]} objects to be de-serialized from an {@link ObjectInputStream}.
-     * Each such {@code byte[]} is then assumed to represents objects serialized by an {@link ObjectOutputStream}, so they
-     * can be read by an {@link ObjectInputStream}. Typically, the legacy format has exactly one operation per {@code byte[]}
-     * (which is partly explaining why performance was not very good). The stream for reading the nested {@code byte[]} is
-     * produced by the {@link Replicable#createObjectInputStreamResolvingAgainstCache(InputStream, Map)} method in order
-     * to avoid duplicates and for setting up proper class loading for the {@link Replicable}'s context.</li>
-     * <li></li>
-     * </ol>
-     * After receiving a single message, assumes it's a
-     * {@link ReplicationServiceImpl#createUncompressingInputStream(InputStream) compressed} stream that first
-     * {@link DataInputStream#readUTF() encodes a UTF string} representing the {@link Replicable#getId() replicable ID},
-     * followed by a sequence of serialized {@code byte[]} objects which each can be {@link Replicable#readOperation(InputStream, Map) de-serialized}
-     * by the receiving {@link Replicable} identified by the ID received as a prefix. This method then applies these operations to the
-     * {@link Replicable} identified by the ID, retrieved through the {@link #replicableProvider}.
+     * Each message is expected to be a {@link ReplicationServiceImpl#createUncompressingInputStream(InputStream)
+     * compressed} stream that starts with the {@link ReplicationReceiver#VERSION_INDICATOR version indicator}, followed
+     * by a single byte holding the protocol version and then the {@link Replicable#getId() replicable ID}; version
+     * indicator and replicable ID are {@link DataInputStream#readUTF() encoded as UTF strings}. All operations of the
+     * message then follow in a single
+     * {@link ObjectInputStream} produced by the
+     * {@link Replicable#createObjectInputStreamResolvingAgainstCache(InputStream, Map)} method in order to avoid
+     * duplicates and for setting up proper class loading for the {@link Replicable}'s context. This method then applies
+     * these operations to the {@link Replicable} identified by the ID, retrieved through the
+     * {@link #replicableProvider}. The corresponding writer is {@link OperationSerializerBufferImpl}.<p>
+     * 
+     * Messages that do not start with the version indicator, such as messages in the legacy protocol which started
+     * with the replicable ID and encoded each operation as a separately serialized {@code byte[]}, are no longer
+     * supported; they are logged and dropped.
      * 
      * @see ReplicationServiceExecutionListener#executed(OperationWithResult)
      */
@@ -246,59 +242,47 @@ public class ReplicationReceiverImpl implements ReplicationReceiver, Runnable {
                 checksPerformed = 0;
                 final InputStream uncompressingInputStream = ReplicationServiceImpl.createUncompressingInputStream(new ByteArrayInputStream(bytesFromMessage));
                 final DataInputStream dataInputStream = new DataInputStream(uncompressingInputStream);
-                final String replicableIdAsStringOrVersionIndicator = dataInputStream.readUTF();
-                final String replicableIdAsString;
-                final boolean legacyVersion;
-                if (replicableIdAsStringOrVersionIndicator.equals(VERSION_INDICATOR)) {
-                    legacyVersion = false;
+                final String versionIndicator = dataInputStream.readUTF();
+                if (!versionIndicator.equals(VERSION_INDICATOR)) {
+                    logger.warning("Dropping replication message that does not start with protocol version indicator "
+                            + VERSION_INDICATOR + " but with " + versionIndicator
+                            + "; the legacy replication protocol is no longer supported");
+                } else {
                     final int protocolVersion = dataInputStream.read();
                     logger.fine(()->"Found protocol version "+protocolVersion);
-                    replicableIdAsString = dataInputStream.readUTF();
-                } else {
-                    legacyVersion = true;
-                    logger.fine("No protocol version indicator found; using legacy protocol");
-                    replicableIdAsString = replicableIdAsStringOrVersionIndicator;
-                }
-                // TODO bug 2465: decide based on the master descriptor whether we want to process this message; if it's for a Replicable we're not replicating from that master, drop the message
-                Replicable<?, ?> replicable = replicableProvider.getReplicable(replicableIdAsString, /* wait */ false);
-                if (replicable != null) {
-                    final Map<String, Class<?>> classLoaderCache = new HashMap<>();
-                    final ObjectInputStream ois = legacyVersion
-                            ? new ObjectInputStream(uncompressingInputStream) // no special stream required; only reading a generic byte[]
-                            : replicable.createObjectInputStreamResolvingAgainstCache(uncompressingInputStream, classLoaderCache);
-                    int operationsInMessage = 0;
-                    try {
-                        while (true) {
-                            if (legacyVersion) {
-                                byte[] serializedOperation = (byte[]) ois.readObject();
-                                if (Util.contains(master.getReplicables(), replicable)) {
-                                    readLegacyOperationAndApplyOrQueueIt(replicable, serializedOperation, classLoaderCache);
-                                }
-                            } else {
+                    final String replicableIdAsString = dataInputStream.readUTF();
+                    // TODO bug 2465: decide based on the master descriptor whether we want to process this message; if it's for a Replicable we're not replicating from that master, drop the message
+                    final Replicable<?, ?> replicable = replicableProvider.getReplicable(replicableIdAsString, /* wait */ false);
+                    if (replicable != null) {
+                        final Map<String, Class<?>> classLoaderCache = new HashMap<>();
+                        final ObjectInputStream ois = replicable.createObjectInputStreamResolvingAgainstCache(uncompressingInputStream, classLoaderCache);
+                        int operationsInMessage = 0;
+                        try {
+                            while (true) {
                                 readOperationAndApplyOrQueueIt(replicable, ois);
-                            }
-                            if (Util.contains(master.getReplicables(), replicable)) {
-                                operationCount++;
-                                operationsInMessage++;
-                                if (operationCount % 10000l == 0) {
-                                    logger.info("Received " + operationCount + " operations so far");
+                                if (Util.contains(master.getReplicables(), replicable)) {
+                                    operationCount++;
+                                    operationsInMessage++;
+                                    if (operationCount % 10000l == 0) {
+                                        logger.info("Received " + operationCount + " operations so far");
+                                    }
+                                } else {
+                                    logger.fine("Dropping operation for non-replicated replicable "+replicable.getId());
                                 }
-                            } else {
-                                logger.fine("Dropping operation for non-replicated replicable "+replicable.getId());
                             }
+                        } catch (EOFException eof) {
+                            logger.fine("Reached EOF on replication message after having read " + operationsInMessage
+                                    + " operations");
+                            // reached EOF; expected
                         }
-                    } catch (EOFException eof) {
-                        logger.fine("Reached EOF on replication message after having read " + operationsInMessage
-                                + " operations");
-                        // reached EOF; expected
+                    } else {
+                        // otherwise, we don't know the replicable and simply drop the message with all the operations for the unknown recipient
+                        Stream<Named> sn = StreamSupport.stream(replicableProvider.getReplicables().spliterator(), /* parallel */ false)
+                            .map(r->(() -> r.getId().toString()));
+                        logger.warning("received replication message for replicable with ID "+replicableIdAsString+" which is unknnown by this replicator "+
+                                "which only knows "+
+                                Util.join(", ", sn::iterator));
                     }
-                } else {
-                    // otherwise, we don't know the replicable and simply drop the message with all the operations for the unknown recipient
-                    Stream<Named> sn = StreamSupport.stream(replicableProvider.getReplicables().spliterator(), /* parallel */ false)
-                        .map(r->(() -> r.getId().toString()));
-                    logger.warning("received replication message for replicable with ID "+replicableIdAsString+" which is unknnown by this replicator "+
-                            "which only knows "+
-                            Util.join(", ", sn::iterator));
                 }
             } catch (ConsumerCancelledException cce) {
                 logger.info("Consumer has been shut down properly.");
@@ -388,13 +372,6 @@ public class ReplicationReceiverImpl implements ReplicationReceiver, Runnable {
             logger.log(Level.WARNING, "Error getting security service", e);
             return null;
         }
-    }
-
-    private <S, O extends OperationWithResult<S, ?>> void readLegacyOperationAndApplyOrQueueIt(
-            Replicable<S, O> replicable, byte[] serializedOperation, Map<String, Class<?>> classLoaderCache)
-            throws ClassNotFoundException, IOException {
-        O operation = replicable.readOperation(new ByteArrayInputStream(serializedOperation), classLoaderCache);
-        applyOrQueue(operation, replicable);
     }
 
     /**

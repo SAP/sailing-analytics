@@ -20,6 +20,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
@@ -43,50 +44,85 @@ import net.jpountz.lz4.LZ4BlockOutputStream;
 public class ReplicationReceiverExceptionTest {
     @Test
     public void testCurrentMessageContinuesAfterFailedOperations() throws Exception {
-        assertFollowingOperationsApplied(/* legacy */ false, /* startSuspended */ false, /* asynchronous */ false);
-    }
-
-    @Test
-    public void testLegacyMessageContinuesAfterFailedOperations() throws Exception {
-        assertFollowingOperationsApplied(/* legacy */ true, /* startSuspended */ false, /* asynchronous */ false);
+        assertFollowingOperationsApplied(/* startSuspended */ false, /* asynchronous */ false);
     }
 
     @Test
     public void testSuspendedCurrentMessageContinuesAfterFailedOperations() throws Exception {
-        assertFollowingOperationsApplied(/* legacy */ false, /* startSuspended */ true, /* asynchronous */ false);
-    }
-
-    @Test
-    public void testSuspendedLegacyMessageContinuesAfterFailedOperations() throws Exception {
-        assertFollowingOperationsApplied(/* legacy */ true, /* startSuspended */ true, /* asynchronous */ false);
+        assertFollowingOperationsApplied(/* startSuspended */ true, /* asynchronous */ false);
     }
 
     @Test
     public void testAsynchronousCurrentMessageContinuesAfterFailedOperations() throws Exception {
-        assertFollowingOperationsApplied(/* legacy */ false, /* startSuspended */ false, /* asynchronous */ true);
+        assertFollowingOperationsApplied(/* startSuspended */ false, /* asynchronous */ true);
     }
 
     @Test
-    public void testAsynchronousLegacyMessageContinuesAfterFailedOperations() throws Exception {
-        assertFollowingOperationsApplied(/* legacy */ true, /* startSuspended */ false, /* asynchronous */ true);
+    public void testLegacyMessageIsDropped() throws Exception {
+        final TestReplica replica = new TestReplica();
+        final QueueingConsumer consumer = new QueueingConsumer(mock(Channel.class));
+        consumer.handleDelivery("test", new Envelope(/* deliveryTag */ 1, /* redeliver */ false, "test", "test"),
+                /* props */ null, serializeMessage(replica, /* legacy */ true, /* asynchronous */ false,
+                        TestOperation.BEFORE));
+        consumer.handleDelivery("test", new Envelope(/* deliveryTag */ 2, /* redeliver */ false, "test", "test"),
+                /* props */ null, serializeMessage(replica, /* legacy */ false, /* asynchronous */ false,
+                        TestOperation.NEXT_MESSAGE));
+        consumer.handleCancel("test");
+        final ReplicationReceiverImpl receiver = createReceiver(replica, /* startSuspended */ false, consumer);
+        final List<LogRecord> warnings = new CopyOnWriteArrayList<>();
+        final Logger logger = Logger.getLogger(ReplicationReceiverImpl.class.getName());
+        final Handler handler = new Handler() {
+            @Override
+            public void publish(final LogRecord record) {
+                if (record.getLevel() == Level.WARNING) {
+                    warnings.add(record);
+                }
+            }
+
+            @Override
+            public void flush() {
+            }
+
+            @Override
+            public void close() {
+            }
+        };
+        logger.addHandler(handler);
+        try {
+            receiver.run();
+            assertTrue(replica.completed.await(/* timeout */ 5, TimeUnit.SECONDS),
+                    "The operation in the current-protocol message did not complete; replica state: " + replica.entries);
+            assertEquals(Arrays.asList("NEXT_MESSAGE"), replica.entries);
+            assertTrue(warnings.stream().anyMatch(
+                    (final LogRecord record) -> record.getMessage().contains("legacy replication protocol")),
+                    "Dropping a legacy message must be logged");
+        } finally {
+            logger.removeHandler(handler);
+            receiver.stop(/* applyQueuedMessages */ false);
+        }
     }
 
-    private void assertFollowingOperationsApplied(final boolean legacy, final boolean startSuspended,
-            final boolean asynchronous) throws Exception {
-        final TestReplica replica = new TestReplica();
+    private ReplicationReceiverImpl createReceiver(final TestReplica replica, final boolean startSuspended,
+            final QueueingConsumer consumer) {
         final ReplicationMasterDescriptor master = mock(ReplicationMasterDescriptor.class);
         final ReplicablesProvider provider = mock(ReplicablesProvider.class);
         when(master.getReplicables()).thenReturn(Collections.singleton(replica));
         doReturn(replica).when(provider).getReplicable(replica.getId().toString(), /* wait */ false);
+        return new ReplicationReceiverImpl(master, provider, startSuspended, consumer);
+    }
+
+    private void assertFollowingOperationsApplied(final boolean startSuspended, final boolean asynchronous)
+            throws Exception {
+        final TestReplica replica = new TestReplica();
         final QueueingConsumer consumer = new QueueingConsumer(mock(Channel.class));
         // Both failures and the following successful operation are deliberately in one transport message.
         consumer.handleDelivery("test", new Envelope(/* deliveryTag */ 1, /* redeliver */ false, "test", "test"),
-                /* props */ null, serializeMessage(replica, legacy, asynchronous, TestOperation.BEFORE,
+                /* props */ null, serializeMessage(replica, /* legacy */ false, asynchronous, TestOperation.BEFORE,
                         TestOperation.CONFLICT, TestOperation.CHECKED_FAILURE, TestOperation.AFTER));
         consumer.handleDelivery("test", new Envelope(/* deliveryTag */ 2, /* redeliver */ false, "test", "test"),
-                /* props */ null, serializeMessage(replica, legacy, asynchronous, TestOperation.NEXT_MESSAGE));
+                /* props */ null, serializeMessage(replica, /* legacy */ false, asynchronous, TestOperation.NEXT_MESSAGE));
         consumer.handleCancel("test");
-        final ReplicationReceiverImpl receiver = new ReplicationReceiverImpl(master, provider, startSuspended, consumer);
+        final ReplicationReceiverImpl receiver = createReceiver(replica, startSuspended, consumer);
         final List<LogRecord> failures = new CopyOnWriteArrayList<>();
         final Logger logger = Logger.getLogger(ReplicationReceiverImpl.class.getName());
         final Handler handler = new Handler() {
