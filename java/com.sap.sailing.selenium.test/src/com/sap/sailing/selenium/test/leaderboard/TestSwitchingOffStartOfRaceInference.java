@@ -97,6 +97,12 @@ public class TestSwitchingOffStartOfRaceInference extends AbstractSeleniumTest {
         // Create a regatta with 1 series and 5 races as well as a leaderboard
         RegattaStructureManagementPanelPO regattaStructure = adminConsole.goToRegattaStructure();
         regattaStructure.createRegatta(this.regatta, /* withDefaultLeaderboard */ false);
+        // This test first expects inferred scores (BMW Cup Race 3 has no race start time on the TracTrac side) and
+        // only then switches inference off to verify the scores disappear. New regattas now default start-time
+        // inference off, so enable it explicitly to establish the expected initial state.
+        final RegattaEditDialogPO regattaEditDialog = regattaStructure.getRegattaList().editRegatta(this.regatta);
+        regattaEditDialog.setUseStartTimeInference(true);
+        regattaEditDialog.pressOk();
         RegattaDetailsCompositePO regattaDetails = regattaStructure.getRegattaDetails(this.regatta);
         SeriesEditDialogPO seriesDialog = regattaDetails.editSeries(RegattaStructureManagementPanelPO.DEFAULT_SERIES_NAME);
         seriesDialog.addRaces(3, 3);
