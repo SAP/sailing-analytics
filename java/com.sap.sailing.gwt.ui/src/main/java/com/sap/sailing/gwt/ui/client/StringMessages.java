@@ -1461,6 +1461,13 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     String actionAnalyze();
     String inviteSelectedCompetitors();
     String denoteAllRacesForRaceLogTrackingShorctut();
+    String automaticTrackingTimes();
+    String suggestAutomaticTrackingTimes(String regattaName, String settingName);
+    String suggestAutomaticTrackingTimesAlsoDisablesInference(String regattaName, String inferenceSettingName, String trackingSettingName);
+    String applyAutomaticTrackingTimes();
+    String continueWithManualTrackingTimes();
+    String learnMoreAboutRaceManagerApp();
+    String automaticTrackingTimesEnabled(String regattaName);
     String registerCompetitors();
     String registerBoats();
     String createDefaultRegattaLeaderboard();

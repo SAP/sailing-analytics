@@ -76,8 +76,34 @@ public class SmartphoneTrackingEventManagementPanelPO extends PageArea {
         return this.waitForPO(MapDevicesDialogPO::new, "regattaLogTrackingDeviceMappingsDialog");
     }
 
-    public void denoteLeaderboardForRaceLogTracking(DataEntryPO aLeaderboard) {
+    public void denoteLeaderboardForRaceLogTracking(final DataEntryPO aLeaderboard) {
         aLeaderboard.clickActionImage(ACTION_DENOTE_FOR_RACELOG_TRACKING);
+        waitForAjaxRequests();
+        final List<WebElement> automaticTrackingTimesDialogs = driver.findElements(
+                new BySeleniumId("AutomaticTrackingTimesDialog"));
+        if (!automaticTrackingTimesDialogs.isEmpty()) {
+            automaticTrackingTimesDialogs.get(/* index */ 0).findElement(new BySeleniumId("CancelButton")).click();
+        }
+        findElementBySeleniumId(this.driver, "OkButton").click();
+        waitForAjaxRequests();
+    }
+
+    public void clickDenoteForRaceLogTracking(final DataEntryPO aLeaderboard) {
+        aLeaderboard.clickActionImage(ACTION_DENOTE_FOR_RACELOG_TRACKING);
+        waitForAjaxRequests();
+    }
+
+    public boolean isAutomaticTrackingTimesDialogShown() {
+        return !driver.findElements(new BySeleniumId("AutomaticTrackingTimesDialog")).isEmpty();
+    }
+
+    public void applyAutomaticTrackingTimesAndFinishDenotation() {
+        // Confirm the automatic-tracking-times suggestion popup; its OK button applies the setting.
+        final WebElement automaticTrackingTimesDialog = findElementBySeleniumId(this.driver,
+                "AutomaticTrackingTimesDialog");
+        automaticTrackingTimesDialog.findElement(new BySeleniumId("OkButton")).click();
+        waitForAjaxRequests();
+        // The race-name prefix dialog follows; confirm it with its default prefix.
         findElementBySeleniumId(this.driver, "OkButton").click();
         waitForAjaxRequests();
     }
