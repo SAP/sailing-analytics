@@ -1,10 +1,17 @@
 # Sailing GWT UI tests
 
-Run `Refresher Tests.launch` in Eclipse to execute the refresher regression tests on Java 8.
+These regression tests are for local Eclipse execution only. This project intentionally has
+no Maven POM and is not listed in `java/pom.xml`, so the Maven/CI build does not compile or run it.
+
+Import this directory using **File > Import > General > Existing Projects into Workspace**
+alongside the Sailing Analytics projects. Configure a Java 8 JDK for the `JavaSE-1.8` execution
+environment, then right-click `Refresher Tests.launch` and select **Run As > JUnit Test**.
 The launch uses the client-side `gwt-user.jar` and the required project outputs. It excludes
 `gwt-dev.jar` and `gwt-servlet.jar`, whose GWT 2.12 `GWTBridge` class requires Java 11 and is
-not needed for these plain-JVM tests. `MarkedAsyncCallback` already supports running without
-the GWT bridge.
+not needed for these plain-JVM tests. With this restricted classpath, `MarkedAsyncCallback`
+uses its fallback for an unavailable GWT runtime. Use the supplied launch configuration:
+the Java 8 Tycho/OSGi test runtime includes the incompatible bridge and fails with
+`UnsupportedClassVersionError`, which that fallback does not handle.
 
 The tests control completion of each asynchronous load explicitly, covering overlapping
 recipient requests, deduplication, registration snapshots, cache reuse, reentrant reloads,
