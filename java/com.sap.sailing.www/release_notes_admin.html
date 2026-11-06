@@ -10,7 +10,7 @@
 <body>
     <div class="logoAndTitlePanel">
         <script>
-            if (!${clientConfigurationContext['debrandingActive']}){
+            if ("${clientConfigurationContext['debrandingActive']}" === "false") {
                 document.write("<a class=\"sapLogo\" href=\"https://www.sap.com?campaigncode=CRM-XH21-OSP-Sailing\"><img class=\"sapLogoImage\" src=\"/images/logo-small@2x.png\" alt=\"SAP Website\"/></a>\r\n");
             }
         </script>
@@ -38,7 +38,7 @@
                     to be processed.</li>
                 <li>Media link detection (as other re-directs) did not follow HTTP 303 response codes,
                     leading to false-positive messages about unreachable media, in particular YouTube videos,
-                    which has now been fixed.</li> 
+                    which has now been fixed.</li>
           </ul>
           <h2 class="articleSubheadline">October 2026</h2>
           <ul class="bulletList">

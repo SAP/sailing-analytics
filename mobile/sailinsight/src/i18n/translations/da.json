@@ -108,7 +108,7 @@
   "text_placeholder_session_name": "Navn på begivenhed",
   "text_edit_session_claim_01": "Præciser din begivenhed med specifikke ",
   "text_edit_session_claim_02": "oplysninger om din bane og dit team.",
-  "text_edit_competitor_claim_01": "Præciser din deltagelse med specifikke",
+  "text_edit_competitor_claim_01": "Præciser din deltagelse med specifikke ",
   "text_edit_competitor_claim_02": "oplysninger om din konkurrent og dit team.",
   "text_share_session_description": "Hej! Tag med på en tur med mig!",
   "text_share_session_message_header": "Tilmeld dig {{regattaName}}",
