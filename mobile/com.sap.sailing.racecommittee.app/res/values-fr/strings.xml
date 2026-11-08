@@ -470,7 +470,7 @@
     <string name="dependent_races_prompt">"Sélectionnez la course"</string>
     <string name="minutes_after">"Minutes après"</string>
     <string name="minutes_after_long">"%1$.0f min. après %2$s"</string>
-    <string name="wind_accuracy_ago">"il y a "</string>
+    <string name="wind_accuracy_ago">"il y a"</string>
     <string name="gate_time_schedule_long">"%1$d + %2$d = %3$d minutes"</string>
     <string name="gate_time_schedule_short">"%d minutes"</string>
     <string name="not_available">"sans objet"</string>
