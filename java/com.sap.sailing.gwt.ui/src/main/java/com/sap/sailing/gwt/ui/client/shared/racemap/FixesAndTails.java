@@ -287,18 +287,11 @@ public class FixesAndTails {
          * when there is actually position data to fetch.
          */
         void executeWithTimeRanges(final TimeRangesConsumer consumer) {
-            final Map<String, Date> fromTimes = new HashMap<>();
-            final Map<String, Date> toTimes = new HashMap<>();
-            for (final Entry<String, TimeRange> e : timeRangesByCompetitorIdAsString.entrySet()) {
-                if (!ignoreFixesForTheseCompetitorIdsAsString.contains(e.getKey())) {
-                    fromTimes.put(e.getKey(), e.getValue().from().asDate());
-                    toTimes.put(e.getKey(), e.getValue().to().asDate());
-                }
-            }
-            if (!fromTimes.isEmpty()) {
+            final Pair<Map<String, Date>, Map<String, Date>> fromAndTo = computeFromAndToMaps();
+            if (!fromAndTo.getA().isEmpty()) {
                 register();
             }
-            consumer.accept(fromTimes, toTimes);
+            consumer.accept(fromAndTo.getA(), fromAndTo.getB());
         }
 
         /**
@@ -309,6 +302,14 @@ public class FixesAndTails {
          * allowing the caller to fire the corresponding RPC.
          */
         void executeForNonEmptyTimeRanges(final TimeRangesConsumer consumer) {
+            final Pair<Map<String, Date>, Map<String, Date>> fromAndTo = computeFromAndToMaps();
+            if (!fromAndTo.getA().isEmpty()) {
+                register();
+                consumer.accept(fromAndTo.getA(), fromAndTo.getB());
+            }
+        }
+
+        private Pair<Map<String, Date>, Map<String, Date>> computeFromAndToMaps() {
             final Map<String, Date> fromTimes = new HashMap<>();
             final Map<String, Date> toTimes = new HashMap<>();
             for (final Entry<String, TimeRange> e : timeRangesByCompetitorIdAsString.entrySet()) {
@@ -317,16 +318,13 @@ public class FixesAndTails {
                     toTimes.put(e.getKey(), e.getValue().to().asDate());
                 }
             }
-            if (!fromTimes.isEmpty()) {
-                register();
-                consumer.accept(fromTimes, toTimes);
-            }
+            return new Pair<>(fromTimes, toTimes);
         }
 
         /**
          * Creates a {@link GetBoatPositionsCallback} pre-wired so that on success
          * {@link #processResponse(Map)} is called followed by {@code onSuccess}, and on failure
-         * {@link #cancel()} is called followed by {@code onFailure}. This keeps both sides of the
+         * {@link #processResponse()} is called followed by {@code onFailure}. This keeps both sides of the
          * callback symmetric and prevents callers from forgetting to update the in-flight state.
          */
         GetBoatPositionsCallback createCallback(final DetailType detailType,
@@ -344,7 +342,7 @@ public class FixesAndTails {
 
                 @Override
                 public void onFailure(final Throwable caught) {
-                    cancel();
+                    processResponse();
                     onFailure.accept(caught);
                 }
             });
@@ -372,16 +370,17 @@ public class FixesAndTails {
             inFlightRequests.remove(this);
         }
 
+        void processResponse() {
+            inFlightRequests.remove(this);
+        }
+
         void processResponse(Map<CompetitorDTO, GPSFixDTOWithSpeedWindTackAndLegTypeIterable> boatPositions) {
-            if (!inFlightRequests.remove(this)) {
-                // Not in inFlightRequests: either this request had empty time ranges (executeWithTimeRanges
-                // did not register it) or it was already cancelled/processed. Either way, nothing to do.
-                return;
-            }
-            for (final Entry<CompetitorDTO, GPSFixDTOWithSpeedWindTackAndLegTypeIterable> e : boatPositions.entrySet()) {
-                if (!ignoreFixesForTheseCompetitorIdsAsString.contains(e.getKey().getIdAsString())) {
-                    final boolean mustClearCache = mustClearCacheForTheseCompetitorIdsAsString.remove(e.getKey().getIdAsString());
-                    updateFixes(e.getKey(), e.getValue(), mustClearCache, transitionTimeInMillis, detailTypeForFixes);
+            if (inFlightRequests.remove(this)) {
+                for (final Entry<CompetitorDTO, GPSFixDTOWithSpeedWindTackAndLegTypeIterable> e : boatPositions.entrySet()) {
+                    if (!ignoreFixesForTheseCompetitorIdsAsString.contains(e.getKey().getIdAsString())) {
+                        final boolean mustClearCache = mustClearCacheForTheseCompetitorIdsAsString.remove(e.getKey().getIdAsString());
+                        updateFixes(e.getKey(), e.getValue(), mustClearCache, transitionTimeInMillis, detailTypeForFixes);
+                    }
                 }
             }
         }
@@ -1100,8 +1099,9 @@ public class FixesAndTails {
      * <p>
      * 
      * The {@link #earliestTimePointRequested} map is updated, assuming that the requests returned will be sent before
-     * invoking this method again. Neither {@link PositionRequest} is added to {@link #inFlightRequests} here; the caller
-     * must call {@link PositionRequest#register()} on each request only when the corresponding RPC is actually sent.
+     * invoking this method again. Neither {@link PositionRequest} is added to {@link #inFlightRequests} here;
+     * registration happens inside {@link PositionRequest#executeWithTimeRanges(TimeRangesConsumer)} and
+     * {@link PositionRequest#executeForNonEmptyTimeRanges(TimeRangesConsumer)} when the consumer fires the RPC.
      * 
      * @return a pair of {@link PositionRequest} objects; the {@link Pair#getA() first} provides the parameters for a
      *         "quick" request, assuming that only a few positions (up to {@link #MAX_DURATION_FOR_QUICK_REQUESTS}) need

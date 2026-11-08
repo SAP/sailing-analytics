@@ -1529,12 +1529,10 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
         }
         final PositionRequest quickRequest = quickAndSlowRequest.getA();
         final PositionRequest slowRequest = quickAndSlowRequest.getB();
-        final GetBoatPositionsCallback quickDropCallback = quickRequest.createCallback(detailType, competitorsByIdAsString,
+        final GetBoatPositionsCallback droppableBoatPositionsCallback = quickRequest.createCallback(detailType, competitorsByIdAsString,
                 (request, boatPositions) -> updateBoatPositions(newTime, transitionTimeInMillis, competitorsToShow,
                         boatPositions, /* updateTailsOnly */ true, detailTypeChanged, detailType),
                 t -> errorReporter.reportError("Error obtaining racemap data: " + t.getMessage(), true /*silentMode */));
-        // GetRaceMapDataAction always fires (it also fetches marks, ranks, etc.); the quick PositionRequest
-        // registers itself only when there are non-empty time ranges to fetch for positions.
         quickRequest.executeWithTimeRanges((from, to) ->
             asyncActionsExecutor.execute(new GetRaceMapDataAction(sailingService, timeRangeActionsExecutor, competitorsByIdAsString,
                         race, useNullAsTimePoint() ? null : newTime, from, to, /* extrapolate */ true,
@@ -1542,7 +1540,7 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                         raceCompetitorSet.getMd5OfIdsAsStringOfCompetitorParticipatingInRaceInAlphanumericOrderOfTheirID(),
                         newTime, settings.isShowEstimatedDuration(), detailType, leaderboardName, leaderboardGroupName, leaderboardGroupId,
                         // callback to use for alternative GetBoatPositionsAction fired when GetRaceMapDataAction gets dropped:
-                        quickDropCallback, quickRequest::dropped),
+                        droppableBoatPositionsCallback, quickRequest::dropped),
                 GET_RACE_MAP_DATA_CATEGORY,
                 getRaceMapDataCallback(newTime, transitionTimeInMillis, quickRequest, competitorsToShow,
                                        ++boatPositionRequestIDCounter, isRedraw, detailTypeChanged, detailType, competitorsByIdAsString)));
@@ -1566,7 +1564,7 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
         return new MarkedAsyncCallback<>(new AsyncCallback<RaceMapDataDTO>() {
             @Override
             public void onFailure(Throwable caught) {
-                quickRequest.cancel();
+                quickRequest.processResponse();
                 errorReporter.reportError("Error obtaining racemap data: " + caught.getMessage(), true /*silentMode */);
             }
 
