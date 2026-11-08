@@ -324,7 +324,7 @@ public class FixesAndTails {
         /**
          * Creates a {@link GetBoatPositionsCallback} pre-wired so that on success
          * {@link #processResponse(Map)} is called followed by {@code onSuccess}, and on failure
-         * {@link #processResponse()} is called followed by {@code onFailure}. This keeps both sides of the
+         * {@link #onFailure()} is called followed by {@code onFailure}. This keeps both sides of the
          * callback symmetric and prevents callers from forgetting to update the in-flight state.
          */
         GetBoatPositionsCallback createCallback(final DetailType detailType,
@@ -342,7 +342,7 @@ public class FixesAndTails {
 
                 @Override
                 public void onFailure(final Throwable caught) {
-                    processResponse();
+                    PositionRequest.this.onFailure();
                     onFailure.accept(caught);
                 }
             });
@@ -370,7 +370,7 @@ public class FixesAndTails {
             inFlightRequests.remove(this);
         }
 
-        void processResponse() {
+        void onFailure() {
             inFlightRequests.remove(this);
         }
 

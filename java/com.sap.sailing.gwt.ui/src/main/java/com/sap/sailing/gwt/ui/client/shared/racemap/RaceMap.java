@@ -1564,7 +1564,7 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
         return new MarkedAsyncCallback<>(new AsyncCallback<RaceMapDataDTO>() {
             @Override
             public void onFailure(Throwable caught) {
-                quickRequest.processResponse();
+                quickRequest.onFailure();
                 errorReporter.reportError("Error obtaining racemap data: " + caught.getMessage(), true /*silentMode */);
             }
 
