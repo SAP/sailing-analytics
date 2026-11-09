@@ -4,12 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
@@ -44,6 +47,52 @@ public class TimeRangeActionsExecutorTest {
             timeRangeMap.put(key, timeRange);
             return timeRangeMap;
         }
+    }
+
+    @Test
+    public void testEmptyRequestCompletesExactlyOnce() {
+        final TimeRangeActionsExecutor<Map<String, Integer>, Integer, String> executor = new TimeRangeActionsExecutor<>();
+        final AtomicInteger successCount = new AtomicInteger();
+        executor.execute(new TimeRangeAsyncAction<Map<String, Integer>, String>() {
+            @Override
+            public Map<String, TimeRange> getTimeRanges() {
+                return Collections.emptyMap();
+            }
+
+            @Override
+            public void execute(final Map<String, TimeRange> timeRanges,
+                    final AsyncCallback<Map<String, Integer>> callback) {
+                assertTrue(timeRanges.isEmpty());
+                callback.onSuccess(Collections.emptyMap());
+            }
+        }, new TimeRangeAsyncCallback<Map<String, Integer>, Integer, String>() {
+            @Override
+            public Map<String, Integer> unzipResult(final Map<String, Integer> result) {
+                return result;
+            }
+
+            @Override
+            public Map<String, Integer> zipSubResults(final Map<String, Integer> subResultMap) {
+                return subResultMap;
+            }
+
+            @Override
+            public Integer joinSubResults(final TimeRange timeRange, final List<Pair<TimeRange, Integer>> toJoin) {
+                throw new AssertionError("An empty request has no sub-results to join");
+            }
+
+            @Override
+            public void onSuccess(final Map<String, Integer> result) {
+                successCount.incrementAndGet();
+                assertTrue(result.isEmpty());
+            }
+
+            @Override
+            public void onFailure(final Throwable caught) {
+                fail(caught);
+            }
+        });
+        assertEquals(/* expected */ 1, successCount.get());
     }
 
     @Test
