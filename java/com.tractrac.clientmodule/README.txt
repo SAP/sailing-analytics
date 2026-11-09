@@ -16,6 +16,52 @@ It contains also some files:
  - Manifest.txt -> manifest used to create the test.jar file
 
 ********************************************
+     TracAPI 5.1.2
+********************************************
+This is a final version. It keeps the backward compatibility.
+
+  Release date: 09/11/2026
+
+ 1) Bugs
+
+ - DNS is not correctly propagated due to a typo error added in v 5.1.0 (reported by Radek Masnika, 09/11/2026)
+
+********************************************
+     TracAPI 5.1.1
+********************************************
+This is a final version. It keeps the backward compatibility.
+
+  Release date: 20/06/2026
+
+ 1) Bugs
+
+ - reloadFromServer fails if the race was retrieved from a event (reported by Thomas Scott, 20/06/2026)
+
+********************************************
+        TracAPI 5.1.0
+********************************************
+ This is a final version. It updates some enums, breaking the backward compatibility. The old parameters file are 100% compatible with this
+ version of TracAPI. The updated enums are:
+
+     - RaceCompetitorStatusType: uses the new statuses from World Sailing (adding RAC and FIN). Using also the 3-character abbreviations.
+        - RACING: has been renamed as RAC.
+        - DISQUALIFIED: has been renamed as DSQ.
+        - ABANDONED: has been renamed as RET.
+        - DONT_RACE: has been renamed as DNS.
+        - RETIRED: has been renamed as RET.
+        - NO_DATA: has been removed.
+        - MIS: has been removed.
+        - NO_COLLECT: has been removed.
+        - FINISH_CONFIRMED: has been removed.
+        - DPI: has been added.
+        - RDG: has been added.
+        - ZFP: has been added.
+
+     - EventType: updating the sports that are supported by TracTrac.
+
+   Release date: 08/04/2026
+
+********************************************
         TracAPI 5.0.3
 ********************************************
 This is a final version. It keeps the backward compatibility.
@@ -1115,7 +1161,7 @@ Build number: 13262
 2) Bugs
 
  - The ICompetitorClass implementation can contain duplicate entries of different implementations. (Reported by
- Juan Salvador Pérez, 16/01/2017)
+ Juan Salvador P�rez, 16/01/2017)
 
 ********************************************
     TracAPI 3.3.0
@@ -1466,7 +1512,7 @@ Build number: 9436
  has a race start time) and FirstControl (if the start of the race happens when the competitor passes for
  the first control). The value by default is RaceStart. At this moment this value only can be managed at an event
  level (in the event manager) but in a future we will add this functionality at a race level (Requested by
- Jérome Soussens, 14/10/2014)
+ J�rome Soussens, 14/10/2014)
  - The method IControlPoint.getPosition is deprecated. Use the IControlPointPositionListener.gotControlPointPosition()
  to know the position of a control point (Reported by Jorge Piera, 28/10/2014)
  - Adding the isNonCompeting() method to the ICompetitor interface. If a competitor is a non competing competitor
