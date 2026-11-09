@@ -18,6 +18,10 @@
                 in use, protecting existing leaderboards and their access permissions.</li>
             <li>Fixed missing leaderboard links and outdated event details on some servers when events
                 are created or updated through the API.</li>
+            <li>Fixes a memory leak in the race player (<tt>RaceBoard.html</tt>) that had to do with
+                managing multiple in-flight boat position requests. Under certain circumstances, requests
+                that were never sent because they were empty may have been remembered, with no clean-up
+                in place.</li>
          </ul>
          <h5 class="articleSubheadline">October 2026</h5>
          <ul class="bulletList">
