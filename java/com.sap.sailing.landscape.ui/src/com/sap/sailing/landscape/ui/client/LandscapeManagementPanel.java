@@ -1678,6 +1678,7 @@ public class LandscapeManagementPanel extends SimplePanel {
                                 stringMessages.archiveMasterDataImportFinished());
                     }
                 });
+        progressPanel.setWidth("100%");
         content.add(progressPanel);
         final Button close = new Button(stringMessages.close());
         close.addClickHandler(event -> dialog.hide());
