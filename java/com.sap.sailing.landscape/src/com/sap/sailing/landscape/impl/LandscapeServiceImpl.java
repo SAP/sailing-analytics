@@ -806,7 +806,9 @@ public class LandscapeServiceImpl implements LandscapeService {
         Throwable failure = null;
         try {
             importStarted.accept(new Pair<>(idForProgressTracking, hostnameOfArchive));
-            final DataImportProgress mdiProgress = waitForMDICompletionOrError(archive, idForProgressTracking, /* log message */ "MDI from "+hostnameFromWhichToArchive+" into "+hostnameOfArchive);
+            final DataImportProgress mdiProgress = waitForMDICompletionOrError(archive, idForProgressTracking,
+                    /* log message */ "Waiting for MDI from " + hostnameFromWhichToArchive + " into " + hostnameOfArchive
+                            + " to finish: completion check");
             final CompareServersResult compareServersResult;
             final String mongoDbArchivingErrorMessage;
             if (mdiProgress != null && !mdiProgress.failed() && mdiProgress.getResult() != null) {
