@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -26,13 +27,14 @@ public class TimeRangeActionsExecutorTest {
 
     private class DelayedTimeRangeAsyncAction<Result, Key> implements TimeRangeAsyncAction<Result, Key> {
         private final Result result;
-        private final TimeRange timeRange;
-        private final Key key;
+        private final Map<Key, TimeRange> timeRanges;
         private Optional<AsyncCallback<Result>> optionalCallback = Optional.empty();
-        public DelayedTimeRangeAsyncAction(Result result, TimeRange timeRange, Key key) {
+        public DelayedTimeRangeAsyncAction(final Result result, final TimeRange timeRange, final Key key) {
+            this(result, Collections.singletonMap(key, timeRange));
+        }
+        public DelayedTimeRangeAsyncAction(final Result result, final Map<Key, TimeRange> timeRanges) {
             this.result = result;
-            this.timeRange = timeRange;
-            this.key = key;
+            this.timeRanges = timeRanges;
         }
         public void returnResult() {
             optionalCallback.ifPresent(callback -> callback.onSuccess(result));
@@ -43,9 +45,69 @@ public class TimeRangeActionsExecutorTest {
         }
         @Override
         public Map<Key, TimeRange> getTimeRanges() {
-            final Map<Key, TimeRange> timeRangeMap = new HashMap<>(1);
-            timeRangeMap.put(key, timeRange);
-            return timeRangeMap;
+            return timeRanges;
+        }
+    }
+
+    private static class SummingCallback implements TimeRangeAsyncCallback<Map<String, Integer>, Integer, String> {
+        private final AtomicInteger successCount = new AtomicInteger();
+        private final AtomicReference<Map<String, Integer>> result = new AtomicReference<>();
+
+        @Override
+        public Map<String, Integer> unzipResult(final Map<String, Integer> compoundResult) {
+            return compoundResult;
+        }
+
+        @Override
+        public Map<String, Integer> zipSubResults(final Map<String, Integer> subResultMap) {
+            return subResultMap;
+        }
+
+        @Override
+        public Integer joinSubResults(final TimeRange timeRange, final List<Pair<TimeRange, Integer>> toJoin) {
+            return toJoin.stream().mapToInt(Pair::getB).sum();
+        }
+
+        @Override
+        public void onSuccess(final Map<String, Integer> compoundResult) {
+            successCount.incrementAndGet();
+            result.set(compoundResult);
+        }
+
+        @Override
+        public void onFailure(final Throwable caught) {
+            fail(caught);
+        }
+    }
+
+    @Test
+    public void testMultiKeyResultSurvivesDependentCompletion() {
+        // Exercise both shared keys, independent of the executor's key iteration order.
+        for (final String sharedKey : Arrays.asList("a", "b")) {
+            final TimeRangeActionsExecutor<Map<String, Integer>, Integer, String> executor = new TimeRangeActionsExecutor<>();
+            final Map<String, TimeRange> firstRanges = new HashMap<>();
+            firstRanges.put("a", new MilliTimeRange(/* from */ 10, /* to */ 20));
+            firstRanges.put("b", new MilliTimeRange(/* from */ 10, /* to */ 20));
+            final Map<String, Integer> firstResult = new HashMap<>();
+            firstResult.put("a", /* value */ 1);
+            firstResult.put("b", /* value */ 2);
+            final DelayedTimeRangeAsyncAction<Map<String, Integer>, String> firstAction =
+                    new DelayedTimeRangeAsyncAction<>(firstResult, firstRanges);
+            final DelayedTimeRangeAsyncAction<Map<String, Integer>, String> dependentAction =
+                    new DelayedTimeRangeAsyncAction<>(Collections.singletonMap(sharedKey, /* value */ 3),
+                            new MilliTimeRange(/* from */ 15, /* to */ 25), sharedKey);
+            final SummingCallback firstCallback = new SummingCallback();
+            final SummingCallback dependentCallback = new SummingCallback();
+            executor.execute(firstAction, firstCallback);
+            executor.execute(dependentAction, dependentCallback);
+            // The dependent waits for one key of the first response, then releases that dependency.
+            dependentAction.returnResult();
+            assertEquals(/* expected */ 0, dependentCallback.successCount.get());
+            firstAction.returnResult();
+            assertEquals(firstResult, firstCallback.result.get());
+            assertEquals(Collections.singletonMap(sharedKey, firstResult.get(sharedKey) + 3), dependentCallback.result.get());
+            assertEquals(/* expected */ 1, firstCallback.successCount.get());
+            assertEquals(/* expected */ 1, dependentCallback.successCount.get());
         }
     }
 

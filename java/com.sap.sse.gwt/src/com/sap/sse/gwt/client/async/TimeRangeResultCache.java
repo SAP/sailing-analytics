@@ -64,7 +64,8 @@ public class TimeRangeResultCache<SubResult> {
         private int childrenWithoutResultCounter = 0;
         private boolean hasResult = false;
         private SubResult result = null;
-        private boolean actionResultRetrieved = false;
+        private boolean responseReceived = false;
+        private boolean actionResultReleased = false;
 
         public Request(TimeRange timeRange, TimeRange trimmedTimeRange, AsyncCallback<Void> callback,
                 TimeRangeAsyncAction<?, ?> action, Iterable<TimeRangeResultCache<SubResult>.Request> childrenList) {
@@ -163,11 +164,13 @@ public class TimeRangeResultCache<SubResult> {
          * @param result
          *            this {@link Request}'s {@link SubResult}
          */
-        public void onSuccess(SubResult result) {
+        public void onSuccess(final SubResult result) {
+            responseReceived = true;
             setResult(result);
             notifyActionSuccessIfHasAllResults();
             final HashSet<Request> parents = new HashSet<>(parentSet);
             parents.forEach(parent -> parent.onChildSuccess());
+            evictIfNoLongerNeeded();
         }
 
         /**
@@ -177,10 +180,12 @@ public class TimeRangeResultCache<SubResult> {
          * @param caught
          *            {@link Throwable} that occurred
          */
-        public void onFailure(Throwable caught) {
+        public void onFailure(final Throwable caught) {
+            responseReceived = true;
             notifyActionFailure(caught);
             final HashSet<Request> parents = new HashSet<>(parentSet); // onChildFailure will remove elements from parentSet
             parents.forEach(parent -> parent.onChildFailure(caught));
+            evictIfNoLongerNeeded();
         }
 
         /**
@@ -232,17 +237,26 @@ public class TimeRangeResultCache<SubResult> {
 
         /**
          * Determines if this {@link Request} can be evicted from the cache.
+         * A per-key notification does not mean the action has retrieved its result yet: a multi-key action may
+         * still be waiting for other keys. Explicitly released requests must also remain until their own response
+         * arrives, even if a dependency has already failed and completed the action's callback.
          * @return {@code true} if it can be evicted
          */
         protected boolean canBeEvicted() {
-            return callbackWasCalled && parentSet.isEmpty();
+            return actionResultReleased && responseReceived && parentSet.isEmpty();
         }
 
         /**
-         * Calls {@link #releaseChildren()} and then removes itself from the cache if no longer needed.
+         * Releases the action's claim on its results, calls {@link #releaseChildren()}, and removes this request
+         * from the cache if no longer needed.
          */
         protected void releaseChildrenAndEvictSelf() {
+            actionResultReleased = true;
             releaseChildren();
+            evictIfNoLongerNeeded();
+        }
+
+        private void evictIfNoLongerNeeded() {
             if (canBeEvicted()) {
                 TimeRangeResultCache.this.evictRequestFromCache(this);
             }
@@ -258,11 +272,11 @@ public class TimeRangeResultCache<SubResult> {
             if (!callbackWasCalled) {
                 throw new IllegalStateException("Callback was not called yet");
             }
-            if (actionResultRetrieved) {
+            if (actionResultReleased) {
                 throw new IllegalStateException(
-                        "Results have been retrieved already and the dependencies have been released");
+                        "Results have already been retrieved or released");
             }
-            List<Pair<TimeRange, SubResult>> actionResults;
+            final List<Pair<TimeRange, SubResult>> actionResults;
             if (getTrimmedTimeRange() == null) { // true if this Request is completely covered by others
                 actionResults = new ArrayList<>(childrenSet.size());
             } else {
@@ -276,7 +290,6 @@ public class TimeRangeResultCache<SubResult> {
                 actionResults.add(new Pair<>(child.getTrimmedTimeRange(), child.getResult()));
             }
             releaseChildrenAndEvictSelf();
-            actionResultRetrieved = true;
             return actionResults;
         }
 
