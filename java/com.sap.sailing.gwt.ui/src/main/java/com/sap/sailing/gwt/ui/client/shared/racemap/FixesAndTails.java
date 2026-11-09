@@ -281,10 +281,11 @@ public class FixesAndTails {
         
         /**
          * Computes the from/to time maps for the non-ignored competitors and always invokes {@code consumer},
-         * even when the maps are empty. If the maps are non-empty, this request is also registered in
-         * {@link #inFlightRequests} before the consumer is called. Use this when the consumer must always
-         * fire (e.g. to fetch non-position data alongside positions), but registration should only happen
-         * when there is actually position data to fetch.
+         * even when the maps are empty. This request is always registered in {@link #inFlightRequests} before
+         * the consumer is called, so its callback can complete it consistently even for an empty response.
+         * Use this when the consumer must always fire (e.g. to fetch non-position data alongside positions).
+         * If a position-only fallback replaces the compound action, the request stays registered until
+         * that fallback succeeds or fails.
          */
         void executeWithTimeRanges(final TimeRangesConsumer consumer) {
             final Pair<Map<String, Date>, Map<String, Date>> fromAndTo = computeFromAndToMaps();
