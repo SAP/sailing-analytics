@@ -17,11 +17,12 @@ import com.sap.sse.shared.json.JsonDeserializer;
 public class DataImportProgressJsonDeserializer implements JsonDeserializer<DataImportProgress> {
     @Override
     public DataImportProgress deserialize(final JSONObject object) throws JsonDeserializationException {
-        final DataImportProgress result = new DataImportProgressImpl(UUID.fromString(object.get(DataImportProgressJsonSerializer.OPERATION_ID).toString()));
+        final Object currentSubProgress = object.get(DataImportProgressJsonSerializer.CURRENT_SUB_PROGRESS);
+        final DataImportProgress result = new DataImportProgressImpl(
+                UUID.fromString(object.get(DataImportProgressJsonSerializer.OPERATION_ID).toString()),
+                currentSubProgress == null ? DataImportSubProgress.IMPORT_INIT
+                        : DataImportSubProgress.valueOf(currentSubProgress.toString()));
         result.setOverAllProgressPct(((Number) object.get(DataImportProgressJsonSerializer.OVERALL_PROGRESS_PERCENT)).doubleValue());
-        if (object.get(DataImportProgressJsonSerializer.CURRENT_SUB_PROGRESS) != null) {
-            result.setCurrentSubProgress(DataImportSubProgress.valueOf(object.get(DataImportProgressJsonSerializer.CURRENT_SUB_PROGRESS).toString()));
-        }
         result.setCurrentSubProgressPct(((Number) object.get(DataImportProgressJsonSerializer.CURRENT_SUB_PROGRESS_PERCENT)).doubleValue());
         if ((Boolean) object.get(DataImportProgressJsonSerializer.FAILED)) {
             result.setFailed();
