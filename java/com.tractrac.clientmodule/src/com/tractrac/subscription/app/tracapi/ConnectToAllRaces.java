@@ -14,7 +14,7 @@ public class ConnectToAllRaces {
 
     public static void main(String[] args) throws CreateModelException, URISyntaxException, SubscriberInitializationException, IOException, RaceLoadingException {
 
-        URI paramURI = new URI("https://event.tractrac.com/events/event_20140429_ESSQingdao/jsonservice.php");
+        URI paramURI = new URI("https://liveserver1.tractrac.com/events/event_20260618_KielerWoch/jsonservice.php");
         String apiToken = args[0];
         IEventFactory eventFactory = ModelLocator.getEventFactory();
         IEvent event = eventFactory.createEvent(apiToken, paramURI);
