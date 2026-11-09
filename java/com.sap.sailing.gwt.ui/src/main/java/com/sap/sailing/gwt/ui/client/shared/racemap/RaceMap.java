@@ -1539,8 +1539,7 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                         (settings.isShowSimulationOverlay() ? simulationOverlay.getLegIdentifier() : null),
                         raceCompetitorSet.getMd5OfIdsAsStringOfCompetitorParticipatingInRaceInAlphanumericOrderOfTheirID(),
                         newTime, settings.isShowEstimatedDuration(), detailType, leaderboardName, leaderboardGroupName, leaderboardGroupId,
-                        // callback to use for alternative GetBoatPositionsAction fired when GetRaceMapDataAction gets dropped:
-                        droppableBoatPositionsCallback, quickRequest::dropped),
+                        droppableBoatPositionsCallback),
                 GET_RACE_MAP_DATA_CATEGORY,
                 getRaceMapDataCallback(newTime, transitionTimeInMillis, quickRequest, competitorsToShow,
                                        ++boatPositionRequestIDCounter, isRedraw, detailTypeChanged, detailType, competitorsByIdAsString)));
