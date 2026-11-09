@@ -288,9 +288,7 @@ public class FixesAndTails {
          */
         void executeWithTimeRanges(final TimeRangesConsumer consumer) {
             final Pair<Map<String, Date>, Map<String, Date>> fromAndTo = computeFromAndToMaps();
-            if (!fromAndTo.getA().isEmpty()) {
-                register();
-            }
+            register();
             consumer.accept(fromAndTo.getA(), fromAndTo.getB());
         }
 
@@ -303,7 +301,7 @@ public class FixesAndTails {
          */
         void executeForNonEmptyTimeRanges(final TimeRangesConsumer consumer) {
             final Pair<Map<String, Date>, Map<String, Date>> fromAndTo = computeFromAndToMaps();
-            if (!fromAndTo.getA().isEmpty()) {
+            if (!fromAndTo.getA().isEmpty ()) {
                 register();
                 consumer.accept(fromAndTo.getA(), fromAndTo.getB());
             }
@@ -358,12 +356,8 @@ public class FixesAndTails {
             ignoreFixesForTheseCompetitorIdsAsString.add(competitor.getIdAsString());
         }
         
-        void register() {
+        private void register() {
             inFlightRequests.add(this);
-        }
-
-        void cancel() {
-            inFlightRequests.remove(this);
         }
 
         void dropped() {
@@ -382,6 +376,8 @@ public class FixesAndTails {
                         updateFixes(e.getKey(), e.getValue(), mustClearCache, transitionTimeInMillis, detailTypeForFixes);
                     }
                 }
+            } else {
+                GWT.log("WARNING: processing response for a request that does not seem to have been sent or that has already been processed: "+this);
             }
         }
 
