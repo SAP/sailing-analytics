@@ -24,7 +24,15 @@ public class DataImportProgressImpl implements DataImportProgress {
     }
 
     public DataImportProgressImpl(final UUID currentImportOperationId) {
+        this(currentImportOperationId, DataImportSubProgress.IMPORT_INIT);
+    }
+
+    /**
+     * Initializes a progress snapshot at its current stage without logging a stage transition.
+     */
+    public DataImportProgressImpl(final UUID currentImportOperationId, final DataImportSubProgress currentSubProgress) {
         this.currentImportOperationId = currentImportOperationId;
+        this.currentSubProgress = currentSubProgress;
     }
 
     @Override
