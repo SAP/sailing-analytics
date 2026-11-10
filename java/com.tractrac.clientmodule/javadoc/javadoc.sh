@@ -1,1 +1,1 @@
-/usr/lib/jvm/jdk-21.0.8/bin/javadoc @options @packages
+/usr/lib/jvm/java-25-openjdk-amd64/bin/javadoc @options @packages
