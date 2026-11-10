@@ -58,7 +58,7 @@ public class MasterDataImporter {
      * {@link RacingEventService#createOrUpdateDataImportProgressWithReplication}. They are laid out as a single
      * monotonically increasing schedule so the progress bar never jumps backwards (see bug6227): transfer of the
      * object graph ({@link #PROGRESS_TRANSFER_STARTED} to {@link #PROGRESS_TRANSFER_COMPLETED}), then the two
-     * streamed top-level sections, each given an equal-width band: the wind tracks fill
+     * streamed top-level sections that usually dominate the import time, each given an equal-width band: the wind tracks fill
      * {@link #PROGRESS_TRANSFER_COMPLETED} to {@link #PROGRESS_WIND_TRACKS_DONE} and the sensor fixes fill
      * {@link #PROGRESS_WIND_TRACKS_DONE} to {@link #PROGRESS_SENSOR_FIXES_DONE}. Next, the graph is applied and the
      * races are loaded before publishing {@link #PROGRESS_COMPLETE} (see bug6335). The per-item band positions are
@@ -163,9 +163,19 @@ public class MasterDataImporter {
         }
         racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId, PROGRESS_TRANSFER_COMPLETED,
                 DataImportSubProgress.TRANSFER_COMPLETED, 0.5);
-        // Persist the streamed wind and sensor fixes before applying the graph: the operation starts race loading,
-        // which must find the imported wind in the store already (see bug6335). Completion is published only after
-        // the operation has finished loading the races and the imported event IDs have been added to its result.
+        // The wind tracks and sensor fixes are streamed as top-level objects after the serialized object graph
+        // (see bug6227), but must be persisted before applying ImportMasterDataOperation: that operation starts
+        // race loading, which must find the imported wind in the store already (see bug6335). Because the wind and
+        // sensor-fix imports usually dominate the overall time, an equal-width band is reserved for each: overall
+        // progress rises monotonically from PROGRESS_TRANSFER_COMPLETED through the wind band
+        // (PROGRESS_TRANSFER_COMPLETED -> PROGRESS_WIND_TRACKS_DONE, 0.3 -> 0.5) and the sensor-fix band
+        // (PROGRESS_WIND_TRACKS_DONE -> PROGRESS_SENSOR_FIXES_DONE, 0.5 -> 0.7). Each band advances by its width
+        // multiplied by the fraction of wind tracks or device sections imported. Applying the graph and loading
+        // the races then advances progress from 0.7 to 0.95, leaving PROGRESS_COMPLETE for the true end of the import.
+        // The single terminal "Done" marker and the operation's result are published only here, with replication,
+        // after both fix imports, race loading, and adding the imported event IDs to the result. Thus, a client
+        // polling either the primary or a replica sees DataImportProgress.getResult() turn non-null only at genuine
+        // completion, rather than prematurely when the object-graph operation returns (see bug6227 and bug6322).
         final ClassLoader oldContextClassLoaderForStreamedData = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(racingEventService.getDeserializationClassLoader());
         try {

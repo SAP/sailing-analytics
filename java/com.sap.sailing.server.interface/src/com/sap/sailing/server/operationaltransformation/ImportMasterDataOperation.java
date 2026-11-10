@@ -167,10 +167,17 @@ public class ImportMasterDataOperation extends
             progress.setOverAllProgressPct(0.95);
             progress.setCurrentSubProgressPct(0);
             waitForTrackedRacesToFinishLoading(trackedRacesToWaitForLoadingComplete);
-            // The wind and sensor fixes have already been imported by MasterDataImporter.importFromStream (0.3 -> 0.7),
-            // so race loading finds them in the stores (see bug6335). Leave completion and result publication to the
-            // importer, which adds the imported event IDs and replicates the complete result. In particular, applying
-            // the stripped operation on a replica must not publish completion before the primary finishes loading.
+            // Deliberately do not publish the result, mark overall completion (1.0), or log "Done" here. The wind
+            // tracks and sensor fixes have already been streamed and imported by MasterDataImporter.importFromStream
+            // (see bug6227), before this operation starts race loading so it finds the fixes in the stores (see bug6335).
+            // Those two phases usually dominate the import time and each have an equal-width progress band:
+            // 0.3 -> 0.5 for wind tracks and 0.5 -> 0.7 for sensor fixes. This operation follows at 0.7, advances to
+            // 0.8 for event links, 0.9 for starting race loading, and 0.95 for waiting for loading to finish.
+            // The result is returned to the importer, which adds the imported event IDs (see bug6322) and owns the
+            // terminal 1.0 progress, the single "Done" log, and result publication with replication. In particular,
+            // applying the stripped operation on a replica must not publish completion before the primary finishes
+            // loading. Clients polling either the primary or a replica must see a non-null result only at genuine
+            // completion of the whole import.
             return creationCount;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error during execution of ImportMasterDataOperation", e);
