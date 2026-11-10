@@ -141,7 +141,7 @@ public class ImportMasterDataOperation extends
                 progress.setCurrentSubProgressPct((double) i / numOfGroupsToImport);
             }
             progress.setCurrentSubProgress(DataImportSubProgress.UPDATE_EVENT_LEADERBOARD_GROUP_LINKS);
-            progress.setOverAllProgressPct(0.4);
+            progress.setOverAllProgressPct(0.8);
             progress.setCurrentSubProgressPct(0);
             final Iterable<Event> allEvents = masterData.getAllEvents();
             int numOfEventsToHandle = Util.size(allEvents);
@@ -160,22 +160,17 @@ public class ImportMasterDataOperation extends
             }
             toState.mediaTracksImported(allMediaTracksToImport, creationCount, override);
             progress.setCurrentSubProgress(DataImportSubProgress.IMPORT_TRACKED_RACES);
-            progress.setOverAllProgressPct(0.53);
+            progress.setOverAllProgressPct(0.9);
             progress.setCurrentSubProgressPct(0);
             final Iterable<TrackedRace> trackedRacesToWaitForLoadingComplete = importTrackedRaces(toState, securityService);            
             progress.setCurrentSubProgress(DataImportSubProgress.WAITING_FOR_TRACKED_RACES_TO_FINISH_LOADING);
-            progress.setOverAllProgressPct(0.6);
+            progress.setOverAllProgressPct(0.95);
             progress.setCurrentSubProgressPct(0);
             waitForTrackedRacesToFinishLoading(trackedRacesToWaitForLoadingComplete);
-            // Deliberately do not publish the result, mark overall completion (1.0), or log "Done" here. This
-            // operation applies only the object graph; the wind tracks and sensor fixes are streamed and imported
-            // afterwards by MasterDataImporter.importFromStream, which owns the terminal 1.0 progress, the single
-            // "Done" log, and the result publication (with replication) at the true end of the whole import. Publishing
-            // the result here would let a client polling either the master or a replica report success before the wind
-            // and sensor-fix imports have even started (see bug6227). The result is still returned to the caller below,
-            // which carries it out to MasterDataImporter for publication at genuine completion. This operation
-            // therefore ends at 0.6, set above after waiting for the tracked races to load, leaving 0.6 -> 0.8 for the
-            // wind band and 0.8 -> 1.0 for the sensor-fix band, the two phases that usually dominate the import.
+            // The wind and sensor fixes have already been imported by MasterDataImporter.importFromStream (0.3 -> 0.7),
+            // so race loading finds them in the stores (see bug6335). Leave completion and result publication to the
+            // importer, which adds the imported event IDs and replicates the complete result. In particular, applying
+            // the stripped operation on a replica must not publish completion before the primary finishes loading.
             return creationCount;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error during execution of ImportMasterDataOperation", e);
