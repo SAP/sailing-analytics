@@ -18,6 +18,16 @@
                 in use, protecting existing leaderboards and their access permissions.</li>
             <li>Fixed missing leaderboard links and outdated event details on some servers when events
                 are created or updated through the API.</li>
+            <li>Fixes a memory leak in the race player (<tt>RaceBoard.html</tt>) that had to do with
+                managing multiple in-flight boat position requests. Under certain circumstances, requests
+                that were never sent because they were empty may have been remembered, with no clean-up
+                in place.</li>
+            <li>Fixed a long-standing race player bug that could leave boat tracks incomplete, particularly
+                when moving the time slider repeatedly. When overlapping boat-position requests completed
+                in a particular order, cached results could be discarded before a multi-boat request had
+                collected them, causing an exception and preventing track updates. Results now remain
+                available until the requesting action and all dependent requests have released them,
+                with outstanding responses handled safely even after a related request fails.</li>
          </ul>
          <h5 class="articleSubheadline">October 2026</h5>
          <ul class="bulletList">

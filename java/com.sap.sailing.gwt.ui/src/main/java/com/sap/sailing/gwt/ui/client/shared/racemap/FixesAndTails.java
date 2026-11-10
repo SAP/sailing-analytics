@@ -11,7 +11,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.maps.client.mvc.MVCArray;
@@ -22,6 +22,7 @@ import com.sap.sailing.domain.common.DetailType;
 import com.sap.sailing.domain.common.dto.CompetitorDTO;
 import com.sap.sailing.domain.common.dto.CompetitorWithBoatDTO;
 import com.sap.sailing.gwt.ui.actions.GetBoatPositionsAction;
+import com.sap.sailing.gwt.ui.actions.GetBoatPositionsCallback;
 import com.sap.sailing.gwt.ui.actions.GetRaceMapDataAction;
 import com.sap.sailing.gwt.ui.client.SailingServiceAsync;
 import com.sap.sailing.gwt.ui.shared.GPSFixDTOWithSpeedWindTackAndLegType;
@@ -226,6 +227,14 @@ public class FixesAndTails {
      * @author Axel Uhl (d043530)
      *
      */
+    interface TimeRangesConsumer {
+        void accept(Map<String, Date> fromTimes, Map<String, Date> toTimes);
+    }
+
+    interface PositionResponseConsumer {
+        void accept(PositionRequest request, Map<CompetitorDTO, GPSFixDTOWithSpeedWindTackAndLegTypeIterable> boatPositions);
+    }
+
     class PositionRequest {
         /**
          * The <em>same</em> set for two entangled requests; when a request processes its response and
@@ -270,22 +279,72 @@ public class FixesAndTails {
             return mustClearCacheForTheseCompetitorIdsAsString.contains(competitor.getIdAsString());
         }
         
-        Map<String, Date> getFromByCompetitorIdAsString() {
-            return getFromOrToByCompetitorIdAsString(TimeRange::from);
+        /**
+         * Computes the from/to time maps for the non-ignored competitors and always invokes {@code consumer},
+         * even when the maps are empty. This request is always registered in {@link #inFlightRequests} before
+         * the consumer is called, so its callback can complete it consistently even for an empty response.
+         * Use this when the consumer must always fire (e.g. to fetch non-position data alongside positions).
+         * If a position-only fallback replaces the compound action, the request stays registered until
+         * that fallback succeeds or fails.
+         */
+        void executeWithTimeRanges(final TimeRangesConsumer consumer) {
+            final Pair<Map<String, Date>, Map<String, Date>> fromAndTo = computeFromAndToMaps();
+            register();
+            consumer.accept(fromAndTo.getA(), fromAndTo.getB());
         }
-        
-        Map<String, Date> getToByCompetitorIdAsString() {
-            return getFromOrToByCompetitorIdAsString(TimeRange::to);
+
+        /**
+         * Computes the from/to time maps for the non-ignored competitors. If the resulting from map is empty
+         * (either because {@link #timeRangesByCompetitorIdAsString} is empty or all entries are ignored),
+         * this method does nothing — no registration, no consumer invocation. Otherwise, registers this
+         * request in {@link #inFlightRequests} and invokes {@code consumer} with the from and to maps,
+         * allowing the caller to fire the corresponding RPC.
+         */
+        void executeForNonEmptyTimeRanges(final TimeRangesConsumer consumer) {
+            final Pair<Map<String, Date>, Map<String, Date>> fromAndTo = computeFromAndToMaps();
+            if (!fromAndTo.getA().isEmpty ()) {
+                register();
+                consumer.accept(fromAndTo.getA(), fromAndTo.getB());
+            }
         }
-        
-        private Map<String, Date> getFromOrToByCompetitorIdAsString(Function<TimeRange, TimePoint> dateFetcher) {
-            final Map<String, Date> result = new HashMap<>();
+
+        private Pair<Map<String, Date>, Map<String, Date>> computeFromAndToMaps() {
+            final Map<String, Date> fromTimes = new HashMap<>();
+            final Map<String, Date> toTimes = new HashMap<>();
             for (final Entry<String, TimeRange> e : timeRangesByCompetitorIdAsString.entrySet()) {
                 if (!ignoreFixesForTheseCompetitorIdsAsString.contains(e.getKey())) {
-                    result.put(e.getKey(), dateFetcher.apply(e.getValue()).asDate());
+                    fromTimes.put(e.getKey(), e.getValue().from().asDate());
+                    toTimes.put(e.getKey(), e.getValue().to().asDate());
                 }
             }
-            return result;
+            return new Pair<>(fromTimes, toTimes);
+        }
+
+        /**
+         * Creates a {@link GetBoatPositionsCallback} pre-wired so that on success
+         * {@link #processResponse(Map)} is called followed by {@code onSuccess}, and on failure
+         * {@link #onFailure()} is called followed by {@code onFailure}. This keeps both sides of the
+         * callback symmetric and prevents callers from forgetting to update the in-flight state.
+         */
+        GetBoatPositionsCallback createCallback(final DetailType detailType,
+                final Map<String, CompetitorDTO> competitorsByIdAsString,
+                final PositionResponseConsumer onSuccess,
+                final Consumer<Throwable> onFailure) {
+            return new GetBoatPositionsCallback(detailType, new AsyncCallback<com.sap.sailing.gwt.ui.shared.CompactBoatPositionsDTO>() {
+                @Override
+                public void onSuccess(final com.sap.sailing.gwt.ui.shared.CompactBoatPositionsDTO result) {
+                    final Map<CompetitorDTO, GPSFixDTOWithSpeedWindTackAndLegTypeIterable> boatPositions =
+                            result.getBoatPositionsForCompetitors(competitorsByIdAsString);
+                    processResponse(boatPositions);
+                    onSuccess.accept(PositionRequest.this, boatPositions);
+                }
+
+                @Override
+                public void onFailure(final Throwable caught) {
+                    PositionRequest.this.onFailure();
+                    onFailure.accept(caught);
+                }
+            });
         }
         
         /**
@@ -298,15 +357,28 @@ public class FixesAndTails {
             ignoreFixesForTheseCompetitorIdsAsString.add(competitor.getIdAsString());
         }
         
+        private void register() {
+            inFlightRequests.add(this);
+        }
+
+        void dropped() {
+            inFlightRequests.remove(this);
+        }
+
+        void onFailure() {
+            inFlightRequests.remove(this);
+        }
+
         void processResponse(Map<CompetitorDTO, GPSFixDTOWithSpeedWindTackAndLegTypeIterable> boatPositions) {
-            if (!inFlightRequests.remove(this)) {
-                GWT.log("WARNING: processing response for a request that does not seem to have been sent or that has already been processed: "+this);
-            }
-            for (final Entry<CompetitorDTO, GPSFixDTOWithSpeedWindTackAndLegTypeIterable> e : boatPositions.entrySet()) {
-                if (!ignoreFixesForTheseCompetitorIdsAsString.contains(e.getKey().getIdAsString())) {
-                    final boolean mustClearCache = mustClearCacheForTheseCompetitorIdsAsString.remove(e.getKey().getIdAsString());
-                    updateFixes(e.getKey(), e.getValue(), mustClearCache, transitionTimeInMillis, detailTypeForFixes);
+            if (inFlightRequests.remove(this)) {
+                for (final Entry<CompetitorDTO, GPSFixDTOWithSpeedWindTackAndLegTypeIterable> e : boatPositions.entrySet()) {
+                    if (!ignoreFixesForTheseCompetitorIdsAsString.contains(e.getKey().getIdAsString())) {
+                        final boolean mustClearCache = mustClearCacheForTheseCompetitorIdsAsString.remove(e.getKey().getIdAsString());
+                        updateFixes(e.getKey(), e.getValue(), mustClearCache, transitionTimeInMillis, detailTypeForFixes);
+                    }
                 }
+            } else {
+                GWT.log("WARNING: processing response for a request that does not seem to have been sent or that has already been processed: "+this);
             }
         }
 
@@ -1024,21 +1096,23 @@ public class FixesAndTails {
      * <p>
      * 
      * The {@link #earliestTimePointRequested} map is updated, assuming that the requests returned will be sent before
-     * invoking this method again. The two {@link PositionRequest}s returned are added to the {@link #inFlightRequests}
-     * set.
+     * invoking this method again. Neither {@link PositionRequest} is added to {@link #inFlightRequests} here;
+     * registration happens inside {@link PositionRequest#executeWithTimeRanges(TimeRangesConsumer)} and
+     * {@link PositionRequest#executeForNonEmptyTimeRanges(TimeRangesConsumer)} when the consumer fires the RPC.
      * 
      * @return a pair of {@link PositionRequest} objects; the {@link Pair#getA() first} provides the parameters for a
      *         "quick" request, assuming that only a few positions (up to {@link #MAX_DURATION_FOR_QUICK_REQUESTS}) need
      *         to be fetched and where the call can be performed in a compound {@link GetRaceMapDataAction}; the
      *         {@link Pair#getB() second} is for a "slow" request that needs to fetch longer segments of tracks and that
      *         can be sent using {@link GetBoatPositionsAction}. None of the pair's components is {@code null}), but the
-     *         {@link PositionRequest#getFromByCompetitorIdAsString()} and {@link PositionRequest#getToByCompetitorIdAsString()} results may be empty. The two
+     *         time ranges inside a request may be empty, in which case
+     *         {@link PositionRequest#executeForNonEmptyTimeRanges(TimeRangesConsumer)} will skip execution. The two
      *         requests are "entangled", in the sense that if the combined effect of the requests has to be that the
      *         cache for one or more competitors is to be cleared before updating the new positions, exactly the first
      *         of the two requests to process its response will carry out this clearing. It is important to reliably
      *         obtain the positions for both requests, so if the "quick" request should be dropped together with a
      *         compound {@link GetRaceMapDataAction}, at least the position-related part needs to be run, e.g., using
-     *         a more specific {@link GetBoatPositionsAction} with the {@link TimeRangeActionsExecutor}. 
+     *         a more specific {@link GetBoatPositionsAction} with the {@link TimeRangeActionsExecutor}.
      */
     protected Pair<PositionRequest, PositionRequest> computeFromAndTo(Date upTo,
             Iterable<CompetitorDTO> competitorsToShow, long effectiveTailLengthInMilliseconds,
@@ -1106,8 +1180,6 @@ public class FixesAndTails {
         }
         final PositionRequest quick = new PositionRequest(timeRangesForQuickRequest, mustClearCacheForTheseCompetitorIdsAsString, detailType, transitionTimeInMillis);
         final PositionRequest slow = new PositionRequest(timeRangesForSlowRequest, quick); // entangle with quick request
-        inFlightRequests.add(quick);
-        inFlightRequests.add(slow);
         return new Pair<>(quick, slow);
     }
 
