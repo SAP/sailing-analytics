@@ -839,14 +839,25 @@ public class MasterDataImportTest {
                 raceColumnOnTarget, MillisecondsTimePoint.now()));
     }
 
-    private RacingEventService getDestService(UUID randomUUID) {
-        RacingEventServiceImplMock destService = new RacingEventServiceImplMock(
-                new DataImportProgressImpl(randomUUID)) {
-            @Override
-            public SecurityService getSecurityService() {
-                return MasterDataImportTest.this.securityService;
-            }
-        };
+    /** Public so Mockito can subclass this test service across OSGi class loaders. */
+    public static class DestinationRacingEventService extends RacingEventServiceImplMock {
+        private final SecurityService securityService;
+
+        public DestinationRacingEventService(final DataImportProgressImpl progress,
+                final SecurityService securityService) {
+            super(progress);
+            this.securityService = securityService;
+        }
+
+        @Override
+        public SecurityService getSecurityService() {
+            return securityService;
+        }
+    }
+
+    private RacingEventService getDestService(final UUID randomUUID) {
+        final RacingEventServiceImplMock destService = new DestinationRacingEventService(
+                new DataImportProgressImpl(randomUUID), securityService);
         return destService;
     }
 
