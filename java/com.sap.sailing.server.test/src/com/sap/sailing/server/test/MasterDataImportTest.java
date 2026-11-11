@@ -40,8 +40,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
 
 import com.mongodb.MongoException;
 import com.mongodb.ReadConcern;
@@ -57,7 +59,9 @@ import com.sap.sailing.domain.abstractlog.race.RaceLogStartTimeEvent;
 import com.sap.sailing.domain.abstractlog.race.RaceLogWindFixEvent;
 import com.sap.sailing.domain.abstractlog.race.impl.CompetitorResultImpl;
 import com.sap.sailing.domain.abstractlog.race.impl.CompetitorResultsImpl;
+import com.sap.sailing.domain.abstractlog.race.impl.RaceLogEndOfTrackingEventImpl;
 import com.sap.sailing.domain.abstractlog.race.impl.RaceLogFinishPositioningConfirmedEventImpl;
+import com.sap.sailing.domain.abstractlog.race.impl.RaceLogStartOfTrackingEventImpl;
 import com.sap.sailing.domain.abstractlog.race.impl.RaceLogStartTimeEventImpl;
 import com.sap.sailing.domain.abstractlog.race.impl.RaceLogWindFixEventImpl;
 import com.sap.sailing.domain.abstractlog.regatta.events.RegattaLogDeviceCompetitorMappingEvent;
@@ -128,13 +132,21 @@ import com.sap.sailing.domain.persistence.racelog.tracking.MongoSensorFixStoreFa
 import com.sap.sailing.domain.racelog.tracking.EmptySensorFixStore;
 import com.sap.sailing.domain.racelog.tracking.SensorFixStore;
 import com.sap.sailing.domain.racelog.tracking.test.mock.MockSmartphoneImeiServiceFinderFactory;
+import com.sap.sailing.domain.racelogtracking.RaceLogTrackingAdapter;
+import com.sap.sailing.domain.racelogtracking.RaceLogTrackingAdapterFactory;
 import com.sap.sailing.domain.racelogtracking.impl.PingDeviceIdentifierImpl;
+import com.sap.sailing.domain.racelogtracking.impl.RaceLogConnectivityParams;
+import com.sap.sailing.domain.racelogtracking.impl.RaceLogConnectivityParamsHandler;
 import com.sap.sailing.domain.racelogtracking.impl.SmartphoneImeiIdentifierImpl;
 import com.sap.sailing.domain.ranking.OneDesignRankingMetric;
 import com.sap.sailing.domain.test.TrackBasedTest;
 import com.sap.sailing.domain.tracking.DummyTrackedRace;
 import com.sap.sailing.domain.tracking.DynamicTrackedRegatta;
+import com.sap.sailing.domain.tracking.RaceHandle;
+import com.sap.sailing.domain.tracking.RaceTracker;
+import com.sap.sailing.domain.tracking.RaceTrackingHandler.DefaultRaceTrackingHandler;
 import com.sap.sailing.domain.tracking.TrackedRace;
+import com.sap.sailing.domain.tracking.TrackedRegattaListener;
 import com.sap.sailing.domain.tracking.WindTrack;
 import com.sap.sailing.domain.tracking.impl.EmptyWindStore;
 import com.sap.sailing.server.impl.RacingEventServiceImpl;
@@ -155,9 +167,11 @@ import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
 import com.sap.sse.common.impl.MillisecondsDurationImpl;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
+import com.sap.sse.common.impl.SingleTypeBasedServiceFinderImpl;
 import com.sap.sse.common.media.MimeType;
 import com.sap.sse.mongodb.MongoDBConfiguration;
 import com.sap.sse.mongodb.MongoDBService;
+import com.sap.sse.replication.FullyInitializedReplicableTracker;
 import com.sap.sse.security.SecurityService;
 import com.sap.sse.security.shared.WithQualifiedObjectIdentifier;
 import com.sap.sse.security.shared.impl.SecuredSecurityTypes.PublicReadableActions;
@@ -825,14 +839,25 @@ public class MasterDataImportTest {
                 raceColumnOnTarget, MillisecondsTimePoint.now()));
     }
 
-    private RacingEventService getDestService(UUID randomUUID) {
-        RacingEventServiceImplMock destService = new RacingEventServiceImplMock(
-                new DataImportProgressImpl(randomUUID)) {
-            @Override
-            public SecurityService getSecurityService() {
-                return MasterDataImportTest.this.securityService;
-            }
-        };
+    /** Public so Mockito can subclass this test service across OSGi class loaders. */
+    public static class DestinationRacingEventService extends RacingEventServiceImplMock {
+        private final SecurityService securityService;
+
+        public DestinationRacingEventService(final DataImportProgressImpl progress,
+                final SecurityService securityService) {
+            super(progress);
+            this.securityService = securityService;
+        }
+
+        @Override
+        public SecurityService getSecurityService() {
+            return securityService;
+        }
+    }
+
+    private RacingEventService getDestService(final UUID randomUUID) {
+        final RacingEventServiceImplMock destService = new DestinationRacingEventService(
+                new DataImportProgressImpl(randomUUID), securityService);
         return destService;
     }
 
@@ -1038,6 +1063,134 @@ public class MasterDataImportTest {
         }
     }
 
+
+    /**
+     * The race loaded by the import must already contain the streamed wind fixes (bug6335). Creating another
+     * tracked race or lazily creating its wind track after the import would hide the ordering regression.
+     */
+    @Test
+    @Timeout(60)
+    public void testImportedWindIsAvailableOnRaceLoadedDuringImport() throws Exception {
+        installRaceLogFixTracking(sourceService);
+        final Event event = sourceService.addEvent(TEST_EVENT_NAME, /* eventDescription */ null, eventStartDate,
+                eventEndDate, "source venue", /* isPublic */ false, eventUUID);
+        final UUID courseAreaId = UUID.randomUUID();
+        event.getVenue().addCourseArea(sourceService.getBaseDomainFactory().getOrCreateCourseArea(courseAreaId,
+                "course area", /* centerPosition */ null, /* radius */ null));
+        final Fleet fleet = new FleetImpl("fleet");
+        final String raceColumnName = "R1";
+        final Series series = new SeriesImpl("series", /* isMedal */ false, /* isFleetsCanRunInParallel */ true,
+                Collections.singletonList(fleet), /* raceColumnNames */ Collections.emptyList(), sourceService);
+        final Regatta regatta = sourceService.createRegatta(TEST_REGATTA_NAME, TEST_BOAT_CLASS_NAME,
+                /* canBoatsOfCompetitorsChangePerRace */ true, CompetitorRegistrationType.CLOSED,
+                /* registrationLinkSecret */ null, /* startDate */ null, /* endDate */ null, UUID.randomUUID(),
+                Collections.singletonList(series), /* persistent */ true, new LowPoint(), courseAreaId,
+                /* buoyZoneRadiusInHullLengths */ 2.0, /* useStartTimeInference */ false,
+                /* controlTrackingFromStartAndFinishTimes */ false, /* autoRestartTrackingUponCompetitorSetChange */ false,
+                OneDesignRankingMetric::new);
+        final WindSource windSource = new WindSourceWithAdditionalID(WindSourceType.EXPEDITION, "bug6335");
+        final Wind wind = new WindImpl(new DegreePosition(/* latDeg */ 54, /* lngDeg */ 30),
+                new MillisecondsTimePoint(20000), new KnotSpeedWithBearingImpl(/* knots */ 20, new DegreeBearingImpl(12)));
+        final byte[] exported;
+        final Serializable exportedRaceId;
+        try {
+            series.addRaceColumn(raceColumnName, sourceService);
+            final RegattaLeaderboard leaderboard = sourceService.addRegattaLeaderboard(regatta.getRegattaIdentifier(),
+                    "leaderboard", new int[0]);
+            final LeaderboardGroup group = sourceService.addLeaderboardGroup(TEST_GROUP_UUID, TEST_GROUP_NAME,
+                    "group description", /* displayName */ null, /* displayGroupsInReverseOrder */ false,
+                    Collections.singletonList(leaderboard.getName()), /* overallLeaderboardDiscardThresholds */ null,
+                    /* scoringScheme */ null);
+            event.addLeaderboardGroup(group);
+            final RaceColumn raceColumn = leaderboard.getRaceColumnByName(raceColumnName);
+            final RaceLog raceLog = raceColumn.getRaceLog(fleet);
+            final RaceLogTrackingAdapter adapter = RaceLogTrackingAdapterFactory.INSTANCE
+                    .getAdapter(sourceService.getBaseDomainFactory());
+            adapter.denoteRaceForRaceLogTracking(sourceService, leaderboard, raceColumn, fleet, "wind import race");
+            raceLog.add(new RaceLogStartOfTrackingEventImpl(new MillisecondsTimePoint(10000), author, /* pPassId */ 0));
+            raceLog.add(new RaceLogEndOfTrackingEventImpl(new MillisecondsTimePoint(30000), author, /* pPassId */ 0));
+            final RaceHandle handle = adapter.startTracking(sourceService, leaderboard, raceColumn, fleet,
+                    /* trackWind */ false, /* correctWindDirectionByMagneticDeclination */ false,
+                    new DefaultRaceTrackingHandler());
+            assertNotNull(handle.getRace(RaceTracker.TIMEOUT_FOR_RECEIVING_RACE_DEFINITION_IN_MILLISECONDS));
+            final TrackedRace sourceRace = handle.getTrackedRegatta().getTrackedRace(handle.getRace());
+            sourceRace.waitForLoadingToFinish();
+            sourceRace.getOrCreateWindTrack(windSource).add(wind);
+            exportedRaceId = sourceRace.getRace().getId();
+            final Response response = masterDataResource.getMasterDataByLeaderboardGroups(Collections.singletonList(group.getId()),
+                    /* compress */ false, /* exportWind */ true, /* exportDeviceConfigs */ false,
+                    /* exportTrackedRacesAndStartTracking */ true);
+            try (final ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+                ((StreamingOutput) response.getEntity()).write(output);
+                exported = output.toByteArray();
+            }
+        } finally {
+            sourceService.removeRegatta(regatta);
+        }
+        // Source and destination share the test database, so remove all source data before importing.
+        deleteAllDataFromDatabase();
+        final UUID operationId = UUID.randomUUID();
+        final RacingEventService destination = spy(getDestService(operationId));
+        installRaceLogFixTracking(destination);
+        doReturn(new DefaultRaceTrackingHandler()).when(destination).getPermissionAwareRaceTrackingHandler();
+        doReturn(new SingleTypeBasedServiceFinderImpl<>(new RaceLogConnectivityParamsHandler(destination),
+                RaceLogConnectivityParams.TYPE)).when(destination).getRaceTrackingConnectivityParamsServiceFinder();
+        try {
+            final MasterDataImporter importer = new MasterDataImporter(destination.getBaseDomainFactory(), destination,
+                    securityService.getCurrentUser(), securityService.getDefaultTenantForCurrentUser());
+            try (final ByteArrayInputStream input = new ByteArrayInputStream(exported)) {
+                importer.importFromStream(input, operationId, /* override */ false);
+            }
+            final Leaderboard importedLeaderboard = destination.getLeaderboardByName(regatta.getName());
+            assertNotNull(importedLeaderboard);
+            final RaceColumn importedColumn = importedLeaderboard.getRaceColumnByName(raceColumnName);
+            final TrackedRace importedRace = importedColumn.getTrackedRace(importedColumn.getFleetByName(fleet.getName()));
+            assertNotNull(importedRace, "The import must load and link the race itself");
+            assertEquals(exportedRaceId, importedRace.getRace().getId());
+            Assertions.assertTrue(importedRace.hasFinishedLoading());
+            // Check the sources before getOrCreateWindTrack: creating a missing track here could load the DB lazily.
+            Assertions.assertTrue(Util.contains(importedRace.getWindSources(), windSource),
+                    "The imported wind source must already be present on the race loaded during import");
+            final WindTrack importedWindTrack = importedRace.getOrCreateWindTrack(windSource);
+            importedWindTrack.lockForRead();
+            try {
+                final List<Wind> importedFixes = Util.asList(importedWindTrack.getRawFixes());
+                assertEquals(/* expected */ 1, importedFixes.size());
+                final Wind importedWind = importedFixes.get(/* index */ 0);
+                assertEquals(wind.getTimePoint(), importedWind.getTimePoint());
+                // MongoDB's compact wind representation quantizes position, speed, and bearing.
+                assertEquals(wind.getPosition().getLatDeg(), importedWind.getPosition().getLatDeg(), /* delta */ 0.0000001);
+                assertEquals(wind.getPosition().getLngDeg(), importedWind.getPosition().getLngDeg(), /* delta */ 0.0000001);
+                assertEquals(wind.getKnots(), importedWind.getKnots(), /* delta */ 0.02);
+                assertEquals(wind.getBearing().getDegrees(), importedWind.getBearing().getDegrees(), /* delta */ 0.01);
+            } finally {
+                importedWindTrack.unlockAfterRead();
+            }
+        } finally {
+            final Regatta importedRegatta = destination.getRegattaByName(regatta.getName());
+            if (importedRegatta != null) {
+                destination.removeRegatta(importedRegatta);
+            }
+        }
+    }
+
+    /** Installs the production fix-loading listener normally registered through OSGi. */
+    private void installRaceLogFixTracking(final RacingEventService service) throws InterruptedException {
+        @SuppressWarnings("unchecked")
+        final FullyInitializedReplicableTracker<RacingEventService> serviceTracker =
+                Mockito.mock(FullyInitializedReplicableTracker.class);
+        doReturn(service).when(serviceTracker).getInitializedService(Mockito.anyLong());
+        // Explicitly install the internal listener because this test runs without its OSGi registration.
+        @SuppressWarnings("restriction")
+        final TrackedRegattaListener listener =
+                new com.sap.sailing.domain.racelogtracking.impl.fixtracker.RegattaLogFixTrackerRegattaListener(
+                        serviceTracker, /* sensorFixMapperFactory */ null);
+        Mockito.doAnswer((final InvocationOnMock invocation) -> {
+            final DynamicTrackedRegatta trackedRegatta = (DynamicTrackedRegatta) invocation.callRealMethod();
+            listener.regattaAdded(trackedRegatta);
+            return trackedRegatta;
+        }).when(service).getOrCreateTrackedRegatta(Mockito.any(Regatta.class));
+    }
 
     @Test
     public void testMasterDataImportForRaceLogEventsReferencingCompetitors() throws MalformedURLException, IOException,

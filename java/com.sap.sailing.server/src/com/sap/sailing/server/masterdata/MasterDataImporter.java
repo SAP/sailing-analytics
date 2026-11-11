@@ -57,21 +57,22 @@ public class MasterDataImporter {
      * Overall-progress milestones for a master-data import, in the {@code [0, 1]} range reported through
      * {@link RacingEventService#createOrUpdateDataImportProgressWithReplication}. They are laid out as a single
      * monotonically increasing schedule so the progress bar never jumps backwards (see bug6227): transfer of the
-     * serialized stream ({@link #PROGRESS_TRANSFER_STARTED} to {@link #PROGRESS_TRANSFER_COMPLETED}), applying the
-     * object graph up to {@link #PROGRESS_GRAPH_APPLIED}, then the two streamed top-level sections that dominate the
-     * time, each given an equal-width band: the wind tracks fill {@link #PROGRESS_GRAPH_APPLIED} to
-     * {@link #PROGRESS_WIND_TRACKS_DONE} and the sensor fixes fill {@link #PROGRESS_WIND_TRACKS_DONE} to
-     * {@link #PROGRESS_COMPLETE}. The per-item band positions are computed as {@code start + width * fractionDone}
+     * object graph ({@link #PROGRESS_TRANSFER_STARTED} to {@link #PROGRESS_TRANSFER_COMPLETED}), then the two
+     * streamed top-level sections that usually dominate the import time, each given an equal-width band: the wind tracks fill
+     * {@link #PROGRESS_TRANSFER_COMPLETED} to {@link #PROGRESS_WIND_TRACKS_DONE} and the sensor fixes fill
+     * {@link #PROGRESS_WIND_TRACKS_DONE} to {@link #PROGRESS_SENSOR_FIXES_DONE}. Next, the graph is applied and the
+     * races are loaded before publishing {@link #PROGRESS_COMPLETE} (see bug6335). The per-item band positions are
+     * computed as {@code start + width * fractionDone}
      * from these milestones (see {@link #importWindTracks} and {@link #importRaceLogTrackingGPSFixes}) rather than
      * from repeated literals, so the two band widths cannot drift apart from the milestones that bound them.
      */
     private static final double PROGRESS_TRANSFER_STARTED = 0.03;
     private static final double PROGRESS_TRANSFER_COMPLETED = 0.3;
-    private static final double PROGRESS_GRAPH_APPLIED = 0.6;
-    private static final double PROGRESS_WIND_TRACKS_DONE = 0.8;
+    private static final double PROGRESS_WIND_TRACKS_DONE = 0.5;
+    private static final double PROGRESS_SENSOR_FIXES_DONE = 0.7;
     private static final double PROGRESS_COMPLETE = 1.0;
-    private static final double PROGRESS_WIND_TRACKS_BAND_WIDTH = PROGRESS_WIND_TRACKS_DONE - PROGRESS_GRAPH_APPLIED;
-    private static final double PROGRESS_SENSOR_FIXES_BAND_WIDTH = PROGRESS_COMPLETE - PROGRESS_WIND_TRACKS_DONE;
+    private static final double PROGRESS_WIND_TRACKS_BAND_WIDTH = PROGRESS_WIND_TRACKS_DONE - PROGRESS_TRANSFER_COMPLETED;
+    private static final double PROGRESS_SENSOR_FIXES_BAND_WIDTH = PROGRESS_SENSOR_FIXES_DONE - PROGRESS_WIND_TRACKS_DONE;
     private final DomainFactory baseDomainFactory;
     private final RacingEventService racingEventService;
     private final User user;
@@ -162,34 +163,38 @@ public class MasterDataImporter {
         }
         racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId, PROGRESS_TRANSFER_COMPLETED,
                 DataImportSubProgress.TRANSFER_COMPLETED, 0.5);
-        final MasterDataImportObjectCreationCountImpl creationCount = applyMasterDataImportOperation(topLevelMasterData,
-                importOperationId, override);
-        // The ImportMasterDataOperation applied above deliberately stops short of overall completion (it ends at
-        // PROGRESS_GRAPH_APPLIED after waiting for tracked races to load); the wind tracks and the sensor fixes are
-        // streamed as top-level objects after the operation's object graph and are imported here (see bug6227).
-        // Because the wind and sensor-fix imports usually dominate the overall time, an equal-width band is reserved
-        // for each: overall progress rises monotonically from PROGRESS_GRAPH_APPLIED through the wind band
-        // (PROGRESS_GRAPH_APPLIED -> PROGRESS_WIND_TRACKS_DONE) and the sensor-fix band (PROGRESS_WIND_TRACKS_DONE ->
-        // PROGRESS_COMPLETE), and the single terminal "Done" marker plus overall PROGRESS_COMPLETE is emitted here, at
-        // the true end of the whole import, rather than prematurely inside the operation. The operation's result is
-        // likewise published only here, with replication, so that a client polling either the master or a replica sees
-        // DataImportProgress.getResult() turn non-null only at genuine completion (after the sensor-fix import), not
-        // when the object-graph operation returns at PROGRESS_GRAPH_APPLIED (see bug6227).
+        // The wind tracks and sensor fixes are streamed as top-level objects after the serialized object graph
+        // (see bug6227), but must be persisted before applying ImportMasterDataOperation: that operation starts
+        // race loading, which must find the imported wind in the store already (see bug6335). Because the wind and
+        // sensor-fix imports usually dominate the overall time, an equal-width band is reserved for each: overall
+        // progress rises monotonically from PROGRESS_TRANSFER_COMPLETED through the wind band
+        // (PROGRESS_TRANSFER_COMPLETED -> PROGRESS_WIND_TRACKS_DONE, 0.3 -> 0.5) and the sensor-fix band
+        // (PROGRESS_WIND_TRACKS_DONE -> PROGRESS_SENSOR_FIXES_DONE, 0.5 -> 0.7). Each band advances by its width
+        // multiplied by the fraction of wind tracks or device sections imported. Applying the graph and loading
+        // the races then advances progress from 0.7 to 0.95, leaving PROGRESS_COMPLETE for the true end of the import.
+        // The single terminal "Done" marker and the operation's result are published only here, with replication,
+        // after both fix imports, race loading, and adding the imported event IDs to the result. Thus, a client
+        // polling either the primary or a replica sees DataImportProgress.getResult() turn non-null only at genuine
+        // completion, rather than prematurely when the object-graph operation returns (see bug6227 and bug6322).
         final ClassLoader oldContextClassLoaderForStreamedData = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(racingEventService.getDeserializationClassLoader());
         try {
-            racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId, PROGRESS_GRAPH_APPLIED,
-                    DataImportSubProgress.IMPORT_WIND_TRACKS, 0);
+            racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId, PROGRESS_TRANSFER_COMPLETED,
+                    DataImportSubProgress.IMPORT_WIND_TRACKS, /* subProgressPct */ 0);
             logger.info("Reading wind tracks for import "+importOperationId);
             importWindTracks(objectInputStream, importOperationId);
             racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId, PROGRESS_WIND_TRACKS_DONE,
-                    DataImportSubProgress.IMPORT_SENSOR_FIXES, 0);
+                    DataImportSubProgress.IMPORT_SENSOR_FIXES, /* subProgressPct */ 0);
             logger.info("Reading GPS/sensor fixes for import "+importOperationId);
             importRaceLogTrackingGPSFixes(objectInputStream, importOperationId,
                     topLevelMasterData.getRaceLogTrackingDeviceRanges().size());
         } finally {
             Thread.currentThread().setContextClassLoader(oldContextClassLoaderForStreamedData);
         }
+        racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId, PROGRESS_SENSOR_FIXES_DONE,
+                DataImportSubProgress.IMPORT_WAIT, /* subProgressPct */ 0);
+        final MasterDataImportObjectCreationCountImpl creationCount = applyMasterDataImportOperation(topLevelMasterData,
+                importOperationId, override);
         final Set<UUID> eventIdsImported = new HashSet<>();
         for (final Iterable<Event> events : topLevelMasterData.getEventForLeaderboardGroup().values()) {
             for (final Event event : events) {
@@ -198,7 +203,7 @@ public class MasterDataImporter {
         }
         creationCount.setEventIdsImported(eventIdsImported);
         racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId, PROGRESS_COMPLETE,
-                DataImportSubProgress.IMPORT_SENSOR_FIXES, 1.0, creationCount);
+                DataImportSubProgress.WAITING_FOR_TRACKED_RACES_TO_FINISH_LOADING, /* subProgressPct */ 1.0, creationCount);
         logger.info("Done importing master data into " + racingEventService);
         return topLevelMasterData.getEventForLeaderboardGroup();
     }
@@ -220,8 +225,8 @@ public class MasterDataImporter {
      * Sub-progress for the {@link DataImportSubProgress#IMPORT_WIND_TRACKS} phase is advanced once per wind track,
      * driven by that leading count, mirroring the per-device advancement of
      * {@link #importRaceLogTrackingGPSFixes(ObjectInputStream, UUID, int) the sensor-fix section}: overall progress
-     * rises across the {@link #PROGRESS_GRAPH_APPLIED}-to-{@link #PROGRESS_WIND_TRACKS_DONE} band as
-     * {@code PROGRESS_GRAPH_APPLIED + PROGRESS_WIND_TRACKS_BAND_WIDTH * windTracksDone / expectedWindTrackCount}. A
+     * rises across the {@link #PROGRESS_TRANSFER_COMPLETED}-to-{@link #PROGRESS_WIND_TRACKS_DONE} band as
+     * {@code PROGRESS_TRANSFER_COMPLETED + PROGRESS_WIND_TRACKS_BAND_WIDTH * windTracksDone / expectedWindTrackCount}. A
      * finer per-fix granularity is intentionally not attempted because the streaming format carries no per-track fix
      * count.
      * <p>
@@ -278,7 +283,7 @@ public class MasterDataImporter {
                 if (expectedWindTrackCount > 0) {
                     final double fractionDone = (double) windTracksDone / expectedWindTrackCount;
                     racingEventService.createOrUpdateDataImportProgressWithReplication(importOperationId,
-                            PROGRESS_GRAPH_APPLIED + PROGRESS_WIND_TRACKS_BAND_WIDTH * fractionDone,
+                            PROGRESS_TRANSFER_COMPLETED + PROGRESS_WIND_TRACKS_BAND_WIDTH * fractionDone,
                             DataImportSubProgress.IMPORT_WIND_TRACKS, fractionDone);
                 }
                 nextHeader = objectInputStream.readObject();

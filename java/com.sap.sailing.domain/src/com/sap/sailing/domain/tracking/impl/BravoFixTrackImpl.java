@@ -151,6 +151,7 @@ public class BravoFixTrackImpl<ItemType extends WithID & Serializable> extends S
         this.expeditionRateOfTurnCache = createTimeRangeCache(trackedItem, "expeditionRateOfTurnCache");
         this.expeditionTimeToBurnToLineCache = createTimeRangeCache(trackedItem, "expeditionTimeToBurnToLineCache");
         this.expeditionDistanceBelowLineInMetersCache = createTimeRangeCache(trackedItem, "expeditionDistanceBelowLineCache");
+        this.expeditionKickerTensionCache = createTimeRangeCache(trackedItem, "expeditionKickerTensionCache");
     }
 
     public GPSFixTrack<ItemType, GPSFixMoving> getGpsTrack() {
