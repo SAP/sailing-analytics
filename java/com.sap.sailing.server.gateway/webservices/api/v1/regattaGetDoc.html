@@ -14,6 +14,18 @@
 <b>Description:</b>
 <p>The service gets the details of a regatta.<br/>
 All slashes contained within the {name} parameter must be replaced by "__" (double underscore).</p>
+<p>Scoring configuration: <code>scoringSystem</code> contains the scoring scheme enum name.
+Each <code>series</code> entry includes <code>discardThresholds</code>: null means no series-local
+discarding rule; an empty array means an explicit local rule allowing no discards. Otherwise, the
+array contains the numbers of scored races at which successive discards become available; for example,
+<code>[1]</code> allows one discard after one scored race. Local rules constrain discards to their series.
+The series also includes <code>oneAlwaysStaysOne</code> and <code>hasCrossFleetMergedRanking</code>,
+alongside its Medal, score-reset, carry-forward and maximum-discard settings.</p>
+<p>Column objects at <code>series[].trackedRaces.fleets[].races[]</code> include
+<code>isMedalRace</code>, effective numeric <code>factor</code>, nullable <code>explicitFactor</code>
+(null means use the scoring scheme's default), and <code>oneAlwaysStaysOne</code>
+(a score of one remains one when scaling). These settings are present for untracked columns too.
+The effective factor includes any explicit override; Medal defaults depend on the scoring scheme.</p>
 <br/>
 <table>
 	<tr>

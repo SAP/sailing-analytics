@@ -12,6 +12,15 @@
 <h2>URL: /api/v1/leaderboards/{name}</h2>
 
 <b>Description:</b>
+<p>Scoring configuration is included even for empty results and untracked columns, including flexible leaderboards:
+<code>scoringScheme</code> is the scoring scheme enum name (for example <code>LOW_POINT</code>).
+Each column in <code>trackedRacesInfo</code> includes <code>isMedalRace</code>, the effective numeric
+<code>factor</code>, nullable <code>explicitFactor</code> (null means use the scheme's default), and
+<code>oneAlwaysStaysOne</code> (a score of one remains one when scaling).
+The factor includes any explicit override; Medal defaults depend on the scoring scheme.
+Column entries follow <code>columnNames</code> order and are present without a tracked race.
+For regatta leaderboards, series-local discard/reset/carry settings are available from
+<a href="regattaGetDoc.html">/api/v1/regattas/{name}</a>.</p>
 <p>The service gets the details of a leaderboard</p>
 <br/>
 <table>
