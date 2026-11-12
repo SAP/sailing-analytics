@@ -154,6 +154,7 @@ public abstract class AbstractLeaderboardsResource extends AbstractSailingServer
         jsonLeaderboard.put("delayToLiveInMillis", leaderboard.getDelayToLiveInMillis());
         jsonLeaderboard.put("resultState", resultState.name());
         jsonLeaderboard.put("type", leaderboard.getLeaderboardType().name());
+        jsonLeaderboard.put("scoringScheme", leaderboard.getScoringScheme().getType().name());
         jsonLeaderboard.put("shardingLeaderboardName", ShardingType.LEADERBOARDNAME.encodeShardingInfo(leaderboard.getName()));
         final JSONArray discardIndices = getDiscardingRuleAsJson(leaderboard);
         if (discardIndices != null) {
@@ -179,11 +180,15 @@ public abstract class AbstractLeaderboardsResource extends AbstractSailingServer
         final JSONArray trackedRacesInfo = new JSONArray();
         jsonLeaderboard.put("columnNames", jsonColumnNames);
         jsonLeaderboard.put("trackedRacesInfo", trackedRacesInfo);
-        for (RaceColumn raceColumn : leaderboard.getRaceColumns()) {
+        for (final RaceColumn raceColumn : leaderboard.getRaceColumns()) {
             jsonColumnNames.add(raceColumn.getName());
             final JSONObject raceColumnJson = new JSONObject();
             trackedRacesInfo.add(raceColumnJson);
             raceColumnJson.put("raceColumnName", raceColumn.getName());
+            raceColumnJson.put("isMedalRace", raceColumn.isMedalRace());
+            raceColumnJson.put("factor", leaderboard.getScoringScheme().getScoreFactor(raceColumn));
+            raceColumnJson.put("explicitFactor", raceColumn.getExplicitFactor());
+            raceColumnJson.put("oneAlwaysStaysOne", raceColumn.isOneAlwaysStaysOne());
             final JSONArray fleetsJson = new JSONArray();
             raceColumnJson.put(LeaderboardNameConstants.FLEETS, fleetsJson);
             for (final Fleet fleet : raceColumn.getFleets()) {
