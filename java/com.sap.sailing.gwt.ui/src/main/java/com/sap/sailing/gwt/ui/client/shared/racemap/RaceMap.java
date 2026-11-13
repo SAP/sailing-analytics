@@ -1023,7 +1023,7 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                         double newZoomLevel = map.getZoom();
                         // remove transitions on any manual viewport change (zoom or pan) so boats snap to
                         // their correct positions rather than animating across the displacement
-                        if (!isAutoZoomInProgress()) {
+                        if (!isAutoZoomInProgress() && (newZoomLevel != currentZoomLevel || suppressTransitionAfterPan)) {
                             removeTransitions();
                         }
                         currentMapBounds = BoundsUtil.getMapBounds(map.getBounds(), new DegreeBearingImpl(map.getHeading()), coordinateSystem);
