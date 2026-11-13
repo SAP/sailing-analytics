@@ -8,6 +8,18 @@
       <div class="innerContent">
          <h5 class="articleSubheadline">November 2026</h5>
          <ul class="bulletList">
+            <li>Fixed uncorrected scores in the leaderboard REST APIs (v1 and v2):
+                <tt>uncorrectedTotalPoints</tt> now contains the score before score corrections
+                instead of duplicating <tt>totalPoints</tt>. Clients must explicitly request
+                <tt>includeUncorrectedTotalPoints=true</tt> to receive this field. When the parameter
+                is absent or false, the field is omitted and its potentially expensive computation
+                is skipped. Requested but unavailable scores are returned as JSON <tt>null</tt>.
+                The meaning of <tt>totalPoints</tt> and <tt>netPoints</tt> is unchanged.
+                See <a href="https://github.com/eclipse-sailing-analytics/sailing-analytics/issues/6336">issue #6336</a>.</li>
+            <li>REST API leaderboard responses (v1/v2) now include scoring schemes, Medal flags and
+                column scoring factors, including for flexible leaderboards and empty results.
+                Regatta responses (v1) also expose series-specific discard thresholds and additional
+                scoring settings, making scoring configuration available without browser-specific calls.</li>
             <li>Improved Wind Chart responsiveness for long-running races and fine-grained wind data by
                 avoiding redundant updates and expensive matching of historical data points.
                 This fixes a performance regression that was introduced by a

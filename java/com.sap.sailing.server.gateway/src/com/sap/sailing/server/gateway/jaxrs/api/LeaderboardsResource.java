@@ -200,7 +200,8 @@ public class LeaderboardsResource extends AbstractLeaderboardsResource {
             @DefaultValue("Live") @QueryParam("resultState") ResultStates resultState,
             @QueryParam("maxCompetitorsCount") Integer maxCompetitorsCount,
             @QueryParam("secret") String regattaSecret,
-            @DefaultValue("false") @QueryParam("competitorAndBoatIdsOnly") boolean competitorAndBoatIdsOnly) {
+            @DefaultValue("false") @QueryParam("competitorAndBoatIdsOnly") boolean competitorAndBoatIdsOnly,
+            @DefaultValue("false") @QueryParam("includeUncorrectedTotalPoints") final boolean includeUncorrectedTotalPoints) {
         ShardingContext.setShardingConstraint(ShardingType.LEADERBOARDNAME, leaderboardName);
         try {
             Response response;
@@ -220,7 +221,8 @@ public class LeaderboardsResource extends AbstractLeaderboardsResource {
                     JSONObject jsonLeaderboard;
                     jsonLeaderboard = getLeaderboardJson(resultState, maxCompetitorsCount, requestTimePoint,
                             leaderboard, timePoint, /* race column names */ null, /* race detail names */ null, competitorAndBoatIdsOnly,
-                            /* showOnlyActiveRacesForCompetitorIds */ null, skip, /* showOnlyCompetitorsWithIdsProvided */ false);
+                            /* showOnlyActiveRacesForCompetitorIds */ null, skip, /* showOnlyCompetitorsWithIdsProvided */ false,
+                            includeUncorrectedTotalPoints);
                     response = Response.ok(streamingOutput(jsonLeaderboard)).build();
                 } catch (NoWindException | InterruptedException | ExecutionException e) {
                     response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage())
@@ -236,12 +238,13 @@ public class LeaderboardsResource extends AbstractLeaderboardsResource {
     @Override
     protected JSONObject getLeaderboardJson(Leaderboard leaderboard,
             TimePoint resultTimePoint, ResultStates resultState, Integer maxCompetitorsCount, List<String> raceColumnNames,
-            List<String> raceDetailNames, boolean competitorIdsOnly, List<String> showOnlyActiveRacesForCompetitorIds, boolean userPresentedValidRegattaSecret, boolean showOnlyCompetitorsWithIdsProvided)
+            List<String> raceDetailNames, boolean competitorIdsOnly, List<String> showOnlyActiveRacesForCompetitorIds, boolean userPresentedValidRegattaSecret, boolean showOnlyCompetitorsWithIdsProvided,
+            final boolean includeUncorrectedTotalPoints)
             throws NoWindException, InterruptedException, ExecutionException {
         LeaderboardDTO leaderboardDTO = leaderboard.getLeaderboardDTO(
                 resultTimePoint, Collections.<String> emptyList(), /* addOverallDetails */
                 false, getService(), getService().getBaseDomainFactory(),
-                /* fillTotalPointsUncorrected */false);
+                /* fillTotalPointsUncorrected */ includeUncorrectedTotalPoints);
         JSONObject jsonLeaderboard = new JSONObject();
         writeCommonLeaderboardData(jsonLeaderboard, leaderboard, resultState, leaderboardDTO.getTimePoint(), maxCompetitorsCount);
         JSONArray jsonCompetitorEntries = new JSONArray();
@@ -273,7 +276,9 @@ public class LeaderboardsResource extends AbstractLeaderboardsResource {
                 final FleetDTO fleetOfCompetitor = leaderboardEntry.fleet;
                 jsonEntry.put("fleet", fleetOfCompetitor == null ? "" : fleetOfCompetitor.getName());
                 jsonEntry.put("totalPoints", leaderboardEntry.totalPoints);
-                jsonEntry.put("uncorrectedTotalPoints", leaderboardEntry.totalPoints);
+                if (includeUncorrectedTotalPoints) {
+                    jsonEntry.put("uncorrectedTotalPoints", leaderboardEntry.totalPointsUncorrected);
+                }
                 jsonEntry.put("netPoints", leaderboardEntry.netPoints);
                 MaxPointsReason maxPointsReason = leaderboardEntry.reasonForMaxPoints;
                 jsonEntry.put("maxPointsReason", maxPointsReason != null ? maxPointsReason.toString() : null);
