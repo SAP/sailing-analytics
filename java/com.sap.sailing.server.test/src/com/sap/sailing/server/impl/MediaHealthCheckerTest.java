@@ -1,8 +1,8 @@
 package com.sap.sailing.server.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doThrow;
@@ -27,6 +27,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
@@ -57,6 +62,8 @@ public class MediaHealthCheckerTest {
     private static final String VALID_VIDEO_PATH = "/video";
     private static final String REDIRECT_PATH = "/redirect";
     private static final String HTTP_ERROR_PATH = "/not-found";
+    private static final String RATE_LIMITED_PATH = "/rate-limited";
+    private static final String RATE_LIMITED_REDIRECT_PATH = "/redirect-rate-limited";
     private static final String HTML_PATH = "/html";
     private static final String SLOW_IMAGE_PATH = "/slow-image";
 
@@ -77,35 +84,185 @@ public class MediaHealthCheckerTest {
 
     @Test
     public void testValidImageIsAvailable() throws Exception {
-        assertTrue(new MediaUrlHealthChecker().isImageAvailable(getUrl(VALID_IMAGE_PATH)));
+        assertEquals(Optional.of(/* value */ true), new MediaUrlHealthChecker().isImageAvailable(getUrl(VALID_IMAGE_PATH)));
     }
 
     @Test
     public void testRedirectToValidImageIsAvailable() throws Exception {
-        assertTrue(new MediaUrlHealthChecker().isImageAvailable(getUrl(REDIRECT_PATH)));
+        assertEquals(Optional.of(/* value */ true), new MediaUrlHealthChecker().isImageAvailable(getUrl(REDIRECT_PATH)));
     }
 
     @Test
     public void testHttpErrorIsNotAvailable() throws Exception {
-        assertFalse(new MediaUrlHealthChecker().isImageAvailable(getUrl(HTTP_ERROR_PATH)));
+        assertEquals(Optional.of(/* value */ false), new MediaUrlHealthChecker().isImageAvailable(getUrl(HTTP_ERROR_PATH)));
     }
 
     @Test
     public void testHtmlResponseIsNotAvailable() throws Exception {
-        assertFalse(new MediaUrlHealthChecker().isImageAvailable(getUrl(HTML_PATH)));
+        assertEquals(Optional.of(/* value */ false), new MediaUrlHealthChecker().isImageAvailable(getUrl(HTML_PATH)));
     }
 
     @Test
     public void testReadTimeoutIsNotAvailable() throws Exception {
         final MediaUrlHealthChecker checker = new MediaUrlHealthChecker(Duration.ONE_SECOND.divide(10));
-        assertFalse(checker.isImageAvailable(getUrl(SLOW_IMAGE_PATH)));
+        assertEquals(Optional.of(/* value */ false), checker.isImageAvailable(getUrl(SLOW_IMAGE_PATH)));
     }
 
     @Test
     public void testConnectionFailureIsNotAvailable() throws Exception {
         final URL url = getUrl(VALID_IMAGE_PATH);
         server.stop();
-        assertFalse(new MediaUrlHealthChecker(Duration.ONE_SECOND).isImageAvailable(url));
+        assertEquals(Optional.of(/* value */ false), new MediaUrlHealthChecker(Duration.ONE_SECOND).isImageAvailable(url));
+    }
+
+    @Test
+    public void testRateLimitedImageHasNoVerdict() throws Exception {
+        assertEquals(/* expected */ Optional.empty(), new MediaUrlHealthChecker().isImageAvailable(getUrl(RATE_LIMITED_PATH)));
+    }
+
+    @Test
+    public void testRedirectToRateLimitedImageHasNoVerdict() throws Exception {
+        assertEquals(/* expected */ Optional.empty(), new MediaUrlHealthChecker().isImageAvailable(getUrl(RATE_LIMITED_REDIRECT_PATH)));
+    }
+
+    @Test
+    public void testRateLimitedVideoHasNoVerdict() throws Exception {
+        assertEquals(/* expected */ Optional.empty(), new MediaUrlHealthChecker().isUrlReachable(getUrl(RATE_LIMITED_PATH)));
+    }
+
+    @Test
+    public void testRedirectToRateLimitedVideoHasNoVerdict() throws Exception {
+        assertEquals(/* expected */ Optional.empty(), new MediaUrlHealthChecker().isUrlReachable(getUrl(RATE_LIMITED_REDIRECT_PATH)));
+    }
+
+    @Test
+    public void testRateLimitingIsLoggedAtInfo() throws Exception {
+        final Logger logger = Logger.getLogger(MediaUrlHealthChecker.class.getName());
+        final Handler handler = mock(Handler.class);
+        final Level previousLevel = logger.getLevel();
+        logger.setLevel(Level.INFO);
+        logger.addHandler(handler);
+        try {
+            final URL url = getUrl(RATE_LIMITED_PATH);
+            final MediaUrlHealthChecker checker = new MediaUrlHealthChecker();
+            assertEquals(/* expected */ Optional.empty(), checker.isImageAvailable(url));
+            assertEquals(/* expected */ Optional.empty(), checker.isUrlReachable(url));
+            final ArgumentCaptor<LogRecord> records = ArgumentCaptor.forClass(LogRecord.class);
+            verify(handler, times(/* wantedNumberOfInvocations */ 2)).publish(records.capture());
+            for (final LogRecord record : records.getAllValues()) {
+                assertEquals(Level.INFO, record.getLevel());
+                assertTrue(record.getMessage().contains("429"));
+                assertTrue(record.getMessage().contains(url.toString()));
+            }
+        } finally {
+            logger.removeHandler(handler);
+            logger.setLevel(previousLevel);
+        }
+    }
+
+    @Test
+    public void testRateLimitedEventImagesDoNotChangeStateOrNotify() throws Exception {
+        final URL imageUrl = getUrl(RATE_LIMITED_PATH);
+        final Iterable<Event> events = Arrays.asList(
+                mockEvent("Healthy", imageUrl, /* missing */ false, /* notificationSent */ false),
+                mockEvent("Missing", imageUrl, /* missing */ true, /* notificationSent */ false),
+                mockEvent("Notified", imageUrl, /* missing */ true, /* notificationSent */ true),
+                mockEvent("Notification only", imageUrl, /* missing */ false, /* notificationSent */ true));
+        final SecurityService securityService = mock(SecurityService.class);
+        for (final Event event : events) {
+            mockOwnership(securityService, event, "owner");
+        }
+        final RacingEventService eventService = mock(RacingEventService.class);
+        createActivatorWithOwnerNotificationEnabled(/* enabled */ true).checkMedia(events,
+                securityService, new MediaUrlHealthChecker(), eventService);
+        verify(securityService, never()).sendMail(anyString(), anyString(), anyString());
+        verify(securityService, never()).getOwnership(any());
+        verify(eventService, never()).apply(any());
+        for (final Event event : events) {
+            final ImageDescriptor image = event.getImages().iterator().next();
+            verify(image, never()).isMissing();
+            verify(image, never()).isMissingMailNotificationSent();
+        }
+    }
+
+    @Test
+    public void testRateLimitedEventVideosDoNotChangeStateOrNotify() throws Exception {
+        final URL videoUrl = getUrl(RATE_LIMITED_PATH);
+        final Iterable<Event> events = Arrays.asList(
+                mockEventWithVideo("Healthy", videoUrl, /* missing */ false, /* notificationSent */ false),
+                mockEventWithVideo("Missing", videoUrl, /* missing */ true, /* notificationSent */ false),
+                mockEventWithVideo("Notified", videoUrl, /* missing */ true, /* notificationSent */ true),
+                mockEventWithVideo("Notification only", videoUrl, /* missing */ false, /* notificationSent */ true));
+        final SecurityService securityService = mock(SecurityService.class);
+        for (final Event event : events) {
+            mockOwnership(securityService, event, "owner");
+        }
+        final RacingEventService eventService = mock(RacingEventService.class);
+        createActivatorWithOwnerNotificationEnabled(/* enabled */ true).checkMedia(events,
+                securityService, new MediaUrlHealthChecker(), eventService);
+        verify(securityService, never()).sendMail(anyString(), anyString(), anyString());
+        verify(securityService, never()).getOwnership(any());
+        verify(eventService, never()).apply(any());
+        for (final Event event : events) {
+            final VideoDescriptor video = event.getVideos().iterator().next();
+            verify(video, never()).isMissing();
+            verify(video, never()).isMissingMailNotificationSent();
+        }
+    }
+
+    @Test
+    public void testRateLimitedImageUrlIsCheckedOncePerRunAndRetriedNextRun() throws Exception {
+        final URL imageUrl = getUrl(RATE_LIMITED_PATH);
+        final Event firstEvent = mockEvent("First", imageUrl, /* missing */ false, /* notificationSent */ false);
+        final Event secondEvent = mockEvent("Second", imageUrl, /* missing */ true, /* notificationSent */ true);
+        final Iterable<Event> events = Arrays.asList(firstEvent, secondEvent);
+        final SecurityService securityService = mock(SecurityService.class);
+        final RacingEventService eventService = mock(RacingEventService.class);
+        final TestImageUrlHealthChecker checker = new TestImageUrlHealthChecker(/* imageAvailable */ Optional.empty());
+        final Activator activator = createActivatorWithOwnerNotificationEnabled(/* enabled */ true);
+        activator.checkMedia(events, securityService, checker, eventService);
+        assertEquals(/* expected */ 1, checker.getNumberOfChecks());
+        activator.checkMedia(events, securityService, checker, eventService);
+        assertEquals(/* expected */ 2, checker.getNumberOfChecks());
+        verify(securityService, never()).sendMail(anyString(), anyString(), anyString());
+        verify(eventService, never()).apply(any());
+    }
+
+    @Test
+    public void testRateLimitedVideoUrlIsCheckedOncePerRunAndRetriedNextRun() throws Exception {
+        final URL videoUrl = getUrl(RATE_LIMITED_PATH);
+        final Event firstEvent = mockEventWithVideo("First", videoUrl, /* missing */ false, /* notificationSent */ false);
+        final Event secondEvent = mockEventWithVideo("Second", videoUrl, /* missing */ true, /* notificationSent */ true);
+        final Iterable<Event> events = Arrays.asList(firstEvent, secondEvent);
+        final SecurityService securityService = mock(SecurityService.class);
+        final RacingEventService eventService = mock(RacingEventService.class);
+        final TestVideoUrlHealthChecker checker = new TestVideoUrlHealthChecker(/* videoReachable */ Optional.empty());
+        final Activator activator = createActivatorWithOwnerNotificationEnabled(/* enabled */ true);
+        activator.checkMedia(events, securityService, checker, eventService);
+        assertEquals(/* expected */ 1, checker.getNumberOfChecks());
+        activator.checkMedia(events, securityService, checker, eventService);
+        assertEquals(/* expected */ 2, checker.getNumberOfChecks());
+        verify(securityService, never()).sendMail(anyString(), anyString(), anyString());
+        verify(eventService, never()).apply(any());
+    }
+
+    @Test
+    public void testRateLimitedImageDoesNotPreventCheckingOtherMedia() throws Exception {
+        final URL imageUrl = getUrl(RATE_LIMITED_PATH);
+        final URL videoUrl = getUrl(HTTP_ERROR_PATH);
+        final Event event = mockEvent("Event", imageUrl, /* missing */ true, /* notificationSent */ true);
+        final VideoDescriptor video = mock(VideoDescriptor.class);
+        when(video.getURL()).thenReturn(videoUrl);
+        when(video.getTags()).thenReturn(Collections.emptyList());
+        when(event.getVideos()).thenReturn(Collections.singleton(video));
+        final SecurityService securityService = mock(SecurityService.class);
+        mockOwnership(securityService, event, "owner");
+        final RacingEventService eventService = mock(RacingEventService.class);
+        createActivatorWithOwnerNotificationEnabled(/* enabled */ true).checkMedia(Collections.singleton(event),
+                securityService, new MediaUrlHealthChecker(), eventService);
+        verify(eventService, never()).apply(any(UpdateEventImageHealth.class));
+        verify(securityService, times(/* wantedNumberOfInvocations */ 1)).sendMail(eq("owner"), anyString(), anyString());
+        verifyVideoHealthUpdate(eventService, event, videoUrl, /* missing */ true, /* notificationSent */ true);
     }
 
     @Test
@@ -229,7 +386,7 @@ public class MediaHealthCheckerTest {
         final TestImageUrlHealthChecker imageUrlHealthChecker = new TestImageUrlHealthChecker(false);
         final RacingEventService eventService = mock(RacingEventService.class);
         when(eventService.getMasterDescriptor()).thenReturn(mock(ReplicationMasterDescriptor.class));
-        new Activator(ResourceBundleStringMessages.NULL).checkMedia(Collections.singleton(event),
+        createActivator().checkMedia(Collections.singleton(event),
                 securityService, imageUrlHealthChecker, eventService);
         assertEquals(0, imageUrlHealthChecker.getNumberOfChecks());
         verify(securityService, never()).sendMail(anyString(), anyString(), anyString());
@@ -244,7 +401,7 @@ public class MediaHealthCheckerTest {
         when(securityService.getMasterDescriptor()).thenReturn(mock(ReplicationMasterDescriptor.class));
         final TestImageUrlHealthChecker imageUrlHealthChecker = new TestImageUrlHealthChecker(true);
         final RacingEventService eventService = mock(RacingEventService.class);
-        new Activator(ResourceBundleStringMessages.NULL).checkMedia(Collections.singleton(event),
+        createActivator().checkMedia(Collections.singleton(event),
                 securityService, imageUrlHealthChecker, eventService);
         assertEquals(1, imageUrlHealthChecker.getNumberOfChecks());
         verify(eventService, never()).apply(any(UpdateEventImageHealth.class));
@@ -257,7 +414,7 @@ public class MediaHealthCheckerTest {
         final SecurityService securityService = mock(SecurityService.class);
         final TestImageUrlHealthChecker imageUrlHealthChecker = new TestImageUrlHealthChecker(false);
         final RacingEventService eventService = mock(RacingEventService.class);
-        new Activator(ResourceBundleStringMessages.NULL).checkMedia(Collections.singleton(event),
+        createActivator().checkMedia(Collections.singleton(event),
                 securityService, imageUrlHealthChecker, eventService);
         verify(securityService, never()).sendMail(anyString(), anyString(), anyString());
         verifyImageHealthUpdate(eventService, event, imageUrl, /* missing */ true, /* notificationSent */ false);
@@ -265,17 +422,19 @@ public class MediaHealthCheckerTest {
 
     @Test
     public void testValidVideoUrlIsReachable() throws Exception {
-        assertTrue(new MediaUrlHealthChecker().isUrlReachable(getUrl(VALID_VIDEO_PATH)));
+        assertEquals(Optional.of(/* value */ true), new MediaUrlHealthChecker().isUrlReachable(getUrl(VALID_VIDEO_PATH)));
     }
 
     @Test
     public void testHttpErrorVideoUrlIsNotReachable() throws Exception {
-        assertFalse(new MediaUrlHealthChecker().isUrlReachable(getUrl(HTTP_ERROR_PATH)));
+        assertEquals(Optional.of(/* value */ false), new MediaUrlHealthChecker().isUrlReachable(getUrl(HTTP_ERROR_PATH)));
     }
     
     @Test
     public void testYoutubeVideoReachable() throws Exception {
-        assertTrue(new MediaUrlHealthChecker().isUrlReachable(new URL("https://youtu.be/5ohJe5rcBVM")));
+        final Optional<Boolean> reachable = new MediaUrlHealthChecker().isUrlReachable(new URL("https://youtu.be/5ohJe5rcBVM"));
+        assumeTrue(reachable.isPresent(), "YouTube rate limiting prevented a reachability verdict");
+        assertTrue(reachable.get());
     }
 
     @Test
@@ -402,15 +561,19 @@ public class MediaHealthCheckerTest {
     }
 
     private static class TestImageUrlHealthChecker extends MediaUrlHealthChecker {
-        private final boolean imageAvailable;
+        private final Optional<Boolean> imageAvailable;
         private int numberOfChecks;
 
-        private TestImageUrlHealthChecker(boolean imageAvailable) {
+        private TestImageUrlHealthChecker(final boolean imageAvailable) {
+            this(Optional.of(imageAvailable));
+        }
+
+        private TestImageUrlHealthChecker(final Optional<Boolean> imageAvailable) {
             this.imageAvailable = imageAvailable;
         }
 
         @Override
-        boolean isImageAvailable(URL imageUrl) {
+        Optional<Boolean> isImageAvailable(final URL imageUrl) {
             numberOfChecks++;
             return imageAvailable;
         }
@@ -421,15 +584,25 @@ public class MediaHealthCheckerTest {
     }
 
     private static class TestVideoUrlHealthChecker extends MediaUrlHealthChecker {
-        private final boolean videoReachable;
+        private final Optional<Boolean> videoReachable;
+        private int numberOfChecks;
 
-        private TestVideoUrlHealthChecker(boolean videoReachable) {
+        private TestVideoUrlHealthChecker(final boolean videoReachable) {
+            this(Optional.of(videoReachable));
+        }
+
+        private TestVideoUrlHealthChecker(final Optional<Boolean> videoReachable) {
             this.videoReachable = videoReachable;
         }
 
         @Override
-        boolean isUrlReachable(URL url) {
+        Optional<Boolean> isUrlReachable(final URL url) {
+            numberOfChecks++;
             return videoReachable;
+        }
+
+        private int getNumberOfChecks() {
+            return numberOfChecks;
         }
     }
 
@@ -493,6 +666,12 @@ public class MediaHealthCheckerTest {
             case REDIRECT_PATH:
                 writeResponse(outputStream, "302 Found", "Location: " + VALID_IMAGE_PATH + "\r\n", new byte[0]);
                 break;
+            case RATE_LIMITED_PATH:
+                writeResponse(outputStream, "429 Too Many Requests", "Content-Type: image/jpeg\r\nRetry-After: 60\r\n", imageBytes);
+                break;
+            case RATE_LIMITED_REDIRECT_PATH:
+                writeResponse(outputStream, "302 Found", "Location: " + RATE_LIMITED_PATH + "\r\n", new byte[0]);
+                break;
             case HTTP_ERROR_PATH:
                 writeResponse(outputStream, "404 Not Found", "", new byte[0]);
                 break;
@@ -527,12 +706,21 @@ public class MediaHealthCheckerTest {
         }
     }
 
-    private Activator createActivatorWithOwnerNotificationEnabled(boolean enabled) {
+    private Activator createActivator() {
+        return new Activator(ResourceBundleStringMessages.NULL) {
+            @Override
+            void scheduleMediaCheck(final Runnable checkTask, final Duration delay) {
+                checkTask.run();
+            }
+        };
+    }
+
+    private Activator createActivatorWithOwnerNotificationEnabled(final boolean enabled) {
         final String propertyName = Activator.EVENT_MEDIA_OWNER_NOTIFICATION_ENABLED_PROPERTY_NAME;
         final String previousValue = System.getProperty(propertyName);
         System.setProperty(propertyName, Boolean.toString(enabled));
         try {
-            return new Activator(ResourceBundleStringMessages.NULL);
+            return createActivator();
         } finally {
             if (previousValue == null) {
                 System.clearProperty(propertyName);
