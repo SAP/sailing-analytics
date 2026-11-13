@@ -251,19 +251,29 @@ public class Activator implements BundleActivator {
         // only run this on a RacingEventService primary node, not on replicas
         if (eventService.getMasterDescriptor() == null) {
             final Map<String, Boolean> availabilityByUrl = new HashMap<>();
+            final Set<Runnable> checkTasks = new HashSet<>();
             for (final Event event : events) {
                 for (final ImageDescriptor image : event.getImages()) {
-                    checkMediaDescriptor(event, image, "Image", availabilityByUrl,
-                            url -> imageUrlHealthChecker.isImageAvailable(url),
-                            (id, url, missing, sent) -> new UpdateEventImageHealth(id, url, missing, sent),
-                            securityService, eventService);
+                    checkTasks.add(()->
+                        checkMediaDescriptor(event, image, "Image", availabilityByUrl,
+                                url -> imageUrlHealthChecker.isImageAvailable(url),
+                                (id, url, missing, sent) -> new UpdateEventImageHealth(id, url, missing, sent),
+                                securityService, eventService));
                 }
                 for (final VideoDescriptor video : event.getVideos()) {
-                    checkMediaDescriptor(event, video, "Video", availabilityByUrl,
-                            url -> imageUrlHealthChecker.isUrlReachable(url),
-                            (id, url, missing, sent) -> new UpdateEventVideoHealth(id, url, missing, sent),
-                            securityService, eventService);
+                    checkTasks.add(()->
+                        checkMediaDescriptor(event, video, "Video", availabilityByUrl,
+                                url -> imageUrlHealthChecker.isUrlReachable(url),
+                                (id, url, missing, sent) -> new UpdateEventVideoHealth(id, url, missing, sent),
+                                securityService, eventService));
                 }
+            }
+            // Now spread out the checking tasks approximately across 90% of the entire re-check interval:
+            final Duration graceTimeBetweenRequestsToAvoidRateLimits = EVENT_MEDIA_CHECK_INTERVAL.divide(checkTasks.size()).times(0.9);
+            Duration delay = Duration.NULL;
+            for (final Runnable checkTask : checkTasks) {
+                ThreadPoolUtil.INSTANCE.getDefaultBackgroundTaskThreadPoolExecutor().schedule(checkTask, delay.asMillis(), TimeUnit.MILLISECONDS);
+                delay = delay.plus(graceTimeBetweenRequestsToAvoidRateLimits);
             }
         }
     }
