@@ -12,6 +12,15 @@
 <h2>URL: /api/v1/leaderboards/{name}</h2>
 
 <b>Description:</b>
+<p>Scoring configuration is included even for empty results and untracked columns, including flexible leaderboards:
+<code>scoringScheme</code> is the scoring scheme enum name (for example <code>LOW_POINT</code>).
+Each column in <code>trackedRacesInfo</code> includes <code>isMedalRace</code>, the effective numeric
+<code>factor</code>, nullable <code>explicitFactor</code> (null means use the scheme's default), and
+<code>oneAlwaysStaysOne</code> (a score of one remains one when scaling).
+The factor includes any explicit override; Medal defaults depend on the scoring scheme.
+Column entries follow <code>columnNames</code> order and are present without a tracked race.
+For regatta leaderboards, series-local discard/reset/carry settings are available from
+<a href="regattaGetDoc.html">/api/v1/regattas/{name}</a>.</p>
 <p>The service gets the details of a leaderboard</p>
 <br/>
 <table>
@@ -47,6 +56,19 @@
 	             fields for all competitors and boats again.</div>
 	    </td>
 	</tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td>includeUncorrectedTotalPoints [Default = false, true]: if true, compute and include
+            <tt>uncorrectedTotalPoints</tt> in each score cell under <tt>competitors[].raceScores</tt>.
+            This is the score before score corrections; <tt>totalPoints</tt> remains the corrected score
+            and <tt>netPoints</tt> retains its existing meaning. Requested but unavailable uncorrected
+            scores are represented as JSON <tt>null</tt>, like other unavailable score fields.
+            When absent or false, the field is omitted and uncorrected scores are not computed.
+            Computing these scores can be expensive, especially for unfinished competitors in large fleets.
+            <b>Client migration:</b> the field was previously included by default and incorrectly duplicated
+            <tt>totalPoints</tt>; clients that need uncorrected scores must now explicitly opt in.
+            Example: <tt>/sailingserver/api/v1/leaderboards/{name}?includeUncorrectedTotalPoints=true</tt>.</td>
+    </tr>
 	<tr>
 		<td>Request method:</td>
 		<td>GET</td>
