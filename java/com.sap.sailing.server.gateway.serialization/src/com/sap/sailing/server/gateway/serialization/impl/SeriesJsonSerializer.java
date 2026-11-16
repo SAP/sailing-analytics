@@ -12,6 +12,7 @@ import com.sap.sailing.domain.abstractlog.race.state.impl.ReadonlyRaceStateImpl;
 import com.sap.sailing.domain.base.Fleet;
 import com.sap.sailing.domain.base.RaceColumn;
 import com.sap.sailing.domain.base.Series;
+import com.sap.sailing.domain.leaderboard.ThresholdBasedResultDiscardingRule;
 import com.sap.sailing.domain.tracking.TrackedRace;
 import com.sap.sse.common.impl.MillisecondsTimePoint;
 import com.sap.sse.shared.json.JsonSerializer;
@@ -26,6 +27,9 @@ public class SeriesJsonSerializer implements JsonSerializer<Series> {
     public static final String FIELD_IS_MEDAL_SERIES = "isMedalSeries";
     public static final String FIELD_FLEETS_CAN_RUN_IN_PARALLEL = "fleetsCanRunInParallel";
     public static final String FIELD_MAXIMUM_NUMBER_OF_DISCARDS = "maximumNumberOfDiscards";
+    public static final String FIELD_DISCARD_THRESHOLDS = "discardThresholds";
+    public static final String FIELD_ONE_ALWAYS_STAYS_ONE = "oneAlwaysStaysOne";
+    public static final String FIELD_HAS_CROSS_FLEET_MERGED_RANKING = "hasCrossFleetMergedRanking";
     public static final String FIELD_FIRST_COLUMS_IS_NON_DISCARDABLE_CARRY_FORWARD = "firstColumnIsNonDiscardableCarryForward";
 
     private final JsonSerializer<Fleet> fleetSerializer;
@@ -36,8 +40,8 @@ public class SeriesJsonSerializer implements JsonSerializer<Series> {
         this.raceLogResolver = raceLogResolver;
     }
 
-    public JSONObject serialize(Series series) {
-        JSONObject result = new JSONObject();
+    public JSONObject serialize(final Series series) {
+        final JSONObject result = new JSONObject();
         
         result.put(FIELD_NAME, series.getName());
         result.put(FIELD_IS_MEDAL_SERIES, series.isMedal());
@@ -45,6 +49,19 @@ public class SeriesJsonSerializer implements JsonSerializer<Series> {
         result.put(FIELD_STARTS_WITH_ZERO_SCORE, series.isStartsWithZeroScore());
         result.put(FIELD_HAS_SPLIT_FLEET_CONTIGUOUS_SCORING, series.hasSplitFleetContiguousScoring());
         result.put(FIELD_MAXIMUM_NUMBER_OF_DISCARDS, series.getMaximumNumberOfDiscards());
+        result.put(FIELD_ONE_ALWAYS_STAYS_ONE, series.isOneAlwaysStaysOne());
+        result.put(FIELD_HAS_CROSS_FLEET_MERGED_RANKING, series.hasCrossFleetMergedRanking());
+        final ThresholdBasedResultDiscardingRule discardingRule = series.getResultDiscardingRule();
+        final JSONArray discardThresholds;
+        if (discardingRule == null) {
+            discardThresholds = null;
+        } else {
+            discardThresholds = new JSONArray();
+            for (final int threshold : discardingRule.getDiscardIndexResultsStartingWithHowManyRaces()) {
+                discardThresholds.add(threshold);
+            }
+        }
+        result.put(FIELD_DISCARD_THRESHOLDS, discardThresholds);
         result.put(FIELD_FIRST_COLUMS_IS_NON_DISCARDABLE_CARRY_FORWARD, series.isFirstColumnNonDiscardableCarryForward());
         JSONArray fleetsJson = new JSONArray();
         for (Fleet fleet : series.getFleets()) {
@@ -75,6 +92,9 @@ public class SeriesJsonSerializer implements JsonSerializer<Series> {
                 JSONObject raceColumnJson = new JSONObject();
                 raceColumnJson.put(FIELD_NAME, raceColumn.getName());
                 raceColumnJson.put("isMedalRace" , raceColumn.isMedalRace());
+                raceColumnJson.put("factor", series.getRegatta().getScoringScheme().getScoreFactor(raceColumn));
+                raceColumnJson.put("explicitFactor", raceColumn.getExplicitFactor());
+                raceColumnJson.put(FIELD_ONE_ALWAYS_STAYS_ONE, raceColumn.isOneAlwaysStaysOne());
                 raceColumnJson.put("courseAreaId", courseAreaId==null?null:courseAreaId.toString());
                 if (trackedRace != null) {
                     raceColumnJson.put("isLive", trackedRace.isLive(MillisecondsTimePoint.now()));

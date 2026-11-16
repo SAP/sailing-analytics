@@ -199,7 +199,7 @@ public class EventResourceTest extends AbstractJaxRsApiTest {
     
     private Response getLeaderboard(String name) {
         return leaderboardsResource.getLeaderboard(name, AbstractLeaderboardsResource.ResultStates.Final, null, null,
-                /* competitorAndBoatIdsOnly */ false);
+                /* competitorAndBoatIdsOnly */ false, /* includeUncorrectedTotalPoints */ false);
     }
     
     private boolean hasAtLeastOneCourseArea(JSONObject objEvent) {

@@ -72,7 +72,8 @@ public class LeaderboardsResourceV2 extends AbstractLeaderboardsResource {
             @QueryParam("secret") String regattaSecret,
             @DefaultValue("false") @QueryParam("competitorAndBoatIdsOnly") boolean competitorAndBoatIdsOnly,
             @QueryParam("showOnlyActiveRacesForCompetitorIds") List<String> showOnlyActiveRacesForCompetitorIds,
-            @DefaultValue("False") @QueryParam("showOnlyCompetitorsWithIdsProvided") Boolean showOnlyCompetitorsWithIdsProvided) {
+            @DefaultValue("False") @QueryParam("showOnlyCompetitorsWithIdsProvided") Boolean showOnlyCompetitorsWithIdsProvided,
+            @DefaultValue("false") @QueryParam("includeUncorrectedTotalPoints") final boolean includeUncorrectedTotalPoints) {
         ShardingContext.setShardingConstraint(ShardingType.LEADERBOARDNAME, leaderboardName);
         try {
             Response response;
@@ -98,9 +99,11 @@ public class LeaderboardsResourceV2 extends AbstractLeaderboardsResource {
                     if (timePoint != null || resultState == ResultStates.Live) {
                         jsonLeaderboard = getLeaderboardJson(leaderboard, timePoint, resultState, maxCompetitorsCount,
                                 raceColumnNames, raceDetails, competitorAndBoatIdsOnly,
-                                showOnlyActiveRacesForCompetitorIds, skip, showOnlyCompetitorsWithIdsProvided);
+                                showOnlyActiveRacesForCompetitorIds, skip, showOnlyCompetitorsWithIdsProvided,
+                                includeUncorrectedTotalPoints);
                     } else {
-                        jsonLeaderboard = createEmptyLeaderboardJson(leaderboard, resultState, maxCompetitorsCount, skip);
+                        jsonLeaderboard = createEmptyLeaderboardJson(leaderboard, resultState, maxCompetitorsCount, skip,
+                                includeUncorrectedTotalPoints);
                     }
                     response = Response.ok(streamingOutput(jsonLeaderboard)).header("Content-Type", MediaType.APPLICATION_JSON + ";charset=UTF-8").build();
                 } catch (NoWindException | InterruptedException | ExecutionException e) {
@@ -118,7 +121,8 @@ public class LeaderboardsResourceV2 extends AbstractLeaderboardsResource {
     protected JSONObject getLeaderboardJson(Leaderboard leaderboard, TimePoint resultTimePoint,
             ResultStates resultState, Integer maxCompetitorsCount, List<String> raceColumnNames,
             List<String> raceDetailNames, boolean competitorAndBoatIdsOnly,
-            List<String> showOnlyActiveRacesForCompetitorIds, boolean userPresentedValidRegattaSecret, boolean showOnlyCompetitorsWithIdsProvided)
+            List<String> showOnlyActiveRacesForCompetitorIds, boolean userPresentedValidRegattaSecret, boolean showOnlyCompetitorsWithIdsProvided,
+            final boolean includeUncorrectedTotalPoints)
             throws NoWindException, InterruptedException, ExecutionException {
         List<String> raceColumnsToShow = calculateRaceColumnsToShow(leaderboard, raceColumnNames, showOnlyActiveRacesForCompetitorIds, resultTimePoint);
         List<DetailType> raceDetailsToShow = calculateRaceDetailTypesToShow(raceDetailNames);
@@ -126,7 +130,7 @@ public class LeaderboardsResourceV2 extends AbstractLeaderboardsResource {
                 resultTimePoint, raceColumnsToShow, /* addOverallDetails */
                 hasOverallDetail(raceDetailsToShow),
                 getService(), getService().getBaseDomainFactory(),
-                /* fillTotalPointsUncorrected */false);
+                /* fillTotalPointsUncorrected */ includeUncorrectedTotalPoints);
         final MillisecondsTimePoint leaderboardTimePoint = new MillisecondsTimePoint(leaderboardDTO.getTimePoint());
         JSONObject jsonLeaderboard = new JSONObject();
         writeCommonLeaderboardData(jsonLeaderboard, leaderboard, resultState, leaderboardDTO.getTimePoint(), maxCompetitorsCount);
@@ -213,7 +217,9 @@ public class LeaderboardsResourceV2 extends AbstractLeaderboardsResource {
                     final FleetDTO fleetOfCompetitor = leaderboardEntry.fleet;
                     jsonEntry.put("fleet", fleetOfCompetitor == null ? "" : fleetOfCompetitor.getName());
                     jsonEntry.put("totalPoints", leaderboardEntry.totalPoints);
-                    jsonEntry.put("uncorrectedTotalPoints", leaderboardEntry.totalPoints);
+                    if (includeUncorrectedTotalPoints) {
+                        jsonEntry.put("uncorrectedTotalPoints", leaderboardEntry.totalPointsUncorrected);
+                    }
                     jsonEntry.put("netPoints", leaderboardEntry.netPoints);
                     MaxPointsReason maxPointsReason = leaderboardEntry.reasonForMaxPoints;
                     jsonEntry.put("maxPointsReason", maxPointsReason != null ? maxPointsReason.toString() : null);
