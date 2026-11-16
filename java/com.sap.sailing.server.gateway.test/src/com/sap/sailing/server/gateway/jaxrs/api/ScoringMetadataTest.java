@@ -91,12 +91,12 @@ public class ScoringMetadataTest {
         for (final ResultStates state : ResultStates.values()) {
             final Response responseV1 = v1.getLeaderboard(leaderboard.getName(), state,
                     /* maxCompetitorsCount */ null, "secret", /* competitorAndBoatIdsOnly */ false,
-                    /* fetchUncorrectedScores */ false);
+                    /* includeUncorrectedTotalPoints */ false);
             final Response responseV2 = v2.getLeaderboard(leaderboard.getName(), state,
                     Collections.emptyList(), Collections.emptyList(), /* time */ null, /* timeasmillis */ null,
                     /* maxCompetitorsCount */ null, "secret", /* competitorAndBoatIdsOnly */ false,
                     Collections.emptyList(), /* showOnlyCompetitorsWithIdsProvided */ false,
-                    /* fetchUncorrectedScores */ false);
+                    /* includeUncorrectedTotalPoints */ false);
             for (final Response response : Arrays.asList(responseV1, responseV2)) {
                 final String body = StreamingOutputUtil.getEntityAsString(response.getEntity());
                 assertEquals(/* expected */ 200, response.getStatus(), body);
