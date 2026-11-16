@@ -1,0 +1,2786 @@
+{
+  "name": "ESS 2012 Rio (Extreme40)",
+  "scheme": "HIGH_POINT",
+  "type": "RegattaLeaderboard",
+  "displayName": "Rio",
+  "provenance": {
+    "results": {
+      "url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboards/ESS%202012%20Rio%20%28Extreme40%29",
+      "resolved_url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboards/ESS%202012%20Rio%20%28Extreme40%29",
+      "fetched_at": "2026-11-11T17:15:48.637397+00:00",
+      "status": 200,
+      "sha256": "90d13325a214a959675908d780f94f5a69d82d2e6204b446f551590718d7c15e",
+      "bytes": 58251
+    },
+    "configuration": {
+      "url": "https://www.sapsailing.com/sailingserver/api/v1/regattas/ESS%202012%20Rio%20%28Extreme40%29",
+      "resolved_url": "https://www.sapsailing.com/sailingserver/api/v1/regattas/ESS%202012%20Rio%20%28Extreme40%29",
+      "fetched_at": "2026-11-11T17:15:48.918185+00:00",
+      "status": 200,
+      "sha256": "9bfe926aacb5a2d5d37811aa67c1d768fc685d45898c62bde7648045d84294dd",
+      "bytes": 6996
+    },
+    "metadata": {
+      "base": "https://sapsailing.com",
+      "source": "central-metadata.json",
+      "sha256": "933a31e4dd4cde658f818e47e548e218ce8f8e0283669fbf32710569597064d8"
+    },
+    "capturedScheme": "HIGH_POINT"
+  },
+  "timePoint": 1355079741000,
+  "canBoatsOfCompetitorsChangePerRace": false,
+  "discardThresholds": [],
+  "series": [
+    {
+      "name": "Default",
+      "medal": false,
+      "parallel": true,
+      "reset": false,
+      "carry": false,
+      "contiguous": false,
+      "maximumDiscards": null,
+      "fleets": [
+        {
+          "name": "Default",
+          "ordering": 0
+        }
+      ],
+      "columns": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R6",
+        "R7",
+        "R8",
+        "R9",
+        "R10",
+        "R11",
+        "R12",
+        "R13",
+        "R14",
+        "R15",
+        "R16",
+        "R17",
+        "R18",
+        "R19",
+        "R20",
+        "R21",
+        "R22",
+        "R23",
+        "R24",
+        "R25",
+        "R26",
+        "R27",
+        "R28",
+        "R29",
+        "R30"
+      ]
+    }
+  ],
+  "columns": [
+    {
+      "name": "R1",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R2",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R3",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R4",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R5",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R6",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R7",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R8",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R9",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R10",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R11",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R12",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R13",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R14",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R15",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R16",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R17",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R18",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R19",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R20",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R21",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R22",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R23",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R24",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R25",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R26",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R27",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R28",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R29",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R30",
+      "factor": 2,
+      "explicitFactor": 2,
+      "oneAlwaysStaysOne": false
+    }
+  ],
+  "competitors": [
+    {
+      "id": "f99147d4-f205-11e1-984d-10bf48d758ce",
+      "name": "The Wave Muscat",
+      "displayName": "The Wave Muscat",
+      "sailID": "The Wave",
+      "expectedRank": 1,
+      "expectedTotal": 192.2,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R16",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R17",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R18",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R19",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R20",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R21",
+          "fleet": "Default",
+          "points": 7.1,
+          "reason": "RDG",
+          "isCorrected": true,
+          "expectedNet": 7.1,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R22",
+          "fleet": "Default",
+          "points": 7.1,
+          "reason": "RDG",
+          "isCorrected": true,
+          "expectedNet": 7.1,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R23",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R24",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R25",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R26",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R27",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R28",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R29",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R30",
+          "fleet": "Default",
+          "points": 16.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 16.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "f9365a9a-f205-11e1-984d-10bf48d758ce",
+      "name": "Groupe Edmond de Rothschild",
+      "displayName": "Groupe Edmond de Rothschild",
+      "sailID": "Rothschild",
+      "expectedRank": 2,
+      "expectedTotal": 192.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R16",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R17",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R18",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R19",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R20",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R21",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R22",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R23",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R24",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R25",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R26",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R27",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R28",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R29",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R30",
+          "fleet": "Default",
+          "points": 18.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 18.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "f94a453c-f205-11e1-984d-10bf48d758ce",
+      "name": "Oman Air",
+      "displayName": "Oman Air",
+      "sailID": "Oman Air",
+      "expectedRank": 3,
+      "expectedTotal": 181.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R16",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R17",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R18",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R19",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R20",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R21",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R22",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R23",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R24",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R25",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R26",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R27",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R28",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R29",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R30",
+          "fleet": "Default",
+          "points": 14.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 14.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "f95dacda-f205-11e1-984d-10bf48d758ce",
+      "name": "Red Bull Sailing Team",
+      "displayName": "Red Bull Sailing Team",
+      "sailID": "Red Bull",
+      "expectedRank": 4,
+      "expectedTotal": 179.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R16",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R17",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R18",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R19",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R20",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R21",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R22",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R23",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R24",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R25",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R26",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R27",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R28",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R29",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R30",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "f978dc4e-f205-11e1-984d-10bf48d758ce",
+      "name": "SAP Extreme Sailing Team",
+      "displayName": "SAP Extreme Sailing Team",
+      "sailID": "SAP",
+      "expectedRank": 5,
+      "expectedTotal": 166.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R16",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R17",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R18",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R19",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R20",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R21",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R22",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R23",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R24",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R25",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R26",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R27",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R28",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R29",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R30",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "f91389a2-f205-11e1-984d-10bf48d758ce",
+      "name": "Alinghi",
+      "displayName": "Alinghi",
+      "sailID": "Alinghi",
+      "expectedRank": 6,
+      "expectedTotal": 152.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R16",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R17",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R18",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R19",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R20",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R21",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R22",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R23",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R24",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R25",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R26",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R27",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R28",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R29",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R30",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "f91ea1de-f205-11e1-984d-10bf48d758ce",
+      "name": "GAC Pindar",
+      "displayName": "GAC Pindar",
+      "sailID": "Pindar",
+      "expectedRank": 7,
+      "expectedTotal": 129.6,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R16",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R17",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R18",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R19",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R20",
+          "fleet": "Default",
+          "points": 4.6,
+          "reason": "RDG",
+          "isCorrected": true,
+          "expectedNet": 4.6,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R21",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R22",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R23",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R24",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R25",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R26",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R27",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R28",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R29",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R30",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "f9ae084c-f205-11e1-984d-10bf48d758ce",
+      "name": "ZouLou",
+      "displayName": "ZouLou",
+      "sailID": "Zoulou",
+      "expectedRank": 8,
+      "expectedTotal": 119.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R16",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R17",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R18",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R19",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R20",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R21",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R22",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R23",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R24",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R25",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R26",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R27",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R28",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R29",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R30",
+          "fleet": "Default",
+          "points": 12.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 12.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "b955a778-3a26-11e2-bea6-10bf48d758ce",
+      "name": "Team Brasil",
+      "displayName": "Team Brasil",
+      "sailID": "Brasil",
+      "expectedRank": 9,
+      "expectedTotal": 92.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R16",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R17",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R18",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R19",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R20",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R21",
+          "fleet": "Default",
+          "points": 0.0,
+          "reason": "DSQ",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R22",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R23",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R24",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R25",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R26",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R27",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R28",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R29",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R30",
+          "fleet": "Default",
+          "points": 10.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 10.0,
+          "expectedDiscard": false
+        }
+      ]
+    }
+  ]
+}

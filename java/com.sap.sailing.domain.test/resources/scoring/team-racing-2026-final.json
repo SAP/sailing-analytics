@@ -1,0 +1,229 @@
+{
+  "name": "German Open Team Race & European Team Racing Qualifier 2026 des PYC (Finale)",
+  "scheme": "HIGH_POINT_FIRST_GETS_ONE",
+  "type": "RegattaLeaderboard",
+  "displayName": "3 Finale",
+  "provenance": {
+    "results": {
+      "url": "https://vsaw.sapsailing.com/sailingserver/api/v1/leaderboards/German%20Open%20Team%20Race%20%26%20European%20Team%20Racing%20Qualifier%202026%20des%20PYC%20%28Finale%29",
+      "fetched_at": "2026-11-11T15:11:10.469827+00:00",
+      "status": 200,
+      "resolved_url": "https://vsaw.sapsailing.com/sailingserver/api/v1/leaderboards/German%20Open%20Team%20Race%20%26%20European%20Team%20Racing%20Qualifier%202026%20des%20PYC%20%28Finale%29",
+      "sha256": "358406972abd3f0b41df3c07a66b2853f6a652b312216a0270c73e52c4d253f2",
+      "bytes": 4115
+    },
+    "configuration": {
+      "url": "https://vsaw.sapsailing.com/sailingserver/api/v1/regattas/German%20Open%20Team%20Race%20%26%20European%20Team%20Racing%20Qualifier%202026%20des%20PYC%20%28Finale%29",
+      "fetched_at": "2026-11-11T15:10:38.234873+00:00",
+      "status": 200,
+      "resolved_url": "https://vsaw.sapsailing.com/sailingserver/api/v1/regattas/German%20Open%20Team%20Race%20%26%20European%20Team%20Racing%20Qualifier%202026%20des%20PYC%20%28Finale%29",
+      "sha256": "0bcc21e2ebdda9a153af3ccc3f6d0a72ec9c2db8e8330bd6dd7aa2fd72a46823",
+      "bytes": 2060
+    },
+    "metadata": {
+      "base": "https://vsaw.sapsailing.com",
+      "fetched_at": "2026-11-11T15:14:12.600733+00:00",
+      "sha256": "a3c5870f3e4b7c2f600c74e88fb0ea9a6cdf0584f6a0f820d75e6a7af5661074"
+    },
+    "capturedScheme": "HIGH_POINT_FIRST_GETS_ONE"
+  },
+  "timePoint": 1779799161787,
+  "canBoatsOfCompetitorsChangePerRace": false,
+  "discardThresholds": [],
+  "series": [
+    {
+      "name": "Finale",
+      "medal": true,
+      "parallel": true,
+      "reset": true,
+      "carry": false,
+      "contiguous": false,
+      "maximumDiscards": null,
+      "fleets": [
+        {
+          "name": "Großes",
+          "ordering": 1
+        },
+        {
+          "name": "Kleines",
+          "ordering": 2
+        }
+      ],
+      "columns": [
+        "Fi1",
+        "Fi2",
+        "Fi3"
+      ]
+    }
+  ],
+  "columns": [
+    {
+      "name": "Fi1",
+      "factor": 1,
+      "explicitFactor": 1,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "Fi2",
+      "factor": 1,
+      "explicitFactor": 1,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "Fi3",
+      "factor": 1,
+      "explicitFactor": 1,
+      "oneAlwaysStaysOne": false
+    }
+  ],
+  "competitors": [
+    {
+      "id": "8280ea70-c84e-4d01-8f2b-c7272de9b2f8",
+      "name": "WM Team",
+      "displayName": "WM Team",
+      "sailID": "7",
+      "expectedRank": 1,
+      "expectedTotal": 2.0,
+      "cells": [
+        {
+          "column": "Fi1",
+          "fleet": "Großes",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Fi2",
+          "fleet": "Großes",
+          "points": 0.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Fi3",
+          "fleet": "Großes",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "0e3cce2b-f485-46c6-8b33-19bfb51d24d4",
+      "name": "VSaW",
+      "displayName": "VSaW",
+      "sailID": "10",
+      "expectedRank": 2,
+      "expectedTotal": 1.0,
+      "cells": [
+        {
+          "column": "Fi1",
+          "fleet": "Großes",
+          "points": 0.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Fi2",
+          "fleet": "Großes",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Fi3",
+          "fleet": "Großes",
+          "points": 0.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "84c295f8-ef05-4b82-865f-8862ef1d8fda",
+      "name": "BYC 1",
+      "displayName": "BYC 1",
+      "sailID": "4",
+      "expectedRank": 3,
+      "expectedTotal": 2.0,
+      "cells": [
+        {
+          "column": "Fi1",
+          "fleet": "Kleines",
+          "points": 0.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Fi2",
+          "fleet": "Kleines",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Fi3",
+          "fleet": "Kleines",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "764e605d-096b-4761-a9ab-de6988ccaf57",
+      "name": "Hamburg 1",
+      "displayName": "Hamburg 1",
+      "sailID": "2",
+      "expectedRank": 4,
+      "expectedTotal": 1.0,
+      "cells": [
+        {
+          "column": "Fi1",
+          "fleet": "Kleines",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Fi2",
+          "fleet": "Kleines",
+          "points": 0.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Fi3",
+          "fleet": "Kleines",
+          "points": 0.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        }
+      ]
+    }
+  ]
+}

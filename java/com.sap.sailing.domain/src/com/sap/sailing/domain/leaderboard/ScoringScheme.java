@@ -97,9 +97,13 @@ public interface ScoringScheme extends Serializable {
 
     /**
      * @param competitor1Scores
-     *            scores of the first competitor, in the order of race columns in the leaderboard
+     *            corrected, unweighted total points of the first competitor, including discarded scores,
+     *            in the order of race columns in the leaderboard; the implementation applies any required weighting
      * @param competitor2Scores
-     *            scores of the second competitor, in the order of race columns in the leaderboard
+     *            corrected, unweighted total points of the second competitor, including discarded scores,
+     *            in the order of race columns in the leaderboard
+     * @param totalPointsSupplier
+     *            supplies the same unweighted total points as {@link Leaderboard#getTotalPoints(Competitor, RaceColumn, TimePoint)}
      * @param discardedRaceColumnsPerCompetitor
      *            for each competitor holds the result of {@link Leaderboard#getResultDiscardingRule()
      *            Leaderborad.getResultDiscardingRule()}{@code .}{@link ResultDiscardingRule#getDiscardedRaceColumns(Competitor, Leaderboard, Iterable, TimePoint, ScoringScheme)
@@ -353,24 +357,30 @@ public interface ScoringScheme extends Serializable {
     /**
      * Precondition: either both scored in medal race or both didn't. If both scored, the better score sum wins. If both
      * scored the same sum in the medal races, apply
-     * {@link #compareByScoreSum(Competitor, List, double, Competitor, List, double, boolean, boolean, Supplier)} to
+     * {@link #compareByBetterScore(Competitor, List, Competitor, List, Iterable, boolean, TimePoint, Leaderboard, Map, BiFunction, WindLegTypeAndLegBearingAndORCPerformanceCurveCache)} to
      * apply the same tie breaking to the medal races as for other series.
      * <p>
      * 
      * This is to be applied only if the net score of both competitors are equal to each other.
+     * The Medal score lists and sums are weighted net points; {@code totalPointsSupplier} supplies unweighted
+     * total points for the subsequent {@link #compareByBetterScore} comparison.
      */
-    default int compareByMedalRaceScore(Competitor o1, Competitor o2, Double o1MedalRaceScore, Double o2MedalRaceScore,
-            List<Pair<RaceColumn, Double>> o1ScoringMedalRaces, List<Pair<RaceColumn, Double>> o2ScoringMedalRaces,
-            TimePoint timePoint, Leaderboard leaderboard,
-            Map<Competitor, Set<RaceColumn>> discardedRaceColumnsPerCompetitor,
-            BiFunction<Competitor, RaceColumn, Double> totalPointsSupplier, boolean nullScoresAreBetter,
-            WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache) {
+    default int compareByMedalRaceScore(final Competitor o1, final Competitor o2, final Double o1MedalRaceScore, final Double o2MedalRaceScore,
+            final List<Pair<RaceColumn, Double>> o1ScoringMedalRaces, final List<Pair<RaceColumn, Double>> o2ScoringMedalRaces,
+            final TimePoint timePoint, final Leaderboard leaderboard,
+            final Map<Competitor, Set<RaceColumn>> discardedRaceColumnsPerCompetitor,
+            final BiFunction<Competitor, RaceColumn, Double> totalPointsSupplier, final boolean nullScoresAreBetter,
+            final WindLegTypeAndLegBearingAndORCPerformanceCurveCache cache) {
         assert o1MedalRaceScore != null || o2MedalRaceScore == null;
         int result;
         if (o1MedalRaceScore != null) {
             result = getScoreComparator(nullScoresAreBetter).compare(o1MedalRaceScore, o2MedalRaceScore);
             if (result == 0 && o1ScoringMedalRaces.size() > 1) { // only work calling if more than one scoring medal race
-                result = compareByBetterScore(o1, o1ScoringMedalRaces, o2, o2ScoringMedalRaces,
+                final List<Pair<RaceColumn, Double>> o1UnweightedMedalScores = Util.asList(Util.map(o1ScoringMedalRaces,
+                        (final Pair<RaceColumn, Double> score) -> new Pair<>(score.getA(), totalPointsSupplier.apply(o1, score.getA()))));
+                final List<Pair<RaceColumn, Double>> o2UnweightedMedalScores = Util.asList(Util.map(o2ScoringMedalRaces,
+                        (final Pair<RaceColumn, Double> score) -> new Pair<>(score.getA(), totalPointsSupplier.apply(o2, score.getA()))));
+                result = compareByBetterScore(o1, o1UnweightedMedalScores, o2, o2UnweightedMedalScores,
                         Util.map(o1ScoringMedalRaces, Pair::getA), nullScoresAreBetter, timePoint, leaderboard,
                         discardedRaceColumnsPerCompetitor, totalPointsSupplier, cache);
             }

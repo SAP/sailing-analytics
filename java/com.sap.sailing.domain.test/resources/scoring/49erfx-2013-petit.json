@@ -1,0 +1,507 @@
+{
+  "name": "49er Euros 2013 Petit Final (49FX)",
+  "scheme": "LOW_POINT",
+  "type": "RegattaLeaderboard",
+  "displayName": "Petit Final - 49erFX",
+  "provenance": {
+    "results": {
+      "url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboards/49er%20Euros%202013%20Petit%20Final%20%2849FX%29",
+      "finalUrl": "https://www.sapsailing.com/sailingserver/api/v1/leaderboards/49er%20Euros%202013%20Petit%20Final%20%2849FX%29",
+      "status": 200,
+      "retrievedAt": "2026-11-13T01:27:51.415277+00:00",
+      "contentType": "application/json;charset=utf-8",
+      "sha256": "acfa51db5dfd5f326536149e750c3794d9ac4609532cfdcf4440b4ecc2ce784d"
+    },
+    "configuration": {
+      "url": "https://www.sapsailing.com/sailingserver/api/v1/regattas/49er%20Euros%202013%20Petit%20Final%20%2849FX%29",
+      "finalUrl": "https://www.sapsailing.com/sailingserver/api/v1/regattas/49er%20Euros%202013%20Petit%20Final%20%2849FX%29",
+      "status": 200,
+      "retrievedAt": "2026-11-13T01:28:42.838342+00:00",
+      "contentType": "application/json;charset=utf-8",
+      "sha256": "333bf58a1f1f2ee5d49e559c7395d9702e5df57953a2edaa163ec595e8e3381c"
+    },
+    "metadata": {
+      "base": "https://sapsailing.com",
+      "source": "central-metadata.json",
+      "sha256": "933a31e4dd4cde658f818e47e548e218ce8f8e0283669fbf32710569597064d8"
+    },
+    "capturedScheme": "LOW_POINT",
+    "officialResults": {
+      "url": "https://49er.org/wp-content/uploads/2013/06/OVERALL-49FX-FINAL.pdf",
+      "finalUrl": "https://49er.org/wp-content/uploads/2013/06/OVERALL-49FX-FINAL.pdf",
+      "status": 200,
+      "retrievedAt": "2026-11-13T01:27:51.983676+00:00",
+      "contentType": "application/pdf",
+      "sha256": "bc5d19703d0914a099bdcf52e322006730c36cebce8c19e6be79224bc75be06e"
+    }
+  },
+  "timePoint": 1373206178000,
+  "canBoatsOfCompetitorsChangePerRace": false,
+  "discardThresholds": [],
+  "series": [
+    {
+      "name": "Default",
+      "medal": true,
+      "parallel": true,
+      "reset": false,
+      "carry": false,
+      "contiguous": false,
+      "maximumDiscards": null,
+      "fleets": [
+        {
+          "name": "Default",
+          "ordering": 0
+        }
+      ],
+      "columns": [
+        "M0",
+        "M1",
+        "M2",
+        "M3"
+      ]
+    }
+  ],
+  "columns": [
+    {
+      "name": "M0",
+      "factor": 1,
+      "explicitFactor": 1,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "M1",
+      "factor": 2,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "M2",
+      "factor": 2,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "M3",
+      "factor": 2,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    }
+  ],
+  "competitors": [
+    {
+      "id": "b564133c-e4eb-11e2-a0ba-60a44ce903c3",
+      "name": "Peters+Groves",
+      "displayName": "Frances Peters, Nicola Groves",
+      "sailID": "GBR121",
+      "expectedRank": 1,
+      "expectedTotal": 133.0,
+      "cells": [
+        {
+          "column": "M0",
+          "fleet": "",
+          "points": 119.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 119.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M1",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M2",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M3",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "b52b7ea0-e4eb-11e2-a0ba-60a44ce903c3",
+      "name": "Jurczok",
+      "displayName": "Victoria Jurczok, Anika Lorenz",
+      "sailID": "GER712",
+      "expectedRank": 2,
+      "expectedTotal": 139.0,
+      "cells": [
+        {
+          "column": "M0",
+          "fleet": "",
+          "points": 123.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 123.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M1",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M2",
+          "fleet": "Default",
+          "points": 10.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 10.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M3",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "b5fdc1b2-e4eb-11e2-a0ba-60a44ce903c3",
+      "name": "Görge+Görge",
+      "displayName": "Jule GÃ¶rge, Lotta GÃ¶rge",
+      "sailID": "GER810",
+      "expectedRank": 3,
+      "expectedTotal": 161.0,
+      "cells": [
+        {
+          "column": "M0",
+          "fleet": "",
+          "points": 131.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 131.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M1",
+          "fleet": "Default",
+          "points": 10.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 10.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M2",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M3",
+          "fleet": "Default",
+          "points": 16.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 16.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "b5d0d17a-e4eb-11e2-a0ba-60a44ce903c3",
+      "name": "Meyer+Hahlbrock",
+      "displayName": "Leonie Meyer, Maren Hahlbrock",
+      "sailID": "GER777",
+      "expectedRank": 4,
+      "expectedTotal": 172.0,
+      "cells": [
+        {
+          "column": "M0",
+          "fleet": "",
+          "points": 150.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 150.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M1",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M2",
+          "fleet": "Default",
+          "points": 12.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 12.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M3",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "b659ee38-e4eb-11e2-a0ba-60a44ce903c3",
+      "name": "Macgregor",
+      "displayName": "Kate Macgregor, Mary Rook",
+      "sailID": "GBR370",
+      "expectedRank": 5,
+      "expectedTotal": 192.0,
+      "cells": [
+        {
+          "column": "M0",
+          "fleet": "",
+          "points": 166.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 166.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M1",
+          "fleet": "Default",
+          "points": 16.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 16.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M2",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M3",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "b59213fe-e4eb-11e2-a0ba-60a44ce903c3",
+      "name": "Tunnicliffe",
+      "displayName": "Anna Tunnicliffe, Molly Vandemoer",
+      "sailID": "USA816",
+      "expectedRank": 6,
+      "expectedTotal": 194.0,
+      "cells": [
+        {
+          "column": "M0",
+          "fleet": "",
+          "points": 162.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 162.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M1",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M2",
+          "fleet": "Default",
+          "points": 14.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 14.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M3",
+          "fleet": "Default",
+          "points": 10.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 10.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "b62ceb4a-e4eb-11e2-a0ba-60a44ce903c3",
+      "name": "Schütt",
+      "displayName": "Maiken Foght SchÃ¼tt, Anne-Julie Foght SchÃ¼tt",
+      "sailID": "DEN104",
+      "expectedRank": 7,
+      "expectedTotal": 201.0,
+      "cells": [
+        {
+          "column": "M0",
+          "fleet": "",
+          "points": 167.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 167.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M1",
+          "fleet": "Default",
+          "points": 14.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 14.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M2",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M3",
+          "fleet": "Default",
+          "points": 12.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 12.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "b68cb28c-e4eb-11e2-a0ba-60a44ce903c3",
+      "name": "Price",
+      "displayName": "Olivia Price, Caitlin Elks",
+      "sailID": "AUS848",
+      "expectedRank": 8,
+      "expectedTotal": 203.0,
+      "cells": [
+        {
+          "column": "M0",
+          "fleet": "",
+          "points": 151.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 151.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M1",
+          "fleet": "Default",
+          "points": 18.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 18.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M2",
+          "fleet": "Default",
+          "points": 16.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 16.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M3",
+          "fleet": "Default",
+          "points": 18.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 18.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "e079c62c-e683-11e2-a60b-60a44ce903c3",
+      "name": "Cantero",
+      "displayName": "MarÃ­a Cantero, Ana HernÃ¡ndez",
+      "sailID": "ESP989",
+      "expectedRank": 9,
+      "expectedTotal": 211.0,
+      "cells": [
+        {
+          "column": "M0",
+          "fleet": "",
+          "points": 167.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 167.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M1",
+          "fleet": "Default",
+          "points": 12.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 12.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M2",
+          "fleet": "Default",
+          "points": 18.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 18.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "M3",
+          "fleet": "Default",
+          "points": 14.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 14.0,
+          "expectedDiscard": false
+        }
+      ]
+    }
+  ],
+  "configurationNotes": "Fresh results and regatta configuration after user corrections on 2026-11-13; column factors and leaderboard discard thresholds retain the separately captured central GWT metadata. All 36 cells, nine totals and stage ranks agree with the official Petit Final PDF (Adv maps to 1; championship places 10-17 map to 2-9). M0 remains unflagged."
+}
