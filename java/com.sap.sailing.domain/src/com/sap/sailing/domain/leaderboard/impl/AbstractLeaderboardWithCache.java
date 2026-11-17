@@ -527,7 +527,7 @@ public abstract class AbstractLeaderboardWithCache implements Leaderboard {
                     }
                     final boolean computeLegDetails = namesOfRaceColumnsForWhichToLoadLegDetails != null &&
                             namesOfRaceColumnsForWhichToLoadLegDetails.contains(raceColumn.getName());
-                    Future<LeaderboardEntryDTO> future = executor.submit(() -> {
+                    final Future<LeaderboardEntryDTO> future = executor.submit(cpuMeterCallable(() -> {
                         // if leg details are to be requested, the ranking info needs to be provided:
                         // TODO bug5143 (performance): shouldn't the rankingInfoCache be passed on because detail computations need them all?
                         final RankingInfo rankingInfo = computeLegDetails ? rankingInfoCache.computeIfAbsent(new Pair<>(raceColumn, competitor),
@@ -539,7 +539,7 @@ public abstract class AbstractLeaderboardWithCache implements Leaderboard {
                         return getLeaderboardEntryDTO(entry, raceColumn, competitor, timePoint, computeLegDetails,
                                 rankingInfo, waitForLatestAnalyses, legRanksCache, baseDomainFactory,
                                 fillTotalPointsUncorrected, cache);
-                    });
+                    }, CPUMeteringType.LEADERBOARD_COMPUTE_DTO.name()));
                     futuresForCompetitorAndColumnName.put(new Pair<>(competitor, raceColumn.getName()), new Pair<>(row, future));
                 }
                 result.rows.put(competitorDTO, row);

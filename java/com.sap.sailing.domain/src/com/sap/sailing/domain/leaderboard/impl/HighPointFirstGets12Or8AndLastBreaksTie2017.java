@@ -38,25 +38,20 @@ public class HighPointFirstGets12Or8AndLastBreaksTie2017 extends AbstractHighPoi
     }
     
     @Override
-    public Double getPenaltyScore(RaceColumn raceColumn, Competitor competitor, MaxPointsReason maxPointsReason,
-            Integer numberOfCompetitorsInRace, NumberOfCompetitorsInLeaderboardFetcher numberOfCompetitorsInLeaderboardFetcher, TimePoint timePoint, Leaderboard leaderboard, Supplier<Double> uncorrectedScoreProvider) {
-        Double result;
-        /**
-         * 1. Get all competitors without a max point reason.
-         * 2. This list of competitors is assumed to be all competitors having successfully taken part in the race.
-         * 3. The score of the last competitor will be 12-size(competitorList)
-         * 
-         * XXX How about two competitors not finishing a race? They will get the same score. NOR does not state
-         * anything on how to handle such a situation except that it implicates that this will lead to a tie. No
-         * update from OC Sport on that question so far (Mar 2017).
-         */
-        int competitorCountWithoutMaxPointReason = numberOfCompetitorsInLeaderboardFetcher.getNumberOfCompetitorsWithoutMaxPointReason(raceColumn, timePoint);
+    public Double getPenaltyScore(final RaceColumn raceColumn, final Competitor competitor, final MaxPointsReason maxPointsReason,
+            final Integer numberOfCompetitorsInRace, final NumberOfCompetitorsInLeaderboardFetcher numberOfCompetitorsInLeaderboardFetcher,
+            final TimePoint timePoint, final Leaderboard leaderboard, final Supplier<Double> uncorrectedScoreProvider) {
+        final Double result;
+        // Finishers have no max-points reason; the last one's score is maximumScore - finisherCount + 1.
+        final int competitorCountWithoutMaxPointReason = numberOfCompetitorsInLeaderboardFetcher
+                .getNumberOfCompetitorsWithoutMaxPointReason(raceColumn, timePoint);
+        final double maximumScore = getScoreForRaceWinner(raceColumn);
         if (maxPointsReason == MaxPointsReason.DNS || maxPointsReason == MaxPointsReason.DNF || maxPointsReason == MaxPointsReason.RET) {
-        	result = (12 - competitorCountWithoutMaxPointReason) * 1.0;
+            result = maximumScore - competitorCountWithoutMaxPointReason;
         } else if (maxPointsReason == MaxPointsReason.DSQ || maxPointsReason == MaxPointsReason.OCS) {
-        	result = (12 - competitorCountWithoutMaxPointReason - 1) * 1.0;
+            result = maximumScore - competitorCountWithoutMaxPointReason - 1;
         } else {
-        	result = 0.0;
+            result = 0.0;
         }
         return result;
     }

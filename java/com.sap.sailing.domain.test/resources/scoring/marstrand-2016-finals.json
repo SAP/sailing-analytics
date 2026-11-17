@@ -1,0 +1,176 @@
+{
+  "name": "WMRT 2016 - Marstrand - Finals",
+  "scheme": "HIGH_POINT_MATCH_RACING",
+  "type": "RegattaLeaderboard",
+  "displayName": "Finals",
+  "provenance": {
+    "results": {
+      "url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboards/WMRT%202016%20-%20Marstrand%20-%20Finals",
+      "resolved_url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboards/WMRT%202016%20-%20Marstrand%20-%20Finals",
+      "fetched_at": "2026-11-11T16:49:34.725790+00:00",
+      "status": 200,
+      "bytes": 3526,
+      "sha256": "9b82e21914a0792257e3ea1063f816e7c31925794ca2a7f493cde02b46e6d4b7"
+    },
+    "configuration": {
+      "url": "https://www.sapsailing.com/sailingserver/api/v1/regattas/WMRT%202016%20-%20Marstrand%20-%20Finals",
+      "resolved_url": "https://www.sapsailing.com/sailingserver/api/v1/regattas/WMRT%202016%20-%20Marstrand%20-%20Finals",
+      "fetched_at": "2026-11-11T16:49:34.422756+00:00",
+      "status": 200,
+      "bytes": 1617,
+      "sha256": "83db16f68b5fb9dd0a6b24dc16e9db6722db230bb198175436b095b2457a6175"
+    },
+    "metadata": {
+      "base": "https://sapsailing.com",
+      "source": "central-metadata.json",
+      "sha256": "933a31e4dd4cde658f818e47e548e218ce8f8e0283669fbf32710569597064d8"
+    },
+    "capturedScheme": "HIGH_POINT_MATCH_RACING"
+  },
+  "timePoint": 1468072870500,
+  "canBoatsOfCompetitorsChangePerRace": true,
+  "discardThresholds": [],
+  "series": [
+    {
+      "name": "Finals",
+      "medal": false,
+      "parallel": false,
+      "reset": false,
+      "carry": false,
+      "contiguous": false,
+      "maximumDiscards": null,
+      "fleets": [
+        {
+          "name": "Default",
+          "ordering": 0
+        }
+      ],
+      "columns": [
+        "101",
+        "102",
+        "103",
+        "104"
+      ]
+    }
+  ],
+  "columns": [
+    {
+      "name": "101",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "102",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "103",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "104",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    }
+  ],
+  "competitors": [
+    {
+      "id": "6dc43ed0-23f7-0134-0373-60a44ce903c3",
+      "name": "Robertson",
+      "displayName": "Robertson",
+      "sailID": null,
+      "expectedRank": 1,
+      "expectedTotal": 2.0,
+      "cells": [
+        {
+          "column": "101",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "102",
+          "fleet": "Default",
+          "points": -1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": -1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "103",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "104",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "564fd530-23eb-0134-01ac-60a44ce903c3",
+      "name": "Canfield",
+      "displayName": "Canfield",
+      "sailID": null,
+      "expectedRank": 2,
+      "expectedTotal": 1.0,
+      "cells": [
+        {
+          "column": "101",
+          "fleet": "Default",
+          "points": 0.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "102",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "103",
+          "fleet": "Default",
+          "points": 0.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "104",
+          "fleet": "Default",
+          "points": 0.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        }
+      ]
+    }
+  ]
+}
