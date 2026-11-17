@@ -1,0 +1,3504 @@
+{
+  "name": "Champions League 2014",
+  "scheme": "HIGH_POINT_WINNER_GETS_EIGHT_AND_INTERPOLATION",
+  "type": "RegattaLeaderboard",
+  "displayName": "Champions League 2014",
+  "provenance": {
+    "results": {
+      "url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboards/Champions%20League%202014",
+      "resolved_url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboards/Champions%20League%202014",
+      "fetched_at": "2026-11-11T17:15:49.944434+00:00",
+      "status": 200,
+      "sha256": "9c56272aa1df56296de2865ab1366c548e76c1f9533c0dc14991ea75ce9afd4c",
+      "bytes": 78619
+    },
+    "configuration": {
+      "url": "https://www.sapsailing.com/sailingserver/api/v1/regattas/Champions%20League%202014",
+      "resolved_url": "https://www.sapsailing.com/sailingserver/api/v1/regattas/Champions%20League%202014",
+      "fetched_at": "2026-11-11T17:15:50.243151+00:00",
+      "status": 200,
+      "sha256": "c24af2ae8761356b5f6746980f0a112fd2e59b9ba0bb72bb8f94b5648b938b31",
+      "bytes": 10046
+    },
+    "metadata": {
+      "base": "https://sapsailing.com",
+      "source": "central-metadata.json",
+      "sha256": "933a31e4dd4cde658f818e47e548e218ce8f8e0283669fbf32710569597064d8"
+    },
+    "capturedScheme": "HIGH_POINT_WINNER_GETS_EIGHT_AND_INTERPOLATION"
+  },
+  "timePoint": 1413989682000,
+  "canBoatsOfCompetitorsChangePerRace": false,
+  "discardThresholds": [],
+  "series": [
+    {
+      "name": "Default",
+      "medal": false,
+      "parallel": true,
+      "reset": false,
+      "carry": false,
+      "contiguous": false,
+      "maximumDiscards": null,
+      "fleets": [
+        {
+          "name": "Group 1",
+          "ordering": 0
+        },
+        {
+          "name": "Group 2",
+          "ordering": 0
+        },
+        {
+          "name": "Group 3",
+          "ordering": 0
+        }
+      ],
+      "columns": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R6",
+        "R7",
+        "R8",
+        "R9",
+        "R10",
+        "R11",
+        "R12",
+        "R13",
+        "R14",
+        "R15"
+      ]
+    }
+  ],
+  "columns": [
+    {
+      "name": "R1",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R2",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R3",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R4",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R5",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R6",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R7",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R8",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R9",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R10",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R11",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R12",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R13",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R14",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R15",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    }
+  ],
+  "competitors": [
+    {
+      "id": "39abc7b0-3809-0132-45cc-10bf48d758ce",
+      "name": "Kongelig Dansk Yachtklub",
+      "displayName": "Kongelig Dansk Yachtklub",
+      "sailID": "KDY",
+      "expectedRank": 1,
+      "expectedTotal": 92.833,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 2",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 1",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 3",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 3",
+          "points": 5.667,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.667,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 2",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 2",
+          "points": 3.333,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.333,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 2",
+          "points": 6.833,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.833,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 2",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 3",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 3",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 1",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "3a201b90-3809-0132-45d5-10bf48d758ce",
+      "name": "Circolo Canottieri Aniene",
+      "displayName": "Circolo Canottieri Aniene",
+      "sailID": "CCA",
+      "expectedRank": 2,
+      "expectedTotal": 92.333,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 2",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 1",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 3",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 2",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 3",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 1",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 2",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 3",
+          "points": 3.333,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.333,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 2",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "3d93e7f0-3809-0132-45e1-10bf48d758ce",
+      "name": "Oman Sail",
+      "displayName": "Oman Sail",
+      "sailID": "OMA",
+      "expectedRank": 3,
+      "expectedTotal": 89.833,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 2",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 3",
+          "points": 5.667,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.667,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 2",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 3",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 2",
+          "points": 6.833,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.833,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 2",
+          "points": 4.5,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.5,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 3",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 2",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 2",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 2",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 3",
+          "points": 6.833,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.833,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "39786550-3809-0132-45c9-10bf48d758ce",
+      "name": "Kongelig Norsk Seilforening",
+      "displayName": "Kongelig Norsk Seilforening",
+      "sailID": "RNYC",
+      "expectedRank": 4,
+      "expectedTotal": 89.5,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 3",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 1",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 2",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 3",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 3",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 3",
+          "points": 4.5,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.5,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 2",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 3",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 2",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "38c3c670-3809-0132-45c0-10bf48d758ce",
+      "name": "Nordeutscher Regatta Verein",
+      "displayName": "Nordeutscher Regatta Verein",
+      "sailID": "NRV",
+      "expectedRank": 5,
+      "expectedTotal": 85.83,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 1",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 3",
+          "points": 3.333,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.333,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 1",
+          "points": 5.667,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.667,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 1",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 2",
+          "points": 6.83,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.83,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 2",
+          "points": 6.833,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.833,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 3",
+          "points": 2.167,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.167,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 2",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "38e6fbf0-3809-0132-45c3-10bf48d758ce",
+      "name": "Verein Seglerhaus am Wannsee",
+      "displayName": "Verein Seglerhaus am Wannsee",
+      "sailID": "VSaW",
+      "expectedRank": 6,
+      "expectedTotal": 81.834,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 1",
+          "points": 6.833,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.833,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 3",
+          "points": 2.167,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.167,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 3",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 3",
+          "points": 5.667,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.667,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 3",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 3",
+          "points": 4.5,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.5,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 3",
+          "points": 5.667,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.667,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "3ff53610-3809-0132-45f9-10bf48d758ce",
+      "name": "WaterSportVereniging Almere",
+      "displayName": "WaterSportVereniging Almere",
+      "sailID": "WSVA",
+      "expectedRank": 7,
+      "expectedTotal": 79.666,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 3",
+          "points": 4.5,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.5,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 3",
+          "points": 6.833,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.833,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 2",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 3",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 2",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 1",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 2",
+          "points": 3.333,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.333,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 3",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 3",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "3f6a7f30-3809-0132-45f3-10bf48d758ce",
+      "name": "Real Club Nautico de Gran Canaria",
+      "displayName": "Real Club Nautico de Gran Canaria",
+      "sailID": "RCNGC",
+      "expectedRank": 8,
+      "expectedTotal": 77.33,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 3",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 3",
+          "points": 3.33,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.33,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 3",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 2",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 2",
+          "points": 2.167,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.167,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 1",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 3",
+          "points": 6.833,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.833,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 3",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 3",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "39f70940-3809-0132-45d2-10bf48d758ce",
+      "name": "Hellerup Sejlklub",
+      "displayName": "Hellerup Sejlklub",
+      "sailID": "HS",
+      "expectedRank": 9,
+      "expectedTotal": 75.333,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 3",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 3",
+          "points": 6.833,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.833,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 2",
+          "points": 5.667,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.667,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 3",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 3",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 1",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 2",
+          "points": 4.5,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.5,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 1",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 2",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 3",
+          "points": 3.333,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.333,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "3db444b0-3809-0132-45e4-10bf48d758ce",
+      "name": "Kerteminde Sejlklub",
+      "displayName": "Kerteminde Sejlklub",
+      "sailID": "KS",
+      "expectedRank": 10,
+      "expectedTotal": 74.164,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 2",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 3",
+          "points": 4.5,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.5,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 2",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 3",
+          "points": 5.667,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.667,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 2",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 2",
+          "points": 3.33,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.33,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 1",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 2",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 3",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 2",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 3",
+          "points": 5.667,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.667,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "39218370-3809-0132-45c6-10bf48d758ce",
+      "name": "Union Yacht Club Mondsee",
+      "displayName": "Union Yacht Club Mondsee",
+      "sailID": "UYCM",
+      "expectedRank": 11,
+      "expectedTotal": 71.83,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 2",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 2",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 3",
+          "points": 3.33,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.33,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 1",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 2",
+          "points": 4.5,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.5,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 3",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 3",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 3",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "3aea1c60-3809-0132-45de-10bf48d758ce",
+      "name": "Württembergischer Yacht-Club",
+      "displayName": "Württembergischer Yacht-Club",
+      "sailID": "WYC",
+      "expectedRank": 12,
+      "expectedTotal": 71.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 2",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 3",
+          "points": 6.833,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.833,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 3",
+          "points": 5.667,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.667,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 1",
+          "points": 2.167,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.167,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 2",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 2",
+          "points": 4.5,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.5,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 3",
+          "points": 6.833,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.833,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 2",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "3e050170-3809-0132-45ea-10bf48d758ce",
+      "name": "Sport Nautique de l'Ouest",
+      "displayName": "Sport Nautique de l'Ouest",
+      "sailID": "SNO",
+      "expectedRank": 13,
+      "expectedTotal": 70.84,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 2",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 3",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 2",
+          "points": 2.17,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.17,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 2",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 3",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 2",
+          "points": 5.67,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.67,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "3a75f5f0-3809-0132-45d8-10bf48d758ce",
+      "name": "Thunersee Yachtclub",
+      "displayName": "Thunersee Yachtclub",
+      "sailID": "TYC",
+      "expectedRank": 14,
+      "expectedTotal": 65.67,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 2",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 2",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 2",
+          "points": 2.17,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.17,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 2",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 2",
+          "points": 5.667,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.667,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 2",
+          "points": 4.5,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.5,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 3",
+          "points": 3.333,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.333,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 2",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "388d46f0-3809-0132-45bd-10bf48d758ce",
+      "name": "Yacht Club Bregenz",
+      "displayName": "Yacht Club Bregenz",
+      "sailID": "YCB",
+      "expectedRank": 15,
+      "expectedTotal": 61.667,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 2",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 3",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 3",
+          "points": 4.5,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.5,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 3",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 3",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 3",
+          "points": 5.667,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.667,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 3",
+          "points": 3.333,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.333,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 3",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 2",
+          "points": 2.167,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.167,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 1",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "3dd0b8c0-3809-0132-45e7-10bf48d758ce",
+      "name": "Union Yacht Club",
+      "displayName": "Union Yacht Club",
+      "sailID": "UYC",
+      "expectedRank": 16,
+      "expectedTotal": 60.833,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 3",
+          "points": 6.833,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.833,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 2",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 3",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 2",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 2",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 3",
+          "points": 2.167,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.167,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 2",
+          "points": 6.833,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.833,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "3aab46c0-3809-0132-45db-10bf48d758ce",
+      "name": "Göteborgs Kungligs Segel Sällskap",
+      "displayName": "Göteborgs Kungligs Segel Sällskap",
+      "sailID": "GKSS",
+      "expectedRank": 17,
+      "expectedTotal": 58.507000000000005,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 3",
+          "points": 6.833,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.833,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 2",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 3",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 2",
+          "points": 5.67,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.67,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 2",
+          "points": 5.67,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.67,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 3",
+          "points": 2.167,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.167,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 3",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 3",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 1",
+          "points": 0.0,
+          "reason": "OCS",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 3",
+          "points": 2.167,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.167,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "3fbeb6a0-3809-0132-45f6-10bf48d758ce",
+      "name": "Yacht Club Costa Smeralda",
+      "displayName": "Yacht Club Costa Smeralda",
+      "sailID": "YCCS",
+      "expectedRank": 18,
+      "expectedTotal": 58.333,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 3",
+          "points": 2.167,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.167,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 2",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 1",
+          "points": 3.333,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.333,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 1",
+          "points": 0.0,
+          "reason": "OCS",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 3",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 3",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 1",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 2",
+          "points": 3.333,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.333,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 3",
+          "points": 4.5,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.5,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "3e535f30-3809-0132-45ed-10bf48d758ce",
+      "name": "Saint Petersburg Yacht Club",
+      "displayName": "Saint Petersburg Yacht Club",
+      "sailID": "SPYC",
+      "expectedRank": 19,
+      "expectedTotal": 50.67,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 3",
+          "points": 5.667,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.667,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 1",
+          "points": 4.5,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.5,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 3",
+          "points": 2.17,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.17,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 3",
+          "points": 4.5,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.5,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 3",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 3",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 3",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 3",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 3",
+          "points": 6.833,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.833,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 2",
+          "points": 0.0,
+          "reason": "OCS",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "3edff730-3809-0132-45f0-10bf48d758ce",
+      "name": "Royal Thames Yacht Club",
+      "displayName": "Royal Thames Yacht Club",
+      "sailID": "RTYC",
+      "expectedRank": 20,
+      "expectedTotal": 49.003,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 3",
+          "points": 3.333,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.333,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 3",
+          "points": 2.17,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.17,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 3",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 3",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 3",
+          "points": 4.5,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.5,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 3",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "38406800-3809-0132-45ba-10bf48d758ce",
+      "name": "Kungliga Svenska Segel Sällskapet",
+      "displayName": "Kungliga Svenska Segel Sällskapet",
+      "sailID": "KSSS",
+      "expectedRank": 21,
+      "expectedTotal": 43.833,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 1",
+          "points": 0.0,
+          "reason": "DSQ",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 3",
+          "points": 4.5,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.5,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 2",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 3",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 3",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 2",
+          "points": 3.333,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.333,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "39ce5800-3809-0132-45cf-10bf48d758ce",
+      "name": "Royal Yacht Club Moscow",
+      "displayName": "Royal Yacht Club Moscow",
+      "sailID": "RYCM",
+      "expectedRank": 22,
+      "expectedTotal": 27.5,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 3",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 1",
+          "points": 0.0,
+          "reason": "OCS",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 3",
+          "points": 3.333,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.333,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 3",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 2",
+          "points": 2.167,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.167,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 2",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 2",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "37d7bec0-3809-0132-45b7-10bf48d758ce",
+      "name": "Chojnicki Klub Zeglarski",
+      "displayName": "Chojnicki Klub Zeglarski",
+      "sailID": "CKZ",
+      "expectedRank": 23,
+      "expectedTotal": 19.167,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Group 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Group 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Group 3",
+          "points": 2.167,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.167,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Group 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Group 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Group 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Group 3",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "Group 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "Group 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "Group 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "Group 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "Group 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "Group 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R14",
+          "fleet": "Group 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R15",
+          "fleet": "Group 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        }
+      ]
+    }
+  ]
+}
