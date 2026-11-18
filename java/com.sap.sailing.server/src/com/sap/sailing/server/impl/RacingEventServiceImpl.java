@@ -615,6 +615,8 @@ Replicator {
      */
     private final CountDownLatch polarDataServiceArrived = new CountDownLatch(1);
 
+    private final boolean restoreTrackedRaces;
+
     private final ServiceTracker<ResultUrlRegistry, ResultUrlRegistry> resultUrlRegistryServiceTracker;
 
     private final ServiceTracker<ScoreCorrectionProvider, ScoreCorrectionProvider> scoreCorrectionProviderServiceTracker;
@@ -861,7 +863,7 @@ Replicator {
             MediaDB mediaDb, final WindStore windStore, final SensorFixStore sensorFixStore,
             TypeBasedServiceFinderFactory serviceFinderFactory, TrackedRegattaListenerManager trackedRegattaListener,
             SailingNotificationService sailingNotificationService,
-            TrackedRaceStatisticsCache trackedRaceStatisticsCache, boolean restoreTrackedRaces,
+            TrackedRaceStatisticsCache trackedRaceStatisticsCache, final boolean restoreTrackedRaces,
             FullyInitializedReplicableTracker<SecurityService> securityServiceTracker,
             FullyInitializedReplicableTracker<SharedSailingData> sharedSailingDataTracker,
             ServiceTracker<ReplicationService, ReplicationService> replicationServiceTracker,
@@ -872,6 +874,7 @@ Replicator {
         logger.info("Created " + this);
         this.eventResolverListeners = Collections.newSetFromMap(new ConcurrentHashMap<>());
         this.securityServiceTracker = securityServiceTracker;
+        this.restoreTrackedRaces = restoreTrackedRaces;
         this.numberOfTrackedRacesToRestore = restoreTrackedRaces
                 ? Long.MAX_VALUE /* set to the real value in restoreTrackedRaces(), staying unhealthy until races loaded */
                 : 0;
@@ -4921,7 +4924,7 @@ Replicator {
         return bundleContext.getService(ref);
     }
 
-    public void setPolarDataService(PolarDataService service) {
+    public void setPolarDataService(final PolarDataService service) {
         if (this.polarDataService == null && service != null) {
             polarDataService = service;
             // The polars bundle now registers its service only after it has already obtained the
@@ -4930,6 +4933,12 @@ Replicator {
             // as a defensive no-op for services registered by other paths (e.g. test harnesses).
             polarDataService.registerDomainFactory(baseDomainFactory);
             setPolarDataServiceOnAllTrackedRaces(service);
+            if (!restoreTrackedRaces) {
+                // bug6348: without restoration the startup batch is empty. Release its submission
+                // gate now that the polar service is initialized; per-race fix ingestion and
+                // global pipeline drain still gate wind-estimator installation.
+                polarDataService.markLoadingOfAllRacesToRestoreStarted();
+            }
             // bug6241: unblock the deferred restoreTrackedRaces() background task so it can
             // now proceed with adding tracked races. Every race added after this point will
             // observe a non-null polarDataService in this RacingEventServiceImpl and will have
