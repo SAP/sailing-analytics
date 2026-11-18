@@ -97,7 +97,9 @@ public class Activator implements BundleActivator {
             // markLoadingOfAllRacesToRestoreStarted() once its enumeration loop has fired for every
             // race to restore. Until then, runWhenPolarLoadingFinishedFor(...) callbacks are held
             // to avoid firing on a transient idle window of the loading pipeline between races.
-            // See bug6241.Why
+            // With restoration disabled, RacingEventServiceImpl.setPolarDataService() signals
+            // the empty startup batch as soon as this initialized service is registered.
+            // See bug6241 and bug6348.
             final PolarDataServiceImpl service = new PolarDataServiceImpl(
                     /* waitForLoadingOfAllRacesToRestoreToBeStarted */ true);
             service.registerDomainFactory(domainFactory);

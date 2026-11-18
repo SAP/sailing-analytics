@@ -269,12 +269,14 @@ public class Activator implements BundleActivator {
                                 securityService, eventService));
                 }
             }
-            // Now spread out the checking tasks approximately across 90% of the entire re-check interval:
-            final Duration graceTimeBetweenRequestsToAvoidRateLimits = EVENT_MEDIA_CHECK_INTERVAL.divide(checkTasks.size()).times(0.9);
-            Duration delay = Duration.NULL;
-            for (final Runnable checkTask : checkTasks) {
-                scheduleMediaCheck(checkTask, delay);
-                delay = delay.plus(graceTimeBetweenRequestsToAvoidRateLimits);
+            if (!checkTasks.isEmpty()) {
+                // Now spread out the checking tasks approximately across 90% of the entire re-check interval:
+                final Duration graceTimeBetweenRequestsToAvoidRateLimits = EVENT_MEDIA_CHECK_INTERVAL.divide(checkTasks.size()).times(0.9);
+                Duration delay = Duration.NULL;
+                for (final Runnable checkTask : checkTasks) {
+                    scheduleMediaCheck(checkTask, delay);
+                    delay = delay.plus(graceTimeBetweenRequestsToAvoidRateLimits);
+                }
             }
         }
     }
