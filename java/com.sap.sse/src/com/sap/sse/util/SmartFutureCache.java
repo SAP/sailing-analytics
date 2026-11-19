@@ -2,9 +2,7 @@ package com.sap.sse.util;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -451,11 +449,11 @@ public class SmartFutureCache<K, V, U extends UpdateInterval<U>> {
         synchronized (ongoingRecalculations) {
             suspended = false;
             logger.finest("resuming cache "+nameForLocks);
-            for (Iterator<Entry<K, Pair<U, Set<SettableFuture<Future<V>>>>>> i=triggeredAndNotYetScheduled.entrySet().iterator(); i.hasNext(); ) {
-                Entry<K, Pair<U, Set<SettableFuture<Future<V>>>>> e = i.next();
-                logger.finest(()->"while resuming "+nameForLocks+", triggering update for key "+e.getKey()+" with update interval "+e.getValue());
-                triggerUpdate(e.getKey(), e.getValue().getA());
-                i.remove();
+            // Scheduling may remove an entry; a running calculation must retain its queued work and readers.
+            for (final K key : new HashSet<>(triggeredAndNotYetScheduled.keySet())) {
+                final Pair<U, Set<SettableFuture<Future<V>>>> queued = triggeredAndNotYetScheduled.get(key);
+                logger.finest(()->"while resuming "+nameForLocks+", triggering update for key "+key+" with update interval "+queued);
+                triggerUpdate(key, queued.getA());
             }
         }
     }
@@ -646,6 +644,7 @@ public class SmartFutureCache<K, V, U extends UpdateInterval<U>> {
                 boolean reuseExistingFuture = scheduledOrRunning.tryToUpdateUpdateInterval(updateInterval);
                 if (reuseExistingFuture) {
                     result = scheduledOrRunning;
+                    linkQueuedReadersToScheduledFuture(key, result);
                     // Turn this logging on in case you need to debug the SmartFutureCache. Otherwise, log level detection is too expensive here.
                     // logger.finest("re-using existing future task on cache "+nameForLocks+" for key "+key);
                     smartFutureCacheTaskReuseCounter++;
@@ -662,9 +661,24 @@ public class SmartFutureCache<K, V, U extends UpdateInterval<U>> {
                 }
             } else {
                 result = schedule(key, updateInterval, callerWaitsSynchronouslyForResult);
+                linkQueuedReadersToScheduledFuture(key, result);
             }
         }
         return result;
+    }
+
+    /**
+     * Transfers queued readers to the concrete task that will perform their update. Callers must hold the
+     * monitor of {@link #ongoingRecalculations} and have scheduled or updated a task covering the queued interval.
+     * If a calculation is already running, leave the queued entry intact instead, for its completion to schedule.
+     */
+    private void linkQueuedReadersToScheduledFuture(final K key, final Future<V> future) {
+        final Pair<U, Set<SettableFuture<Future<V>>>> queued = triggeredAndNotYetScheduled.remove(key);
+        if (queued != null) {
+            for (final SettableFuture<Future<V>> reader : queued.getB()) {
+                reader.set(future);
+            }
+        }
     }
 
     /**
@@ -717,12 +731,13 @@ public class SmartFutureCache<K, V, U extends UpdateInterval<U>> {
      *             if any; this happens regardless of whether the calculation was still ongoing and waited for, or if
      *             not waiting for any current execution.
      */
-    public V get(final K key, boolean waitForLatest) {
+    public V get(final K key, final boolean waitForLatest) {
         final V value;
         final Future<V> future;
         if (waitForLatest) {
             synchronized (ongoingRecalculations) {
-                final Pair<U, Set<SettableFuture<Future<V>>>> triggeredSinceLastCacheUpdate = triggeredAndNotYetScheduled.remove(key);
+                // Keep earlier readers attached if this update still has to wait for an ongoing calculation.
+                final Pair<U, Set<SettableFuture<Future<V>>>> triggeredSinceLastCacheUpdate = triggeredAndNotYetScheduled.get(key);
                 if (triggeredSinceLastCacheUpdate != null) {
                     future = scheduleRecalculationIfNotScheduledOrRunningOtherwiseUpdateScheduledTaskOrQueueIfAlreadyRunning(key, triggeredSinceLastCacheUpdate.getA(),
                             /* callerWaitsSynchronouslyForResult: if a new task is scheduled, we'll wait for it by calling future.get() below */ true);
