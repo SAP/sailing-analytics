@@ -87,6 +87,11 @@ public abstract class AbstractHighPointFirstGetsFixedOr8AndLastBreaksTie extends
         Double effectiveScore = super.getScoreForRank(leaderboard, raceColumn, competitor, rank, numberOfCompetitorsInRaceFetcher, numberOfCompetitorsInLeaderboardFetcher, timePoint);
         return checkForOverwrittenScore(raceColumn, rank, effectiveScore);
     }
+
+    /** The race's maximum score, including the same race-log override used for finish scores. */
+    protected double getScoreForRaceWinner(final RaceColumn raceColumn) {
+        return checkForOverwrittenScore(raceColumn, /* rank */ 1, getScoreForRaceWinner());
+    }
     
     private Double checkForOverwrittenScore(RaceColumn raceColumn, int rank, Double effectiveScore) {
         Double result = effectiveScore;

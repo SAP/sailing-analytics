@@ -25,6 +25,13 @@
           <div class="innerContent">
           <h2 class="articleSubheadline">November 2026</h2>
           <ul class="bulletList">
+                <li>Leaderboard CPU metering now includes executor tasks that construct leaderboard entries and
+                    optional race/leg details, attributing their CPU time to <tt>LEADERBOARD_COMPUTE_DTO</tt>.
+                    Values reported by <tt>/sailingserver/api/v1/leaderboards/{name}/cpu</tt>, including aggregate
+                    CPU totals, may therefore be higher for the same workload. Take this expanded accounting
+                    into account when comparing measurements from before and after this update; higher readings
+                    alone do not indicate a performance regression. See
+                    <a href="https://github.com/eclipse-sailing-analytics/sailing-analytics/issues/6347">issue #6347</a>.</li>
                 <li>Leaderboard-group creation and updates now reject name conflicts, including generated names
                     such as "Season Overall", before making changes. Existing leaderboards, ownership and access
                     permissions are preserved when a conflict is rejected.</li>
@@ -38,7 +45,10 @@
                     to be processed.</li>
                 <li>Media link detection (as other re-directs) did not follow HTTP 303 response codes,
                     leading to false-positive messages about unreachable media, in particular YouTube videos,
-                    which has now been fixed.</li>
+                    which has now been fixed. Furthermore, we are now spreading out the checks across the
+                    re-check interval (currently once per day) to avoid rate limiting, and if rate limiting
+                    should still occur, a 429 HTTP status will not trigger a notification about missing
+                    media anymore.</li>
                 <li>The TracTrac connector has been upgraded to TracAPI-5.1.2, fixing an error with propagating official
                     DNS results from the TracTrac system to Sailing Analytics.</li> 
           </ul>

@@ -514,6 +514,13 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
      * active while auto-zooming whereas stopping them seems the better option for manual zooms.
      */
     private boolean autoZoomInProgress;
+
+    /**
+     * Set when the user starts a manual pan and cleared when the map goes idle (after inertia settles).
+     * During this period {@link #calculateTimeForPositionTransitionInMillis} returns -1 so that boats
+     * snap to their correct positions rather than animating across the pan displacement.
+     */
+    private boolean suppressTransitionAfterPan;
     
     /**
      * The length of the advantage line; default is 1000m, but upon map initialization and zoom it is set to the
@@ -963,7 +970,9 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                     }
                 });
                 map.addDragStartHandler(event -> {
-                    if (streamletOverlay != null 
+                    // suppress boat transitions for the entire drag + inertia period; cleared in IdleMapHandler
+                    suppressTransitionAfterPan = true;
+                    if (streamletOverlay != null
                             && settings.isShowWindStreamletOverlay()
                             && paywallResolver.hasPermission(SecuredDomainType.TrackedRaceActions.VIEWSTREAMLETS, raceMapLifecycle.getRaceDTO())) {
                         streamletOverlay.onDragStart();
@@ -990,6 +999,8 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                             streamletOverlay.onBoundsChanged(/* zoomChanged */ false);
                         }
                         advantageLineLength = getMapDiagonalVisibleDistance();
+                        // map has fully settled including inertia glide; safe to re-enable boat transitions
+                        suppressTransitionAfterPan = false;
                         showAdvantageLineAndUpdateWindLadder(getCompetitorsToShow(), getTimer().getTime(), /* timeForPositionTransitionMillis */ -1 /* (no transition) */);
                         refreshMapWithoutAnimation();
                         if (!mapFirstZoomDone) {
@@ -1010,7 +1021,9 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                     @Override
                     public void onEvent(BoundsChangeMapEvent event) {
                         double newZoomLevel = map.getZoom();
-                        if (!isAutoZoomInProgress() && (newZoomLevel != currentZoomLevel)) {
+                        // remove transitions on any manual viewport change (zoom or pan) so boats snap to
+                        // their correct positions rather than animating across the displacement
+                        if (!isAutoZoomInProgress() && (newZoomLevel != currentZoomLevel || suppressTransitionAfterPan)) {
                             removeTransitions();
                         }
                         currentMapBounds = BoundsUtil.getMapBounds(map.getBounds(), new DegreeBearingImpl(map.getHeading()), coordinateSystem);
@@ -1919,7 +1932,10 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
         } else {
             timeForPositionTransitionMillis = -1;
         }
-        if (timer.getPlayState() == PlayStates.Playing) {
+        if (suppressTransitionAfterPan) {
+            // user is panning or inertia glide is still in progress; do not animate boat positions
+            timeForPositionTransitionMillisSmoothed = -1;
+        } else if (timer.getPlayState() == PlayStates.Playing) {
             // choose 130% of the refresh interval as transition period to make it unlikely that the transition
             // stops before the next update has been received
             long smoothInterval = 1300 * timer.getRefreshInterval() / 1000;
@@ -1934,7 +1950,6 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                     timeForPositionTransitionMillisSmoothed = -1;
                 }
             }
-
         } else {
             // do not animate in non live modus
             timeForPositionTransitionMillisSmoothed = -1; // -1 means 'no transition

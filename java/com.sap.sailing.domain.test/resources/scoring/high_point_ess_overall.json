@@ -1,0 +1,781 @@
+{
+  "name": "Extreme Sailing Series 2015 Overall",
+  "scheme": "HIGH_POINT_ESS_OVERALL",
+  "type": "RegattaMetaLeaderboard",
+  "displayName": "Extreme Sailing Series 2015 Overall",
+  "provenance": {
+    "results": {
+      "url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboards/Extreme%20Sailing%20Series%202015%20Overall",
+      "fetched_at": "2026-11-11T19:08:07.441541+00:00",
+      "status": 200,
+      "resolved_url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboards/Extreme%20Sailing%20Series%202015%20Overall",
+      "sha256": "47e0d248a622ebf37c67537e7eb0c8a0e58ef736577ba0b77cb5893881987839",
+      "bytes": 15227
+    },
+    "configuration": {
+      "url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboardgroups/Extreme%20Sailing%20Series%202015",
+      "fetched_at": "2026-11-11T19:07:44.774769+00:00",
+      "status": 200,
+      "resolved_url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboardgroups/Extreme%20Sailing%20Series%202015",
+      "sha256": "56d7e3b3f5ae2dbb4777f2e3a9a1ba0cb5ff877dbfa94d86bff83ab3178629e8",
+      "bytes": 137632
+    },
+    "metadata": {
+      "base": "https://sapsailing.com",
+      "source": "central-metadata.json",
+      "sha256": "933a31e4dd4cde658f818e47e548e218ce8f8e0283669fbf32710569597064d8"
+    },
+    "capturedScheme": "HIGH_POINT_ESS_OVERALL"
+  },
+  "timePoint": 1452249463000,
+  "canBoatsOfCompetitorsChangePerRace": false,
+  "discardThresholds": [],
+  "series": [],
+  "columns": [
+    {
+      "name": "Singapore",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "Muscat",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "Qingdao",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "Cardiff",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "Hamburg",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "Saint Petersburg",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "Istanbul",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "Sydney",
+      "factor": 2,
+      "explicitFactor": 2,
+      "oneAlwaysStaysOne": false
+    }
+  ],
+  "competitors": [
+    {
+      "id": "657fa5a0-83db-11e2-88c0-10bf48d758ce",
+      "name": "The Wave, Muscat",
+      "displayName": "The Wave, Muscat",
+      "sailID": "The Wave",
+      "expectedRank": 1,
+      "expectedTotal": 87.0,
+      "cells": [
+        {
+          "column": "Singapore",
+          "fleet": "MetaFleet",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Muscat",
+          "fleet": "MetaFleet",
+          "points": 10.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 10.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Qingdao",
+          "fleet": "MetaFleet",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Cardiff",
+          "fleet": "MetaFleet",
+          "points": 10.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 10.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Hamburg",
+          "fleet": "MetaFleet",
+          "points": 10.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 10.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Saint Petersburg",
+          "fleet": "MetaFleet",
+          "points": 10.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 10.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Istanbul",
+          "fleet": "MetaFleet",
+          "points": 10.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 10.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Sydney",
+          "fleet": "MetaFleet",
+          "points": 20.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 20.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "655bd56c-83db-11e2-88c0-10bf48d758ce",
+      "name": "SAP Extreme Sailing Team",
+      "displayName": "SAP Extreme Sailing Team",
+      "sailID": "SAP",
+      "expectedRank": 2,
+      "expectedTotal": 74.0,
+      "cells": [
+        {
+          "column": "Singapore",
+          "fleet": "MetaFleet",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Muscat",
+          "fleet": "MetaFleet",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Qingdao",
+          "fleet": "MetaFleet",
+          "points": 10.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 10.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Cardiff",
+          "fleet": "MetaFleet",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Hamburg",
+          "fleet": "MetaFleet",
+          "points": 9.0,
+          "reason": "RDG",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Saint Petersburg",
+          "fleet": "MetaFleet",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Istanbul",
+          "fleet": "MetaFleet",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Sydney",
+          "fleet": "MetaFleet",
+          "points": 18.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 18.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "65322500-83db-11e2-88c0-10bf48d758ce",
+      "name": "Red Bull Sailing Team",
+      "displayName": "Red Bull Sailing Team",
+      "sailID": "Red Bull",
+      "expectedRank": 3,
+      "expectedTotal": 70.0,
+      "cells": [
+        {
+          "column": "Singapore",
+          "fleet": "MetaFleet",
+          "points": 10.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 10.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Muscat",
+          "fleet": "MetaFleet",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Qingdao",
+          "fleet": "MetaFleet",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Cardiff",
+          "fleet": "MetaFleet",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Hamburg",
+          "fleet": "MetaFleet",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Saint Petersburg",
+          "fleet": "MetaFleet",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Istanbul",
+          "fleet": "MetaFleet",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Sydney",
+          "fleet": "MetaFleet",
+          "points": 16.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 16.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "84e68b70-7ada-0131-e5b7-60a44ce903c3",
+      "name": "Oman Air",
+      "displayName": "Oman Air",
+      "sailID": "Oman Air",
+      "expectedRank": 4,
+      "expectedTotal": 58.0,
+      "cells": [
+        {
+          "column": "Singapore",
+          "fleet": "MetaFleet",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Muscat",
+          "fleet": "MetaFleet",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Qingdao",
+          "fleet": "MetaFleet",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Cardiff",
+          "fleet": "MetaFleet",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Hamburg",
+          "fleet": "MetaFleet",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Saint Petersburg",
+          "fleet": "MetaFleet",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Istanbul",
+          "fleet": "MetaFleet",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Sydney",
+          "fleet": "MetaFleet",
+          "points": 14.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 14.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "f097f4f0-7ad9-0131-e5b4-60a44ce903c3",
+      "name": "Gazprom Team Russia",
+      "displayName": "Gazprom Team Russia",
+      "sailID": "Team Russia",
+      "expectedRank": 5,
+      "expectedTotal": 51.0,
+      "cells": [
+        {
+          "column": "Singapore",
+          "fleet": "MetaFleet",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Muscat",
+          "fleet": "MetaFleet",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Qingdao",
+          "fleet": "MetaFleet",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Cardiff",
+          "fleet": "MetaFleet",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Hamburg",
+          "fleet": "MetaFleet",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Saint Petersburg",
+          "fleet": "MetaFleet",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Istanbul",
+          "fleet": "MetaFleet",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Sydney",
+          "fleet": "MetaFleet",
+          "points": 10.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 10.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "8dd098a0-8ab6-0132-440b-448a5b8481d8",
+      "name": "Team Turx",
+      "displayName": "Team Turx",
+      "sailID": "Team Turx",
+      "expectedRank": 6,
+      "expectedTotal": 44.0,
+      "cells": [
+        {
+          "column": "Singapore",
+          "fleet": "MetaFleet",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Muscat",
+          "fleet": "MetaFleet",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Qingdao",
+          "fleet": "MetaFleet",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Cardiff",
+          "fleet": "MetaFleet",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Hamburg",
+          "fleet": "MetaFleet",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Saint Petersburg",
+          "fleet": "MetaFleet",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Istanbul",
+          "fleet": "MetaFleet",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Sydney",
+          "fleet": "MetaFleet",
+          "points": 12.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 12.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "64bbff7e-83db-11e2-88c0-10bf48d758ce",
+      "name": "GAC Pindar",
+      "displayName": "GAC Pindar",
+      "sailID": "GAC Pindar",
+      "expectedRank": 7,
+      "expectedTotal": 43.0,
+      "cells": [
+        {
+          "column": "Singapore",
+          "fleet": "MetaFleet",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Muscat",
+          "fleet": "MetaFleet",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Qingdao",
+          "fleet": "MetaFleet",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Cardiff",
+          "fleet": "MetaFleet",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Hamburg",
+          "fleet": "MetaFleet",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Saint Petersburg",
+          "fleet": "MetaFleet",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Istanbul",
+          "fleet": "MetaFleet",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Sydney",
+          "fleet": "MetaFleet",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "d6c80fc0-8ab6-0132-440c-448a5b8481d8",
+      "name": "Lino Sonego Team Italia",
+      "displayName": "Lino Sonego Team Italia",
+      "sailID": "Lino Sonego",
+      "expectedRank": 8,
+      "expectedTotal": 42.0,
+      "cells": [
+        {
+          "column": "Singapore",
+          "fleet": "MetaFleet",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Muscat",
+          "fleet": "MetaFleet",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Qingdao",
+          "fleet": "MetaFleet",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Cardiff",
+          "fleet": "MetaFleet",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Hamburg",
+          "fleet": "MetaFleet",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Saint Petersburg",
+          "fleet": "MetaFleet",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Istanbul",
+          "fleet": "MetaFleet",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Sydney",
+          "fleet": "MetaFleet",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        }
+      ]
+    }
+  ],
+  "groupName": "Extreme Sailing Series 2015",
+  "children": [
+    {
+      "resource": "high_point_ess_overall-act-1",
+      "column": "Singapore"
+    },
+    {
+      "resource": "high_point_ess_overall-act-2",
+      "column": "Muscat"
+    },
+    {
+      "resource": "high_point_ess_overall-act-3",
+      "column": "Qingdao"
+    },
+    {
+      "resource": "high_point_ess_overall-act-4",
+      "column": "Cardiff"
+    },
+    {
+      "resource": "high_point_ess_overall-act-5",
+      "column": "Hamburg"
+    },
+    {
+      "resource": "high_point_ess_overall-act-6",
+      "column": "Saint Petersburg"
+    },
+    {
+      "resource": "high_point_ess_overall-act-7",
+      "column": "Istanbul"
+    },
+    {
+      "resource": "high_point_ess_overall-act-8",
+      "column": "Sydney"
+    }
+  ],
+  "suppressedIds": [
+    "e442a414-83db-11e2-88c0-10bf48d758ce"
+  ],
+  "configurationNotes": "Child links/order from group REST response. Overall suppression inferred from child IDs absent from captured overall field. Only explicitly corrected overall cells are imported."
+}
