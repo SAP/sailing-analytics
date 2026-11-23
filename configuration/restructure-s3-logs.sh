@@ -4,13 +4,13 @@ then reconcile S3 (upload new keys, delete old flat keys). Interactive, phased."
 
 import argparse, json, os, re, subprocess, sys, tempfile, time
 
-# ================= CONFIG — verify before first run =================
+# ================= CONFIG =================
 BASE   = "/var/log/old/cache/aws/sapsailing-access-logs"
-BUCKET = "media.sapsailing.com"                 # bucket you sync from
-LISTDIR = "/var/tmp"                            # on-disk scratch (NOT tmpfs)
+BUCKET = "sapsailing-access-logs"
+LISTDIR = "/var/tmp"
 PART   = "media.sapsailing.com017363970217/eu-west-1/media.sapsailing.com"
-MERGED_LOCAL = os.path.join(BASE, "logs", PART) # local merged destination tree
-MERGED_S3    = f"logs/{PART}"                   # matching S3 key prefix
+MERGED_LOCAL = os.path.join(BASE, "logs", PART)   # unchanged
+MERGED_S3    = f"logs/{PART}"                      # unchanged
 
 JOBS = [
     {   # S3 server access logs:  media.sapsailing.comYYYY-MM-DD-HH-MM-SS-ID
