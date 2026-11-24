@@ -145,20 +145,14 @@ public class Swarm implements TimeListener {
         double time0 = Duration.currentTimeMillis();
         // the swarm is paused during map interactions (drag, inertia, zoom) to avoid drawing
         // particles while the projection is in flux; on the final tick, bounds and projections
-        // are updated and particles are either recycled (zoom) or reprojected (pan) before resuming
+        // are updated and particles are recycled before resuming
         if (swarmPauseInTicks > 1) {
             swarmPauseInTicks--;
         } else if (swarmPauseInTicks == 1) {
             startSwarmIfNecessaryAndUpdateProjection();
-            if (zoomChanged) {
-                diffPx = new Vector(0, 0);
-                recycleParticles();
-                zoomChanged = false;
-            } else {
-                realignParticlesToProjection();
-                diffPx = new Vector(0, 0);
-                clearNextFrame = false;
-            }
+            diffPx = new Vector(0, 0);
+            recycleParticles();
+            zoomChanged = false;
             swarmPauseInTicks = 0;
         }
         // update the swarm if it is not paused and the map is not being interacted with
@@ -235,21 +229,6 @@ public class Swarm implements TimeListener {
     private void recycleParticles() {
         for (int idx = 0; idx < particles.length; idx++) {
             particles[idx] = this.recycleOrCreateParticle(particles[idx]);
-        }
-    }
-
-    private void realignParticlesToProjection() {
-        if (particles != null && getMapProjection() != null) {
-            // After a pan, container-pixel coordinates are stale. Reproject from the authoritative
-            // lat/lng position so the first draw frame after wake uses correct screen coordinates.
-            for (int idx = 0; idx < particles.length; idx++) {
-                final Particle particle = particles[idx];
-                if (particle != null && particle.currentPosition != null) {
-                    final Vector reprojected = new Vector(getMapProjection().fromLatLngToContainerPixel(particle.currentPosition));
-                    particle.currentPixelCoordinate = reprojected;
-                    particle.previousPixelCoordinate = reprojected;
-                }
-            }
         }
     }
 
