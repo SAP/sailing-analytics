@@ -238,9 +238,9 @@ public class Swarm implements TimeListener {
     }
 
     /**
-     * Called when the map bounds have changed (pan or zoom). Accumulates the zoom-changed flag
-     * and sets the pause countdown to {@code swarmPause} ticks, after which the swarm resumes
-     * drawing with updated projections.
+     * Called when the map bounds have changed (pan or zoom). If a zoom occurred, clears the canvas
+     * immediately to avoid artifacts. Sets the pause countdown to {@code swarmPause} ticks, after
+     * which particles are recycled and drawing resumes.
      */
     public void onBoundsChanged(final boolean zoomChanged, final int swarmPause) {
         this.zoomChanged |= zoomChanged;
