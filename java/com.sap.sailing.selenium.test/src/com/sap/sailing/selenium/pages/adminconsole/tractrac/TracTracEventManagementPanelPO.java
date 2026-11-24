@@ -277,11 +277,8 @@ public class TracTracEventManagementPanelPO extends PageArea {
         return new GenericCellTablePO<>(this.driver, this.trackableRacesCellTable, DataEntryPO.class);
     }
     
-    private void setSelection(WebElement checkbox, boolean selected) {
-        WebElement input = checkbox.findElement(By.tagName("input"));
-        
-        if(input.isSelected() != selected)
-            input.click();
+    private void setSelection(final WebElement checkbox, final boolean selected) {
+        setCheckboxSelected(() -> checkbox.findElement(By.tagName("input")), selected);
     }
     
     private void waitForSelectedRacesContainDifferentBoatClassesError(String boatClass) {

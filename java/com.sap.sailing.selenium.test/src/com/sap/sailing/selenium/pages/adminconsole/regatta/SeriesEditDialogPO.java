@@ -145,21 +145,15 @@ public class SeriesEditDialogPO extends DataEntryDialogPO {
         return raceNamesGrid.findElements(By.tagName("tr"));
     }
 
-    public void setMedalSeries(boolean medal) {
-        if(medalSeriesCheckbox.isSelected() != medal) {
-            new Actions(driver).moveToElement(medalSeriesCheckbox).click().build().perform();
-        }
+    public void setMedalSeries(final boolean medal) {
+        setCheckboxSelected(() -> medalSeriesCheckbox, medal);
     }
 
-    public void setCrossFleetMergedRankingCheckboxStatus(boolean status) {
-        if(hasCrossFleetMergedRankingCheckbox.isSelected() != status) {
-            hasCrossFleetMergedRankingCheckbox.click();
-        }
+    public void setCrossFleetMergedRankingCheckboxStatus(final boolean status) {
+        setCheckboxSelected(() -> hasCrossFleetMergedRankingCheckbox, status);
     }
 
-    public void setSplitFleetContiguousScoringCheckbox(boolean status) {
-        if(hasSplitFleetContiguousScoringCheckbox.isSelected() != status) {
-            hasSplitFleetContiguousScoringCheckbox.click();
-        }
+    public void setSplitFleetContiguousScoringCheckbox(final boolean status) {
+        setCheckboxSelected(() -> hasSplitFleetContiguousScoringCheckbox, status);
     }
 }

@@ -8,22 +8,27 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.openqa.selenium.Alert;
-import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -543,44 +548,94 @@ public class PageObject {
      * Waits for an element inside a possibly animated container to become interactable, then clicks it using WebDriver.
      */
     protected void clickWhenInteractable(final Supplier<WebElement> elementSupplier) {
-        final WebElement element = waitUntilInteractable(elementSupplier);
-        element.click();
+        performWhenInteractable(elementSupplier, WebElement::click);
+    }
+
+    protected void performWhenInteractable(final Supplier<WebElement> elementSupplier,
+            final Consumer<WebElement> interaction) {
+        waitForInteraction(elementSupplier, (final WebElement element, final Point point) -> interaction.accept(element),
+                /* upperLeftCorner */ false);
+    }
+
+    /** Clicks an exposed cell corner to avoid activating links or widgets embedded in a table cell. */
+    protected void clickWhenInteractableAtCorner(final Supplier<WebElement> elementSupplier,
+            final BooleanSupplier clickNeeded, final boolean controlClick) {
+        waitForInteraction(elementSupplier, (final WebElement element, final Point point) -> {
+            if (clickNeeded.getAsBoolean()) {
+                final Actions actions = new Actions(driver);
+                if (controlClick) {
+                    actions.keyDown(Keys.CONTROL);
+                }
+                try {
+                    actions.moveToLocation(point.getX(), point.getY()).click().perform();
+                } finally {
+                    if (controlClick) {
+                        new Actions(driver).keyUp(Keys.CONTROL).perform();
+                    }
+                }
+            }
+        }, /* upperLeftCorner */ true);
+    }
+
+    protected void setCheckboxSelected(final Supplier<WebElement> inputSupplier, final boolean selected) {
+        final boolean[] interactionCompleted = { false };
+        waitUntil(() -> {
+            if (!interactionCompleted[0] && inputSupplier.get().isSelected() != selected) {
+                performWhenInteractable(inputSupplier, (final WebElement input) -> {
+                    if (input.isSelected() != selected) {
+                        input.click();
+                    }
+                });
+                interactionCompleted[0] = true;
+            }
+            // Observe the result without toggling again while an asynchronous update is pending.
+            return inputSupplier.get().isSelected() == selected;
+        });
     }
 
     /**
-     * Waits for an element inside a possibly animated container to have a stable, exposed interaction point. JavaScript
-     * is only used to observe layout and hit-testing; the returned element can be used for native WebDriver operations.
+     * Centers an element inside a possibly animated container and waits for a stable, exposed interaction point.
+     * JavaScript is used for scrolling and hit-testing; interactions themselves use native WebDriver operations.
      *
      * @return the stable, exposed element supplied by {@code elementSupplier}
      */
     protected WebElement waitUntilInteractable(final Supplier<WebElement> elementSupplier) {
+        return waitForInteraction(elementSupplier, (final WebElement element, final Point point) -> { },
+                /* upperLeftCorner */ false);
+    }
+
+    private WebElement waitForInteraction(final Supplier<WebElement> elementSupplier,
+            final BiConsumer<WebElement, Point> interaction, final boolean upperLeftCorner) {
         final String[] previousLayoutSignature = new String[1];
         final int[] stableLayoutSamples = new int[1];
         final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DEFAULT_LOOKUP_TIMEOUT));
-        wait.pollingEvery(Duration.ofMillis(100));
-        final WebElement interactableElement = wait.until(webDriver -> {
+        wait.pollingEvery(Duration.ofMillis(/* millis */ 100));
+        final WebElement interactableElement = wait.until((final WebDriver webDriver) -> {
             WebElement result = null;
             try {
                 final WebElement element = elementSupplier.get();
-                String layoutSignature = null;
+                InteractableLayout layout = null;
+                scrollToCenter(element);
                 if (element.isDisplayed() && element.isEnabled()) {
-                    layoutSignature = getInteractableLayoutSignature(element);
+                    layout = getInteractableLayout(element, upperLeftCorner);
                 }
-                if (layoutSignature == null) {
+                if (layout == null) {
                     previousLayoutSignature[0] = null;
                     stableLayoutSamples[0] = 0;
                 } else {
-                    if (layoutSignature.equals(previousLayoutSignature[0])) {
+                    if (layout.signature.equals(previousLayoutSignature[0])) {
                         stableLayoutSamples[0]++;
                     } else {
-                        previousLayoutSignature[0] = layoutSignature;
+                        previousLayoutSignature[0] = layout.signature;
                         stableLayoutSamples[0] = 1;
                     }
                     if (stableLayoutSamples[0] >= 3) {
+                        // Retry failures before a successful interaction, including interception at click time.
+                        interaction.accept(element, layout.point);
                         result = element;
                     }
                 }
-            } catch (ElementNotInteractableException | JavascriptException | NoSuchElementException
+            } catch (final ElementNotInteractableException | JavascriptException | NoSuchElementException
                     | StaleElementReferenceException e) {
                 previousLayoutSignature[0] = null;
                 stableLayoutSamples[0] = 0;
@@ -591,10 +646,9 @@ public class PageObject {
     }
 
     /**
-     * Returns a signature of the element and relevant ancestor layout when the element's WebDriver click point is
-     * exposed. A {@code null} result means that the element is not ready for a native click.
+     * Returns the layout and exposed native interaction point, or null while the target is not ready.
      */
-    private String getInteractableLayoutSignature(final WebElement element) {
+    private InteractableLayout getInteractableLayout(final WebElement element, final boolean upperLeftCorner) {
         // Use WebDriver's viewport-clipped center; elementFromPoint accounts for actual CSS clipping.
         // Overflow ancestors do not necessarily clip absolutely positioned descendants (including GWT panels).
         final Object result = ((JavascriptExecutor) driver).executeScript(
@@ -626,15 +680,29 @@ public class PageObject {
                 + "  }"
                 + "}"
                 + "if (right <= left || bottom <= top) return null;"
-                + "var centerX = Math.floor((left + right) / 2);"
-                + "var centerY = Math.floor((top + bottom) / 2);"
+                + "var centerX = Math.floor(arguments[1] ? left + 1 : (left + right) / 2);"
+                + "var centerY = Math.floor(arguments[1] ? top + 1 : (top + bottom) / 2);"
+                + "if (centerX >= right || centerY >= bottom) return null;"
                 + "var hit = document.elementFromPoint(centerX, centerY);"
                 + "if (hit === null || (hit !== element && !element.contains(hit))) return null;"
+                + "if (arguments[1] && hit.closest('a,button,input,select,textarea,[role=button]')) return null;"
                 + "signature.push([centerX, centerY].join(','));"
-                + "return signature.join(';');",
-                element);
-        final String layoutSignature = (String) result;
-        return layoutSignature;
+                + "return [signature.join(';'), centerX, centerY];",
+                element, upperLeftCorner);
+        final List<?> values = (List<?>) result;
+        final InteractableLayout layout = values == null ? null : new InteractableLayout((String) values.get(/* index */ 0),
+                new Point(((Number) values.get(/* index */ 1)).intValue(), ((Number) values.get(/* index */ 2)).intValue()));
+        return layout;
+    }
+
+    private static final class InteractableLayout {
+        private final String signature;
+        private final Point point;
+
+        private InteractableLayout(final String signature, final Point point) {
+            this.signature = signature;
+            this.point = point;
+        }
     }
 
     protected void waitUntilAlertIsPresent() {
@@ -717,7 +785,8 @@ public class PageObject {
         T get(WebDriver driver, WebElement element);
     }
     
-    protected WebElement goToTab(WebElement tabPanel, String tabName, final String id, TabPanelType tabPanelType) {
+    protected WebElement goToTab(final WebElement tabPanel, final String tabName, final String id,
+            final TabPanelType tabPanelType) {
         final MessageFormat expressionFormat;
         switch(tabPanelType) {
         case TAB_PANEL:
@@ -733,10 +802,7 @@ public class PageObject {
                 throw new IllegalArgumentException("TabPanelType \"" + tabPanelType + "\" is unsupported");
         }
         final String expression = expressionFormat.format(new Object[] {tabName});
-        WebElement tab = tabPanel.findElement(By.xpath(expression));
-        WebDriverWait waitForTab = new WebDriverWait(driver, Duration.ofSeconds(20)); // here, wait time is 20 seconds
-        waitForTab.until(ExpectedConditions.visibilityOf(tab)); // this will wait for tab to be visible for 20 seconds
-        tab.click();
+        clickWhenInteractable(() -> tabPanel.findElement(By.xpath(expression)));
         return waitForWebElement(tabPanel, id);      
     }
     
@@ -881,10 +947,6 @@ public class PageObject {
         }
     }
     
-    protected void scrollToView(WebElement webElement) {
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(false);", webElement);
-    }
-
     protected void scrollToCenter(final WebElement webElement) {
         ((JavascriptExecutor) driver).executeScript(
                 "arguments[0].scrollIntoView({block: 'center', inline: 'nearest', behavior: 'instant'});",

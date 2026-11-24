@@ -7,7 +7,6 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.sap.sailing.selenium.core.BySeleniumId;
@@ -62,12 +61,10 @@ public abstract class DataEntryDialogPO extends PageArea {
         pressOk(false, true);
     }
     
-    public void pressOk(boolean acceptAlert, boolean waitForAjaxRequests) {
+    public void pressOk(final boolean acceptAlert, final boolean waitForAjaxRequests) {
         // This generically triggers revalidation in dialogs to ensure that the ok button gets enabled
         ((JavascriptExecutor) driver).executeScript("!!document.activeElement ? document.activeElement.blur() : 0");
-        Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-        // click OK
-        wait.until(ExpectedConditions.elementToBeClickable(okButton)).click();        
+        clickWhenInteractable(() -> findElementBySeleniumId("OkButton"));
         if (acceptAlert) {
             final Alert alert = new WebDriverWait(driver, Duration.ofSeconds(DEFAULT_WAIT_TIMEOUT_SECONDS))
                     .until(ExpectedConditions.alertIsPresent());
@@ -80,12 +77,11 @@ public abstract class DataEntryDialogPO extends PageArea {
     }
     
     public void pressCancel() {
-        this.cancelButton.click();
+        clickWhenInteractable(() -> findElementBySeleniumId("CancelButton"));
     }
     
     public void pressMakeDefault() {
-        WebElement element = findElementBySeleniumId(ID_MAKE_DEFAULT_BUTTON);
-        element.click();
+        clickWhenInteractable(() -> findElementBySeleniumId(ID_MAKE_DEFAULT_BUTTON));
         waitForNotificationAndDismiss();
     }
     
@@ -94,7 +90,6 @@ public abstract class DataEntryDialogPO extends PageArea {
     }
     
     public void clickOkButtonOrThrow() {
-        waitUntil(okButton::isEnabled);
-        okButton.click();
+        clickWhenInteractable(() -> findElementBySeleniumId("OkButton"));
     }
 }
