@@ -8,7 +8,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 
 import com.sap.sailing.selenium.core.BySeleniumId;
 import com.sap.sailing.selenium.core.FindBy;
@@ -162,28 +161,33 @@ public class SmartphoneTrackingEventManagementPanelPO extends PageArea {
 
     // Selects exactly the named rows in the race table, deselecting all others.
     // Retries one row at a time to handle GWT re-renders between clicks.
-    public void selectRaceRowsByName(String... raceNames) {
+    public void selectRaceRowsByName(final String... raceNames) {
         final List<String> namesToSelect = Arrays.asList(raceNames);
-        boolean changed = true;
-        while (changed) {
-            changed = false;
+        waitUntil(() -> {
+            boolean selectionMatches = true;
             try {
                 final CellTablePO<DataEntryPO> raceTable = getRaceColumnTableWrapper().getRaceColumnTable();
                 for (final DataEntryPO entry : raceTable.getEntries()) {
-                    final boolean shouldBeSelected = namesToSelect.contains(entry.getColumnContent("Race"));
+                    final String raceName = entry.getColumnContent("Race");
+                    final boolean shouldBeSelected = namesToSelect.contains(raceName);
                     final boolean isSelected = entry.isSelected();
                     if (shouldBeSelected != isSelected) {
-                        final WebElement checkboxDiv = entry.getWebElement().findElement(By.xpath("./td[1]/div"));
-                        scrollToView(checkboxDiv);
-                        new Actions(this.driver).moveToElement(checkboxDiv).click().build().perform();
-                        changed = true;
+                        clickWhenInteractable(() -> {
+                            final WebElement checkboxDiv = waitForRaceRow(raceName).getWebElement()
+                                    .findElement(By.xpath("./td[1]/div"));
+                            // Keep the checkbox away from tab-panel edges, just like action images.
+                            scrollToCenter(checkboxDiv);
+                            return checkboxDiv;
+                        });
+                        selectionMatches = false;
                         break;
                     }
                 }
-            } catch (StaleElementReferenceException e) {
-                changed = true;
+            } catch (final StaleElementReferenceException e) {
+                selectionMatches = false;
             }
-        }
+            return selectionMatches;
+        });
     }
 
     private DataEntryPO waitForTableEntry(final CellTablePO<DataEntryPO> table, final String column, final String value) {

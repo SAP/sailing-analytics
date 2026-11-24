@@ -594,13 +594,16 @@ public class PageObject {
      * Returns a signature of the element and relevant ancestor layout when the element's WebDriver click point is
      * exposed. A {@code null} result means that the element is not ready for a native click.
      */
-    private String getInteractableLayoutSignature(WebElement element) {
-        Object result = ((JavascriptExecutor) driver).executeScript(
+    private String getInteractableLayoutSignature(final WebElement element) {
+        // Use WebDriver's viewport-clipped center; elementFromPoint accounts for actual CSS clipping.
+        // Overflow ancestors do not necessarily clip absolutely positioned descendants (including GWT panels).
+        final Object result = ((JavascriptExecutor) driver).executeScript(
                 "var element = arguments[0];"
                 + "if (!element.isConnected) return null;"
-                + "var rect = element.getBoundingClientRect();"
-                + "var viewportWidth = document.documentElement.clientWidth;"
-                + "var viewportHeight = document.documentElement.clientHeight;"
+                + "var rect = element.getClientRects()[0];"
+                + "if (!rect) return null;"
+                + "var viewportWidth = window.innerWidth;"
+                + "var viewportHeight = window.innerHeight;"
                 + "var left = Math.max(0, Math.min(rect.left, rect.right));"
                 + "var right = Math.min(viewportWidth, Math.max(rect.left, rect.right));"
                 + "var top = Math.max(0, Math.min(rect.top, rect.bottom));"
@@ -620,16 +623,6 @@ public class PageObject {
                 + "    signature.push([round(nodeRect.left), round(nodeRect.top), round(nodeRect.right),"
                 + "        round(nodeRect.bottom), style.overflowX, style.overflowY, style.clip, style.clipPath,"
                 + "        style.transform, style.opacity].join(','));"
-                + "    if (node !== element) {"
-                + "      if (clipsX) {"
-                + "        left = Math.max(left, nodeRect.left);"
-                + "        right = Math.min(right, nodeRect.right);"
-                + "      }"
-                + "      if (clipsY) {"
-                + "        top = Math.max(top, nodeRect.top);"
-                + "        bottom = Math.min(bottom, nodeRect.bottom);"
-                + "      }"
-                + "    }"
                 + "  }"
                 + "}"
                 + "if (right <= left || bottom <= top) return null;"
@@ -640,7 +633,7 @@ public class PageObject {
                 + "signature.push([centerX, centerY].join(','));"
                 + "return signature.join(';');",
                 element);
-        String layoutSignature = (String) result;
+        final String layoutSignature = (String) result;
         return layoutSignature;
     }
 
@@ -890,6 +883,12 @@ public class PageObject {
     
     protected void scrollToView(WebElement webElement) {
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(false);", webElement);
+    }
+
+    protected void scrollToCenter(final WebElement webElement) {
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].scrollIntoView({block: 'center', inline: 'nearest', behavior: 'instant'});",
+                webElement);
     }
     
     public boolean isElementEntirelyVisible(WebElement element) {
