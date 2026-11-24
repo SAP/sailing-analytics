@@ -5,7 +5,6 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.By.ByXPath;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Action;
@@ -181,9 +180,7 @@ public class DataEntryPO extends CellTableRowPO {
             final WebElement image = this.context.findElement(By.xpath(".//td/div/div[@name=\"" + actionName + "\"]/img"));
             // Center the icon away from clipping edges of nested tab panels before checking its click point.
             // Re-fetch and scroll on each poll because GWT may replace the action image while updating the row.
-            ((JavascriptExecutor) driver).executeScript(
-                    "arguments[0].scrollIntoView({block: 'center', inline: 'nearest', behavior: 'instant'});",
-                    image);
+            scrollToCenter(image);
             return image;
         });
     }
