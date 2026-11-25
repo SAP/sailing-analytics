@@ -1,19 +1,15 @@
 package com.sap.sailing.selenium.pages.adminconsole.tracking;
 
-import org.openqa.selenium.By.ByName;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import com.sap.sailing.selenium.core.FindBy;
+import com.sap.sailing.selenium.pages.adminconsole.ActionsHelper;
 import com.sap.sailing.selenium.pages.adminconsole.tracking.TrackedRacesBoatTablePO.BoatEntry;
 import com.sap.sailing.selenium.pages.gwt.CellTablePO;
 import com.sap.sailing.selenium.pages.gwt.DataEntryPO;
 
 public class TrackedRacesBoatTablePO extends CellTablePO<BoatEntry> {
     public static class BoatEntry extends DataEntryPO {
-        @FindBy(how = ByName.class, using = "UPDATE")
-        private WebElement editButton;
-
         private static final String NAME_COLUMN = "Name";
         private static final String SAILID_COLUMN = "Sail number";
         private static final String BOATCLASSNAME_COLUMN = "Boat Class";
@@ -45,7 +41,7 @@ public class TrackedRacesBoatTablePO extends CellTablePO<BoatEntry> {
         }
 
         public TrackedRacesBoatEditDialogPO clickEditButton() {
-            editButton.click();
+            clickActionImage(ActionsHelper.UPDATE_ACTION);
             WebElement dialog = findElementBySeleniumId(this.driver, "BoatEditDialog");
             return new TrackedRacesBoatEditDialogPO(this.driver, dialog);
         }

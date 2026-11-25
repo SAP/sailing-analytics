@@ -1,6 +1,7 @@
 package com.sap.sailing.domain.racelogtracking.test.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -496,6 +497,36 @@ public class TrackedRaceLoadsFixesTest extends AbstractGPSFixStoreTest {
             store.storeFix(device, createFix(350, 10, 20));
             testNumberOfRawFixes(trackedRace.getOrCreateTrack(mark), 1);
         });
+    }
+
+    @Test
+    public void testBatchedMarkFixesOutsideTrackingIntervalProvideBoundaryPositions() throws InterruptedException {
+        final long startOfTracking = 100;
+        final long endOfTracking = 300;
+        final GPSFix firstBefore = createFix(/* millis */ 50, /* lat */ 10, /* lng */ 20);
+        final GPSFix closerBefore = createFix(/* millis */ 75, /* lat */ 11, /* lng */ 21);
+        final GPSFix firstAfter = createFix(/* millis */ 375, /* lat */ 12, /* lng */ 22);
+        final GPSFix closerAfter = createFix(/* millis */ 350, /* lat */ 13, /* lng */ 23);
+        testFixes(startOfTracking, endOfTracking,
+                () -> map(mark, device, /* from */ 0, /* to */ 400), trackedRace -> {
+            testNumberOfRawFixes(trackedRace.getOrCreateTrack(mark), /* expected */ 0);
+            // Deliver through the store after loading has finished, so only the live batch listener can add the fixes.
+            store.storeFixes(device, Arrays.asList(firstBefore, closerBefore, firstAfter, closerAfter),
+                    /* returnManeuverUpdate */ false, /* returnLiveDelay */ false);
+            assertMarkFixMatches(closerBefore, trackedRace.getOrCreateTrack(mark)
+                    .getLastFixAtOrBefore(new MillisecondsTimePoint(startOfTracking)));
+            assertMarkFixMatches(closerAfter, trackedRace.getOrCreateTrack(mark)
+                    .getFirstFixAtOrAfter(new MillisecondsTimePoint(endOfTracking)));
+            testNumberOfRawFixes(trackedRace.getOrCreateTrack(mark), /* expected */ 4);
+        });
+    }
+
+    private void assertMarkFixMatches(final GPSFix expectedFix, final GPSFix actualFix) {
+        assertNotNull(actualFix);
+        assertEquals(expectedFix.getTimePoint(), actualFix.getTimePoint());
+        // Compact track storage quantizes coordinates, so allow a small positional rounding error.
+        assertEquals(/* expected */ 0, expectedFix.getPosition().getDistance(actualFix.getPosition()).getMeters(),
+                /* delta */ 0.1);
     }
 
     @SafeVarargs

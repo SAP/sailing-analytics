@@ -1,9 +1,12 @@
 package com.sap.sailing.domain.racelogtracking.test.impl;
 
 import static com.sap.sse.common.Util.size;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.FileNotFoundException;
@@ -62,6 +65,7 @@ import com.sap.sailing.domain.racelog.tracking.SensorFixStore;
 import com.sap.sailing.domain.racelog.tracking.test.mock.MockSmartphoneImeiServiceFinderFactory;
 import com.sap.sailing.domain.racelogtracking.RaceLogTrackingAdapter;
 import com.sap.sailing.domain.racelogtracking.RaceLogTrackingAdapterFactory;
+import com.sap.sailing.domain.racelogtracking.TrackingTimesRevocationReport;
 import com.sap.sailing.domain.racelogtracking.impl.SmartphoneImeiIdentifierImpl;
 import com.sap.sailing.domain.racelogtracking.impl.fixtracker.RaceLogFixTrackerManager;
 import com.sap.sailing.domain.racelogtracking.test.RaceLogTrackingTestHelper;
@@ -78,6 +82,7 @@ import com.sap.sailing.server.util.WaitForTrackedRaceUtil;
 import com.sap.sse.common.NoCorrespondingServiceRegisteredException;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.TransformationException;
+import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.impl.DegreeBearingImpl;
 import com.sap.sse.common.impl.DegreePosition;
 import com.sap.sse.common.impl.KnotSpeedWithBearingImpl;
@@ -279,6 +284,49 @@ public class CreateAndTrackWithRaceLogTest extends RaceLogTrackingTestHelper {
         TrackedRace race2 = trackAndGetRace(column);
         assertEquals(explicitStartOfTracking, waitForStartOfTracking(race2));
         assertEquals(explicitEndOfTracking, race2.getEndOfTracking());
+    }
+
+    @Test
+    public void testRevokingExplicitTrackingTimesUpdatesExistingTrackedRace() throws Exception {
+        regatta.setControlTrackingFromStartAndFinishTimes(true);
+        final RaceColumn column = leaderboard.getRaceColumnByName(columnName);
+        raceLog = column.getRaceLog(fleet);
+        adapter.denoteRaceForRaceLogTracking(service, leaderboard, column, fleet, "race");
+        final TimePoint startOfRace = new MillisecondsTimePoint(/* millis */ 1_000_000);
+        final TimePoint finishedTime = new MillisecondsTimePoint(/* millis */ 2_000_000);
+        setStartAndEndOfRaceInRaceLog(startOfRace, finishedTime);
+        // Both generations of explicit bounds must be revoked before automatic bounds take effect.
+        setStartAndEndOfTrackingInRaceLog(new MillisecondsTimePoint(/* millis */ 100_000),
+                new MillisecondsTimePoint(/* millis */ 3_000_000));
+        final TimePoint explicitStart = new MillisecondsTimePoint(/* millis */ 200_000);
+        final TimePoint explicitEnd = new MillisecondsTimePoint(/* millis */ 4_000_000);
+        setStartAndEndOfTrackingInRaceLog(explicitStart, explicitEnd);
+        final TrackedRace race = trackAndGetRace(column);
+        assertEquals(explicitStart, race.getStartOfTracking());
+        assertEquals(explicitEnd, race.getEndOfTracking());
+        final TimePoint[] notifiedBounds = new TimePoint[2];
+        race.addListener(new AbstractRaceChangeListener() {
+            @Override
+            public void startOfTrackingChanged(final TimePoint oldStartOfTracking, final TimePoint newStartOfTracking) {
+                notifiedBounds[0] = newStartOfTracking;
+            }
+            @Override
+            public void endOfTrackingChanged(final TimePoint oldEndOfTracking, final TimePoint newEndOfTracking) {
+                notifiedBounds[1] = newEndOfTracking;
+            }
+        });
+        final TrackingTimesRevocationReport report = adapter.revokeExplicitTrackingTimes(leaderboard, service);
+        assertNull(report.getErrorCode());
+        assertEquals(/* expected */ 4, report.getRevokedEvents().get(new Pair<>(column, fleet)).size());
+        assertNull(race.getTrackingTimesFromRaceLogs());
+        assertSame(race, column.getTrackedRace(fleet));
+        final TimePoint expectedStart = startOfRace.minus(TrackedRace.START_TRACKING_THIS_MUCH_BEFORE_RACE_START);
+        final TimePoint expectedEnd = finishedTime.plus(TrackedRace.STOP_TRACKING_THIS_MUCH_AFTER_RACE_FINISH);
+        assertAll("Revocation must update and notify the existing tracked race without retracking",
+                () -> assertEquals(expectedStart, race.getStartOfTracking()),
+                () -> assertEquals(expectedEnd, race.getEndOfTracking()),
+                () -> assertEquals(expectedStart, notifiedBounds[0]),
+                () -> assertEquals(expectedEnd, notifiedBounds[1]));
     }
 
     @Test
