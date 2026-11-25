@@ -27,6 +27,7 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.PageFactory;
@@ -610,6 +611,7 @@ public class PageObject {
         final int[] stableLayoutSamples = new int[1];
         final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DEFAULT_LOOKUP_TIMEOUT));
         wait.pollingEvery(Duration.ofMillis(/* millis */ 100));
+        wait.withMessage(() -> "Element did not become interactable: " + describeInteractionTarget(elementSupplier));
         final WebElement interactableElement = wait.until((final WebDriver webDriver) -> {
             WebElement result = null;
             try {
@@ -643,6 +645,26 @@ public class PageObject {
             return result;
         });
         return interactableElement;
+    }
+
+    private String describeInteractionTarget(final Supplier<WebElement> elementSupplier) {
+        String result;
+        try {
+            result = String.valueOf(((JavascriptExecutor) driver).executeScript(
+                    "var e=arguments[0],r=e.getBoundingClientRect();"
+                    + "function describe(n){return n ? {tag:n.tagName,id:n.id,"
+                    + "seleniumId:n.getAttribute('selenium-id'),classes:n.className} : null;}"
+                    + "var x=Math.max(0,Math.min(innerWidth-1,r.left+r.width/2)),"
+                    + "y=Math.max(0,Math.min(innerHeight-1,r.top+r.height/2));"
+                    + "return {target:describe(e),rect:{x:r.x,y:r.y,width:r.width,height:r.height},"
+                    + "elementAtCenter:describe(document.elementFromPoint(x,y)),"
+                    + "dialogs:Array.from(document.querySelectorAll('.gwt-DialogBox')).map(describe),"
+                    + "pendingAjax:window.PENDING_AJAX_CALLS ? PENDING_AJAX_CALLS.numberOfPendingCalls('') : null};",
+                    elementSupplier.get()));
+        } catch (final WebDriverException e) {
+            result = e.getClass().getSimpleName() + ": " + e.getMessage();
+        }
+        return result;
     }
 
     /**

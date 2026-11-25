@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import com.sap.sailing.selenium.core.SeleniumTestCase;
+import com.sap.sailing.selenium.pages.adminconsole.regatta.SeriesEditDialogPO;
 import com.sap.sailing.selenium.pages.common.DataEntryDialogPO;
 import com.sap.sailing.selenium.pages.gwt.CheckBoxPO;
 import com.sap.sailing.selenium.pages.gwt.DataEntryPO;
@@ -151,6 +153,32 @@ public class TestPageObjectInteractions extends AbstractSeleniumTest {
         dialog.pressCancel();
         assertEquals(/* expected */ 2L, script("return dialogClicks;"));
         assertNativeClicks();
+    }
+
+    @SeleniumTestCase
+    public void setsSeriesCheckboxInputsWithoutTogglingAnAlreadyMatchingState() {
+        script("var dialog=document.getElementById('dialog'); dialog.innerHTML='';"
+                + "['MedalSeriesCheckbox','HasCrossFleetMergedRankingCheckbox','HasSplitFleetContiguousScoringCheckbox']"
+                + ".forEach(function(id){var span=document.createElement('span'); span.className='gwt-CheckBox';"
+                + "span.setAttribute('selenium-id',id); span.innerHTML='<input type=checkbox><label>'+id+'</label>';"
+                + "span.addEventListener('click',function(e){if(e.target.tagName==='INPUT'){window.checkboxClicks++;"
+                + "if(!e.isTrusted)window.untrustedClicks++;}}); dialog.appendChild(span);});");
+        final SeriesEditDialogPO dialog = new SeriesEditDialogPO(getWebDriver(), getWebDriver().findElement(By.id("dialog")));
+        assertSeriesCheckbox(dialog::setMedalSeries, "MedalSeriesCheckbox");
+        assertSeriesCheckbox(dialog::setCrossFleetMergedRankingCheckboxStatus, "HasCrossFleetMergedRankingCheckbox");
+        assertSeriesCheckbox(dialog::setSplitFleetContiguousScoringCheckbox, "HasSplitFleetContiguousScoringCheckbox");
+        assertEquals(/* expected */ 6L, script("return checkboxClicks;"));
+        assertNativeClicks();
+    }
+
+    private void assertSeriesCheckbox(final Consumer<Boolean> setter, final String seleniumId) {
+        final WebElement input = getWebDriver().findElement(By.cssSelector("[selenium-id='" + seleniumId + "'] input"));
+        setter.accept(/* selected */ true);
+        assertTrue(input.isSelected());
+        setter.accept(/* selected */ true);
+        assertTrue(input.isSelected());
+        setter.accept(/* selected */ false);
+        assertFalse(input.isSelected());
     }
 
     private GenericCellTablePO<DataEntryPO> table() {

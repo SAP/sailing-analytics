@@ -12,6 +12,7 @@ import org.openqa.selenium.support.ui.Select;
 import com.sap.sailing.selenium.core.BySeleniumId;
 import com.sap.sailing.selenium.core.FindBy;
 import com.sap.sailing.selenium.pages.common.DataEntryDialogPO;
+import com.sap.sailing.selenium.pages.gwt.CheckBoxPO;
 
 public class SeriesEditDialogPO extends DataEntryDialogPO {
 
@@ -146,14 +147,14 @@ public class SeriesEditDialogPO extends DataEntryDialogPO {
     }
 
     public void setMedalSeries(final boolean medal) {
-        setCheckboxSelected(() -> medalSeriesCheckbox, medal);
+        CheckBoxPO.create(driver, medalSeriesCheckbox).setSelected(medal);
     }
 
     public void setCrossFleetMergedRankingCheckboxStatus(final boolean status) {
-        setCheckboxSelected(() -> hasCrossFleetMergedRankingCheckbox, status);
+        CheckBoxPO.create(driver, hasCrossFleetMergedRankingCheckbox).setSelected(status);
     }
 
     public void setSplitFleetContiguousScoringCheckbox(final boolean status) {
-        setCheckboxSelected(() -> hasSplitFleetContiguousScoringCheckbox, status);
+        CheckBoxPO.create(driver, hasSplitFleetContiguousScoringCheckbox).setSelected(status);
     }
 }
