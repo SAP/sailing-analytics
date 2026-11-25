@@ -3,7 +3,6 @@ package com.sap.sailing.selenium.pages.adminconsole;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -303,10 +302,13 @@ public class AdminConsolePage extends HostPageWithAuthentication {
     }
     
     private void cancelWhatsNewDialogIfAppearing() {
-        try {
-            waitForPO(WhatsNewDialogPO::new, ID_ADMIN_WHATS_NEW_DIALOG, 1).pressCancel();
-        } catch (TimeoutException exc) {
-            logger.log(Level.FINEST, "What's new dialog not found => ignoring", exc);
+        // The marked login/changelog/preference chain must finish before absence means no dialog is required.
+        waitForAjaxRequests();
+        final WebElement dialog = findElementOrNullBySeleniumId(driver, ID_ADMIN_WHATS_NEW_DIALOG);
+        if (dialog != null) {
+            new WhatsNewDialogPO(driver, dialog).pressCancel();
+            waitForElementNotExistsBySeleniumId(driver, ID_ADMIN_WHATS_NEW_DIALOG);
+            waitForAjaxRequests();
         }
     }
 

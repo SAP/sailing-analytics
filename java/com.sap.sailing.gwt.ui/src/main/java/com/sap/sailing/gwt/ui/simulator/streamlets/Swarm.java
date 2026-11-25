@@ -54,6 +54,14 @@ public class Swarm implements TimeListener {
      */
     private boolean swarmOffScreen = false;
 
+    /**
+     * Set while the user is dragging or inertia is still running. Drawing is suppressed entirely
+     * during this period; cleared by the caller when the map fully settles (IdleMapHandler).
+     * This avoids drawing particles against a moving projection without relying on a fixed-duration
+     * countdown that may be too short for a hard fling.
+     */
+    private boolean mapInteractionInProgress = false;
+
     private int swarmPauseInTicks = 0;
 
     private Date timePoint;
@@ -135,26 +143,20 @@ public class Swarm implements TimeListener {
 
     private void updateSwarmOneTick(int animationIntervalMillis) {
         double time0 = Duration.currentTimeMillis();
-        // upon zooming the swarm is shortly paused, to ensure no strange rendering during the css zoom
-        // animations
+        // the swarm is paused during map interactions (drag, inertia, zoom) to avoid drawing
+        // particles while the projection is in flux; on the final tick, bounds and projections
+        // are updated and particles are recycled before resuming
         if (swarmPauseInTicks > 1) {
             swarmPauseInTicks--;
         } else if (swarmPauseInTicks == 1) {
-            // ensure bounds and projections are up to date
             startSwarmIfNecessaryAndUpdateProjection();
-            if (zoomChanged) {
-                // ensure amount of particles is updated
-                diffPx = new Vector(0, 0);
-                recycleParticles();
-                zoomChanged = false;
-            } else {
-                // process the offset
-                diffPx = fullcanvas.getDiffPx();
-            }
+            diffPx = new Vector(0, 0);
+            recycleParticles();
+            zoomChanged = false;
             swarmPauseInTicks = 0;
         }
-        // update the swarm if it is not paused
-        if ((!swarmOffScreen) && (swarmPauseInTicks == 0)) {
+        // update the swarm if it is not paused and the map is not being interacted with
+        if ((!swarmOffScreen) && (swarmPauseInTicks == 0) && !mapInteractionInProgress) {
             execute(diffPx);
             diffPx = new Vector(0, 0);
         }
@@ -235,12 +237,15 @@ public class Swarm implements TimeListener {
         recycleParticles();
     }
 
-    public void onBoundsChanged(boolean zoomChanged, int swarmPause) {
+    /**
+     * Called when the map bounds have changed (pan or zoom). If a zoom occurred, clears the canvas
+     * immediately to avoid artifacts. Sets the pause countdown to {@code swarmPause} ticks, after
+     * which particles are recycled and drawing resumes.
+     */
+    public void onBoundsChanged(final boolean zoomChanged, final int swarmPause) {
         this.zoomChanged |= zoomChanged;
         if (this.zoomChanged) {
             clearCanvas();
-        } else {
-            fullcanvas.setCanvasSettings();
         }
         this.swarmPauseInTicks = swarmPause;
     }
@@ -383,7 +388,7 @@ public class Swarm implements TimeListener {
         timePoint = newTime;
     }
 
-    public void pause(int swarmPauseInTicks) {
-        this.swarmPauseInTicks = swarmPauseInTicks;
+    public void setMapInteractionInProgress(final boolean inProgress) {
+        this.mapInteractionInProgress = inProgress;
     }
 }

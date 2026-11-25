@@ -1,0 +1,98 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Page object interaction regression fixture</title>
+<style>
+body { margin: 0; }
+#zeroHeight { height: 0; overflow: hidden; }
+#panel { position: absolute; top: 60px; left: 30px; width: 700px; height: 300px; overflow: auto; }
+.spacer { height: 650px; }
+#edge { position: fixed; top: 330px; left: 30px; width: 700px; height: 30px; background: gray; z-index: 2; }
+table { width: 660px; border-spacing: 0; }
+td { height: 50px; padding: 10px; border: 1px solid #aaa; text-align: center; }
+td a { display: inline-block; padding: 10px; }
+td img { width: 16px; height: 16px; background: blue; }
+.selection { width: 12px; height: 12px; margin: auto; background: #008cb0; }
+#overlay { position: fixed; inset: 0; z-index: 10; background: #ccc; display: none; }
+#checkbox { position: absolute; top: 400px; left: 30px; }
+#dialog { position: absolute; top: 460px; left: 30px; }
+</style></head><body>
+<div id="zeroHeight"><div id="panel"><div class="spacer"></div>
+<table id="rows"><thead><tr><th __gwt_header="0">Group</th><th __gwt_header="1">Name</th>
+<th __gwt_header="2">Actions</th></tr></thead><tbody></tbody></table>
+<div class="spacer"></div></div></div><div id="edge"></div><div id="overlay"></div>
+<span id="checkbox" class="gwt-CheckBox"><input type="checkbox"><label>Option</label></span>
+<div id="dialog" class="gwt-DialogBox"><button selenium-id="OkButton">OK</button>
+<button selenium-id="CancelButton">Cancel</button><span selenium-id="StatusLabel"></span></div>
+<script>
+window.selected = [];
+window.checkboxMode = false;
+window.checkboxHeader = false;
+window.rowClicks = 0;
+window.actionClicks = 0;
+window.linkClicks = 0;
+window.checkboxClicks = 0;
+window.dialogClicks = 0;
+window.untrustedClicks = 0;
+window.replacements = 0;
+window.replaceOnScroll = false;
+window.duplicateOnScroll = false;
+window.order = ['R1', 'R2', 'R3'];
+function render() {
+    document.querySelector('th').innerHTML = checkboxMode
+        ? (checkboxHeader ? '<input type="checkbox">' : '✓') : 'Group';
+    document.querySelector('tbody').innerHTML = order.map(function(name) {
+        return '<tr aria-selected="' + selected.includes(name) + '"><td><div>'
+            + (checkboxMode ? (checkboxHeader ? '<div class="selection"></div>'
+                : '<input type="checkbox" ' + (selected.includes(name) ? 'checked' : '') + '>') : 'Fleet')
+            + '</div></td><td><a href="#">' + name + '</a></td>'
+            + '<td><div name="UPDATE"><img alt="edit" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"></div></td></tr>';
+    }).join('');
+}
+function showOverlay() {
+    document.getElementById('overlay').style.display = 'block';
+    setTimeout(function() { document.getElementById('overlay').style.display = 'none'; }, 700);
+}
+document.getElementById('panel').addEventListener('scroll', function() {
+    if (replaceOnScroll) {
+        replaceOnScroll = false;
+        replacements++;
+        if (duplicateOnScroll) order.push('R3');
+        document.querySelector('tbody').innerHTML = '';
+        setTimeout(render, 200);
+    }
+});
+document.getElementById('rows').addEventListener('click', function(event) {
+    if (!event.isTrusted) untrustedClicks++;
+    const row = event.target.closest('tbody tr');
+    if (!row) return;
+    event.preventDefault();
+    if (event.target.closest('a')) { linkClicks++; return; }
+    if (event.target.closest('[name=UPDATE]')) { actionClicks++; return; }
+    if (checkboxMode && event.target.closest('td') !== row.cells[0]) return;
+    const name = row.cells[1].textContent;
+    const toggle = checkboxMode || event.ctrlKey;
+    rowClicks++;
+    // Simulate GWT's deferred selection update, replacement and reordering of every row.
+    setTimeout(function() {
+        selected = toggle ? (selected.includes(name) ? selected.filter(function(n) { return n !== name; })
+            : selected.concat(name)) : [name];
+        order.reverse();
+        replacements++;
+        render();
+    }, 200);
+});
+document.getElementById('checkbox').addEventListener('click', function(event) {
+    if (event.target.tagName !== 'INPUT') return;
+    if (!event.isTrusted) untrustedClicks++;
+    event.preventDefault();
+    checkboxClicks++;
+    const checked = !event.target.checked;
+    setTimeout(function() {
+        document.querySelector('#checkbox input').outerHTML = '<input type="checkbox" ' + (!checked ? 'checked' : '') + '>';
+    }, 200);
+});
+document.getElementById('dialog').addEventListener('click', function(event) {
+    if (!event.isTrusted) untrustedClicks++;
+    if (event.target.tagName === 'BUTTON') dialogClicks++;
+});
+render();
+</script></body></html>

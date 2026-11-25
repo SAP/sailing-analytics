@@ -343,20 +343,22 @@ public class DynamicTrackedRaceLogListener extends BaseRaceLogEventVisitor {
     }
 
     @Override
-    public void visit(RaceLogRevokeEvent event) {
-        if (markPassingUpdateListener != null) {
-            RaceLogEvent revokedEvent = null;
-            for (final RaceLog log : raceLogs.keySet()) {
-                try {
-                    log.lockForRead();
-                    revokedEvent = log.getEventById(event.getRevokedEventId());
-                    if (revokedEvent != null) {
-                        break;
-                    }
-                } finally {
-                    log.unlockAfterRead();
+    public void visit(final RaceLogRevokeEvent event) {
+        RaceLogEvent revokedEvent = null;
+        for (final RaceLog log : raceLogs.keySet()) {
+            try {
+                log.lockForRead();
+                revokedEvent = log.getEventById(event.getRevokedEventId());
+                if (revokedEvent != null) {
+                    break;
                 }
+            } finally {
+                log.unlockAfterRead();
             }
+        }
+        if (revokedEvent instanceof RaceLogStartOfTrackingEvent || revokedEvent instanceof RaceLogEndOfTrackingEvent) {
+            trackedRace.updateStartAndEndOfTracking(/* waitForGPSFixesToLoad */ false);
+        } else if (markPassingUpdateListener != null) {
             if (revokedEvent instanceof RaceLogSuppressedMarkPassingsEvent) {
                 markPassingUpdateListener.removeSuppressedPassing(revokedEvent.getInvolvedCompetitors().get(0));
             } else if (revokedEvent instanceof RaceLogFixedMarkPassingEvent) {
