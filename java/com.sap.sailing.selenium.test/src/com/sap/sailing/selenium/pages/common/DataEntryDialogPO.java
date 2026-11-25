@@ -64,7 +64,7 @@ public abstract class DataEntryDialogPO extends PageArea {
     public void pressOk(final boolean acceptAlert, final boolean waitForAjaxRequests) {
         // This generically triggers revalidation in dialogs to ensure that the ok button gets enabled
         ((JavascriptExecutor) driver).executeScript("!!document.activeElement ? document.activeElement.blur() : 0");
-        clickWhenInteractable(() -> findElementBySeleniumId("OkButton"));
+        clickWhenInteractable(() -> okButton);
         if (acceptAlert) {
             final Alert alert = new WebDriverWait(driver, Duration.ofSeconds(DEFAULT_WAIT_TIMEOUT_SECONDS))
                     .until(ExpectedConditions.alertIsPresent());
@@ -77,7 +77,7 @@ public abstract class DataEntryDialogPO extends PageArea {
     }
     
     public void pressCancel() {
-        clickWhenInteractable(() -> findElementBySeleniumId("CancelButton"));
+        clickWhenInteractable(() -> cancelButton);
     }
     
     public void pressMakeDefault() {
@@ -90,6 +90,6 @@ public abstract class DataEntryDialogPO extends PageArea {
     }
     
     public void clickOkButtonOrThrow() {
-        clickWhenInteractable(() -> findElementBySeleniumId("OkButton"));
+        clickWhenInteractable(() -> okButton);
     }
 }
