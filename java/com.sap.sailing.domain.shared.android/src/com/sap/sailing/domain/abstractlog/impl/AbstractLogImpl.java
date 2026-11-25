@@ -122,6 +122,14 @@ extends TrackImpl<EventT> implements AbstractLog<EventT, VisitorT> {
         return add(event, false);
     }
 
+    /**
+     * Registers an added event in the ID index and updates revocation state while the caller holds the write lock.
+     *
+     * @param event
+     *            the event already added to the raw events
+     * @return a revocation warning message for the caller to {@link #logRevocationWarning(String) log} after the
+     *         operation releases its locks, or {@code null} if no warning is needed
+     */
     private String registerAddedEvent(final EventT event) {
         assertWriteLock();
         final String revocationWarning = revokeIfNecessary(event);
@@ -135,7 +143,18 @@ extends TrackImpl<EventT> implements AbstractLog<EventT, VisitorT> {
         }
     }
 
+    /**
+     * Applies the revocation, if any, represented by the new event while the caller holds the write lock. Rejected
+     * revocations are converted to warnings without updating the revoked-event IDs.
+     *
+     * @param newEvent
+     *            the newly added event to check for a revocation
+     * @return a warning message about a missing target or rejected revocation for the caller to
+     *         {@link #logRevocationWarning(String) log} after the operation releases its locks, or {@code null} if no
+     *         warning is needed
+     */
     private String revokeIfNecessary(final EventT newEvent) {
+        assertWriteLock();
         String revocationWarning = null;
         if (newEvent instanceof RevokeEvent) {
             final RevokeEvent<?> revokeEvent = (RevokeEvent<?>) newEvent;
@@ -149,6 +168,18 @@ extends TrackImpl<EventT> implements AbstractLog<EventT, VisitorT> {
         return revocationWarning;
     }
 
+    /**
+     * Checks whether the event may revoke its target. A target that is not yet loaded is allowed, but produces a
+     * warning message instead of logging while the calling operation may still hold log locks.
+     *
+     * @param revokeEvent
+     *            the revocation event to validate
+     * @return a warning message for the caller to {@link #logRevocationWarning(String) log} after the operation
+     *         releases its locks if the target is missing, or {@code null} if the target exists and the revocation is
+     *         permitted
+     * @throws NotRevokableException
+     *             if the target is not revokable or the revocation's author has insufficient priority
+     */
     private String checkIfSuccessfullyRevokes(final RevokeEvent<?> revokeEvent) throws NotRevokableException {
         String revocationWarning = null;
         lockForRead();
@@ -390,6 +421,19 @@ extends TrackImpl<EventT> implements AbstractLog<EventT, VisitorT> {
         }
     }
 
+    /**
+     * Adds a previously absent event during a merge, updating the raw events, ID index and revocation state while
+     * the caller holds this log's write lock. Existing events are ignored.
+     * The event and any revocation warning are collected so that the caller can notify listeners and log warnings
+     * after releasing both logs' locks, including when a later event causes the merge to fail.
+     *
+     * @param event
+     *            the event to merge into this log
+     * @param addedEvents
+     *            receives successfully registered events in merge order for deferred listener notification
+     * @param revocationWarnings
+     *            receives revocation warnings for deferred logging
+     */
     private void addForMerge(final EventT event, final List<EventT> addedEvents, final List<String> revocationWarnings) {
         assertWriteLock();
         if (getInternalRawFixes().add(event)) {
