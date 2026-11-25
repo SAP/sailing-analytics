@@ -25,11 +25,16 @@ import com.sap.sse.mongodb.MongoDBService;
 
 public abstract class MongoEndpointImpl implements MongoEndpoint {
     private static final Logger logger = Logger.getLogger(MongoEndpointImpl.class.getName());
-    private static final int IMPORT_BATCH_SIZE = 100;
+    /**
+     * Upper bound on the number of documents retained per write batch. Package-visible so that the test fragment,
+     * which contributes to this package, can derive its expectations from the budget instead of duplicating it.
+     */
+    static final int IMPORT_BATCH_SIZE = 100;
     /**
      * Limit retained BSON bytes as well as document count. A larger document is inserted in a batch of its own.
+     * Package-visible so that the test fragment can derive its expectations from the budget instead of duplicating it.
      */
-    private static final int IMPORT_BATCH_BYTES = 8 * 1024 * 1024;
+    static final int IMPORT_BATCH_BYTES = 8 * 1024 * 1024;
     
     @Override
     public abstract boolean equals(Object o);

@@ -25,6 +25,13 @@
           <div class="innerContent">
           <h2 class="articleSubheadline">November 2026</h2>
           <ul class="bulletList">
+                <li>Archiving a MongoDB database (for example when archiving a replica set) no longer risks
+                    exhausting the server's Java heap. The archive copy now streams documents as raw BSON and
+                    bounds each write batch by both document count and encoded BSON size, so the memory it retains
+                    stays bounded regardless of the number of documents or the size of individual documents; an
+                    oversized but valid document is copied on its own. Previously, archiving large databases could
+                    fail with an <tt>OutOfMemoryError</tt>. See
+                    <a href="https://github.com/eclipse-sailing-analytics/sailing-analytics/issues/6357">issue #6357</a>.</li>
                 <li>Leaderboard CPU metering now includes executor tasks that construct leaderboard entries and
                     optional race/leg details, attributing their CPU time to <tt>LEADERBOARD_COMPUTE_DTO</tt>.
                     Values reported by <tt>/sailingserver/api/v1/leaderboards/{name}/cpu</tt>, including aggregate

@@ -1,4 +1,4 @@
-package com.sap.sse.landscape.mongodb.test;
+package com.sap.sse.landscape.mongodb.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -33,44 +33,76 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
-import com.sap.sse.landscape.mongodb.impl.MongoEndpointImpl;
 
+/**
+ * Regression tests for the archive-copy path in {@link MongoEndpointImpl#importDatabase(MongoDatabase)}, which caused
+ * heap exhaustion when archiving large replica sets (issue #6357). The original importer streamed through a cursor but
+ * retained up to {@link MongoEndpointImpl#IMPORT_BATCH_SIZE} fully decoded {@code Document} objects per write, so a
+ * document-count limit alone could not bound the heap for large nested BSON documents, and it never closed its cursors.
+ * <p>
+ * These tests pin down the fix: copying as raw BSON, bounding each write batch by both document count and encoded BSON
+ * bytes, bounding the driver read batch, and closing the collection-name and document cursors on success and failure.
+ * <p>
+ * This test lives in the same package as {@link MongoEndpointImpl} and runs from the {@code com.sap.sse.landscape.test}
+ * fragment, which contributes to the host bundle's packages. It can therefore read the package-visible
+ * {@link MongoEndpointImpl#IMPORT_BATCH_SIZE} and {@link MongoEndpointImpl#IMPORT_BATCH_BYTES} budgets and derive its
+ * expectations from them, so the assertions stay correct if those budgets are retuned rather than silently asserting
+ * stale literals.
+ */
 public class TestMongoDatabaseImport {
+    /**
+     * More than two full count-limited batches of tiny documents are copied in several batches, each within the
+     * count budget, in their original order, with the first write happening before the whole collection has been read
+     * (proving the copy streams rather than materializing every document first), and both cursors are closed.
+     */
     @Test
     public void testStreamsSmallDocumentsInOrder() throws URISyntaxException {
+        final int documentCount = 2 * MongoEndpointImpl.IMPORT_BATCH_SIZE + 5;
         final List<RawBsonDocument> documents = new ArrayList<>();
-        for (int i = 0; i < 205; i++) {
+        for (int i = 0; i < documentCount; i++) {
             documents.add(new RawBsonDocument(new Document("_id", i), new DocumentCodec()));
         }
         final ImportFixture fixture = new ImportFixture(documents);
         assertSame(fixture.targetDatabase, fixture.endpoint.importDatabase(fixture.sourceDatabase));
-        assertEquals(/* expected */ 3, fixture.batches.size());
+        final int expectedBatchCount = (documentCount + MongoEndpointImpl.IMPORT_BATCH_SIZE - 1) / MongoEndpointImpl.IMPORT_BATCH_SIZE;
+        assertEquals(expectedBatchCount, fixture.batches.size());
         for (final List<RawBsonDocument> batch : fixture.batches) {
-            assertTrue(batch.size() <= 100);
+            assertTrue(batch.size() <= MongoEndpointImpl.IMPORT_BATCH_SIZE);
         }
         assertTrue(fixture.readCountsAtInsert.get(/* index */ 0) < documents.size(), "Must write before consuming the whole collection");
         assertEquals(documents, fixture.batches.stream().flatMap(List::stream).collect(Collectors.toList()));
         fixture.verifyCursorsClosed();
     }
 
+    /**
+     * Documents small enough to stay under the count limit but large enough that two together approach the byte budget
+     * are split across more than one batch, each batch staying within {@link MongoEndpointImpl#IMPORT_BATCH_BYTES},
+     * demonstrating that a document-count limit alone does not bound retained bytes. All documents are preserved in
+     * order and both cursors are closed.
+     */
     @Test
     public void testLimitsBatchesByBsonBytes() throws URISyntaxException {
-        final RawBsonDocument document = documentWithPayload(/* payloadBytes */ 3 * 1024 * 1024);
+        final RawBsonDocument document = documentWithPayload(/* payloadBytes */ MongoEndpointImpl.IMPORT_BATCH_BYTES * 2 / 5);
         final List<RawBsonDocument> documents = Collections.nCopies(/* n */ 5, document);
         final ImportFixture fixture = new ImportFixture(documents);
         fixture.endpoint.importDatabase(fixture.sourceDatabase);
         assertTrue(fixture.batches.size() > 1, "A document-count limit alone does not bound retained bytes");
         for (final List<RawBsonDocument> batch : fixture.batches) {
-            assertTrue(batch.stream().mapToInt((final RawBsonDocument d) -> d.getByteBuffer().remaining()).sum() <= 8 * 1024 * 1024);
+            assertTrue(batch.stream().mapToInt((final RawBsonDocument d) -> d.getByteBuffer().remaining()).sum() <= MongoEndpointImpl.IMPORT_BATCH_BYTES);
         }
         assertEquals(documents, fixture.batches.stream().flatMap(List::stream).collect(Collectors.toList()));
         fixture.verifyCursorsClosed();
     }
 
+    /**
+     * A single document larger than the whole byte budget is copied in a batch of its own, flanked by the small
+     * documents around it in separate batches, so one oversized but valid document neither blocks the copy nor is
+     * merged with its neighbours. Both cursors are closed.
+     */
     @Test
     public void testDocumentLargerThanBatchBudgetIsCopiedAlone() throws URISyntaxException {
         final RawBsonDocument small = documentWithPayload(/* payloadBytes */ 10);
-        final RawBsonDocument large = documentWithPayload(/* payloadBytes */ 9 * 1024 * 1024);
+        final RawBsonDocument large = documentWithPayload(/* payloadBytes */ MongoEndpointImpl.IMPORT_BATCH_BYTES + 1);
         final ImportFixture fixture = new ImportFixture(Arrays.asList(small, large, small));
         fixture.endpoint.importDatabase(fixture.sourceDatabase);
         assertEquals(/* expected */ 3, fixture.batches.size());
@@ -80,6 +112,10 @@ public class TestMongoDatabaseImport {
         fixture.verifyCursorsClosed();
     }
 
+    /**
+     * An empty source collection is still created on the target, so database hashes stay equal, and no write is
+     * attempted. Both cursors are closed.
+     */
     @Test
     public void testPreservesEmptyCollection() throws URISyntaxException {
         final ImportFixture fixture = new ImportFixture(Collections.emptyList());
@@ -89,6 +125,10 @@ public class TestMongoDatabaseImport {
         fixture.verifyCursorsClosed();
     }
 
+    /**
+     * When a write fails, the original exception propagates unchanged and both cursors are closed, so a failed archive
+     * does not leak MongoDB cursors.
+     */
     @Test
     public void testClosesCursorsOnWriteFailure() throws URISyntaxException {
         final ImportFixture fixture = new ImportFixture(Collections.singletonList(documentWithPayload(/* payloadBytes */ 10)));
@@ -98,6 +138,10 @@ public class TestMongoDatabaseImport {
         fixture.verifyCursorsClosed();
     }
 
+    /**
+     * When a read fails, the original exception propagates unchanged and both cursors are closed, so a failed archive
+     * does not leak MongoDB cursors.
+     */
     @Test
     public void testClosesCursorsOnReadFailure() throws URISyntaxException {
         final ImportFixture fixture = new ImportFixture(Collections.singletonList(documentWithPayload(/* payloadBytes */ 10)));
@@ -111,6 +155,20 @@ public class TestMongoDatabaseImport {
         return new RawBsonDocument(new Document("_id", "id").append("payload", new byte[payloadBytes]), new DocumentCodec());
     }
 
+    /**
+     * Mocked MongoDB wiring for a single source database holding one collection named {@code "collection"} whose
+     * documents are supplied to the constructor. The source and target databases, their collections, and the
+     * collection-name and document cursors are all Mockito mocks; the importer runs against them as the real method via
+     * {@code thenCallRealMethod()}.
+     * <p>
+     * The fixture records every {@code insertMany} batch in {@link #batches} and, in {@link #readCountsAtInsert}, how
+     * many documents had been read when each batch was written, so tests can assert batch sizing, ordering and
+     * streaming. {@link #verifyCursorsClosed()} checks that both cursors were closed.
+     * <p>
+     * Both the raw-BSON collection lookup used by the importer and the original decoded-{@code Document} lookup are
+     * stubbed (see {@link #supportDecodedCollections()}), sharing one input and write sink, so a regression fails on
+     * the intended batching or cursor-cleanup assertion rather than on an unstubbed collection lookup.
+     */
     private static class ImportFixture {
         private final MongoDatabase sourceDatabase = mock(MongoDatabase.class);
         private final MongoDatabase targetDatabase = mock(MongoDatabase.class);
@@ -141,7 +199,7 @@ public class TestMongoDatabaseImport {
             when(sourceCollection.find()).thenReturn(find);
             when(find.batchSize(anyInt())).thenAnswer((final InvocationOnMock invocation) -> {
                 final int batchSize = invocation.getArgument(/* index */ 0);
-                assertTrue(batchSize > 0 && batchSize <= 100, "Read batches must also be bounded");
+                assertTrue(batchSize > 0 && batchSize <= MongoEndpointImpl.IMPORT_BATCH_SIZE, "Read batches must also be bounded");
                 return find;
             });
             when(find.iterator()).thenReturn(documentCursor);
