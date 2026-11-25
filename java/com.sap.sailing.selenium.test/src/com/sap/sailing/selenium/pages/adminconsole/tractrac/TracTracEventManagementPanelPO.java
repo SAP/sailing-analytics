@@ -1,5 +1,6 @@
 package com.sap.sailing.selenium.pages.adminconsole.tractrac;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,9 +11,11 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.sap.sailing.domain.common.BoatClassMasterdata;
 import com.sap.sailing.domain.test.AbstractTracTracLiveTest;
@@ -120,27 +123,41 @@ public class TracTracEventManagementPanelPO extends PageArea {
         super(driver, element);
     }
     
-    public void addConnectionAndListTrackableRaces(String url) {
-        AddTracTracConnectionDialogPO dialog = addConnection();
+    public void addConnectionAndListTrackableRaces(final String url) {
+        final AddTracTracConnectionDialogPO dialog = addConnection();
         dialog.setJsonUrl(url);
         dialog.setTracTracApiToken(AbstractTracTracLiveTest.getTracTracApiToken());
         dialog.pressOk();
         listRacesForExistingConnection(url);
     }
 
-    public void listRacesForExistingConnection(String url) {
-        CellTablePO<DataEntryPO> tablePO = getConfigurationTable();
-        tablePO.waitForTableToShowData();
-        tablePO.selectEntries(entry -> {
-            return url.equals(entry.getColumnContent("JSON URL"));
-        }, () -> false);
-        
-        this.listRacesButton.click();
+    public void listRacesForExistingConnection(final String url) {
+        waitForConnectionEntry(url);
+        final CellTablePO<DataEntryPO> tablePO = getConfigurationTable();
+        tablePO.selectEntries((final DataEntryPO entry) -> url.equals(entry.getColumnContent("JSON URL")), () -> false);
+        waitUntil(() -> {
+            final List<DataEntryPO> selectedEntries = tablePO.getSelectedEntries();
+            return selectedEntries.size() == 1
+                    && url.equals(selectedEntries.get(/* index */ 0).getColumnContent("JSON URL"));
+        });
+        clickWhenInteractable(() -> listRacesButton);
         waitForAjaxRequests();
+    }
+
+    public DataEntryPO waitForConnectionEntry(final String url) {
+        final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DEFAULT_LOOKUP_TIMEOUT));
+        wait.ignoring(StaleElementReferenceException.class);
+        wait.withMessage(() -> "TracTrac connection not found for JSON URL " + url + "; visible connections: "
+                + getConfigurationTable().getEntries().stream()
+                        .map((final DataEntryPO entry) -> entry.getColumnContent("JSON URL"))
+                        .collect(java.util.stream.Collectors.toList()));
+        return wait.until((final WebDriver webDriver) -> getConfigurationTable().getEntries().stream()
+                .filter((final DataEntryPO entry) -> url.equals(entry.getColumnContent("JSON URL")))
+                .findFirst().orElse(/* other */ null));
     }
     
     public AddTracTracConnectionDialogPO addConnection() {
-        addConnectionButton.click();
+        clickWhenInteractable(() -> addConnectionButton);
         final WebElement dialog = findElementBySeleniumId(this.driver, "TracTracConnectionDialog");
         return new AddTracTracConnectionDialogPO(this.driver, dialog);
     }
@@ -277,11 +294,8 @@ public class TracTracEventManagementPanelPO extends PageArea {
         return new GenericCellTablePO<>(this.driver, this.trackableRacesCellTable, DataEntryPO.class);
     }
     
-    private void setSelection(WebElement checkbox, boolean selected) {
-        WebElement input = checkbox.findElement(By.tagName("input"));
-        
-        if(input.isSelected() != selected)
-            input.click();
+    private void setSelection(final WebElement checkbox, final boolean selected) {
+        setCheckboxSelected(() -> checkbox.findElement(By.tagName("input")), selected);
     }
     
     private void waitForSelectedRacesContainDifferentBoatClassesError(String boatClass) {

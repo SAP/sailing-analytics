@@ -124,7 +124,9 @@ public class TracTracEventManagementPanel extends AbstractEventManagementPanel i
         grid.setWidget(0, 1, showHiddenRacesCheckbox);
         // Add TracTrac Connection
         final AccessControlledButtonPanel buttonPanel = new AccessControlledButtonPanel(userService, SecuredDomainType.TRACKED_RACE);
-        buttonPanel.addUnsecuredAction(stringMessages.refresh(), () -> connectionsTable.refreshTracTracConnectionList());
+        final Button refreshConnectionsButton = buttonPanel.addUnsecuredAction(stringMessages.refresh(),
+                () -> connectionsTable.refreshTracTracConnectionList());
+        refreshConnectionsButton.ensureDebugId("RefreshTracTracConnectionsButton");
         Button addCreateAction = buttonPanel.addCreateAction(stringMessages.addTracTracConnection(),
                 () -> new TracTracConnectionDialog(
                         new DialogCallback<TracTracConfigurationWithSecurityDTO>() {
