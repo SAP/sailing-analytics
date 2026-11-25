@@ -56,6 +56,7 @@ import com.sap.sse.concurrent.NamedReentrantReadWriteLock;
  *
  */
 public class MongoSensorFixStoreImpl extends MongoFixHandler implements MongoSensorFixStore {
+    private static final int FIX_LOADING_BATCH_SIZE = 1000;
     private static final Logger logger = Logger.getLogger(MongoSensorFixStoreImpl.class.getName());
     private final MongoCollection<Document> fixesCollection;
     private final MetadataCollection metadataCollection;
@@ -155,7 +156,7 @@ public class MongoSensorFixStoreImpl extends MongoFixHandler implements MongoSen
         Bson query = Filters.and(filters);
         final MongoCollection<Document> fixesCollectionWithReadConcern = fixesCollection.withReadConcern(readConcern);
         FindIterable<Document> result = clientSession == null ? fixesCollectionWithReadConcern.find(query) : fixesCollectionWithReadConcern.find(clientSession, query);
-        result.batchSize(100000).sort(new Document(FieldNames.TIME_AS_MILLIS.name(), ascending ? 1 : -1));
+        result.batchSize(FIX_LOADING_BATCH_SIZE).sort(new Document(FieldNames.TIME_AS_MILLIS.name(), ascending ? 1 : -1));
         if (onlyOneResult) {
             result.limit(1);
         }
