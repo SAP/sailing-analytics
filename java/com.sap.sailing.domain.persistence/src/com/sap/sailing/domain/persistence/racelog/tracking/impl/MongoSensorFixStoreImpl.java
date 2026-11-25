@@ -254,12 +254,10 @@ public class MongoSensorFixStoreImpl extends MongoFixHandler implements MongoSen
             return new HashSet<>(Util.<DeviceIdentifier, Set<FixReceivedListener<FixT>>> get(
                     listenersWithFixType, device, Collections.emptySet()));
         });
-        for (FixT fix : fixes) {
-            for (FixReceivedListener<FixT> listener : listenersToInform) {
-                final Iterable<Triple<RegattaAndRaceIdentifier, Boolean, Duration>> racesWithManeuverChangeFromListener =
-                        listener.fixReceived(device, fix, returnManeuverChanges, returnLiveDelay);
-                Util.addAll(racesWithManeuverChangeFromListener, raceWithChangedManeuver);
-            }
+        for (final FixReceivedListener<FixT> listener : listenersToInform) {
+            final Iterable<Triple<RegattaAndRaceIdentifier, Boolean, Duration>> racesWithManeuverChangeFromListener =
+                    listener.fixesReceived(device, fixes, returnManeuverChanges, returnLiveDelay);
+            Util.addAll(racesWithManeuverChangeFromListener, raceWithChangedManeuver);
         }
         return raceWithChangedManeuver;
     }
