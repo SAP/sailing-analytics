@@ -22,7 +22,7 @@ public class LeaderboardRacesTablePO extends CellTablePO<RaceEntryPO> {
         }
         
         public SetStartTimeDialogPO clickSetStartTime() {
-            ActionsHelper.findSetStartTimeAction(getWebElement()).click();
+            clickActionImage(ActionsHelper.SET_START_TIME_ACTION);
             return getPO(SetStartTimeDialogPO::new, "SetStartTimeDialog");
         }
         

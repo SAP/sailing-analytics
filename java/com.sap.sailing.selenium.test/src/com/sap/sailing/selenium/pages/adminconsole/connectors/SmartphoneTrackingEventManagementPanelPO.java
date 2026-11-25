@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -160,33 +159,13 @@ public class SmartphoneTrackingEventManagementPanelPO extends PageArea {
     }
 
     // Selects exactly the named rows in the race table, deselecting all others.
-    // Retries one row at a time to handle GWT re-renders between clicks.
     public void selectRaceRowsByName(final String... raceNames) {
         final List<String> namesToSelect = Arrays.asList(raceNames);
         waitUntil(() -> {
-            boolean selectionMatches = true;
-            try {
-                final CellTablePO<DataEntryPO> raceTable = getRaceColumnTableWrapper().getRaceColumnTable();
-                for (final DataEntryPO entry : raceTable.getEntries()) {
-                    final String raceName = entry.getColumnContent("Race");
-                    final boolean shouldBeSelected = namesToSelect.contains(raceName);
-                    final boolean isSelected = entry.isSelected();
-                    if (shouldBeSelected != isSelected) {
-                        clickWhenInteractable(() -> {
-                            final WebElement checkboxDiv = waitForRaceRow(raceName).getWebElement()
-                                    .findElement(By.xpath("./td[1]/div"));
-                            // Keep the checkbox away from tab-panel edges, just like action images.
-                            scrollToCenter(checkboxDiv);
-                            return checkboxDiv;
-                        });
-                        selectionMatches = false;
-                        break;
-                    }
-                }
-            } catch (final StaleElementReferenceException e) {
-                selectionMatches = false;
-            }
-            return selectionMatches;
+            // The race table may still be refreshing when its selection is requested.
+            getRaceColumnTableWrapper().getRaceColumnTable().selectEntries(
+                    (final DataEntryPO entry) -> namesToSelect.contains(entry.getColumnContent("Race")), () -> false);
+            return true;
         });
     }
 

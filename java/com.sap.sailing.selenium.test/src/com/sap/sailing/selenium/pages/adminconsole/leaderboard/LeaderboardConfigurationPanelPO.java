@@ -120,8 +120,7 @@ public class LeaderboardConfigurationPanelPO extends PageArea {
     public void deleteLeaderboard(String leaderboard) {
         LeaderboardEntryPO entry = findLeaderboard(leaderboard);
         if (entry != null) {
-            WebElement removeAction = ActionsHelper.findDeleteAction(entry.getWebElement());
-            removeAction.click();
+            entry.clickActionImage(ActionsHelper.DELETE_ACTION);
             ActionsHelper.acceptAlert(this.driver);
             waitForAjaxRequests();
         }
