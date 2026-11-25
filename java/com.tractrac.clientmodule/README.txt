@@ -16,6 +16,22 @@ It contains also some files:
  - Manifest.txt -> manifest used to create the test.jar file
 
 ********************************************
+     TracAPI 5.1.3
+********************************************
+This is a final version. It keeps the backward compatibility.
+
+  Release date: 24/11/2026
+
+ 1) Features
+
+ - Adding two new methods to the IPosition interface:
+  1) getHeel: the heel angle in degrees. It will be NULL if the tracker doesn't provide it.
+    (Requested by Jorge Piera, 24/11/2026)
+  2) getAcceleration: the acceleration reported by the tracker. It will be NULL if the tracker
+    doesn't provide it.
+    (Requested by Jorge Piera, 24/11/2026)
+
+********************************************
      TracAPI 5.1.2
 ********************************************
 This is a final version. It keeps the backward compatibility.
