@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.sap.sse.gwt.client.async.MarkedAsyncCallback;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog.DialogCallback;
 import com.sap.sse.gwt.settings.SettingsToJsonSerializerGWT;
 import com.sap.sse.gwt.shared.ClientConfiguration;
@@ -34,7 +35,8 @@ public abstract class AbstractWhatsNewDialogFactory<S extends AbstractWhatsNewSe
     
     protected final void showWhatsNewDialogIfNecessaryAndUpdatePreference() {
         if (!isUserAlreadyNotified() && ClientConfiguration.getInstance().isBrandingActive()) {
-            currentCharacterCount(charCount -> userService.getPreference(getPrefName(), new ServiceCallback<String>() {
+            currentCharacterCount((final int charCount) -> userService.getPreference(getPrefName(),
+                    new MarkedAsyncCallback<>(new ServiceCallback<String>() {
                 @Override
                 public void onSuccess(final String result) {
                     final SettingsToJsonSerializerGWT serializer = new SettingsToJsonSerializerGWT();
@@ -68,13 +70,14 @@ public abstract class AbstractWhatsNewDialogFactory<S extends AbstractWhatsNewSe
                         showDialog(dialogCallback);
                     }
                 }
-            }));
+            })));
         }
     }
 
-    private void updateOrCreatePreference(final long charCount, final SettingsToJsonSerializerGWT serializer, ServiceCallback<Void> callback) {
+    private void updateOrCreatePreference(final long charCount, final SettingsToJsonSerializerGWT serializer,
+            final ServiceCallback<Void> callback) {
         final String serializedSetting = serializer.serializeToString(getInstanceForSerialization(charCount));
-        userService.setPreference(getPrefName(), serializedSetting, callback);
+        userService.setPreference(getPrefName(), serializedSetting, new MarkedAsyncCallback<>(callback));
     }
 
     protected abstract void currentCharacterCount(IntConsumer callback);

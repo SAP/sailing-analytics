@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.openqa.selenium.By;
@@ -234,17 +235,19 @@ public abstract class CellTablePO<T extends DataEntryPO> extends PageArea {
      * @param entryFetcher
      *   The provider to use to obtain the table entries to select
      */
-    public void selectEntries(Supplier<Stream<T>> entryFetcher) {
-        // First deselect all selected entries
-        for (T entry : getSelectedEntries()) {
-            entry.deselect();
+    public void selectEntries(final Supplier<Stream<T>> entryFetcher) {
+        // Capture identities before any click can replace the remaining rows.
+        final List<Supplier<DataEntryPO>> selectedEntries = getSelectedEntries().stream()
+                .map(DataEntryPO::getFreshEntrySupplier).collect(Collectors.toList());
+        for (final Supplier<DataEntryPO> entry : selectedEntries) {
+            entry.get().deselect();
         }
-        // Select all specified entries
-        entryFetcher.get().forEach(entry -> {
-            if (this.getWebElement().equals(entry.table.getWebElement())) {
-                entry.appendToSelection();
-            }
-        });
+        final List<Supplier<DataEntryPO>> entriesToSelect = entryFetcher.get()
+                .filter((final T entry) -> getWebElement().equals(entry.table.getWebElement()))
+                .map(DataEntryPO::getFreshEntrySupplier).collect(Collectors.toList());
+        for (final Supplier<DataEntryPO> entry : entriesToSelect) {
+            entry.get().appendToSelection();
+        }
     }
     
     /**
@@ -252,17 +255,18 @@ public abstract class CellTablePO<T extends DataEntryPO> extends PageArea {
      * 
      * <p>Note: If an entry is not contained in the table it will not be selected.</p>
      */
-    public void selectEntries(Predicate<T> toSelectPredicate, BooleanSupplier canAbort) {
-        for (T entry : getEntries()) {
-            if(toSelectPredicate.test(entry)) {
-                entry.appendToSelection();
-            } else {
-                entry.deselect();
-            }
+    public void selectEntries(final Predicate<T> toSelectPredicate, final BooleanSupplier canAbort) {
+        final List<Runnable> selectionChanges = new ArrayList<>();
+        for (final T entry : getEntries()) {
+            // Evaluate stateful predicates exactly once, before updating the table.
+            final boolean selected = toSelectPredicate.test(entry);
+            final Supplier<DataEntryPO> entrySupplier = entry.getFreshEntrySupplier();
+            selectionChanges.add(() -> entrySupplier.get().setSelected(selected));
             if (canAbort.getAsBoolean()) {
                 break;
             }
         }
+        selectionChanges.forEach(Runnable::run);
     }
     
     /**
