@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import org.bson.Document;
 
+import com.mongodb.ReadPreference;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.sap.sailing.domain.tractracadapter.DomainFactory;
@@ -31,12 +32,14 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
     public Iterable<TracTracConfiguration> getTracTracConfigurations() {
         final List<TracTracConfiguration> result = new ArrayList<TracTracConfiguration>();
         try {
-            MongoCollection<org.bson.Document> ttConfigs = database.getCollection(CollectionNames.TRACTRAC_CONFIGURATIONS.name());
-            for (Document o : ttConfigs.find()) {
-                TracTracConfiguration ttConfig = loadTracTracConfiguration(o);
+            // Configuration reads follow acknowledged writes; a nearest secondary may still have the old snapshot.
+            final MongoCollection<Document> ttConfigs = database.getCollection(CollectionNames.TRACTRAC_CONFIGURATIONS.name())
+                    .withReadPreference(ReadPreference.primary());
+            for (final Document o : ttConfigs.find()) {
+                final TracTracConfiguration ttConfig = loadTracTracConfiguration(o);
                 result.add(ttConfig);
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
              // something went wrong during DB access; report, then use empty new wind track
             logger.log(Level.SEVERE, "Error connecting to MongoDB, unable to load recorded TracTrac configurations. Check MongoDB settings.");
             logger.log(Level.SEVERE, "getTracTracConfigurations", e);
@@ -45,8 +48,9 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
     }
     
     @Override
-    public TracTracConfiguration getTracTracConfiguration(String jsonUrl) {
-        MongoCollection<org.bson.Document> ttConfigs = database.getCollection(CollectionNames.TRACTRAC_CONFIGURATIONS.name());
+    public TracTracConfiguration getTracTracConfiguration(final String jsonUrl) {
+        final MongoCollection<Document> ttConfigs = database.getCollection(CollectionNames.TRACTRAC_CONFIGURATIONS.name())
+                .withReadPreference(ReadPreference.primary());
         return loadTracTracConfiguration(ttConfigs.find(MongoObjectFactoryImpl.getMongoQueryForJsonUrl(jsonUrl)).first());
     }
     

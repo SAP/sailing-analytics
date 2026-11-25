@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.LifecycleMethodExecutionExceptionHandler;
 import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -21,7 +22,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.sap.sailing.selenium.test.AbstractSeleniumTest;
 
-public class ScreenShotRule implements TestExecutionExceptionHandler {
+public class ScreenShotRule implements TestExecutionExceptionHandler, LifecycleMethodExecutionExceptionHandler {
     private static final Logger logger = Logger.getLogger(ScreenShotRule.class.getName());
 
     private static final String NOT_SUPPORTED_IMAGE = "/com/sap/sailing/selenium/resources/not-supported.png"; //$NON-NLS-1$
@@ -32,9 +33,19 @@ public class ScreenShotRule implements TestExecutionExceptionHandler {
     static final String SCREENSHOT_FILE_EXTENSION = ".png"; //$NON-NLS-1$
     
     @Override
-    public void handleTestExecutionException(ExtensionContext context, Throwable cause) throws Throwable {
-        captureScreenshots(context);
+    public void handleTestExecutionException(final ExtensionContext context, final Throwable cause) throws Throwable {
+        try {
+            captureScreenshots(context);
+        } catch (final RuntimeException screenshotFailure) {
+            cause.addSuppressed(screenshotFailure);
+        }
         throw cause;
+    }
+
+    @Override
+    public void handleBeforeEachMethodExecutionException(final ExtensionContext context, final Throwable cause)
+            throws Throwable {
+        handleTestExecutionException(context, cause);
     }
 
     /**
