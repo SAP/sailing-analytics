@@ -128,6 +128,9 @@ extends Track<EventT>, WithID {
 
     /**
      * Merges all events from the <code>other</code> log into this.
+     * Listeners are notified for newly added events in merge order after this operation has released both logs' locks.
+     * Each notification therefore observes the completed merge rather than its intermediate states. Concurrent
+     * additions may already be visible when a listener is called.
      */
     void merge(AbstractLog<EventT, VisitorT> other);
     

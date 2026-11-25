@@ -3,11 +3,13 @@ package com.sap.sailing.domain.abstractlog.impl;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Set;
@@ -53,6 +55,7 @@ extends TrackImpl<EventT> implements AbstractLog<EventT, VisitorT> {
      */
     private transient Map<UUID, Set<EventT>> eventsDeliveredToClient = new HashMap<UUID, Set<EventT>>();
 
+    /** Guarded by the track's read/write lock, together with the raw events and revocation state. */
     private Map<Serializable, EventT> eventsById = new HashMap<Serializable, EventT>();
 
     private final Serializable id;
@@ -82,24 +85,26 @@ extends TrackImpl<EventT> implements AbstractLog<EventT, VisitorT> {
         return this.id;
     }
 
-    protected void onSuccessfulAdd(EventT event, boolean notifyListeners) {
-        revokeIfNecessary(event);
-        eventsById.put(event.getId(), event);
+    /** Called after the event's state has been published and the adding operation has released its locks. */
+    protected void onSuccessfulAdd(final EventT event, final boolean notifyListeners) {
+        logger.finer(String.format("%s (%s) was added to log %s.", event, event.getClass().getName(), getId()));
         if (notifyListeners) {
             notifyListenersAboutReceive(event);
         }
     }
 
-    protected boolean add(EventT event, boolean notifyListeners) {
-        boolean isAdded = false;
+    protected boolean add(final EventT event, final boolean notifyListeners) {
+        final boolean isAdded;
+        final String revocationWarning;
         lockForWrite();
         try {
             isAdded = getInternalRawFixes().add(event);
+            revocationWarning = isAdded ? registerAddedEvent(event) : null;
         } finally {
             unlockAfterWrite();
         }
+        logRevocationWarning(revocationWarning);
         if (isAdded) {
-            logger.finer(String.format("%s (%s) was added to log %s.", event, event.getClass().getName(), getId()));
             onSuccessfulAdd(event, notifyListeners);
         } else {
             logger.finer(String.format("%s (%s) was not added to race log %s because it already existed there.", event, event.getClass().getName(), getId()));
@@ -117,26 +122,37 @@ extends TrackImpl<EventT> implements AbstractLog<EventT, VisitorT> {
         return add(event, false);
     }
 
-    private void revokeIfNecessary(EventT newEvent) {
-        if (newEvent instanceof RevokeEvent) {
-            RevokeEvent<?> revokeEvent = (RevokeEvent<?>) newEvent;
-            try {
-                checkIfSuccessfullyRevokes(revokeEvent);
-                lockForWrite();
-                try {
-                    revokedEventIds.add(revokeEvent.getRevokedEventId());
-                } finally {
-                    unlockAfterWrite();
-                }
-            } catch (NotRevokableException e) {
-                logger.log(Level.WARNING, e.getMessage());
-            }
+    private String registerAddedEvent(final EventT event) {
+        assertWriteLock();
+        final String revocationWarning = revokeIfNecessary(event);
+        eventsById.put(event.getId(), event);
+        return revocationWarning;
+    }
+
+    private void logRevocationWarning(final String revocationWarning) {
+        if (revocationWarning != null) {
+            logger.warning(revocationWarning);
         }
     }
 
-    private void checkIfSuccessfullyRevokes(RevokeEvent<?> revokeEvent) throws NotRevokableException {
+    private String revokeIfNecessary(final EventT newEvent) {
+        String revocationWarning = null;
+        if (newEvent instanceof RevokeEvent) {
+            final RevokeEvent<?> revokeEvent = (RevokeEvent<?>) newEvent;
+            try {
+                revocationWarning = checkIfSuccessfullyRevokes(revokeEvent);
+                revokedEventIds.add(revokeEvent.getRevokedEventId());
+            } catch (final NotRevokableException e) {
+                revocationWarning = e.getMessage();
+            }
+        }
+        return revocationWarning;
+    }
+
+    private String checkIfSuccessfullyRevokes(final RevokeEvent<?> revokeEvent) throws NotRevokableException {
+        String revocationWarning = null;
         lockForRead();
-        EventT revokedEvent;
+        final EventT revokedEvent;
         try {
             revokedEvent = getEventById(revokeEvent.getRevokedEventId());
         } finally {
@@ -146,18 +162,18 @@ extends TrackImpl<EventT> implements AbstractLog<EventT, VisitorT> {
             // it can happen that the event that has been revoked is not yet loaded - as we assume
             // that race log events never get removed we can safely continue and assume that
             // the event will be loaded later
-            logger.warning("RevokeEvent for "+revokeEvent.getShortInfo()+" added, that refers to non-existent event to be revoked. Could also happen that the revoke event is before the event to be revoked.");
+            revocationWarning = "RevokeEvent for "+revokeEvent.getShortInfo()+" added, that refers to non-existent event to be revoked. Could also happen that the revoke event is before the event to be revoked.";
         } else {
             if (! (revokedEvent instanceof Revokable)) {
                 throw new NotRevokableException("RevokeEvent trying to revoke non-revokable event");
             }
-
             // make sure to compare only author priorities - assuming that revoke events are
             // independent of passes and times
             if (revokeEvent.getAuthor().getPriority() > revokedEvent.getAuthor().getPriority()) {
                 throw new NotRevokableException("RevokeEvent does not have sufficient priority");
             }
         }
+        return revocationWarning;
     }
 
     @Override
@@ -322,46 +338,66 @@ extends TrackImpl<EventT> implements AbstractLog<EventT, VisitorT> {
     }
 
     @Override
-    public void merge(AbstractLog<EventT, VisitorT> other) {
+    public void merge(final AbstractLog<EventT, VisitorT> other) {
+        final List<EventT> addedEvents = new ArrayList<>();
+        final List<String> revocationWarnings = new ArrayList<>();
         lockForWrite();
-        other.lockForRead();
         try {
-            RaceLogEventComparator comparator = new RaceLogEventComparator();
-            Iterator<EventT> thisIter = getRawFixes().iterator();
-            Iterator<EventT> otherIter = other.getRawFixes().iterator();
-            EventT thisEvent = null;
-            EventT otherEvent = null;
-            while (otherIter.hasNext() || otherEvent != null) {
-                if (thisEvent == null && thisIter.hasNext()) {
-                    thisEvent = thisIter.next();
-                }
-                if (otherEvent == null) {
-                    otherEvent = otherIter.next();
-                }
-                if (thisEvent == null) {
-                    // All events of this race log have been consumed; simply keep adding the events
-                    // from the other race log to this race log.
-                    // otherEvent has to be non-null because if thisIter didn't have a next, otherIter must have had a next
-                    add(otherEvent);
-                    otherEvent = null; // "consumed" otherEvent; try to grab next if a next element exists in otherIter
-                } else {
-                    final int comparison = comparator.compare(thisEvent, otherEvent);
-                    if (comparison < 0) {
-                        thisEvent = null; // skip the "lesser" race log event on this race log
-                    } else if (comparison == 0) {
-                        // the race log event from the other log is already contained in this log; skip both
-                        thisEvent = null;
+            other.lockForRead();
+            try {
+                final RaceLogEventComparator comparator = new RaceLogEventComparator();
+                final Iterator<EventT> thisIter = getRawFixes().iterator();
+                final Iterator<EventT> otherIter = other.getRawFixes().iterator();
+                EventT thisEvent = null;
+                EventT otherEvent = null;
+                while (otherIter.hasNext() || otherEvent != null) {
+                    if (thisEvent == null && thisIter.hasNext()) {
+                        thisEvent = thisIter.next();
+                    }
+                    if (otherEvent == null) {
+                        otherEvent = otherIter.next();
+                    }
+                    if (thisEvent == null) {
+                        // All events of this log have been consumed; keep adding events from the other log.
+                        addForMerge(otherEvent, addedEvents, revocationWarnings);
                         otherEvent = null;
                     } else {
-                        // comparison > 0; we skipped on this race log until we found a "greater" event on this race log; insert otherEvent
-                        add(otherEvent);
-                        otherEvent = null; // "consumed"
+                        final int comparison = comparator.compare(thisEvent, otherEvent);
+                        if (comparison < 0) {
+                            thisEvent = null; // skip the "lesser" event on this log
+                        } else if (comparison == 0) {
+                            // The event is already contained in this log; skip both.
+                            thisEvent = null;
+                            otherEvent = null;
+                        } else {
+                            addForMerge(otherEvent, addedEvents, revocationWarnings);
+                            otherEvent = null;
+                        }
                     }
                 }
+            } finally {
+                other.unlockAfterRead();
             }
         } finally {
-            other.unlockAfterRead();
             unlockAfterWrite();
+            // Notify even about a successfully added prefix if a later event made the merge fail.
+            for (final String revocationWarning : revocationWarnings) {
+                logRevocationWarning(revocationWarning);
+            }
+            for (final EventT event : addedEvents) {
+                onSuccessfulAdd(event, /* notifyListeners */ true);
+            }
+        }
+    }
+
+    private void addForMerge(final EventT event, final List<EventT> addedEvents, final List<String> revocationWarnings) {
+        assertWriteLock();
+        if (getInternalRawFixes().add(event)) {
+            final String revocationWarning = registerAddedEvent(event);
+            addedEvents.add(event);
+            if (revocationWarning != null) {
+                revocationWarnings.add(revocationWarning);
+            }
         }
     }
 
@@ -373,12 +409,12 @@ extends TrackImpl<EventT> implements AbstractLog<EventT, VisitorT> {
     protected abstract EventT createRevokeEvent(AbstractLogEventAuthor author, EventT toRevoke, String reason);
 
     @Override
-    public void revokeEvent(AbstractLogEventAuthor author, EventT toRevoke, String reason) throws NotRevokableException {
+    public void revokeEvent(final AbstractLogEventAuthor author, final EventT toRevoke, final String reason) throws NotRevokableException {
         if (toRevoke == null) {
             throw new NotRevokableException("Received null as event to revoke");
         }
-        EventT revokeEvent = createRevokeEvent(author, toRevoke, reason);
-        checkIfSuccessfullyRevokes((RevokeEvent<?>) revokeEvent);
+        final EventT revokeEvent = createRevokeEvent(author, toRevoke, reason);
+        logRevocationWarning(checkIfSuccessfullyRevokes((RevokeEvent<?>) revokeEvent));
         add(revokeEvent);
     }
 
