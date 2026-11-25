@@ -14,6 +14,9 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
+import com.sap.sailing.domain.abstractlog.race.RaceLogEndOfTrackingEvent;
+import com.sap.sailing.domain.abstractlog.race.RaceLogStartOfTrackingEvent;
+import com.sap.sailing.domain.abstractlog.race.analyzing.impl.TrackingTimesEventFinder;
 import com.sap.sailing.domain.abstractlog.race.impl.RaceLogEndOfTrackingEventImpl;
 import com.sap.sailing.domain.abstractlog.race.impl.RaceLogRaceStatusEventImpl;
 import com.sap.sailing.domain.abstractlog.race.impl.RaceLogStartOfTrackingEventImpl;
@@ -33,6 +36,7 @@ import com.sap.sailing.domain.base.impl.RaceDefinitionImpl;
 import com.sap.sailing.domain.base.impl.RegattaImpl;
 import com.sap.sailing.domain.base.impl.WaypointImpl;
 import com.sap.sailing.domain.common.CompetitorRegistrationType;
+import com.sap.sailing.domain.common.abstractlog.NotRevokableException;
 import com.sap.sailing.domain.common.racelog.RaceLogRaceStatus;
 import com.sap.sailing.domain.racelog.RaceLogAndTrackedRaceResolver;
 import com.sap.sailing.domain.racelog.impl.EmptyRaceLogStore;
@@ -62,7 +66,7 @@ public class TrackedRaceStartTimeInferenceTest extends AbstractGPSFixStoreTest {
      */
     @Test
     public void testStartTimeInferencePrecedenceOrder() throws TransformationException,
-            NoCorrespondingServiceRegisteredException, InterruptedException {
+            NoCorrespondingServiceRegisteredException, InterruptedException, NotRevokableException {
         Competitor comp2 = DomainFactory.INSTANCE.getOrCreateCompetitor("comp2", "comp2", "c2", null, null, null, null,
                 /* timeOnTimeFactor */ null, /* timeOnDistanceAllowancePerNauticalMile */ null, null, /* storePersistently */ true);
         Boat boat2 = DomainFactory.INSTANCE.getOrCreateBoat("boat2", "boat2", boatClass, "USA 123", null, /* storePersistently */ true);
@@ -124,7 +128,9 @@ public class TrackedRaceStartTimeInferenceTest extends AbstractGPSFixStoreTest {
         assertEquals(endOfTrackingInRacelog, trackedRace.getEndOfTracking());
         
         // shouldn't change when setting start/end of tracking
-        setManualTrackingTimesOnTrackedRace(trackedRace, new MillisecondsTimePoint(500000), new MillisecondsTimePoint(600000));
+        final TimePoint receivedStartOfTracking = new MillisecondsTimePoint(/* millis */ 500000);
+        final TimePoint receivedEndOfTracking = new MillisecondsTimePoint(/* millis */ 600000);
+        setManualTrackingTimesOnTrackedRace(trackedRace, receivedStartOfTracking, receivedEndOfTracking);
         assertEquals(startOfTrackingInRacelog, trackedRace.getStartOfTracking());
         assertEquals(endOfTrackingInRacelog, trackedRace.getEndOfTracking());
         
@@ -135,6 +141,21 @@ public class TrackedRaceStartTimeInferenceTest extends AbstractGPSFixStoreTest {
         trackedRace.attachRaceLog(raceLog);
         assertEquals(startOfTrackingInRacelog, trackedRace.getStartOfTracking());
         assertEquals(endOfTrackingInRacelog, trackedRace.getEndOfTracking());
+        // Revocation must also work without a mark-passing calculator, preserving connector precedence.
+        final Util.Pair<RaceLogStartOfTrackingEvent, RaceLogEndOfTrackingEvent> trackingEvents =
+                new TrackingTimesEventFinder(raceLog).analyze();
+        raceLog.revokeEvent(author, trackingEvents.getA());
+        assertEquals(receivedStartOfTracking, trackedRace.getStartOfTracking());
+        assertEquals(endOfTrackingInRacelog, trackedRace.getEndOfTracking());
+        raceLog.revokeEvent(author, trackingEvents.getB());
+        assertEquals(receivedStartOfTracking, trackedRace.getStartOfTracking());
+        assertEquals(receivedEndOfTracking, trackedRace.getEndOfTracking());
+        // Once connector bounds are cleared, the race-log start and finished times provide the fallback.
+        setManualTrackingTimesOnTrackedRace(trackedRace, /* startTime */ null, /* endTime */ null);
+        assertEquals(trackedRace.getStartOfRace().minus(TrackedRace.START_TRACKING_THIS_MUCH_BEFORE_RACE_START),
+                trackedRace.getStartOfTracking());
+        assertEquals(trackedRace.getFinishedTime().plus(TrackedRace.STOP_TRACKING_THIS_MUCH_AFTER_RACE_FINISH),
+                trackedRace.getEndOfTracking());
     }    
     
     /**
