@@ -33,5 +33,7 @@ public interface ContextMenuResources extends AuthenticationResources {
         @ClassName("primary-item")
         String primaryItem();
 
+        String disabled();
+
     }
 }

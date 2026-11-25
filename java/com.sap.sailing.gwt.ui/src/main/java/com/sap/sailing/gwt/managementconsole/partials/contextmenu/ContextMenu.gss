@@ -45,6 +45,11 @@
     color: TEXT_COLOR_HIGHLIGHT;
 }
 
+.context-menu .items .disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
 @media (max-width: 44.99em) {
     .context-menu {
         top: initial !important;

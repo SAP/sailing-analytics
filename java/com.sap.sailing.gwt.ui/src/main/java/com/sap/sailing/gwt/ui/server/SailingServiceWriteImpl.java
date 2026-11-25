@@ -338,6 +338,7 @@ import com.sap.sailing.server.operationaltransformation.StopTrackingRace;
 import com.sap.sailing.server.operationaltransformation.UpdateBoat;
 import com.sap.sailing.server.operationaltransformation.UpdateCompetitor;
 import com.sap.sailing.server.operationaltransformation.UpdateCompetitorDisplayNameInLeaderboard;
+import com.sap.sailing.server.operationaltransformation.UpdateCourseAreas;
 import com.sap.sailing.server.operationaltransformation.UpdateEliminatedCompetitorsInLeaderboard;
 import com.sap.sailing.server.operationaltransformation.UpdateEvent;
 import com.sap.sailing.server.operationaltransformation.UpdateIsMedalRace;
@@ -1533,6 +1534,26 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
     public void removeCourseAreas(UUID eventId, UUID[] courseAreaIds) {
         getSecurityService().checkCurrentUserDeletePermission(getService().getEvent(eventId));
         getService().apply(new RemoveCourseAreas(eventId, courseAreaIds));
+    }
+
+    @Override
+    public void updateCourseAreas(final UUID eventId, final List<CourseAreaDTO> courseAreas) {
+        getSecurityService().checkCurrentUserUpdatePermission(getService().getEvent(eventId));
+        final Set<UUID> updatedIds = new HashSet<>();
+        for (final CourseAreaDTO area : courseAreas) {
+            updatedIds.add(area.getId());
+        }
+        // An area can be shared by several events. Authorize all affected events before applying the operation.
+        for (final Event event : getService().getAllEvents()) {
+            if (Util.stream(event.getVenue().getCourseAreas()).anyMatch(area -> updatedIds.contains(area.getId()))) {
+                getSecurityService().checkCurrentUserUpdatePermission(event);
+            }
+        }
+        getService().apply(new UpdateCourseAreas(eventId,
+                Util.toArray(Util.map(courseAreas, CourseAreaDTO::getId), new UUID[courseAreas.size()]),
+                Util.toArray(Util.map(courseAreas, CourseAreaDTO::getName), new String[courseAreas.size()]),
+                Util.toArray(Util.map(courseAreas, CourseAreaDTO::getCenterPosition), new Position[courseAreas.size()]),
+                Util.toArray(Util.map(courseAreas, CourseAreaDTO::getRadius), new Distance[courseAreas.size()])));
     }
 
     @Override

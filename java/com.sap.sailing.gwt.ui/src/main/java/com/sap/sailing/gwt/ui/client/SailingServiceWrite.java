@@ -320,6 +320,8 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
 
     void createCourseAreas(UUID eventId, List<CourseAreaDTO> courseAreas);
 
+    void updateCourseAreas(UUID eventId, List<CourseAreaDTO> courseAreas) throws UnauthorizedException;
+
     EventDTO createEvent(String eventName, String eventDescription, Date startDate, Date endDate, String venue,
             boolean isPublic, List<CourseAreaDTO> courseAreas, String officialWebsiteURLAsString, String baseURLAsString,
             Map<String, String> sailorsInfoWebsiteURLsByLocaleName, List<ImageDTO> images,

@@ -78,7 +78,7 @@ public class GetStartViewAction implements SailingAction<StartViewDTO>, IsClient
         final List<SailingVideoDTO> videoCandidates = new ArrayList<>();
         for (EventHolder holder : recentEventsCalculator.getEventsNewestFirst()) {
             if (result.getRecentEvents().size() < MAX_RECENT_EVENTS) {
-                result.addRecentEvent(HomeServiceUtil.convertToEventListDTO(holder.event, holder.baseURL, holder.onRemoteServer));
+                result.addRecentEvent(HomeServiceUtil.convertToEventListDTO(holder.event, holder.baseURL, holder.onRemoteServer, context.getSecurityService()));
             }
             EventBase event = holder.event;
             EventLinkDTO eventLink = HomeServiceUtil.convertToEventLinkDTO(holder.event, holder.baseURL, holder.onRemoteServer);

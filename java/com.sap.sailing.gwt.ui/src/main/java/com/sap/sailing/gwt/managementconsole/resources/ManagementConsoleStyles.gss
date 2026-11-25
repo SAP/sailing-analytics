@@ -99,7 +99,7 @@ select option, .gwt-ListBox option, .gwt-SuggestBoxPopup table tbody tr td {
 	background-color: BACKGROUND_COLOR_LIGHTER;
 }
 
-input, .gwt-TextBox, .gwt-PasswordTextBox, .gwt-SuggestBox, input.com-sap-sse-gwt-client-controls-datetime-DateTimeInputResources-Style-dateTimeInput {
+input:not([type=checkbox]), textarea, .gwt-TextBox, .gwt-PasswordTextBox, .gwt-SuggestBox, input.com-sap-sse-gwt-client-controls-datetime-DateTimeInputResources-Style-dateTimeInput {
     color: TEXT_COLOR_PRIMARY;
     font-style: italic;
     font-size: FONT_SIZE_LARGE;
@@ -113,6 +113,24 @@ input, .gwt-TextBox, .gwt-PasswordTextBox, .gwt-SuggestBox, input.com-sap-sse-gw
     background: none;
     display: inline-block;
     outline: none;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.checkbox-field {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin: 10px 0 20px 0;
+    text-transform: none;
+}
+
+.checkbox-field input[type=checkbox] {
+    width: auto;
+    margin: 0 .5rem 0 0;
+    flex-shrink: 0;
 }
 
 input::placeholder,

@@ -635,6 +635,10 @@ public interface RacingEventService extends TrackedRegattaRegistry, RegattaFetch
 
     CourseArea[] removeCourseAreaWithoutReplication(UUID eventId, UUID[] courseAreaIds);
 
+    /** Updates existing areas in place and persists every event sharing an updated area. */
+    void updateCourseAreasWithoutReplication(UUID eventId, UUID[] courseAreaIds, String[] courseAreaNames,
+            Position[] centerPositions, Distance[] radiuses);
+
     /**
      * Returns a mobile device's configuration.
      * @param identifier of the client (may include event)

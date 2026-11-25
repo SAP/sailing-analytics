@@ -1,0 +1,70 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:dt="urn:import:com.sap.sse.gwt.client.controls.datetime"
+             xmlns:ca="urn:import:com.sap.sailing.gwt.managementconsole.partials.inputs.courseareas">
+
+    <ui:with field="res" type="com.sap.sailing.gwt.common.client.SharedResources" />
+    <ui:with field="app_res" type="com.sap.sailing.gwt.managementconsole.resources.ManagementConsoleResources" />
+    <ui:with field="i18n" type="com.sap.sailing.gwt.ui.client.StringMessages" />
+    <g:HTMLPanel>
+        <div ui:field="headerContainer">
+            <div class="{res.mediaCss.grid}">
+                <div class="{res.mediaCss.column}">
+                    <g:Anchor ui:field="back" addStyleNames="{app_res.icons.icon} {app_res.icons.iconBack} {app_res.style.backNavigation}" />
+                </div>
+            </div>
+            <div class="{res.mediaCss.grid}" style="padding-bottom:2rem;">
+                <div class="{res.mediaCss.column} {res.mediaCss.small12}">
+                    <div class="{app_res.fonts.title}"><ui:text from='{i18n.editEvent}' /></div>
+                </div>
+                <div class="{res.mediaCss.column} {res.mediaCss.small12}">
+                    <div class="{app_res.fonts.text}"><ui:text from='{i18n.editEventSubtitle}' /></div>
+                </div>
+            </div>
+        </div>
+        <g:ScrollPanel ui:field="scrollContainer">
+            <g:HTMLPanel>
+                <div class="{res.mediaCss.grid}">
+                    <div class="{res.mediaCss.column} {res.mediaCss.small12} {res.mediaCss.medium6}">
+                        <label for="eventName"><ui:text from='{i18n.nameLabel}' /></label>
+                        <input ui:field="nameInput" placeholder="{i18n.eventNamePlaceholder}"/>
+                    </div>
+                    <div class="{res.mediaCss.column} {res.mediaCss.small12} {res.mediaCss.medium6}">
+                        <label for="venue"><ui:text from='{i18n.venueLabel}' /></label>
+                        <input ui:field="venueInput" placeholder="{i18n.venuePlaceholder}"/>
+                    </div>
+                    <div class="{res.mediaCss.column} {res.mediaCss.small12} {res.mediaCss.medium6}">
+                        <label for="startDate"><ui:text from='{i18n.startDateLabel}' /></label>
+                        <dt:DateAndTimeInput ui:field="startDateInput"/>
+                    </div>
+                    <div class="{res.mediaCss.column} {res.mediaCss.small12} {res.mediaCss.medium6}">
+                        <label for="endDate"><ui:text from='{i18n.endDateLabel}' /></label>
+                        <dt:DateAndTimeInput ui:field="endDateInput"/>
+                    </div>
+                    <div class="{res.mediaCss.column} {res.mediaCss.small12}">
+                        <label for="description"><ui:text from='{i18n.descriptionLabel}' /></label>
+                        <g:TextArea ui:field="descriptionInput" visibleLines="3"/>
+                    </div>
+                    <div class="{res.mediaCss.column} {res.mediaCss.small12} {res.mediaCss.medium6}">
+                        <div class="{res.mediaCss.small12} {res.mediaCss.medium12}">
+                            <label for="course_areas"><ui:text from='{i18n.courseAreasLabel}' /></label>
+                        </div>
+                        <ca:CourseAreasInput ui:field="courseAreasInput"/>
+                    </div>
+                    <div class="{res.mediaCss.column} {res.mediaCss.small12} {res.mediaCss.medium6}">
+                        <label class="{app_res.style.checkboxField}">
+                            <input type="checkbox" ui:field="isPublicCheckbox"/>
+                            <span><ui:text from='{i18n.isPublicLabel}' /></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="{res.mediaCss.grid}">
+                    <div class="{res.mediaCss.column} {res.mediaCss.small12} {res.mediaCss.medium4}" style="float:right">
+                        <g:Button ui:field="saveEventButton" text="{i18n.save}" addStyleNames="{app_res.style.button} {app_res.style.buttonRight} {app_res.style.primary}"/>
+                    </div>
+                </div>
+            </g:HTMLPanel>
+        </g:ScrollPanel>
+    </g:HTMLPanel>
+</ui:UiBinder>

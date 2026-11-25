@@ -527,6 +527,8 @@ public interface SailingServiceWriteAsync extends FileStorageManagementGwtServic
     
     void createCourseAreas(UUID eventId, List<CourseAreaDTO> courseAreas, AsyncCallback<Void> callback);
 
+    void updateCourseAreas(UUID eventId, List<CourseAreaDTO> courseAreas, AsyncCallback<Void> callback);
+
     void removeCourseAreas(UUID eventId, UUID[] idsOfCourseAreasToRemove, AsyncCallback<Void> callback);
 
     void removeRegatta(RegattaIdentifier regattaIdentifier, AsyncCallback<Void> callback);

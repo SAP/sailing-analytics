@@ -81,9 +81,18 @@ public class ContextMenu extends Composite {
     }
 
     public void addItem(final String label, final String iconStyle, final ClickHandler handler) {
+        addItem(label, iconStyle, handler, /* enabled */ true, /* tooltip */ null);
+    }
+
+    public void addItem(final String label, final String iconStyle, final ClickHandler handler, final boolean enabled,
+            final String tooltip) {
         final ContextMenuItem item = new ContextMenuItem(label, iconStyle);
         item.addClickHandler(event -> menuPopup.hide());
         item.addClickHandler(handler);
+        item.setEnabled(enabled);
+        if (tooltip != null) {
+            item.setTooltip(tooltip);
+        }
         itemsContainer.add(item);
     }
 

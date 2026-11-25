@@ -31,6 +31,14 @@ public class Header extends Composite implements NeedsAuthenticationContext {
     interface HeaderUiBinder extends UiBinder<Widget, Header> {
     }
 
+    /**
+     * A navigation menu item whose active (currently-selected) state can be toggled so the user can see which top-level
+     * category is presently shown.
+     */
+    public interface ActivatableMenuItem extends HasVisibility {
+        void setActive(boolean active);
+    }
+
     private static HeaderUiBinder uiBinder = GWT.create(HeaderUiBinder.class);
 
     @UiField
@@ -70,7 +78,7 @@ public class Header extends Composite implements NeedsAuthenticationContext {
         setVisible(actions, authenticationContext.isLoggedIn());
     }
 
-    public HasVisibility addMenuItem(final String text, final ClickHandler handler) {
+    public ActivatableMenuItem addMenuItem(final String text, final ClickHandler handler) {
         final Anchor desktopItem = createMenuItem(text);
         desktopItem.addClickHandler(handler);
         desktopMenu.add(desktopItem);
@@ -115,11 +123,11 @@ public class Header extends Composite implements NeedsAuthenticationContext {
         }
     }
 
-    private class MenuItem implements HasVisibility {
+    private class MenuItem implements ActivatableMenuItem {
 
-        private final Set<HasVisibility> items = new HashSet<>();
+        private final Set<Anchor> items = new HashSet<>();
 
-        private MenuItem(final HasVisibility... anchors) {
+        private MenuItem(final Anchor... anchors) {
             this.items.addAll(Arrays.asList(anchors));
         }
 
@@ -131,6 +139,11 @@ public class Header extends Composite implements NeedsAuthenticationContext {
         @Override
         public void setVisible(final boolean visible) {
             items.forEach(item -> item.setVisible(visible));
+        }
+
+        @Override
+        public void setActive(final boolean active) {
+            items.forEach(item -> item.setStyleName(local_res.style().itemActive(), active));
         }
 
     }

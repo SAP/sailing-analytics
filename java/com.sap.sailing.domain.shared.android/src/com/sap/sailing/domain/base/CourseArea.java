@@ -17,6 +17,9 @@ import com.sap.sse.common.Positioned;
  */
 public interface CourseArea extends Positioned, NamedWithID, IsManagedByCache<SharedDomainFactory<?>> {
     UUID getId();
+
+    /** Updates the attributes without changing the identity or references held by regattas and race logs. */
+    void update(String name, Position centerPosition, Distance radius);
     
     @Override
     default Position getPosition() {

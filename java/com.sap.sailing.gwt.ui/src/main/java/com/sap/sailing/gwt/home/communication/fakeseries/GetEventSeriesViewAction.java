@@ -104,7 +104,7 @@ public class GetEventSeriesViewAction implements SailingAction<EventSeriesViewDT
 
         for (Event eventInSeries : HomeServiceUtil.getEventsForSeriesOrdered(leaderBoardGroup,
                 ctx.getRacingEventService())) {
-            EventMetadataDTO eventOfSeries = HomeServiceUtil.convertToMetadataDTO(eventInSeries);
+            EventMetadataDTO eventOfSeries = HomeServiceUtil.convertToMetadataDTO(eventInSeries, ctx.getSecurityService());
             dto.addEvent(eventOfSeries);
 
             oneEventStarted |= eventOfSeries.isStarted();

@@ -75,7 +75,7 @@ public class CreateRegattaCallback implements DialogCallback<RegattaDTO>{
             }
 
             @Override
-            public void onSuccess(RegattaDTO regatta) {
+            public void onSuccess(final RegattaDTO regatta) {
                 // if regatta creation was successful, add race columns as modeled in the creation dialog;
                 // note that the SeriesCreationParametersDTO don't describe race columns.
                 createDefaultRacesIfDefaultSeriesIsPresent(newRegatta);

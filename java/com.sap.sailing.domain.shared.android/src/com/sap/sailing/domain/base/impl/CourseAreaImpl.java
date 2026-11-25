@@ -12,10 +12,13 @@ public class CourseAreaImpl extends NamedImpl implements CourseArea {
     private static final long serialVersionUID = 5912385360170509150L;
 
     private final UUID id;
-    private final Position centerPosition;
-    private final Distance radius;
+    private volatile Position centerPosition;
+    private volatile Distance radius;
+    // Keep NamedImpl and the original fields for compatibility with serialized course areas.
+    // An older serialized instance has no updatedName and continues to use the inherited name.
+    private volatile String updatedName;
 
-    public CourseAreaImpl(String name, UUID id, Position centerPosition, Distance radius) {
+    public CourseAreaImpl(final String name, final UUID id, final Position centerPosition, final Distance radius) {
         super(name);
         this.id = id;
         this.centerPosition = centerPosition;
@@ -25,6 +28,21 @@ public class CourseAreaImpl extends NamedImpl implements CourseArea {
     @Override
     public UUID getId() {
         return id;
+    }
+
+    @Override
+    public String getName() {
+        return updatedName == null ? super.getName() : updatedName;
+    }
+
+    @Override
+    public void update(final String name, final Position centerPosition, final Distance radius) {
+        if (name == null) {
+            throw new IllegalArgumentException("Course area name must not be null");
+        }
+        this.updatedName = name;
+        this.centerPosition = centerPosition;
+        this.radius = radius;
     }
 
     @Override
@@ -38,7 +56,7 @@ public class CourseAreaImpl extends NamedImpl implements CourseArea {
     }
 
     @Override
-    public CourseArea resolve(SharedDomainFactory<?> domainFactory) {
+    public CourseArea resolve(final SharedDomainFactory<?> domainFactory) {
         return domainFactory.getOrCreateCourseArea(id, getName(), getCenterPosition(), getRadius());
     }
 }

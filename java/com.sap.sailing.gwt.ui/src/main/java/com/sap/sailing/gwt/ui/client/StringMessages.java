@@ -190,6 +190,10 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     String country();
     String no3LetterCodes();
     String delete();
+    String confirmDeleteEvent(String eventName);
+    String eventDeleted(String eventName);
+    String errorDeletingEvent(String eventName, String message);
+    String noPermissionToDeleteEvent();
     String showCharts();
     String raceWithThisNameAlreadyExists();
     String raceWithThisNameAlreadyExistsInRegatta();
@@ -2411,6 +2415,12 @@ public interface StringMessages extends com.sap.sse.gwt.client.StringMessages,
     String createEventSeriesSubtitle();
     String createEventButton();
     String createEventSeriesButton();
+    String editEvent();
+    String editEventSubtitle();
+    String startDateLabel();
+    String endDateLabel();
+    String descriptionLabel();
+    String isPublicLabel();
     String nameLabel();
     String eventNamePlaceholder();
     String eventSeriesNamePlaceholder();

@@ -28,6 +28,9 @@ public interface HeaderResources extends AuthenticationResources {
 
         String active();
 
+        @ClassName("item-active")
+        String itemActive();
+
         String actions();
 
         String item();

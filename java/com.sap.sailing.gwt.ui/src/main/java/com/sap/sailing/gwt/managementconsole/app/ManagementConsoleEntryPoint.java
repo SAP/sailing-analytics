@@ -3,6 +3,7 @@ package com.sap.sailing.gwt.managementconsole.app;
 import static com.sap.sse.security.ui.authentication.AuthenticationPlaces.SIGN_IN;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,6 +14,8 @@ import java.util.function.Supplier;
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.place.shared.Place;
+import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
 import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
@@ -21,11 +24,19 @@ import com.google.web.bindery.event.shared.SimpleEventBus;
 import com.sap.sailing.domain.common.security.SecuredDomainType;
 import com.sap.sailing.gwt.common.client.SharedResources;
 import com.sap.sailing.gwt.managementconsole.partials.header.Header;
+import com.sap.sailing.gwt.managementconsole.partials.header.Header.ActivatableMenuItem;
 import com.sap.sailing.gwt.managementconsole.partials.mainframe.MainFrame;
 import com.sap.sailing.gwt.managementconsole.places.AbstractManagementConsolePlace;
 import com.sap.sailing.gwt.managementconsole.places.dashboard.DashboardPlace;
+import com.sap.sailing.gwt.managementconsole.places.event.create.CreateEventPlace;
+import com.sap.sailing.gwt.managementconsole.places.event.edit.EditEventPlace;
+import com.sap.sailing.gwt.managementconsole.places.event.media.EventMediaPlace;
 import com.sap.sailing.gwt.managementconsole.places.event.overview.EventOverviewPlace;
+import com.sap.sailing.gwt.managementconsole.places.eventseries.create.CreateEventSeriesPlace;
+import com.sap.sailing.gwt.managementconsole.places.eventseries.events.EventSeriesEventsPlace;
 import com.sap.sailing.gwt.managementconsole.places.eventseries.overview.EventSeriesOverviewPlace;
+import com.sap.sailing.gwt.managementconsole.places.regatta.create.AddRegattaPlace;
+import com.sap.sailing.gwt.managementconsole.places.regatta.overview.RegattaOverviewPlace;
 import com.sap.sailing.gwt.managementconsole.places.showcase.ShowcasePlace;
 import com.sap.sailing.gwt.managementconsole.resources.ManagementConsoleResources;
 import com.sap.sailing.gwt.ui.client.AbstractSailingWriteEntryPoint;
@@ -63,8 +74,8 @@ public class ManagementConsoleEntryPoint extends AbstractSailingWriteEntryPoint 
             mainFrame.setAuthenticationContext(event.getCtx());
             menuItemConfigs.forEach(c -> c.validate(event.getCtx()));
         });
+        initMenuItems(clientFactory, eventBus, mainFrame.getHeader());
         initActivitiesAndPlaces(clientFactory, eventBus, mainFrame);
-        initMenuItems(clientFactory, mainFrame.getHeader());
     }
 
     private void initActivitiesAndPlaces(final ManagementConsoleClientFactory clientFactory, final EventBus eventBus,
@@ -82,15 +93,21 @@ public class ManagementConsoleEntryPoint extends AbstractSailingWriteEntryPoint 
         historyHandler.handleCurrentHistory();
     }
 
-    private void initMenuItems(final ManagementConsoleClientFactory clientFactory, final Header header) {
+    private void initMenuItems(final ManagementConsoleClientFactory clientFactory, final EventBus eventBus,
+            final Header header) {
         addMenuItem(clientFactory, header, "(SHOWCASE)", ShowcasePlace::new);
-        addMenuItem(clientFactory, header, "Dashboard", DashboardPlace::new);
+        addMenuItem(clientFactory, header, "Dashboard", DashboardPlace::new)
+                .matchesPlaces(DashboardPlace.class);
 
         addMenuItem(clientFactory, header, msg.series(), EventSeriesOverviewPlace::new)
-                .permission(SecuredDomainType.EVENT, DefaultActions.MUTATION_ACTIONS);
+                .permission(SecuredDomainType.EVENT, DefaultActions.MUTATION_ACTIONS)
+                .matchesPlaces(EventSeriesOverviewPlace.class, CreateEventSeriesPlace.class,
+                        EventSeriesEventsPlace.class);
 
         addMenuItem(clientFactory, header, msg.events(), EventOverviewPlace::new)
-                .permission(SecuredDomainType.EVENT, DefaultActions.MUTATION_ACTIONS);
+                .permission(SecuredDomainType.EVENT, DefaultActions.MUTATION_ACTIONS)
+                .matchesPlaces(EventOverviewPlace.class, CreateEventPlace.class, EditEventPlace.class,
+                        EventMediaPlace.class, AddRegattaPlace.class, RegattaOverviewPlace.class);
 
         // addMenuItem(clientFactory, header, msg.deviceConfiguration(), ShowcasePlace::new)
         // .permission(SecuredDomainType.RACE_MANAGER_APP_DEVICE_CONFIGURATION, DefaultActions.MUTATION_ACTIONS);
@@ -125,14 +142,15 @@ public class ManagementConsoleEntryPoint extends AbstractSailingWriteEntryPoint 
                 // TODO: Temporary! Replace with account management navigation as soon as specified
                 event -> clientFactory.getAuthenticationManager().logout()));
         initMenuItem(clientFactory, header.initSignOutItem(event -> clientFactory.getAuthenticationManager().logout()));
-
+        eventBus.addHandler(PlaceChangeEvent.TYPE,
+                event -> menuItemConfigs.forEach(c -> c.updateActiveState(event.getNewPlace())));
     }
 
     private MenuItemConfig addMenuItem(final ManagementConsoleClientFactory clientFactory, final Header header,
             final String text, final Supplier<AbstractManagementConsolePlace> targetPlace) {
 
         final ClickHandler navigation = event -> clientFactory.getPlaceController().goTo(targetPlace.get());
-        final HasVisibility menuItem = header.addMenuItem(text, navigation);
+        final ActivatableMenuItem menuItem = header.addMenuItem(text, navigation);
         final MenuItemConfig config = new MenuItemConfig(clientFactory.getUserService(), menuItem);
         this.menuItemConfigs.add(config);
         return config;
@@ -147,12 +165,21 @@ public class ManagementConsoleEntryPoint extends AbstractSailingWriteEntryPoint 
     private class MenuItemConfig {
 
         private final Set<Predicate<AuthenticationContext>> permissions = new HashSet<>();
+        private final Set<Class<? extends Place>> activePlaces = new HashSet<>();
         private final UserService userService;
         private final HasVisibility menuItem;
+        private final ActivatableMenuItem activatableMenuItem;
+
+        private MenuItemConfig(final UserService userService, final ActivatableMenuItem menuItem) {
+            this.userService = userService;
+            this.menuItem = menuItem;
+            this.activatableMenuItem = menuItem;
+        }
 
         private MenuItemConfig(final UserService userService, final HasVisibility menuItem) {
             this.userService = userService;
             this.menuItem = menuItem;
+            this.activatableMenuItem = null;
         }
 
         private MenuItemConfig permission(final HasPermissions type, final Action... actions) {
@@ -173,6 +200,20 @@ public class ManagementConsoleEntryPoint extends AbstractSailingWriteEntryPoint 
         private MenuItemConfig anyServerPermission(final Action... actions) {
             permissions.add(ctx -> userService.hasAnyServerPermission(actions));
             return this;
+        }
+
+        @SafeVarargs
+        private final MenuItemConfig matchesPlaces(final Class<? extends Place>... places) {
+            activePlaces.addAll(Arrays.asList(places));
+            return this;
+        }
+
+        private void updateActiveState(final Place currentPlace) {
+            final boolean active = activatableMenuItem != null && currentPlace != null
+                    && activePlaces.contains(currentPlace.getClass());
+            if (activatableMenuItem != null) {
+                activatableMenuItem.setActive(active);
+            }
         }
 
         private void validate(final AuthenticationContext ctx) {

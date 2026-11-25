@@ -1,0 +1,97 @@
+@external gwt-SuggestBox;
+div.course-area-row {
+    margin-bottom: 0.75em;
+    padding-bottom: 0.5em;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+a.geometry-toggle {
+    white-space: nowrap;
+    font-size: 0.85em;
+    align-self: center;
+}
+input.geometry-box {
+    width: 8em;
+}
+div.copy-panel {
+    margin: 0.5em 0 1em 0;
+    padding: 0.75em;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.02);
+}
+div.copy-panel input:not([type=checkbox]), div.copy-panel .gwt-SuggestBox {
+    margin-bottom: 1rem;
+}
+div.copy-row {
+    margin-bottom: 0.5em;
+}
+a.credentials-toggle {
+    display: inline-block;
+    margin-bottom: 0.5em;
+    font-size: 0.85em;
+    opacity: 0.7;
+}
+div.button-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75em;
+    margin-bottom: 0.5em;
+}
+div.picker-content {
+    padding: 0.75em;
+    width: 92vw;
+    max-width: 440px;
+    box-sizing: border-box;
+}
+div.picker-select-all {
+    display: flex;
+    align-items: center;
+    gap: 0.75em;
+    padding: 0.5em 0.4em;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.15);
+    font-weight: 600;
+}
+div.picker-list {
+    margin: 0;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+div.picker-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75em;
+    padding: 0.6em 0.4em;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+div.picker-row:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+div.picker-details {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex-grow: 1;
+    cursor: pointer;
+}
+div.picker-name {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+div.picker-meta {
+    font-size: 0.8em;
+    opacity: 0.65;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+div.picker-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.75em;
+    margin-top: 0.75em;
+    padding: 0.4em;
+}

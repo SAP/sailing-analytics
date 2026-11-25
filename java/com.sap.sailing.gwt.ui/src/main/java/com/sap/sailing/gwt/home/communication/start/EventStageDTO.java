@@ -8,6 +8,8 @@ import com.sap.sse.gwt.shared.DTO;
 
 public class EventStageDTO extends EventLinkAndMetadataDTO implements DTO {
 
+    private static final long serialVersionUID = 4438172094857336291L;
+
     private StageEventType stageType;
     private String stageImageURL;
     private Set<TrackingConnectorInfoDTO> trackingConnectorInfo;

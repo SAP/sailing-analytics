@@ -24,7 +24,11 @@ class ContextMenuItem extends Composite implements HasClickHandlers {
     @UiField
     Element icon, text;
 
+    @UiField
+    ContextMenuResources local_res;
+
     private final Anchor control;
+    private boolean enabled = true;
 
     ContextMenuItem(final String label, final String iconStyle) {
         initWidget(control = uiBinder.createAndBindUi(this));
@@ -34,11 +38,26 @@ class ContextMenuItem extends Composite implements HasClickHandlers {
 
     @Override
     public HandlerRegistration addClickHandler(final ClickHandler handler) {
-        return control.addClickHandler(handler);
+        return control.addClickHandler(event -> {
+            if (enabled) {
+                handler.onClick(event);
+            }
+        });
+    }
+
+    void setEnabled(final boolean enabled) {
+        this.enabled = enabled;
+        control.setStyleName(local_res.style().disabled(), !enabled);
+    }
+
+    void setTooltip(final String tooltip) {
+        control.setTitle(tooltip);
     }
 
     public void click() {
-        control.getElement().<ButtonElement> cast().click();
+        if (enabled) {
+            control.getElement().<ButtonElement> cast().click();
+        }
     }
 
 }

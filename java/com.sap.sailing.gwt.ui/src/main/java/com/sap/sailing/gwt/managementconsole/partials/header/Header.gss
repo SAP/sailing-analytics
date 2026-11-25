@@ -41,6 +41,11 @@
     padding: .75rem;
 }
 
+.header .actions .menu-mobile .item.item-active {
+    color: GENERIC_COLOR_HIGHLIGHT;
+    font-weight: bold;
+}
+
 .header .actions .menu-mobile .separator {
     height: 1px;
     background-color: TEXT_COLOR_INPUTS;
@@ -74,5 +79,11 @@
 
     .header .menu > a:hover {
         color: GENERIC_COLOR_HIGHLIGHT;
+    }
+
+    .header .menu > .item.item-active {
+        color: GENERIC_COLOR_HIGHLIGHT;
+        font-weight: bold;
+        text-decoration: underline;
     }
 }

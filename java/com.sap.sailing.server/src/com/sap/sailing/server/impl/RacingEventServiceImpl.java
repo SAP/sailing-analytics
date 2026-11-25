@@ -4262,6 +4262,41 @@ Replicator {
     }
 
     @Override
+    public void updateCourseAreasWithoutReplication(final UUID eventId, final UUID[] courseAreaIds,
+            final String[] courseAreaNames, final Position[] centerPositions, final Distance[] radiuses) {
+        final Event event = eventsById.get(eventId);
+        if (event == null) {
+            throw new IllegalArgumentException("No sailing event with ID " + eventId + " found.");
+        }
+        if (courseAreaIds.length != courseAreaNames.length || courseAreaIds.length != centerPositions.length
+                || courseAreaIds.length != radiuses.length) {
+            throw new IllegalArgumentException("Course area attribute counts must match");
+        }
+        final Map<UUID, CourseArea> areasById = new HashMap<>();
+        for (final CourseArea area : event.getVenue().getCourseAreas()) {
+            areasById.put(area.getId(), area);
+        }
+        final Set<UUID> updatedIds = new HashSet<>();
+        // Validate the complete request before mutating any shared objects.
+        for (int i = 0; i < courseAreaIds.length; i++) {
+            if (!areasById.containsKey(courseAreaIds[i]) || !updatedIds.add(courseAreaIds[i])
+                    || courseAreaNames[i] == null) {
+                throw new IllegalArgumentException("Invalid or duplicate course area for event " + eventId + ": "
+                        + courseAreaIds[i]);
+            }
+        }
+        for (int i = 0; i < courseAreaIds.length; i++) {
+            areasById.get(courseAreaIds[i]).update(courseAreaNames[i], centerPositions[i], radiuses[i]);
+        }
+        // Event documents embed the area attributes; all shared occurrences must survive a restart consistently.
+        for (final Event affectedEvent : getAllEvents()) {
+            if (Util.stream(affectedEvent.getVenue().getCourseAreas()).anyMatch(area -> updatedIds.contains(area.getId()))) {
+                mongoObjectFactory.storeEvent(affectedEvent);
+            }
+        }
+    }
+
+    @Override
     public void mediaTrackAdded(MediaTrack mediaTrack) {
         if (mediaTrack.dbId == null) {
             mediaTrack.dbId = mediaDB.insertMediaTrack(mediaTrack.title, mediaTrack.url, mediaTrack.startTime,

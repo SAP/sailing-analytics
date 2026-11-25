@@ -51,6 +51,7 @@ import com.sap.sse.gwt.client.media.VideoDTO;
 import com.sap.sse.gwt.dispatch.shared.exceptions.DispatchException;
 import com.sap.sse.gwt.dispatch.shared.exceptions.ServerDispatchException;
 import com.sap.sse.security.SecurityService;
+import com.sap.sse.security.ui.server.SecurityDTOUtil;
 import com.sap.sse.shared.media.ImageDescriptor;
 import com.sap.sse.shared.media.MediaDescriptor;
 import com.sap.sse.shared.media.VideoDescriptor;
@@ -295,7 +296,7 @@ public final class HomeServiceUtil {
     
     public static EventStageDTO convertToEventStageDTO(EventBase event, URL baseURL, boolean onRemoteServer, StageEventType stageType, RacingEventService service, boolean useTeaserImage) {
         EventStageDTO dto = new EventStageDTO();
-        mapToMetadataDTO(event, dto);
+        mapToMetadataDTO(event, dto, service.getSecurityService());
         dto.setBaseURL(baseURL.toString());
         dto.setOnRemoteServer(onRemoteServer);
         dto.setStageType(stageType);
@@ -305,21 +306,21 @@ public final class HomeServiceUtil {
         dto.setStageImageURL(useTeaserImage ? findEventThumbnailImageUrlAsString(event) : getStageImageURLAsString(event));
         return dto;
     }
-    
-    public static EventListEventDTO convertToEventListDTO(EventBase event, URL baseURL, boolean onRemoteServer) {
+
+    public static EventListEventDTO convertToEventListDTO(EventBase event, URL baseURL, boolean onRemoteServer, SecurityService securityService) {
         EventListEventDTO dto = new EventListEventDTO();
-        mapToMetadataDTO(event, dto);
+        mapToMetadataDTO(event, dto, securityService);
         dto.setBaseURL(String.valueOf(baseURL));
         dto.setOnRemoteServer(onRemoteServer);
         return dto;
     }
-    
-    public static EventMetadataDTO convertToMetadataDTO(EventBase event) {
+
+    public static EventMetadataDTO convertToMetadataDTO(EventBase event, SecurityService securityService) {
         EventMetadataDTO dto = new EventMetadataDTO();
-        mapToMetadataDTO(event, dto);
+        mapToMetadataDTO(event, dto, securityService);
         return dto;
     }
-    
+
     public static EventLinkDTO convertToEventLinkDTO(EventBase event, URL baseURL, boolean onRemoteServer) {
         EventLinkDTO dto = new EventLinkDTO();
         mapToReferenceDTO(event, dto);
@@ -327,9 +328,10 @@ public final class HomeServiceUtil {
         dto.setOnRemoteServer(onRemoteServer);
         return dto;
     }
-    
-    public static void mapToMetadataDTO(EventBase event, EventMetadataDTO dto) {
+
+    public static void mapToMetadataDTO(EventBase event, EventMetadataDTO dto, SecurityService securityService) {
         mapToReferenceDTO(event, dto);
+        dto.setName(event.getName());
         dto.setStartDate(event.getStartDate() == null ? null : event.getStartDate().asDate());
         dto.setEndDate(event.getEndDate() == null ? null : event.getEndDate().asDate());
         dto.setState(HomeServiceUtil.calculateEventState(event));
@@ -338,6 +340,7 @@ public final class HomeServiceUtil {
             dto.setLocation(getLocation(event));
         }
         dto.setThumbnailImageURL(HomeServiceUtil.findEventThumbnailImageUrlAsString(event));
+        SecurityDTOUtil.addSecurityInformation(securityService, dto);
     }
     
     private static void mapToReferenceDTO(EventBase event, EventReferenceDTO dto) {

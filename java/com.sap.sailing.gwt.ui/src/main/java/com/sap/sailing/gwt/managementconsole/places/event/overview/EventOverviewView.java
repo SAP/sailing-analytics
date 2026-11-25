@@ -21,9 +21,13 @@ public interface EventOverviewView
 
         void navigateToCreateEvent();
 
+        void editEvent(EventMetadataDTO event);
+
         void advancedSettings(ManagementConsoleResources app_res, EventMetadataDTO event);
 
         void deleteEvent(EventMetadataDTO event);
+
+        boolean canDeleteEvent(EventMetadataDTO event);
     }
 
 }

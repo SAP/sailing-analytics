@@ -101,6 +101,9 @@ public interface ManagementConsoleResources extends ClientBundle {
 
         String label();
 
+        @ClassName("checkbox-field")
+        String checkboxField();
+
         String primary();
 
         String highlighted();

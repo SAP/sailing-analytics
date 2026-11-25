@@ -9,7 +9,6 @@ import java.util.TreeSet;
 
 import com.sap.sailing.domain.common.WindSource;
 import com.sap.sailing.domain.common.WindSourceType;
-import com.sap.sailing.domain.common.security.SecuredDomainType;
 import com.sap.sailing.domain.common.windfinder.SpotDTO;
 import com.sap.sailing.gwt.common.communication.event.EventMetadataDTO;
 import com.sap.sailing.gwt.home.communication.event.HasLogo;
@@ -17,21 +16,13 @@ import com.sap.sailing.gwt.ui.shared.TrackingConnectorInfoDTO;
 import com.sap.sse.common.Util;
 import com.sap.sse.gwt.client.media.ImageDTO;
 import com.sap.sse.gwt.dispatch.shared.commands.Result;
-import com.sap.sse.security.shared.HasPermissions;
-import com.sap.sse.security.shared.QualifiedObjectIdentifier;
-import com.sap.sse.security.shared.TypeRelativeObjectIdentifier;
-import com.sap.sse.security.shared.dto.AccessControlListDTO;
-import com.sap.sse.security.shared.dto.OwnershipDTO;
-import com.sap.sse.security.shared.dto.SecuredDTO;
-import com.sap.sse.security.shared.dto.SecurityInformationDTO;
 
-public class EventViewDTO extends EventMetadataDTO implements Result, HasLogo, SecuredDTO {
+public class EventViewDTO extends EventMetadataDTO implements Result, HasLogo {
 
     private static final long serialVersionUID = 3549272772994999483L;
 
     private TreeSet<RegattaMetadataDTO> regattas = new TreeSet<>();
-    private SecurityInformationDTO securityInformation = new SecurityInformationDTO();
-    
+
     private boolean multiRegatta;
     private SeriesReferenceWithEventsDTO seriesData;
     private boolean hasMedia;
@@ -40,7 +31,6 @@ public class EventViewDTO extends EventMetadataDTO implements Result, HasLogo, S
     private String officialWebsiteURL;
     private String sailorsInfoWebsiteURL;
     private String description;
-    private String name;
     private List<SpotDTO> allWindFinderSpotIdsUsedByEvent;
     private Set<TrackingConnectorInfoDTO> trackingConnectorInfos;
 
@@ -165,48 +155,5 @@ public class EventViewDTO extends EventMetadataDTO implements Result, HasLogo, S
 
     public void setTrackingConnectorInfos(Set<TrackingConnectorInfoDTO> trackingConnectorInfo) {
         this.trackingConnectorInfos = trackingConnectorInfo;
-    }
-
-    @Override
-    public QualifiedObjectIdentifier getIdentifier() {
-        return getPermissionType().getQualifiedObjectIdentifier(getTypeRelativeObjectIdentifier());
-    }
-
-    @Override
-    public HasPermissions getPermissionType() {
-        return SecuredDomainType.EVENT;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-    
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public AccessControlListDTO getAccessControlList() {
-        return securityInformation.getAccessControlList();
-    }
-
-    @Override
-    public OwnershipDTO getOwnership() {
-        return securityInformation.getOwnership();
-    }
-
-    @Override
-    public void setAccessControlList(AccessControlListDTO accessControlList) {
-        this.securityInformation.setAccessControlList(accessControlList);
-    }
-
-    @Override
-    public void setOwnership(OwnershipDTO ownership) {
-        this.securityInformation.setOwnership(ownership);
-    }
-
-    public TypeRelativeObjectIdentifier getTypeRelativeObjectIdentifier() {
-        return new TypeRelativeObjectIdentifier(getId().toString());
     }
 }

@@ -5,7 +5,9 @@ import com.sap.sailing.gwt.common.communication.event.EventState;
 import com.sap.sailing.gwt.home.communication.start.StageEventType;
 
 public class EventLinkAndMetadataDTO extends EventMetadataDTO {
-    
+
+    private static final long serialVersionUID = 6512995854737456123L;
+
     private String baseURL;
     private boolean isOnRemoteServer;
     

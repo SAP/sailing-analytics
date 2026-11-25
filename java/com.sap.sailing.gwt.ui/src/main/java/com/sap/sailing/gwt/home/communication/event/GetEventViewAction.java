@@ -27,7 +27,6 @@ import com.sap.sailing.gwt.ui.shared.TrackingConnectorInfoDTO;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.media.MediaTagConstants;
 import com.sap.sse.gwt.dispatch.shared.caching.IsClientCacheable;
-import com.sap.sse.security.ui.server.SecurityDTOUtil;
 import com.sap.sse.shared.media.ImageDescriptor;
 
 /**
@@ -66,7 +65,7 @@ public class GetEventViewAction implements SailingAction<EventViewDTO>, IsClient
         }
         context.getSecurityService().checkCurrentUserReadPermission(event);
         final EventViewDTO dto = new EventViewDTO();
-        HomeServiceUtil.mapToMetadataDTO(event, dto);
+        HomeServiceUtil.mapToMetadataDTO(event, dto, context.getSecurityService());
         ImageDescriptor logoImage = event.findImageWithTag(MediaTagConstants.LOGO.getName());
         dto.setLogoImage(logoImage != null && !logoImage.isMissing() ? HomeServiceUtil.convertToImageDTO(logoImage) : null);
         dto.setOfficialWebsiteURL(event.getOfficialWebsiteURL() == null ? null : event.getOfficialWebsiteURL().toString());
@@ -119,7 +118,6 @@ public class GetEventViewAction implements SailingAction<EventViewDTO>, IsClient
         Set<TrackingConnectorInfoDTO> trackingConnectorInfos = event.getTrackingConnectorInfos().stream()
                 .map(TrackingConnectorInfoDTO::new).collect(Collectors.toSet());
         dto.setTrackingConnectorInfos(trackingConnectorInfos);
-        SecurityDTOUtil.addSecurityInformation(context.getSecurityService(), dto);
         return dto;
     }
 
