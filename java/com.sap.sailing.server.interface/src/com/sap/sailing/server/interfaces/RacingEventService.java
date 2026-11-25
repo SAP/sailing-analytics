@@ -58,6 +58,7 @@ import com.sap.sailing.domain.common.CompetitorRegistrationType;
 import com.sap.sailing.domain.common.DataImportProgress;
 import com.sap.sailing.domain.common.DataImportSubProgress;
 import com.sap.sailing.domain.common.DetailType;
+import com.sap.sailing.domain.common.MasterDataImportObjectCreationCount;
 import com.sap.sailing.domain.common.NoWindException;
 import com.sap.sailing.domain.common.RaceFetcher;
 import com.sap.sailing.domain.common.RegattaAndRaceIdentifier;
@@ -84,8 +85,8 @@ import com.sap.sailing.domain.leaderboard.RegattaLeaderboardWithEliminations;
 import com.sap.sailing.domain.leaderboard.RegattaLeaderboardWithOtherTieBreakingLeaderboard;
 import com.sap.sailing.domain.leaderboard.ScoringScheme;
 import com.sap.sailing.domain.leaderboard.impl.DelegatingRegattaLeaderboardWithCompetitorElimination;
-import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprintRegistry;
 import com.sap.sailing.domain.maneuverhash.ManeuverRaceFingerprintRegistry;
+import com.sap.sailing.domain.markpassinghash.MarkPassingRaceFingerprintRegistry;
 import com.sap.sailing.domain.persistence.DomainObjectFactory;
 import com.sap.sailing.domain.persistence.MongoObjectFactory;
 import com.sap.sailing.domain.polars.PolarDataService;
@@ -186,7 +187,14 @@ public interface RacingEventService extends TrackedRegattaRegistry, RegattaFetch
     
     /**
      * Traverses through the event's {@link Event#getLeaderboardGroups() leaderboard groups} and from there on to the
-     * {@link Leaderboard}s and finds }
+     * {@link Leaderboard}s and finds all {@link TrackedRace}s whose tracking interval contains {@code at}.
+     * <p>
+     * A tracked race is only returned when {@code at} is at or after its {@link TrackedRace#getStartOfTracking() start
+     * of tracking} and, if an {@link TrackedRace#getEndOfTracking() end of tracking} is defined, at or before that end.
+     * Because the start of tracking is used as the lower interval bound, every {@link TrackedRace} returned is
+     * guaranteed to have a non-{@code null} {@link TrackedRace#getStartOfTracking() start of tracking}; callers may rely
+     * on this and dereference it without a null check. The {@link TrackedRace#getEndOfTracking() end of tracking} may
+     * still be {@code null} for races whose tracking has not ended yet.
      * 
      * @param at
      *            the time point that must be between a {@link TrackedRace}'s {@link TrackedRace#getStartOfTracking()
@@ -484,6 +492,18 @@ public interface RacingEventService extends TrackedRegattaRegistry, RegattaFetch
             Iterable<String> windFinderReviewedSpotCollectionIds);
 
     /**
+     * Updates the persisted health state for all images of the event whose URL matches <code>imageUrl</code>. Does not
+     * replicate automatically; see {@link com.sap.sailing.server.operationaltransformation.UpdateEventImageHealth}.
+     */
+    void updateEventImageHealth(UUID eventId, String imageUrl, boolean missing, boolean missingMailNotificationSent);
+
+    /**
+     * Updates the persisted health state for all videos of the event whose URL matches <code>videoUrl</code>. Does not
+     * replicate automatically; see {@link com.sap.sailing.server.operationaltransformation.UpdateEventVideoHealth}.
+     */
+    void updateEventVideoHealth(UUID eventId, String videoUrl, boolean missing, boolean missingMailNotificationSent);
+    
+    /**
      * Renames a sailing event. If a sailing event by the name <code>oldName</code> does not exist in {@link #getEvents()},
      * or if a event with the name <code>newName</code> already exists, an {@link IllegalArgumentException} is thrown.
      * If the method completes normally, the rename has been successful, and the event previously obtained by calling
@@ -745,6 +765,17 @@ public interface RacingEventService extends TrackedRegattaRegistry, RegattaFetch
 
     DataImportProgress createOrUpdateDataImportProgressWithReplication(UUID importOperationId,
             double overallProgressPct, DataImportSubProgress subProgress, double subProgressPct);
+
+    /**
+     * Like {@link #createOrUpdateDataImportProgressWithReplication(UUID, double, DataImportSubProgress, double)} but
+     * also publishes the final {@code result} both locally and on all replicas, so that a client polling either the
+     * master or a replica sees {@link DataImportProgress#getResult()} turn non-{@code null} at the same, true point of
+     * completion (see bug6227). Use the {@code result}-less overload for the intermediate progress updates that carry
+     * no result yet.
+     */
+    DataImportProgress createOrUpdateDataImportProgressWithReplication(UUID importOperationId,
+            double overallProgressPct, DataImportSubProgress subProgress, double subProgressPct,
+            MasterDataImportObjectCreationCount result);
 
     DataImportProgress createOrUpdateDataImportProgressWithoutReplication(UUID importOperationId,
             double overallProgressPct, DataImportSubProgress subProgress, double subProgressPct);
@@ -1061,6 +1092,15 @@ public interface RacingEventService extends TrackedRegattaRegistry, RegattaFetch
             final boolean exportDeviceConfigurations, String targetServerUsername, String targetServerPassword,
             String targetServerBearerToken, final boolean exportTrackedRacesAndStartTracking,
             final UUID importOperationId) throws IllegalArgumentException;
+
+    /**
+     * Registers progress before scheduling the import with the current security subject. Returns after acceptance;
+     * failures during execution are reported in the replicated {@link DataImportProgress} for the supplied UUID.
+     */
+    void importMasterDataAsync(final String urlAsString, final UUID[] leaderboardGroupIds, final boolean override,
+            final boolean compress, final boolean exportWind, final boolean exportDeviceConfigurations,
+            final String targetServerUsername, final String targetServerPassword, final String targetServerBearerToken,
+            final boolean exportTrackedRacesAndStartTracking, final UUID importOperationId);
 
     void addOrReplaceExpeditionDeviceConfiguration(UUID deviceConfigurationId, String name, Integer expeditionBoatId);
 

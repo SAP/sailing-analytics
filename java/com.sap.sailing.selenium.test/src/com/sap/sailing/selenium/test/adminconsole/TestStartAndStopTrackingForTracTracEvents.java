@@ -38,12 +38,7 @@ public class TestStartAndStopTrackingForTracTracEvents extends AbstractSeleniumT
     
     private TrackableRaceDescriptor trackableRace;
     private TrackedRaceDescriptor trackedRace;
-    
-    // TODO see below: Complete the test case
-//    private static final String NO_REGATTA = "No regatta";
-    
-//    private static final String BMW_CUP_RACE_8 = "BMW Cup Race 8";
-    
+
     @Override
     @BeforeEach
     public void setUp() {

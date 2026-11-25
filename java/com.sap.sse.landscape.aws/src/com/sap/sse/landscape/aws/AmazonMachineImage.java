@@ -4,6 +4,7 @@ import com.sap.sse.common.Util;
 import com.sap.sse.landscape.Landscape;
 import com.sap.sse.landscape.MachineImage;
 
+import software.amazon.awssdk.services.ec2.model.ArchitectureValues;
 import software.amazon.awssdk.services.ec2.model.BlockDeviceMapping;
 import software.amazon.awssdk.services.ec2.model.ImageState;
 import software.amazon.awssdk.services.ec2.model.Tag;
@@ -21,4 +22,6 @@ public interface AmazonMachineImage<ShardingKey> extends MachineImage {
     }
 
     Iterable<Tag> getTags();
+    
+    ArchitectureValues getArchitecture();
 }

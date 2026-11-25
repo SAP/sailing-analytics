@@ -281,7 +281,8 @@ public class AdminConsoleActivity extends AbstractActivity implements AdminConso
     }
 
     protected void checkPublicServerNonPublicUserWarning() {
-        sailingService.getServerConfiguration(new AsyncCallback<ServerConfigurationDTO>() {
+        sailingService.getServerConfiguration(new MarkedAsyncCallback<ServerConfigurationDTO>(
+                new AsyncCallback<ServerConfigurationDTO>() {
             @Override
             public void onFailure(Throwable caught) {
             }
@@ -324,7 +325,7 @@ public class AdminConsoleActivity extends AbstractActivity implements AdminConso
                             }
                         });
             }
-        }); 
+        })); 
     }
 
     @Override

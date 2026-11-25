@@ -5,10 +5,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import com.sap.sailing.domain.common.DataImportProgress;
+import com.sap.sailing.landscape.common.LiveContentCheckResult;
 import com.sap.sailing.landscape.common.SharedLandscapeConstants;
 import com.sap.sailing.landscape.procedures.DeployProcessOnMultiServer;
 import com.sap.sailing.landscape.procedures.SailingAnalyticsMasterConfiguration;
@@ -20,6 +23,7 @@ import com.sap.sailing.server.gateway.interfaces.CompareServersResult;
 import com.sap.sailing.server.gateway.interfaces.SailingServer;
 import com.sap.sailing.server.gateway.interfaces.SailingServerFactory;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.Util.Triple;
 import com.sap.sse.common.mail.MailException;
 import com.sap.sse.landscape.Release;
@@ -221,12 +225,49 @@ public interface LandscapeService {
     /**
      * @return the reports on the master data import and content comparison; 
      */
+    LiveContentCheckResult checkForLiveContent(Iterable<AwsApplicationReplicaSet<String, SailingAnalyticsMetrics,
+            SailingAnalyticsProcess<String>>> applicationReplicaSets, String bearerToken) throws Exception;
+
+    /**
+     * Archives synchronously. This can take a long time; prefer {@link #archiveReplicaSetAsync} to avoid client or
+     * proxy timeouts. After import acceptance, the final outcome, including server comparison differences or failures,
+     * is emailed once per user to the initiating user, both replica set owners, and users with master-data export
+     * permission on the source or import permission on the archive. Only verified email addresses are used.
+     * <p>
+     *
+     * The {@link Triple#getC() third} component of the result returned is an optional error message describing an error
+     * that occurred when archiving the replica set's MongoDB was requested ({@code mongoDbArchivingErrorMessage}), or
+     * {@code null} if that wasn't requested or no error occurred during DB archiving.
+     *
+     * @param force
+     *            when {@code false} (the recommended default), the affected replica set is first checked for live
+     *            content (e.g., a race that is being tracked live). If live content is found, archiving is not carried
+     *            out and a {@link LiveContentConflictException} carrying the {@link LiveContentCheckResult} is thrown
+     *            so the caller can decide whether to proceed anyway. When {@code true}, this safety check is skipped
+     *            and archiving proceeds regardless of any live content, potentially disrupting a live race.
+     * @throws LiveContentConflictException
+     *             if {@code force} is {@code false} and the affected replica set is found to be serving live content;
+     *             it carries the {@link LiveContentCheckResult} describing the detected content
+     */
     Triple<DataImportProgress, CompareServersResult, String> archiveReplicaSet(String regionId,
             AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> applicationReplicaSetToArchive,
             String bearerTokenOrNullForApplicationReplicaSetToArchive, String bearerTokenOrNullForArchive,
             Duration durationToWaitBeforeCompareServers, int maxNumberOfCompareServerAttempts,
             boolean removeApplicationReplicaSet, MongoEndpoint moveDatabaseHere, String optionalKeyName,
-            byte[] passphraseForPrivateKeyDecryption) throws Exception;
+            byte[] passphraseForPrivateKeyDecryption, boolean force) throws LiveContentConflictException, Exception;
+
+    /**
+     * Returns the accepted MDI UUID and the importing replica set's hostname. The remainder of archiving runs in
+     * the background, independently of client polling. Its final outcome, including server comparison differences,
+     * is logged and mailed to the same recipients as {@link #archiveReplicaSet}, once per user with a verified email
+     * address. Failures after import acceptance are also emailed.
+     */
+    Pair<UUID, String> archiveReplicaSetAsync(final String regionId,
+            final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> applicationReplicaSetToArchive,
+            final String bearerTokenOrNullForApplicationReplicaSetToArchive, final String bearerTokenOrNullForArchive,
+            final Duration durationToWaitBeforeCompareServers, final int maxNumberOfCompareServerAttempts,
+            final boolean removeApplicationReplicaSet, final MongoEndpoint moveDatabaseHere, final String optionalKeyName,
+            final byte[] passphraseForPrivateKeyDecryption, final boolean force) throws Exception;
     
     /**
      * If the replica set is mapped through DNS, the DNS record is removed first, before any attempts are made to shut
@@ -241,10 +282,20 @@ public interface LandscapeService {
      *            endpoint
      * @return an error message string in case archiving the database was requested but failed for some reason;
      *         {@code null} otherwise
+     * @param force
+     *            when {@code false} (the recommended default), the affected replica set is first checked for live
+     *            content (e.g., a race that is being tracked live). If live content is found, the removal is not carried
+     *            out and a {@link LiveContentConflictException} carrying the {@link LiveContentCheckResult} is thrown so
+     *            the caller can decide whether to proceed anyway. When {@code true}, this safety check is skipped and
+     *            the removal proceeds regardless of any live content, potentially disrupting a live race.
+     * @throws LiveContentConflictException
+     *             if {@code force} is {@code false} and the affected replica set is found to be serving live content;
+     *             it carries the {@link LiveContentCheckResult} describing the detected content
      */
     String removeApplicationReplicaSet(String regionId,
             AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> applicationReplicaSetToRemove,
-            MongoEndpoint moveDatabaseHere, String optionalKeyName, byte[] passphraseForPrivateKeyDecryption) throws Exception;
+            MongoEndpoint moveDatabaseHere, String optionalKeyName, byte[] passphraseForPrivateKeyDecryption,
+            boolean force) throws LiveContentConflictException, Exception;
 
     Release getRelease(String releaseNameOrNullForLatestMaster);
 
@@ -262,7 +313,7 @@ public interface LandscapeService {
      * target groups. If no replica exists, one is launched with the master's release, and the method waits
      * until the replica has reached its healthy state. The replica is then registered in the public target group.<p>
      * 
-     * Then, the {@code ./refreshInstance.sh install-release <release>} command is sent to the master which will
+     * Then, the {@code refreshInstance.sh install-release <release>} command is sent to the master which will
      * download and unpack the new release but will not yet stop the master process. In parallel, the existing
      * default launch template version will be copied and updated with user data reflecting the new release to be used.
      * The existing auto-scaling group will then use the new default launch template version.<p>
@@ -285,22 +336,41 @@ public interface LandscapeService {
      * Shards are updated by spinning up replicas for the temporary transition and changing the auto scaling config.
      * After that all shard replicas are getting shutdown and restarted with the new launch config.
      * It's expected that the replica set has its own auto scaling group if it has shards.
+     *
+     * @param force
+     *            when {@code false} (the recommended default), the {@code replicaSet} is first checked for live content
+     *            (e.g., a race that is being tracked live). If live content is found, the upgrade is not carried out and
+     *            a {@link LiveContentConflictException} carrying the {@link LiveContentCheckResult} is thrown so the
+     *            caller can decide whether to proceed anyway. When {@code true}, this safety check is skipped and the
+     *            upgrade proceeds regardless of any live content, potentially disrupting a live race.
+     * @throws LiveContentConflictException
+     *             if {@code force} is {@code false} and the {@code replicaSet} is found to be serving live content; it
+     *             carries the {@link LiveContentCheckResult} describing the detected content
      */
     AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> upgradeApplicationReplicaSet(AwsRegion region,
             AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet,
             String releaseOrNullForLatestMaster, String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
-            String replicaReplicationBearerToken) throws InterruptedException, ExecutionException,
+            String replicaReplicationBearerToken, boolean force) throws LiveContentConflictException, InterruptedException, ExecutionException,
             MalformedURLException, IOException, TimeoutException, Exception;
 
     /**
      * @return a new replica that was started in case no running replica was found in the {@code replicaSet}, otherwise
      *         {@code null}.
+     * @param force
+     *            when {@code false} (the recommended default), the {@code replicaSet} is first checked for live content
+     *            (e.g., a race that is being tracked live). If live content is found, the operation is not carried out
+     *            and a {@link LiveContentConflictException} carrying the {@link LiveContentCheckResult} is thrown so the
+     *            caller can decide whether to proceed anyway. When {@code true}, this safety check is skipped and the
+     *            operation proceeds regardless of any live content, potentially disrupting a live race.
+     * @throws LiveContentConflictException
+     *             if {@code force} is {@code false} and the {@code replicaSet} is found to be serving live content; it
+     *             carries the {@link LiveContentCheckResult} describing the detected content
      */
     SailingAnalyticsProcess<String> ensureAtLeastOneReplicaExistsStopReplicatingAndRemoveMasterFromTargetGroups(
             AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet,
             String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
-            String effectiveReplicaReplicationBearerToken) throws Exception, MalformedURLException, IOException,
-            TimeoutException, InterruptedException, ExecutionException;
+            String effectiveReplicaReplicationBearerToken, boolean force) throws LiveContentConflictException, Exception, MalformedURLException,
+            IOException, TimeoutException, InterruptedException, ExecutionException;
 
     /**
      * For an existing replica set deploys a new replica onto an existing host. The host may be shared by multiple
@@ -309,7 +379,6 @@ public interface LandscapeService {
      * eligible} for deploying a process of the replica set to it. In particular, the directory as derived from the
      * replica set name and the HTTP port must not be used by any other application already deployed on that host.
      * The replica process is registered with the {@code replicaSet}'s public target group.
-     * @param optionalIgtimiRiotPort TODO
      */
     <AppConfigBuilderT extends Builder<AppConfigBuilderT, String>,
      MultiServerDeployerBuilderT extends DeployProcessOnMultiServer.Builder<MultiServerDeployerBuilderT, String, SailingAnalyticsHost<String>, SailingAnalyticsReplicaConfiguration<String>, AppConfigBuilderT>>
@@ -434,6 +503,15 @@ public interface LandscapeService {
      *            can be used if {@code useSharedInstance} is {@code true} to specify a preferred shared instance to
      *            deploy the new master process to. The instance will be checked for eligibility first, including
      *            checking the AZ, and if not eligible the method behaves as if the instance had not been specified.
+     * @param force
+     *            when {@code false} (the recommended default), the {@code replicaSet} is first checked for live content
+     *            (e.g., a race that is being tracked live). If live content is found, the master is not moved and a
+     *            {@link LiveContentConflictException} carrying the {@link LiveContentCheckResult} is thrown so the caller
+     *            can decide whether to proceed anyway. When {@code true}, this safety check is skipped and the master is
+     *            moved regardless of any live content, potentially disrupting a live race.
+     * @throws LiveContentConflictException
+     *             if {@code force} is {@code false} and the {@code replicaSet} is found to be serving live content; it
+     *             carries the {@link LiveContentCheckResult} describing the detected content
      */
     <AppConfigBuilderT extends SailingAnalyticsMasterConfiguration.Builder<AppConfigBuilderT, String>,
     MultiServerDeployerBuilderT extends DeployProcessOnMultiServer.Builder<MultiServerDeployerBuilderT, String, SailingAnalyticsHost<String>, SailingAnalyticsMasterConfiguration<String>, AppConfigBuilderT>>
@@ -443,8 +521,8 @@ public interface LandscapeService {
             Optional<SailingAnalyticsHost<String>> optionalPreferredInstanceToDeployTo, String optionalKeyName,
             byte[] privateKeyEncryptionPassphrase, String optionalMasterReplicationBearerTokenOrNull,
             String optionalReplicaReplicationBearerTokenOrNull, Integer optionalMemoryInMegabytesOrNull,
-            Integer optionalMemoryTotalSizeFactorOrNull) throws MalformedURLException, IOException, TimeoutException,
-            InterruptedException, ExecutionException, Exception;
+            Integer optionalMemoryTotalSizeFactorOrNull, boolean force) throws LiveContentConflictException, MalformedURLException, IOException,
+            TimeoutException, InterruptedException, ExecutionException, Exception;
 
     /**
      * If the {@code replicaSet} provided has one or more auto-scaling groups, their default launch template version is
@@ -509,15 +587,27 @@ public interface LandscapeService {
      * @param optionalInstanceTypeForNewInstance
      *            if not specified, the new multi-instance launched will use the same instance type as the one from
      *            where the processes are moved away ({@code host})
+     * @param forceMasterReplicaSetNames
+     *            the names of those replica sets whose master ("primary") process should be moved even if it currently
+     *            serves live content. Before moving any master, each affected primary not named here is checked for live
+     *            content (e.g., a race that is being tracked live); if any such replica set is found to have live
+     *            content, no master is moved and a {@link LiveContentConflictException} carrying the
+     *            {@link LiveContentCheckResult} is thrown. Naming a replica set here skips that safety check for it and
+     *            forces its master to be moved regardless of any live content, potentially disrupting a live race.
      * @return a triple of which the {@link Triple#getA() first} element is the new host to which the processes have
      *         been moved, the {@link Triple#getB() second} element is the set of master processes moved, and the
      *         {@link Triple#getC() third} element is the set of replica processes moved; the master and replica process
      *         maps are keyed by the names of the application replica sets to which the processes belong.
+     * @throws LiveContentConflictException
+     *             if one or more affected master processes whose replica set is not listed in
+     *             {@code forceMasterReplicaSetNames} are found to be serving live content; it carries the
+     *             {@link LiveContentCheckResult} describing the detected content
      */
     Triple<SailingAnalyticsHost<String>, Map<String, SailingAnalyticsProcess<String>>, Map<String, SailingAnalyticsProcess<String>>>
     moveAllApplicationProcessesAwayFrom(SailingAnalyticsHost<String> host,
             Optional<InstanceType> optionalInstanceTypeForNewInstance,
-            String optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception;
+            String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
+            Set<String> forceMasterReplicaSetNames) throws LiveContentConflictException, Exception;
 
     String getHostname(String replicaSetName, String optionalDomainName);
 

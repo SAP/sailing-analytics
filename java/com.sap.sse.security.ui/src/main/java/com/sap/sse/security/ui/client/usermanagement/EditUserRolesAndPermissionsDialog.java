@@ -7,6 +7,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.MultiSelectionModel;
 import com.sap.sse.gwt.client.ErrorReporter;
+import com.sap.sse.gwt.client.async.MarkedAsyncCallback;
 import com.sap.sse.gwt.client.celltable.CellTableWithCheckboxResources;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog;
 import com.sap.sse.security.shared.dto.RolesAndPermissionsForUserDTO;
@@ -41,7 +42,8 @@ public class EditUserRolesAndPermissionsDialog extends DataEntryDialog<Void> {
             public void run() {
                 selectionAdapter.clear();
                 userService.getUserManagementService().getRolesAndPermissionsForUser(selectedUsername,
-                        new AsyncCallback<RolesAndPermissionsForUserDTO>() {
+                        new MarkedAsyncCallback<RolesAndPermissionsForUserDTO>(
+                                new AsyncCallback<RolesAndPermissionsForUserDTO>() {
                             @Override
                             public void onSuccess(RolesAndPermissionsForUserDTO result) {
                                 selectionAdapter.clear();
@@ -55,7 +57,7 @@ public class EditUserRolesAndPermissionsDialog extends DataEntryDialog<Void> {
                             public void onFailure(Throwable caught) {
                                 errorReporter.reportError(caught.getMessage());
                             }
-                        });
+                        }));
             }
         };
         wildcardPermissionPanel = new WildcardPermissionPanel(userService, stringMessages, errorReporter,

@@ -10,14 +10,14 @@ import com.sap.sailing.android.shared.ui.utils.MultiplePreferenceChangeListener;
 import com.sap.sailing.android.shared.ui.views.EditSetPreference;
 
 import android.os.Bundle;
-import android.support.v14.preference.MultiSelectListPreference;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.preference.CheckBoxPreference;
-import android.support.v7.preference.ListPreference;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.Preference.OnPreferenceChangeListener;
-import android.support.v7.preference.PreferenceFragmentCompat;
-import android.support.v7.preference.PreferenceScreen;
+import androidx.preference.MultiSelectListPreference;
+import androidx.fragment.app.DialogFragment;
+import androidx.preference.CheckBoxPreference;
+import androidx.preference.ListPreference;
+import androidx.preference.Preference;
+import androidx.preference.Preference.OnPreferenceChangeListener;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceScreen;
 
 /**
  * Created by I074137 on 18.09.13.

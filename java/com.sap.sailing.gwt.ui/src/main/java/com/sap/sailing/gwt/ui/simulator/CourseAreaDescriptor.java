@@ -40,7 +40,7 @@ public class CourseAreaDescriptor {
         double lon2 = lon1
                 + Math.atan2(Math.sin(brng) * Math.sin(d / R) * Math.cos(lat1),
                         Math.cos(d / R) - Math.sin(lat1) * Math.sin(lat2));
-        lon2 = (lon2 + 3 * Math.PI) % (2 * Math.PI) - Math.PI; // normalize to -180� ... +180�*/
+        lon2 = (lon2 + 3 * Math.PI) % (2 * Math.PI) - Math.PI; // normalize to -180° ... +180°*/
 
         double lat2deg = lat2 / Math.PI * 180;
         double lon2deg = lon2 / Math.PI * 180;

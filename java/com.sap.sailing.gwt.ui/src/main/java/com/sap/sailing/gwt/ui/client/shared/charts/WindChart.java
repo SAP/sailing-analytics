@@ -131,6 +131,7 @@ public class WindChart extends AbstractRaceChart<WindChartSettings> implements R
         colorMap = new ColorMapImpl<WindSource>();
         chart = new Chart()
                 .setPersistent(true)
+                .setAutoGeneratePointIds(false)
                 .setReflow(false)
                 .setZoomType(BaseChart.ZoomType.X)
                 .setMarginLeft(65)
@@ -382,8 +383,12 @@ public class WindChart extends AbstractRaceChart<WindChartSettings> implements R
     /**
      * Updates the wind charts with the wind data from <code>result</code>. If <code>append</code> is <code>true</code>, previously
      * existing points in the chart are left unchanged. Otherwise, the existing wind series are replaced.
+     * Unchanged append responses retain the existing samples without resubmitting them.
+     *
+     * @return whether a series was initialized or updated, or a replacement was requested (even if empty)
      */
-    public void updateChartSeries(WindInfoForRaceDTO result, boolean append) {
+    public boolean updateChartSeries(final WindInfoForRaceDTO result, final boolean append) {
+        boolean changed = !append;
         Long newMinTimepoint = timeOfEarliestRequestInMillis;
         Long newMaxTimepoint = timeOfLatestRequestInMillis;
         for (final WindSource windSource: result.windTrackInfoByWindSource.keySet()) {
@@ -436,36 +441,47 @@ public class WindChart extends AbstractRaceChart<WindChartSettings> implements R
                     }
                 }
             }
-            Point[] newDirectionPoints;
-            Point[] newSpeedPoints = null;
-            if (append) {
-                Point[] oldDirectionPoints = windSourceDirectionPoints.get(windSource) != null ? windSourceDirectionPoints.get(windSource) : new Point[0];
-                newDirectionPoints = new Point[oldDirectionPoints.length + currentPointIndex];
-                System.arraycopy(oldDirectionPoints, 0, newDirectionPoints, 0, oldDirectionPoints.length);
-                System.arraycopy(directionPoints, 0, newDirectionPoints, oldDirectionPoints.length, currentPointIndex);
-                if (windSource.getType().useSpeed()) {
-                    Point[] oldSpeedPoints =  windSourceSpeedPoints.get(windSource) != null ? windSourceSpeedPoints.get(windSource) : new Point[0];
-                    newSpeedPoints = new Point[oldSpeedPoints.length + currentPointIndex];
-                    System.arraycopy(oldSpeedPoints, 0, newSpeedPoints, 0, oldSpeedPoints.length);
-                    System.arraycopy(speedPoints, 0, newSpeedPoints, oldSpeedPoints.length, currentPointIndex);
+            // Retain unchanged history without copying it or asking Highcharts to match every point again.
+            if (!append || currentPointIndex != 0 || !windSourceDirectionPoints.containsKey(windSource)
+                    || (windSource.getType().useSpeed() && !windSourceSpeedPoints.containsKey(windSource))) {
+                final Point[] newDirectionPoints;
+                final Point[] newSpeedPoints;
+                if (append) {
+                    final Point[] oldDirectionPoints = windSourceDirectionPoints.get(windSource) != null
+                            ? windSourceDirectionPoints.get(windSource) : new Point[0];
+                    newDirectionPoints = new Point[oldDirectionPoints.length + currentPointIndex];
+                    System.arraycopy(oldDirectionPoints, /* srcPos */ 0, newDirectionPoints, /* destPos */ 0,
+                            oldDirectionPoints.length);
+                    System.arraycopy(directionPoints, /* srcPos */ 0, newDirectionPoints, oldDirectionPoints.length,
+                            currentPointIndex);
+                    if (windSource.getType().useSpeed()) {
+                        final Point[] oldSpeedPoints = windSourceSpeedPoints.get(windSource) != null
+                                ? windSourceSpeedPoints.get(windSource) : new Point[0];
+                        newSpeedPoints = new Point[oldSpeedPoints.length + currentPointIndex];
+                        System.arraycopy(oldSpeedPoints, /* srcPos */ 0, newSpeedPoints, /* destPos */ 0, oldSpeedPoints.length);
+                        System.arraycopy(speedPoints, /* srcPos */ 0, newSpeedPoints, oldSpeedPoints.length, currentPointIndex);
+                    } else {
+                        newSpeedPoints = null;
+                    }
+                } else {
+                    newDirectionPoints = directionPoints;
+                    newSpeedPoints = speedPoints;
                 }
-            } else {
-                newDirectionPoints = directionPoints;
-                newSpeedPoints = speedPoints;
-            }
-            setSeriesPoints(directionSeries, newDirectionPoints, /* manageZoom */ true);
-            windSourceDirectionPoints.put(windSource, newDirectionPoints);
-            if (windSource.getType().useSpeed()) {
-                setSeriesPoints(speedSeries, newSpeedPoints, /* manageZoom */ true);
-                windSourceSpeedPoints.put(windSource, newSpeedPoints);
-            }
-            if (firstPointOfFirstSeries == null && newDirectionPoints.length != 0) { //If firstPointOfFirstSeries is null, than this series is the first
-                firstPointOfFirstSeries = newDirectionPoints[0];
+                setSeriesPoints(directionSeries, newDirectionPoints, /* manageZoom */ true);
+                windSourceDirectionPoints.put(windSource, newDirectionPoints);
+                if (windSource.getType().useSpeed()) {
+                    setSeriesPoints(speedSeries, newSpeedPoints, /* manageZoom */ true);
+                    windSourceSpeedPoints.put(windSource, newSpeedPoints);
+                }
+                if (firstPointOfFirstSeries == null && newDirectionPoints.length != 0) { //If firstPointOfFirstSeries is null, than this series is the first
+                    firstPointOfFirstSeries = newDirectionPoints[0];
+                }
+                changed = true;
             }
         }
-        
         timeOfEarliestRequestInMillis = newMinTimepoint;
         timeOfLatestRequestInMillis = newMaxTimepoint;
+        return changed;
     }
 
     @Override
@@ -583,9 +599,10 @@ public class WindChart extends AbstractRaceChart<WindChartSettings> implements R
                             @Override
                             public void onSuccess(WindInfoForRaceDTO result) {
                                 if (result != null) {
-                                    updateChartSeries(result, append);
-                                    updateVisibleSeries();
-                                    updateStatPlotLines();
+                                    if (updateChartSeries(result, append)) {
+                                        updateVisibleSeries();
+                                        updateStatPlotLines();
+                                    }
                                 } else {
                                     if (!append) {
                                         clearChart(); // no wind known for untracked race

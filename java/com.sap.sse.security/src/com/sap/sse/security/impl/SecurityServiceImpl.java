@@ -94,6 +94,7 @@ import com.nulabinc.zxcvbn.matchers.SlantedKeyboardLoader;
 import com.sap.sse.ServerInfo;
 import com.sap.sse.branding.BrandingConfigurationService;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.ObjectAlreadyExistsException;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.TimedLock;
 import com.sap.sse.common.Util;
@@ -215,6 +216,16 @@ implements ReplicableSecurityService, ClearStateTestSupport {
     private static final Logger logger = Logger.getLogger(SecurityServiceImpl.class.getName());
 
     private static final String ADMIN_DEFAULT_PASSWORD = "admin";
+
+    /**
+     * Name of the environment variable through which operators can provide the initial password for the
+     * {@link UserStore#ADMIN_USERNAME admin} user that is created when a fresh instance starts with an empty
+     * security store (i.e. one that does not replicate its security service from a master). When set to a
+     * non-blank value, that value is used as the initial admin password and a strong password is enforced;
+     * when unset, the well-known {@link #ADMIN_DEFAULT_PASSWORD} is used for backward compatibility and a
+     * security warning is logged. See GitHub issue #6312.
+     */
+    private static final String ADMIN_INITIAL_PASSWORD_ENV_VAR = "SAILING_ADMIN_INITIAL_PASSWORD";
 
     private final Set<String> migratedHasPermissionTypes = new ConcurrentSkipListSet<>();
 
@@ -364,6 +375,7 @@ implements ReplicableSecurityService, ClearStateTestSupport {
         this.hasPermissionsProvider = hasPermissionsProvider;
         this.cacheManager = loadReplicationCacheManagerContents();
         this.corsFilterConfigurationsByReplicaSetName = loadCORSFilterConfigurations();
+        applyCORSFilterForLocalReplicaSet();
         logger.info("Loaded shiro.ini file from: classpath:shiro.ini");
         final StringBuilder logMessage = new StringBuilder("[urls] section from Shiro configuration:");
         final Section urlsSection = shiroConfiguration.getSection("urls");
@@ -428,15 +440,18 @@ implements ReplicableSecurityService, ClearStateTestSupport {
         logger.info("Loading CORS filter configurations");
         final ConcurrentMap<String, Pair<Boolean, Set<String>>> result = new ConcurrentHashMap<>();
         result.putAll(PersistenceFactory.INSTANCE.getDefaultDomainObjectFactory().loadCORSFilterConfigurationsForReplicaSetNames());
-        if (result.containsKey(ServerInfo.getName())) {
-            final Pair<Boolean, Set<String>> thisServersCORSFilterConfig = result.get(ServerInfo.getName());
+        return result;
+    }
+
+    private void applyCORSFilterForLocalReplicaSet() {
+        if (corsFilterConfigurationsByReplicaSetName.containsKey(ServerInfo.getName())) {
+            final Pair<Boolean, Set<String>> thisServersCORSFilterConfig = corsFilterConfigurationsByReplicaSetName.get(ServerInfo.getName());
             if (thisServersCORSFilterConfig.getA()) {
                 getCORSFilterConfiguration().setWildcard();
             } else {
                 getCORSFilterConfiguration().setOrigins(thisServersCORSFilterConfig.getB());
             }
         }
-        return result;
     }
     
     @Override
@@ -486,11 +501,25 @@ implements ReplicableSecurityService, ClearStateTestSupport {
             isInitialOrMigration = false;
             if (!store.hasUsers()) {
                 isInitialOrMigration = true;
-                logger.info("No users found, creating default user \""+UserStore.ADMIN_USERNAME+"\" with password \""+ADMIN_DEFAULT_PASSWORD+"\"");
+                final String configuredInitialPassword = System.getenv(ADMIN_INITIAL_PASSWORD_ENV_VAR);
+                final boolean hasConfiguredInitialPassword = configuredInitialPassword != null
+                        && !configuredInitialPassword.trim().isEmpty();
+                final String adminPassword = hasConfiguredInitialPassword ? configuredInitialPassword
+                        : ADMIN_DEFAULT_PASSWORD;
+                if (hasConfiguredInitialPassword) {
+                    logger.info("No users found, creating default user \"" + UserStore.ADMIN_USERNAME
+                            + "\" with the initial password supplied via the " + ADMIN_INITIAL_PASSWORD_ENV_VAR
+                            + " environment variable");
+                } else {
+                    logger.warning("No users found, creating default user \"" + UserStore.ADMIN_USERNAME
+                            + "\" with the well-known default password because the " + ADMIN_INITIAL_PASSWORD_ENV_VAR
+                            + " environment variable is not set. This is insecure; set " + ADMIN_INITIAL_PASSWORD_ENV_VAR
+                            + " to a strong value on fresh instances. Future versions may refuse to start without it.");
+                }
                 final User adminUser = createSimpleUser(UserStore.ADMIN_USERNAME, "nobody@sapsailing.com",
-                        ADMIN_DEFAULT_PASSWORD,
+                        adminPassword,
                         /* fullName */ null, /* company */ null, Locale.ENGLISH, /* validationBaseURL */ null,
-                        null, /* clientIP */ null, /* enforce strong password */ false);
+                        null, /* clientIP */ null, /* enforce strong password */ hasConfiguredInitialPassword);
                 setOwnership(adminUser.getIdentifier(), adminUser, null);
                 Role adminRole = new Role(adminRoleDefinition, /* transitive */ true);
                 addRoleForUserAndSetUserAsOwner(adminUser, adminRole);
@@ -1862,7 +1891,7 @@ implements ReplicableSecurityService, ClearStateTestSupport {
             logger.info(authProviderName + " requires Request token first.. obtaining..");
             try {
                 requestToken = service.getRequestToken();
-                logger.info("Got request token: " + requestToken);
+                logger.fine("Obtained request token from provider " + authProviderName);
                 // we must save in the session. It will be required to
                 // get the access token
                 SessionUtils.saveRequestTokenToSession(requestToken);
@@ -2196,10 +2225,53 @@ implements ReplicableSecurityService, ClearStateTestSupport {
 
     @Override
     public <T> T setOwnershipCheckPermissionForObjectCreationAndRevertOnError(
-            HasPermissions type, TypeRelativeObjectIdentifier typeIdentifier, String securityDisplayName,
-            Callable<T> actionWithResult) {
+            final HasPermissions type, final TypeRelativeObjectIdentifier typeIdentifier, final String securityDisplayName,
+            final Callable<T> actionWithResult) {
         return setOwnershipCheckPermissionForObjectCreationAndRevertOnError(type, typeIdentifier,
-                securityDisplayName, actionWithResult, /* check for SERVER:CREATE_OBJECT */ true);
+                securityDisplayName, () -> {}, actionWithResult, /* doServerCreateObjectCheck */ true,
+                /* revertOwnershipOnConflict */ false);
+    }
+
+    @Override
+    public <T> T setOwnershipCheckPermissionForObjectCreationAndRevertOnError(final HasPermissions type,
+            final TypeRelativeObjectIdentifier typeIdentifier, final String securityDisplayName,
+            final Runnable creationPrecondition, final Callable<T> actionWithResult) {
+        return setOwnershipCheckPermissionForObjectCreationAndRevertOnError(type, typeIdentifier,
+                securityDisplayName, creationPrecondition, actionWithResult, /* doServerCreateObjectCheck */ true,
+                /* revertOwnershipOnConflict */ true);
+    }
+
+    private static final class ObjectCreationLock {
+        private int users;
+    }
+
+    private final Map<QualifiedObjectIdentifier, ObjectCreationLock> objectCreationLocks = new HashMap<>();
+
+    private <T> T setOwnershipCheckPermissionForObjectCreationAndRevertOnError(final HasPermissions type,
+            final TypeRelativeObjectIdentifier typeRelativeIdentifier, final String securityDisplayName,
+            final Runnable creationPrecondition, final Callable<T> actionWithResult,
+            final boolean doServerCreateObjectCheck, final boolean revertOwnershipOnConflict) {
+        final QualifiedObjectIdentifier identifier = type.getQualifiedObjectIdentifier(typeRelativeIdentifier);
+        final ObjectCreationLock lock;
+        synchronized (objectCreationLocks) {
+            lock = objectCreationLocks.computeIfAbsent(identifier, (final QualifiedObjectIdentifier key) -> new ObjectCreationLock());
+            lock.users++;
+        }
+        final T result;
+        try {
+            synchronized (lock) {
+                creationPrecondition.run();
+                result = doSetOwnershipCheckPermissionForObjectCreationAndRevertOnError(identifier,
+                        securityDisplayName, actionWithResult, doServerCreateObjectCheck, revertOwnershipOnConflict);
+            }
+        } finally {
+            synchronized (objectCreationLocks) {
+                if (--lock.users == 0) {
+                    objectCreationLocks.remove(identifier);
+                }
+            }
+        }
+        return result;
     }
 
     /**
@@ -2219,11 +2291,10 @@ implements ReplicableSecurityService, ClearStateTestSupport {
      * considered to have the permission to create the object, the {@code actionWithResult} is invoked, and
      * the object returned by the action is the result of this method.
      */
-    private <T> T setOwnershipCheckPermissionForObjectCreationAndRevertOnError(HasPermissions type,
-            TypeRelativeObjectIdentifier typeRelativeIdentifier, String securityDisplayName, Callable<T> actionWithResult,
-            boolean doServerCreateObjectCheck) {
-        QualifiedObjectIdentifier identifier = type.getQualifiedObjectIdentifier(typeRelativeIdentifier);
-        T result = null;
+    private <T> T doSetOwnershipCheckPermissionForObjectCreationAndRevertOnError(final QualifiedObjectIdentifier identifier,
+            final String securityDisplayName, final Callable<T> actionWithResult, final boolean doServerCreateObjectCheck,
+            final boolean revertOwnershipOnConflict) {
+        final T result;
         boolean didSetOwnership = false;
         try {
             final OwnershipAnnotation preexistingOwnership = getOwnership(identifier);
@@ -2238,7 +2309,7 @@ implements ReplicableSecurityService, ClearStateTestSupport {
             }
             try {
                 SecurityUtils.getSubject().checkPermission(identifier.getStringPermission(DefaultActions.CREATE));
-            } catch (AuthorizationException e) {
+            } catch (final AuthorizationException e) {
                 if (didSetOwnership) {
                     throw e;
                 } else {
@@ -2252,12 +2323,14 @@ implements ReplicableSecurityService, ClearStateTestSupport {
                 }
             }
             result = actionWithResult.call();
-        } catch (AuthorizationException e) {
-            if (didSetOwnership) {
+        } catch (final AuthorizationException | ObjectAlreadyExistsException e) {
+            if (didSetOwnership && (e instanceof AuthorizationException || revertOwnershipOnConflict)) {
                 deleteOwnership(identifier);
             }
             throw e;
-        } catch (Exception e) {
+        } catch (final RuntimeException e) {
+            throw e;
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
         return result;
@@ -2282,7 +2355,7 @@ implements ReplicableSecurityService, ClearStateTestSupport {
     public <T> T setOwnershipWithoutCheckPermissionForObjectCreationAndRevertOnError(HasPermissions type,
             TypeRelativeObjectIdentifier typeIdentifier, String securityDisplayName, Callable<T> actionWithResult) {
         return setOwnershipCheckPermissionForObjectCreationAndRevertOnError(type, typeIdentifier, securityDisplayName,
-                actionWithResult, false);
+                () -> {}, actionWithResult, /* doServerCreateObjectCheck */ false, /* revertOwnershipOnConflict */ false);
     }
 
     @Override
@@ -2371,14 +2444,14 @@ implements ReplicableSecurityService, ClearStateTestSupport {
     }
 
     @Override
-    public <T> T checkPermissionAndDeleteOwnershipForObjectRemoval(QualifiedObjectIdentifier identifier,
-            Callable<T> actionToDeleteObject) {
+    public <T> T checkPermissionAndDeleteOwnershipForObjectRemoval(final QualifiedObjectIdentifier identifier,
+            final Callable<T> actionToDeleteObject) {
         try {
             SecurityUtils.getSubject().checkPermission(identifier.getStringPermission(DefaultActions.DELETE));
             final T result = actionToDeleteObject.call();
             deleteAllDataForRemovedObject(identifier);
             return result;
-        } catch (UnauthorizedException e) {
+        } catch (final RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -2665,6 +2738,7 @@ implements ReplicableSecurityService, ClearStateTestSupport {
         final SecurityServiceInitialLoadExtensionsDTO initialLoadExtensions = (SecurityServiceInitialLoadExtensionsDTO) is.readObject();
         final ConcurrentMap<String, Pair<Boolean, Set<String>>> newCORSFilterConfigurations = initialLoadExtensions.getCorsFilterConfigurationsByReplicaSetName();
         corsFilterConfigurationsByReplicaSetName.putAll(newCORSFilterConfigurations);
+        applyCORSFilterForLocalReplicaSet();
         if (initialLoadExtensions.getClientIPBasedTimedLocksForBearerTokenAuthentication() != null) {
             // checking for null for backward compatibility; an older primary/master may not have known this field yet
             clientIPBasedTimedLocksForBearerTokenAuthentication.putAll(initialLoadExtensions.getClientIPBasedTimedLocksForBearerTokenAuthentication());

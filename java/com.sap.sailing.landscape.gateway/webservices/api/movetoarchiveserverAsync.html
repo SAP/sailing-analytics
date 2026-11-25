@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <link href='../../../../sailing-fontface-1.0.cache.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+    <link href='../../../main.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+    <link rel='icon' href='../../../../sap.ico' type='image/x-icon'>
+    <title>SAP Sailing Analytics Webservices API Version 1.0</title>
+</head>
+<body>
+<h1>SAP Sailing Analytics Webservices API Version 1.0</h1>
+<h2>URL: /sailinglandscape/api/landscape/movetoarchiveserver/async</h2>
+
+<b>Description:</b>
+<p>Starts archiving an application replica set, including content comparison and any requested database archiving
+and replica set removal. <b>Archiving is long-running; this asynchronous pattern is preferred, particularly to avoid
+client or proxy timeouts.</b> The <a href="movetoarchiveserver.html">synchronous endpoint</a> remains available for
+clients that depend on receiving the final results in the POST response.</p>
+<table>
+    <tr>
+        <td>Webservice Type:</td>
+        <td>POST</td>
+    </tr>
+    <tr>
+        <td>Output format:</td>
+        <td>json (application/json;charset=UTF-8)</td>
+    </tr>
+    <tr>
+        <td>Form parameters:</td>
+        <td>Accepts exactly the <a href="movetoarchiveserver.html#parameters">synchronous endpoint's form parameters</a>
+            as <tt>application/x-www-form-urlencoded</tt>, with the same defaults:
+            <tt>durationToWaitBeforeCompareServersInMilliseconds=300000</tt>,
+            <tt>maxNumberOfCompareserverAttempts=5</tt>, <tt>removeApplicationReplicaSet=true</tt>, and <tt>force=false</tt>.</td>
+    </tr>
+    <tr>
+        <td>Permissions:</td>
+        <td><tt>LANDSCAPE:MANAGE:AWS</tt> and, when removing the source replica set, permission to delete its
+            <tt>SERVER</tt>. Source and archive credentials must permit master-data export and import, respectively.</td>
+    </tr>
+</table>
+<h2>Acceptance</h2>
+<p>The request waits for preparation and for the archive to accept the master data import (MDI), then returns
+HTTP <tt>202 Accepted</tt>. Preparation can still take time; <tt>timeoutInMilliseconds</tt> only limits replica set
+discovery, not the entire request. Importing, comparison and cleanup continue in the background independently of
+client polling. Acceptance does not mean archiving has completed or succeeded.</p>
+<p>Before acceptance, live content conflicts return HTTP <tt>409 Conflict</tt> with the same conflict body as the
+synchronous endpoint; missing replica sets and other archiving exceptions return HTTP <tt>400 Bad Request</tt>.</p>
+<p>Example request (replace the credential placeholders):</p>
+<pre>curl -X POST \
+  -H 'Authorization: Bearer &lt;landscape-token&gt;' \
+  -d 'regionId=eu-west-2' -d 'replicaSetName=my-event' -d 'keyName=my-key' \
+  --data-urlencode 'privateKeyEncryptionPassphrase=&lt;passphrase&gt;' \
+  --data-urlencode 'bearerTokenForReplicaSetToArchive=&lt;source-token&gt;' \
+  --data-urlencode 'bearerTokenForArchive=&lt;archive-token&gt;' \
+  'https://sapsailing.com/sailinglandscape/api/landscape/movetoarchiveserver/async'</pre>
+<p>Example response, HTTP <tt>202 Accepted</tt>:</p>
+<pre>{
+  "progressTrackingUuid": "1f07d1cf-0652-4fc3-83bc-a79612a5aa68",
+  "archiveHostname": "archive.sapsailing.com"
+}</pre>
+<h2>Polling import progress</h2>
+<p>Use the returned <tt>archiveHostname</tt> and <tt>progressTrackingUuid</tt> to poll the archive's existing
+<a href="/sailingserver/webservices/api/v1/masterdataimport.html">MDI progress endpoint</a>, for example every five seconds:</p>
+<pre>curl -H 'Authorization: Bearer &lt;archive-token&gt;' \
+  'https://archive.sapsailing.com/sailingserver/api/v1/masterdataimport/progress?progressTrackingUuid=1f07d1cf-0652-4fc3-83bc-a79612a5aa68'</pre>
+<p>Authenticate with credentials having master-data import permission on the archive, normally the token supplied
+as <tt>bearerTokenForArchive</tt>, or the initiating user's token when that parameter was omitted. Progress is
+replicated; allow a bounded initial delay for HTTP 404 while replication catches up. Progress expires one hour
+after import completion, so do not retry HTTP 404 indefinitely. Report authentication/permission errors.</p>
+<p>The progress JSON includes <tt>overallProgressPercent</tt>, <tt>failed</tt> and <tt>errorMessage</tt>.
+Stop polling on <tt>failed=true</tt>, or when a non-null <tt>result</tt> indicates successful import;
+a percentage alone is not a completion signal.</p>
+<p><b>The UUID tracks only the master data import.</b> Import success does not establish that content comparison,
+database archiving or replica set removal has finished or succeeded. Those steps continue in the background;
+the final archiving outcome is logged and emailed to the initiating user, both replica set owners, and users with
+master-data export permission on the source or import permission on the archive. Each user receives one outcome
+email, in their locale, if their email address is verified. Failures after import acceptance are also emailed.
+This endpoint does not provide a pollable final archiving result.</p>
+<div style="height: 1em;"></div>
+<a href="index.html">Back to Web Service Overview</a>
+</body>
+</html>

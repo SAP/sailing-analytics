@@ -2,14 +2,20 @@ package com.sap.sailing.landscape.ui.client;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.sap.sailing.domain.common.DataImportProgress;
+import com.sap.sailing.landscape.common.EventLiveContent;
+import com.sap.sailing.landscape.common.LiveContentAwareOperationResult;
+import com.sap.sailing.landscape.common.LiveContentCheckResult;
+import com.sap.sailing.landscape.common.RaceLiveContent;
+import com.sap.sailing.landscape.common.ReplicaSetLiveContent;
 import com.sap.sailing.landscape.ui.shared.AmazonMachineImageDTO;
 import com.sap.sailing.landscape.ui.shared.AvailabilityZoneDTO;
 import com.sap.sailing.landscape.ui.shared.AwsInstanceDTO;
 import com.sap.sailing.landscape.ui.shared.AwsShardDTO;
-import com.sap.sailing.landscape.ui.shared.CompareServersResultDTO;
 import com.sap.sailing.landscape.ui.shared.LeaderboardNameDTO;
 import com.sap.sailing.landscape.ui.shared.MongoEndpointDTO;
 import com.sap.sailing.landscape.ui.shared.MongoScalingInstructionsDTO;
@@ -20,10 +26,21 @@ import com.sap.sailing.landscape.ui.shared.SSHKeyPairDTO;
 import com.sap.sailing.landscape.ui.shared.SailingApplicationReplicaSetDTO;
 import com.sap.sailing.landscape.ui.shared.SerializationDummyDTO;
 import com.sap.sse.common.Duration;
-import com.sap.sse.common.Util.Triple;
+import com.sap.sse.common.Util.Pair;
 import com.sap.sse.landscape.aws.common.shared.RedirectDTO;
 
 public interface LandscapeManagementWriteService extends RemoteService {
+    /** Returns the accepted import UUID and archive hostname; archiving continues on the server. */
+    LiveContentAwareOperationResult<Pair<UUID, String>> archiveReplicaSetAsync(final String regionId,
+            final SailingApplicationReplicaSetDTO<String> applicationReplicaSetToArchive,
+            final String bearerTokenOrNullForApplicationReplicaSetToArchive, final String bearerTokenOrNullForArchive,
+            final Duration durationToWaitBeforeCompareServers, final int maxNumberOfCompareServerAttempts,
+            final boolean removeApplicationReplicaSet, final MongoEndpointDTO moveDatabaseHere, final String optionalKeyName,
+            final byte[] passphraseForPrivateKeyDecryption, final boolean force) throws Exception;
+
+    DataImportProgress getArchiveMasterDataImportProgress(final String archiveHostname, final UUID operationId,
+            final String bearerTokenOrNullForArchive) throws Exception;
+
     ArrayList<String> getRegions();
     
     ArrayList<String> getInstanceTypeNames(boolean canBeDeployedInNlbInstanceBasedTargetGroup);
@@ -94,7 +111,9 @@ public interface LandscapeManagementWriteService extends RemoteService {
             String optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception;
     
     SerializationDummyDTO serializationDummy(ProcessDTO mongoProcessDTO, AwsInstanceDTO awsInstanceDTO, AwsShardDTO shardDTO,
-            SailingApplicationReplicaSetDTO<String> sailingApplicationReplicationSetDTO, LeaderboardNameDTO leaderboard);
+            SailingApplicationReplicaSetDTO<String> sailingApplicationReplicationSetDTO, LeaderboardNameDTO leaderboard,
+            ReplicaSetLiveContent replicaSetLiveContent, EventLiveContent eventLiveContent, RaceLiveContent raceLiveContent,
+            Long lng);
 
     SailingApplicationReplicaSetDTO<String> createApplicationReplicaSet(String regionId, String name, boolean sharedMasterInstance,
             String masterInstanceType, String optionalReplicaInstanceTypeOrNull, boolean dynamicLoadBalancerMapping,
@@ -105,28 +124,24 @@ public interface LandscapeManagementWriteService extends RemoteService {
 
     void defineDefaultRedirect(String regionId, String hostname, RedirectDTO redirect, String keyName, String passphraseForPrivateKeyDecryption);
 
-    String removeApplicationReplicaSet(String regionId,
+    LiveContentAwareOperationResult<String> removeApplicationReplicaSet(String regionId,
             SailingApplicationReplicaSetDTO<String> applicationReplicaSetToRemove, MongoEndpointDTO moveDatabaseHere,
-            String optionalKeyName, byte[] passphraseForPrivateKeyDescryption) throws Exception;
+            String optionalKeyName, byte[] passphraseForPrivateKeyDescryption, boolean force) throws Exception;
 
     SailingApplicationReplicaSetDTO<String> createDefaultLoadBalancerMappings(String regionId,
             SailingApplicationReplicaSetDTO<String> applicationReplicaSetToCreateLoadBalancerMappingFor,
             boolean useDynamicLoadBalancer, String optionalDomainName, boolean forceDNSUpdate) throws Exception;
     
-    SailingApplicationReplicaSetDTO<String> upgradeApplicationReplicaSet(String regionId,
-            SailingApplicationReplicaSetDTO<String> applicationReplicaSetToUpgrade, String releaseOrNullForLatestMaster,
-            String optionalKeyName, byte[] privateKeyEncryptionPassphrase, String securityReplicationBearerToken) throws Exception;
+    LiveContentCheckResult checkForLiveContent(String regionId,
+            ArrayList<SailingApplicationReplicaSetDTO<String>> applicationReplicaSets, String bearerToken,
+            String optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception;
+
+    LiveContentAwareOperationResult<SailingApplicationReplicaSetDTO<String>> upgradeApplicationReplicaSet(
+            String regionId, SailingApplicationReplicaSetDTO<String> applicationReplicaSetToUpgrade,
+            String releaseOrNullForLatestMaster, String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
+            String securityReplicationBearerToken, boolean force) throws Exception;
 
     ArrayList<ReleaseDTO> getReleases();
-
-    Triple<DataImportProgress, CompareServersResultDTO, String> archiveReplicaSet(String regionId,
-            SailingApplicationReplicaSetDTO<String> applicationReplicaSetToArchive,
-            String bearerTokenOrNullForApplicationReplicaSetToArchive,
-            String bearerTokenOrNullForArchive,
-            Duration durationToWaitBeforeCompareServers,
-            int maxNumberOfCompareServerAttempts, boolean removeApplicationReplicaSet,
-            MongoEndpointDTO moveDatabaseHere, String optionalKeyName, byte[] passphraseForPrivateKeyDecryption)
-            throws Exception;
 
     SailingApplicationReplicaSetDTO<String> deployApplicationToExistingHost(String replicaSetName,
             AwsInstanceDTO hostToDeployTo, String replicaInstanceType, boolean dynamicLoadBalancerMapping,
@@ -137,9 +152,11 @@ public interface LandscapeManagementWriteService extends RemoteService {
             Integer optionalIgtimiRiotPort, AwsInstanceDTO optionalPreferredInstanceToDeployUnmanagedReplicaTo) throws Exception;
 
 
-    Boolean ensureAtLeastOneReplicaExistsStopReplicatingAndRemoveMasterFromTargetGroups(String regionId,
-            SailingApplicationReplicaSetDTO<String> applicationReplicaSet, String optionalKeyName,
-            byte[] privateKeyEncryptionPassphrase, String replicaReplicationBearerToken) throws Exception;
+    LiveContentAwareOperationResult<Boolean>
+            ensureAtLeastOneReplicaExistsStopReplicatingAndRemoveMasterFromTargetGroups(String regionId,
+                    SailingApplicationReplicaSetDTO<String> applicationReplicaSet, String optionalKeyName,
+                    byte[] privateKeyEncryptionPassphrase, String replicaReplicationBearerToken, boolean force)
+                    throws Exception;
 
     ArrayList<SailingApplicationReplicaSetDTO<String>> updateImageForReplicaSets(String regionId,
             ArrayList<SailingApplicationReplicaSetDTO<String>> applicationReplicaSetsToUpdate,
@@ -156,11 +173,12 @@ public interface LandscapeManagementWriteService extends RemoteService {
             Integer optionalMemoryInMegabytesOrNull, Integer optionalMemoryTotalSizeFactorOrNull,
             String optionalSharedReplicaInstanceType) throws Exception;
 
-    SailingApplicationReplicaSetDTO<String> moveMasterToOtherInstance(
+    LiveContentAwareOperationResult<SailingApplicationReplicaSetDTO<String>> moveMasterToOtherInstance(
             SailingApplicationReplicaSetDTO<String> applicationReplicaSetDTO, boolean useSharedInstance,
             String optionalInstanceTypeOrNull, String optionalKeyName, byte[] privateKeyEncryptionPassphrase,
             String optionalMasterReplicationBearerTokenOrNull, String optionalReplicaReplicationBearerTokenOrNull,
-            Integer optionalMemoryInMegabytesOrNull, Integer optionalMemoryTotalSizeFactorOrNull) throws Exception;
+            Integer optionalMemoryInMegabytesOrNull, Integer optionalMemoryTotalSizeFactorOrNull, boolean force)
+            throws Exception;
 
     SailingApplicationReplicaSetDTO<String> changeAutoScalingReplicasInstanceType(
             SailingApplicationReplicaSetDTO<String> replicaSet, String instanceTypeName,
@@ -184,8 +202,9 @@ public interface LandscapeManagementWriteService extends RemoteService {
     
     void removeShardingKeysFromShard(Iterable<LeaderboardNameDTO> shardingKeysToRemove, String region, String shardName, SailingApplicationReplicaSetDTO<String> replicaSet, String bearerToken, String optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception;
 
-    void moveAllApplicationProcessesAwayFrom(AwsInstanceDTO host, String optionalInstanceTypeForNewInstance,
-            String optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception;
+    LiveContentAwareOperationResult<String> moveAllApplicationProcessesAwayFrom(
+            AwsInstanceDTO host, String optionalInstanceTypeForNewInstance, String optionalKeyName,
+            byte[] privateKeyEncryptionPassphrase, Set<String> forceMasterReplicaSetNames) throws Exception;
 
     boolean hasDNSResourceRecordsForReplicaSet(String replicaSetName, String optionalDomainName);
 

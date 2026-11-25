@@ -4,6 +4,12 @@
 
 # Sailing Analytics
 
+[![REUSE status](https://api.reuse.software/badge/github.com/eclipse-sailing-analytics/sailing-analytics)](https://api.reuse.software/info/github.com/eclipse-sailing-analytics/sailing-analytics)
+[![CodeQL](https://github.com/eclipse-sailing-analytics/sailing-analytics/workflows/CodeQL/badge.svg)](https://github.com/eclipse-sailing-analytics/sailing-analytics/security/code-scanning)
+[![GitHub license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://raw.githubusercontent.com/eclipse-sailing-analytics/sailing-analytics/main/LICENSE)
+[![Downloads](https://img.shields.io/badge/download-all%20releases-brightgreen.svg)](https://github.com/eclipse-sailing-analytics/sailing-analytics/releases/)
+[![Container image](https://img.shields.io/badge/container-ghcr.io%2Feclipse--sailing--analytics%2Fsailing--analytics-2496ED?logo=docker&logoColor=white)](https://github.com/eclipse-sailing-analytics/sailing-analytics/pkgs/container/sailing-analytics)
+
 ## About this Project
 
 The Eclipse Azimuth Sailing Analytics project, formerly known as the "SAP Sailing Analytics," provides a solution for portraying and analyzing sailing regattas, supporting training scenarios, and powering the vast archive at https://sapsailing.com. The solution consists of a cloud application with a web-based user interface, as well as three companion apps that integrate with the cloud application. This repository has the code for the cloud-based web application, and two of the three mobile apps (Buoy Pinger and Race Manager). The third companion app (Sail Insight) is found in [another repository](https://github.com/SAP/sailing-analytics-sail-insight).
@@ -63,7 +69,6 @@ To start contributing, read the onboarding document at the following URL: [https
 The project welcomes contributions in the form of pull requests, for example, enhancements of the Data Mining functionality, including any sailing-specific metric or dimension you may think of and that you find is still missing so far; or new connectors to exciting new tracking systems; or additional features for the race viewer; or a map visualization that does not require a Google Map but uses Open Street Map / Open Layers; landscape automation; improved start sequence analytics; major UI improvements for the administrative layer ("AdminConsole"), etc.
 
 The issue tracker at [https://bugzilla.sapsailing.com](https://bugzilla.sapsailing.com) is currently used for any sort of issue and enhancement request tracking. Help to migrate this smoothly to Github Issues would be much appreciated, ideally keeping issue numbers stable due to many references to those Bugzilla bug numbers, be it in the source code, the Wiki, or the build infrastructure.
-
 
 ## Code of Conduct
 
@@ -271,7 +276,7 @@ to connect to the server's OSGi console.
 
 Alternatively, use an "environment" definition that sets useful defaults, e.g., like this:
 ```
-    docker run -P -it --rm -e "SERVER_NAME=test77" -e "USE_ENVIRONMENT=live-master-server" -e "REPLICATE_MASTER_BEARER_TOKEN=BRxGpF0nr68Z4m/f13/MgiYhdRB3xoDCYd+rLc17rTs=" ghcr.io/eclipse-sailing-analytics/sailing-analytics:latest \
+    docker run -P -it --rm -e "SERVER_NAME=test77" -e "USE_ENVIRONMENT=live-master-server" -e "REPLICATE_MASTER_BEARER_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" ghcr.io/eclipse-sailing-analytics/sailing-analytics:latest \
         bash -c "rm env.sh; echo \"
 SERVER_NAME=test77
 USE_ENVIRONMENT=live-master-server

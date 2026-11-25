@@ -25,13 +25,13 @@ import com.sap.sailing.server.interfaces.RacingEventService;
 import com.sap.sse.ServerInfo;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.Util;
+import com.sap.sse.landscape.common.shared.LandscapeConstants;
 import com.sap.sse.mongodb.MongoDBService;
 import com.sap.sse.replication.ReplicationService;
 import com.sap.sse.replication.ReplicationStatus;
 import com.sap.sse.util.ThreadPoolUtil;
 
 public class StatusServlet extends HttpServlet {
-    private static final String WAIT_UNTIL_RACES_LOADED = "waitUntilRacesLoaded";
     private static final long serialVersionUID = -8896724182560416457L;
 
     protected <T> T getService(Class<T> clazz) {
@@ -56,7 +56,7 @@ public class StatusServlet extends HttpServlet {
         final ServletContext servletContext = req.getServletContext();
         final JSONObject result = new JSONObject();
         final RacingEventService service = getService(servletContext);
-        final String waitUntilRacesLoadedString = req.getParameter(WAIT_UNTIL_RACES_LOADED);
+        final String waitUntilRacesLoadedString = req.getParameter(LandscapeConstants.WAIT_FOR_HEALTHY_UNTIL_RACES_LOADED);
         boolean waitUntilRacesLoaded = Boolean.valueOf(waitUntilRacesLoadedString);
         result.put("servername", ServerInfo.getName());
         result.put("serverdirectory", ServerInfo.getServerDirectory().getAbsolutePath());
@@ -96,8 +96,11 @@ public class StatusServlet extends HttpServlet {
             }
             boolean available = numberOfTrackedRacesRestored >= numberOfTrackedRacesToRestore
                     && (replicationStatus == null || replicationStatus.isAvailable());
-            if (waitUntilRacesLoaded) {
-                available = available && numberOfTrackedRacesRestoredDoneLoading == numberOfTrackedRacesToRestore;
+            if (waitUntilRacesLoaded && numberOfTrackedRacesToRestore > 0) {
+                // interestingly, we sometimes see servers where numberOfTrackedRacesRestoredDoneLoading > numberOfTrackedRacesToRestore...
+                available = available &&
+                        (numberOfTrackedRacesRestoredDoneLoading >= numberOfTrackedRacesToRestore
+                        || numberOfTrackedRacesStillLoading <= 0);
             }
             result.put("available", available);
             resp.setStatus(available ? HttpServletResponse.SC_OK : HttpServletResponse.SC_SERVICE_UNAVAILABLE);

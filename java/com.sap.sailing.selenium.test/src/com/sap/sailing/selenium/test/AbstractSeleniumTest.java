@@ -135,7 +135,7 @@ public abstract class AbstractSeleniumTest {
     }
     
     public void clearBrowserCache(WebDriver driver) {
-        WebDriverWait webDriverWait = new WebDriverWait(driver, 1L);
+        WebDriverWait webDriverWait = new WebDriverWait(driver, java.time.Duration.ofSeconds(1));
         WebElement clearBrowsingButon = webDriverWait.until(d -> d.findElement(By.cssSelector("* /deep/ #clearBrowsingDataConfirm")));
         clearBrowsingButon.click();
     }

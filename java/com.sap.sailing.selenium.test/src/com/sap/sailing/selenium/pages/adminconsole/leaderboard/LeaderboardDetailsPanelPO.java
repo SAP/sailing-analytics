@@ -1,5 +1,6 @@
 package com.sap.sailing.selenium.pages.adminconsole.leaderboard;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -152,8 +153,7 @@ public class LeaderboardDetailsPanelPO extends PageArea {
     public void unlinkRace(RaceDescriptor race) {
         DataEntryPO entry = findRace(race);
         if (entry != null) {
-            WebElement action = ActionsHelper.findUnlinkRaceAction(entry.getWebElement());
-            action.click();
+            entry.clickActionImage(ActionsHelper.UNLINK_RACE_ACTION);
             waitForAjaxRequests(); // unlinking update the leaderboard details table; wait for callback to finish
         }
     }
@@ -162,9 +162,7 @@ public class LeaderboardDetailsPanelPO extends PageArea {
         DataEntryPO entry = findRace(race);
         
         if(entry != null) {
-            WebElement action = ActionsHelper.findRefreshAction(entry.getWebElement());
-            
-            action.click();
+            entry.clickActionImage(ActionsHelper.REFRESH_RACE_ACTION);
             
             // QUESTION [D049941]: What else can happen?
             ActionsHelper.acceptAlert(this.driver);
@@ -172,7 +170,7 @@ public class LeaderboardDetailsPanelPO extends PageArea {
     }
     
     public void linkRace(RaceDescriptor race, TrackedRaceDescriptor tracking) {
-        WebDriverWait webDriverWait = new WebDriverWait(driver, DEFAULT_LOOKUP_TIMEOUT);
+        WebDriverWait webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(DEFAULT_LOOKUP_TIMEOUT));
         DataEntryPO raceRow = webDriverWait.until(new Function<WebDriver, DataEntryPO>() {
             @Override
             public DataEntryPO apply(WebDriver t) {

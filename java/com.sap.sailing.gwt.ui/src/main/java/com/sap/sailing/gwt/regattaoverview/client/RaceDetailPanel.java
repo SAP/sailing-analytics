@@ -31,7 +31,7 @@ public class RaceDetailPanel extends SimplePanel {
             d = -d;
         }
         NumberFormat decimalFormat = NumberFormat.getFormat("##.###");
-        return "" + d + '\u00B0' + m + '\u2032' + decimalFormat.format(s) + '\u2033'; // add �, ', " symbols
+        return "" + d + '\u00B0' + m + '\u2032' + decimalFormat.format(s) + '\u2033'; // add °, ', " symbols
     }
 
     private static final int MAX_PROCEDURE_FIELDS = 2;

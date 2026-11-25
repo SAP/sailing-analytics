@@ -1,0 +1,1944 @@
+{
+  "name": "SOF2024 - QN - Formula Kite Women",
+  "scheme": "LOW_POINT_FIRST_TO_WIN_THREE_RACES",
+  "type": "RegattaLeaderboard",
+  "displayName": "QN - Formula Kite Women",
+  "provenance": {
+    "results": {
+      "url": "https://sapsailing.com/sailingserver/api/v1/leaderboards/SOF2024%20-%20QN%20-%20Formula%20Kite%20Women",
+      "fetched_at": "2026-11-11T15:11:24.901180+00:00",
+      "status": 200,
+      "resolved_url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboards/SOF2024%20-%20QN%20-%20Formula%20Kite%20Women",
+      "sha256": "38881adac3b18aa4eb5d9eeabf9d1c950d06e7aea636a37acb548fb583063f9c",
+      "bytes": 36131
+    },
+    "configuration": {
+      "url": "https://sapsailing.com/sailingserver/api/v1/regattas/SOF2024%20-%20QN%20-%20Formula%20Kite%20Women",
+      "fetched_at": "2026-11-11T15:03:52.682491+00:00",
+      "status": 200,
+      "resolved_url": "https://www.sapsailing.com/sailingserver/api/v1/regattas/SOF2024%20-%20QN%20-%20Formula%20Kite%20Women",
+      "sha256": "3f7af4d3b2a50fcc175eede9c95523b66fe5728cb4d402575d72dbb1c30f1b2d",
+      "bytes": 5044
+    },
+    "metadata": {
+      "base": "https://sapsailing.com",
+      "source": "central-metadata.json",
+      "sha256": "933a31e4dd4cde658f818e47e548e218ce8f8e0283669fbf32710569597064d8"
+    },
+    "capturedScheme": "LOW_POINT_FIRST_TO_WIN_THREE_RACES"
+  },
+  "timePoint": 1714060381500,
+  "canBoatsOfCompetitorsChangePerRace": false,
+  "discardThresholds": [
+    4,
+    7,
+    11
+  ],
+  "series": [
+    {
+      "name": "Opening",
+      "medal": false,
+      "parallel": true,
+      "reset": false,
+      "carry": false,
+      "contiguous": false,
+      "maximumDiscards": null,
+      "fleets": [
+        {
+          "name": "Default",
+          "ordering": 0
+        }
+      ],
+      "columns": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R6",
+        "R7",
+        "R8",
+        "R9",
+        "R10",
+        "R11",
+        "R12",
+        "R13"
+      ]
+    },
+    {
+      "name": "Semifinal",
+      "medal": true,
+      "parallel": true,
+      "reset": true,
+      "carry": true,
+      "contiguous": false,
+      "maximumDiscards": null,
+      "fleets": [
+        {
+          "name": "A",
+          "ordering": 0
+        },
+        {
+          "name": "B",
+          "ordering": 0
+        }
+      ],
+      "columns": [
+        "CWSF",
+        "SF1"
+      ]
+    },
+    {
+      "name": "Grand Final",
+      "medal": true,
+      "parallel": true,
+      "reset": true,
+      "carry": true,
+      "contiguous": false,
+      "maximumDiscards": null,
+      "fleets": [
+        {
+          "name": "Default",
+          "ordering": 0
+        }
+      ],
+      "columns": [
+        "CWGF",
+        "GF1",
+        "GF2"
+      ]
+    }
+  ],
+  "columns": [
+    {
+      "name": "R1",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R2",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R3",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R4",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R5",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R6",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R7",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R8",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R9",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R10",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R11",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R12",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R13",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "CWSF",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "SF1",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "CWGF",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "GF1",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "GF2",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    }
+  ],
+  "competitors": [
+    {
+      "id": "d70ab440-e4b3-013c-bced-0eeb2fba6aa7",
+      "name": "Jessie KAMPMAN",
+      "displayName": "Jessie KAMPMAN",
+      "sailID": "FRA 125",
+      "expectedRank": 1,
+      "expectedTotal": 3.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R2",
+          "fleet": "",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R4",
+          "fleet": "",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R8",
+          "fleet": "",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "CWSF",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "SF1",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "CWGF",
+          "fleet": "",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "GF1",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "GF2",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "d70057c0-e4b3-013c-bcea-0eeb2fba6aa7",
+      "name": "Eleanor ALDRIDGE",
+      "displayName": "Eleanor ALDRIDGE",
+      "sailID": "GBR 154",
+      "expectedRank": 2,
+      "expectedTotal": 2.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R3",
+          "fleet": "",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R4",
+          "fleet": "",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R5",
+          "fleet": "",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "CWSF",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "SF1",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "CWGF",
+          "fleet": "",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "GF1",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "GF2",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "d71536a0-e4b3-013c-bcf0-0eeb2fba6aa7",
+      "name": "Lauriane NOLOT",
+      "displayName": "Lauriane NOLOT",
+      "sailID": "FRA 131",
+      "expectedRank": 3,
+      "expectedTotal": 0.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "",
+          "points": 16.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R9",
+          "fleet": "",
+          "points": 25.0,
+          "reason": "DNC",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R10",
+          "fleet": "",
+          "points": 17.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R11",
+          "fleet": "",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "CWSF",
+          "fleet": "",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "SF1",
+          "fleet": "A",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "CWGF",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "GF1",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "GF2",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "d71fa100-e4b3-013c-bcf3-0eeb2fba6aa7",
+      "name": "Katie DABSON",
+      "displayName": "Katie DABSON",
+      "sailID": "GBR 161",
+      "expectedRank": 4,
+      "expectedTotal": 0.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "",
+          "points": 14.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R4",
+          "fleet": "",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "",
+          "points": 25.0,
+          "reason": "DNC",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R13",
+          "fleet": "",
+          "points": 10.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "CWSF",
+          "fleet": "",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "SF1",
+          "fleet": "B",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "CWGF",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "GF1",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "GF2",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "d72a6fd0-e4b3-013c-bcf7-0eeb2fba6aa7",
+      "name": "Breiana WHITEHEAD",
+      "displayName": "Breiana WHITEHEAD",
+      "sailID": "AUS BW24",
+      "expectedRank": 5,
+      "expectedTotal": 1.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "",
+          "points": 25.0,
+          "reason": "DNC",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R7",
+          "fleet": "",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "",
+          "points": 14.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R11",
+          "fleet": "",
+          "points": 14.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 14.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "",
+          "points": 25.0,
+          "reason": "DNC",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "CWSF",
+          "fleet": "",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "SF1",
+          "fleet": "B",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "CWGF",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "GF1",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "GF2",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "d7354580-e4b3-013c-bcfb-0eeb2fba6aa7",
+      "name": "Gisela PULIDO",
+      "displayName": "Gisela PULIDO",
+      "sailID": "ESP GP20",
+      "expectedRank": 6,
+      "expectedTotal": 1.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "",
+          "points": 12.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R2",
+          "fleet": "",
+          "points": 11.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 11.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "",
+          "points": 11.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 11.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "",
+          "points": 13.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R8",
+          "fleet": "",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "",
+          "points": 12.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R11",
+          "fleet": "",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "CWSF",
+          "fleet": "",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "SF1",
+          "fleet": "A",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "CWGF",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "GF1",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "GF2",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "d73fd4d0-e4b3-013c-bcfe-0eeb2fba6aa7",
+      "name": "Jingyue CHEN",
+      "displayName": "Jingyue CHEN",
+      "sailID": "CHN LC7",
+      "expectedRank": 7,
+      "expectedTotal": 0.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "",
+          "points": 16.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R2",
+          "fleet": "",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "",
+          "points": 10.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 10.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "",
+          "points": 10.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 10.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "",
+          "points": 12.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R7",
+          "fleet": "",
+          "points": 15.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R8",
+          "fleet": "",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "CWSF",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "SF1",
+          "fleet": "A",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "CWGF",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "GF1",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "GF2",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "d74b2ae0-e4b3-013c-bd01-0eeb2fba6aa7",
+      "name": "Wan LI",
+      "displayName": "Wan LI",
+      "sailID": "CHN WL13",
+      "expectedRank": 8,
+      "expectedTotal": 0.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "",
+          "points": 11.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 11.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "",
+          "points": 13.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 13.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "",
+          "points": 15.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R5",
+          "fleet": "",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "",
+          "points": 14.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R9",
+          "fleet": "",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R13",
+          "fleet": "",
+          "points": 25.0,
+          "reason": "DNC",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "CWSF",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "SF1",
+          "fleet": "B",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "CWGF",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "GF1",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "GF2",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "d7553fc0-e4b3-013c-bd04-0eeb2fba6aa7",
+      "name": "Madeleine ANDERSON",
+      "displayName": "Madeleine ANDERSON",
+      "sailID": "GBR 172",
+      "expectedRank": 9,
+      "expectedTotal": 0.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "",
+          "points": 10.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 10.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "",
+          "points": 11.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 11.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "",
+          "points": 15.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R6",
+          "fleet": "",
+          "points": 13.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R7",
+          "fleet": "",
+          "points": 12.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 12.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R11",
+          "fleet": "",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "",
+          "points": 13.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R13",
+          "fleet": "",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "CWSF",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "SF1",
+          "fleet": "B",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "CWGF",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "GF1",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "GF2",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "d75f5ca0-e4b3-013c-bd07-0eeb2fba6aa7",
+      "name": "Lily YOUNG",
+      "displayName": "Lily YOUNG",
+      "sailID": "GBR 110",
+      "expectedRank": 10,
+      "expectedTotal": 0.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "",
+          "points": 13.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 13.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "",
+          "points": 16.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R5",
+          "fleet": "",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R8",
+          "fleet": "",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R9",
+          "fleet": "",
+          "points": 12.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 12.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R10",
+          "fleet": "",
+          "points": 25.0,
+          "reason": "DNC",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R11",
+          "fleet": "",
+          "points": 12.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 12.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R12",
+          "fleet": "",
+          "points": 17.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R13",
+          "fleet": "",
+          "points": 15.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 15.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "CWSF",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "SF1",
+          "fleet": "A",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "CWGF",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "GF1",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "GF2",
+          "fleet": "",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    }
+  ]
+}

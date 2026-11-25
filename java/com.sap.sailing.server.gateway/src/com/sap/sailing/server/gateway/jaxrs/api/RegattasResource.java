@@ -2313,6 +2313,9 @@ public class RegattasResource extends AbstractSailingServerResource {
                 if (detailType.getPremiumAction() != null && leaderboard.getPermissionType().supports(detailType.getPremiumAction())) {
                     getSecurityService().checkCurrentUserExplicitPermissions(leaderboard, detailType.getPremiumAction());
                 }
+                if (detailType.getTrackedRaceAction() != null && trackedRace.getPermissionType().supports(detailType.getTrackedRaceAction())) {
+                    getSecurityService().checkCurrentUserExplicitPermissions(trackedRace, detailType.getTrackedRaceAction());
+                }
             }
             final Map<Competitor, FutureTask<Iterable<Pair<TimePoint, Map<DetailType, Double>>>>> resultFutures = new HashMap<>();
             for (final String competitorIdAsString : competitorIds) {
@@ -2521,9 +2524,10 @@ public class RegattasResource extends AbstractSailingServerResource {
                                 SecuredSecurityTypes.PublicReadableActions.READ_AND_READ_PUBLIC_ACTIONS)) {
                             final JSONObject jsonCompetitorInLeg = new JSONObject();
                             final TrackedLegOfCompetitor trackedLegOfCompetitor = leg.getTrackedLeg(competitor);
+                            // Suppressed competitors remain in the tracked race but have no leaderboard row.
                             final LeaderboardRowDTO row = leaderboardDTO.rows.get(competitorDTOsByIdAsString.get(competitor.getId().toString()));
-                            final LeaderboardEntryDTO entry = row.fieldsByRaceColumnName.get(raceColumnName);
-                            final LegEntryDTO legDetail = entry.legDetails.get(zeroBasedLegIndex);
+                            final LeaderboardEntryDTO entry = row == null ? null : row.fieldsByRaceColumnName.get(raceColumnName);
+                            final LegEntryDTO legDetail = entry == null ? null : entry.legDetails.get(zeroBasedLegIndex);
                             if (trackedLegOfCompetitor != null) {
                                 jsonCompetitorInLeg.put("id",
                                         competitor.getId() != null ? competitor.getId().toString() : null);

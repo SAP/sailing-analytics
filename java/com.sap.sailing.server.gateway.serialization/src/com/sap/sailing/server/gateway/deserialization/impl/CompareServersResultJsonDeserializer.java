@@ -22,12 +22,12 @@ public class CompareServersResultJsonDeserializer implements JsonDeserializer<Co
         return new CompareServersResult() {
             @Override
             public String getServerB() {
-                return serverAName;
+                return serverBName;
             }
             
             @Override
             public String getServerA() {
-                return serverBName;
+                return serverAName;
             }
             
             @Override

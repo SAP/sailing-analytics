@@ -10,6 +10,7 @@ import com.sap.sse.landscape.Region;
 import com.sap.sse.landscape.aws.AmazonMachineImage;
 import com.sap.sse.landscape.aws.AwsLandscape;
 
+import software.amazon.awssdk.services.ec2.model.ArchitectureValues;
 import software.amazon.awssdk.services.ec2.model.BlockDeviceMapping;
 import software.amazon.awssdk.services.ec2.model.Image;
 import software.amazon.awssdk.services.ec2.model.ImageState;
@@ -85,6 +86,11 @@ public class AmazonMachineImageImpl<ShardingKey> implements AmazonMachineImage<S
     @Override
     public ImageState getState() {
         return image.state();
+    }
+    
+    @Override
+    public ArchitectureValues getArchitecture() {
+        return image.architecture();
     }
 
     @Override

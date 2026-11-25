@@ -8,17 +8,28 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementNotInteractableException;
+import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -503,13 +514,30 @@ public class PageObject {
         wait.until(new AjaxCallsExecuted(category, numberOfCalls));
     }
     
+    /**
+     * <p>Returns the current number of finished Ajax requests in the given category, as tracked by the harness's
+     *   pending-Ajax semaphore. The counter increases monotonically, so a caller can read a baseline before triggering
+     *   an action and then {@link #waitForAjaxRequestsExecuted(String, int)} for {@code baseline + n} to reliably wait
+     *   for the completion of the {@code n} requests the action fires. This encapsulates the underlying
+     *   {@code window.PENDING_AJAX_CALLS} representation.</p>
+     * 
+     * @param category
+     *   The category of Ajax requests whose finished count should be returned.
+     * @return
+     *   The number of finished Ajax requests in the given category since the page was loaded.
+     */
+    protected int getNumberOfFinishedAjaxRequests(String category) {
+        return AjaxCallsExecuted.getNumberOfFinishedCalls(this.driver, category);
+    }
+    
     protected void waitForElement(String seleniumId) {
-        WebDriverWait webDriverWait = new WebDriverWait(driver, DEFAULT_LOOKUP_TIMEOUT);
+        WebDriverWait webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(DEFAULT_LOOKUP_TIMEOUT));
         webDriverWait.until(ExpectedConditions.presenceOfElementLocated(new BySeleniumId(seleniumId)));
     }
     
     protected void waitUntil(Function<WebDriver, Boolean> predicate) {
-        WebDriverWait webDriverWait = new WebDriverWait(driver, DEFAULT_LOOKUP_TIMEOUT);
+        final WebDriverWait webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(DEFAULT_LOOKUP_TIMEOUT));
+        webDriverWait.ignoring(StaleElementReferenceException.class);
         webDriverWait.until(predicate);
     }
     
@@ -517,8 +545,190 @@ public class PageObject {
         waitUntil((driver) -> supplier.getAsBoolean());
     }
     
+    /**
+     * Waits for an element inside a possibly animated container to become interactable, then clicks it using WebDriver.
+     */
+    protected void clickWhenInteractable(final Supplier<WebElement> elementSupplier) {
+        performWhenInteractable(elementSupplier, WebElement::click);
+    }
+
+    protected void performWhenInteractable(final Supplier<WebElement> elementSupplier,
+            final Consumer<WebElement> interaction) {
+        waitForInteraction(elementSupplier, (final WebElement element, final Point point) -> interaction.accept(element),
+                /* upperLeftCorner */ false);
+    }
+
+    /** Clicks an exposed cell corner to avoid activating links or widgets embedded in a table cell. */
+    protected void clickWhenInteractableAtCorner(final Supplier<WebElement> elementSupplier,
+            final BooleanSupplier clickNeeded, final boolean controlClick) {
+        waitForInteraction(elementSupplier, (final WebElement element, final Point point) -> {
+            if (clickNeeded.getAsBoolean()) {
+                final Actions actions = new Actions(driver);
+                if (controlClick) {
+                    actions.keyDown(Keys.CONTROL);
+                }
+                try {
+                    actions.moveToLocation(point.getX(), point.getY()).click().perform();
+                } finally {
+                    if (controlClick) {
+                        new Actions(driver).keyUp(Keys.CONTROL).perform();
+                    }
+                }
+            }
+        }, /* upperLeftCorner */ true);
+    }
+
+    protected void setCheckboxSelected(final Supplier<WebElement> inputSupplier, final boolean selected) {
+        final boolean[] interactionCompleted = { false };
+        waitUntil(() -> {
+            if (!interactionCompleted[0] && inputSupplier.get().isSelected() != selected) {
+                performWhenInteractable(inputSupplier, (final WebElement input) -> {
+                    if (input.isSelected() != selected) {
+                        input.click();
+                    }
+                });
+                interactionCompleted[0] = true;
+            }
+            // Observe the result without toggling again while an asynchronous update is pending.
+            return inputSupplier.get().isSelected() == selected;
+        });
+    }
+
+    /**
+     * Centers an element inside a possibly animated container and waits for a stable, exposed interaction point.
+     * JavaScript is used for scrolling and hit-testing; interactions themselves use native WebDriver operations.
+     *
+     * @return the stable, exposed element supplied by {@code elementSupplier}
+     */
+    protected WebElement waitUntilInteractable(final Supplier<WebElement> elementSupplier) {
+        return waitForInteraction(elementSupplier, (final WebElement element, final Point point) -> { },
+                /* upperLeftCorner */ false);
+    }
+
+    private WebElement waitForInteraction(final Supplier<WebElement> elementSupplier,
+            final BiConsumer<WebElement, Point> interaction, final boolean upperLeftCorner) {
+        final String[] previousLayoutSignature = new String[1];
+        final int[] stableLayoutSamples = new int[1];
+        final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DEFAULT_LOOKUP_TIMEOUT));
+        wait.pollingEvery(Duration.ofMillis(/* millis */ 100));
+        wait.withMessage(() -> "Element did not become interactable: " + describeInteractionTarget(elementSupplier));
+        final WebElement interactableElement = wait.until((final WebDriver webDriver) -> {
+            WebElement result = null;
+            try {
+                final WebElement element = elementSupplier.get();
+                InteractableLayout layout = null;
+                scrollToCenter(element);
+                if (element.isDisplayed() && element.isEnabled()) {
+                    layout = getInteractableLayout(element, upperLeftCorner);
+                }
+                if (layout == null) {
+                    previousLayoutSignature[0] = null;
+                    stableLayoutSamples[0] = 0;
+                } else {
+                    if (layout.signature.equals(previousLayoutSignature[0])) {
+                        stableLayoutSamples[0]++;
+                    } else {
+                        previousLayoutSignature[0] = layout.signature;
+                        stableLayoutSamples[0] = 1;
+                    }
+                    if (stableLayoutSamples[0] >= 3) {
+                        // Retry failures before a successful interaction, including interception at click time.
+                        interaction.accept(element, layout.point);
+                        result = element;
+                    }
+                }
+            } catch (final ElementNotInteractableException | JavascriptException | NoSuchElementException
+                    | StaleElementReferenceException e) {
+                previousLayoutSignature[0] = null;
+                stableLayoutSamples[0] = 0;
+            }
+            return result;
+        });
+        return interactableElement;
+    }
+
+    private String describeInteractionTarget(final Supplier<WebElement> elementSupplier) {
+        String result;
+        try {
+            result = String.valueOf(((JavascriptExecutor) driver).executeScript(
+                    "var e=arguments[0],r=e.getBoundingClientRect();"
+                    + "function describe(n){return n ? {tag:n.tagName,id:n.id,"
+                    + "seleniumId:n.getAttribute('selenium-id'),classes:n.className} : null;}"
+                    + "var x=Math.max(0,Math.min(innerWidth-1,r.left+r.width/2)),"
+                    + "y=Math.max(0,Math.min(innerHeight-1,r.top+r.height/2));"
+                    + "return {target:describe(e),rect:{x:r.x,y:r.y,width:r.width,height:r.height},"
+                    + "elementAtCenter:describe(document.elementFromPoint(x,y)),"
+                    + "dialogs:Array.from(document.querySelectorAll('.gwt-DialogBox')).map(describe),"
+                    + "pendingAjax:window.PENDING_AJAX_CALLS ? PENDING_AJAX_CALLS.numberOfPendingCalls('') : null};",
+                    elementSupplier.get()));
+        } catch (final WebDriverException e) {
+            result = e.getClass().getSimpleName() + ": " + e.getMessage();
+        }
+        return result;
+    }
+
+    /**
+     * Returns the layout and exposed native interaction point, or null while the target is not ready.
+     */
+    private InteractableLayout getInteractableLayout(final WebElement element, final boolean upperLeftCorner) {
+        // Use WebDriver's viewport-clipped center; elementFromPoint accounts for actual CSS clipping.
+        // Overflow ancestors do not necessarily clip absolutely positioned descendants (including GWT panels).
+        final Object result = ((JavascriptExecutor) driver).executeScript(
+                "var element = arguments[0];"
+                + "if (!element.isConnected) return null;"
+                + "var rect = element.getClientRects()[0];"
+                + "if (!rect) return null;"
+                + "var viewportWidth = window.innerWidth;"
+                + "var viewportHeight = window.innerHeight;"
+                + "var left = Math.max(0, Math.min(rect.left, rect.right));"
+                + "var right = Math.min(viewportWidth, Math.max(rect.left, rect.right));"
+                + "var top = Math.max(0, Math.min(rect.top, rect.bottom));"
+                + "var bottom = Math.min(viewportHeight, Math.max(rect.top, rect.bottom));"
+                + "var round = function(value) { return Math.round(value * 100) / 100; };"
+                + "var signature = [];"
+                + "for (var node = element; node; node = node.parentElement) {"
+                + "  var style = window.getComputedStyle(node);"
+                + "  if (style.display === 'none' || style.visibility === 'hidden'"
+                + "      || style.visibility === 'collapse' || parseFloat(style.opacity) === 0) return null;"
+                + "  var clipsX = style.overflowX !== 'visible';"
+                + "  var clipsY = style.overflowY !== 'visible';"
+                + "  var hasOtherLayoutEffect = style.clip !== 'auto' || style.clipPath !== 'none'"
+                + "      || style.transform !== 'none';"
+                + "  if (node === element || clipsX || clipsY || hasOtherLayoutEffect) {"
+                + "    var nodeRect = node.getBoundingClientRect();"
+                + "    signature.push([round(nodeRect.left), round(nodeRect.top), round(nodeRect.right),"
+                + "        round(nodeRect.bottom), style.overflowX, style.overflowY, style.clip, style.clipPath,"
+                + "        style.transform, style.opacity].join(','));"
+                + "  }"
+                + "}"
+                + "if (right <= left || bottom <= top) return null;"
+                + "var centerX = Math.floor(arguments[1] ? left + 1 : (left + right) / 2);"
+                + "var centerY = Math.floor(arguments[1] ? top + 1 : (top + bottom) / 2);"
+                + "if (centerX >= right || centerY >= bottom) return null;"
+                + "var hit = document.elementFromPoint(centerX, centerY);"
+                + "if (hit === null || (hit !== element && !element.contains(hit))) return null;"
+                + "if (arguments[1] && hit.closest('a,button,input,select,textarea,[role=button]')) return null;"
+                + "signature.push([centerX, centerY].join(','));"
+                + "return [signature.join(';'), centerX, centerY];",
+                element, upperLeftCorner);
+        final List<?> values = (List<?>) result;
+        final InteractableLayout layout = values == null ? null : new InteractableLayout((String) values.get(/* index */ 0),
+                new Point(((Number) values.get(/* index */ 1)).intValue(), ((Number) values.get(/* index */ 2)).intValue()));
+        return layout;
+    }
+
+    private static final class InteractableLayout {
+        private final String signature;
+        private final Point point;
+
+        private InteractableLayout(final String signature, final Point point) {
+            this.signature = signature;
+            this.point = point;
+        }
+    }
+
     protected void waitUntilAlertIsPresent() {
-        WebDriverWait webDriverWait = new WebDriverWait(driver, DEFAULT_LOOKUP_TIMEOUT);
+        WebDriverWait webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(DEFAULT_LOOKUP_TIMEOUT));
         webDriverWait.until(ExpectedConditions.alertIsPresent());
     }
     
@@ -597,7 +807,8 @@ public class PageObject {
         T get(WebDriver driver, WebElement element);
     }
     
-    protected WebElement goToTab(WebElement tabPanel, String tabName, final String id, TabPanelType tabPanelType) {
+    protected WebElement goToTab(final WebElement tabPanel, final String tabName, final String id,
+            final TabPanelType tabPanelType) {
         final MessageFormat expressionFormat;
         switch(tabPanelType) {
         case TAB_PANEL:
@@ -613,10 +824,7 @@ public class PageObject {
                 throw new IllegalArgumentException("TabPanelType \"" + tabPanelType + "\" is unsupported");
         }
         final String expression = expressionFormat.format(new Object[] {tabName});
-        WebElement tab = tabPanel.findElement(By.xpath(expression));
-        WebDriverWait waitForTab = new WebDriverWait(driver, 20); // here, wait time is 20 seconds
-        waitForTab.until(ExpectedConditions.visibilityOf(tab)); // this will wait for tab to be visible for 20 seconds
-        tab.click();
+        clickWhenInteractable(() -> tabPanel.findElement(By.xpath(expression)));
         return waitForWebElement(tabPanel, id);      
     }
     
@@ -676,7 +884,7 @@ public class PageObject {
      * Waits for an alert box to appear. If no alert shows up, an Exception is thrown.
      */
     protected Alert waitForAlert(int timeoutInSeconds) {
-        return new WebDriverWait(driver, timeoutInSeconds).until(ExpectedConditions.alertIsPresent());
+        return new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds)).until(ExpectedConditions.alertIsPresent());
     }
     
     protected void waitForAlertAndAccept(String expectedMessage) {
@@ -688,7 +896,7 @@ public class PageObject {
      * Exception is thrown.
      */
     protected void waitForAlertAndAccept(int timeoutInSeconds, String expectedMessageRegexp) {
-        final Alert expectedAlert = new WebDriverWait(driver, timeoutInSeconds).until(ExpectedConditions.alertIsPresent());
+        final Alert expectedAlert = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds)).until(ExpectedConditions.alertIsPresent());
         assertTrue(expectedAlert.getText().matches(expectedMessageRegexp));
         expectedAlert.accept();
     }
@@ -711,7 +919,7 @@ public class PageObject {
      * Waits for an notification to appear and dismisses the notification by clicking on it. If no notification shows up, an Exception is thrown.
      */
     protected void waitForNotificationAndDismiss(int timeoutInSeconds, String expectedNotificationMessage) {
-        WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
         wait.until(new Function<WebDriver, Boolean>() {
             @Override
             public Boolean apply(WebDriver t) {
@@ -761,8 +969,10 @@ public class PageObject {
         }
     }
     
-    protected void scrollToView(WebElement webElement) {
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(false);", webElement);
+    protected void scrollToCenter(final WebElement webElement) {
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].scrollIntoView({block: 'center', inline: 'nearest', behavior: 'instant'});",
+                webElement);
     }
     
     public boolean isElementEntirelyVisible(WebElement element) {

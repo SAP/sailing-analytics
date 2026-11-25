@@ -176,4 +176,5 @@ public interface SharedLandscapeConstants {
      * See also <a href="...">the Wiki article about this.</a>
      */
     String ARCHIVE_FAILOVER_ADDRESS = "archive-failover." +DEFAULT_DOMAIN_NAME;
+
 }

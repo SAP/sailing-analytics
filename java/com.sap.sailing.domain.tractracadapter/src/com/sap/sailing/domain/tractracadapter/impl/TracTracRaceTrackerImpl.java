@@ -415,6 +415,8 @@ public class TracTracRaceTrackerImpl extends AbstractRaceTrackerImpl<RaceTrackin
         // domain regatta *after* calling removeRace
         final RaceDefinition raceDefinition = domainFactory.removeRace(tractracRace.getEvent(), tractracRace, regattaInWhichToTryToRemoveExistingRace, trackedRegattaRegistry);
         if (raceDefinition != null) {
+            logger.info("Found race "+regattaInWhichToTryToRemoveExistingRace.getName()+" / "+raceDefinition.getName()+
+                    " that is being tracked again. Removing old race");
             trackedRegattaRegistry.removeRace(regattaInWhichToTryToRemoveExistingRace, raceDefinition);
         }
         // Look up / create the Regatta and TrackedRegatta after they may potentially have been removed by the

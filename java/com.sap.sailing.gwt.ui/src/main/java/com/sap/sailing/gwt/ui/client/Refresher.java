@@ -27,16 +27,18 @@ public interface Refresher<T> {
 
     /**
      * Force a reload of the data from server and call afterwards asynchronously the fill method of the given
-     * {@link Displayer}.
+     * {@link Displayer}. If a load is already in flight, join it and add the requested recipients to that load's
+     * recipients. Each recipient is filled once per load.
      * 
      * @param fillOnlyDisplayer
-     *            if not <code>null</code> only the fill method of the given {@link Displayer} will be called.
+     *            if not <code>null</code> requests only the given {@link Displayer}; otherwise requests all displayers
+     *            registered at the time of this call. Overlapping calls contribute the union of their recipients.
      */
     void reloadAndCallFillOnly(Displayer<T> fillOnlyDisplayer);
 
     /**
      * Force a reload of the data from server and afterwards call the fill method of all registered {@link Displayer}s
-     * asynchronously.
+     * asynchronously. Captures the displayers registered at the time of this call and joins an in-flight load if present.
      */
     void reloadAndCallFillAll();
 
@@ -53,8 +55,9 @@ public interface Refresher<T> {
 
     /**
      * Call fill method of given {@link Displayer} even if it is not registered. If data was not loaded before, do an
-     * initial load and call fill method of all registered {@link Displayer} asynchronously and if not registered of the
+     * initial load and call fill method of all registered {@link Displayer}s asynchronously and if not registered on the
      * given {@link Displayer}, too.
+     * If the initial load is already in flight, its recipients are extended accordingly. Cached data is filled immediately.
      * 
      * @param displayer
      *            the {@link Displayer} on which the fill method shall be called.

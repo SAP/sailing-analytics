@@ -31,6 +31,7 @@ Import-Package: com.sap.sse.branding.shared,
  org.osgi.framework,
  org.osgi.util.tracker
 Export-Package: com.google.gwt.user.client.rpc.core.java.util,
+ com.sap.sse.common,
  com.sap.sse.common.impl,
  com.sap.sse.gwt.client,
  com.sap.sse.gwt.client.async,

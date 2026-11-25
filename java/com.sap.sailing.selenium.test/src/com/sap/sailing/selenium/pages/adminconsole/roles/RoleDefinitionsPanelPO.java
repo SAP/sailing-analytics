@@ -1,6 +1,5 @@
 package com.sap.sailing.selenium.pages.adminconsole.roles;
 
-import org.openqa.selenium.By.ByName;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -15,10 +14,6 @@ public class RoleDefinitionsPanelPO extends PageArea {
     
     public static class RoleEntryPO extends DataEntryWithSecurityActionsPO {
 
-        @FindBy(how = ByName.class, using = "UPDATE")
-        private WebElement updateButton;
-        
-
         public RoleEntryPO(CellTablePO<?> table, WebElement element) {
             super(table, element);
         }
@@ -28,7 +23,7 @@ public class RoleDefinitionsPanelPO extends PageArea {
         }
         
         public RoleDefinitionCreationAndUpdateDialogPO openUpdateDialog() {
-            updateButton.click();
+            clickActionImage("UPDATE");
             return waitForPO(RoleDefinitionCreationAndUpdateDialogPO::new, "RoleDefinitionEditDialog");
         }
     }
@@ -61,6 +56,12 @@ public class RoleDefinitionsPanelPO extends PageArea {
             }
         }
         return null;
+    }
+
+    public RoleEntryPO findRoleWhenPresent(final String roleName) {
+        waitForAjaxRequests();
+        waitUntil(() -> findRole(roleName) != null);
+        return findRole(roleName);
     }
     
     public void selectRole(String name) {

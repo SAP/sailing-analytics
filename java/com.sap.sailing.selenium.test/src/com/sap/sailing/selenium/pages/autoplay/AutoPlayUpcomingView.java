@@ -1,5 +1,6 @@
 package com.sap.sailing.selenium.pages.autoplay;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.function.Function;
 
@@ -22,7 +23,7 @@ public class AutoPlayUpcomingView extends PageArea {
     }
 
     public String getText() {
-        return new WebDriverWait(driver, TIMEOUT_FOR_UPCOMING_VIEW).until(new Function<WebDriver, String>() {
+        return new WebDriverWait(driver, Duration.ofSeconds(TIMEOUT_FOR_UPCOMING_VIEW)).until(new Function<WebDriver, String>() {
             @Override
             public String apply(WebDriver t) {
                 try {

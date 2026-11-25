@@ -194,7 +194,6 @@ public class JorgesTracTracParallelLoadingTest {
         public void gotPositionedItemPosition(IPositionedItem control, IPosition position) {
             String outputFile = race.getName() + "-Control-" + control.getName() + "-Positions.txt";
             String date = String.valueOf(position.getTimestamp());
-
             write(outputFile, control.getId() + ", " + date + ", " + position.getLongitude() + ", " + position.getLatitude()
                     + "\n");
         }
@@ -214,12 +213,10 @@ public class JorgesTracTracParallelLoadingTest {
 
         @Override
         public void gotStoredDataEvent(IStoredDataEvent storedDataEvent) {
-
         }
 
         @Override
         public void gotLiveDataEvent(ILiveDataEvent liveDataEvent) {
-
         }
 
         @Override

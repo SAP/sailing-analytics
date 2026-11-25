@@ -24,6 +24,7 @@ import com.sap.sailing.gwt.ui.shared.DeviceConfigurationWithSecurityDTO;
 import com.sap.sse.common.Util;
 import com.sap.sse.gwt.adminconsole.AdminConsoleTableResources;
 import com.sap.sse.gwt.client.ErrorReporter;
+import com.sap.sse.gwt.client.async.MarkedAsyncCallback;
 import com.sap.sse.gwt.client.celltable.AbstractSortableTextColumn;
 import com.sap.sse.gwt.client.celltable.EntityIdentityComparator;
 import com.sap.sse.gwt.client.celltable.FlushableCellTable;
@@ -76,9 +77,10 @@ public class DeviceConfigurationListComposite extends Composite  {
     }
 
     public void refreshTable() {
-        sailingServiceWrite.getDeviceConfigurations(new AsyncCallback<List<DeviceConfigurationWithSecurityDTO>>() {
+        sailingServiceWrite.getDeviceConfigurations(
+                new MarkedAsyncCallback<>(new AsyncCallback<List<DeviceConfigurationWithSecurityDTO>>() {
             @Override
-            public void onSuccess(List<DeviceConfigurationWithSecurityDTO> result) {
+            public void onSuccess(final List<DeviceConfigurationWithSecurityDTO> result) {
                 if (configurationsDataProvider.getList().isEmpty()) {
                     configurationTable.getColumnSortList().clear();
                     configurationTable.getColumnSortList().push(configurationTable.getColumn(0));
@@ -90,14 +92,14 @@ public class DeviceConfigurationListComposite extends Composite  {
             }
             
             @Override
-            public void onFailure(Throwable caught) {
+            public void onFailure(final Throwable caught) {
                 noConfigurationsLabel.setText(stringMessages.errorRetrievingConfiguration());
                 noConfigurationsLabel.setVisible(true);
                 configurationTable.setVisible(false);
                 errorReporter.reportError("Error retrieving configuration data from server: " + caught.getMessage());
                 refreshableConfigurationSelectionModel.clear();
             }
-        });
+        }));
     }
 
     public RefreshableMultiSelectionModel<DeviceConfigurationWithSecurityDTO> getSelectionModel() {

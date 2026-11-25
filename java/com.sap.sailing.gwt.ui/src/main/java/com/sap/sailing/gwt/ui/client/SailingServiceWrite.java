@@ -97,6 +97,7 @@ import com.sap.sailing.gwt.ui.shared.courseCreation.MarkRoleDTO;
 import com.sap.sailing.gwt.ui.shared.courseCreation.MarkTemplateDTO;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.NoCorrespondingServiceRegisteredException;
+import com.sap.sse.common.ObjectAlreadyExistsException;
 import com.sap.sse.common.Position;
 import com.sap.sse.common.TimePoint;
 import com.sap.sse.common.TransformationException;
@@ -280,7 +281,7 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
 
     UUID importMasterData(String host, UUID[] leaderboardGroupIds, boolean override, boolean compress, boolean exportWind,
             boolean exportDeviceConfigurations, String targetServerUsername, String targetServerPassword,
-            boolean exportTrackedRacesAndStartTracking) throws UnauthorizedException;
+            boolean exportTrackedRacesAndStartTracking) throws Exception;
 
     RegattaDTO createRegatta(String regattaName, String boatClassName, boolean canBoatsOfCompetitorsChangePerRace,
             CompetitorRegistrationType competitorRegistrationType, String registrationLinkSecret, Date startDate,
@@ -338,11 +339,11 @@ public interface SailingServiceWrite extends FileStorageManagementGwtService, Sa
 
     void updateLeaderboardGroup(UUID leaderboardGroupId, String oldName, String newName, String newDescription,
             String newDisplayName, List<String> leaderboardNames, int[] overallLeaderboardDiscardThresholds,
-            ScoringSchemeType overallLeaderboardScoringSchemeType);
+            ScoringSchemeType overallLeaderboardScoringSchemeType) throws ObjectAlreadyExistsException;
 
     LeaderboardGroupDTO createLeaderboardGroup(String groupName, String description, String displayName,
             boolean displayGroupsInReverseOrder, int[] overallLeaderboardDiscardThresholds,
-            ScoringSchemeType overallLeaderboardScoringSchemeType);
+            ScoringSchemeType overallLeaderboardScoringSchemeType) throws ObjectAlreadyExistsException;
 
     void trackWithSwissTiming(RegattaIdentifier regattaToAddTo, List<SwissTimingRaceRecordDTO> rrs, String hostname,
             int port, boolean trackWind, boolean correctWindByDeclination, boolean useInternalMarkPassingAlgorithm,

@@ -12,11 +12,11 @@ public class DataImportProgressImpl implements DataImportProgress {
 
     private static final long serialVersionUID = 5538458397711003527L;
     private UUID currentImportOperationId;
-    private MasterDataImportObjectCreationCount result = null;
+    private volatile MasterDataImportObjectCreationCount result = null;
     private double overallProgressPct = 0;
     private DataImportSubProgress currentSubProgress = DataImportSubProgress.IMPORT_INIT;
     private double currentSubProgressPct = 0;
-    private boolean failed = false;
+    private volatile boolean failed = false;
     private String errorMessage;
 
     @Deprecated
@@ -24,7 +24,15 @@ public class DataImportProgressImpl implements DataImportProgress {
     }
 
     public DataImportProgressImpl(final UUID currentImportOperationId) {
+        this(currentImportOperationId, DataImportSubProgress.IMPORT_INIT);
+    }
+
+    /**
+     * Initializes a progress snapshot at its current stage without logging a stage transition.
+     */
+    public DataImportProgressImpl(final UUID currentImportOperationId, final DataImportSubProgress currentSubProgress) {
         this.currentImportOperationId = currentImportOperationId;
+        this.currentSubProgress = currentSubProgress;
     }
 
     @Override

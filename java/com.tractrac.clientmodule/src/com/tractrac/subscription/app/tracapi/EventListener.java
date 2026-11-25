@@ -77,7 +77,7 @@ public class EventListener extends AbstractListener {
             String markCourseArea = positionedItem.getCourseArea();
             String raceCourseArea = this.race.getCourseArea();
             if (markCourseArea != null && raceCourseArea != null && !markCourseArea.equals(raceCourseArea)) {
-                //show("Discarding position because control course area " + markCourseArea + "(" + control.getName() + ") is not like " + race.getCourseArea());
+                show("Discarding position because control course area " + markCourseArea + "(" + positionedItem.getName() + ") is not like " + race.getCourseArea());
                 return;
             }
         }

@@ -1,7 +1,6 @@
 package com.sap.sailing.selenium.pages.adminconsole.usergroups;
 
-import org.openqa.selenium.By.ByName;
-import org.openqa.selenium.ElementNotSelectableException;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -17,16 +16,12 @@ public class UserGroupUserPanelPO extends PageArea {
     
     public static class UserEntryPO extends DataEntryWithSecurityActionsPO {
 
-        @FindBy(how = ByName.class, using = "DELETE")
-        private WebElement deleteButton;
-        
-
         public UserEntryPO(CellTablePO<?> table, WebElement element) {
             super(table, element);
         }
         
         public void deleteUser() {
-            deleteButton.click();
+            clickActionImage("DELETE");
         }
     }
     
@@ -69,7 +64,7 @@ public class UserGroupUserPanelPO extends PageArea {
     
     public void clickAddButtonOrThrow() {
         if (!addButton.isEnabled()) {
-            throw new ElementNotSelectableException("Add Button was disabled");
+            throw new ElementNotInteractableException("Add Button was disabled");
         } else {
             addButton.click();
         }
@@ -77,7 +72,7 @@ public class UserGroupUserPanelPO extends PageArea {
     
     public void clickAddButtonAndExpectPermissionError() {
         if (!addButton.isEnabled()) {
-            throw new ElementNotSelectableException("Add Button was disabled");
+            throw new ElementNotInteractableException("Add Button was disabled");
         } else {
             addButton.click();
         }

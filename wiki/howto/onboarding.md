@@ -5,6 +5,8 @@ First of all, make sure you've looked at [http://www.amazon.de/Patterns-Elements
 
 ## Eclipse Azimuth Sailing Analytics Development Setup
 
+> **New to the project on a Mac?** There is a self-contained, step-by-step setup guide you can follow top to bottom without looking things up here: [[Onboarding Quickstart (for Mac)|wiki/howto/onboarding-quickstart-mac]]. This document remains the authoritative reference for all platforms and covers the background, edge cases and troubleshooting the quickstart leaves out.
+
 ### Accounts
 
 1. Git Account
@@ -37,38 +39,22 @@ First of all, make sure you've looked at [http://www.amazon.de/Patterns-Elements
    - Request a [Hudson](https://hudson.sapsailing.com) user by sending e-mail to Axel Uhl or Simon Marcel Pamies.
 
 ### Installations
-1. Eclipse IDE for Eclipse Committers, version ["2026-03"](https://www.eclipse.org/downloads/packages/release/2026-03/r/eclipse-ide-eclipse-committers). If you are using a Mac and want to use SAPJVM, this has to be the 64 bit version. This is because SAPJVM is not available for Apple Silicon Macs, and Eclipse's OS architecture must match the JVM architecture. Mac users can install SDKMAN! to manage and install different JDKs. For example Amazon Corretto 8: `sdk install java 8.0.472-amzn`.
+1. Eclipse IDE for Eclipse Committers, version ["2026-09"](https://www.eclipse.org/downloads/packages/release/2026-09/r/eclipse-ide-eclipse-committers). If you are using a Mac and want to use SAPJVM, this has to be the 64 bit version. This is because SAPJVM is not available for Apple Silicon Macs, and Eclipse's OS architecture must match the JVM architecture. Mac users can install SDKMAN! to manage and install different JDKs. For example Amazon Corretto 8: `sdk install java 8.0.472-amzn`.
 2. JDK 1.8 (Java SE 8), ideal is the SAPJVM 1.8: Go to [https://tools.eu1.hana.ondemand.com/#cloud](https://tools.eu1.hana.ondemand.com/#cloud), scroll down to `SAP JVM` select your operating System, extract the downloaded .zip into desired location (e.g. Windows `C:\Program Files\Java`. If you want to make this your default JDK, set the `JAVA_HOME` variable to it. In any case, set the `JAVA8_HOME` variable to it which is required by a few build scripts where certain steps currently are not yet compatible with newer JDK releases. For Gradle builds (currently using Gradle 7.6), such as our Android build process, also install Java 17 and set the `JAVA17_HOME` variable to it.
 3. Git (e.g. Git for Windows v2.18), [http://git-scm.com](http://git-scm.com) / [https://git-for-windows.github.io](https://git-for-windows.github.io) still
 4. Configure git (see [Git repository configuration essentials](#git-repository-configuration-essentials))
 5. MongoDB (at least Release 6.0), download: [https://www.mongodb.com/](https://www.mongodb.com/). You may need to choose the community edition. In addition, install `mongosh`.
 6. RabbitMQ, download from [http://www.rabbitmq.com](http://www.rabbitmq.com). Requires Erlang to be installed. RabbitMQ installer will assist in installing Erlang. Some sources report that there may be trouble with the latest versions of RabbitMQ. In some cases, McAffee seems to block the installation of the latest version on SAP hardware; in other cases connection problems to the newest versions have been reported. We know that version 3.6.8 works well. [https://github.com/rabbitmq/rabbitmq-server/releases/tag/rabbitmq_v3_6_8](https://github.com/rabbitmq/rabbitmq-server/releases/tag/rabbitmq_v3_6_8)
-7.  Maven 3.1.1 (or higher), [http://maven.apache.org](http://maven.apache.org)
-    A setup guide for windows can be found on this webpage: [https://maven.apache.org/guides/getting-started/windows-prerequisites.html](https://maven.apache.org/guides/getting-started/windows-prerequisites.html)
 8.  Forked GWT SDK 2.12.4 release [https://github.com/eclipse-sailing-analytics/gwt-forward-serialization-rpc/releases/download/gwt-2.12.4/gwt-2.12.4.zip](https://github.com/eclipse-sailing-analytics/gwt-forward-serialization-rpc/releases/download/gwt-2.12.4/gwt-2.12.4.zip)). The official releases can be found at [http://www.gwtproject.org/download.html](http://www.gwtproject.org/download.html)
     but shouldn't be used unless we roll back the changes of branch ``bug5077`` or GWT has merged and released the [pull request 9779](https://github.com/gwtproject/gwt/pull/9779).
     Download the GWT SDK and extract it to a location of your preference (e.g. `C:\Program Files\gwt` on Windows or `/opt` on Linux or MacOS/X).
     You will see in section [Tuning the Eclipse Installation](#tuning-the-eclipse-installation)
     below how you announce this GWT SDK to your Eclipse installation.
-9. Standalone Android SDK (see section "Additional steps required for Android projects"). OPTIONALLY: You may additionally install Android Studio ([https://developer.android.com/tools/studio/index.html](https://developer.android.com/tools/studio/index.html)) or IntelliJ IDEA ([https://www.jetbrains.com/idea/download/](https://www.jetbrains.com/idea/download/)).
-    Make sure that the environment variable `ANDROID_HOME` is set (e.g. Windows C:\Users\\**'user'**\AppData\Local\Android\Sdk )
 10. Get the content of the git repository
     Clone the repository to your local file system from `git@github.com:eclipse-sailing-analytics/sailing-analytics.git` or `ssh://trac@sapsailing.com/home/trac/git` User "trac" has all public ssh keys.
 11. Install the eclipse plugins (see [Automatic Eclipse plugin installation](#automatic-eclipse-plugin-installation))
 12. Configure Eclipse (see [Tuning the Eclipse Installation](#tuning-the-eclipse-installation))
-13. Configure Maven to use the correct JRE by following the instructions in the paragraph [maven-setup](#maven-setup)
-14. Follow the instructions in the [development setup](#sap-sailing-analytics-development-setup) to build the project.
-15. The steps for building the project for a deployment can be found in the [Build for deployment](#build-for-deployment) section. This is not needed in the daily development workflow and should only be run when needed. 
-16. Install Ant: https://ant.apache.org/manual/install.html and makes sure to add to path: it is necessary for building gwt.
 17. Chrome or Firefox. Safari does not work reliably with this project.
-
-### Further optional but recommended installations
-
-1. For Windows users, [Cygwin](http://www.cygwin.com/) or a [Git Bash](https://git-scm.com/downloads) may be useful for being able to run any Bash scripts.
-   Please note that when using one of the newer versions of Cygwin, your Cygwin home folder setting might differ from your Windows home folder. This will likely lead to problems when issuing certain commands. For troubleshooting, take a look at the following thread: [https://stackoverflow.com/questions/1494658/how-can-i-change-my-cygwin-home-folder-after-installation](https://stackoverflow.com/questions/1494658/how-can-i-change-my-cygwin-home-folder-after-installation)
-2. Eclipse Mylyn Bugzilla extension
-3. kdiff3 (git tool)
-4. Firebug (javascript & .css debugging, included in Firefox Developer Tools in newer versions of Firefox by default)
 
 ### Git repository configuration essentials
 
@@ -78,15 +64,15 @@ If you are first time git user, don't forget to specify your user metadata. Use 
 
 Depending on the location of your local repository, it's filepaths might be too long for the default settings to handle. Excecute the command `git config --system core.longpaths true` to enable your system wide git installation to handle long file paths.
 
-### Maven Setup
-
-Copy the settings.xml (may be in $GIT_HOME/configuration/maven-settings.xml and $GIT_HOME/configuration/maven-settings-proxy.xml) **and** the toolchains.xml from the top-level git folder to your ~/.m2 directory. Adjust the proxy settings in settings.xml accordingly (suggested settings for inside a corporate network requiring a HTTP proxy for access to external web). Set the paths inside of toolchains.xml to your JDKs depending on where you installed them (this is like setting the compiler for your IDE, but for Maven; This makes it possible to build with the same Maven configuration on every system). Make sure the mvn executable you installed above is in your path. 
+Committers synchronizing Eclipse upstream changes into SAP downstream through a bot fork should also follow [[Hints for Eclipse Azimuth Sailing Analytics Committers|wiki/howto/onboarding#hints-for-eclipse-azimuth-sailing-analytics-committers]] below.
 
 ### Automatic Eclipse plugin installation
-The necessary Eclipse plugins can be automatically installed into a newly unzipped version of ["2025-12"](https://www.eclipse.org/downloads/packages/release/2025-12/r/eclipse-ide-eclipse-committers) by using the `./configuration/pluginsForEclipse2026-03.p2f` file, found in the git repository cloned in _step 11_. To install the plugins open Eclipse and install Software Items from File. (File ⇒ Import ⇒ Install ⇒ Install Software from File). The description file is located at `/configuration/pluginsForEclipse2026-03.p2f`. 
+The necessary Eclipse plugins can be automatically installed into a newly unzipped version of ["2026-06"](https://www.eclipse.org/downloads/packages/release/2026-09/r/eclipse-ide-eclipse-committers) by using the `pluginsForEclipse2026-0.p2f` file, found in the git repository cloned in _step 11_. To install the plugins open Eclipse and install Software Items from File. (File ⇒ Import ⇒ Install ⇒ Install Software from File). The description file is located at `/configuration/pluginsForEclipse2026-09.p2f`. 
 Make sure to select all Plugins (it might not be possible to select Lucene ignore that) and click next. In the pop-up dialog shown next, select the top radio button ("Update my installation to be compatible with the items being installed"). Skip the `Installation details`, accept the licence agreements and click finish. While Eclipse is installing the plugins a pop-up will appear in the background where you need to trust all plugins. Be aware that the installation may take several minutes depending on your Internet connection. 
 
 Be also aware that with this p2f-file it's not possible to update the plugins to newer versions. 
+
+To use the AssistAI Plugin the MCP Server configuration needs to be add to your coding assistant (e.g Claude Code in ~/.claude.json). For configuration look into ([eclipse-chatgpt-plugin](https://github.com/gradusnikov/eclipse-chatgpt-plugin)).
 
 The p2f-file includes the following plugins for your convenience:
 
@@ -96,13 +82,23 @@ The p2f-file includes the following plugins for your convenience:
 - Memory Analyzer ([https://www.eclipse.org/mat/](https://www.eclipse.org/mat/))
 - SAP JVM Profiler ([https://tools.hana.ondemand.com](https://tools.hana.ondemand.com))
 - UMLet ([https://www.umlet.com/](https://www.umlet.com/))
+- AssistAI ([https://marketplace.eclipse.org/content/assistai-eclipse-ide-mcp-server-ai-agents](https://marketplace.eclipse.org/content/assistai-eclipse-ide-mcp-server-ai-agents))
 - various updates to preinstalled plugins
 
 ### Tuning the Eclipse Installation
 
-Out of the box, multiple settings in Eclipse need to be changed. You can either import the configurations from the ``configuration/eclipse-preferences.epf`` file or follow the given instructions;
+Out of the box, multiple settings in Eclipse need to be changed. You can either import the configurations and change only user-specific settings (A) or follow all given instructions (B);
 
-Go to Window ⇒ Preferences and change the following two settings:
+A. Go to File ⇒ Import ⇒ General ⇒ Preferences and use ``configuration/eclipse-preferences.epf`` file. Then Go to Window ⇒ Preferences and change the following settings:
+
+- In "GWT ⇒ GWT Settings ⇒ Add..." add the GWT SDK you downloaded and unpacked earlier
+- In "Java ⇒ Build Path ⇒ Classpath Variables" create a new classpath variable called `ANDROID_HOME`. Set its value to the installation location of your Android SDK, e.g., `C:\Users\'user'\AppData\Local\Android\Sdk` or `/usr/local/android-sdk-linux`.
+- In "Java ⇒ Code Style ⇒ Formatter" import the CodeFormatter.xml from $GIT_HOME/java (where$GIT_HOME is the directory cloned in _step 11_).
+- In "Java ⇒ Compiler" set the Compiler compliance level to 1.8
+- In "Java ⇒ Installed JREs" add the Java 8 sdk and activate it. 
+- In "Java ⇒ Installed JREs ⇒ Execution Environments" make sure that the Java 8 JRE is selected for JavaSE-1.8 (if the jre is not listed open and close the preference Window once) 
+
+B. Go to Window ⇒ Preferences and change the following settings:
 
 - In "General ⇒ Content Types" select on CSS (Text ⇒ CSS) and add \*.gss in the lower file association list to get limited syntax highlighting and content assist in GSS files
 - In "General ⇒ Editors ⇒ Text Editors" check Insert Spaces for Tabs
@@ -112,6 +108,7 @@ Go to Window ⇒ Preferences and change the following two settings:
 - For YouTube API access, provide an Eclipse variable ``YOUTUBE_API_KEY``. You can use your own Google developer account to create such a key; see [here](https://console.cloud.google.com).
 - In case you need to test with the payment provider (ChargeBee) active, you need to provide Eclipse variables (Run/Rebug ⇒ String Substitution) ``CHARGEBEE_SITE`` and ``CHARGEBEE_API_KEY`` where the recommendation is to use ``sailytics-test`` for the site and a corresponding test API key; there is one launch configuration running against the live ChargeBee site, but its use is not recommended for obvious reasons. For it, define the variables ``CHARGEBEE_SITE_LIVE`` and ``CHARGEBEE_API_KEY_LIVE``, respectively.
 - To successfully obtain polar and wind estimation data from ``sapsailing.com``, you need to define the Eclipse variables (Run/Debug ⇒ String Substitution) ``POLAR_DATA_BEARER_TOKEN`` and ``WIND_ESTIMATION_MODEL_BEARER_TOKEN`` that need to authenticate a user with permissions to read the respective models.
+- Only if you want to run the ORC public-certificate tests (e.g., ``TestORCPublicCertificateDatabase``, ``TestORCPerformanceCurve``) locally with success: define an Eclipse variable (Run/Debug ⇒ String Substitution) ``ORC_API_KEY`` and reference it as an environment variable in the test launch configuration. The adapter reads the key from the ``ORC_API_KEY`` environment variable and talks to the key-based ORC JSON API at ``https://sas.orc.org/api/{key}/``. Without the key these tests fail (rather than being skipped) on purpose, so the misconfiguration is noticed; offline tests in the same classes still run. To obtain a key, either ask your team lead for one, or request your own: sign in to ORC Sailor Services at [https://sas.orc.org/](https://sas.orc.org/), then open the [Developers page](https://sas.orc.org/developers.html) and request API access for your account (describe your project and how it will use the API); once ORC grants access (confirmed by email), you create your keys on that same Developers page. See the [API documentation](https://sas.orc.org/api-docs.php) for the full procedure and endpoint reference. Note that a key is shown only once at creation, so store it safely; if lost, revoke it and create a new one.
 - Define a ``GITHUB_TOKEN`` variable; it may be empty (but has to be generally present), or you can use it to set a personal access token (PAT) which will then be used, in particular, for requesting application releases from GitHub.
 - To work with the wind estimation model training launch configuration (e.g., SimpleModelsTrainingPart1.launch), define an Eclipse variable (Run/Debug ⇒ String Substitution) ``SAPSAILING_BEARER_TOKEN`` which needs to authenticate a user eligible to read all maneuver data from sapsailing.com
 - In "GWT ⇒ Errors/Warnings" set "Missing SDK" to "Ignore" 
@@ -152,7 +149,7 @@ Go to Window ⇒ Preferences and change the following two settings:
    - Choose "GWT Sailing SDM" in the "Development Mode" Tab and open "...AdminConsole.html...". This should open [http://127.0.0.1:8888/gwt/AdminConsole](http://127.0.0.1:8888/gwt/AdminConsole). (It is normal that the first try fails. Reload the page after the first try)
    - Default Login: user "admin", password "admin"
    - In the list on the left, click on "Connectors"
-   - For TracTrac Events: In the "TracTrac Connections" Form, fill in the JSON URL [http://germanmaster.traclive.dk/events/event_20120905_erEuropean/jsonservice.php](http://germanmaster.traclive.dk/events/event_20120905_erEuropean/jsonservice.php)(all other required information will be filled in automatically)
+   - Click "Add TracTrac Connection": In the "TracTrac Connections" Form, fill in the JSON URL [http://event.tractrac.com/events/event_20170922_DeutscheJu/jsonservice.php](http://event.tractrac.com/events/event_20170922_DeutscheJu/jsonservice.php) and TracTrac API token "e1c8618d5da19eb97a08aafe93ccf11374d83c92". For more test events look into [bug#6170](https://github.com/eclipse-sailing-analytics/sailing-analytics/issues/6170?id=6170#c8).
    - Press "List Races"
 6. Further useful launch configurations
    - Use SAP JVM Profiler. If you used the script above and installed the SAPJVM instead of the jdk, you can now open the profiling perspective by clicking on Window ⇒ Perspective ⇒ Open Perspective ⇒ Profiling)
@@ -191,6 +188,23 @@ The Android Apps can be built in Android Studio or gradle command line. Android 
 If git is not in the Path system environment variable, the gradle build will not work.
 
 ## Further hints
+
+### Optional but recommended installations
+
+1.  Maven 3.9.9 (or higher), [http://maven.apache.org](http://maven.apache.org)
+    A setup guide for windows can be found on this webpage: [https://maven.apache.org/guides/getting-started/windows-prerequisites.html](https://maven.apache.org/guides/getting-started/windows-prerequisites.html) in case you want to build a full release locally
+2. Configure Maven to use the correct JRE by following the instructions in the paragraph [maven-setup](#maven-setup)
+3. The steps for building the project for a deployment can be found in the [Build for deployment](#build-for-deployment) section. This is not needed in the daily development workflow and should only be run when needed. 
+4.  Standalone Android SDK (see section "Additional steps required for Android projects"). OPTIONALLY: You may additionally install Android Studio ([https://developer.android.com/tools/studio/index.html](https://developer.android.com/tools/studio/index.html)) or IntelliJ IDEA ([https://www.jetbrains.com/idea/download/](https://www.jetbrains.com/idea/download/)) in case you want to work on the mobile companion apps from the ``mobile/`` folder
+    Make sure that the environment variable `ANDROID_HOME` is set (e.g. Windows C:\Users\\**'user'**\AppData\Local\Android\Sdk )
+5. Install Ant: https://ant.apache.org/manual/install.html and makes sure to add to path in case you want to build the gwt fork (usually not needed as the fork's release is obtained from Github).
+6. For Windows users, [Cygwin](http://www.cygwin.com/) or a [Git Bash](https://git-scm.com/downloads) may be useful for being able to run any Bash scripts.
+   Please note that when using one of the newer versions of Cygwin, your Cygwin home folder setting might differ from your Windows home folder. This will likely lead to problems when issuing certain commands. For troubleshooting, take a look at the following thread: [https://stackoverflow.com/questions/1494658/how-can-i-change-my-cygwin-home-folder-after-installation](https://stackoverflow.com/questions/1494658/how-can-i-change-my-cygwin-home-folder-after-installation)
+7. kdiff3 or p4merge for resolving Git merge conflicts graphically if you don't want to do this in Eclipse / eGit
+
+### Maven Setup
+
+Copy the settings.xml (may be in $GIT_HOME/configuration/maven-settings.xml and $GIT_HOME/configuration/maven-settings-proxy.xml) **and** the toolchains.xml from the top-level git folder to your ~/.m2 directory. Adjust the proxy settings in settings.xml accordingly (suggested settings for inside a corporate network requiring a HTTP proxy for access to external web). Set the paths inside of toolchains.xml to your JDKs depending on where you installed them (this is like setting the compiler for your IDE, but for Maven; This makes it possible to build with the same Maven configuration on every system). Make sure the mvn executable you installed above is in your path. 
 
 ### Build for deployment
 Open a shell (preferrably a git bash or a cygwin bash), cd to the git workspace's root folder and issue "./configuration/buildAndUpdateProduct.sh build". This should build the software and run all the tests. If you want to avoid the tests being executed, use the -t option. If you only want to build one GWT permutation (Chrome/English), use the -b option. When inside the SAP VPN, add the -p option for proxy use. Run the build script without arguments to get usage hints.
@@ -245,8 +259,8 @@ Another struggle can be to install the JVM Profiler Plug-in on ARM based Eclipse
 This applies only if you try to get old "GWT Dev Mode" to work, support for which has ended on very old Firefox version 24.
 Install the GWT Browser Plugin for the GWT Development mode. As of 2016-08-31 Firefox is the only browser supporting the GWT plugin, you have to download Firefox version 24 for it to work. The Plugin can be found on this page: [https://code.google.com/archive/p/google-web-toolkit/downloads](https://code.google.com/archive/p/google-web-toolkit/downloads)
 
-### Create Hudson Job
-If you want a hudson job to run when you push your branch then you can run a script in `configuration` called `createHudsonJobForBug.sh`. For you bug branch titled `bug<bug number>`, create a build job, which will create a release, by running the script like so: `./createHudsonJobForBug.sh <bug number>`.
+### Create Jenkins Job
+If you are a committer on the Eclipse Azimuth Sailing Analytics project and want a Jenkins job to run when you push your branch then you can run a script in `configuration` called `createJenkinsJobForIssue.sh`. For you issue branch titled `bug<issue-number>`, create a build job, which will create a release, by running the script like so: `./createJenkinsJobForIssue.sh <issue-number>`.
 The script will include the issue's summary in its description.
 If on Windows, you may need to disable any web shields in antivirus software, to allow `curl` to function. If on Mac, you may need to install gnu-sed (``gsed``) via Homebrew.
 
@@ -262,3 +276,110 @@ Solution: This was occurring because the website didn't have any content in the 
 Check out [refactoring patterns](https://refactoring.guru/) as a sort of cheatsheet for the aforementioned design patterns books.
 The [Pragmatic Programmer](https://en.wikipedia.org/wiki/The_Pragmatic_Programmer) is a great read too.
 We also have an [onboarding glossary](https://wiki.sapsailing.com/wiki/howto/glossary).
+
+## Hints for Eclipse Azimuth Sailing Analytics Committers
+
+### Synchronizing Eclipse upstream into SAP downstream
+
+The script `configuration/merge-upstream-to-downstream.sh` merges changes from the Eclipse upstream repository into the SAP downstream repository through a pull request from a secondary account's fork. Using `eclipse-sailing-analytics-bot` to push the fork branch and author the pull request leaves your own committer account available to review and approve it, subject to the repository's branch-protection rules.
+
+The script fetches upstream and downstream, fast-forwards their local tracking branches, merges both into the local fork branch, pushes that branch, and opens a pull request against SAP downstream. It also detects an existing pull request and avoids creating a duplicate. This is a maintainer workflow for upstream-to-downstream synchronization; the SSH setup described earlier remains suitable for day-to-day development.
+
+### Set up the fork remote and its PAT
+
+Install the [GitHub CLI (`gh`)](https://cli.github.com/) and have a personal access token (PAT) for `eclipse-sailing-analytics-bot` available. The token must allow pushing to the bot's fork and opening pull requests against `SAP/sailing-analytics`. Run the following commands in Bash (or Git Bash on Windows), from the repository root.
+
+The examples use these names:
+
+| Role | Remote | Local branch |
+| --- | --- | --- |
+| Eclipse upstream | `eclipse` | `eclipse-main` |
+| SAP downstream | `sap` | `sap-main` |
+| Bot fork | `eclipse-sailing-analytics-bot` | `eclipse-sailing-analytics-bot-sap-main` |
+
+Add the upstream and downstream remotes if they are not already configured:
+
+```bash
+git remote add eclipse git@github.com:eclipse-sailing-analytics/sailing-analytics.git
+git remote add sap git@github.com:SAP/sailing-analytics.git
+```
+
+The **fork remote must contain the bot PAT in the form `https://<PAT>@github.com/owner/repository`**. The merge script extracts it from this URL at runtime and passes it to `gh` through `GH_TOKEN` for its pull-request operations. Both the script and the credential helper below use this URL as their single source of credentials.
+
+To add or update the bot remote, enter the PAT at the hidden prompt:
+
+```bash
+read -r -s -p 'PAT for eclipse-sailing-analytics-bot: ' fork_pat
+printf '\n'
+if git remote get-url eclipse-sailing-analytics-bot >/dev/null 2>&1; then
+  git remote set-url eclipse-sailing-analytics-bot \
+    "https://${fork_pat}@github.com/eclipse-sailing-analytics-bot/sailing-analytics"
+else
+  git remote add eclipse-sailing-analytics-bot \
+    "https://${fork_pat}@github.com/eclipse-sailing-analytics-bot/sailing-analytics"
+fi
+unset fork_pat
+```
+
+If the remote already contains a working PAT in this format, continue with the helper setup. When rotating the PAT, update the remote URL using the same procedure.
+
+### Register a credential helper for the fork
+
+A Git credential helper is a program Git asks for a username and password/token when authenticating. Some Git/libcurl combinations lose URL-embedded credentials during an HTTPS operation: libcurl reports an effective URL with the credentials removed, which Git interprets as a redirect. The initial request can authenticate successfully, but a later push request then prompts for a username. Fetching the public repository may still work anonymously.
+
+The following helper reads the PAT from the fork remote whenever Git asks, including after that loss of credentials. Run this setup once per clone:
+
+```bash
+credential='credential.https://github.com/eclipse-sailing-analytics-bot/sailing-analytics'
+git config --local "$credential.useHttpPath" true
+git config --local --replace-all "$credential.helper" ''
+git config --local --add "$credential.helper" '!f() {
+  if test "$1" = get; then
+    url=$(git remote get-url eclipse-sailing-analytics-bot) &&
+    pat=$(printf "%s" "$url" | sed -nE "s#^https://([^@/:]+)@.*#\1#p") &&
+    test -n "$pat" &&
+    printf "username=x-access-token\npassword=%s\n\n" "$pat"
+  fi
+}; f'
+```
+
+The URL-specific settings select this helper for the fork; `useHttpPath` includes the repository path in credential matching. The empty helper entry resets inherited helpers for this URL so another account's cached credentials do not take precedence. The helper returns the PAT as the password and `x-access-token` as the username; the PAT determines the authenticated account. It does not keep a second copy of the token or require a cache to be refreshed.
+
+These settings live in this clone's `.git/config` and are not distributed by commits or cloning. Each committer using this workflow configures them in each clone. If using a different fork, remote name, or URL path (including a `.git` suffix), adapt the credential URL and helper's remote name accordingly. This configures command-line Git, which the merge script invokes; Eclipse/EGit's authentication configuration is separate.
+
+The warning `redirecting to https://github.com/eclipse-sailing-analytics-bot/sailing-analytics/` may still appear on affected Git/libcurl versions. The helper makes the credentials available again so the push can complete without an interactive login.
+
+### Initialize the local branches and run the merge
+
+Fetch the three remotes:
+
+```bash
+git fetch eclipse
+git fetch sap
+git fetch eclipse-sailing-analytics-bot
+```
+
+Create any of the following local branches that do not already exist:
+
+```bash
+git branch --track eclipse-main eclipse/main
+git branch --track sap-main sap/main
+git branch --track eclipse-sailing-analytics-bot-sap-main eclipse-sailing-analytics-bot/main
+```
+
+With no uncommitted changes to tracked files, run:
+
+```bash
+./configuration/merge-upstream-to-downstream.sh \
+  --fork-remote eclipse-sailing-analytics-bot \
+  --upstream-remote eclipse \
+  --downstream-remote sap
+```
+
+The local branch names above match the script's defaults. Use `./configuration/merge-upstream-to-downstream.sh --help` for different remote or branch names. The script normally stops without creating a pull request when upstream contributes no new commits; after a successful run, review the resulting pull request using your own committer account.
+
+The same helper also supports a manual push of the fork branch:
+
+```bash
+git push eclipse-sailing-analytics-bot eclipse-sailing-analytics-bot-sap-main:main
+```

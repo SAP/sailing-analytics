@@ -451,7 +451,7 @@
     <string name="data_reload_title">"Данные изменены вовне"</string>
     <string name="data_reload_message">"Данные были перезагружены. Возможна потеря данных."</string>
     <string name="preference_allow_dependent_races_header">"Относительное время начала (мин.)"</string>
-    <string name="preference_allow_dependent_races_description">"Включить относительное время начала между гонками "</string>
+    <string name="preference_allow_dependent_races_description">"Включить относительное время начала между гонками"</string>
     <string name="preference_dependent_races_offset_header">"Смещение относительного времени начала по умолчанию (мин.)"</string>
     <string name="preference_allow_edit_race_factor_header">"Изменение коэффициента гонки"</string>
     <string name="preference_protest_time_header">"Длительность времени протеста (мин.)"</string>

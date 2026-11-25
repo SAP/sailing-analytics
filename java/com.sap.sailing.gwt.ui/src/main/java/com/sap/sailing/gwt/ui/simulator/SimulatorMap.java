@@ -445,6 +445,8 @@ public class SimulatorMap extends AbsolutePanel implements RequiresDataInitializ
 
             @Override
             public void onSuccess(String googleMapsLoaderAuthenticationParams) {
+                GoogleMapsLoader.setAuthFailureListener(
+                        () -> errorReporter.reportError(stringMessages.errorGoogleMapsAuthenticationFailed()));
                 GoogleMapsLoader.load(onLoad, googleMapsLoaderAuthenticationParams);
             }
         });

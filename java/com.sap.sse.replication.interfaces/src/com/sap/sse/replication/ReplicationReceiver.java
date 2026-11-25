@@ -4,9 +4,11 @@ import java.util.Map;
 
 public interface ReplicationReceiver {
     /**
-     * A string that is sent for new replication protocol versions instead of the stringified {@link Replicable} ID.
-     * That replicable ID is usually a fully-qualified class name. It must not be equal to this version indicator string
-     * which has the value {@code "***"}.
+     * The string with which every replication message starts, followed by the protocol version and the stringified
+     * {@link Replicable} ID. Messages not starting with this indicator, such as messages in the legacy protocol which
+     * started with the replicable ID directly, are rejected by the receiver. The replicable ID is usually a
+     * fully-qualified class name. It must not be equal to this version indicator string which has the value
+     * {@code "***"}.
      */
     static String VERSION_INDICATOR = "***";
 

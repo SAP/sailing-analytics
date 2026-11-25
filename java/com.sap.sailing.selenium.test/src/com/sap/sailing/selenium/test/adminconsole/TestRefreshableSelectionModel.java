@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.time.Duration;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.WebDriver;
@@ -127,7 +128,7 @@ public class TestRefreshableSelectionModel extends AbstractSeleniumTest {
             // assert selection
             windowForSelection.switchToWindow();
             competitorPanelForSelection.pushRefreshButton();
-            WebDriverWait waitTimer = new WebDriverWait(competitorPanelForSelection.driver, 10);
+            WebDriverWait waitTimer = new WebDriverWait(competitorPanelForSelection.driver, Duration.ofSeconds(10));
             ExpectedCondition<Boolean> condition = new ExpectedCondition<Boolean>() {
                 @Override
                 public Boolean apply(WebDriver arg0) {

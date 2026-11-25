@@ -1,5 +1,6 @@
 package com.sap.sailing.selenium.core;
 
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -50,9 +51,13 @@ public class WindowManager {
     }
     
     /**
-     * This is the old, currently unused code superseded by {@link #withExtraWindow(WebDriver, BiConsumer)}.
+     * Runs the given test logic with a second, <em>independent</em> browser in addition to the default one. A fresh
+     * {@link WebDriver} (and thus a separate browser instance) is obtained from the web driver factory for the extra
+     * window and is quit again once the test logic returns. Use this only when a test genuinely requires two separate
+     * browsers; to work with a second window within the <em>same</em> browser, use
+     * {@link #withExtraWindow(WebDriver, BiConsumer)} instead.
      */
-    public void withExtraWindow(BiConsumer<WebDriverWindow, WebDriverWindow> defaultAndExtraWindow) {
+    public void withExtraBrowser(BiConsumer<WebDriverWindow, WebDriverWindow> defaultAndExtraWindow) {
         // ensures that a default window exists
         getDefaultWebDriver();
         final WebDriver extraDriver = webDriverFactory.get();
@@ -72,15 +77,16 @@ public class WindowManager {
     }
 
     /**
-     * New version of {@link #withExtraWindow(BiConsumer)} that uses the WebDriver passed as parameter and uses
-     * a single {@link WebDriver} for both windows.
+     * Runs the given test logic with a second window opened in the browser controlled by the {@link WebDriver} passed
+     * as parameter, i.e. using a single {@link WebDriver} for both windows. To run with a second, separate browser
+     * instead, use {@link #withExtraBrowser(BiConsumer)}.
      */
     public void withExtraWindow(WebDriver driver, BiConsumer<WebDriverWindow, WebDriverWindow> defaultAndExtraWindow) {
         String originalWindowHandle = driver.getWindowHandle();
         // Open a new window using JavaScript
         ((JavascriptExecutor) driver).executeScript("window.open('about:blank','_blank');");
         // Wait until the new window appears
-        new WebDriverWait(driver, /* seconds */ 5).until(d -> d.getWindowHandles().size() > 1);
+        new WebDriverWait(driver, /* seconds */ Duration.ofSeconds(5)).until(d -> d.getWindowHandles().size() > 1);
         // Identify the new window handle
         String extraWindowHandle = driver.getWindowHandles().stream()
             .filter(handle -> !handle.equals(originalWindowHandle))

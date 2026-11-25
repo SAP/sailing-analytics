@@ -19,6 +19,11 @@ public class SecurityServiceMockFactory {
         UserGroupImpl defaultTenant = new UserGroupImpl(new UUID(0, 1), "defaultTenant");
         final SecurityService result = Mockito.mock(SecurityService.class);
         Mockito.doReturn(defaultTenant).when(result).getServerGroup();
+        Mockito.doAnswer(invocation -> {
+            invocation.getArgument(/* index */ 3, Runnable.class).run();
+            return invocation.getArgument(/* index */ 4, Callable.class).call();
+        }).when(result).setOwnershipCheckPermissionForObjectCreationAndRevertOnError(Mockito.any(),
+                Mockito.any(), Mockito.any(), Mockito.any(Runnable.class), Mockito.any(Callable.class));
         Mockito.doAnswer(new Answer<Object>() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {

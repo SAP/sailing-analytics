@@ -5,8 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -116,35 +116,27 @@ public class LoginListViews extends LoggableDialogFragment implements View.OnCli
     @Override
     public void onClick(View view) {
 
-        switch (view.getId()) {
-            case R.id.event_header:
-                mCourseAreaContainer.close();
-                mPositionContainer.close();
-                final boolean expanded = mEventContainer.toggle();
-                final Fragment fragment = requireFragmentManager().findFragmentById(R.id.event_fragment);
-                if (fragment instanceof EventListFragment) {
-                    if (expanded) {
-                        ((EventListFragment) fragment).onExpanded();
-                    } else {
-                        ((EventListFragment) fragment).onCollapsed();
-                    }
+        final int id = view.getId();
+        if (id == R.id.event_header) {
+            mCourseAreaContainer.close();
+            mPositionContainer.close();
+            final boolean expanded = mEventContainer.toggle();
+            final Fragment fragment = requireFragmentManager().findFragmentById(R.id.event_fragment);
+            if (fragment instanceof EventListFragment) {
+                if (expanded) {
+                    ((EventListFragment) fragment).onExpanded();
+                } else {
+                    ((EventListFragment) fragment).onCollapsed();
                 }
-                break;
-
-            case R.id.area_header:
-                mEventContainer.close();
-                mPositionContainer.close();
-                mCourseAreaContainer.toggle();
-                break;
-
-            case R.id.position_header:
-                mEventContainer.close();
-                mCourseAreaContainer.close();
-                mPositionContainer.toggle();
-                break;
-
-            default:
-                break;
+            }
+        } else if (id == R.id.area_header) {
+            mEventContainer.close();
+            mPositionContainer.close();
+            mCourseAreaContainer.toggle();
+        } else if (id == R.id.position_header) {
+            mEventContainer.close();
+            mCourseAreaContainer.close();
+            mPositionContainer.toggle();
         }
 
         showButton();

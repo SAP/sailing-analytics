@@ -1,0 +1,92 @@
+# bash completion for merge-upstream-to-downstream.sh
+#
+# Provides Tab-completion for the script's named options and, intelligently,
+# for their VALUES:
+#   * remote-name options (--fork-remote/--upstream-remote/--downstream-remote)
+#     complete against the git remotes of the repo containing the CWD;
+#   * remote-branch options (--upstream-branch/--downstream-branch/--fork-branch)
+#     complete against the branches OF THE MATCHING REMOTE — the script resolves
+#     each of those to a remote (via its paired --*-remote option already on the
+#     line, the MERGE_U2D_* env var, or the built-in default), so e.g.
+#     `--upstream-remote eclipse --upstream-branch <Tab>` lists eclipse's branches;
+#   * local-branch options (--local-*-branch) complete against local branches.
+#
+# Install (any one of):
+#   * source it from ~/.bashrc:            source /path/to/merge-upstream-to-downstream.bash-completion
+#   * or drop/symlink into the user dir:   ~/.local/share/bash-completion/completions/merge-upstream-to-downstream.sh
+#   * or system-wide:                      /usr/share/bash-completion/completions/merge-upstream-to-downstream.sh
+# (The last two use on-demand loading; the file's basename must match the command
+#  being completed — hence the symlink name ending in .sh below.)
+
+# Enumerate git remotes for the repo containing $PWD (empty & silent if not a repo).
+__m2d_remotes() {
+    git remote 2>/dev/null
+}
+
+# Enumerate branch short-names present on a given remote (arg 1), via the
+# remote-tracking refs. strip=3 turns refs/remotes/<remote>/<branch> into <branch>.
+__m2d_remote_branches() {
+    local remote="$1"
+    [ -n "$remote" ] || return 0
+    git for-each-ref --format='%(refname:strip=3)' "refs/remotes/${remote}/" 2>/dev/null
+}
+
+# Enumerate local branch short-names. strip=2 turns refs/heads/<branch> into <branch>.
+__m2d_local_branches() {
+    git for-each-ref --format='%(refname:strip=2)' refs/heads/ 2>/dev/null
+}
+
+# Resolve which remote a given "role" (fork|upstream|downstream) points at, using
+# the SAME precedence the script itself uses: an explicit --<role>-remote already
+# typed on the command line > the MERGE_U2D_<ROLE>_REMOTE env var > built-in default.
+# $1 = role; the current COMP_WORDS are scanned for the explicit flag.
+__m2d_resolve_remote() {
+    local role="$1" flag="--${1}-remote" i
+    # 1) explicit flag already on the line (supports both "--flag val" and "--flag=val").
+    for (( i = 1; i < COMP_CWORD; i++ )); do
+        case "${COMP_WORDS[i]}" in
+            "$flag")   [ $((i + 1)) -lt $COMP_CWORD ] && { printf '%s' "${COMP_WORDS[i+1]}"; return 0; } ;;
+            "$flag"=*) printf '%s' "${COMP_WORDS[i]#*=}"; return 0 ;;
+        esac
+    done
+    # 2) env var, then 3) built-in default.
+    case "$role" in
+        fork)       printf '%s' "${MERGE_U2D_FORK_REMOTE:-}" ;;
+        upstream)   printf '%s' "${MERGE_U2D_UPSTREAM_REMOTE:-eclipse}" ;;
+        downstream) printf '%s' "${MERGE_U2D_DOWNSTREAM_REMOTE:-sap}" ;;
+    esac
+}
+
+_merge_upstream_to_downstream() {
+    local cur prev opts
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    opts="--fork-remote --upstream-remote --downstream-remote \
+          --upstream-branch --downstream-branch --fork-branch \
+          --local-upstream-branch --local-downstream-branch --local-fork-branch \
+          -h --help"
+    # Complete the VALUE when the previous word is an option that takes one.
+    case "$prev" in
+        --fork-remote|--upstream-remote|--downstream-remote)
+            COMPREPLY=( $(compgen -W "$(__m2d_remotes)" -- "$cur") ); return 0 ;;
+        --upstream-branch)
+            COMPREPLY=( $(compgen -W "$(__m2d_remote_branches "$(__m2d_resolve_remote upstream)")" -- "$cur") ); return 0 ;;
+        --downstream-branch)
+            COMPREPLY=( $(compgen -W "$(__m2d_remote_branches "$(__m2d_resolve_remote downstream)")" -- "$cur") ); return 0 ;;
+        --fork-branch)
+            COMPREPLY=( $(compgen -W "$(__m2d_remote_branches "$(__m2d_resolve_remote fork)")" -- "$cur") ); return 0 ;;
+        --local-upstream-branch|--local-downstream-branch|--local-fork-branch)
+            COMPREPLY=( $(compgen -W "$(__m2d_local_branches)" -- "$cur") ); return 0 ;;
+    esac
+    # Otherwise complete an option NAME. compgen -W filters by "$cur", so an
+    # empty cur (bare Tab right after the command) lists every option, while a
+    # partial like "--fork" narrows it — and a stray non-option word yields the
+    # options too rather than nothing.
+    COMPREPLY=( $(compgen -W "$opts" -- "$cur") )
+    return 0
+}
+
+# Register for the plain name, the .sh form, and any path invocation (./x, /abs/x).
+complete -F _merge_upstream_to_downstream \
+    merge-upstream-to-downstream.sh \
+    ./merge-upstream-to-downstream.sh

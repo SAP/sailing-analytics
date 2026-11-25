@@ -514,6 +514,13 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
      * active while auto-zooming whereas stopping them seems the better option for manual zooms.
      */
     private boolean autoZoomInProgress;
+
+    /**
+     * Set when the user starts a manual pan and cleared when the map goes idle (after inertia settles).
+     * During this period {@link #calculateTimeForPositionTransitionInMillis} returns -1 so that boats
+     * snap to their correct positions rather than animating across the pan displacement.
+     */
+    private boolean suppressTransitionAfterPan;
     
     /**
      * The length of the advantage line; default is 1000m, but upon map initialization and zoom it is set to the
@@ -963,7 +970,9 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                     }
                 });
                 map.addDragStartHandler(event -> {
-                    if (streamletOverlay != null 
+                    // suppress boat transitions for the entire drag + inertia period; cleared in IdleMapHandler
+                    suppressTransitionAfterPan = true;
+                    if (streamletOverlay != null
                             && settings.isShowWindStreamletOverlay()
                             && paywallResolver.hasPermission(SecuredDomainType.TrackedRaceActions.VIEWSTREAMLETS, raceMapLifecycle.getRaceDTO())) {
                         streamletOverlay.onDragStart();
@@ -983,13 +992,14 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                             map.panTo(coordinateSystem.toLatLng(autoZoomBounds.getCenter()));
                             autoZoomOut = false;
                         }
-                        if (streamletOverlay != null 
+                        if (streamletOverlay != null
                                 && settings.isShowWindStreamletOverlay()
                                 && paywallResolver.hasPermission(SecuredDomainType.TrackedRaceActions.VIEWSTREAMLETS, raceMapLifecycle.getRaceDTO())) {
                             streamletOverlay.onDragEnd();
-                            streamletOverlay.onBoundsChanged(/* zoomChanged */ false);
                         }
                         advantageLineLength = getMapDiagonalVisibleDistance();
+                        // map has fully settled including inertia glide; safe to re-enable boat transitions
+                        suppressTransitionAfterPan = false;
                         showAdvantageLineAndUpdateWindLadder(getCompetitorsToShow(), getTimer().getTime(), /* timeForPositionTransitionMillis */ -1 /* (no transition) */);
                         refreshMapWithoutAnimation();
                         if (!mapFirstZoomDone) {
@@ -1009,8 +1019,11 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                 map.addBoundsChangeHandler(new BoundsChangeMapHandler() {
                     @Override
                     public void onEvent(BoundsChangeMapEvent event) {
-                        double newZoomLevel = map.getZoom();
-                        if (!isAutoZoomInProgress() && (newZoomLevel != currentZoomLevel)) {
+                        final double newZoomLevel = map.getZoom();
+                        final boolean zoomChanged = newZoomLevel != currentZoomLevel;
+                        // remove transitions on any manual viewport change (zoom or pan) so boats snap to
+                        // their correct positions rather than animating across the displacement
+                        if (!isAutoZoomInProgress() && (zoomChanged || suppressTransitionAfterPan)) {
                             removeTransitions();
                         }
                         currentMapBounds = BoundsUtil.getMapBounds(map.getBounds(), new DegreeBearingImpl(map.getHeading()), coordinateSystem);
@@ -1018,6 +1031,11 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                         headerPanel.getElement().getStyle().setWidth(map.getOffsetWidth(), Unit.PX);
                         advantageLineLength = getMapDiagonalVisibleDistance();
                         showAdvantageLineAndUpdateWindLadder(getCompetitorsToShow(), getTimer().getTime(), /* timeForPositionTransitionMillis */ -1 /* (no transition) */);
+                        if (streamletOverlay != null
+                                && settings.isShowWindStreamletOverlay()
+                                && paywallResolver.hasPermission(SecuredDomainType.TrackedRaceActions.VIEWSTREAMLETS, raceMapLifecycle.getRaceDTO())) {
+                            streamletOverlay.onBoundsChanged(zoomChanged);
+                        }
                     }
                 });
                 // If there was a time change before the API was loaded, reset the time
@@ -1076,6 +1094,8 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
 
             @Override
             public void onSuccess(String googleMapsLoaderAuthenticationParams) {
+                GoogleMapsLoader.setAuthFailureListener(
+                        () -> errorReporter.reportError(stringMessages.errorGoogleMapsAuthenticationFailed()));
                 GoogleMapsLoader.load(onLoad, googleMapsLoaderAuthenticationParams);
             }
         });
@@ -1521,59 +1541,34 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
             final Pair<PositionRequest, PositionRequest> quickAndSlowRequest,
             RegattaAndRaceIdentifier race, final Date newTime, final long transitionTimeInMillis,
             final Iterable<CompetitorDTO> competitorsToShow, boolean isRedraw, final DetailType detailType, boolean detailTypeChanged) {
-        final Map<String, Date> fromTimesForQuickCall = quickAndSlowRequest.getA().getFromByCompetitorIdAsString();
-        final Map<String, Date> toTimesForQuickCall = quickAndSlowRequest.getA().getToByCompetitorIdAsString();
-        final Map<String, Date> fromTimesForNonOverlappingTailsCall = quickAndSlowRequest.getB().getFromByCompetitorIdAsString();
-        final Map<String, Date> toTimesForNonOverlappingTailsCall = quickAndSlowRequest.getB().getToByCompetitorIdAsString();
         final Map<String, CompetitorDTO> competitorsByIdAsString = new HashMap<>();
-        for (CompetitorDTO competitor : competitorSelection.getAllCompetitors()) {
+        for (final CompetitorDTO competitor : competitorSelection.getAllCompetitors()) {
             competitorsByIdAsString.put(competitor.getIdAsString(), competitor);
         }
-        // only update the tails for these competitors
-        asyncActionsExecutor.execute(new GetRaceMapDataAction(sailingService, timeRangeActionsExecutor, competitorsByIdAsString,
-                    race, useNullAsTimePoint() ? null : newTime, fromTimesForQuickCall, toTimesForQuickCall, /* extrapolate */ true,
-                    (settings.isShowSimulationOverlay() ? simulationOverlay.getLegIdentifier() : null),
-                    raceCompetitorSet.getMd5OfIdsAsStringOfCompetitorParticipatingInRaceInAlphanumericOrderOfTheirID(),
-                    newTime, settings.isShowEstimatedDuration(), detailType, leaderboardName, leaderboardGroupName, leaderboardGroupId,
-                    // callback to use for alternative GetBoatPositionsAction fired when GetRaceMapDataAction gets dropped:
-                    getBoatPositionsCallback(quickAndSlowRequest.getA(), newTime, transitionTimeInMillis, competitorsToShow, detailType, detailTypeChanged, competitorsByIdAsString)),
-            GET_RACE_MAP_DATA_CATEGORY,
-            getRaceMapDataCallback(newTime, transitionTimeInMillis, quickAndSlowRequest.getA(), competitorsToShow,
-                                   ++boatPositionRequestIDCounter, isRedraw, detailTypeChanged, detailType, fromTimesForQuickCall, toTimesForQuickCall, competitorsByIdAsString));
+        final PositionRequest quickRequest = quickAndSlowRequest.getA();
+        final PositionRequest slowRequest = quickAndSlowRequest.getB();
+        final GetBoatPositionsCallback droppableBoatPositionsCallback = quickRequest.createCallback(detailType, competitorsByIdAsString,
+                (request, boatPositions) -> updateBoatPositions(newTime, transitionTimeInMillis, competitorsToShow,
+                        boatPositions, /* updateTailsOnly */ true, detailTypeChanged, detailType),
+                t -> errorReporter.reportError("Error obtaining racemap data: " + t.getMessage(), true /*silentMode */));
+        quickRequest.executeWithTimeRanges((from, to) ->
+            asyncActionsExecutor.execute(new GetRaceMapDataAction(sailingService, timeRangeActionsExecutor, competitorsByIdAsString,
+                        race, useNullAsTimePoint() ? null : newTime, from, to, /* extrapolate */ true,
+                        (settings.isShowSimulationOverlay() ? simulationOverlay.getLegIdentifier() : null),
+                        raceCompetitorSet.getMd5OfIdsAsStringOfCompetitorParticipatingInRaceInAlphanumericOrderOfTheirID(),
+                        newTime, settings.isShowEstimatedDuration(), detailType, leaderboardName, leaderboardGroupName, leaderboardGroupId,
+                        droppableBoatPositionsCallback),
+                GET_RACE_MAP_DATA_CATEGORY,
+                getRaceMapDataCallback(newTime, transitionTimeInMillis, quickRequest, competitorsToShow,
+                                       ++boatPositionRequestIDCounter, isRedraw, detailTypeChanged, detailType, competitorsByIdAsString)));
         // next, if necessary, do the full thing; the two calls have different action classes, so throttling should not drop one for the other
-        if (!fromTimesForNonOverlappingTailsCall.keySet().isEmpty()) {
-            timeRangeActionsExecutor.execute(new GetBoatPositionsAction(sailingService, race,
-                    fromTimesForNonOverlappingTailsCall, toTimesForNonOverlappingTailsCall, /* extrapolate */ true,
+        slowRequest.executeForNonEmptyTimeRanges((from, to) ->
+            timeRangeActionsExecutor.execute(new GetBoatPositionsAction(sailingService, race, from, to, /* extrapolate */ true,
                     detailType, leaderboardName, leaderboardGroupName, leaderboardGroupId),
-                    getBoatPositionsCallback(quickAndSlowRequest.getB(), newTime, transitionTimeInMillis, competitorsToShow,
-                            detailType, detailTypeChanged, competitorsByIdAsString));
-        }
-    }
-
-    private GetBoatPositionsCallback getBoatPositionsCallback(
-            final PositionRequest positionRequest, final Date newTime,
-            final long transitionTimeInMillis, final Iterable<CompetitorDTO> competitorsToShow,
-            final DetailType detailType, boolean detailTypeChanged,
-            final Map<String, CompetitorDTO> competitorsByIdAsString) {
-        return new GetBoatPositionsCallback(detailType, new AsyncCallback<CompactBoatPositionsDTO>() {
-            @Override
-            public void onFailure(Throwable t) {
-                errorReporter.reportError("Error obtaining racemap data: " + t.getMessage(), true /*silentMode */);
-            }
-
-            @Override
-            public void onSuccess(CompactBoatPositionsDTO result) {
-                // Note: the fromAndToAndOverlap.getC() map will be UPDATED by the call to updateBoatPositions for those
-                // entries that are considered not overlapping; subsequently, fromAndToOverlap.getC() will contain true for
-                // all its entries so that the other response received for GetRaceMapDataAction will consider this an
-                // overlap if it happens after this update.
-                final Map<CompetitorDTO, GPSFixDTOWithSpeedWindTackAndLegTypeIterable> boatPositionsForCompetitors =
-                        result.getBoatPositionsForCompetitors(competitorsByIdAsString);
-                positionRequest.processResponse(boatPositionsForCompetitors);
-                updateBoatPositions(newTime, transitionTimeInMillis,
-                        competitorsToShow, boatPositionsForCompetitors, /* updateTailsOnly */ true, detailTypeChanged, detailType);
-            }
-        });
+                    slowRequest.createCallback(detailType, competitorsByIdAsString,
+                            (request, boatPositions) -> updateBoatPositions(newTime, transitionTimeInMillis, competitorsToShow,
+                                    boatPositions, /* updateTailsOnly */ true, detailTypeChanged, detailType),
+                            t -> errorReporter.reportError("Error obtaining racemap data: " + t.getMessage(), true /*silentMode */))));
     }
 
     private AsyncCallback<RaceMapDataDTO> getRaceMapDataCallback(
@@ -1581,14 +1576,15 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
             final long transitionTimeInMillis,
             final PositionRequest quickRequest,
             final Iterable<CompetitorDTO> competitorsToShow, final int requestID, boolean isRedraw, boolean detailTypeChanged,
-            DetailType detailType, final Map<String, Date> fromTimesForQuickCall, final Map<String, Date> toTimesForQuickCall,
+            DetailType detailType,
             final Map<String, CompetitorDTO> competitorsByIdAsString) {
         return new MarkedAsyncCallback<>(new AsyncCallback<RaceMapDataDTO>() {
             @Override
             public void onFailure(Throwable caught) {
+                quickRequest.onFailure();
                 errorReporter.reportError("Error obtaining racemap data: " + caught.getMessage(), true /*silentMode */);
             }
-            
+
             @Override
             public void onSuccess(RaceMapDataDTO raceMapDataDTO) {
                 if (map != null && raceMapDataDTO != null) {
@@ -1598,7 +1594,7 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                     if (startedProcessingRequestID < requestID) {
                         startedProcessingRequestID = requestID;
                         // Uncomment the following for enhanced log output regarding getRaceMapData requests
-                        // GWT.log("Processing race map data request "+requestID+" with detail type "+detailType+"\n"+getFromAndToTimesAsString());
+                        // GWT.log("Processing race map data request "+requestID+" with detail type "+detailType+"\n"+quickRequest);
                         if (raceMapDataDTO.raceCompetitorIdsAsStrings != null) {
                             try {
                                 raceCompetitorSet.setIdsAsStringsOfCompetitorsInRace(raceMapDataDTO.raceCompetitorIdsAsStrings);
@@ -1660,25 +1656,11 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                     } else {
                         GWT.log("Dropped result from getRaceMapData(...) except for boat positions with detail type "+detailType+
                                 " because it was for request ID "+requestID+
-                                " while we already started processing request "+startedProcessingRequestID+"\n"+
-                                getFromAndToTimesAsString());
+                                " while we already started processing request "+startedProcessingRequestID+"\n"+quickRequest);
                     }
                 } else { // map was null or we didn't get a valid response; record time in case this was because map API hasn't loaded yet
                     lastTimeChangeBeforeInitialization = newTime;
                 }
-            }
-
-            private String getFromAndToTimesAsString() {
-                final StringBuilder result = new StringBuilder();
-                for (final Entry<String, Date> from : fromTimesForQuickCall.entrySet()) {
-                    result.append(from.getKey());
-                    result.append(": ");
-                    result.append(from.getValue());
-                    result.append("..");
-                    result.append(toTimesForQuickCall.get(from.getKey()));
-                    result.append("; ");
-                }
-                return result.toString();
             }
 
             private Map<String, Double> getCompetitorsSpeedInKnotsMap(
@@ -1955,7 +1937,10 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
         } else {
             timeForPositionTransitionMillis = -1;
         }
-        if (timer.getPlayState() == PlayStates.Playing) {
+        if (suppressTransitionAfterPan) {
+            // user is panning or inertia glide is still in progress; do not animate boat positions
+            timeForPositionTransitionMillisSmoothed = -1;
+        } else if (timer.getPlayState() == PlayStates.Playing) {
             // choose 130% of the refresh interval as transition period to make it unlikely that the transition
             // stops before the next update has been received
             long smoothInterval = 1300 * timer.getRefreshInterval() / 1000;
@@ -1970,7 +1955,6 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                     timeForPositionTransitionMillisSmoothed = -1;
                 }
             }
-
         } else {
             // do not animate in non live modus
             timeForPositionTransitionMillisSmoothed = -1; // -1 means 'no transition
@@ -2053,7 +2037,7 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                         Math.cos(lat1) * Math.sin(distanceRad) * Math.cos(bearingRad));
         double lon2 = lon1 + Math.atan2(Math.sin(bearingRad)*Math.sin(distanceRad)*Math.cos(lat1), 
                        Math.cos(distanceRad)-Math.sin(lat1)*Math.sin(lat2));
-        lon2 = (lon2+3*Math.PI) % (2*Math.PI) - Math.PI;  // normalize to -180..+180�
+        lon2 = (lon2+3*Math.PI) % (2*Math.PI) - Math.PI;  // normalize to -180..+180°
         // position is already in LatLng space, so no mapping through coordinateSystem is required here
         return LatLng.newInstance(lat2 / Math.PI * 180., lon2  / Math.PI * 180.);
     }

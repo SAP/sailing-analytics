@@ -541,7 +541,8 @@ public class MultiVideoDialog extends DialogBox {
 
                     @Override
                     public void progress(Double current, Double total) {
-                        statusLabel.setText(stringMessages.transferStarted() + " " + Math.round(current / 1024 / 1024)
+                        statusLabel.setText(com.sap.sailing.landscape.ui.client.i18n.StringMessages.INSTANCE.transferStarted()
+                                + " " + Math.round(current / 1024 / 1024)
                                 + "/" + Math.round(total / 1024 / 1024) + " MB");
                     }
 

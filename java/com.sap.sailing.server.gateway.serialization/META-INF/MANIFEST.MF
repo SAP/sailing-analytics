@@ -7,6 +7,7 @@ Bundle-Vendor: SAP
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: 
  com.sap.sailing.declination,
+ com.sap.sailing.landscape.common,
  org.json.simple
 Require-Bundle: com.sap.sailing.domain.common,
  com.sap.sailing.domain.shared.android,

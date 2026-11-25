@@ -14,6 +14,19 @@ public interface MediaDescriptor extends Serializable {
     MimeType getMimeType();
     URL getURL();
 
+    /**
+     * Whether the media URL is currently known to be unavailable.
+     */
+    boolean isMissing();
+    void setMissing(boolean missing);
+
+    /**
+     * Whether the owner has already been notified for the current missing state. This is reset when the media becomes
+     * available again.
+     */
+    boolean isMissingMailNotificationSent();
+    void setMissingMailNotificationSent(boolean missingMailNotificationSent);
+
     String getTitle();
     void setTitle(String title);
 

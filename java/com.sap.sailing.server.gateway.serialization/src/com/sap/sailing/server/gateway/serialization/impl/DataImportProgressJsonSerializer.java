@@ -7,6 +7,7 @@ import com.sap.sailing.domain.common.DataImportProgress;
 import com.sap.sse.shared.json.JsonSerializer;
 
 public class DataImportProgressJsonSerializer implements JsonSerializer<DataImportProgress> {
+    public static final String EVENT_IDS_IMPORTED = "eventIdsImported";
     public static final String OVERALL_PROGRESS_PERCENT = "overallProgressPercent";
     public static final String CURRENT_SUB_PROGRESS = "currentSubProgress";
     public static final String CURRENT_SUB_PROGRESS_PERCENT = "currentSubProgressPercent";
@@ -23,7 +24,7 @@ public class DataImportProgressJsonSerializer implements JsonSerializer<DataImpo
     public static final String TRACKED_RACES_COUNT = "trackedRacesCount";
     
     @Override
-    public JSONObject serialize(DataImportProgress object) {
+    public JSONObject serialize(final DataImportProgress object) {
         final JSONObject result = new JSONObject();
         result.put(OVERALL_PROGRESS_PERCENT, object.getOverallProgressPct());
         result.put(CURRENT_SUB_PROGRESS, object.getCurrentSubProgress()==null?null:object.getCurrentSubProgress().name());
@@ -44,6 +45,11 @@ public class DataImportProgressJsonSerializer implements JsonSerializer<DataImpo
                 counts.put(OVERWRITTEN_REGATTA_NAMES, overwrittenRegattaNames);
             }
             counts.put(TRACKED_RACES_COUNT, object.getResult().getTrackedRacesCount());
+            if (object.getResult().getEventIdsImported() != null) {
+                final JSONArray eventIds = new JSONArray();
+                object.getResult().getEventIdsImported().forEach(id -> eventIds.add(id.toString()));
+                counts.put(EVENT_IDS_IMPORTED, eventIds);
+            }
         };
         result.put(OPERATION_ID, object.getOperationId().toString());
         result.put(FAILED, object.failed());

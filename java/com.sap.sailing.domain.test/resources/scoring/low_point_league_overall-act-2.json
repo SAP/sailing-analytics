@@ -1,0 +1,3214 @@
+{
+  "name": "Danish Sailing League 2024 1. div - Helsingør",
+  "scheme": "LOW_POINT_WITH_AUTOMATIC_RDG",
+  "type": "RegattaLeaderboard",
+  "displayName": "Danish Sailing League 2024 1. div - Helsingør",
+  "provenance": {
+    "results": {
+      "url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboards/Danish%20Sailing%20League%202024%201.%20div%20-%20Helsing%C3%B8r",
+      "fetched_at": "2026-11-11T19:08:36.054847+00:00",
+      "status": 200,
+      "resolved_url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboards/Danish%20Sailing%20League%202024%201.%20div%20-%20Helsing%C3%B8r",
+      "sha256": "75e899af64173d0b03dfce2c1ef169c26b34622504acb4f3ff88efa732406731",
+      "bytes": 72080
+    },
+    "configuration": {
+      "url": "https://www.sapsailing.com/sailingserver/api/v1/regattas/Danish%20Sailing%20League%202024%201.%20div%20-%20Helsing%C3%B8r",
+      "fetched_at": "2026-11-11T19:08:36.322106+00:00",
+      "status": 200,
+      "resolved_url": "https://www.sapsailing.com/sailingserver/api/v1/regattas/Danish%20Sailing%20League%202024%201.%20div%20-%20Helsing%C3%B8r",
+      "sha256": "c70d7418e409721f98ed3e496d30ab23e1ecd46915d4cccd67c340a1dce5bf18",
+      "bytes": 11141
+    },
+    "metadata": {
+      "base": "https://sapsailing.com",
+      "source": "central-metadata.json",
+      "sha256": "933a31e4dd4cde658f818e47e548e218ce8f8e0283669fbf32710569597064d8"
+    },
+    "capturedScheme": "LOW_POINT_WITH_AUTOMATIC_RDG"
+  },
+  "timePoint": 1718541059000,
+  "canBoatsOfCompetitorsChangePerRace": true,
+  "discardThresholds": [],
+  "series": [
+    {
+      "name": "default",
+      "medal": false,
+      "parallel": false,
+      "reset": false,
+      "carry": false,
+      "contiguous": false,
+      "maximumDiscards": null,
+      "fleets": [
+        {
+          "name": "Race 1",
+          "ordering": 0
+        },
+        {
+          "name": "Race 2",
+          "ordering": 0
+        },
+        {
+          "name": "Race 3",
+          "ordering": 0
+        }
+      ],
+      "columns": [
+        "F1",
+        "F2",
+        "F3",
+        "F4",
+        "F5",
+        "F6",
+        "F7",
+        "F8",
+        "F9",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15"
+      ]
+    }
+  ],
+  "columns": [
+    {
+      "name": "F1",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "F2",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "F3",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "F4",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "F5",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "F6",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "F7",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "F8",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "F9",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "F10",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "F11",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "F12",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "F13",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "F14",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "F15",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    }
+  ],
+  "competitors": [
+    {
+      "id": "bd68a750-f5bd-013c-2ecd-342e996a9920",
+      "name": "Roskilde",
+      "displayName": "Roskilde",
+      "sailID": null,
+      "expectedRank": 1,
+      "expectedTotal": 13.0,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 3",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bd77f590-f5bd-013c-2ed9-342e996a9920",
+      "name": "Sønderborg Yacht-Club",
+      "displayName": "Sønderborg Yacht-Club",
+      "sailID": null,
+      "expectedRank": 2,
+      "expectedTotal": 25.5,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 3",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 2",
+          "points": 2.5,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.5,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 3",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 3",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bd580c80-f5bd-013c-2ec5-342e996a9920",
+      "name": "Kaløvig Bådelaug",
+      "displayName": "Kaløvig Bådelaug",
+      "sailID": null,
+      "expectedRank": 3,
+      "expectedTotal": 31.5,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 2",
+          "points": 3.5,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.5,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 2",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 2",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bd38eaf0-f5bd-013c-2eb5-342e996a9920",
+      "name": "KDY",
+      "displayName": "KDY",
+      "sailID": null,
+      "expectedRank": 4,
+      "expectedTotal": 32.0,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 3",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 3",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bdace610-f5bd-013c-2ef9-342e996a9920",
+      "name": "KDY WOW",
+      "displayName": "KDY WOW",
+      "sailID": null,
+      "expectedRank": 5,
+      "expectedTotal": 32.0,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 3",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 2",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 3",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 3",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 3",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 2",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 3",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bd48a520-f5bd-013c-2ebd-342e996a9920",
+      "name": "Aalborg Sejlklub",
+      "displayName": "Aalborg Sejlklub",
+      "sailID": null,
+      "expectedRank": 6,
+      "expectedTotal": 34.0,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 3",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 3",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 2",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 3",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bd9121a0-f5bd-013c-2ee9-342e996a9920",
+      "name": "Horsens Sejlklub",
+      "displayName": "Horsens Sejlklub",
+      "sailID": null,
+      "expectedRank": 7,
+      "expectedTotal": 34.0,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 2",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 2",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 2",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bd6e6450-f5bd-013c-2ed1-342e996a9920",
+      "name": "ASK Team Salt",
+      "displayName": "ASK Team Salt",
+      "sailID": null,
+      "expectedRank": 8,
+      "expectedTotal": 35.0,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 2",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 3",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 2",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 3",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bd2dd930-f5bd-013c-2eb1-342e996a9920",
+      "name": "Sejlklubben Neptun Vejle",
+      "displayName": "Sejlklubben Neptun Vejle",
+      "sailID": null,
+      "expectedRank": 9,
+      "expectedTotal": 37.0,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 2",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 2",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 3",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 3",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 2",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bd87b7a0-f5bd-013c-2ee1-342e996a9920",
+      "name": "Thurø Sejlklub",
+      "displayName": "Thurø Sejlklub",
+      "sailID": null,
+      "expectedRank": 10,
+      "expectedTotal": 38.0,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 2",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 2",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 3",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 3",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bd9b0390-f5bd-013c-2eed-342e996a9920",
+      "name": "Bandholm Sejlklub",
+      "displayName": "Bandholm Sejlklub",
+      "sailID": null,
+      "expectedRank": 11,
+      "expectedTotal": 40.0,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 3",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 3",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 2",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 3",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bd501e10-f5bd-013c-2ec1-342e996a9920",
+      "name": "MAST Youngsters",
+      "displayName": "MAST Youngsters",
+      "sailID": null,
+      "expectedRank": 12,
+      "expectedTotal": 41.0,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 2",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 2",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 3",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bd829080-f5bd-013c-2edd-342e996a9920",
+      "name": "Kjøbenhavns Amatør Sejlklub",
+      "displayName": "Kjøbenhavns Amatør Sejlklub",
+      "sailID": null,
+      "expectedRank": 13,
+      "expectedTotal": 41.5,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 2",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 2",
+          "points": 3.5,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.5,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 3",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 3",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 3",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 3",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bda68060-f5bd-013c-2ef5-342e996a9920",
+      "name": "Skovshoved",
+      "displayName": "Skovshoved",
+      "sailID": null,
+      "expectedRank": 14,
+      "expectedTotal": 42.0,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 3",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 3",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 3",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 3",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 3",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 3",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 3",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bdb994b0-f5bd-013c-2efd-342e996a9920",
+      "name": "Hellerup Sejlklub",
+      "displayName": "Hellerup Sejlklub",
+      "sailID": null,
+      "expectedRank": 15,
+      "expectedTotal": 46.0,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 3",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 3",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 3",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 3",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 2",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bd72ec80-f5bd-013c-2ed5-342e996a9920",
+      "name": "Svendborg Sund Sejlklub",
+      "displayName": "Svendborg Sund Sejlklub",
+      "sailID": null,
+      "expectedRank": 16,
+      "expectedTotal": 46.5,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 2",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 3",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 2",
+          "points": 2.5,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.5,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 3",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 3",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 1",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bda0f050-f5bd-013c-2ef1-342e996a9920",
+      "name": "Aarhus Sejlklub",
+      "displayName": "Aarhus Sejlklub",
+      "sailID": null,
+      "expectedRank": 17,
+      "expectedTotal": 49.0,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 3",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 3",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 3",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 3",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 2",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 3",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 1",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bd614390-f5bd-013c-2ec9-342e996a9920",
+      "name": "DTU-Sejlsport",
+      "displayName": "DTU-Sejlsport",
+      "sailID": null,
+      "expectedRank": 18,
+      "expectedTotal": 50.0,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 3",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 3",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 2",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 3",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 2",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bd40cee0-f5bd-013c-2eb9-342e996a9920",
+      "name": "Sejlklubben Limfjorden",
+      "displayName": "Sejlklubben Limfjorden",
+      "sailID": null,
+      "expectedRank": 19,
+      "expectedTotal": 55.0,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 1",
+          "points": 8.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 3",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 3",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 3",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 3",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 2",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 2",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bd8c1920-f5bd-013c-2ee5-342e996a9920",
+      "name": "Sejlcenter Nivå",
+      "displayName": "Sejlcenter Nivå",
+      "sailID": null,
+      "expectedRank": 20,
+      "expectedTotal": 55.0,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 3",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 3",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 2",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 3",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 2",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 1",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bd27be80-f5bd-013c-2ead-342e996a9920",
+      "name": "Happy Moms / Nivå",
+      "displayName": "Happy Moms / Nivå",
+      "sailID": null,
+      "expectedRank": 21,
+      "expectedTotal": 63.0,
+      "cells": [
+        {
+          "column": "F1",
+          "fleet": "Race 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F2",
+          "fleet": "Race 1",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F3",
+          "fleet": "Race 3",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F4",
+          "fleet": "Race 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F5",
+          "fleet": "Race 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F6",
+          "fleet": "Race 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F7",
+          "fleet": "Race 3",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F8",
+          "fleet": "Race 3",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F9",
+          "fleet": "Race 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F10",
+          "fleet": "Race 3",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F11",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F12",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F13",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F14",
+          "fleet": "Race 3",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        },
+        {
+          "column": "F15",
+          "fleet": "Race 2",
+          "points": null,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": null,
+          "expectedDiscard": false
+        }
+      ]
+    }
+  ]
+}

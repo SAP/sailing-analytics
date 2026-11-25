@@ -1,7 +1,13 @@
 We want all local variables, fields, and parameters to be declared "final" as far as possible.
 
-We want all literals used as parameters (true, false, numeric literals, Optional.empty() and null) to be prefixed with a comment telling the parameter name.
+We want all literals used as parameters (true, false, numeric literals, Optional.empty() and null) to be prefixed with a comment telling the parameter name. Exception: when a method takes a single parameter and the method name already conveys its semantics (e.g. a lone boolean argument to a setter like setUseStartTimeInference(true)), do not add the comment.
 
 We want a single exit point in any method only, so no multiple "return" statements.
 
 Avoid unnecessary empty lines. If you feel like you need to separate code within a single method into "sections", consider using double-slash comments to explain what the next section is.
+
+We want a zero-warning workspace. Always remove unused imports and check Eclipse workspace warnings as well as errors before completing Java changes.
+
+## Jenkins build workflow
+
+Use `cjj <issue-number>` to create the Jenkins job, then push the bug branch. GitHub Actions automatically triggers Jenkins after the preceding workflow completes. Do not manually launch the Jenkins build after creating the job or pushing, unless the user explicitly requests a manual build. An initially idle Jenkins job is expected while GitHub Actions runs.

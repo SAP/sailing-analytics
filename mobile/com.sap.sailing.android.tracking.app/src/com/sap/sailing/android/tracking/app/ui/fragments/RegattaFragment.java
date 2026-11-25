@@ -10,9 +10,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AlertDialog;
+import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
+import androidx.appcompat.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -169,34 +169,26 @@ public class RegattaFragment extends BaseFragment implements OnClickListener {
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-        case R.id.show_leaderboards_button:
+        final int id = view.getId();
+        if (id == R.id.show_leaderboards_button) {
             startLeaderboardActivity();
-            break;
-        case R.id.show_event_button:
+        } else if (id == R.id.show_event_button) {
             startEventActivity();
-            break;
-        case R.id.start_tracking:
+        } else if (id == R.id.start_tracking) {
             if (showingThankYouNote) {
-                RegattaActivity regattaActivity = (RegattaActivity) getActivity();
+                final RegattaActivity regattaActivity = (RegattaActivity) getActivity();
                 regattaActivity.checkout();
             } else if (LocationHelper.isGPSEnabled(getActivity())) {
                 startTrackingActivity();
             } else {
                 LocationHelper.showNoGPSError(getActivity(), getString(R.string.enable_gps));
             }
-            break;
-        case R.id.add_photo_button:
+        } else if (id == R.id.add_photo_button) {
             showChooseExistingPictureOrTakeNewPhotoAlert();
-            break;
-        case R.id.add_photo_text:
+        } else if (id == R.id.add_photo_text) {
             showChooseExistingPictureOrTakeNewPhotoAlert();
-            break;
-        case R.id.change_photo_button:
+        } else if (id == R.id.change_photo_button) {
             showChooseExistingPictureOrTakeNewPhotoAlert();
-            break;
-        default:
-            break;
         }
     }
 

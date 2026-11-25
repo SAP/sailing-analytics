@@ -19,6 +19,8 @@ import com.sap.sse.gwt.client.celltable.EntityIdentityComparator;
 public abstract class AbstractRefresher<T> implements Refresher<T> {
     private Logger logger = Logger.getLogger(getClass().getName());
     private final Set<Displayer<T>> displayers = new HashSet<Displayer<T>>();
+    /** Union of the recipients requested for the current load, including registration snapshots for fill-all calls. */
+    private final Set<Displayer<T>> pendingDisplayers = new HashSet<>();
     private List<T> dtos;
     private boolean loading;
 
@@ -42,48 +44,56 @@ public abstract class AbstractRefresher<T> implements Refresher<T> {
     }
 
     @Override
-    public void reloadAndCallFillOnly(Displayer<T> fillOnlyDisplayer) {
-        reloadAndCallFillOnly(fillOnlyDisplayer, null);
+    public void reloadAndCallFillOnly(final Displayer<T> fillOnlyDisplayer) {
+        reloadAndCallFillOnly(fillOnlyDisplayer, /* fillAdditionally */ null);
     }
 
-    public void reloadAndCallFillOnly(Displayer<T> fillOnlyDisplayer, Displayer<T> fillAdditionally) {
-        AsyncCallback<Iterable<T>> callback = new AsyncCallback<Iterable<T>>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                // already logged. do nothing here
-            }
-            @Override
-            public void onSuccess(Iterable<T> result) {
-                if (result != null) {
-                    dtos = new ArrayList<T>();
-                    result.forEach(dto -> dtos.add(dto));
-                } else {
-                    dtos = null;
-                }
-                loading = false;
-                logger.fine("Loading data finished. Call fill methods from displayers.");
-                if (fillOnlyDisplayer != null) {
-                    fill(result, fillOnlyDisplayer);
-                } else {
-                    callAllFill(result, null);
-                }
-                if (fillAdditionally != null && !displayers.contains(fillAdditionally)) {
-                    fill(result, fillAdditionally);
-                }
-            }
-        };
+    public void reloadAndCallFillOnly(final Displayer<T> fillOnlyDisplayer, final Displayer<T> fillAdditionally) {
+        if (fillOnlyDisplayer == null) {
+            pendingDisplayers.addAll(displayers);
+        } else {
+            pendingDisplayers.add(fillOnlyDisplayer);
+        }
+        if (fillAdditionally != null) {
+            pendingDisplayers.add(fillAdditionally);
+        }
         if (!loading) {
             logger.fine("Start loading data from service.");
             loading = true;
-            reload(new MarkedAsyncCallback<>(callback));
+            reload(new MarkedAsyncCallback<>(new AsyncCallback<Iterable<T>>() {
+                @Override
+                public void onFailure(final Throwable caught) {
+                    // The error has already been reported; discard this batch and allow a retry.
+                    pendingDisplayers.clear();
+                    loading = false;
+                }
+
+                @Override
+                public void onSuccess(final Iterable<T> result) {
+                    if (result != null) {
+                        dtos = new ArrayList<T>();
+                        result.forEach(dto -> dtos.add(dto));
+                    } else {
+                        dtos = null;
+                    }
+                    // Detach this batch before a displayer can initiate another load from its fill callback.
+                    final Set<Displayer<T>> displayersToFill = new HashSet<>(pendingDisplayers);
+                    pendingDisplayers.clear();
+                    loading = false;
+                    logger.fine("Loading data finished. Call fill methods from displayers.");
+                    for (final Displayer<T> displayer : displayersToFill) {
+                        fill(result, displayer);
+                    }
+                }
+            }));
         } else {
-            logger.fine("Data is already loading. Skip reload.");
+            logger.fine("Data is already loading. Added requested displayers to the pending recipients.");
         }
     }
 
     @Override
     public void reloadAndCallFillAll() {
-        reloadAndCallFillOnly(null);
+        reloadAndCallFillOnly(/* fillOnlyDisplayer */ null);
     }
 
     @Override
@@ -92,9 +102,9 @@ public abstract class AbstractRefresher<T> implements Refresher<T> {
     }
 
     @Override
-    public void callFillAndReloadInitially(Displayer<T> displayer) {
+    public void callFillAndReloadInitially(final Displayer<T> displayer) {
         if (dtos == null) {
-            reloadAndCallFillOnly(null, displayer);
+            reloadAndCallFillOnly(/* fillOnlyDisplayer */ null, displayer);
         } else if (displayer != null) {
             fill(dtos, displayer);
         } else {

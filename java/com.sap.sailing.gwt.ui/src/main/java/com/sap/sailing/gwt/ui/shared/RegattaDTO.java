@@ -39,7 +39,7 @@ public class RegattaDTO extends NamedSecuredObjectDTO implements SecuredDTO {
     public ScoringSchemeType scoringScheme;
     public List<CourseAreaDTO> courseAreas = new ArrayList<>();
     public DeviceConfigurationDTO.RegattaConfigurationDTO configuration;
-    public boolean useStartTimeInference = true;
+    public boolean useStartTimeInference = false;
     public boolean controlTrackingFromStartAndFinishTimes = false;
     public boolean autoRestartTrackingUponCompetitorSetChange = false;
     public boolean canBoatsOfCompetitorsChangePerRace = false;

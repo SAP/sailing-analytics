@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 
 import com.sap.sailing.selenium.core.BySeleniumId;
 import com.sap.sailing.selenium.core.FindBy;
@@ -76,16 +74,54 @@ public class SmartphoneTrackingEventManagementPanelPO extends PageArea {
         return this.waitForPO(MapDevicesDialogPO::new, "regattaLogTrackingDeviceMappingsDialog");
     }
 
-    public void denoteLeaderboardForRaceLogTracking(DataEntryPO aLeaderboard) {
+    public void denoteLeaderboardForRaceLogTracking(final DataEntryPO aLeaderboard) {
         aLeaderboard.clickActionImage(ACTION_DENOTE_FOR_RACELOG_TRACKING);
+        waitForAjaxRequests();
+        final List<WebElement> automaticTrackingTimesDialogs = driver.findElements(
+                new BySeleniumId("AutomaticTrackingTimesDialog"));
+        if (!automaticTrackingTimesDialogs.isEmpty()) {
+            automaticTrackingTimesDialogs.get(/* index */ 0).findElement(new BySeleniumId("CancelButton")).click();
+        }
         findElementBySeleniumId(this.driver, "OkButton").click();
         waitForAjaxRequests();
     }
 
-    public void startTrackingForRace(DataEntryPO aRaceRow) {
+    public void clickDenoteForRaceLogTracking(final DataEntryPO aLeaderboard) {
+        aLeaderboard.clickActionImage(ACTION_DENOTE_FOR_RACELOG_TRACKING);
+        waitForAjaxRequests();
+    }
+
+    public boolean isAutomaticTrackingTimesDialogShown() {
+        return !driver.findElements(new BySeleniumId("AutomaticTrackingTimesDialog")).isEmpty();
+    }
+
+    public void applyAutomaticTrackingTimesAndFinishDenotation() {
+        // Confirm the automatic-tracking-times suggestion popup; its OK button applies the setting.
+        final WebElement automaticTrackingTimesDialog = findElementBySeleniumId(this.driver,
+                "AutomaticTrackingTimesDialog");
+        automaticTrackingTimesDialog.findElement(new BySeleniumId("OkButton")).click();
+        waitForAjaxRequests();
+        // The race-name prefix dialog follows; confirm it with its default prefix.
+        findElementBySeleniumId(this.driver, "OkButton").click();
+        waitForAjaxRequests();
+    }
+
+    public void startTrackingForRace(final String raceName) {
         // Notifications from previous actions may cover the button on CI
         dismissAllExistingNotifications();
-        aRaceRow.clickActionImage(ACTION_START_TRACKING);
+        // The start-tracking action image only appears once the denotation has been applied
+        // client-side; wait for it (re-fetching the row each poll to survive GWT re-renders)
+        // rather than assuming the row's mere presence implies the action is available.
+        waitUntil(() -> {
+            try {
+                return waitForRaceRow(raceName).hasActionImage(ACTION_START_TRACKING);
+            } catch (final RuntimeException e) {
+                // StaleElementReferenceException (a RuntimeException) and the transient
+                // "table mid-re-render" RuntimeException from createDataEntry both mean "retry"
+                return false;
+            }
+        });
+        waitForRaceRow(raceName).clickActionImage(ACTION_START_TRACKING);
         waitForAjaxRequests();
     }
 
@@ -123,29 +159,14 @@ public class SmartphoneTrackingEventManagementPanelPO extends PageArea {
     }
 
     // Selects exactly the named rows in the race table, deselecting all others.
-    // Retries one row at a time to handle GWT re-renders between clicks.
-    public void selectRaceRowsByName(String... raceNames) {
+    public void selectRaceRowsByName(final String... raceNames) {
         final List<String> namesToSelect = Arrays.asList(raceNames);
-        boolean changed = true;
-        while (changed) {
-            changed = false;
-            try {
-                final CellTablePO<DataEntryPO> raceTable = getRaceColumnTableWrapper().getRaceColumnTable();
-                for (final DataEntryPO entry : raceTable.getEntries()) {
-                    final boolean shouldBeSelected = namesToSelect.contains(entry.getColumnContent("Race"));
-                    final boolean isSelected = entry.isSelected();
-                    if (shouldBeSelected != isSelected) {
-                        final WebElement checkboxDiv = entry.getWebElement().findElement(By.xpath("./td[1]/div"));
-                        scrollToView(checkboxDiv);
-                        new Actions(this.driver).moveToElement(checkboxDiv).click().build().perform();
-                        changed = true;
-                        break;
-                    }
-                }
-            } catch (StaleElementReferenceException e) {
-                changed = true;
-            }
-        }
+        waitUntil(() -> {
+            // The race table may still be refreshing when its selection is requested.
+            getRaceColumnTableWrapper().getRaceColumnTable().selectEntries(
+                    (final DataEntryPO entry) -> namesToSelect.contains(entry.getColumnContent("Race")), () -> false);
+            return true;
+        });
     }
 
     private DataEntryPO waitForTableEntry(final CellTablePO<DataEntryPO> table, final String column, final String value) {

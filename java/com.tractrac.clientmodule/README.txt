@@ -16,6 +16,68 @@ It contains also some files:
  - Manifest.txt -> manifest used to create the test.jar file
 
 ********************************************
+     TracAPI 5.1.3
+********************************************
+This is a final version. It keeps the backward compatibility.
+
+  Release date: 24/11/2026
+
+ 1) Features
+
+ - Adding two new methods to the IPosition interface:
+  1) getHeel: the heel angle in degrees. It will be NULL if the tracker doesn't provide it.
+    (Requested by Jorge Piera, 24/11/2026)
+  2) getAcceleration: the acceleration reported by the tracker. It will be NULL if the tracker
+    doesn't provide it.
+    (Requested by Jorge Piera, 24/11/2026)
+
+********************************************
+     TracAPI 5.1.2
+********************************************
+This is a final version. It keeps the backward compatibility.
+
+  Release date: 09/11/2026
+
+ 1) Bugs
+
+ - DNS is not correctly propagated due to a typo error added in v 5.1.0 (reported by Radek Masnika, 09/11/2026)
+
+********************************************
+     TracAPI 5.1.1
+********************************************
+This is a final version. It keeps the backward compatibility.
+
+  Release date: 20/06/2026
+
+ 1) Bugs
+
+ - reloadFromServer fails if the race was retrieved from a event (reported by Thomas Scott, 20/06/2026)
+
+********************************************
+        TracAPI 5.1.0
+********************************************
+ This is a final version. It updates some enums, breaking the backward compatibility. The old parameters file are 100% compatible with this
+ version of TracAPI. The updated enums are:
+
+     - RaceCompetitorStatusType: uses the new statuses from World Sailing (adding RAC and FIN). Using also the 3-character abbreviations.
+        - RACING: has been renamed as RAC.
+        - DISQUALIFIED: has been renamed as DSQ.
+        - ABANDONED: has been renamed as RET.
+        - DONT_RACE: has been renamed as DNS.
+        - RETIRED: has been renamed as RET.
+        - NO_DATA: has been removed.
+        - MIS: has been removed.
+        - NO_COLLECT: has been removed.
+        - FINISH_CONFIRMED: has been removed.
+        - DPI: has been added.
+        - RDG: has been added.
+        - ZFP: has been added.
+
+     - EventType: updating the sports that are supported by TracTrac.
+
+   Release date: 08/04/2026
+
+********************************************
         TracAPI 5.0.3
 ********************************************
 This is a final version. It keeps the backward compatibility.

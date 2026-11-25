@@ -56,6 +56,7 @@ import com.sap.sse.concurrent.NamedReentrantReadWriteLock;
  *
  */
 public class MongoSensorFixStoreImpl extends MongoFixHandler implements MongoSensorFixStore {
+    private static final int FIX_LOADING_BATCH_SIZE = 1000;
     private static final Logger logger = Logger.getLogger(MongoSensorFixStoreImpl.class.getName());
     private final MongoCollection<Document> fixesCollection;
     private final MetadataCollection metadataCollection;
@@ -155,7 +156,7 @@ public class MongoSensorFixStoreImpl extends MongoFixHandler implements MongoSen
         Bson query = Filters.and(filters);
         final MongoCollection<Document> fixesCollectionWithReadConcern = fixesCollection.withReadConcern(readConcern);
         FindIterable<Document> result = clientSession == null ? fixesCollectionWithReadConcern.find(query) : fixesCollectionWithReadConcern.find(clientSession, query);
-        result.batchSize(100000).sort(new Document(FieldNames.TIME_AS_MILLIS.name(), ascending ? 1 : -1));
+        result.batchSize(FIX_LOADING_BATCH_SIZE).sort(new Document(FieldNames.TIME_AS_MILLIS.name(), ascending ? 1 : -1));
         if (onlyOneResult) {
             result.limit(1);
         }
@@ -254,12 +255,10 @@ public class MongoSensorFixStoreImpl extends MongoFixHandler implements MongoSen
             return new HashSet<>(Util.<DeviceIdentifier, Set<FixReceivedListener<FixT>>> get(
                     listenersWithFixType, device, Collections.emptySet()));
         });
-        for (FixT fix : fixes) {
-            for (FixReceivedListener<FixT> listener : listenersToInform) {
-                final Iterable<Triple<RegattaAndRaceIdentifier, Boolean, Duration>> racesWithManeuverChangeFromListener =
-                        listener.fixReceived(device, fix, returnManeuverChanges, returnLiveDelay);
-                Util.addAll(racesWithManeuverChangeFromListener, raceWithChangedManeuver);
-            }
+        for (final FixReceivedListener<FixT> listener : listenersToInform) {
+            final Iterable<Triple<RegattaAndRaceIdentifier, Boolean, Duration>> racesWithManeuverChangeFromListener =
+                    listener.fixesReceived(device, fixes, returnManeuverChanges, returnLiveDelay);
+            Util.addAll(racesWithManeuverChangeFromListener, raceWithChangedManeuver);
         }
         return raceWithChangedManeuver;
     }

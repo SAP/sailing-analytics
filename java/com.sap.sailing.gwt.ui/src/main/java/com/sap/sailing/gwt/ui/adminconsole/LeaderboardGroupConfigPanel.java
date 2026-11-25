@@ -45,6 +45,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionChangeEvent;
+import com.sap.sailing.domain.common.ConflictObjectType;
 import com.sap.sailing.domain.common.dto.RaceColumnDTO;
 import com.sap.sailing.domain.common.security.SecuredDomainType;
 import com.sap.sailing.gwt.settings.client.raceboard.RaceBoardPerspectiveOwnSettings;
@@ -58,6 +59,7 @@ import com.sap.sailing.gwt.ui.leaderboard.ScoringSchemeTypeFormatter;
 import com.sap.sailing.gwt.ui.shared.LeaderboardGroupDTO;
 import com.sap.sailing.gwt.ui.shared.RegattaDTO;
 import com.sap.sailing.gwt.ui.shared.StrippedLeaderboardDTO;
+import com.sap.sse.common.ObjectAlreadyExistsException;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.util.NaturalComparator;
 import com.sap.sse.gwt.adminconsole.AdminConsoleTableResources;
@@ -695,9 +697,9 @@ public class LeaderboardGroupConfigPanel extends AbstractRegattaPanel
                 newGroup.getOverallLeaderboardDiscardThresholds(), newGroup.getOverallLeaderboardScoringSchemeType(), new MarkedAsyncCallback<LeaderboardGroupDTO>(
                         new AsyncCallback<LeaderboardGroupDTO>() {
                             @Override
-                            public void onFailure(Throwable t) {
+                            public void onFailure(final Throwable t) {
                                 errorReporter.reportError(stringMessages.errorCreatingLeaderboardGroup(newGroup.getName())
-                                                + ": " + t.getMessage());
+                                                + ": " + getLeaderboardGroupErrorMessage(t));
                             }
                             @Override
                             public void onSuccess(LeaderboardGroupDTO newGroup) {
@@ -722,9 +724,9 @@ public class LeaderboardGroupConfigPanel extends AbstractRegattaPanel
                 updateDescriptor.getOverallLeaderboardScoringSchemeType(), new MarkedAsyncCallback<Void>(
                         new AsyncCallback<Void>() {
                             @Override
-                            public void onFailure(Throwable t) {
-                                errorReporter.reportError("Error trying to update leaderboard group " + oldGroupName + ": "
-                                        + t.getMessage());
+                            public void onFailure(final Throwable t) {
+                                errorReporter.reportError(stringMessages.errorUpdatingLeaderboardGroup(oldGroupName) + ": "
+                                        + getLeaderboardGroupErrorMessage(t));
                             }
                             @Override
                             public void onSuccess(Void v) {
@@ -776,9 +778,9 @@ public class LeaderboardGroupConfigPanel extends AbstractRegattaPanel
                 group.getOverallLeaderboardScoringSchemeType(), new MarkedAsyncCallback<Void>(
                         new AsyncCallback<Void>() {
                             @Override
-                            public void onFailure(Throwable t) {
-                                errorReporter.reportError("Error trying to update leaderboard group " + group.getName() + ": "
-                                        + t.getMessage());
+                            public void onFailure(final Throwable t) {
+                                errorReporter.reportError(stringMessages.errorUpdatingLeaderboardGroup(group.getName()) + ": "
+                                        + getLeaderboardGroupErrorMessage(t));
                             }
                             @Override
                             public void onSuccess(Void v) {
@@ -790,6 +792,23 @@ public class LeaderboardGroupConfigPanel extends AbstractRegattaPanel
                         }));
     }
     
+    private String getLeaderboardGroupErrorMessage(final Throwable caught) {
+        final String result;
+        if (caught instanceof ObjectAlreadyExistsException) {
+            final ObjectAlreadyExistsException conflict = (ObjectAlreadyExistsException) caught;
+            if (conflict.getObjectType() == ConflictObjectType.LEADERBOARD) {
+                result = stringMessages.overallLeaderboardNameAlreadyExists(conflict.getIdentifier());
+            } else if (conflict.getObjectType() == ConflictObjectType.LEADERBOARD_GROUP) {
+                result = stringMessages.leaderboardGroupNameAlreadyExists(conflict.getIdentifier());
+            } else {
+                result = caught.getMessage();
+            }
+        } else {
+            result = caught.getMessage();
+        }
+        return result;
+    }
+
     private void removeLeaderboardGroups(final Collection<LeaderboardGroupDTO> groups) {
         if (!groups.isEmpty()) {
             final Set<UUID> groupIds = new HashSet<>();

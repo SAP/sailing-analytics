@@ -69,10 +69,8 @@ public class RaceBoardPage extends HostPageWithAuthentication {
     }
 
     public MapSettingsPO openMapSettings() {
-        waitUntil(() -> moreOptionsButton.isDisplayed());
-        moreOptionsButton.click();
-        waitUntil(() -> raceMapSettingsButton.isDisplayed() && raceMapSettingsButton.getLocation().y > 100);
-        raceMapSettingsButton.click();
+        clickWhenInteractable(() -> moreOptionsButton);
+        clickWhenInteractable(() -> findElementBySeleniumId("raceMapSettingsButton"));
         waitUntil(new BooleanSupplier() {
             @Override
             public boolean getAsBoolean() {
@@ -91,8 +89,7 @@ public class RaceBoardPage extends HostPageWithAuthentication {
     }
     
     public LeaderboardSettingsDialogPO openLeaderboardSettingsDialog() {
-        waitUntil(() -> moreOptionsButton.isDisplayed());
-        moreOptionsButton.click();
+        clickWhenInteractable(() -> moreOptionsButton);
         WebElement leaderboardSettingsButton = null;
         try {
             leaderboardSettingsButton = findElementBySeleniumId("leaderboardSettingsButton");
@@ -109,7 +106,7 @@ public class RaceBoardPage extends HostPageWithAuthentication {
                     return toggleButtonElement.isDisplayed();
                 }
             });
-            findElementBySeleniumId("SplitLayoutPanelToggleButton-leaderboard").click();
+            clickWhenInteractable(() -> findElementBySeleniumId("SplitLayoutPanelToggleButton-leaderboard"));
             leaderboardSettingsButton = findElementBySeleniumId("leaderboardSettingsButton");
         }
         final WebElement finalLeaderboardSettingsButton = leaderboardSettingsButton;
@@ -120,7 +117,7 @@ public class RaceBoardPage extends HostPageWithAuthentication {
                 return finalLeaderboardSettingsButton.isDisplayed();
             }
         });
-        leaderboardSettingsButton.click();
+        clickWhenInteractable(() -> findElementBySeleniumId("leaderboardSettingsButton"));
         return new LeaderboardSettingsDialogPO(driver, findElementBySeleniumId("LeaderboardSettingsDialog"));
     }
     

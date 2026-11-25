@@ -147,7 +147,10 @@ public class HttpUrlConnectionHelper {
                     optionalOutputStreamConsumer.get().accept(outputStream);
                 }
                 if (connection.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM
-                        || connection.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
+                        || connection.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP
+                        || connection.getResponseCode() == HttpURLConnection.HTTP_SEE_OTHER
+                        || connection.getResponseCode() == 307 /* HTTP_TEMP_REDIRECT */
+                        || connection.getResponseCode() == 308 /* HTTP_PERM_REDIRECT */) {
                     String location = connection.getHeaderField("Location");
                     nextUrl = new URL(nextUrl, location);
                     connection.disconnect();

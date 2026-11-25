@@ -25,6 +25,7 @@ import com.sap.sse.landscape.aws.impl.AwsInstanceImpl;
 import com.sap.sse.landscape.aws.impl.AwsLandscapeImpl;
 import com.sap.sse.landscape.aws.impl.AwsRegion;
 import com.sap.sse.landscape.aws.impl.AwsTargetGroupImpl;
+import com.sap.sse.landscape.aws.impl.CentralApacheReverseProxy;
 import com.sap.sse.landscape.aws.impl.DNSCache;
 import com.sap.sse.landscape.aws.orchestration.AwsApplicationConfiguration;
 import com.sap.sse.landscape.aws.orchestration.ShardProcedure;
@@ -591,11 +592,10 @@ public interface AwsLandscape<ShardingKey> extends Landscape<ShardingKey> {
     ReverseProxyCluster<ShardingKey, MetricsT, ProcessT, RotatingFileBasedLog> getReverseProxyCluster(Region region);
     
     /**
-     * Returns the reverse proxy in the given region, but encapsulated within a ReverseProxyCluster.
-     * @return
+     * Returns the central reverse proxy in the given region.
      */
     <MetricsT extends ApplicationProcessMetrics, ProcessT extends AwsApplicationProcess<ShardingKey, MetricsT, ProcessT>>
-    ReverseProxyCluster<ShardingKey, MetricsT, ProcessT, RotatingFileBasedLog> getCentralReverseProxy(Region region);
+    CentralApacheReverseProxy<ShardingKey, MetricsT, ProcessT> getCentralReverseProxy(Region region);
     
     /**
      * Each region can have a single load balancer per {@code wildcardDomain} that is the target for any sub-domain of

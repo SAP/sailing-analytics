@@ -229,8 +229,6 @@ import com.sap.sailing.domain.igtimiadapter.server.riot.RiotStandardCommand;
 import com.sap.sailing.domain.leaderboard.Leaderboard;
 import com.sap.sailing.domain.leaderboard.LeaderboardGroup;
 import com.sap.sailing.domain.leaderboard.RegattaLeaderboard;
-import com.sap.sailing.domain.leaderboard.impl.LeaderboardGroupImpl;
-import com.sap.sailing.domain.leaderboard.meta.LeaderboardGroupMetaLeaderboard;
 import com.sap.sailing.domain.racelog.tracking.SensorFixStore;
 import com.sap.sailing.domain.racelogtracking.DeviceMapping;
 import com.sap.sailing.domain.racelogtracking.DeviceMappingWithRegattaLogEvent;
@@ -300,9 +298,10 @@ import com.sap.sailing.gwt.ui.shared.courseCreation.CourseTemplateDTO;
 import com.sap.sailing.gwt.ui.shared.courseCreation.MarkPropertiesDTO;
 import com.sap.sailing.gwt.ui.shared.courseCreation.MarkRoleDTO;
 import com.sap.sailing.gwt.ui.shared.courseCreation.MarkTemplateDTO;
+import com.sap.sailing.landscape.common.SharedLandscapeConstants;
 import com.sap.sailing.server.hierarchy.SailingHierarchyOwnershipUpdater;
+import com.sap.sailing.server.interfaces.LeaderboardGroupManagement;
 import com.sap.sailing.server.interfaces.RacingEventService;
-import com.sap.sailing.server.operationaltransformation.AbstractLeaderboardGroupOperation;
 import com.sap.sailing.server.operationaltransformation.AddColumnToLeaderboard;
 import com.sap.sailing.server.operationaltransformation.AddColumnToSeries;
 import com.sap.sailing.server.operationaltransformation.AddCourseAreas;
@@ -314,7 +313,6 @@ import com.sap.sailing.server.operationaltransformation.AllowCompetitorResetToDe
 import com.sap.sailing.server.operationaltransformation.ConnectTrackedRaceToLeaderboardColumn;
 import com.sap.sailing.server.operationaltransformation.CreateEvent;
 import com.sap.sailing.server.operationaltransformation.CreateFlexibleLeaderboard;
-import com.sap.sailing.server.operationaltransformation.CreateLeaderboardGroup;
 import com.sap.sailing.server.operationaltransformation.CreateRegattaLeaderboard;
 import com.sap.sailing.server.operationaltransformation.CreateRegattaLeaderboardWithEliminations;
 import com.sap.sailing.server.operationaltransformation.CreateRegattaLeaderboardWithOtherTieBreakingLeaderboard;
@@ -346,7 +344,6 @@ import com.sap.sailing.server.operationaltransformation.UpdateIsMedalRace;
 import com.sap.sailing.server.operationaltransformation.UpdateLeaderboard;
 import com.sap.sailing.server.operationaltransformation.UpdateLeaderboardCarryValue;
 import com.sap.sailing.server.operationaltransformation.UpdateLeaderboardColumnFactor;
-import com.sap.sailing.server.operationaltransformation.UpdateLeaderboardGroup;
 import com.sap.sailing.server.operationaltransformation.UpdateLeaderboardIncrementalScoreCorrection;
 import com.sap.sailing.server.operationaltransformation.UpdateLeaderboardMaxPointsReason;
 import com.sap.sailing.server.operationaltransformation.UpdateLeaderboardScoreCorrection;
@@ -405,13 +402,13 @@ import com.sap.sse.security.shared.impl.SecuredSecurityTypes.ServerActions;
 import com.sap.sse.security.shared.impl.UserGroup;
 import com.sap.sse.security.ui.server.SecurityDTOUtil;
 import com.sap.sse.security.ui.shared.SuccessInfo;
+import com.sap.sse.security.util.RemoteServerUtil;
 import com.sap.sse.shared.media.ImageDescriptor;
 import com.sap.sse.shared.media.VideoDescriptor;
 import com.sap.sse.shared.util.impl.UUIDHelper;
 import com.sap.sse.util.HttpUrlConnectionHelper;
 import com.sap.sse.util.ImageConverter;
 import com.sap.sse.util.ImageConverter.ImageWithMetadata;
-import com.sap.sse.util.ThreadPoolUtil;
 
 public class SailingServiceWriteImpl extends SailingServiceImpl implements SailingServiceWrite {
 
@@ -1362,75 +1359,23 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
                 overallLeaderboardDiscardThresholds, overallLeaderboardScoringSchemeType, leaderboards);
     }
 
-    private LeaderboardGroupDTO doCreateLeaderboardGroup(String groupName, String description, String displayName,
-            boolean displayGroupsInReverseOrder, int[] overallLeaderboardDiscardThresholds,
-            ScoringSchemeType overallLeaderboardScoringSchemeType, List<String> leaderBoards) {
-        final UUID newLeaderboardGroupId = UUID.randomUUID();
-        final Callable<LeaderboardGroupDTO> createLeaderboardGroup = ()->getSecurityService()
-            .setOwnershipCheckPermissionForObjectCreationAndRevertOnError(SecuredDomainType.LEADERBOARD_GROUP,
-                LeaderboardGroupImpl.getTypeRelativeObjectIdentifier(newLeaderboardGroupId), displayName,
-                ()->{
-                    AbstractLeaderboardGroupOperation<LeaderboardGroup> createLeaderboardGroupOp = new CreateLeaderboardGroup(
-                            newLeaderboardGroupId, groupName, description, displayName, displayGroupsInReverseOrder,
-                            leaderBoards, overallLeaderboardDiscardThresholds, overallLeaderboardScoringSchemeType);
-                    return convertToLeaderboardGroupDTO(getService().apply(createLeaderboardGroupOp), false, false);
-                });
-        final LeaderboardGroupDTO result;
-        // if an overall leaderboard is requested, establish ownership and check create permission; roll back if not possible;
-        // otherwise, try to establish the leaderboard group's ownership; if that fails with an AuthorizationException,
-        // the overall leaderboard's ownership is removed again, too.
-        if (overallLeaderboardScoringSchemeType != null) {
-            final String overallLeaderboardName = LeaderboardGroupMetaLeaderboard.getOverallLeaderboardName(groupName);
-            result = getSecurityService()
-                .setOwnershipCheckPermissionForObjectCreationAndRevertOnError(SecuredDomainType.LEADERBOARD,
-                    new TypeRelativeObjectIdentifier(overallLeaderboardName), overallLeaderboardName, createLeaderboardGroup);
-        } else {
-            try {
-                result = createLeaderboardGroup.call();
-            } catch (Exception e) {
-                throw new RuntimeException(e); // the callable isn't throwing any checked exception
-            }
-        }
-        return result;
+    private LeaderboardGroupDTO doCreateLeaderboardGroup(final String groupName, final String description,
+            final String displayName, final boolean displayGroupsInReverseOrder,
+            final int[] overallLeaderboardDiscardThresholds, final ScoringSchemeType overallLeaderboardScoringSchemeType,
+            final List<String> leaderBoards) {
+        return convertToLeaderboardGroupDTO(LeaderboardGroupManagement.createLeaderboardGroup(getService(),
+                getSecurityService(), UUID.randomUUID(), groupName, description, displayName, displayGroupsInReverseOrder,
+                leaderBoards, overallLeaderboardDiscardThresholds, overallLeaderboardScoringSchemeType),
+                /* withGeoLocationData */ false, /* withRegattaAndRaceData */ false);
     }
 
     @Override
-    public void updateLeaderboardGroup(UUID leaderboardGroupId, String oldName, String newName, String newDescription,
-            String newDisplayName, List<String> leaderboardNames, int[] overallLeaderboardDiscardThresholds,
-            ScoringSchemeType overallLeaderboardScoringSchemeType) {
-        final LeaderboardGroup leaderboardGroup = getService().getLeaderboardGroupByID(leaderboardGroupId);
-        if (leaderboardGroup == null) {
-            throw new IllegalArgumentException("Leadearboard group with ID "+leaderboardGroupId+" not found.");
-        }
-        final Action updateLeaderboardGroup = ()->{
-            SecurityUtils.getSubject()
-                .checkPermission(SecuredDomainType.LEADERBOARD_GROUP.getStringPermissionForTypeRelativeIdentifier(
-                    DefaultActions.UPDATE,
-                    LeaderboardGroupImpl.getTypeRelativeObjectIdentifier(leaderboardGroupId)));
-            getService().apply(new UpdateLeaderboardGroup(leaderboardGroupId, newName, newDescription, newDisplayName,
-                    leaderboardNames, overallLeaderboardDiscardThresholds, overallLeaderboardScoringSchemeType));
-        };
-        if (leaderboardGroup.getOverallLeaderboard() == null && overallLeaderboardScoringSchemeType != null) {
-            // an overall leaderboard will be created; check permissions:
-            final String overallLeaderboardName = LeaderboardGroupMetaLeaderboard.getOverallLeaderboardName(newName);
-            getSecurityService().setOwnershipCheckPermissionForObjectCreationAndRevertOnError(SecuredDomainType.LEADERBOARD,
-                    new TypeRelativeObjectIdentifier(overallLeaderboardName), overallLeaderboardName, updateLeaderboardGroup);
-        } else if (leaderboardGroup.getOverallLeaderboard() != null && overallLeaderboardScoringSchemeType == null) {
-            // an overall leaderboard existed but will now be removed; check permissions
-            getSecurityService().checkPermissionAndDeleteOwnershipForObjectRemoval(leaderboardGroup.getOverallLeaderboard(), updateLeaderboardGroup);
-        } else {
-            if (leaderboardGroup.getOverallLeaderboard() != null) {
-                SecurityUtils.getSubject()
-                    .checkPermission(SecuredDomainType.LEADERBOARD.getStringPermissionForTypeRelativeIdentifier(
-                        DefaultActions.UPDATE,
-                        new TypeRelativeObjectIdentifier(leaderboardGroup.getOverallLeaderboard().getName())));
-            }
-            try {
-                updateLeaderboardGroup.run();
-            } catch (Exception e) {
-                throw new RuntimeException(e); // the createLeaderboardGroup block above doesn't throw any checked exceptions
-            }
-        }
+    public void updateLeaderboardGroup(final UUID leaderboardGroupId, final String oldName, final String newName,
+            final String newDescription, final String newDisplayName, final List<String> leaderboardNames,
+            final int[] overallLeaderboardDiscardThresholds, final ScoringSchemeType overallLeaderboardScoringSchemeType) {
+        LeaderboardGroupManagement.updateLeaderboardGroup(getService(), getSecurityService(), leaderboardGroupId,
+                newName, newDescription, newDisplayName, leaderboardNames, overallLeaderboardDiscardThresholds,
+                overallLeaderboardScoringSchemeType);
     }
 
     protected void createAndAddLeaderboardGroup(final EventDTO newEvent, List<String> leaderboardNames)
@@ -1798,8 +1743,8 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
     @Override
     public UUID importMasterData(final String urlAsString, final UUID[] leaderboardGroupIds, final boolean override,
             final boolean compress, final boolean exportWind, final boolean exportDeviceConfigurations,
-            String targetServerUsername, String targetServerPassword,
-            final boolean exportTrackedRacesAndStartTracking) {
+            final String targetServerUsername, final String targetServerPassword,
+            final boolean exportTrackedRacesAndStartTracking) throws MalformedURLException {
         final UUID importOperationId = UUID.randomUUID();
         getSecurityService().checkCurrentUserServerPermission(ServerActions.CAN_IMPORT_MASTERDATA);
         final String targetServerBearerToken;
@@ -1808,19 +1753,13 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
         } else {
             targetServerBearerToken = null;
         }
-        // Create a progress indicator for as long as the server gets data from the other server.
-        // As soon as the server starts the import operation, a progress object will be built on every server
-        Runnable masterDataImportTask = new Runnable() {
-            @Override
-            public void run() {
-                getService().importMasterData(urlAsString, leaderboardGroupIds, override, compress, exportWind,
-                        exportDeviceConfigurations, targetServerUsername, targetServerPassword, targetServerBearerToken,
-                        exportTrackedRacesAndStartTracking, importOperationId);
-            }
-        };
-        // We need to convey the current user's credentials into the masterDataImportTask for default object ownership and permissions in case no
-        // deviating username and password have been provided:
-        executor.execute(ThreadPoolUtil.INSTANCE.associateWithSubjectIfAny(masterDataImportTask));
+        final URL url = RemoteServerUtil.createBaseUrl(urlAsString);
+        if (!SharedLandscapeConstants.isTrustedDomain(url.getHost())) {
+            throw new IllegalArgumentException("not a trusted domain; valid domains are: "+SharedLandscapeConstants.TRUSTED_DOMAINS);
+        }
+        getService().importMasterDataAsync(urlAsString, leaderboardGroupIds, override, compress, exportWind,
+                exportDeviceConfigurations, targetServerUsername, targetServerPassword, targetServerBearerToken,
+                exportTrackedRacesAndStartTracking, importOperationId);
         return importOperationId;
     }
 
@@ -3330,7 +3269,7 @@ public class SailingServiceWriteImpl extends SailingServiceImpl implements Saili
         final TimePoint startTrackingTimePoint = MillisecondsTimePoint.now();
         // this ensures that the events consistently have different timepoints to ensure a consistent result of the state analysis
         // that's why we can't just call adapter.denoteRaceForRaceLogTracking
-        final TimePoint denotationTimePoint = startTrackingTimePoint.minus(1);
+        final TimePoint denotationTimePoint = startTrackingTimePoint.minusResolution();
         raceLog.add(new RaceLogDenoteForTrackingEventImpl(denotationTimePoint,
                 author, raceLog.getCurrentPassId(), trackedRaceName, regatta.getBoatClass(), UUID.randomUUID()));
         raceLog.add(new RaceLogStartTrackingEventImpl(startTrackingTimePoint, author, raceLog.getCurrentPassId()));

@@ -1,0 +1,2087 @@
+{
+  "name": "Youth Worlds 2025 - Female Windsurfer",
+  "scheme": "LOW_POINT",
+  "type": "RegattaLeaderboard",
+  "displayName": "Female Windsurfer",
+  "provenance": {
+    "results": {
+      "url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboards/Youth%20Worlds%202025%20-%20Female%20Windsurfer",
+      "resolved_url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboards/Youth%20Worlds%202025%20-%20Female%20Windsurfer",
+      "fetched_at": "2026-11-12T14:28:38.582250+00:00",
+      "status": 200,
+      "sha256": "63383d32ce0b4f64004cb2ce44d4727edeb22d68cd2fe47724c46827fd2dd61c",
+      "bytes": 41751
+    },
+    "configuration": {
+      "url": "https://www.sapsailing.com/sailingserver/api/v1/regattas/Youth%20Worlds%202025%20-%20Female%20Windsurfer",
+      "resolved_url": "https://www.sapsailing.com/sailingserver/api/v1/regattas/Youth%20Worlds%202025%20-%20Female%20Windsurfer",
+      "fetched_at": "2026-11-12T14:28:38.827099+00:00",
+      "status": 200,
+      "sha256": "fdc3b64323d36de64d7781988a66e291565c9a743d07d61276b05f65be2798d1",
+      "bytes": 4620
+    },
+    "metadata": {
+      "base": "https://sapsailing.com",
+      "source": "central-metadata.json",
+      "sha256": "933a31e4dd4cde658f818e47e548e218ce8f8e0283669fbf32710569597064d8"
+    },
+    "capturedScheme": "LOW_POINT",
+    "seriesConfiguration": {
+      "url": "https://www.sapsailing.com/gwt/service/sailing",
+      "resolved_url": "https://www.sapsailing.com/gwt/service/sailing",
+      "fetched_at": "2026-11-12T14:28:39.183155+00:00",
+      "status": 200,
+      "sha256": "6ec148a6b9612f199a03c028f64294eefd820ecaa8de18c1237c2aeff98f2357",
+      "bytes": 23928,
+      "body": "8|0|6|https://www.sapsailing.com/gwt/com.sap.sailing.gwt.ui.AdminConsole/|6F6B3BBEBAE3C8B1526603DFF2CCB50A|com.sap.sailing.gwt.ui.client.SailingServiceWrite|getRegattaByName|java.lang.String/2004016611|Youth Worlds 2025 - Female Windsurfer|1|2|3|4|1|5|6|"
+    },
+    "seriesDecoder": {
+      "source": "one-stays-one-20261112/series-metadata.json",
+      "sha256": "d2769a59130014cbf8b191377979927e8f8d201a2c7579620d233d404de6be3a"
+    }
+  },
+  "timePoint": 1766158813000,
+  "canBoatsOfCompetitorsChangePerRace": false,
+  "discardThresholds": [
+    3,
+    8,
+    16
+  ],
+  "series": [
+    {
+      "name": "Course1",
+      "medal": false,
+      "parallel": true,
+      "reset": false,
+      "carry": false,
+      "contiguous": false,
+      "maximumDiscards": null,
+      "fleets": [
+        {
+          "name": "Default",
+          "ordering": 0
+        }
+      ],
+      "columns": [
+        "R1",
+        "R2"
+      ],
+      "oneAlwaysStaysOne": false,
+      "crossFleetMergedRanking": false
+    },
+    {
+      "name": "Slalom1",
+      "medal": false,
+      "parallel": true,
+      "reset": false,
+      "carry": false,
+      "contiguous": false,
+      "maximumDiscards": null,
+      "fleets": [
+        {
+          "name": "Heat 1",
+          "ordering": 0
+        },
+        {
+          "name": "Heat 2",
+          "ordering": 0
+        }
+      ],
+      "columns": [
+        "R3",
+        "R4",
+        "R5"
+      ],
+      "oneAlwaysStaysOne": true,
+      "crossFleetMergedRanking": false
+    },
+    {
+      "name": "Course2",
+      "medal": false,
+      "parallel": true,
+      "reset": false,
+      "carry": false,
+      "contiguous": false,
+      "maximumDiscards": null,
+      "fleets": [
+        {
+          "name": "Default",
+          "ordering": 0
+        }
+      ],
+      "columns": [
+        "R6",
+        "R7"
+      ],
+      "oneAlwaysStaysOne": false,
+      "crossFleetMergedRanking": false
+    },
+    {
+      "name": "Slalom2",
+      "medal": false,
+      "parallel": true,
+      "reset": false,
+      "carry": false,
+      "contiguous": false,
+      "maximumDiscards": null,
+      "fleets": [
+        {
+          "name": "Heat 1",
+          "ordering": 0
+        },
+        {
+          "name": "Heat 2",
+          "ordering": 0
+        }
+      ],
+      "columns": [],
+      "oneAlwaysStaysOne": true,
+      "crossFleetMergedRanking": false
+    }
+  ],
+  "columns": [
+    {
+      "name": "R1",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R2",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R3",
+      "factor": 2,
+      "explicitFactor": 2,
+      "oneAlwaysStaysOne": true
+    },
+    {
+      "name": "R4",
+      "factor": 2,
+      "explicitFactor": 2,
+      "oneAlwaysStaysOne": true
+    },
+    {
+      "name": "R5",
+      "factor": 2,
+      "explicitFactor": 2,
+      "oneAlwaysStaysOne": true
+    },
+    {
+      "name": "R6",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "R7",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    }
+  ],
+  "competitors": [
+    {
+      "id": "580c1124-1f0d-4624-81c2-c16d349841f0",
+      "name": "Medea Marisa Falcioni",
+      "displayName": "Medea Marisa Falcioni",
+      "sailID": "ITA",
+      "expectedRank": 1,
+      "expectedTotal": 6.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 1",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "46b86d68-f428-4b0f-bede-bb5b54df2608",
+      "name": "Taisia Stopchenko",
+      "displayName": "Taisia Stopchenko",
+      "sailID": "AIN",
+      "expectedRank": 2,
+      "expectedTotal": 13.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        }
+      ]
+    },
+    {
+      "id": "212f6533-6c26-48e6-a2a7-b88fa6e32e32",
+      "name": "Nurhayat Guven",
+      "displayName": "Nurhayat Guven",
+      "sailID": "TUR",
+      "expectedRank": 3,
+      "expectedTotal": 15.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 2",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 2",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "2d851a4f-79d2-4c40-b443-2ce7b744e728",
+      "name": "Salomé Simon",
+      "displayName": "Salomé Simon",
+      "sailID": "FRA",
+      "expectedRank": 4,
+      "expectedTotal": 32.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 13.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "d293d592-de58-448c-8967-f4c83361d197",
+      "name": "Martina Mantovani Borrás",
+      "displayName": "Martina Mantovani Borrás",
+      "sailID": "ESP",
+      "expectedRank": 5,
+      "expectedTotal": 36.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 11.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 11.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 13.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "861f2e50-5534-4803-bd6a-36c8af2a3d45",
+      "name": "Alba Klein Meghnagi",
+      "displayName": "Alba Klein Meghnagi",
+      "sailID": "ISR",
+      "expectedRank": 6,
+      "expectedTotal": 36.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 1",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "86b496da-68e7-4a17-b9a0-4a0acf1ebd7e",
+      "name": "Yfke Van Der Meer",
+      "displayName": "Yfke Van Der Meer",
+      "sailID": "NED",
+      "expectedRank": 7,
+      "expectedTotal": 40.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 1",
+          "points": 19.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 1",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 15.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 15.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "0bd23a7e-3f10-4c19-9691-b47e1e67a2d5",
+      "name": "Emma Schleicher",
+      "displayName": "Emma Schleicher",
+      "sailID": "GER",
+      "expectedRank": 8,
+      "expectedTotal": 51.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 12.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 12.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 12.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 12.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 1",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 1",
+          "points": 11.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 11.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 1",
+          "points": 15.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "5f9b0de3-c73d-464a-8f75-9841d61b2284",
+      "name": "Akari Oshima",
+      "displayName": "Akari Oshima",
+      "sailID": "JPN",
+      "expectedRank": 9,
+      "expectedTotal": 56.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 10.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 10.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 2",
+          "points": 13.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 2",
+          "points": 11.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 11.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 12.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 12.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 10.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 10.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "a1a7a791-0bf9-44f8-a6b4-76eff704bb8d",
+      "name": "Sophie Clark",
+      "displayName": "Sophie Clark",
+      "sailID": "GBR",
+      "expectedRank": 10,
+      "expectedTotal": 59.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 2",
+          "points": 29.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 2",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 2",
+          "points": 19.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 19.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 14.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 14.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "99b22b6e-dbcd-4036-8e57-fffc4aa523dd",
+      "name": "Chiara Ferretti",
+      "displayName": "Chiara Ferretti",
+      "sailID": "ARG",
+      "expectedRank": 11,
+      "expectedTotal": 60.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 15.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 15.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 14.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 14.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 2",
+          "points": 29.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 2",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 1",
+          "points": 11.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 11.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 8.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 8.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "beb6d022-5c9b-4d9c-a0fb-dc86db08456c",
+      "name": "Tsz Yuet Cheung",
+      "displayName": "Tsz Yuet Cheung",
+      "sailID": "HKG",
+      "expectedRank": 12,
+      "expectedTotal": 62.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 6.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 6.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 1",
+          "points": 13.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 13.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 1",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 1",
+          "points": 13.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 13.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 14.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 14.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 17.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        }
+      ]
+    },
+    {
+      "id": "73c933f4-11a0-4aa7-b82b-fac689ac12a5",
+      "name": "Hanna Simon",
+      "displayName": "Hanna Simon",
+      "sailID": "HUN",
+      "expectedRank": 13,
+      "expectedTotal": 67.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 10.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 10.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 2",
+          "points": 29.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 2",
+          "points": 11.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 11.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 2",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 18.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 18.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 16.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 16.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "bf8e65ce-440a-412a-94f4-a53ffe46162f",
+      "name": "Daniella Wooldridge",
+      "displayName": "Daniella Wooldridge",
+      "sailID": "NZL",
+      "expectedRank": 14,
+      "expectedTotal": 87.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 16.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 16.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 15.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 15.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 2",
+          "points": 29.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 2",
+          "points": 19.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 19.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 2",
+          "points": 17.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 17.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 11.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 11.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "5af68ca6-bddf-45ba-8c4d-ad40cb0d7859",
+      "name": "Alexandra Lojinova",
+      "displayName": "Alexandra Lojinova",
+      "sailID": "CZE",
+      "expectedRank": 15,
+      "expectedTotal": 88.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "NSC",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 1",
+          "points": 11.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 11.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 1",
+          "points": 17.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 17.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 2",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 11.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 11.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 13.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 13.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "4e5d5cd5-2bbb-47f5-af41-2adcdecf92e3",
+      "name": "Bertha Kivistik",
+      "displayName": "Bertha Kivistik",
+      "sailID": "EST",
+      "expectedRank": 16,
+      "expectedTotal": 89.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 2",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 2",
+          "points": 15.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 15.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 1",
+          "points": 7.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 7.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 16.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 16.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 15.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 15.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "cfe88550-2d1c-40c9-9bd6-f2e4f4f15134",
+      "name": "Amelia Wilson",
+      "displayName": "Amelia Wilson",
+      "sailID": "AUS",
+      "expectedRank": 17,
+      "expectedTotal": 91.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 11.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 11.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 13.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 13.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 1",
+          "points": 29.0,
+          "reason": "BFD",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 1",
+          "points": 19.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 19.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 2",
+          "points": 13.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 13.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 17.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 17.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 18.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 18.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "558dc5e5-1f46-4a51-ba20-5a97827c2ead",
+      "name": "Ewa Miarczynska",
+      "displayName": "Ewa Miarczynska",
+      "sailID": "POL",
+      "expectedRank": 18,
+      "expectedTotal": 97.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 14.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 14.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 1",
+          "points": 17.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 17.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 1",
+          "points": 23.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 23.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 2",
+          "points": 21.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 21.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 10.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 10.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 12.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 12.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "fe64b056-3b99-426c-a6df-d61b7e95e164",
+      "name": "Gayeon Baek",
+      "displayName": "Gayeon Baek",
+      "sailID": "KOR",
+      "expectedRank": 19,
+      "expectedTotal": 114.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 1",
+          "points": 15.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 15.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 1",
+          "points": 13.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 13.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 1",
+          "points": 17.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 17.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 21.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 21.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 21.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 21.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "fb689a45-a098-4e7e-9934-84866a3b45ca",
+      "name": "Angyal Chew",
+      "displayName": "Angyal Chew",
+      "sailID": "SGP",
+      "expectedRank": 20,
+      "expectedTotal": 117.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 1",
+          "points": 9.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 9.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 1",
+          "points": 15.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 15.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 1",
+          "points": 23.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 23.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 20.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 20.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 23.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 23.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "5a84b474-530c-4b59-90d6-d1063b15d26e",
+      "name": "Ane Fiskvik Mjøen",
+      "displayName": "Ane Fiskvik Mjøen",
+      "sailID": "NOR",
+      "expectedRank": 21,
+      "expectedTotal": 128.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 1",
+          "points": 29.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 1",
+          "points": 21.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 21.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 2",
+          "points": 15.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 15.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 19.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 19.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 19.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 19.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "77ef3cf6-e258-42f0-b358-9f0631b5d0ad",
+      "name": "Graceanna Dixon",
+      "displayName": "Graceanna Dixon",
+      "sailID": "USA",
+      "expectedRank": 22,
+      "expectedTotal": 137.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 2",
+          "points": 29.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 2",
+          "points": 17.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 17.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 1",
+          "points": 21.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 21.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 23.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 23.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 22.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 22.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "148e5a34-35f2-45bc-a83d-02e151582463",
+      "name": "Kaelyn Emma Holmes",
+      "displayName": "Kaelyn Emma Holmes",
+      "sailID": "PUR",
+      "expectedRank": 23,
+      "expectedTotal": 144.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 2",
+          "points": 29.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 2",
+          "points": 29.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 29.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 1",
+          "points": 19.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 19.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 22.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 22.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 20.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 20.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "f9c7cf65-967d-4d3b-8d26-1c15f9288fd4",
+      "name": "Sofia Rubini",
+      "displayName": "Sofia Rubini",
+      "sailID": "PER",
+      "expectedRank": 24,
+      "expectedTotal": 158.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 2",
+          "points": 29.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 2",
+          "points": 21.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 21.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 2",
+          "points": 29.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 29.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "8ead1a3a-66e2-4fde-ba63-0007755ad262",
+      "name": "Emilie Wade",
+      "displayName": "Emilie Wade",
+      "sailID": "FIJ",
+      "expectedRank": 25,
+      "expectedTotal": 166.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 2",
+          "points": 29.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 2",
+          "points": 29.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 29.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 1",
+          "points": 29.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 29.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNC",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNC",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "8ec4b1e9-ca73-42b9-aa5a-2417d27d5257",
+      "name": "Syrine Mahjoub",
+      "displayName": "Syrine Mahjoub",
+      "sailID": "TUN",
+      "expectedRank": 26,
+      "expectedTotal": 166.0,
+      "cells": [
+        {
+          "column": "R1",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R2",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R3",
+          "fleet": "Heat 1",
+          "points": 29.0,
+          "reason": "DNC",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": true
+        },
+        {
+          "column": "R4",
+          "fleet": "Heat 1",
+          "points": 29.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 29.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R5",
+          "fleet": "Heat 2",
+          "points": 29.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 29.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R6",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "R7",
+          "fleet": "Default",
+          "points": 27.0,
+          "reason": "DNC",
+          "isCorrected": true,
+          "expectedNet": 27.0,
+          "expectedDiscard": false
+        }
+      ]
+    }
+  ],
+  "configurationNotes": "Complete 26-by-7 board. GWT getRegattaByName independently confirms oneAlwaysStaysOne and absent series-local discard rules; leaderboard thresholds are [3,8,16]. R3-R5 use factor 2 with offset 1. Empty Slalom2 retains its true flag."
+}

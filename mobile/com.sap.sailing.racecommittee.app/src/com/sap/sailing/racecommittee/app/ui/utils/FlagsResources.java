@@ -3,7 +3,7 @@ package com.sap.sailing.racecommittee.app.ui.utils;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 
 import com.sap.sailing.domain.common.racelog.Flags;
 

@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <link href='../../../../sailing-fontface-1.0.cache.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+    <link href='../../../main.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+    <link rel='icon' href='../../../../sap.ico' type='image/x-icon'>
+    <title>SAP Sailing Analytics Webservices API Version 1.0</title>
+</head>
+<body>
+<h1>SAP Sailing Analytics Webservices API Version 1.0</h1>
+<h2>URL: /sailinglandscape/api/landscape/stopreplicatingandremovemasterfromtargetgroups</h2>
+
+<b>Description:</b>
+ <p>Prepares a replica set's master process to be taken out of service without losing read availability. First, it is
+ ensured that at least one replica exists: if no running replica is found in the set, a new one is started. Then all
+ replicas stop replicating the current master, and the master is de-registered from both target groups so that it no
+ longer receives traffic. The master process itself is left running; this service does not terminate it or its host.
+ It is typically used as a preparatory step before other maintenance on the master. Because it de-registers the master
+ that may be serving a race being tracked live, see the <tt>force</tt> parameter below.</p>
+ <br />
+ <table>
+    <tr>
+        <td>Webservice Type:</td>
+        <td>POST</td>
+    </tr>
+    <tr>
+        <td>Output format:</td>
+        <td>json</td>
+    </tr>
+    <tr>
+        <td>Mandatory query parameters:</td>
+        <td>
+            <div><tt>regionId</tt>, region where the replica set is located, e.g., eu-west-1</div>
+            <div><tt>replicaSetName</tt>, name of the replica set; used as the hostname to which the domain name is appended, as well as
+                                 for the database and RabbitMQ exchange name</div>
+        </td>
+    </tr>
+    <tr>
+        <td>Optional form parameters:</td>
+        <td>
+            <div><tt>keyName</tt>, the name of the SSH key to use; must identify an existing SSH key by that name in the region specified
+                          and will be used to log on to existing and new instances using a root ssh connection. If not specified, the
+                          key used to launch an instance will be used for trying to connect to it, and a private key with matching name
+                          for the respective region will be looked up.</div>
+            <div><tt>privateKeyEncryptionPassphrase</tt>, the pass phrase to decrypt the private key for the key specified by the keyName parameter</div>
+            <div><tt>replicaReplicationBearerToken</tt>, the bearer token a newly started replica will use to replicate its master server; defaults to the
+                                               bearer token of the user authenticated for this request. Note that this requires the
+                                               server processing this request to share the security information from security-service.sapsailing.com, too.</div>
+            <div><tt>timeoutInMilliseconds</tt>, timeout in milliseconds to wait for responses from nodes when analyzing the replica sets
+                                        existing in the region; if not specified, waiting will not time out.</div>
+            <div><tt>force</tt>, boolean value defaulting to <tt>false</tt>. Before de-registering the master, the replica set is
+                        checked for <em>live content</em>, that is, races that are currently being tracked live. Taking the master
+                        out of the target groups while a race is tracked live on it would interrupt that live tracking. If live
+                        content is detected and <tt>force</tt> is <tt>false</tt> (the default), the operation is aborted and the
+                        service responds with HTTP status <tt>409 Conflict</tt> and a JSON body describing the offending replica
+                        set, events and races (the body has the same structure as the response of the
+                        <a href="/sailingserver/webservices/api/v1/livecontentGetDoc.html">live-content</a> service). Set
+                        <tt>force</tt> to <tt>true</tt> to bypass this safety check and proceed regardless of any live content,
+                        knowingly accepting the disruption of any live tracking.</div>
+        </td>
+    </tr>
+    <tr>
+        <td>Request method:</td>
+        <td>POST</td>
+    </tr>
+    <tr>
+        <td>Example:</td>
+        <td>curl -X POST -d 'regionId=eu-west-2' -d 'replicaSetName=mynewevent' -d 'keyName=Horst' --data-urlencode 'privateKeyEncryptionPassphrase=HorstsSuperSecretPassword' -H 'Authorization: Bearer RwGK+DV38LKjeuDu+Bx87/3blLJHD7Ff+NCLeud9nRQ=' "https://sapsailing.com/sailinglandscape/api/landscape/stopreplicatingandremovemasterfromtargetgroups"<br>
+        produces output (<tt>additionalReplicaStarted</tt> is <tt>true</tt> if a new replica had to be started because none was running):<pre>
+            {
+              "additionalReplicaStarted": false
+            }
+        </pre>
+        </td>
+    </tr>
+</table>
+<div style="height: 1em;"></div>
+<a href="index.html">Back to Web Service Overview</a>
+</body>
+</html>

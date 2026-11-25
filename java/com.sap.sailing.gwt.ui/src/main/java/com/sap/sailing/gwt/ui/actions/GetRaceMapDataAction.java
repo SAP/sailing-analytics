@@ -38,7 +38,7 @@ public class GetRaceMapDataAction extends AbstractGetMapRelatedDataAction<RaceMa
     private boolean targetEstimationRequired;
     private final TimeRangeActionsExecutor<CompactBoatPositionsDTO, GPSFixDTOWithSpeedWindTackAndLegTypeIterable, Pair<String, DetailType>> timeRangeActionsExecutor;
     private final GetBoatPositionsCallback getBoatPositionsCallback;
-    
+
     public GetRaceMapDataAction(SailingServiceAsync sailingService,
             TimeRangeActionsExecutor<CompactBoatPositionsDTO, GPSFixDTOWithSpeedWindTackAndLegTypeIterable, Pair<String, DetailType>> timeRangeActionsExecutor,
             Map<String, CompetitorDTO> competitorsByIdAsString, RegattaAndRaceIdentifier raceIdentifier, Date date, Map<String, Date> from,

@@ -7,15 +7,15 @@ public interface RaceType {
     
     public enum OlympicRaceCode {
 
-//        SAM102000 Men's Windsurfer = Windsufer M�nner RS:X
+//        SAM102000 Men's Windsurfer = Windsufer Männer RS:X
 //        SAW102000 Women's Windsurfer = Windsurfer Damen RS:X
-//        SAM004000 Men's One Person Dinghy = Laser M�nner
+//        SAM004000 Men's One Person Dinghy = Laser Männer
 //        SAW103000 Women's One Person Dinghy = Laser Damen Laser Radial
-//        SAM002000 Men's One Person Dinghy Heavy = Finn Dinghy M�nner
-//        SAM005000 Men's Two Person Dinghy = 470er M�nner
+//        SAM002000 Men's One Person Dinghy Heavy = Finn Dinghy Männer
+//        SAM005000 Men's Two Person Dinghy = 470er Männer
 //        SAW005000 Women's Two Person Dinghy = 470er Damen
-//        SAM009000 Men's Skiff = 49er M�nner
-//        SAM007000 Men's Keelboat = Starboot M�nner 
+//        SAM009000 Men's Skiff = 49er Männer
+//        SAM007000 Men's Keelboat = Starboot Männer 
 //        SAW010000 Women's Match Racing = Matchrace Damen Elliott 6M (modified)
         
 

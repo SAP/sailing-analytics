@@ -60,8 +60,8 @@ public abstract class BaseRegattaLogDeviceMappingFinder<ItemT extends WithID>
                 }
                 log.revokeEvent(event.getAuthor(), event,
                         "removing single time point " + fixTimePoint + " from mapping for " + item);
-                final TimePoint endOfFirstHalf = fixTimePoint.minus(1);
-                final TimePoint startOfSecondHalf = fixTimePoint.plus(1);
+                final TimePoint endOfFirstHalf = fixTimePoint.minusResolution();
+                final TimePoint startOfSecondHalf = fixTimePoint.plusResolution();
                 if (!endOfFirstHalf.before(from)) {
                     log.add(createDeviceMappingEvent(item, event.getAuthor(), from, endOfFirstHalf, event.getDevice()));
                 }

@@ -10,6 +10,7 @@ import com.sap.sailing.android.tracking.app.ui.activities.TrackingActivity;
 import com.sap.sailing.android.tracking.app.utils.AppPreferences;
 
 import android.annotation.TargetApi;
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -62,6 +63,7 @@ public class TrackingFragment extends BaseFragment {
     }
 
     @Override
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     public void onResume() {
         super.onResume();
         // so it initally updates to "battery-saving" etc.
@@ -77,7 +79,11 @@ public class TrackingFragment extends BaseFragment {
                 LocationHelper.showNoGPSError(getActivity(), getString(R.string.enable_gps));
             }
         };
-        getActivity().registerReceiver(gpsDisabledReceiver, filter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getActivity().registerReceiver(gpsDisabledReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            getActivity().registerReceiver(gpsDisabledReceiver, filter);
+        }
         if (!isLocationEnabled(getActivity())) {
             LocationHelper.showNoGPSError(getActivity(), getString(R.string.enable_gps));
         }

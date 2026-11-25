@@ -8,6 +8,7 @@ Automatic-Module-Name: com.sap.sailing.server.gateway.interface
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: com.sap.sailing.server.gateway.interfaces
 Import-Package: com.sap.sailing.domain.common,
+ com.sap.sailing.landscape.common,
  com.sap.sse.common,
  com.sap.sse.security.util
 Require-Bundle: org.json.simple,

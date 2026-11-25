@@ -116,6 +116,7 @@ public class TimeRangeResultCacheTest {
         assertEquals(fourthExpectedRange, cache.trimAndRegisterRequest(fourthRange, false, fourthAction, getCallback(true)));
         assertEquals(4, cache.getCacheSize());
         cache.registerResult(firstAction, null);
+        cache.getResults(firstAction);
         assertEquals(4, cache.getCacheSize());
         cache.registerFailure(secondAction, new Throwable("Second request failed"));
         assertEquals(2, cache.getCacheSize());
@@ -124,6 +125,46 @@ public class TimeRangeResultCacheTest {
         cache.registerResult(thirdAction, null);
         assertEquals(2, cache.getCacheSize());
         cache.getResults(fourthAction);
+    }
+
+    @Test
+    public void testDependentCompletionPreservesUnretrievedResult() {
+        final TimeRangeResultCache<Integer> cache = new TimeRangeResultCache<>();
+        final TimeRangeAsyncAction<Integer, String> firstAction = getDummyAction();
+        final TimeRangeAsyncAction<Integer, String> dependentAction = getDummyAction();
+        final TimeRange firstRange = new MilliTimeRange(/* from */ 10, /* to */ 20);
+        cache.trimAndRegisterRequest(firstRange, /* forceTimeRange */ false, firstAction, getCallback(/* assertSuccess */ true));
+        cache.trimAndRegisterRequest(new MilliTimeRange(/* from */ 15, /* to */ 25), /* forceTimeRange */ false,
+                dependentAction, getCallback(/* assertSuccess */ true));
+        cache.registerResult(firstAction, /* subResult */ 1);
+        cache.registerResult(dependentAction, /* subResult */ 2);
+        cache.getResults(dependentAction);
+        // The first action may still be waiting for other keys before collecting this key's result.
+        assertEquals(/* expected */ 1, cache.getCacheSize());
+        assertEquals(Collections.singletonList(new Pair<>(firstRange, /* b */ 1)), cache.getResults(firstAction));
+        assertEquals(/* expected */ 0, cache.getCacheSize());
+    }
+
+    @Test
+    public void testDependencyFailureRetainsRequestUntilOwnResponse() {
+        // Both a successful and a failed late response must be accepted and release the remaining entry.
+        for (final boolean lateResponseFails : new boolean[] { false, true }) {
+            final TimeRangeResultCache<Integer> cache = new TimeRangeResultCache<>();
+            final TimeRangeAsyncAction<Integer, String> firstAction = getDummyAction();
+            final TimeRangeAsyncAction<Integer, String> dependentAction = getDummyAction();
+            cache.trimAndRegisterRequest(new MilliTimeRange(/* from */ 10, /* to */ 20), /* forceTimeRange */ false,
+                    firstAction, getCallback(/* assertSuccess */ false));
+            cache.trimAndRegisterRequest(new MilliTimeRange(/* from */ 15, /* to */ 25), /* forceTimeRange */ false,
+                    dependentAction, getCallback(/* assertSuccess */ false));
+            cache.registerFailure(firstAction, new Exception("Dependency failed"));
+            assertEquals(/* expected */ 1, cache.getCacheSize());
+            if (lateResponseFails) {
+                cache.registerFailure(dependentAction, new Exception("Own request failed too"));
+            } else {
+                cache.registerResult(dependentAction, /* subResult */ 2);
+            }
+            assertEquals(/* expected */ 0, cache.getCacheSize());
+        }
     }
 
     @Test

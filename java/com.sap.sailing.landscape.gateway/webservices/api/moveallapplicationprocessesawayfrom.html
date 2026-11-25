@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <link href='../../../../sailing-fontface-1.0.cache.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+    <link href='../../../main.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+    <link rel='icon' href='../../../../sap.ico' type='image/x-icon'>
+    <title>SAP Sailing Analytics Webservices API Version 1.0</title>
+</head>
+<body>
+<h1>SAP Sailing Analytics Webservices API Version 1.0</h1>
+<h2>URL: /sailinglandscape/api/landscape/moveallapplicationprocessesawayfrom</h2>
+
+<b>Description:</b>
+ <p>Moves all application processes (masters and replicas) currently running on a given shared "multi-instance" host to
+ another (newly launched, if necessary) shared instance, so that the original host can be freed up, e.g., for
+ termination or maintenance. The source host must be a multi-instance host intended for sharing, indicated by the tag
+ value <tt>___multi___</tt> on its <tt>sailing-analytics-server</tt> tag; otherwise the operation is rejected. Replicas
+ are moved by launching a replacement on the new host, adding it to its target group once healthy and then removing the
+ old one. Moving a master is more intrusive: it is de-registered from its target groups and re-deployed on the new
+ host. Because moving a master interrupts a race being tracked live on it, masters serving live content are protected
+ by default; see the <tt>forceReplicaSet</tt> parameter below.</p>
+ <br />
+ <table>
+    <tr>
+        <td>Webservice Type:</td>
+        <td>POST</td>
+    </tr>
+    <tr>
+        <td>Output format:</td>
+        <td>json</td>
+    </tr>
+    <tr>
+        <td>Mandatory query parameters:</td>
+        <td>
+            <div><tt>regionId</tt>, region where the host is located, e.g., eu-west-1</div>
+            <div><tt>instanceId</tt>, the AWS instance ID of the shared multi-instance host to move all application processes away from</div>
+        </td>
+    </tr>
+    <tr>
+        <td>Optional form parameters:</td>
+        <td>
+            <div><tt>instanceType</tt>, AWS instance type, such as <tt>I3_2_XLARGE</tt>, to use in case a new instance must be launched
+                          to accommodate the moved processes. If not specified, the new instance uses the same instance type as the
+                          host the processes are moved away from.</div>
+            <div><tt>keyName</tt>, the name of the SSH key to use; must identify an existing SSH key by that name in the region specified
+                          and will be used to log on to existing and new instances using a root ssh connection. If not specified, the
+                          key used to launch an instance will be used for trying to connect to it, and a private key with matching name
+                          for the respective region will be looked up.</div>
+            <div><tt>privateKeyEncryptionPassphrase</tt>, the pass phrase to decrypt the private key for the key specified by the keyName parameter</div>
+            <div><tt>forceReplicaSet</tt>, the name of a replica set whose master should be moved even if it currently serves
+                          <em>live content</em>, that is, a race that is being tracked live. This parameter may be repeated to name
+                          several replica sets (e.g., <tt>-d 'forceReplicaSet=alpha' -d 'forceReplicaSet=beta'</tt>). Before any master
+                          is moved, each affected master whose replica set is <em>not</em> named here is checked for live content; if
+                          any such replica set is found to have live content, no master is moved and the service responds with HTTP
+                          status <tt>409 Conflict</tt> and a JSON body describing the offending replica set(s), events and races (the
+                          body has the same structure as the response of the
+                          <a href="/sailingserver/webservices/api/v1/livecontentGetDoc.html">live-content</a> service). Naming a
+                          replica set here skips that safety check for it and forces its master to be moved regardless of any live
+                          content, knowingly accepting the disruption of any live tracking on it. Unlike the <tt>force</tt> flag of the
+                          other landscape services, this parameter is per replica set rather than a single boolean, because this
+                          operation may affect the masters of several replica sets at once.</div>
+        </td>
+    </tr>
+    <tr>
+        <td>Request method:</td>
+        <td>POST</td>
+    </tr>
+    <tr>
+        <td>Example:</td>
+        <td>curl -X POST -d 'regionId=eu-west-2' -d 'instanceId=i-0123456789abcdef0' -d 'keyName=Horst' --data-urlencode 'privateKeyEncryptionPassphrase=HorstsSuperSecretPassword' -H 'Authorization: Bearer RwGK+DV38LKjeuDu+Bx87/3blLJHD7Ff+NCLeud9nRQ=' "https://sapsailing.com/sailinglandscape/api/landscape/moveallapplicationprocessesawayfrom"<br>
+        produces output (the <tt>masterProcessesMoved</tt> and <tt>replicaProcessesMoved</tt> arrays list the moved processes by their replica set name):<pre>
+            {
+              "newHostId": "i-0fedcba9876543210",
+              "masterProcessesMoved": [
+                { "replicaSetName": "alpha", "port": 8080 }
+              ],
+              "replicaProcessesMoved": [
+                { "replicaSetName": "beta", "port": 8081 }
+              ]
+            }
+        </pre>
+        </td>
+    </tr>
+</table>
+<div style="height: 1em;"></div>
+<a href="index.html">Back to Web Service Overview</a>
+</body>
+</html>

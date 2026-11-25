@@ -22,14 +22,14 @@
     <string name="race_first_finisher">"Primer finalista a %1$s"</string>
     <string name="race_first_finisher_and_time_limit">"Primer finalista a %1$s, el límite de finalización de prueba es de %2$s"</string>
     <string name="race_time_limit">"Límite de finalización de prueba es de %s"</string>
-    <string name="choose_startmode">"Seleccione el modo de salida para esta prueba "</string>
-    <string name="choose_abort_mode">"Seleccione las indicadores que desea visualizar "</string>
-    <string name="choose_abort_flag_mode">"Seleccione el modo de indicador de anulación "</string>
+    <string name="choose_startmode">"Seleccione el modo de salida para esta prueba"</string>
+    <string name="choose_abort_mode">"Seleccione las indicadores que desea visualizar"</string>
+    <string name="choose_abort_flag_mode">"Seleccione el modo de indicador de anulación"</string>
     <string name="flags_up">"ARRIBA"</string>
     <string name="flags_down">"ABAJO"</string>
-    <string name="ap_or_november">"Seleccione el indicador de anulación "</string>
-    <string name="choose_start_mode_flag">"Seleccione un indicador de modo de salida "</string>
-    <string name="abort_starting_phase">"Anule la fase de salida "</string>
+    <string name="ap_or_november">"Seleccione el indicador de anulación"</string>
+    <string name="choose_start_mode_flag">"Seleccione un indicador de modo de salida"</string>
+    <string name="abort_starting_phase">"Anule la fase de salida"</string>
     <string name="abort_running_race">"Anule la prueba"</string>
     <string name="choose_xray_flag_up">"Visualice el recordatorio individual"</string>
     <string name="choose_xray_flag_down">"Elimine el recordatorio individual"</string>
@@ -470,7 +470,7 @@
     <string name="dependent_races_prompt">"Seleccione la prueba"</string>
     <string name="minutes_after">"Minutos después"</string>
     <string name="minutes_after_long">"%1$.0f min. después %2$s"</string>
-    <string name="wind_accuracy_ago">"Hace "</string>
+    <string name="wind_accuracy_ago">"Hace"</string>
     <string name="gate_time_schedule_long">"%1$d + %2$d = %3$d minutos"</string>
     <string name="gate_time_schedule_short">"%d minutos"</string>
     <string name="not_available">"n/a"</string>

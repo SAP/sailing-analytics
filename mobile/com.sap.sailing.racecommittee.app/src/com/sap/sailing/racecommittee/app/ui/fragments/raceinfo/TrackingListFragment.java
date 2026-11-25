@@ -5,15 +5,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.content.Loader;
-import android.support.v4.util.ObjectsCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.annotation.Nullable;
+import androidx.loader.content.Loader;
+import androidx.core.util.ObjectsCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -373,25 +373,19 @@ public class TrackingListFragment extends BaseFragment
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.by_short_name:
-                mComparator = mComparators.get(SORT_SHORT_NAME);
-                break;
-            case R.id.by_name:
-                mComparator = mComparators.get(SORT_NAME);
-                break;
-            case R.id.by_start:
-                mComparator = mComparators.get(SORT_START);
-                break;
-            case R.id.by_goal:
-                mComparator = mComparators.get(SORT_GOAL);
-                break;
-            case R.id.by_boat:
-                mComparator = mComparators.get(SORT_SAIL_NUMBER);
-                break;
-            default:
-                mComparator = mComparators.get(SORT_SAIL_NUMBER);
-
+        final int id = item.getItemId();
+        if (id == R.id.by_short_name) {
+            mComparator = mComparators.get(SORT_SHORT_NAME);
+        } else if (id == R.id.by_name) {
+            mComparator = mComparators.get(SORT_NAME);
+        } else if (id == R.id.by_start) {
+            mComparator = mComparators.get(SORT_START);
+        } else if (id == R.id.by_goal) {
+            mComparator = mComparators.get(SORT_GOAL);
+        } else if (id == R.id.by_boat) {
+            mComparator = mComparators.get(SORT_SAIL_NUMBER);
+        } else {
+            mComparator = mComparators.get(SORT_SAIL_NUMBER);
         }
         sortCompetitors();
         mCompetitorAdapter.notifyDataSetChanged();
@@ -888,14 +882,11 @@ public class TrackingListFragment extends BaseFragment
     @Override
     public void onClick(View v) {
         if (v != null) {
-            switch (v.getId()) {
-                case R.id.nav_prev:
-                    viewPanel(MOVE_DOWN);
-                    break;
-
-                case R.id.nav_next:
-                    viewPanel(MOVE_UP);
-                    break;
+            final int id = v.getId();
+            if (id == R.id.nav_prev) {
+                viewPanel(MOVE_DOWN);
+            } else if (id == R.id.nav_next) {
+                viewPanel(MOVE_UP);
             }
         }
         if (mHeader != null) {

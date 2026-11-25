@@ -2,7 +2,7 @@ package com.sap.sailing.android.tracking.app.utils;
 
 import android.content.DialogInterface;
 import android.net.Uri;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.widget.Toast;
 
 import com.sap.sailing.android.shared.data.http.HttpGetRequest;

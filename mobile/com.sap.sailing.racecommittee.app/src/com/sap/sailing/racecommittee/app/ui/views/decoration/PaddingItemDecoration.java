@@ -1,7 +1,7 @@
 package com.sap.sailing.racecommittee.app.ui.views.decoration;
 
 import android.graphics.Rect;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
 public class PaddingItemDecoration extends RecyclerView.ItemDecoration {

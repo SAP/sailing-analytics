@@ -16,9 +16,9 @@ import com.sap.sse.common.util.NaturalComparator;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.Preference.OnPreferenceClickListener;
-import android.support.v7.preference.PreferenceScreen;
+import androidx.preference.Preference;
+import androidx.preference.Preference.OnPreferenceClickListener;
+import androidx.preference.PreferenceScreen;
 
 public class RegattaSpecificPreferenceFragment extends BasePreferenceFragment {
 

@@ -8,10 +8,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Logger;
@@ -70,6 +73,15 @@ public class GithubReleasesRepository extends AbstractReleaseRepository implemen
     private final static String GITHUB_API_BASE_URL = "https://api.github.com";
     private final static String GITHUB_BASE_URL = "https://github.com";
     private final static int NUMBER_OF_RELEASES_PER_PAGE = 100; // default would be 30; maximum is 100
+    /**
+     * Content types under which the release {@code .tar.gz} archive asset may be published on GitHub. Historically the
+     * release workflow set {@code application/x-tar} explicitly; when the type is inferred from the file extension it
+     * instead becomes {@code application/gzip} (the value the {@code mime-types} library returns for {@code .gz}). Other
+     * types are commonly seen in the wild for a gzip-compressed tar. We accept all of them so the archive asset is found
+     * regardless of which producer variant published the release.
+     */
+    private final static Set<String> ARCHIVE_ASSET_CONTENT_TYPES = new HashSet<>(Arrays.asList("application/x-tar", "application/gzip",
+            "application/x-gzip", "application/x-compressed-tar"));
     private final String owner;
     private final String repositoryName;
     
@@ -377,7 +389,7 @@ public class GithubReleasesRepository extends AbstractReleaseRepository implemen
         String releaseNotesURL = null;
         for (final Object archiveAsset : (JSONArray) releaseJson.get("assets")) {
             final JSONObject archiveAssetJson = (JSONObject) archiveAsset;
-            if (archiveAssetJson.get("content_type").equals("application/x-tar")) {
+            if (ARCHIVE_ASSET_CONTENT_TYPES.contains(archiveAssetJson.get("content_type"))) {
                 archiveDownloadURL = archiveAssetJson.get("browser_download_url").toString();
             } else if (archiveAssetJson.get("name").equals(Release.RELEASE_NOTES_FILE_NAME)) {
                 releaseNotesURL = archiveAssetJson.get("browser_download_url").toString();

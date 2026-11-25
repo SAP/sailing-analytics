@@ -6,7 +6,7 @@ import java.util.Queue;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 public class BroadcastManager {
     private static BroadcastManager mInstance;

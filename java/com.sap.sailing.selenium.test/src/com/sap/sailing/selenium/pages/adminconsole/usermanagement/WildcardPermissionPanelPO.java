@@ -1,7 +1,6 @@
 package com.sap.sailing.selenium.pages.adminconsole.usermanagement;
 
-import org.openqa.selenium.By.ByName;
-import org.openqa.selenium.ElementNotSelectableException;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -17,20 +16,17 @@ public class WildcardPermissionPanelPO extends PageArea {
     
     public static class PermissionEntryPO extends DataEntryWithSecurityActionsPO {
 
-        @FindBy(how = ByName.class, using = "DELETE")
-        private WebElement deleteButton;
-        
-
         public PermissionEntryPO(CellTablePO<?> table, WebElement element) {
             super(table, element);
         }
         
         public void deletePermission() {
-            deleteButton.click();
+            clickActionImage("DELETE");
+            waitForAjaxRequests();
         }
         
         public void deletePermissionAndExpectPermissionError() {
-            deletePermission();
+            clickActionImage("DELETE");
             waitForAlertContainingMessageAndAccept("Could not remove permission");
         }
     }
@@ -65,6 +61,7 @@ public class WildcardPermissionPanelPO extends PageArea {
     public void addPermission(String permissionName) {
         enterNewPermissionValue(permissionName);
         clickAddButtonOrThrow();
+        waitForAjaxRequests();
         waitUntil(() -> findPermission(permissionName) != null);
     }
 
@@ -74,7 +71,7 @@ public class WildcardPermissionPanelPO extends PageArea {
     
     public void clickAddButtonOrThrow() {
         if (!addButton.isEnabled()) {
-            throw new ElementNotSelectableException("Add Button was disabled");
+            throw new ElementNotInteractableException("Add Button was disabled");
         } else {
             addButton.click();
         }
@@ -82,7 +79,7 @@ public class WildcardPermissionPanelPO extends PageArea {
     
     public void clickAddButtonAndExpectPermissionError(String username) {
         if (!addButton.isEnabled()) {
-            throw new ElementNotSelectableException("Add Button was disabled");
+            throw new ElementNotInteractableException("Add Button was disabled");
         } else {
             addButton.click();
         }

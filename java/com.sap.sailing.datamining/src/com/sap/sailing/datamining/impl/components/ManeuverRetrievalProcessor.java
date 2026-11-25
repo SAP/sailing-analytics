@@ -37,7 +37,7 @@ public class ManeuverRetrievalProcessor
         if (finishTime != null) {
             Iterable<Maneuver> maneuvers = null;
             if (!isLastLeg(element)) {
-                finishTime = finishTime.minus(1);
+                finishTime = finishTime.minusResolution();
             }
             try {
                 maneuvers = element.getTrackedLegOfCompetitor().getManeuvers(finishTime, false);

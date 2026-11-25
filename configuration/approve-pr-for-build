@@ -1,0 +1,24 @@
+#!/bin/bash
+if [ "${1}" = "" ]; then
+  echo "Sets and pushes the tag \"prXX-reviewed-for-build\" to the git remote specified"
+  echo "to trigger a build with full secrets and tests. Use only after you have reviewed"
+  echo "the PR closely and trust it to get built/tested with the secrets managed by the"
+  echo "remote git repo you're pushing to."
+  echo
+  echo "Usage: ${0} [ -f ] <git-remote> <pull-request-number>"
+  echo "  -f: force tag update, e.g., if approving an updated version of the PR"
+  echo "Example: ${0} sap 55"
+  exit 2
+else
+  if [ "${1}" = "-f" ]; then
+    force="-f"
+    shift
+  else
+    froce=""
+  fi
+  REMOTE="${1}"
+  PR="${2}"
+  git fetch "${REMOTE}" pull/${PR}/head
+  git tag ${force} pr${PR}-reviewed-for-build FETCH_HEAD
+  git push ${force} "${REMOTE}" pr${PR}-reviewed-for-build 
+fi

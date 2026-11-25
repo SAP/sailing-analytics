@@ -64,9 +64,9 @@ public class Main {
                 race
         );
         raceSubscriber.subscribeConnectionStatus(listener);
-        //raceSubscriber.subscribePositionedItemPositions(listener);
+        raceSubscriber.subscribePositionedItemPositions(listener);
         raceSubscriber.subscribePositions(listener);
-        //raceSubscriber.subscribePositionsSnapped(listener);
+        raceSubscriber.subscribePositionsSnapped(listener);
         raceSubscriber.subscribeControlPassings(listener);
         //raceSubscriber.subscribeCompetitorSensorData(listener);
         //raceSubscriber.subscribeRaceMessages(listener);

@@ -3,8 +3,8 @@ package com.sap.sailing.android.shared.ui.customviews;
 import com.sap.sailing.android.shared.R;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.widget.Toolbar;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;

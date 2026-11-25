@@ -34,6 +34,7 @@ import com.google.gwt.view.client.SetSelectionModel;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.util.NaturalComparator;
 import com.sap.sse.gwt.client.ErrorReporter;
+import com.sap.sse.gwt.client.async.MarkedAsyncCallback;
 import com.sap.sse.gwt.client.celltable.AbstractSortableTextColumn;
 import com.sap.sse.gwt.client.celltable.CellTableWithCheckboxResources;
 import com.sap.sse.gwt.client.celltable.EntityIdentityComparator;
@@ -126,7 +127,7 @@ public class RoleDefinitionsPanel extends VerticalPanel {
             @Override
             public void ok(RoleDefinitionDTO editedObject) {
                     userManagementWriteService.createRoleDefinition(editedObject.getId().toString(),
-                                editedObject.getName(), new AsyncCallback<RoleDefinitionDTO>() {
+                                editedObject.getName(), new MarkedAsyncCallback<RoleDefinitionDTO>(new AsyncCallback<RoleDefinitionDTO>() {
                     @Override
                     public void onFailure(Throwable caught) {
                         errorReporter.reportError(stringMessages.errorCreatingRole(editedObject.getName(), caught.getMessage()));
@@ -146,7 +147,7 @@ public class RoleDefinitionsPanel extends VerticalPanel {
                             }
                         });
                     }
-                });
+                }));
             }
 
             @Override

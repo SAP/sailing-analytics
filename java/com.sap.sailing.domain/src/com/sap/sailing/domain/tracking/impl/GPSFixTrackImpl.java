@@ -1043,7 +1043,7 @@ public abstract class GPSFixTrackImpl<ItemType, FixType extends GPSFix> extends 
         // stopped moving at the last fix.
         FixType last = getInternalFixes().lower(gpsFix);
         if (last != null) {
-            distanceCacheInvalidationStart = last.getTimePoint().plus(1); // add one millisecond to invalidate *after*
+            distanceCacheInvalidationStart = last.getTimePoint().plusResolution(); // one resolution unit later to invalidate *after*
                                                                           // the last fix only
         }
         gpsFix.invalidateCache();

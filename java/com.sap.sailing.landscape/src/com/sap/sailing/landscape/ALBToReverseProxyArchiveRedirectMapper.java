@@ -5,6 +5,7 @@ import java.util.Optional;
 import com.sap.sse.landscape.Log;
 import com.sap.sse.landscape.application.ApplicationProcess;
 import com.sap.sse.landscape.application.ApplicationProcessMetrics;
+import com.sap.sse.landscape.aws.CentralReverseProxy;
 import com.sap.sse.landscape.aws.ReverseProxy;
 import com.sap.sse.landscape.aws.common.shared.EventRedirectDTO;
 import com.sap.sse.landscape.aws.common.shared.EventSeriesRedirectDTO;
@@ -25,28 +26,28 @@ public class ALBToReverseProxyArchiveRedirectMapper<ShardingKey, MetricsT extend
 extends AbstractALBToReverseProxyRedirectMapper<ShardingKey, MetricsT, ProcessT, LogT>
 implements RedirectVisitor {
     
-    public ALBToReverseProxyArchiveRedirectMapper(ReverseProxy<ShardingKey, MetricsT, ProcessT, LogT> reverseProxy,
+    public ALBToReverseProxyArchiveRedirectMapper(CentralReverseProxy<ShardingKey, MetricsT, ProcessT, LogT> reverseProxy,
             String hostname, Optional<String> optionalKeyName, byte[] privateKeyDecryptionPassphrase) {
         super(reverseProxy, hostname, optionalKeyName, privateKeyDecryptionPassphrase);
     }
 
     @Override
     public void visit(PlainRedirectDTO plainRedirectDTO) throws Exception {
-        getReverseProxy().setHomeArchiveRedirect(getHostname(), getOptionalKeyName(), getPrivateKeyDecryptionPassphrase());
+        getCentralReverseProxy().setHomeArchiveRedirect(getHostname(), getOptionalKeyName(), getPrivateKeyDecryptionPassphrase());
     }
 
     @Override
     public void visit(HomeRedirectDTO homeRedirectDTO) throws Exception {
-        getReverseProxy().setHomeArchiveRedirect(getHostname(), getOptionalKeyName(), getPrivateKeyDecryptionPassphrase());
+        getCentralReverseProxy().setHomeArchiveRedirect(getHostname(), getOptionalKeyName(), getPrivateKeyDecryptionPassphrase());
     }
 
     @Override
     public void visit(EventRedirectDTO eventRedirectDTO) throws Exception {
-        getReverseProxy().setEventArchiveRedirect(getHostname(), eventRedirectDTO.getId(), getOptionalKeyName(), getPrivateKeyDecryptionPassphrase());
+        getCentralReverseProxy().setEventArchiveRedirect(getHostname(), eventRedirectDTO.getId(), getOptionalKeyName(), getPrivateKeyDecryptionPassphrase());
     }
 
     @Override
     public void visit(EventSeriesRedirectDTO eventSeriesRedirectDTO) throws Exception {
-        getReverseProxy().setEventSeriesArchiveRedirect(getHostname(), eventSeriesRedirectDTO.getId(), getOptionalKeyName(), getPrivateKeyDecryptionPassphrase());
+        getCentralReverseProxy().setEventSeriesArchiveRedirect(getHostname(), eventSeriesRedirectDTO.getId(), getOptionalKeyName(), getPrivateKeyDecryptionPassphrase());
     }
 }

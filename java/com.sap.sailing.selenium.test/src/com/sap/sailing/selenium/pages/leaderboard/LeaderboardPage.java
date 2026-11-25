@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 
 import com.sap.sailing.selenium.core.BySeleniumId;
 import com.sap.sailing.selenium.core.FindBy;
@@ -117,21 +116,20 @@ public class LeaderboardPage extends HostPage {
         JavascriptExecutor executor = (JavascriptExecutor) driver;
         Long finishedCalls = (Long) executor.executeScript(
                 "return window.PENDING_AJAX_CALLS.numberOfFinishedCalls(arguments[0])", "loadLeaderboardData");
-        // this.playAndPauseAnchor.click();
-        new Actions(driver).moveToElement(playAndPauseAnchor).click().build().perform();
+        clickWhenInteractable(() -> playAndPauseAnchor);
         waitForAjaxRequestsExecuted("loadLeaderboardData", finishedCalls.intValue() + 1);
-        new Actions(driver).moveToElement(playAndPauseAnchor).click().build().perform();
+        clickWhenInteractable(() -> playAndPauseAnchor);
     }
     
     public CompetitorChartsSettingsDialogPO getCompetitorChartsSettings() {
-        this.competitorChartsSettingsButton.click();
+        clickWhenInteractable(() -> competitorChartsSettingsButton);
         return new CompetitorChartsSettingsDialogPO(this.driver,
                 findElementBySeleniumId(this.driver, "CompetitorChartsSettingsDialog"));
     }
     
     public LeaderboardSettingsDialogPO getLeaderboardSettings() {
         scrollToTop();
-        this.leaderboardSettingsButton.click();
+        clickWhenInteractable(() -> leaderboardSettingsButton);
         return new LeaderboardSettingsDialogPO(this.driver,
                 findElementBySeleniumId(this.driver, "LeaderboardSettingsDialog"));
     }
@@ -150,8 +148,7 @@ public class LeaderboardPage extends HostPage {
     }
     
     public LeaderboardSettingsDialogPO getOverallLeaderboardSettings() {
-        WebElement overallLeaderboardSettingsButton = findElementBySeleniumId("SeriesLeaderboardSettingsButton");
-        overallLeaderboardSettingsButton.click();
+        clickWhenInteractable(() -> findElementBySeleniumId("SeriesLeaderboardSettingsButton"));
         return new LeaderboardSettingsDialogPO(this.driver,
                 findElementBySeleniumId(this.driver, "SeriesLeaderboardSettingsDialog"));
     }
@@ -161,7 +158,7 @@ public class LeaderboardPage extends HostPage {
     }
 
     public void showCompetitorChart(String chart) {
-        this.competitorChartsSettingsButton.click();
+        clickWhenInteractable(() -> competitorChartsSettingsButton);
         CompetitorChartsSettingsDialogPO dialog = new CompetitorChartsSettingsDialogPO(this.driver,
                 findElementBySeleniumId(this.driver, "CompetitorChartsSettingsDialog"));
         dialog.selectChartType(chart);

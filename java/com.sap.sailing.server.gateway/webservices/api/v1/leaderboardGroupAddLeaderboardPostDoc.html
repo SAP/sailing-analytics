@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<link href='../../../../sailing-fontface-1.0.cache.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+	<link href='../../../main.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+	<link rel='icon' href='../../../../sap.ico' type='image/x-icon'>
+	<title>SAP Sailing Analytics Webservices API Version 1.0</title>
+</head>
+<body>
+<h1>SAP Sailing Analytics Webservices API Version 1.0</h1>
+<h2>URL: /api/v1/leaderboardgroups/{nameOrUUID}/leaderboards</h2>
+
+<b>Description:</b>
+<p>Adds an existing leaderboard to an existing leaderboard group, at the end of the group's leaderboards, the same way
+the AdminConsole does it. The group's name, description, display name and overall leaderboard (scoring scheme and
+discard thresholds) remain unchanged. Adding a leaderboard that the group already contains changes nothing.
+The request requires the <tt>LEADERBOARD_GROUP:UPDATE</tt> permission on the group, the <tt>LEADERBOARD:UPDATE</tt>
+permission on the group's overall leaderboard if it has one, and the <tt>LEADERBOARD:READ</tt> permission on the
+leaderboard to add.</p>
+<br/>
+<table>
+	<tr>
+		<td>Webservice Type:</td>
+		<td>REST</td>
+	</tr>
+	<tr>
+		<td>Output format:</td>
+		<td>Json, a summary of the group as returned by <a href="leaderboardGroupCreatePostDoc.html">/api/v1/leaderboardgroups</a> (POST)</td>
+	</tr>
+	<tr>
+		<td>Mandatory parameters:</td>
+		<td>
+			<div>nameOrUUID (path): the name or the ID of the group</div>
+			<div>leaderboardName: the name of the leaderboard to add</div>
+		</td>
+	</tr>
+	<tr>
+		<td>Optional parameters:</td>
+		<td>none</td>
+	</tr>
+	<tr>
+		<td>Request method:</td>
+		<td>POST</td>
+	</tr>
+	<tr>
+		<td>Example:</td>
+		<td>
+		<pre>
+		curl -X POST -H "Authorization: Bearer OuknIUZQyADsqcDDEEyvlr+aBIpB4iVBdjdRYJtdO1w=" "http://127.0.0.1:8888/sailingserver/api/v1/leaderboardgroups/5d1c3a0e-8b7f-4c1e-9f0d-2a6b4e8c7d13/leaderboards?leaderboardName=DSBL%202026%20Act%201"
+		</pre>
+		produces output
+		<pre>
+		{
+		  "id": "5d1c3a0e-8b7f-4c1e-9f0d-2a6b4e8c7d13",
+		  "name": "1. Segel-Bundesliga 2026",
+		  "displayName": "2026",
+		  "description": "",
+		  "hasOverallLeaderboard": true,
+		  "overallLeaderboardName": "1. Segel-Bundesliga 2026 Overall",
+		  "leaderboards": ["DSBL 2026 Act 1"]
+		}
+		</pre>
+		</td>
+	</tr>
+	<tr>
+		<td>Errors:</td>
+		<td>
+			<div>400 Bad Request: leaderboardName is missing</div>
+			<div>401 Unauthorized: the current user lacks one of the permissions listed above</div>
+			<div>404 Not Found: no group with this name or ID, or no leaderboard with this name</div>
+		</td>
+	</tr>
+</table>
+<div style="height: 1em;"></div>
+<a href="index.html">Back to Web Service Overview</a> 
+</body>
+</html>

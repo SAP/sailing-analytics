@@ -153,4 +153,24 @@ public abstract class AbstractTimePoint implements TimePoint {
         assert syncToClosestSecondsAndMillisOf.asMillis() % 60000 == result.asMillis() % 60000;
         return result;
     }
+
+    /**
+     * All {@link AbstractTimePoint} implementations are backed by milliseconds (see {@link #asMillis()}), so the
+     * smallest distinguishable difference between two instants is one millisecond. A subclass with a finer resolution
+     * must override this.
+     */
+    @Override
+    public Duration getResolution() {
+        return Duration.ONE_MILLISECOND;
+    }
+
+    @Override
+    public TimePoint plusResolution() {
+        return plus(getResolution());
+    }
+
+    @Override
+    public TimePoint minusResolution() {
+        return minus(getResolution());
+    }
 }

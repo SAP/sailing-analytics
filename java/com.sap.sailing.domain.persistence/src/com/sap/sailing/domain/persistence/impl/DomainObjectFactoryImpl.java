@@ -2952,6 +2952,9 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
             image.setSubtitle(subtitle);
             image.setLocale(locale);
             image.setTags(imageTags);
+            image.setMissing(Boolean.TRUE.equals(dbObject.get(FieldNames.IMAGE_MISSING.name())));
+            image.setMissingMailNotificationSent(
+                    Boolean.TRUE.equals(dbObject.get(FieldNames.IMAGE_MISSING_MAIL_NOTIFICATION_SENT.name())));
             if (imageWidth != null && imageHeight != null) {
                 image.setSize(imageWidth.intValue(), imageHeight.intValue());
             }
@@ -2988,6 +2991,9 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
             video.setTags(videoTags);
             video.setLengthInSeconds(lengthInSeconds == null ? null : lengthInSeconds.intValue());
             video.setThumbnailURL(thumbnailURL);
+            video.setMissing(Boolean.TRUE.equals(dbObject.get(FieldNames.VIDEO_MISSING.name())));
+            video.setMissingMailNotificationSent(
+                    Boolean.TRUE.equals(dbObject.get(FieldNames.VIDEO_MISSING_MAIL_NOTIFICATION_SENT.name())));
         }
         return video;
     }

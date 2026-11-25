@@ -71,10 +71,12 @@ Require-Bundle: com.sap.sailing.domain,
  org.apache.httpcomponents.httpclient,
  org.apache.httpcomponents.httpcore,
  com.sap.sailing.server.gateway.interfaces,
- com.sap.sailing.landscape.common
+ com.sap.sailing.landscape.common,
+ com.sap.sse.landscape.common
 Bundle-ClassPath: .
 Web-ContextPath: /sailingserver
 Export-Package: com.sap.sailing.server.gateway,
+ com.sap.sailing.server.gateway.jaxrs.api;x-friends:="com.sap.sailing.server.replication.test",
  com.sap.sailing.server.gateway.jaxrs.spi,
  com.sap.sailing.server.gateway.windimport.bravo
 Automatic-Module-Name: com.sap.sailing.server.gateway

@@ -1,5 +1,6 @@
 package com.sap.sailing.selenium.pages.adminconsole.regatta;
 
+import java.time.Duration;
 import java.util.function.Function;
 
 import org.openqa.selenium.WebDriver;
@@ -92,7 +93,7 @@ public class RegattaStructureManagementPanelPO extends PageArea {
     }
     
     public RegattaDetailsCompositePO getRegattaDetails() {
-        return new WebDriverWait(driver, DEFAULT_WAIT_TIMEOUT_SECONDS).until(new Function<WebDriver, RegattaDetailsCompositePO>() {
+        return new WebDriverWait(driver, Duration.ofSeconds(DEFAULT_WAIT_TIMEOUT_SECONDS)).until(new Function<WebDriver, RegattaDetailsCompositePO>() {
             @Override
             public RegattaDetailsCompositePO apply(WebDriver t) {
                 if (regattaDetails.isDisplayed()) {

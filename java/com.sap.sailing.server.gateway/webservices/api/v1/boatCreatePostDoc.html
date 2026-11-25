@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<link href='../../../../sailing-fontface-1.0.cache.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+	<link href='../../../main.css' media='screen' rel='stylesheet' title='Default stylesheet' type='text/css' />
+	<link rel='icon' href='../../../../sap.ico' type='image/x-icon'>
+	<title>SAP Sailing Analytics Webservices API Version 1.0</title>
+</head>
+<body>
+<h1>SAP Sailing Analytics Webservices API Version 1.0</h1>
+<h2>URL: /api/v1/boats</h2>
+
+<b>Description:</b>
+<p>Creates a boat on its own, without a competitor, and stores it persistently, the same way the boat table of the
+AdminConsole does it. This is what a regatta whose boats change per race (<tt>canBoatsOfCompetitorsChangePerRace</tt>)
+needs: a set of boats shared by all competitors and assigned to them per race, e.g., with
+<a href="addCompetitorToRace.html">/api/v1/mark/addCompetitorToRace</a>.
+The request requires the <tt>BOAT:CREATE</tt> permission for the new boat (and the server's <tt>CREATE_OBJECT</tt>
+permission); the new boat is owned by the current user and the user's default group.</p>
+<br/>
+<table>
+	<tr>
+		<td>Webservice Type:</td>
+		<td>REST</td>
+	</tr>
+	<tr>
+		<td>Output format:</td>
+		<td>Json, the boat as returned by <a href="boats.html">/api/v1/boats/{id}</a></td>
+	</tr>
+	<tr>
+		<td>Mandatory parameters:</td>
+		<td>
+			<div>boatclass: the name of the boat class; the boat class is created if it does not exist yet</div>
+			<div>name or sailid: at least one of the two (see below)</div>
+		</td>
+	</tr>
+	<tr>
+		<td>Optional parameters:</td>
+		<td>
+			<div>name: the boat's name; defaults to the sailid</div>
+			<div>sailid: the boat's sail number</div>
+			<div>displayColor: the boat's color as an HTML color, e.g. <tt>#ff0000</tt> (url encoded: <tt>%23ff0000</tt>)</div>
+			<div>boatId: the ID for the new boat; a string that parses as a UUID is stored as a UUID, any other string as is;
+			     a random UUID is used if omitted</div>
+		</td>
+	</tr>
+	<tr>
+		<td>Request method:</td>
+		<td>POST</td>
+	</tr>
+	<tr>
+		<td>Example:</td>
+		<td>
+		<pre>
+		curl -X POST -H "Authorization: Bearer OuknIUZQyADsqcDDEEyvlr+aBIpB4iVBdjdRYJtdO1w=" "http://127.0.0.1:8888/sailingserver/api/v1/boats?name=Black&amp;sailid=1&amp;displayColor=%23000000&amp;boatclass=J%2F70"
+		</pre>
+		produces output
+		<pre>
+		{"idtype":"java.util.UUID","id":"0b5e1d2c-6f0a-4f43-9a51-3c6a0e8f1b27","name":"Black","sailId":"1","color":"#000000","boatClass":{"name":"J\/70","typicallyStartsUpwind":true}}
+		</pre>
+		</td>
+	</tr>
+	<tr>
+		<td>Errors:</td>
+		<td>
+			<div>400 Bad Request: boatclass is missing, both name and sailid are missing, or displayColor is not a valid HTML color</div>
+			<div>401 Unauthorized: the current user lacks the permission to create the boat</div>
+			<div>409 Conflict: a boat with the given boatId exists already</div>
+		</td>
+	</tr>
+</table>
+<div style="height: 1em;"></div>
+<a href="index.html">Back to Web Service Overview</a> 
+</body>
+</html>

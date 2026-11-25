@@ -34,7 +34,7 @@ public class MediaTrackTest {
         mediaTrack.duration = ONE_MILLISECOND;
         
         TimePoint startTime = mediaTrack.startTime.plus(2);
-        TimePoint endTime = startTime.plus(1);
+        TimePoint endTime = startTime.plusResolution();
         assertFalse(mediaTrack.overlapsWith(startTime, endTime));
         
     }
@@ -46,7 +46,7 @@ public class MediaTrackTest {
         mediaTrack.duration = ONE_MILLISECOND;
         
         TimePoint startTime = mediaTrack.startTime.minus( 2);
-        TimePoint endTime = startTime.plus(1);
+        TimePoint endTime = startTime.plusResolution();
         assertFalse(mediaTrack.overlapsWith(startTime, endTime));
         
     }
@@ -69,7 +69,7 @@ public class MediaTrackTest {
         mediaTrack.startTime = MillisecondsTimePoint.now();
         mediaTrack.duration = ONE_MILLISECOND.times(2);
         
-        TimePoint startTime = mediaTrack.startTime.plus(1);
+        TimePoint startTime = mediaTrack.startTime.plusResolution();
         TimePoint endTime = startTime.plus(2);
         assertTrue(mediaTrack.overlapsWith(startTime, endTime));
         
@@ -93,8 +93,8 @@ public class MediaTrackTest {
         mediaTrack.startTime = MillisecondsTimePoint.now();
         mediaTrack.duration = ONE_MILLISECOND.times(3);
         
-        TimePoint startTime = mediaTrack.startTime.plus(1);
-        TimePoint endTime = startTime.plus(1);
+        TimePoint startTime = mediaTrack.startTime.plusResolution();
+        TimePoint endTime = startTime.plusResolution();
         assertTrue(mediaTrack.overlapsWith(startTime, endTime));
         
     }
@@ -117,7 +117,7 @@ public class MediaTrackTest {
         mediaTrack.startTime = MillisecondsTimePoint.now();
         mediaTrack.duration = ONE_MILLISECOND.times(2);
         
-        TimePoint startTime = mediaTrack.startTime.plus(1);
+        TimePoint startTime = mediaTrack.startTime.plusResolution();
         TimePoint endTime = null; //--> open end
         assertTrue(mediaTrack.overlapsWith(startTime, endTime));
         

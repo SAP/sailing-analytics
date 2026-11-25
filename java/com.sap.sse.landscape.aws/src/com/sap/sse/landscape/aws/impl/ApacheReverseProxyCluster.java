@@ -11,7 +11,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.sap.sse.landscape.aws.LandscapeConstants;
+
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.Util;
 import com.sap.sse.common.Util.Pair;
@@ -29,6 +29,7 @@ import com.sap.sse.landscape.aws.ApplicationLoadBalancer;
 import com.sap.sse.landscape.aws.AwsAvailabilityZone;
 import com.sap.sse.landscape.aws.AwsInstance;
 import com.sap.sse.landscape.aws.AwsLandscape;
+import com.sap.sse.landscape.aws.AwsLandscapeConstants;
 import com.sap.sse.landscape.aws.ReverseProxyCluster;
 import com.sap.sse.landscape.aws.Tags;
 import com.sap.sse.landscape.aws.TargetGroup;
@@ -41,15 +42,58 @@ import software.amazon.awssdk.services.elasticloadbalancingv2.model.TagDescripti
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.TargetHealth;
 import software.amazon.awssdk.services.elasticloadbalancingv2.model.TargetHealthStateEnum;
 
+/**
+ * A cluster of zero or more Apache reverse proxies. Usually, this will include at least one "central" reverse proxy
+ * which has a different, extended configuration compared to the other reverse proxies in the cluster. Those others are
+ * considered "disposable" in the sense that they can be created and removed based on traffic and availability
+ * considerations. Some services provided by the landscape, such as reverse-proxying a Git repo, providing a private
+ * Docker registry, or running a Gollum-based Wiki are available only on the central reverse proxy.
+ * <p>
+ * 
+ * Furthermore, the central reverse proxy hosts a Git repository with the configuration for central and disposable
+ * reverse proxies. This repo lives as a bare repo under the {@link ApacheReverseProxy#CONFIG_USER httpdConf} user's
+ * {@code ~/repo.git} folder, and as a checked-out workspace under {@code ~/checked-out}. The actual reverse proxy
+ * configuration folders under {@code /etc/httpd} are checked-out workspaces, using either the {@code central} or
+ * the {@code disposable} branch. Both branches merge the {@code main} branch, which is where changes to be delivered
+ * to all reverse proxies must be pushed to.<p>
+ * 
+ * Configuration content only relevant for the central reverse proxy have to happen only on the {@code central} branch
+ * and in the {@code central-config.d} folder, sibling to the {@code conf.d} default configuration folder and sourced
+ * only by the central reverse proxy's configuration.
+ * 
+ * @author Axel Uhl (d043530)
+ *
+ * @param <ShardingKey>
+ * @param <MetricsT>
+ * @param <ProcessT>
+ * @param <LogT>
+ */
 public class ApacheReverseProxyCluster<ShardingKey, MetricsT extends ApplicationProcessMetrics, ProcessT extends ApplicationProcess<ShardingKey, MetricsT, ProcessT>, LogT extends Log>
         extends AbstractApacheReverseProxy<ShardingKey, MetricsT, ProcessT>
         implements ReverseProxyCluster<ShardingKey, MetricsT, ProcessT, RotatingFileBasedLog> {
     private static final Logger logger = Logger.getLogger(ApacheReverseProxyCluster.class.getName());
     private Set<AwsInstance<ShardingKey>> hosts;
+    private final AwsInstance<ShardingKey> centralReverseProxyHost;
 
-    public ApacheReverseProxyCluster(AwsLandscape<ShardingKey> landscape) {
+    /**
+     * Creates an empty cluster facade. To populate it with {@link ApacheReverseProxy reverse proxy instances},
+     * {@link #addHost(AwsInstance)} must be called.
+     */
+    public ApacheReverseProxyCluster(AwsLandscape<ShardingKey> landscape, Region region) {
         super(landscape);
         this.hosts = new HashSet<>();
+        AwsInstance<ShardingKey> centralReverseProxyCandidate = null;
+        for (final AwsInstance<ShardingKey> reverseProxyHost : landscape.getRunningHostsWithTag(region, AwsLandscapeConstants.REVERSE_PROXY_TAG_NAME, AwsInstanceImpl::new)) {
+            addHost(reverseProxyHost);
+            if (landscape.getTag(reverseProxyHost, AwsLandscapeConstants.CENTRAL_REVERSE_PROXY_TAG_NAME).isPresent()) {
+                if (centralReverseProxyCandidate == null) {
+                    centralReverseProxyCandidate = reverseProxyHost;
+                } else {
+                    throw new IllegalStateException("There must only be one central reverse proxy");
+                }
+            }
+        }
+        centralReverseProxyHost = centralReverseProxyCandidate;
     }
 
     @Override
@@ -63,9 +107,13 @@ public class ApacheReverseProxyCluster<ShardingKey, MetricsT extends Application
     private Iterable<ApacheReverseProxy<ShardingKey, MetricsT, ProcessT>> getReverseProxies() {
         return Util.map(hosts, host -> new ApacheReverseProxy<>(getLandscape(), host));
     }
-
+    
     @Override
-    public void addHost(AwsInstance<ShardingKey> host) {
+    public CentralApacheReverseProxy<ShardingKey, MetricsT, ProcessT> getCentralReverseProxy() {
+        return centralReverseProxyHost == null ? null : new CentralApacheReverseProxy<>(getLandscape(), centralReverseProxyHost);
+    }
+
+    private void addHost(AwsInstance<ShardingKey> host) {
         hosts.add(host);
     }
 
@@ -77,8 +125,8 @@ public class ApacheReverseProxyCluster<ShardingKey, MetricsT extends Application
                         landscape) -> new AwsInstanceImpl<ShardingKey>(instanceId, availabilityZone, privateIpAddress,
                                 launchTimePoint, landscape),
                 getAmiId(az.getRegion()), instanceType, az, keyName, getSecurityGroups(az.getRegion()),
-                Optional.of(Tags.with(StartAwsHost.NAME_TAG_NAME, name).and(LandscapeConstants.DISPOSABLE_PROXY, "")
-                        .and(LandscapeConstants.REVERSE_PROXY_TAG_NAME, "")),
+                Optional.of(Tags.with(StartAwsHost.NAME_TAG_NAME, name).and(AwsLandscapeConstants.DISPOSABLE_PROXY, "")
+                        .and(AwsLandscapeConstants.REVERSE_PROXY_TAG_NAME, "")),
                 "");
         addHost(host);
         Wait.wait(() -> host.getInstance().state().name().equals(InstanceStateName.RUNNING), (result) -> result, true,
@@ -86,9 +134,9 @@ public class ApacheReverseProxyCluster<ShardingKey, MetricsT extends Application
                 "Is instance in the running state check");
         for (TargetGroup<ShardingKey> targetGroup : getLandscape().getTargetGroups(az.getRegion())) {
             targetGroup.getTagDescriptions().forEach(description -> description.tags().forEach(tag -> {
-                if (tag.key().equals(LandscapeConstants.ALL_REVERSE_PROXIES)) {
+                if (tag.key().equals(AwsLandscapeConstants.ALL_REVERSE_PROXIES)) {
                     final ApplicationLoadBalancer<ShardingKey> loadBalancer = targetGroup.getLoadBalancer();
-                    if (loadBalancer != null && loadBalancer.getArn().contains(LandscapeConstants.NLB_ARN_CONTAINS)) {
+                    if (loadBalancer != null && loadBalancer.getArn().contains(AwsLandscapeConstants.NLB_ARN_CONTAINS)) {
                         getLandscape().addIpTargetToTargetGroup(targetGroup, Collections.singleton(host));
                         logger.info("Added " + host.getPrivateAddress().getHostAddress() + " to NLB target group"
                                 + targetGroup.getTargetGroupArn());
@@ -111,6 +159,9 @@ public class ApacheReverseProxyCluster<ShardingKey, MetricsT extends Application
             throw new IllegalStateException(
                     "Trying to remove the last hosts of reverse proxy " + this + ". Use terminate() instead");
         }
+        if (host.equals(centralReverseProxyHost)) {
+            throw new IllegalArgumentException("Cannot remove the central reverse proxy "+host+" from this reverse proxy cluster");
+        }
         AwsInstance<ShardingKey> instanceFromHost = new AwsInstanceImpl<ShardingKey>(host.getInstanceId(),
                 host.getAvailabilityZone(), host.getPrivateAddress(Landscape.WAIT_FOR_PROCESS_TIMEOUT),
                 host.getLaunchTimePoint(), getLandscape());
@@ -124,9 +175,9 @@ public class ApacheReverseProxyCluster<ShardingKey, MetricsT extends Application
                     final TagDescription tagDescription = tagDescriptions.next();
                     if (tagDescription.hasTags()) {
                         tagDescription.tags().forEach(tag -> {
-                            if (tag.key().equals(LandscapeConstants.ALL_REVERSE_PROXIES) && targetGroup.getRegisteredTargets().containsKey(instanceFromHost)) {
+                            if (tag.key().equals(AwsLandscapeConstants.ALL_REVERSE_PROXIES) && targetGroup.getRegisteredTargets().containsKey(instanceFromHost)) {
                                 targetGroupsHostResidesIn.add(targetGroup);
-                                if (loadBalancerArn.contains(LandscapeConstants.NLB_ARN_CONTAINS)) {
+                                if (loadBalancerArn.contains(AwsLandscapeConstants.NLB_ARN_CONTAINS)) {
                                     getLandscape().removeIpTargetFromTargetGroup(targetGroup, Collections.singleton(instanceFromHost));
                                 } else {
                                     targetGroup.removeTarget(instanceFromHost);
@@ -162,7 +213,7 @@ public class ApacheReverseProxyCluster<ShardingKey, MetricsT extends Application
      * Gets the latest image in the current region with the correct tag for creating a reverse proxy.
      */
     private MachineImage getAmiId(Region region) {
-        return getLandscape().getLatestImageWithType(region, LandscapeConstants.IMAGE_TYPE_REVERSE_PROXY);
+        return getLandscape().getLatestImageWithType(region, AwsLandscapeConstants.IMAGE_TYPE_REVERSE_PROXY);
     }
 
     @Override
@@ -181,12 +232,13 @@ public class ApacheReverseProxyCluster<ShardingKey, MetricsT extends Application
      * @param redirectSetter
      *            The ConsumerWithException to apply the necessary redirect to the proxy.
      */
-    private void setRedirect(ConsumerWithException<ApacheReverseProxy<ShardingKey, MetricsT, ProcessT>> redirectSetter)
+    private void setRedirect(ConsumerWithException<CentralApacheReverseProxy<ShardingKey, MetricsT, ProcessT>> redirectSetter)
             throws Exception {
-        if (getReverseProxies().iterator().hasNext()) {
-            final ApacheReverseProxy<ShardingKey, MetricsT, ProcessT> proxy = getReverseProxies().iterator().next();
-            redirectSetter.accept(proxy);
+        final CentralApacheReverseProxy<ShardingKey, MetricsT, ProcessT> centralReverseProxy = getCentralReverseProxy();
+        if (centralReverseProxy == null) {
+            throw new IllegalStateException("This reverse proxy cluster has no central node; cannot set redirect");
         }
+        redirectSetter.accept(centralReverseProxy);
     }
 
     @Override
@@ -263,9 +315,11 @@ public class ApacheReverseProxyCluster<ShardingKey, MetricsT extends Application
     @Override
     public void setArchiveAndFailoverIPs(String productionArchiveServerInternalIPAddress, String failoverArchiveServerInternalIPAddress,
             Optional<String> optionalKeyName, byte[] privateKeyEncryptionPassphrase) throws Exception {
-        if (getReverseProxies().iterator().hasNext()) {
-            final ApacheReverseProxy<ShardingKey, MetricsT, ProcessT> proxy = getReverseProxies().iterator().next();
-            proxy.setArchiveAndFailoverIPs(productionArchiveServerInternalIPAddress, failoverArchiveServerInternalIPAddress, optionalKeyName, privateKeyEncryptionPassphrase);
+        final CentralApacheReverseProxy<ShardingKey, MetricsT, ProcessT> centralReverseProxy = getCentralReverseProxy();
+        if (centralReverseProxy == null) {
+            throw new IllegalStateException("This reverse proxy cluster has no central node; cannot set redirect");
         }
+        centralReverseProxy.setArchiveAndFailoverIPs(productionArchiveServerInternalIPAddress,
+                failoverArchiveServerInternalIPAddress, optionalKeyName, privateKeyEncryptionPassphrase);
     }
 }

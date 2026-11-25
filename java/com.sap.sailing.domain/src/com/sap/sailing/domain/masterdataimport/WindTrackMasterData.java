@@ -14,7 +14,14 @@ public class WindTrackMasterData implements Serializable {
 
     private final WindSourceType windSourceType;
     private final Object windSourceId;
-    private final WindTrack windTrack;
+    /**
+     * Held only {@code transient}ly: a {@link WindTrack} for a virtual "wind race" can span several days and grow very
+     * large, so it is never serialized inside this object. Instead the exporter writes this object as a header and
+     * then streams the wind track's fixes as individual top-level stream objects, terminated by a {@code null}
+     * sentinel (see bug6227 and {@code MasterDataResource.writeWindTracks} / {@code MasterDataImporter.importWindTracks}).
+     * As a consequence {@link #getWindTrack()} returns {@code null} on the deserialized (importing) side.
+     */
+    private final transient WindTrack windTrack;
     private final String regattaName;
     private final String raceName;
     private final Serializable raceId;
@@ -37,6 +44,11 @@ public class WindTrackMasterData implements Serializable {
         return windSourceId;
     }
 
+    /**
+     * @return the wind track on the exporting side; {@code null} on the deserialized (importing) side, because the
+     *         {@code windTrack} field is {@code transient} and the wind fixes travel separately as top-level stream
+     *         objects (see the field's Javadoc and bug6227).
+     */
     public WindTrack getWindTrack() {
         return windTrack;
     }

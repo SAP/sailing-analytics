@@ -1,6 +1,6 @@
 package com.sap.sailing.racecommittee.app.ui.utils;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.sap.sailing.domain.abstractlog.race.CompetitorResult;

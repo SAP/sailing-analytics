@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AlertDialog;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -68,32 +68,30 @@ public class BaseActivity extends SendingServiceAwareActivity implements AuthChe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.options_menu_live:
-                if (AppPreferences.on(this).getAccessToken() == null) {
-                    onException(null);
-                } else {
-                    try {
-                        AuthCheckTask task = new AuthCheckTask(this, AppPreferences.on(this).getServerBaseURL(), this);
-                        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                    } catch (MalformedURLException e) {
-                        ExLog.e(this, TAG,
-                                "Error: Failed to perform check-in due to a MalformedURLException: " + e.getMessage());
-                    }
+        final int id = item.getItemId();
+        if (id == R.id.options_menu_live) {
+            if (AppPreferences.on(this).getAccessToken() == null) {
+                onException(null);
+            } else {
+                try {
+                    final AuthCheckTask task = new AuthCheckTask(this, AppPreferences.on(this).getServerBaseURL(), this);
+                    task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                } catch (MalformedURLException e) {
+                    ExLog.e(this, TAG,
+                            "Error: Failed to perform check-in due to a MalformedURLException: " + e.getMessage());
                 }
-                return true;
-            case R.id.options_menu_settings:
-                ExLog.i(this, TAG, "Clicked SETTINGS");
-                startActivity(new Intent(this, PreferenceActivity.class));
-                return true;
-
-            case R.id.options_menu_info:
-                ExLog.i(this, TAG, "Clicked INFO");
-                startActivity(new Intent(this, SystemInformationActivity.class));
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
+            }
+            return true;
+        } else if (id == R.id.options_menu_settings) {
+            ExLog.i(this, TAG, "Clicked SETTINGS");
+            startActivity(new Intent(this, PreferenceActivity.class));
+            return true;
+        } else if (id == R.id.options_menu_info) {
+            ExLog.i(this, TAG, "Clicked INFO");
+            startActivity(new Intent(this, SystemInformationActivity.class));
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
     }
 

@@ -1,9 +1,13 @@
 package com.sap.sailing.landscape.gateway.jaxrs.api;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,6 +31,7 @@ import org.json.simple.JSONObject;
 import com.sap.sailing.domain.common.DataImportProgress;
 import com.sap.sailing.landscape.AwsSessionCredentialsWithExpiry;
 import com.sap.sailing.landscape.LandscapeService;
+import com.sap.sailing.landscape.LiveContentConflictException;
 import com.sap.sailing.landscape.SailingAnalyticsHost;
 import com.sap.sailing.landscape.SailingAnalyticsMetrics;
 import com.sap.sailing.landscape.SailingAnalyticsProcess;
@@ -34,11 +39,14 @@ import com.sap.sailing.landscape.gateway.impl.AwsApplicationProcessJsonSerialize
 import com.sap.sailing.landscape.gateway.impl.AwsApplicationReplicaSetJsonSerializer;
 import com.sap.sailing.landscape.gateway.impl.HostJsonSerializer;
 import com.sap.sailing.landscape.gateway.jaxrs.AbstractLandscapeResource;
+import com.sap.sailing.landscape.common.LiveContentCheckResult;
 import com.sap.sailing.landscape.procedures.SailingAnalyticsHostSupplier;
 import com.sap.sailing.server.gateway.interfaces.CompareServersResult;
 import com.sap.sailing.server.gateway.serialization.impl.CompareServersResultJsonSerializer;
 import com.sap.sailing.server.gateway.serialization.impl.DataImportProgressJsonSerializer;
+import com.sap.sailing.server.gateway.serialization.impl.LiveContentCheckResultJsonSerializer;
 import com.sap.sse.common.Duration;
+import com.sap.sse.common.Util.Pair;
 import com.sap.sse.common.Util.Triple;
 import com.sap.sse.landscape.Landscape;
 import com.sap.sse.landscape.Release;
@@ -81,6 +89,8 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
     private static final String MDI_PROGRESS = "mdiProgress";
     private static final String COMPARE_SERVERS_RESULT = "compareServersResult";
     private static final String ARCHIVE_MONGODB_RESULT = "archiveMongoDBResult";
+    private static final String PROGRESS_TRACKING_UUID = "progressTrackingUuid";
+    private static final String ARCHIVE_HOSTNAME = "archiveHostname";
     private static final String BEARER_TOKEN_FOR_REPLICA_SET_TO_ARCHIVE_FORM_PARAM = "bearerTokenForReplicaSetToArchive";
     private static final String BEARER_TOKEN_FOR_ARCHIVE_FORM_PARAM = "bearerTokenForArchive";
     private static final String MONGO_URI_TO_ARCHIVE_DB_TO_FORM_PARAM = "mongoUriToArchiveDbTo";
@@ -100,6 +110,8 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
     private static final String REPLICA_SET_NAME = "replicaSetName";
     private static final String PORT = "port";
     private static final String IGTIMI_RIOT_PORT = "igtimiRiotPort";
+    private static final String FORCE_FORM_PARAM = "force";
+    private static final String FORCE_REPLICA_SET_FORM_PARAM = "forceReplicaSet";
 
     @Context
     UriInfo uriInfo;
@@ -212,8 +224,7 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
                             dedicatedInstanceType, dynamicLoadBalancerMapping, release.getName(),
                             optionalKeyName, privateKeyEncryptionPassphrase == null ? null : privateKeyEncryptionPassphrase.getBytes(), masterReplicationBearerToken,
                             replicaReplicationBearerToken, domainName, optionalMemoryInMegabytesOrNull,
-                            optionalMemoryTotalSizeFactorOrNull, optionalIgtimiRiotPort, Optional.ofNullable(optionalMinimumAutoScalingGroupSize),
-                            Optional.ofNullable(optionalMaximumAutoScalingGroupSize));
+                            optionalMemoryTotalSizeFactorOrNull, optionalIgtimiRiotPort, Optional.ofNullable(optionalMinimumAutoScalingGroupSize), Optional.ofNullable(optionalMaximumAutoScalingGroupSize));
             final JSONObject result = new AwsApplicationReplicaSetJsonSerializer(release.getName()).serialize(replicaSet);
             response = Response.ok(streamingOutput(result)).build();
         } catch (Exception e) {
@@ -234,7 +245,8 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
             @FormParam(KEY_NAME_FORM_PARAM) String optionalKeyName,
             @FormParam(PRIVATE_KEY_ENCRYPTION_PASSPHRASE_FORM_PARAM) String privateKeyEncryptionPassphrase,
             @FormParam(REPLICA_REPLICATION_BEARER_TOKEN_FORM_PARAM) String replicaReplicationBearerToken,
-            @FormParam(TIMEOUT_IN_MILLISECONDS_FORM_PARAM) Long optionalTimeoutInMilliseconds) {
+            @FormParam(TIMEOUT_IN_MILLISECONDS_FORM_PARAM) Long optionalTimeoutInMilliseconds,
+            @FormParam(FORCE_FORM_PARAM) @DefaultValue("false") boolean force) {
         checkLandscapeManageAwsPermission();
         ResponseBuilder responseBuilder;
         final JSONObject result = new JSONObject();
@@ -245,35 +257,144 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
             replicaSet = getLandscapeService().getApplicationReplicaSet(region, replicaSetName, optionalTimeoutInMilliseconds, optionalKeyName, passphraseForPrivateKeyDecryption);
             final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> upgradedReplicaSet = getLandscapeService().upgradeApplicationReplicaSet(region, replicaSet,
                     releaseNameOrNullForLatestMaster, optionalKeyName, passphraseForPrivateKeyDecryption,
-                    replicaReplicationBearerToken);
+                    replicaReplicationBearerToken, force);
             responseBuilder = Response.ok();
             result.put(RESPONSE_STATUS, "OK");
             result.put(RESPONSE_RELEASE, upgradedReplicaSet.getVersion(Optional.ofNullable(optionalTimeoutInMilliseconds).map(Duration::ofMillis),
                     Optional.ofNullable(optionalKeyName), passphraseForPrivateKeyDecryption).getName());
+        } catch (LiveContentConflictException e) {
+            return liveContentConflict(e.getLiveContentCheckResult());
         } catch (Exception e) {
             result.put(RESPONSE_STATUS, "ERROR");
             result.put(RESPONSE_ERROR_MESSAGE, e.getMessage());
             responseBuilder = Response.serverError();
         }
         return responseBuilder.entity(streamingOutput(result)).build();
-    }    
-    
+    }
+
+    @Path("/stopreplicatingandremovemasterfromtargetgroups")
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces("application/json;charset=UTF-8")
+    public Response ensureAtLeastOneReplicaExistsStopReplicatingAndRemoveMasterFromTargetGroups(
+            @FormParam(REGION_FORM_PARAM) final String regionId,
+            @FormParam(REPLICA_SET_NAME_FORM_PARAM) final String replicaSetName,
+            @FormParam(TIMEOUT_IN_MILLISECONDS_FORM_PARAM) final Long optionalTimeoutInMilliseconds,
+            @FormParam(KEY_NAME_FORM_PARAM) final String optionalKeyName,
+            @FormParam(PRIVATE_KEY_ENCRYPTION_PASSPHRASE_FORM_PARAM) final String privateKeyEncryptionPassphrase,
+            @FormParam(REPLICA_REPLICATION_BEARER_TOKEN_FORM_PARAM) final String replicaReplicationBearerToken,
+            @FormParam(FORCE_FORM_PARAM) @DefaultValue("false") final boolean force) {
+        checkLandscapeManageAwsPermission();
+        Response response;
+        try {
+            final AwsRegion region = new AwsRegion(regionId, getLandscapeService().getLandscape());
+            final byte[] passphrase = privateKeyEncryptionPassphrase == null ? null
+                    : privateKeyEncryptionPassphrase.getBytes();
+            final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> replicaSet =
+                    getLandscapeService().getApplicationReplicaSet(region, replicaSetName,
+                            optionalTimeoutInMilliseconds, optionalKeyName, passphrase);
+            if (replicaSet == null) {
+                response = badRequest("Application replica set with name " + replicaSetName + " not found in region "
+                        + regionId);
+            } else {
+                final SailingAnalyticsProcess<String> additionalReplicaStarted = getLandscapeService()
+                        .ensureAtLeastOneReplicaExistsStopReplicatingAndRemoveMasterFromTargetGroups(replicaSet,
+                                optionalKeyName, passphrase,
+                                getLandscapeService().getEffectiveBearerToken(replicaReplicationBearerToken), force);
+                final JSONObject result = new JSONObject();
+                result.put("additionalReplicaStarted", additionalReplicaStarted != null);
+                response = Response.ok(streamingOutput(result)).build();
+            }
+        } catch (LiveContentConflictException e) {
+            response = liveContentConflict(e.getLiveContentCheckResult());
+        } catch (Exception e) {
+            response = badRequest(e.getMessage());
+        }
+        return response;
+    }
+
+    /**
+     * Archives a replica set synchronously, including content comparison and any requested database archiving and
+     * replica set removal. This is a long-running request: importing races, waiting between comparison attempts and
+     * cleanup can exceed client or proxy timeouts. Prefer {@link #moveToArchiveServerAsync} and poll import progress.
+     * This endpoint retains its synchronous behavior for existing clients. The outcome, including comparison
+     * differences, is also emailed to the initiating user if that user has a verified email address.
+     *
+     * @return HTTP 200 with {@code mdiProgress}, {@code compareServersResult} and {@code archiveMongoDBResult} after
+     *         archiving finishes; callers must inspect those results for failures. Live content conflicts return
+     *         HTTP 409, and other archiving exceptions return HTTP 400.
+     */
     @Path("/movetoarchiveserver")
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces("application/json;charset=UTF-8")
     public Response moveToArchiveServer(
-            @FormParam(REGION_FORM_PARAM) String regionId,
-            @FormParam(REPLICA_SET_NAME_FORM_PARAM) String replicaSetName,
-            @FormParam(KEY_NAME_FORM_PARAM) String optionalKeyName,
-            @FormParam(PRIVATE_KEY_ENCRYPTION_PASSPHRASE_FORM_PARAM) String privateKeyEncryptionPassphrase,
-            @FormParam(BEARER_TOKEN_FOR_REPLICA_SET_TO_ARCHIVE_FORM_PARAM) String bearerTokenOrNullForApplicationReplicaSetToArchive,
-            @FormParam(BEARER_TOKEN_FOR_ARCHIVE_FORM_PARAM) String bearerTokenOrNullForArchive,
-            @FormParam(TIMEOUT_IN_MILLISECONDS_FORM_PARAM) Long optionalTimeoutInMilliseconds,
-            @FormParam(DURATION_TO_WAIT_BEFORE_COMPARE_SERVERS_IN_MILLISECONDS_FORM_PARAM) @DefaultValue("300000") long durationToWaitBeforeCompareServersInMillis,
-            @FormParam(MAX_NUMBER_OF_COMPARE_SERVER_ATTEMPTS_FORM_PARAM) @DefaultValue("5") int maxNumberOfCompareServerAttempts,
-            @FormParam(REMOVE_APPLICATION_REPLICA_SET_FORM_PARAM) @DefaultValue("true") boolean removeApplicationReplicaSet,
-            @FormParam(MONGO_URI_TO_ARCHIVE_DB_TO_FORM_PARAM) String mongoUriToArchiveDbTo) {
+            @FormParam(REGION_FORM_PARAM) final String regionId,
+            @FormParam(REPLICA_SET_NAME_FORM_PARAM) final String replicaSetName,
+            @FormParam(KEY_NAME_FORM_PARAM) final String optionalKeyName,
+            @FormParam(PRIVATE_KEY_ENCRYPTION_PASSPHRASE_FORM_PARAM) final String privateKeyEncryptionPassphrase,
+            @FormParam(BEARER_TOKEN_FOR_REPLICA_SET_TO_ARCHIVE_FORM_PARAM) final String bearerTokenOrNullForApplicationReplicaSetToArchive,
+            @FormParam(BEARER_TOKEN_FOR_ARCHIVE_FORM_PARAM) final String bearerTokenOrNullForArchive,
+            @FormParam(TIMEOUT_IN_MILLISECONDS_FORM_PARAM) final Long optionalTimeoutInMilliseconds,
+            @FormParam(DURATION_TO_WAIT_BEFORE_COMPARE_SERVERS_IN_MILLISECONDS_FORM_PARAM) @DefaultValue("300000") final long durationToWaitBeforeCompareServersInMillis,
+            @FormParam(MAX_NUMBER_OF_COMPARE_SERVER_ATTEMPTS_FORM_PARAM) @DefaultValue("5") final int maxNumberOfCompareServerAttempts,
+            @FormParam(REMOVE_APPLICATION_REPLICA_SET_FORM_PARAM) @DefaultValue("true") final boolean removeApplicationReplicaSet,
+            @FormParam(MONGO_URI_TO_ARCHIVE_DB_TO_FORM_PARAM) final String mongoUriToArchiveDbTo,
+            @FormParam(FORCE_FORM_PARAM) @DefaultValue("false") final boolean force) {
+        return moveToArchiveServer(regionId, replicaSetName, optionalKeyName, privateKeyEncryptionPassphrase,
+                bearerTokenOrNullForApplicationReplicaSetToArchive, bearerTokenOrNullForArchive,
+                optionalTimeoutInMilliseconds, durationToWaitBeforeCompareServersInMillis,
+                maxNumberOfCompareServerAttempts, removeApplicationReplicaSet, mongoUriToArchiveDbTo, force,
+                /* asynchronous */ false);
+    }
+
+    /**
+     * Starts the same archiving workflow as {@code POST /landscape/movetoarchiveserver}, using the same form
+     * parameters, defaults and permissions. This asynchronous pattern is preferred for long-running archiving to
+     * avoid client or proxy timeouts while importing, comparing and cleaning up. The request still waits for
+     * preparation and acceptance of the master data import (MDI) on the archive; it is not an immediate enqueue.
+     * {@code timeoutInMilliseconds} only limits replica set discovery, not the entire request.
+     * <p>
+     * Poll {@code https://<archiveHostname>/sailingserver/api/v1/masterdataimport/progress?progressTrackingUuid=<UUID>}
+     * with credentials that have master-data import permission on the archive. The UUID tracks only the import:
+     * a successful import does not imply completion of content comparison, database archiving or replica set
+     * removal. Archiving continues independently of polling; its final outcome is logged and emailed to the
+     * initiating user if that user has a verified email address.
+     *
+     * @return HTTP 202 with {@code progressTrackingUuid} and {@code archiveHostname} once the archive accepts the
+     *         import. Acceptance does not imply archiving success. Before acceptance, live content conflicts return
+     *         HTTP 409, and other archiving exceptions return HTTP 400.
+     */
+    @Path("/movetoarchiveserver/async")
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces("application/json;charset=UTF-8")
+    public Response moveToArchiveServerAsync(
+            @FormParam(REGION_FORM_PARAM) final String regionId,
+            @FormParam(REPLICA_SET_NAME_FORM_PARAM) final String replicaSetName,
+            @FormParam(KEY_NAME_FORM_PARAM) final String optionalKeyName,
+            @FormParam(PRIVATE_KEY_ENCRYPTION_PASSPHRASE_FORM_PARAM) final String privateKeyEncryptionPassphrase,
+            @FormParam(BEARER_TOKEN_FOR_REPLICA_SET_TO_ARCHIVE_FORM_PARAM) final String bearerTokenOrNullForApplicationReplicaSetToArchive,
+            @FormParam(BEARER_TOKEN_FOR_ARCHIVE_FORM_PARAM) final String bearerTokenOrNullForArchive,
+            @FormParam(TIMEOUT_IN_MILLISECONDS_FORM_PARAM) final Long optionalTimeoutInMilliseconds,
+            @FormParam(DURATION_TO_WAIT_BEFORE_COMPARE_SERVERS_IN_MILLISECONDS_FORM_PARAM) @DefaultValue("300000") final long durationToWaitBeforeCompareServersInMillis,
+            @FormParam(MAX_NUMBER_OF_COMPARE_SERVER_ATTEMPTS_FORM_PARAM) @DefaultValue("5") final int maxNumberOfCompareServerAttempts,
+            @FormParam(REMOVE_APPLICATION_REPLICA_SET_FORM_PARAM) @DefaultValue("true") final boolean removeApplicationReplicaSet,
+            @FormParam(MONGO_URI_TO_ARCHIVE_DB_TO_FORM_PARAM) final String mongoUriToArchiveDbTo,
+            @FormParam(FORCE_FORM_PARAM) @DefaultValue("false") final boolean force) {
+        return moveToArchiveServer(regionId, replicaSetName, optionalKeyName, privateKeyEncryptionPassphrase,
+                bearerTokenOrNullForApplicationReplicaSetToArchive, bearerTokenOrNullForArchive,
+                optionalTimeoutInMilliseconds, durationToWaitBeforeCompareServersInMillis,
+                maxNumberOfCompareServerAttempts, removeApplicationReplicaSet, mongoUriToArchiveDbTo, force,
+                /* asynchronous */ true);
+    }
+
+    private Response moveToArchiveServer(final String regionId, final String replicaSetName, final String optionalKeyName,
+            final String privateKeyEncryptionPassphrase, final String bearerTokenOrNullForApplicationReplicaSetToArchive,
+            final String bearerTokenOrNullForArchive, final Long optionalTimeoutInMilliseconds,
+            final long durationToWaitBeforeCompareServersInMillis, final int maxNumberOfCompareServerAttempts,
+            final boolean removeApplicationReplicaSet, final String mongoUriToArchiveDbTo, final boolean force,
+            final boolean asynchronous) {
         checkLandscapeManageAwsPermission();
         if (removeApplicationReplicaSet) {
             getSecurityService().checkCurrentUserDeletePermission(SecuredSecurityTypes.SERVER.getQualifiedObjectIdentifier(
@@ -281,7 +402,7 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
         }
         Response response;
         final AwsRegion region = new AwsRegion(regionId, getLandscapeService().getLandscape());
-        byte[] passphraseForPrivateKeyDecryption = privateKeyEncryptionPassphrase==null?null:privateKeyEncryptionPassphrase.getBytes();
+        final byte[] passphraseForPrivateKeyDecryption = privateKeyEncryptionPassphrase==null?null:privateKeyEncryptionPassphrase.getBytes();
         final AwsLandscape<String> landscape = getLandscapeService().getLandscape();
         final MongoUriParser<String> mongoUriParser = new MongoUriParser<>(landscape, region);
         try {
@@ -291,18 +412,30 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
                             passphraseForPrivateKeyDecryption);
             if (applicationReplicaSetToArchive == null) {
                 response = badRequest("Application replica set with name " + replicaSetName + " not found in region "+regionId);
+            } else if (asynchronous) {
+                final Pair<UUID, String> importHandle = getLandscapeService().archiveReplicaSetAsync(regionId,
+                        applicationReplicaSetToArchive, bearerTokenOrNullForApplicationReplicaSetToArchive,
+                        bearerTokenOrNullForArchive, Duration.ofMillis(durationToWaitBeforeCompareServersInMillis),
+                        maxNumberOfCompareServerAttempts, removeApplicationReplicaSet, moveDatabaseHere, optionalKeyName,
+                        passphraseForPrivateKeyDecryption, force);
+                final JSONObject result = new JSONObject();
+                result.put(PROGRESS_TRACKING_UUID, importHandle.getA().toString());
+                result.put(ARCHIVE_HOSTNAME, importHandle.getB());
+                response = Response.status(Status.ACCEPTED).entity(streamingOutput(result)).build();
             } else {
                 final Triple<DataImportProgress, CompareServersResult, String> mdiProgressAndCompareServersResult = getLandscapeService().archiveReplicaSet(regionId, applicationReplicaSetToArchive,
                     bearerTokenOrNullForApplicationReplicaSetToArchive, bearerTokenOrNullForArchive,
                     Duration.ofMillis(durationToWaitBeforeCompareServersInMillis), maxNumberOfCompareServerAttempts, removeApplicationReplicaSet,
-                    moveDatabaseHere, optionalKeyName, passphraseForPrivateKeyDecryption);
+                    moveDatabaseHere, optionalKeyName, passphraseForPrivateKeyDecryption, force);
                 final JSONObject result = new JSONObject();
                 result.put(MDI_PROGRESS, mdiProgressAndCompareServersResult.getA()==null?null:new DataImportProgressJsonSerializer().serialize(mdiProgressAndCompareServersResult.getA()));
                 result.put(COMPARE_SERVERS_RESULT, mdiProgressAndCompareServersResult.getB()==null?null:new CompareServersResultJsonSerializer().serialize(mdiProgressAndCompareServersResult.getB()));
                 result.put(ARCHIVE_MONGODB_RESULT, mdiProgressAndCompareServersResult.getC());
                 response = Response.ok(streamingOutput(result)).build();
             }
-        } catch (Exception e) {
+        } catch (final LiveContentConflictException e) {
+            response = liveContentConflict(e.getLiveContentCheckResult());
+        } catch (final Exception e) {
             logger.log(Level.SEVERE, "Error trying to archive replica set "+replicaSetName+" in region "+regionId+": "+e.getMessage(), e);
             response = badRequest("Error trying to archive replica set "+replicaSetName+" in region "+regionId+": "+e.getMessage());
         }
@@ -318,7 +451,8 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
             @FormParam(INSTANCE_ID) String fromInstanceWithId,
             @FormParam(INSTANCE_TYPE_FORM_PARAM) String optionalInstanceType,
             @FormParam(KEY_NAME_FORM_PARAM) String optionalKeyName,
-            @FormParam(PRIVATE_KEY_ENCRYPTION_PASSPHRASE_FORM_PARAM) String privateKeyEncryptionPassphrase) {
+            @FormParam(PRIVATE_KEY_ENCRYPTION_PASSPHRASE_FORM_PARAM) String privateKeyEncryptionPassphrase,
+            @FormParam(FORCE_REPLICA_SET_FORM_PARAM) Set<String> forceMasterReplicaSetNames) {
         checkLandscapeManageAwsPermission();
         Response response;
         try {
@@ -328,7 +462,9 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
             final Triple<SailingAnalyticsHost<String>, Map<String, SailingAnalyticsProcess<String>>, Map<String, SailingAnalyticsProcess<String>>> result = getLandscapeService()
                     .moveAllApplicationProcessesAwayFrom(fromHost,
                             Optional.ofNullable(optionalInstanceType == null ? null : InstanceType.valueOf(optionalInstanceType)),
-                            optionalKeyName, passphraseForPrivateKeyDecryption);
+                            optionalKeyName, passphraseForPrivateKeyDecryption,
+                            forceMasterReplicaSetNames == null ? Collections.emptySet()
+                                    : new HashSet<>(forceMasterReplicaSetNames));
             final JSONObject jsonResult = new JSONObject();
             jsonResult.put(NEW_HOST_ID, result.getA().getId());
             final JSONArray masterProcessesMoved = getProcessesAndTheirReplicaSetNamesAsJSONArray(result.getB());
@@ -336,6 +472,8 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
             final JSONArray replicaProcessesMoved = getProcessesAndTheirReplicaSetNamesAsJSONArray(result.getC());
             jsonResult.put(REPLICA_PROCESSES_MOVED, replicaProcessesMoved);
             response = Response.ok(streamingOutput(jsonResult)).build();
+        } catch (LiveContentConflictException e) {
+            response = liveContentConflict(e.getLiveContentCheckResult());
         } catch (Exception e) {
             final String msg = "Error trying to move processes away from instance with ID "+fromInstanceWithId+" in region "+regionId+": "+e.getMessage();
             logger.log(Level.SEVERE, msg, e);
@@ -344,12 +482,19 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
         return response;
     }
 
+    private Response liveContentConflict(final LiveContentCheckResult liveContentCheckResult) {
+        return Response.status(Status.CONFLICT)
+                .entity(streamingOutput(new LiveContentCheckResultJsonSerializer().serialize(liveContentCheckResult)))
+                .build();
+    }
+
     private JSONArray getProcessesAndTheirReplicaSetNamesAsJSONArray(Map<String, SailingAnalyticsProcess<String>> processesKeyedByTheirApplicationReplicaSetName) {
         final JSONArray result = new JSONArray();
         for (final Entry<String, SailingAnalyticsProcess<String>> e : processesKeyedByTheirApplicationReplicaSetName.entrySet()) {
             final JSONObject processJson = new JSONObject();
             processJson.put(REPLICA_SET_NAME, e.getKey());
             processJson.put(PORT, e.getValue().getPort());
+            result.add(processJson);
         }
         return result;
     }
@@ -364,7 +509,8 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
             @FormParam(TIMEOUT_IN_MILLISECONDS_FORM_PARAM) Long optionalTimeoutInMilliseconds,
             @FormParam(KEY_NAME_FORM_PARAM) String optionalKeyName,
             @FormParam(PRIVATE_KEY_ENCRYPTION_PASSPHRASE_FORM_PARAM) String privateKeyEncryptionPassphrase,
-            @FormParam(MONGO_URI_TO_ARCHIVE_DB_TO_FORM_PARAM) String mongoUriToArchiveDbTo) {
+            @FormParam(MONGO_URI_TO_ARCHIVE_DB_TO_FORM_PARAM) String mongoUriToArchiveDbTo,
+            @FormParam(FORCE_FORM_PARAM) @DefaultValue("false") boolean force) {
         checkLandscapeManageAwsPermission();
         getSecurityService().checkCurrentUserDeletePermission(SecuredSecurityTypes.SERVER.getQualifiedObjectIdentifier(
                 new TypeRelativeObjectIdentifier(replicaSetName)));
@@ -382,9 +528,11 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
                 final MongoUriParser<String> mongoUriParser = new MongoUriParser<>(landscape, region);
                 final MongoEndpoint moveDatabaseHere = mongoUriToArchiveDbTo == null ? null : mongoUriParser.parseMongoUri(mongoUriToArchiveDbTo).getEndpoint();
                 getLandscapeService().removeApplicationReplicaSet(regionId, applicationReplicaSetToRemove, moveDatabaseHere,
-                        optionalKeyName, passphraseForPrivateKeyDecryption);
+                        optionalKeyName, passphraseForPrivateKeyDecryption, force);
                 response = Response.ok().build();
             }
+        } catch (LiveContentConflictException e) {
+            response = liveContentConflict(e.getLiveContentCheckResult());
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error trying to archive replica set "+replicaSetName+" in region "+regionId+": "+e.getMessage(), e);
             response = badRequest("Error trying to archive replica set "+replicaSetName+" in region "+regionId+": "+e.getMessage());
@@ -420,9 +568,10 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
             } else {
                 final LandscapeService landscapeService = getLandscapeService();
                 final SailingAnalyticsHost<String> hostToDeployTo = landscapeService.getLandscape().getHostByInstanceId(region, hostId, new SailingAnalyticsHostSupplier<>());
-                if (landscapeService.isEligibleForDeployment(hostToDeployTo, replicaSet.getServerName(), replicaSet.getPort(),
-                        optionalIgtimiRiotPort,
-                        optionalTimeoutInMilliseconds == null ? Optional.empty() : Optional.of(Duration.ofMillis(optionalTimeoutInMilliseconds)),
+                if (landscapeService.isEligibleForDeployment(hostToDeployTo, replicaSet.getServerName(),
+                        replicaSet.getPort(), optionalIgtimiRiotPort,
+                        optionalTimeoutInMilliseconds == null ? Optional.empty()
+                                : Optional.of(Duration.ofMillis(optionalTimeoutInMilliseconds)),
                         optionalKeyName, passphraseForPrivateKeyDecryption)) {
                     final SailingAnalyticsProcess<String> process = getLandscapeService().deployReplicaToExistingHost(replicaSet, hostToDeployTo, optionalKeyName,
                             passphraseForPrivateKeyDecryption, replicaReplicationBearerToken,
@@ -576,7 +725,8 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
             @FormParam(MASTER_REPLICATION_BEARER_TOKEN_FORM_PARAM) String masterReplicationBearerToken,
             @FormParam(REPLICA_REPLICATION_BEARER_TOKEN_FORM_PARAM) String replicaReplicationBearerToken,
             @FormParam(MEMORY_IN_MEGABYTES_FORM_PARAM) Integer optionalMemoryInMegabytesOrNull,
-            @FormParam(MEMORY_TOTAL_SIZE_FACTOR_FORM_PARAM) Integer optionalMemoryTotalSizeFactorOrNull) {
+            @FormParam(MEMORY_TOTAL_SIZE_FACTOR_FORM_PARAM) Integer optionalMemoryTotalSizeFactorOrNull,
+            @FormParam(FORCE_FORM_PARAM) @DefaultValue("false") boolean force) {
         checkLandscapeManageAwsPermission();
         Response response;
         final AwsRegion region = new AwsRegion(regionId, getLandscapeService().getLandscape());
@@ -596,7 +746,7 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
                                 Optional.ofNullable(optionalInstanceType).map(instanceTypeName->InstanceType.valueOf(instanceTypeName)),
                                 optionalPreferredInstanceToDeployTo, optionalKeyName, passphraseForPrivateKeyDecryption,
                                 masterReplicationBearerToken, replicaReplicationBearerToken,
-                                optionalMemoryInMegabytesOrNull, optionalMemoryTotalSizeFactorOrNull);
+                                optionalMemoryInMegabytesOrNull, optionalMemoryTotalSizeFactorOrNull, force);
                 response = Response.ok()
                         .entity(streamingOutput(new AwsApplicationReplicaSetJsonSerializer(result.getVersion(
                                 optionalTimeoutInMilliseconds == null ? Landscape.WAIT_FOR_PROCESS_TIMEOUT
@@ -604,9 +754,40 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
                                 Optional.ofNullable(optionalKeyName), passphraseForPrivateKeyDecryption).getName()).serialize(result)))
                         .build();
             }
+        } catch (LiveContentConflictException e) {
+            response = liveContentConflict(e.getLiveContentCheckResult());
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error trying to archive replica set "+replicaSetName+" in region "+regionId+": "+e.getMessage(), e);
             response = badRequest("Error trying to archive replica set "+replicaSetName+" in region "+regionId+": "+e.getMessage());
+        }
+        return response;
+    }
+
+    @Path("/livecontentcheck")
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces("application/json;charset=UTF-8")
+    public Response checkForLiveContent(@FormParam(REGION_FORM_PARAM) final String regionId,
+            @FormParam(REPLICA_SET_NAME_FORM_PARAM) final Set<String> replicaSetNames,
+            @FormParam(TIMEOUT_IN_MILLISECONDS_FORM_PARAM) final Long optionalTimeoutInMilliseconds,
+            @FormParam(KEY_NAME_FORM_PARAM) final String optionalKeyName,
+            @FormParam(PRIVATE_KEY_ENCRYPTION_PASSPHRASE_FORM_PARAM) final String privateKeyEncryptionPassphrase,
+            @FormParam(MASTER_REPLICATION_BEARER_TOKEN_FORM_PARAM) final String bearerToken) {
+        checkLandscapeManageAwsPermission();
+        Response response;
+        try {
+            final AwsRegion region = new AwsRegion(regionId, getLandscapeService().getLandscape());
+            final byte[] passphrase = privateKeyEncryptionPassphrase == null ? null
+                    : privateKeyEncryptionPassphrase.getBytes();
+            final Set<AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>>> replicaSets = new HashSet<>();
+            for (final String replicaSetName : replicaSetNames) {
+                replicaSets.add(getLandscapeService().getApplicationReplicaSet(region, replicaSetName,
+                        optionalTimeoutInMilliseconds, optionalKeyName, passphrase));
+            }
+            response = Response.ok(streamingOutput(new LiveContentCheckResultJsonSerializer()
+                    .serialize(getLandscapeService().checkForLiveContent(replicaSets, bearerToken)))).build();
+        } catch (Exception e) {
+            response = badRequest(e.getMessage());
         }
         return response;
     }
@@ -634,7 +815,8 @@ public class SailingLandscapeResource extends AbstractLandscapeResource {
             } else {
                 final AwsApplicationReplicaSet<String, SailingAnalyticsMetrics, SailingAnalyticsProcess<String>> result = getLandscapeService()
                         .changeAutoScalingReplicasInstanceType(replicaSet, InstanceType.valueOf(instanceType),
-                                Landscape.WAIT_FOR_PROCESS_TIMEOUT, Optional.ofNullable(optionalKeyName), passphraseForPrivateKeyDecryption);
+                                Landscape.WAIT_FOR_PROCESS_TIMEOUT, Optional.ofNullable(optionalKeyName),
+                                passphraseForPrivateKeyDecryption);
                 response = Response.ok()
                         .entity(streamingOutput(new AwsApplicationReplicaSetJsonSerializer(result.getVersion(
                                 Landscape.WAIT_FOR_PROCESS_TIMEOUT, Optional.ofNullable(optionalKeyName), passphraseForPrivateKeyDecryption).getName()).serialize(result)))

@@ -1,0 +1,567 @@
+{
+  "name": "2. Österreichische Segelbundesliga 2025 - Attersee Overall",
+  "scheme": "LOW_POINT_OVERALL_USING_NET_POINTS",
+  "type": "RegattaMetaLeaderboard",
+  "displayName": "2. Österreichische Segelbundesliga 2025 - Attersee Overall",
+  "provenance": {
+    "results": {
+      "url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboards/2.%20%C3%96sterreichische%20Segelbundesliga%202025%20-%20Attersee%20Overall",
+      "fetched_at": "2026-11-11T19:08:11.291989+00:00",
+      "status": 200,
+      "resolved_url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboards/2.%20%C3%96sterreichische%20Segelbundesliga%202025%20-%20Attersee%20Overall",
+      "sha256": "9b8a861ef62cdb2766258acdc651613a51eff93c9f22dbb1e7e36fd8f5c9b48d",
+      "bytes": 12058
+    },
+    "configuration": {
+      "url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboardgroups/2.%20%C3%96sterreichische%20Segelbundesliga%202025%20-%20Attersee",
+      "fetched_at": "2026-11-11T19:07:48.833647+00:00",
+      "status": 200,
+      "resolved_url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboardgroups/2.%20%C3%96sterreichische%20Segelbundesliga%202025%20-%20Attersee",
+      "sha256": "8f0acab1db311bdbdfff393789666514cf01c266649a438acdf9c34f4257345e",
+      "bytes": 20002
+    },
+    "metadata": {
+      "base": "https://sapsailing.com",
+      "source": "central-metadata.json",
+      "sha256": "933a31e4dd4cde658f818e47e548e218ce8f8e0283669fbf32710569597064d8"
+    },
+    "capturedScheme": "LOW_POINT_OVERALL_USING_NET_POINTS"
+  },
+  "timePoint": 1750603146500,
+  "canBoatsOfCompetitorsChangePerRace": false,
+  "discardThresholds": [],
+  "series": [],
+  "columns": [
+    {
+      "name": "Attersee",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "Velden",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    }
+  ],
+  "competitors": [
+    {
+      "id": "674520c8-2520-4e28-a00e-50c9bbf0292f",
+      "name": "Segelclub Attersee ",
+      "displayName": "Segelclub Attersee ",
+      "sailID": null,
+      "expectedRank": 1,
+      "expectedTotal": 28.0,
+      "cells": [
+        {
+          "column": "Attersee",
+          "fleet": "MetaFleet",
+          "points": 28.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 28.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Velden",
+          "fleet": "MetaFleet",
+          "points": 0.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "66c4ca2b-b316-475c-807d-f24b1c21bb70",
+      "name": "Pannonia Youth Sailing Team",
+      "displayName": "Pannonia Youth Sailing Team",
+      "sailID": null,
+      "expectedRank": 2,
+      "expectedTotal": 39.0,
+      "cells": [
+        {
+          "column": "Attersee",
+          "fleet": "MetaFleet",
+          "points": 18.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 18.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Velden",
+          "fleet": "MetaFleet",
+          "points": 21.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 21.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "7fde980d-c171-4b99-bac0-0e153e66fa23",
+      "name": "SCATT 2 | DNS | LSC-Wild",
+      "displayName": "SCATT 2 | DNS | LSC-Wild",
+      "sailID": null,
+      "expectedRank": 3,
+      "expectedTotal": 41.0,
+      "cells": [
+        {
+          "column": "Attersee",
+          "fleet": "MetaFleet",
+          "points": 41.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 41.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Velden",
+          "fleet": "MetaFleet",
+          "points": 0.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "288badc5-2555-415f-b740-991107541559",
+      "name": "Union-Yacht-Club Wörthersee 2",
+      "displayName": "Union-Yacht-Club Wörthersee 2",
+      "sailID": null,
+      "expectedRank": 4,
+      "expectedTotal": 42.0,
+      "cells": [
+        {
+          "column": "Attersee",
+          "fleet": "MetaFleet",
+          "points": 25.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 25.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Velden",
+          "fleet": "MetaFleet",
+          "points": 17.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 17.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "ff3ac152-95bd-435e-a841-d9c3f6808238",
+      "name": "YCV Inklusion ",
+      "displayName": "YCV Inklusion ",
+      "sailID": null,
+      "expectedRank": 5,
+      "expectedTotal": 46.0,
+      "cells": [
+        {
+          "column": "Attersee",
+          "fleet": "MetaFleet",
+          "points": 23.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 23.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Velden",
+          "fleet": "MetaFleet",
+          "points": 23.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 23.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "dd2d17e5-80ab-4a57-908c-802da82a5b27",
+      "name": "Segelclub Traunkirchen ",
+      "displayName": "Segelclub Traunkirchen ",
+      "sailID": null,
+      "expectedRank": 6,
+      "expectedTotal": 51.0,
+      "cells": [
+        {
+          "column": "Attersee",
+          "fleet": "MetaFleet",
+          "points": 21.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 21.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Velden",
+          "fleet": "MetaFleet",
+          "points": 30.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 30.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "5ede777b-1263-4356-9c0f-d43fcb63c597",
+      "name": "Union-Yacht-Club Attersee 2",
+      "displayName": "Union-Yacht-Club Attersee 2",
+      "sailID": null,
+      "expectedRank": 7,
+      "expectedTotal": 54.0,
+      "cells": [
+        {
+          "column": "Attersee",
+          "fleet": "MetaFleet",
+          "points": 39.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 39.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Velden",
+          "fleet": "MetaFleet",
+          "points": 15.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 15.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "20cf90d2-c7bd-4d08-9a77-c636928669fd",
+      "name": "Vienna International Sailing Club - Wild",
+      "displayName": "Vienna International Sailing Club - Wild",
+      "sailID": null,
+      "expectedRank": 8,
+      "expectedTotal": 60.0,
+      "cells": [
+        {
+          "column": "Attersee",
+          "fleet": "MetaFleet",
+          "points": 60.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 60.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Velden",
+          "fleet": "MetaFleet",
+          "points": 0.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "47ec7a76-8514-416a-95b4-ce21265b3753",
+      "name": "King Yachting Club",
+      "displayName": "King Yachting Club",
+      "sailID": null,
+      "expectedRank": 9,
+      "expectedTotal": 64.0,
+      "cells": [
+        {
+          "column": "Attersee",
+          "fleet": "MetaFleet",
+          "points": 34.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 34.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Velden",
+          "fleet": "MetaFleet",
+          "points": 30.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 30.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "2f09c5b6-9c12-4b03-9f3a-c1b12a812568",
+      "name": "Segelclub Handelsministerium Yachtclub ",
+      "displayName": "Segelclub Handelsministerium Yachtclub ",
+      "sailID": null,
+      "expectedRank": 10,
+      "expectedTotal": 65.0,
+      "cells": [
+        {
+          "column": "Attersee",
+          "fleet": "MetaFleet",
+          "points": 41.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 41.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Velden",
+          "fleet": "MetaFleet",
+          "points": 24.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 24.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "da369bb2-05dd-4735-928d-798ce4448271",
+      "name": "Nautic Club Austria 2",
+      "displayName": "Nautic Club Austria 2",
+      "sailID": null,
+      "expectedRank": 11,
+      "expectedTotal": 65.0,
+      "cells": [
+        {
+          "column": "Attersee",
+          "fleet": "MetaFleet",
+          "points": 37.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 37.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Velden",
+          "fleet": "MetaFleet",
+          "points": 28.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 28.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "af9207de-8c50-474b-beff-465d8a82825a",
+      "name": "Wäscherutsche Sailing",
+      "displayName": "Wäscherutsche Sailing",
+      "sailID": null,
+      "expectedRank": 12,
+      "expectedTotal": 75.0,
+      "cells": [
+        {
+          "column": "Attersee",
+          "fleet": "MetaFleet",
+          "points": 42.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 42.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Velden",
+          "fleet": "MetaFleet",
+          "points": 33.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 33.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "9b7bc99e-e804-47a9-b428-fba66bea6c5f",
+      "name": "City Sailor",
+      "displayName": "City Sailor",
+      "sailID": null,
+      "expectedRank": 13,
+      "expectedTotal": 78.0,
+      "cells": [
+        {
+          "column": "Attersee",
+          "fleet": "MetaFleet",
+          "points": 46.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 46.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Velden",
+          "fleet": "MetaFleet",
+          "points": 32.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 32.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "14151730-db97-4687-86a6-730982be22ce",
+      "name": "JET Nautics NCA 3",
+      "displayName": "JET Nautics NCA 3",
+      "sailID": null,
+      "expectedRank": 14,
+      "expectedTotal": 81.0,
+      "cells": [
+        {
+          "column": "Attersee",
+          "fleet": "MetaFleet",
+          "points": 45.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 45.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Velden",
+          "fleet": "MetaFleet",
+          "points": 36.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 36.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "3b68dc89-7294-4e12-a1bd-e64e4b339853",
+      "name": "boats2sail Youth",
+      "displayName": "boats2sail Youth",
+      "sailID": null,
+      "expectedRank": 15,
+      "expectedTotal": 85.0,
+      "cells": [
+        {
+          "column": "Attersee",
+          "fleet": "MetaFleet",
+          "points": 40.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 40.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Velden",
+          "fleet": "MetaFleet",
+          "points": 45.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 45.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "9b0f0794-663b-4d6f-839f-fb1840287e04",
+      "name": "Vienna International Sailing Club",
+      "displayName": "Vienna International Sailing Club",
+      "sailID": null,
+      "expectedRank": 16,
+      "expectedTotal": 93.0,
+      "cells": [
+        {
+          "column": "Attersee",
+          "fleet": "MetaFleet",
+          "points": 44.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 44.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Velden",
+          "fleet": "MetaFleet",
+          "points": 49.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 49.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "cf61f34c-c2c1-4248-bed4-cfce45824b4c",
+      "name": "ASACC | ASACC | BYC-Youth",
+      "displayName": "ASACC | ASACC | BYC-Youth",
+      "sailID": null,
+      "expectedRank": 17,
+      "expectedTotal": 110.0,
+      "cells": [
+        {
+          "column": "Attersee",
+          "fleet": "MetaFleet",
+          "points": 58.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 58.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Velden",
+          "fleet": "MetaFleet",
+          "points": 52.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 52.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "503bc8a3-57ad-40ad-b71f-586b493f2700",
+      "name": "Windrocker",
+      "displayName": "Windrocker",
+      "sailID": null,
+      "expectedRank": 18,
+      "expectedTotal": 114.0,
+      "cells": [
+        {
+          "column": "Attersee",
+          "fleet": "MetaFleet",
+          "points": 63.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 63.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Velden",
+          "fleet": "MetaFleet",
+          "points": 51.0,
+          "reason": "NONE",
+          "isCorrected": false,
+          "expectedNet": 51.0,
+          "expectedDiscard": false
+        }
+      ]
+    }
+  ],
+  "groupName": "2. Österreichische Segelbundesliga 2025 - Attersee",
+  "children": [
+    {
+      "resource": "low_point_overall_using_net_points-act-1",
+      "column": "Attersee"
+    },
+    {
+      "resource": "low_point_overall_using_net_points-act-2",
+      "column": "Velden"
+    }
+  ],
+  "suppressedIds": [],
+  "configurationNotes": "Child links/order from group REST response. Overall suppression inferred from child IDs absent from captured overall field. Only explicitly corrected overall cells are imported."
+}

@@ -26,7 +26,7 @@ public class MediaUploadTest extends AbstractSeleniumTest {
     private static final String REGATTA_49ER = "KW 2015 Olympic - 49er"; //$NON-NLS-1$
     private static final String REGATTA_49ER_WITH_SUFFIX = REGATTA_49ER + " (" + BOAT_CLASS_49ER + ")"; //$NON-NLS-1$
     private static final String EVENT_DESC = "Kieler Woche 2015"; //$NON-NLS-1$
-    private static final String VENUE = "Kieler F�rde"; //$NON-NLS-1$
+    private static final String VENUE = "Kieler Förde"; //$NON-NLS-1$
     private static final Date EVENT_START_TIME = DatatypeConverter.parseDateTime("2015-06-20T08:00:00-00:00").getTime();
     private static final Date EVENT_END_TIME = DatatypeConverter.parseDateTime("2015-06-28T20:00:00-00:00").getTime();
     private static final String YOUTUBE_URL_1 = "https://youtu.be/tJFuTKPH_i8";

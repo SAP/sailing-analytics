@@ -1,12 +1,13 @@
 package com.sap.sailing.racecommittee.app.ui.fragments.raceinfo;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -159,6 +160,7 @@ public class StartTimeFragment extends BaseFragment
     }
 
     @Override
+    @SuppressLint("MissingInflatedId")
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.race_schedule_start_time, container, false);
 
@@ -653,27 +655,22 @@ public class StartTimeFragment extends BaseFragment
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.set_start_time_absolute:
-                changeFragment(mStartTime);
-                break;
-            case R.id.set_start_time_relative:
-                changeFragment(mStartTime, new MillisecondsDurationImpl(mTimeOffset.getValue() * 60 * 1000), identifier);
-                break;
-            case R.id.sync_to_minute:
-                syncToMinute();
-                break;
-            case R.id.header_text:
-                if (getArguments() != null
-                        && getArguments().getInt(START_MODE, START_MODE_PRESETUP) == START_MODE_PRESETUP) {
-                    changeFragment();
-                } else {
-                    sendIntent(AppConstants.ACTION_SHOW_MAIN_CONTENT);
-                }
-                break;
-            case R.id.start_date_button:
-                TimeUtils.showDatePickerDialog(getChildFragmentManager(), mStartTime, mEvent);
-                break;
+        final int id = view.getId();
+        if (id == R.id.set_start_time_absolute) {
+            changeFragment(mStartTime);
+        } else if (id == R.id.set_start_time_relative) {
+            changeFragment(mStartTime, new MillisecondsDurationImpl(mTimeOffset.getValue() * 60 * 1000), identifier);
+        } else if (id == R.id.sync_to_minute) {
+            syncToMinute();
+        } else if (id == R.id.header_text) {
+            if (getArguments() != null
+                    && getArguments().getInt(START_MODE, START_MODE_PRESETUP) == START_MODE_PRESETUP) {
+                changeFragment();
+            } else {
+                sendIntent(AppConstants.ACTION_SHOW_MAIN_CONTENT);
+            }
+        } else if (id == R.id.start_date_button) {
+            TimeUtils.showDatePickerDialog(getChildFragmentManager(), mStartTime, mEvent);
         }
     }
 

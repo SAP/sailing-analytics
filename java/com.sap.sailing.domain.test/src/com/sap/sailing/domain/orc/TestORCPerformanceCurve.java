@@ -8,14 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.StreamSupport;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.math.ArgumentOutsideDomainException;
 import org.apache.commons.math.FunctionEvaluationException;
@@ -25,8 +21,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
-import org.w3c.dom.DOMException;
-import org.xml.sax.SAXException;
 
 import com.sap.sailing.domain.common.orc.ORCCertificate;
 import com.sap.sailing.domain.common.orc.ORCPerformanceCurveCourse;
@@ -39,6 +33,7 @@ import com.sap.sailing.domain.orc.impl.ORCPerformanceCurveImpl;
 import com.sap.sailing.domain.orc.impl.ORCPublicCertificateDatabaseImpl;
 import com.sap.sse.common.Bearing;
 import com.sap.sse.common.CountryCode;
+import com.sap.sse.common.CountryCodeFactory;
 import com.sap.sse.common.Distance;
 import com.sap.sse.common.Duration;
 import com.sap.sse.common.Speed;
@@ -64,9 +59,8 @@ public class TestORCPerformanceCurve {
     private static final String RESOURCES = "resources/orc/";
     
     @BeforeAll
-    public static void initialize() throws IOException, ParseException, DOMException, SAXException,
-            ParserConfigurationException, java.text.ParseException {
-        List<ORCPerformanceCurveLeg> legs = new ArrayList<>();
+    public static void initialize() throws IOException, ParseException {
+        final List<ORCPerformanceCurveLeg> legs = new ArrayList<>();
         legs.add(new ORCPerformanceCurveLegImpl(new NauticalMileDistance(2.23), new DegreeBearingImpl(10)));
         legs.add(new ORCPerformanceCurveLegImpl(new NauticalMileDistance(2.00), new DegreeBearingImpl(170)));
         legs.add(new ORCPerformanceCurveLegImpl(new NauticalMileDistance(0.97), new DegreeBearingImpl(0)));
@@ -75,19 +69,20 @@ public class TestORCPerformanceCurve {
         legs.add(new ORCPerformanceCurveLegImpl(new NauticalMileDistance(1.17), new DegreeBearingImpl(180)));
         alturaCourse = new ORCPerformanceCurveCourseImpl(legs); // this course is the same course as seen in the Altura "IMS Explanation" sheet
         // Local File:
-        File fileGER = new File(RESOURCES + "GER2019.json");
+        final File fileGER = new File(RESOURCES + "GER2019.json");
         importerLocal = new ORCCertificatesJsonImporter().read(new FileInputStream(fileGER));
         // Local File new format with specific TWA/TWS bins:
-        File fileWithSpecificBins = new File(RESOURCES + "newFormatCertificate.json");
+        final File fileWithSpecificBins = new File(RESOURCES + "newFormatCertificate.json");
         importerWithSpecificBins = new ORCCertificatesJsonImporter().read(new FileInputStream(fileWithSpecificBins));
-        // Online File:
-        final CountryCode countryWithMostValidCertificates = StreamSupport
-                .stream(ORCPublicCertificateDatabaseImpl.INSTANCE.getCountriesWithValidCertificates().spliterator(),
-                        /* parallel */ false)
-                .max((c1, c2) -> c1.getCertCount() - c2.getCertCount()).get().getIssuingCountry();
-        logger.info("Trying to read country certificates for "+countryWithMostValidCertificates);
-        importerOnline = new ORCCertificatesJsonImporter().read(new URL("https://data.orc.org/public/WPub.dll?action=DownBoatRMS&CountryId="+
-                countryWithMostValidCertificates.getThreeLetterIOCCode()+"&ext=json").openStream());
+        // Online File: a bulk GER download via the key-based sas.orc.org API. All endpoint and key handling lives in
+        // the adapter; the test only asks it for the bulk certificate stream so there is no duplicated URL construction
+        // or env-var/key logic here. The adapter reads the ORC_API_KEY environment variable and throws when it is
+        // absent, so a missing key FAILS this setup rather than silently skipping, and the key is never logged.
+        final CountryCode ger = CountryCodeFactory.INSTANCE.getFromThreeLetterIOCName("GER");
+        logger.info("Trying to read bulk GER certificates from the key-based ORC API");
+        importerOnline = new ORCCertificatesJsonImporter().read(
+                ((ORCPublicCertificateDatabaseImpl) ORCPublicCertificateDatabase.INSTANCE)
+                        .openBulkCertificatesJsonStream(ger));
     }
     
     @Test

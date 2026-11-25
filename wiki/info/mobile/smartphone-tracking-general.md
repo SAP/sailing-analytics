@@ -1,3 +1,5 @@
+> **Note:** A newer step-by-step guide for event hosts is available: [[Setting up Smartphone Tracking for your Event|wiki/howto/eventmanagers/smartphone-tracking]]. This page is kept for reference.
+
 #Smartphone Tracking
 
 It is now possible to track races using only smartphones. This can be set up following the following steps.

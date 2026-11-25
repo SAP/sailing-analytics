@@ -4,7 +4,19 @@ Your WebSearch tool is broken, don't use it. Instead fetch https://duckduckgo.co
 
 # Claude Code Instructions for sailing-analytics
 
+## Research before Answering
+
+Make sure to research the topic/question well and thoroughly instead of just answering quickly and superficially.
+
+## Eclipse AssistAI MCP Server Use
+
+Check for MCP server installations such as "eclipse-coder", "eclipse-ide", "eclipse-runner" and "eclipse-git" and prefer those over the default "Update" and bash-based file search / grep tools. They are more powerful, understand Java and OSGi including call graph and type information, offer powerful refactoring support, are quicker, probably consume fewer tokens, and most importantly keep the Eclipse workspace in sync.
+
 ## Java Coding Style Preferences
+
+### Auto-Formatting
+
+When using any form of auto-formatting, keep it to the actual change and make sure not to apply any auto-formatting to otherwise unchanged code. This would make reviewing a pain.
 
 ### Variable Declarations
 - **Always use `final` where possible** for local variables, parameters, and fields
@@ -38,6 +50,23 @@ public void processItem(Item item) {  // Missing final
     saveResult(result);  // Unnecessary blank line above
 }
 ```
+
+### serialVersionUID
+
+We prefer **generated** serialVersionUID values, not the default "1", so make sure to
+generate the value only after the first combination of fields and methods has been added
+so that at least for an initial version of the type the serialVersionUID is a true, matching
+ID.
+
+However, once a non-trivial serialVersionUID has been generated, committed and pushed, don't
+change it anymore.
+
+## i18n Patterns
+
+Our primary development language is English (en_US). However, we also have to maintain German (de_DE) ourselves.
+For the downstream repository (github.com/SAP/sailing-analytics) there is a translation process attached
+that produces message strings from the translatable message bundles in all other languages supported,
+based on the English messages.
 
 ## Git Commit Messages
 - Follow existing repository convention: start with bug/issue number (e.g., "bug6214: description")

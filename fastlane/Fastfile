@@ -45,6 +45,21 @@ platform :android do
 
     gradle(task: "assembleRelease")  # Build .apk
     #gradle(task: "bundleRelease")  # Build .aab
+    strip_build_type_from_apk_names(build_type: "release")
+  end
+
+  # Central Signing only signs APK file names allow-listed by Non-ABAP Assembly, as listed in each
+  # app's files2sign.json (<module>-unsigned.apk). AGP 8 names release APKs <module>-release-unsigned.apk,
+  # and its new Variant API no longer supports renaming outputs, so we rename them here.
+  def strip_build_type_from_apk_names(build_type:)
+    suffix = "-#{build_type}-unsigned.apk"
+    apks = (lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS] || []).select { |apk| apk.end_with?(suffix) }
+    UI.user_error!("No APK ending in #{suffix} found after Gradle build") if apks.empty?
+    apks.each do |apk|
+      target = apk.delete_suffix(suffix) + "-unsigned.apk"
+      UI.message("Renaming #{apk} to #{File.basename(target)}")
+      File.rename(apk, target)
+    end
   end
 
   desc "Call Kotlin Lint"

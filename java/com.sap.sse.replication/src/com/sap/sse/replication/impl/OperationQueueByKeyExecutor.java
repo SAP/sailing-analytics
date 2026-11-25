@@ -17,7 +17,7 @@ import com.sap.sse.operationaltransformation.Operation;
  * which puts it into a {@link Deque double-ended queue} specific to the key for asynchronous execution as provided by
  * the operation. If it is the first operation in a new {@link Deque} then a task is scheduled for immediate execution
  * which continues to poll the {@link Deque} and apply its operations until drained. This way, if the replication
- * received continues to receive operations with the same key while the first operation with that key is being applied,
+ * continues to receive operations with the same key while the first operation with that key is being applied,
  * the next operations with an equal key will be enqueued in the same queue and will be picked up by the already running
  * task that is specific to the key. When the queue is drained, the task terminates and the queue is removed from
  * {@link #operationQueuesByKey}.<p>
@@ -38,66 +38,56 @@ public class OperationQueueByKeyExecutor {
      * with the {@link #executor} and which hasn't completed yet.
      * <p>
      * 
-     * Changing this map must happen exclusively, while {@code synchronized} on this {@link OperationQueueByKeyExecutor}
-     * object. Changing any of the value queues must happen while being synchronized on the corresponding
-     * {@link #monitorsPerKey} value for an equal key.
+     * All access to this map and its queues must happen while {@code synchronized} on this
+     * {@link OperationQueueByKeyExecutor} object. In particular, looking up a queue and enqueueing an operation must
+     * be atomic with respect to checking whether the queue is empty and removing it. A queue stays registered while
+     * its worker executes an operation, even if no further operations are queued. Operations execute outside this
+     * monitor so different keys can make progress concurrently.
      */
     private final ConcurrentMap<Object, Deque<Runnable>> operationQueuesByKey;
     
-    /**
-     * For any single-key operation, such as looking up or modifying its queue, a monitor object must be obtained (and
-     * created if it does not yet exist) from this map for the respective key and must be {@code synchronized} on. The
-     * mapping can be removed if and only if the corresponding mapping is removed from {@link #operationQueuesByKey}.
-     * <p>
-     * 
-     * Changing this map must happen exclusively, while {@code synchronized} on this {@link OperationQueueByKeyExecutor}
-     * object.
-     */
-    private final ConcurrentMap<Object, Object> monitorsPerKey;
-
-    OperationQueueByKeyExecutor(Executor executor) {
+    OperationQueueByKeyExecutor(final Executor executor) {
         super();
         this.executor = executor;
         this.operationQueuesByKey = new ConcurrentHashMap<>();
-        this.monitorsPerKey = new ConcurrentHashMap<>();
     }
 
-    public void schedule(Object keyForAsynchronousExecution, Runnable runnable) {
-        final Object monitorForKey;
+    /**
+     * Provides package-local access for queue-retirement tests in the test fragment. Callers must follow the
+     * synchronization requirements of {@link #operationQueuesByKey}.
+     */
+    ConcurrentMap<Object, Deque<Runnable>> getOperationQueuesByKey() {
+        return operationQueuesByKey;
+    }
+
+    public void schedule(final Object keyForAsynchronousExecution, final Runnable runnable) {
         final Deque<Runnable> queueForKey;
         final boolean queueCreated;
         synchronized (this) {
             if (operationQueuesByKey.containsKey(keyForAsynchronousExecution)) {
                 queueForKey = operationQueuesByKey.get(keyForAsynchronousExecution);
-                monitorForKey = monitorsPerKey.get(keyForAsynchronousExecution);
                 queueCreated = false;
             } else {
                 logger.fine(()->"Creating operation queue for key "+keyForAsynchronousExecution);
                 queueForKey = new ConcurrentLinkedDeque<>();
                 queueCreated = true;
                 operationQueuesByKey.put(keyForAsynchronousExecution, queueForKey);
-                monitorForKey = new Object();
-                monitorsPerKey.put(keyForAsynchronousExecution, monitorForKey);
-            }
-        }
-        synchronized (monitorForKey) {
-            if (queueCreated) {
-                // the task can be scheduled already, even though the queue is still empty,
-                // because we're under the key's monitor, and all reading from the key-specific
-                // queue must happen under that same monitor
-                executor.execute(()->workOnQueueForKey(keyForAsynchronousExecution));
             }
             queueForKey.add(runnable);
+        }
+        if (queueCreated) {
+            // Publish the first operation before starting the worker, which may run inline with some executors.
+            executor.execute(()->workOnQueueForKey(keyForAsynchronousExecution));
         }
     }
 
     /**
      * Removes operations from the queue for the {@code keyForAsynchronousExecution} which can be expected to not be
-     * empty when this method is called. Changes to the queue are done while {@code synchronized} on the
-     * {@link #monitorsPerKey monitor for the key}, in particular removing an element and deciding whether this
-     * task can end because the queue is empty and hence removing the queue and the monitor consistently.
+     * empty when this method is called. Dequeueing and empty-queue retirement use the same monitor as
+     * {@link #schedule(Object, Runnable) enqueueing}, so an enqueue cannot target a retired queue. Each operation is
+     * executed outside that monitor while its queue remains registered for subsequent submissions with the same key.
      */
-    private void workOnQueueForKey(Object keyForAsynchronousExecution) {
+    private void workOnQueueForKey(final Object keyForAsynchronousExecution) {
         final Deque<Runnable> queueForKey;
         final int[] count = { 1 };
         final TimePoint[] started = new TimePoint[1];
@@ -106,19 +96,16 @@ public class OperationQueueByKeyExecutor {
             return "Started work on queue for key "+keyForAsynchronousExecution;
         });
         Runnable nextOperation;
-        synchronized (monitorsPerKey.get(keyForAsynchronousExecution)) {
+        synchronized (this) {
             queueForKey = operationQueuesByKey.get(keyForAsynchronousExecution);
             nextOperation = queueForKey.pollFirst();
         }
         do {
             nextOperation.run();
-            synchronized (monitorsPerKey.get(keyForAsynchronousExecution)) {
+            synchronized (this) {
                 if (queueForKey.isEmpty()) {
                     nextOperation = null;
-                    synchronized (this) {
-                        monitorsPerKey.remove(keyForAsynchronousExecution);
-                        operationQueuesByKey.remove(keyForAsynchronousExecution);
-                    }
+                    operationQueuesByKey.remove(keyForAsynchronousExecution);
                 } else {
                     nextOperation = queueForKey.pollFirst();
                     count[0]++;

@@ -262,7 +262,7 @@ public class SearchServiceTest {
         // track only R1 and R3
         pfingstbusch29erTrackedR1 = server.apply(new CreateTrackedRace(pfingstbusch29er.getRaceIdentifier(pfingstbusch29erR1), EmptyWindStore.INSTANCE, /* delayToLiveInMillis */ 3000,
                 /* millisecondsOverWhichToAverageWind */ 15000, /* millisecondsOverWhichToAverageSpeed */ 15000, null));
-        pfingstbusch29erTrackedR1.setStartOfTrackingReceived(pfingstbuschStartDate.plus(1));
+        pfingstbusch29erTrackedR1.setStartOfTrackingReceived(pfingstbuschStartDate.plusResolution());
         pfingstbusch29erLeaderboard.getRaceColumnByName("R1").setTrackedRace(pfingstbusch29erLeaderboard.getRaceColumnByName("R1").getFleetByName("Default"), pfingstbusch29erTrackedR1);
         pfingstbusch29erTrackedR3 = server.apply(new CreateTrackedRace(pfingstbusch29er.getRaceIdentifier(pfingstbusch29erR3), EmptyWindStore.INSTANCE, /* delayToLiveInMillis */ 3000,
                 /* millisecondsOverWhichToAverageWind */ 15000, /* millisecondsOverWhichToAverageSpeed */ 15000, null));

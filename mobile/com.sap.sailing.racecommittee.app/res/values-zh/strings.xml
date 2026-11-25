@@ -402,7 +402,7 @@
     <string name="delete_file_title">"删除文件"</string>
     <string name="delete_file">"将删除图片"</string>
     <string name="start_time">"开始时间"</string>
-    <string name="start_time_value">"%2$s%1$s"</string>
+    <string name="start_time_value">"%2$s 的 %1$s"</string>
 
     <!--Extracted locales -->
     <string name="selected_course_area_lost">"选择的场地区域丢失。"</string>

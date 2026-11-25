@@ -600,7 +600,8 @@ public class NewMediaDialog extends DataEntryDialog<MediaTrack> implements FileS
                 JSDownloadUtils.getData(url, new JSDownloadCallback() {
                     @Override
                     public void progress(Double current, Double total) {
-                        lbl.setText(stringMessages.transferStarted() + " " + Math.round(current / 1024 / 1024) + "/"
+                        lbl.setText(com.sap.sailing.landscape.ui.client.i18n.StringMessages.INSTANCE.transferStarted()
+                                + " " + Math.round(current / 1024 / 1024) + "/"
                                 + Math.round(total / 1024 / 1024) + " MB");
                         infoLabel.setWidget(lbl);
                     }

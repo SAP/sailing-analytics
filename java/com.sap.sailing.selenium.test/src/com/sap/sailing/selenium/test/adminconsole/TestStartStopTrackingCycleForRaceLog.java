@@ -51,7 +51,7 @@ public class TestStartStopTrackingCycleForRaceLog extends AbstractSeleniumTest {
         // denote all races for tracking, re-fetching the leaderboard entry each cycle
         smartphonePanel.denoteLeaderboardForRaceLogTracking(smartphonePanel.waitForLeaderboardEntry(this.regatta.toString()));
         // start R1 via local button, R2+R3 via global toggle button
-        smartphonePanel.startTrackingForRace(smartphonePanel.waitForRaceRow(R1));
+        smartphonePanel.startTrackingForRace(R1);
         smartphonePanel.selectRaceRowsByName(R2, R3);
         smartphonePanel.clickStartTrackingButton();
         // stop R3 via local button, R1+R2 via global toggle button

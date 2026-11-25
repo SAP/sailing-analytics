@@ -80,7 +80,6 @@ public abstract class HttpRequest {
 
         connection.setConnectTimeout(5000);
         connection.setReadTimeout(15000);
-        connection.setRequestProperty("connection", "close");
         connection.setRequestProperty("Accept-Encoding", "");
 
         String accessToken = pref.getString(context.getString(R.string.preference_access_token_key), null);

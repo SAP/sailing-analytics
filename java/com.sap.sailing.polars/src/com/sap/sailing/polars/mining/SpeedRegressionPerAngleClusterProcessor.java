@@ -150,7 +150,7 @@ public class SpeedRegressionPerAngleClusterProcessor implements
      * regression for boatspeed over windspeed. We don't know the thresholds or centers of the angle clusters here, so
      * we roughly interpolate by taking 10 values from angle-5 deg to angle+5 deg and average the speeds.
      * 
-     * At the time of writing the size of each angle range is 5� so this method provides a pretty smooth interpolation.
+     * At the time of writing the size of each angle range is 5° so this method provides a pretty smooth interpolation.
      */
     public SpeedWithConfidence<Void> estimateBoatSpeed(BoatClass boatClass, Speed windSpeed, Bearing trueWindAngle)
             throws NotEnoughDataHasBeenAddedException {

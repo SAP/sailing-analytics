@@ -120,7 +120,7 @@ public class PositionTest {
     @Test
     public void translateTest() {
         Position p1 = new DegreePosition(0, 0);
-        // now travel to 123� for 0.001 nautical miles (~ 1.852m)
+        // now travel to 123° for 0.001 nautical miles (~ 1.852m)
         Position p2 = p1.translateGreatCircle(new DegreeBearingImpl(123), new NauticalMileDistance(0.001));
         assertEquals(123, p1.getBearingGreatCircle(p2).getDegrees(), 0.0000001);
         assertEquals(0.001, p1.getDistance(p2).getNauticalMiles(), 0.0000001);

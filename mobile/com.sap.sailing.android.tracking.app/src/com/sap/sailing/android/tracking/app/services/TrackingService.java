@@ -359,8 +359,9 @@ public class TrackingService extends Service implements LocationListener {
     @Override
     public void onProviderDisabled(String provider) {
         // provider (GPS) disabled by the user while tracking
-        Intent local = new Intent();
+        final Intent local = new Intent();
         local.setAction(GPS_DISABLED_MESSAGE);
+        local.setPackage(getPackageName());
         this.sendBroadcast(local);
     }
 

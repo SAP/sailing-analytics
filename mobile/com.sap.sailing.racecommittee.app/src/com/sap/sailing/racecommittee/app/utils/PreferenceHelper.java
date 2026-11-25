@@ -3,7 +3,7 @@ package com.sap.sailing.racecommittee.app.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.support.v7.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 
 import com.sap.sailing.android.shared.logging.ExLog;
 import com.sap.sailing.racecommittee.app.R;
