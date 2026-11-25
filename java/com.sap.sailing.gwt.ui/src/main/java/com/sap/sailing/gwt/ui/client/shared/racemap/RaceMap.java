@@ -992,11 +992,10 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                             map.panTo(coordinateSystem.toLatLng(autoZoomBounds.getCenter()));
                             autoZoomOut = false;
                         }
-                        if (streamletOverlay != null 
+                        if (streamletOverlay != null
                                 && settings.isShowWindStreamletOverlay()
                                 && paywallResolver.hasPermission(SecuredDomainType.TrackedRaceActions.VIEWSTREAMLETS, raceMapLifecycle.getRaceDTO())) {
                             streamletOverlay.onDragEnd();
-                            streamletOverlay.onBoundsChanged(/* zoomChanged */ false);
                         }
                         advantageLineLength = getMapDiagonalVisibleDistance();
                         // map has fully settled including inertia glide; safe to re-enable boat transitions
@@ -1020,10 +1019,11 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                 map.addBoundsChangeHandler(new BoundsChangeMapHandler() {
                     @Override
                     public void onEvent(BoundsChangeMapEvent event) {
-                        double newZoomLevel = map.getZoom();
+                        final double newZoomLevel = map.getZoom();
+                        final boolean zoomChanged = newZoomLevel != currentZoomLevel;
                         // remove transitions on any manual viewport change (zoom or pan) so boats snap to
                         // their correct positions rather than animating across the displacement
-                        if (!isAutoZoomInProgress() && (newZoomLevel != currentZoomLevel || suppressTransitionAfterPan)) {
+                        if (!isAutoZoomInProgress() && (zoomChanged || suppressTransitionAfterPan)) {
                             removeTransitions();
                         }
                         currentMapBounds = BoundsUtil.getMapBounds(map.getBounds(), new DegreeBearingImpl(map.getHeading()), coordinateSystem);
@@ -1031,6 +1031,11 @@ public class RaceMap extends AbstractCompositeComponent<RaceMapSettings> impleme
                         headerPanel.getElement().getStyle().setWidth(map.getOffsetWidth(), Unit.PX);
                         advantageLineLength = getMapDiagonalVisibleDistance();
                         showAdvantageLineAndUpdateWindLadder(getCompetitorsToShow(), getTimer().getTime(), /* timeForPositionTransitionMillis */ -1 /* (no transition) */);
+                        if (streamletOverlay != null
+                                && settings.isShowWindStreamletOverlay()
+                                && paywallResolver.hasPermission(SecuredDomainType.TrackedRaceActions.VIEWSTREAMLETS, raceMapLifecycle.getRaceDTO())) {
+                            streamletOverlay.onBoundsChanged(zoomChanged);
+                        }
                     }
                 });
                 // If there was a time change before the API was loaded, reset the time
