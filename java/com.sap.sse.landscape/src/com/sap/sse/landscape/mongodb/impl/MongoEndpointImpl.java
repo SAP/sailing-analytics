@@ -7,11 +7,13 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.bson.Document;
+import org.bson.RawBsonDocument;
 
 import com.mongodb.ClientSessionOptions;
 import com.mongodb.ConnectionString;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.connection.ClusterConnectionMode;
 import com.mongodb.session.ClientSession;
@@ -23,6 +25,11 @@ import com.sap.sse.mongodb.MongoDBService;
 
 public abstract class MongoEndpointImpl implements MongoEndpoint {
     private static final Logger logger = Logger.getLogger(MongoEndpointImpl.class.getName());
+    private static final int IMPORT_BATCH_SIZE = 100;
+    /**
+     * Limit retained BSON bytes as well as document count. A larger document is inserted in a batch of its own.
+     */
+    private static final int IMPORT_BATCH_BYTES = 8 * 1024 * 1024;
     
     @Override
     public abstract boolean equals(Object o);
@@ -41,32 +48,48 @@ public abstract class MongoEndpointImpl implements MongoEndpoint {
         return getClient().getDatabase(dbName);
     }
 
+    /**
+     * Copies collections sequentially using raw BSON and byte- and count-limited write batches. Retained document data
+     * is bounded independently of collection size by the write batch, the current document, and the driver's read
+     * batch and encoding buffers. A document larger than the write-batch byte budget is copied on its own.
+     */
     @Override
-    public MongoDatabase importDatabase(MongoDatabase from) throws URISyntaxException {
-        final int BATCH_SIZE = 100;
+    public MongoDatabase importDatabase(final MongoDatabase from) throws URISyntaxException {
         final MongoDatabase targetDatabase = getMongoDatabase(from.getName());
         logger.info("Importing database "+from.getName()+" into "+targetDatabase.getName()+" on "+this);
-        for (final String collectionName : from.listCollectionNames()) {
-            final MongoCollection<Document> sourceCollection = from.getCollection(collectionName);
-            targetDatabase.createCollection(collectionName); // if we found it on the exporting side and it's empty it's important still to create it for equal hashes
-            final MongoCollection<Document> targetCollection = targetDatabase.getCollection(collectionName);
-            logger.info("...importing "+sourceCollection.estimatedDocumentCount()+" documents from collection "+collectionName+" from "+from+" into "+this);
-            List<Document> documentsToInsert = new ArrayList<>(BATCH_SIZE);
-            int i=0;
-            for (final Document document : sourceCollection.find()) {
-                documentsToInsert.add(document);
-                i++;
-                if (i>=BATCH_SIZE) {
-                    targetCollection.insertMany(documentsToInsert);
-                    i = 0;
-                    documentsToInsert.clear();
-                }
-            }
-            if (i>0) {
-                targetCollection.insertMany(documentsToInsert);
+        try (final MongoCursor<String> collectionNames = from.listCollectionNames().iterator()) {
+            while (collectionNames.hasNext()) {
+                importCollection(from, targetDatabase, collectionNames.next());
             }
         }
         return targetDatabase;
+    }
+
+    private void importCollection(final MongoDatabase from, final MongoDatabase targetDatabase, final String collectionName) {
+        // Keep documents in their compact wire representation instead of expanding nested arrays and documents on the heap.
+        final MongoCollection<RawBsonDocument> sourceCollection = from.getCollection(collectionName, RawBsonDocument.class);
+        targetDatabase.createCollection(collectionName); // retain empty collections for equal database hashes
+        final MongoCollection<RawBsonDocument> targetCollection = targetDatabase.getCollection(collectionName, RawBsonDocument.class);
+        logger.info("...importing "+sourceCollection.estimatedDocumentCount()+" documents from collection "+collectionName+" from "+from+" into "+this);
+        final List<RawBsonDocument> documentsToInsert = new ArrayList<>(IMPORT_BATCH_SIZE);
+        int batchBytes = 0;
+        try (final MongoCursor<RawBsonDocument> documents = sourceCollection.find().batchSize(IMPORT_BATCH_SIZE).iterator()) {
+            while (documents.hasNext()) {
+                final RawBsonDocument document = documents.next();
+                final int documentBytes = document.getByteBuffer().remaining();
+                if (!documentsToInsert.isEmpty() && (documentsToInsert.size() >= IMPORT_BATCH_SIZE
+                        || batchBytes + documentBytes > IMPORT_BATCH_BYTES)) {
+                    targetCollection.insertMany(documentsToInsert);
+                    documentsToInsert.clear();
+                    batchBytes = 0;
+                }
+                documentsToInsert.add(document);
+                batchBytes += documentBytes;
+            }
+            if (!documentsToInsert.isEmpty()) {
+                targetCollection.insertMany(documentsToInsert);
+            }
+        }
     }
 
     @Override
