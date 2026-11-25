@@ -5,6 +5,7 @@ import java.util.function.IntConsumer;
 import com.google.gwt.user.client.Window;
 import com.sap.sailing.gwt.settings.client.whatsnew.AbstractWhatsNewDialogFactory;
 import com.sap.sailing.gwt.ui.client.SailingServiceAsync;
+import com.sap.sse.gwt.client.async.MarkedAsyncCallback;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog;
 import com.sap.sse.gwt.client.dialog.DataEntryDialog.DialogCallback;
 import com.sap.sse.security.ui.client.UserService;
@@ -32,12 +33,12 @@ public final class WhatsNewDialogFactory extends AbstractWhatsNewDialogFactory<W
 
     @Override
     protected void currentCharacterCount(final IntConsumer callback) {
-        sailingService.getAdminConsoleChangeLogSize(new ServiceCallback<Integer>() {
+        sailingService.getAdminConsoleChangeLogSize(new MarkedAsyncCallback<>(new ServiceCallback<Integer>() {
             @Override
             public void onSuccess(final Integer result) {
                 callback.accept(result.intValue());
             }
-        });
+        }));
     }
 
     @Override

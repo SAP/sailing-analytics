@@ -153,8 +153,7 @@ public class LeaderboardDetailsPanelPO extends PageArea {
     public void unlinkRace(RaceDescriptor race) {
         DataEntryPO entry = findRace(race);
         if (entry != null) {
-            WebElement action = ActionsHelper.findUnlinkRaceAction(entry.getWebElement());
-            action.click();
+            entry.clickActionImage(ActionsHelper.UNLINK_RACE_ACTION);
             waitForAjaxRequests(); // unlinking update the leaderboard details table; wait for callback to finish
         }
     }
@@ -163,9 +162,7 @@ public class LeaderboardDetailsPanelPO extends PageArea {
         DataEntryPO entry = findRace(race);
         
         if(entry != null) {
-            WebElement action = ActionsHelper.findRefreshAction(entry.getWebElement());
-            
-            action.click();
+            entry.clickActionImage(ActionsHelper.REFRESH_RACE_ACTION);
             
             // QUESTION [D049941]: What else can happen?
             ActionsHelper.acceptAlert(this.driver);
