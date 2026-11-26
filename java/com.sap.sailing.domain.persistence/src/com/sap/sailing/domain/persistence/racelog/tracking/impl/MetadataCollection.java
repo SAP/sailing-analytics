@@ -38,7 +38,11 @@ import com.sap.sse.common.TypeBasedServiceFinder;
  * fix inserts outperform the slower background updates to the metadata collection.<p>
  * 
  * Reads from the collection wait for the last batch of updates to complete so that they return a state that
- * corresponds to the time point when the read was triggered.
+ * corresponds to the time point when the read was triggered.<p>
+ *
+ * Different devices have independent background updaters. If an explicit session is supplied, their database
+ * operations synchronize on that session, including reads from foreground threads. Without an explicit session,
+ * updates for different devices remain concurrent. Waiting for an updater never holds the session monitor.
  * 
  * @author Axel Uhl (D043530)
  *
@@ -82,13 +86,12 @@ public class MetadataCollection extends MongoFixHandler {
      * Doesn't {@link #waitForPendingMetadataUpdates(DeviceIdentifier) wait for pending updates} but obtains the
      * metadata object directly from the DB
      */
-    private Document findMetadataObjectInternal(DeviceIdentifier device) throws TransformationException {
-        Bson query = com.sap.sailing.shared.persistence.impl.MongoObjectFactoryImpl.getDeviceQuery(deviceServiceFinder, device);
+    private Document findMetadataObjectInternal(final DeviceIdentifier device) throws TransformationException {
+        final Bson query = com.sap.sailing.shared.persistence.impl.MongoObjectFactoryImpl.getDeviceQuery(deviceServiceFinder, device);
         final MongoCollection<Document> metadataCollectionWithReadConcern = metadataCollection.withReadConcern(readConcern);
-        Document result = (clientSession == null
+        return withClientSessionLock(clientSession, () -> (clientSession == null
                 ? metadataCollectionWithReadConcern.find(query) 
-                : metadataCollectionWithReadConcern.find(clientSession, query)).first();
-        return result;
+                : metadataCollectionWithReadConcern.find(clientSession, query)).first());
     }
 
     TimeRange getTimeRangeCoveredByFixes(DeviceIdentifier device)
@@ -177,7 +180,8 @@ public class MetadataCollection extends MongoFixHandler {
         if (clientSession == null) {
             metadataCollectionWithWriteConcern.updateOne(deviceQuery, updateOperation, upsertOption);
         } else {
-            metadataCollectionWithWriteConcern.updateOne(clientSession, deviceQuery, updateOperation, upsertOption);
+            withClientSessionLock(clientSession,
+                    () -> metadataCollectionWithWriteConcern.updateOne(clientSession, deviceQuery, updateOperation, upsertOption));
         }
     }
 }

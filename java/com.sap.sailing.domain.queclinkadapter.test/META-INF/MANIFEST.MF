@@ -8,7 +8,8 @@ Fragment-Host: com.sap.sailing.domain.queclinkadapter
 Automatic-Module-Name: com.sap.sailing.domain.queclinkadapter.test
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: com.sap.sailing.domain.common.impl,
- com.sap.sse.common.util
+ com.sap.sse.common.util,
+ com.sap.sse.shared.util
 Require-Bundle: junit-jupiter-api;bundle-version="5.11.3",
  junit-jupiter-engine;bundle-version="5.11.3",
  junit-platform-commons;bundle-version="1.11.3",
