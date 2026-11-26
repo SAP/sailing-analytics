@@ -100,10 +100,8 @@ public class CheckBoxPO extends AbstractInputPO {
      * 
      * @param selected the desired selection state
      */
-    public void setSelected(boolean selected) {
-        if(selected != isSelected()) {
-            this.input.click();
-        }
+    public void setSelected(final boolean selected) {
+        setCheckboxSelected(() -> this.input, selected);
     }
     
     @Override

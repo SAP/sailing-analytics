@@ -100,8 +100,11 @@ public abstract class FullCanvasOverlay extends CanvasOverlayV3 implements Requi
     public void onResize() {
         mapWidth = null;
         mapHeight = null;
-    	// improve browser performance by deferred scheduling of redraws
-        Scheduler.get().scheduleDeferred(this::draw);
+        // Defer so the browser has committed the new layout dimensions before we read them.
+        // Call setCanvasSettings() directly rather than draw(), because draw() only runs
+        // setCanvasSettings() before the map projection is first set (mapProjectionSet guard),
+        // so it would be a no-op for an already-initialized overlay.
+        Scheduler.get().scheduleDeferred(this::setCanvasSettings);
     }
 
     @Override
@@ -119,7 +122,8 @@ public abstract class FullCanvasOverlay extends CanvasOverlayV3 implements Requi
     @Override
     protected void draw() {
         if (!mapProjectionSet && getMapProjection() != null) {
-            // Reset the canvas, e.g. onMove() of map or onResize() of window
+            // Initialize canvas size/position until getOnDrawHandler() sets mapProjectionSet=true.
+            // Once mapProjectionSet is true, draw() is a no-op; resize is handled via onResize().
             setCanvasSettings();
         }
     }

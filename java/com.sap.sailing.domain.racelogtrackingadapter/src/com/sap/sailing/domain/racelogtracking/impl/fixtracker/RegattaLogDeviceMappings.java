@@ -248,6 +248,7 @@ public abstract class RegattaLogDeviceMappings<ItemT extends WithID> {
                 if (cacheUpdateJob != null) {
                     logger.fine(()-> "Device mapping cache miss for mapper " + this + " performs cache update.");
                     cacheUpdateJob.run();
+                    cacheUpdateJob = null;
                 } else {
                     logger.fine(() -> "Device mapping cache miss for mapper " + this
                             + " does not update the cache because the mappings were updated in between");

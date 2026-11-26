@@ -60,8 +60,7 @@ public class RegattaDetailsCompositePO extends PageArea {
     public SeriesEditDialogPO editSeries(String series) {
         DataEntryPO entry = findSeries(series);
         if (entry != null) {
-            WebElement action = ActionsHelper.findEditAction(entry.getWebElement());
-            action.click();
+            entry.clickActionImage(ActionsHelper.EDIT_ACTION);
             return waitForPO(SeriesEditDialogPO::new, "SeriesEditDialog", 5);
         }
         return null;
@@ -70,8 +69,7 @@ public class RegattaDetailsCompositePO extends PageArea {
     public void deleteSeries(String series) {
         DataEntryPO entry = findSeries(series);
         if (entry != null) {
-            WebElement removeAction = ActionsHelper.findRemoveAction(entry.getWebElement());
-            removeAction.click();
+            entry.clickActionImage(ActionsHelper.REMOVE_ACTION);
             ActionsHelper.acceptAlert(this.driver);
             waitForAjaxRequests();
         }
