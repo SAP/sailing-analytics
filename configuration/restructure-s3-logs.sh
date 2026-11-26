@@ -59,6 +59,12 @@ def day_ok(y, mo, d, date): return (not date) or (f"{y}-{mo}-{d}" == date)
 def dest_name(job, name):
     s = job.get("strip")
     return name[len(s):] if s and name.startswith(s) else name
+EXPIRED_CODES = {"ExpiredToken", "ExpiredTokenException", "RequestExpired",
+                 "InvalidToken", "TokenRefreshRequired"}
+def _expired(e):
+    import botocore.exceptions
+    return isinstance(e, botocore.exceptions.ClientError) and \
+           e.response.get("Error", {}).get("Code") in EXPIRED_CODES
 
 # ---------------- PHASE 1: local renames ----------------
 def phase1(date):
@@ -147,7 +153,9 @@ def phase2(date, only, workers, dry):
                 for fut in as_completed(futs):
                     src_key = futs[fut]
                     try: fut.result(); done.append(src_key)
-                    except Exception as e: log(f"[{job['name']}] COPY FAIL {src_key}: {e}")
+                    except Exception as e:
+                        if _expired(e): raise
+                        log(f"[{job['name']}] COPY FAIL {src_key}: {e}")
                 copied += len(done)
                 for i in range(0, len(done), 1000):
                     chunk = done[i:i+1000]
@@ -158,8 +166,14 @@ def phase2(date, only, workers, dry):
                     log(f"[{job['name']}]   copied {copied:,} deleted {deleted:,} "
                         f"{copied/max(time.monotonic()-t0,1e-9):,.0f}/s")
                     next_rep += 50_000
+        except Exception as e:
+            if not _expired(e):
+                raise
+            log(f"[{job['name']}] CREDENTIALS EXPIRED after copied {copied:,} / deleted {deleted:,}"
+                f" — renew token and re-run:  ./restructure-s3-logs.sh --phase 2")
+            sys.exit(2)
         finally:
-            ex.shutdown(wait=True)
+            ex.shutdown(wait=True, cancel_futures=True)
         log(f"[{job['name']}] {'WOULD migrate' if dry else 'DONE'}: "
             f"copied {copied:,} deleted {deleted:,} skipped {skipped:,}")
 
