@@ -72,6 +72,8 @@ public class WindStreamletsRaceboardOverlay extends MovingCanvasOverlay implemen
     private boolean colored;
     private final NumberFormat numberFormatOneDecimal = NumberFormatterFactory.getDecimalFormat(1);
     private ElementStyleMutationObserver observer;
+    // set during drag and inertia; suppresses onBoundsChanged() from resetting the swarm pause,
+    // since those BoundsChanged events fire while the projection is still moving
     private boolean dragging = false;
     private Double mapHeadingAtOrientationStart;
     private boolean isAttached = false, startObserverWhenAttached = false;
@@ -373,7 +375,13 @@ public class WindStreamletsRaceboardOverlay extends MovingCanvasOverlay implemen
 
     public void onDragStart() {
         dragging = true;
-        swarm.pause(500 / animationIntervalMillis); // pause animation for two seconds
+        // Suppress drawing for the entire drag + inertia period. Google Maps fires no BoundsChanged
+        // events during the inertia glide, so a countdown-based pause would expire mid-glide and
+        // draw particles against a still-moving projection. The flag is cleared in onDragEnd(),
+        // which RaceMap calls from its IdleMapHandler when the map fully settles.
+        if (swarm != null) {
+            swarm.setMapInteractionInProgress(true);
+        }
     }
 
     public void onMapHeadingChanged(double previousMapHeading, double mapHeading) {
@@ -391,16 +399,18 @@ public class WindStreamletsRaceboardOverlay extends MovingCanvasOverlay implemen
             updateDrawingAngleAndSetCanvasRotation(0);
             swarm.onBoundsChanged(/* zoomChanged */ true, /* swarmPause */ 1);
         }
+        // Map has fully settled; clear the interaction flag and arm a short pause countdown.
+        // On the final countdown tick, startSwarmIfNecessaryAndUpdateProjection() updates bounds
+        // and realignParticlesToProjection() corrects pixel coordinates before the first draw frame.
+        if (swarm != null) {
+            swarm.setMapInteractionInProgress(false);
+            swarm.onBoundsChanged(false, 300 / animationIntervalMillis);
+        }
     }
 
-    public void onBoundsChanged(boolean zoomChanged) {
-        if (swarm != null) {
-            if (dragging) {
-                swarm.pause(300/animationIntervalMillis);
-            } else {
-                int swarmPause = ((zoomChanged ? 1000 : 300)/animationIntervalMillis);
-                swarm.onBoundsChanged(zoomChanged, swarmPause);
-            }
+    public void onBoundsChanged(final boolean zoomChanged) {
+        if (swarm != null && !dragging) {
+            swarm.onBoundsChanged(zoomChanged, (zoomChanged ? 1000 : 300) / animationIntervalMillis);
         }
     }
 

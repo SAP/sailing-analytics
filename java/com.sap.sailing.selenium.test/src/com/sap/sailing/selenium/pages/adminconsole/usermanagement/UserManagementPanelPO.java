@@ -89,8 +89,7 @@ public class UserManagementPanelPO extends PageArea {
         DataEntryPO entry = findUser(username);
         try {
             if (entry != null) {
-                final WebElement action = ActionsHelper.findUpdateAction(entry.getWebElement());
-                action.click();
+                entry.clickActionImage(ActionsHelper.UPDATE_ACTION);
                 final WebElement dialog = findElementBySeleniumId(this.driver, "UserEditDialog");
                 return new EditUserDialogPO(this.driver, dialog);
             }
@@ -222,8 +221,7 @@ public class UserManagementPanelPO extends PageArea {
         selectUser(name);
         final DataEntryPO entry = findUser(name);
         if (entry != null) {
-            final WebElement action = ActionsHelper.findUnlockAction(entry.getWebElement());
-            action.click();
+            entry.clickActionImage(ActionsHelper.UNLOCK_ACTION);
         }
         waitUntilAlertIsPresent();
         driver.switchTo().alert().accept();

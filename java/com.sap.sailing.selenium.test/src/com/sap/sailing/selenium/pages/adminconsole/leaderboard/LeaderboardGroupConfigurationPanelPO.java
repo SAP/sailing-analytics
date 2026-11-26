@@ -51,7 +51,7 @@ public class LeaderboardGroupConfigurationPanelPO extends PageArea {
         DataEntryPO result = findLeaderboardGroup(name);
         
         if (result != null) {
-            ActionsHelper.findDeleteAction(result.getWebElement()).click();
+            result.clickActionImage(ActionsHelper.DELETE_ACTION);
             ActionsHelper.acceptAlert(this.driver);
             
             waitForAjaxRequests();

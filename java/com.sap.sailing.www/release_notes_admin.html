@@ -25,6 +25,17 @@
           <div class="innerContent">
           <h2 class="articleSubheadline">November 2026</h2>
           <ul class="bulletList">
+                <li>Master data imports of GPS and sensor fixes now batch race-tracker notifications and avoid
+                    redundant device-mapping cache updates. Competitor and sensor fixes outside a race's tracking
+                    interval are filtered earlier, reducing processing overhead on archive servers with many
+                    tracked races.</li>
+                <li>Leaderboard CPU metering now includes executor tasks that construct leaderboard entries and
+                    optional race/leg details, attributing their CPU time to <tt>LEADERBOARD_COMPUTE_DTO</tt>.
+                    Values reported by <tt>/sailingserver/api/v1/leaderboards/{name}/cpu</tt>, including aggregate
+                    CPU totals, may therefore be higher for the same workload. Take this expanded accounting
+                    into account when comparing measurements from before and after this update; higher readings
+                    alone do not indicate a performance regression. See
+                    <a href="https://github.com/eclipse-sailing-analytics/sailing-analytics/issues/6347">issue #6347</a>.</li>
                 <li>Leaderboard-group creation and updates now reject name conflicts, including generated names
                     such as "Season Overall", before making changes. Existing leaderboards, ownership and access
                     permissions are preserved when a conflict is rejected.</li>

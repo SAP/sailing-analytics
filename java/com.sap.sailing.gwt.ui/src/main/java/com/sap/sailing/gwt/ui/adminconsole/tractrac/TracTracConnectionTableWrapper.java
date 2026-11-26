@@ -48,6 +48,7 @@ public class TracTracConnectionTableWrapper extends
     private final LabeledAbstractFilterablePanel<TracTracConfigurationWithSecurityDTO> filterField;
     private final SailingServiceAsync sailingServiceWriteAsync;
     private final com.sap.sailing.gwt.ui.client.StringMessages stringMessagesClient;
+    private int connectionListRequestVersion;
 
     public TracTracConnectionTableWrapper(final UserService userService, final SailingServiceWriteAsync sailingServiceWriteAsync,
             final com.sap.sailing.gwt.ui.client.StringMessages stringMessages, final ErrorReporter errorReporter,
@@ -179,30 +180,37 @@ public class TracTracConnectionTableWrapper extends
      *            the same entity if present
      */
     public void refreshTracTracConnectionList(final TracTracConfigurationWithSecurityDTO selectEntityWhenDone) {
+        final int requestVersion = ++connectionListRequestVersion;
         sailingServiceWriteAsync
-                .getPreviousTracTracConfigurations(new AsyncCallback<List<TracTracConfigurationWithSecurityDTO>>() {
+                .getPreviousTracTracConfigurations(new MarkedAsyncCallback<>(new AsyncCallback<List<TracTracConfigurationWithSecurityDTO>>() {
                     @Override
-                    public void onFailure(Throwable caught) {
-                        errorReporter
-                                .reportError("Remote Procedure Call getPreviousTracTracConfigurations() - Failure: "
-                                        + caught.getMessage());
+                    public void onFailure(final Throwable caught) {
+                        if (requestVersion == connectionListRequestVersion) {
+                            errorReporter.reportError("Remote Procedure Call getPreviousTracTracConfigurations() - Failure: "
+                                    + caught.getMessage());
+                        }
                     }
 
                     @Override
-                    public void onSuccess(List<TracTracConfigurationWithSecurityDTO> result) {
-                        filterField.updateAll(result);
-                        if (selectEntityWhenDone != null) {
-                            Scheduler.get().scheduleDeferred(()->{
-                                for (final TracTracConfigurationWithSecurityDTO oneResult : result) {
-                                    if (getSelectionModel().getEntityIdentityComparator().representSameEntity(oneResult, selectEntityWhenDone)) {
-                                        getSelectionModel().setSelected(oneResult, true);
-                                        filterField.search(oneResult.getJsonUrl());
-                                        break;
+                    public void onSuccess(final List<TracTracConfigurationWithSecurityDTO> result) {
+                        // An older snapshot must not overwrite a refresh requested after a create/update.
+                        if (requestVersion == connectionListRequestVersion) {
+                            filterField.updateAll(result);
+                            if (selectEntityWhenDone != null) {
+                                Scheduler.get().scheduleDeferred(() -> {
+                                    if (requestVersion == connectionListRequestVersion) {
+                                        for (final TracTracConfigurationWithSecurityDTO oneResult : result) {
+                                            if (getSelectionModel().getEntityIdentityComparator().representSameEntity(oneResult, selectEntityWhenDone)) {
+                                                getSelectionModel().setSelected(oneResult, /* selected */ true);
+                                                filterField.search(oneResult.getJsonUrl());
+                                                break;
+                                            }
+                                        }
                                     }
-                                }
-                            });
+                                });
+                            }
                         }
                     }
-                });
+                }));
     }
 }

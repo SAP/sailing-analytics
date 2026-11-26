@@ -1,0 +1,470 @@
+{
+  "name": "The Ocean Race 2022-2023 - In-Port Races - IMOCA",
+  "scheme": "HIGH_POINT_LAST_BREAKS_TIE",
+  "type": "RegattaLeaderboard",
+  "displayName": "In-Port Races IMOCA",
+  "provenance": {
+    "results": {
+      "url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboards/The%20Ocean%20Race%202022-2023%20-%20In-Port%20Races%20-%20IMOCA",
+      "resolved_url": "https://www.sapsailing.com/sailingserver/api/v1/leaderboards/The%20Ocean%20Race%202022-2023%20-%20In-Port%20Races%20-%20IMOCA",
+      "fetched_at": "2026-11-11T17:15:50.622080+00:00",
+      "status": 200,
+      "sha256": "9277fd1da1ad2f6cfd63570c9f8c2f4601062b918bd4db5fcd33c54a461cf81f",
+      "bytes": 9994
+    },
+    "configuration": {
+      "url": "https://www.sapsailing.com/sailingserver/api/v1/regattas/The%20Ocean%20Race%202022-2023%20-%20In-Port%20Races%20-%20IMOCA",
+      "resolved_url": "https://www.sapsailing.com/sailingserver/api/v1/regattas/The%20Ocean%20Race%202022-2023%20-%20In-Port%20Races%20-%20IMOCA",
+      "fetched_at": "2026-11-11T17:15:50.954215+00:00",
+      "status": 200,
+      "sha256": "4a833a54fcd19a8868f6689e898b630a8a56c2cd90fc1b4b1aac0aaba5b2cffb",
+      "bytes": 2563
+    },
+    "metadata": {
+      "base": "https://sapsailing.com",
+      "source": "central-metadata.json",
+      "sha256": "933a31e4dd4cde658f818e47e548e218ce8f8e0283669fbf32710569597064d8"
+    },
+    "capturedScheme": "HIGH_POINT_LAST_BREAKS_TIE"
+  },
+  "timePoint": 1688225040000,
+  "canBoatsOfCompetitorsChangePerRace": false,
+  "discardThresholds": [],
+  "series": [
+    {
+      "name": "Default",
+      "medal": false,
+      "parallel": false,
+      "reset": false,
+      "carry": false,
+      "contiguous": false,
+      "maximumDiscards": null,
+      "fleets": [
+        {
+          "name": "Default",
+          "ordering": 0
+        }
+      ],
+      "columns": [
+        "Alicante",
+        "Cape Town",
+        "Itajaí",
+        "Newport",
+        "Aarhus",
+        "The Hague",
+        "Genova"
+      ]
+    }
+  ],
+  "columns": [
+    {
+      "name": "Alicante",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "Cape Town",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "Itajaí",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "Newport",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "Aarhus",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "The Hague",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    },
+    {
+      "name": "Genova",
+      "factor": 1,
+      "explicitFactor": null,
+      "oneAlwaysStaysOne": false
+    }
+  ],
+  "competitors": [
+    {
+      "id": "e40f8b00-7019-013b-947f-342e996a9920",
+      "name": "11th Hour Racing Team",
+      "displayName": "11th Hour Racing Team",
+      "sailID": "11th Hour",
+      "expectedRank": 1,
+      "expectedTotal": 29.0,
+      "cells": [
+        {
+          "column": "Alicante",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Cape Town",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Itajaí",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Newport",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Aarhus",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "The Hague",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Genova",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "e4188010-7019-013b-9484-342e996a9920",
+      "name": "Team Malizia",
+      "displayName": "Team Malizia",
+      "sailID": "Malizia",
+      "expectedRank": 2,
+      "expectedTotal": 25.0,
+      "cells": [
+        {
+          "column": "Alicante",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Cape Town",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Itajaí",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Newport",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Aarhus",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "The Hague",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Genova",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "e4261c70-7019-013b-948e-342e996a9920",
+      "name": "Biotherm Racing",
+      "displayName": "Biotherm Racing",
+      "sailID": "Biotherm",
+      "expectedRank": 3,
+      "expectedTotal": 19.0,
+      "cells": [
+        {
+          "column": "Alicante",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Cape Town",
+          "fleet": "Default",
+          "points": 0.0,
+          "reason": "DNS",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Itajaí",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Newport",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Aarhus",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "The Hague",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Genova",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "e42d1120-7019-013b-9493-342e996a9920",
+      "name": "Team Holcim - PRB",
+      "displayName": "Team Holcim - PRB",
+      "sailID": "Holcim",
+      "expectedRank": 4,
+      "expectedTotal": 17.0,
+      "cells": [
+        {
+          "column": "Alicante",
+          "fleet": "Default",
+          "points": 0.0,
+          "reason": "DNF",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Cape Town",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Itajaí",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Newport",
+          "fleet": "Default",
+          "points": 3.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 3.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Aarhus",
+          "fleet": "Default",
+          "points": 4.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 4.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "The Hague",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Genova",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        }
+      ]
+    },
+    {
+      "id": "e41f3e20-7019-013b-9489-342e996a9920",
+      "name": "GUYOT environnement - Team Europe",
+      "displayName": "GUYOT environnement - Team Europe",
+      "sailID": "GUYOT",
+      "expectedRank": 5,
+      "expectedTotal": 10.0,
+      "cells": [
+        {
+          "column": "Alicante",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Cape Town",
+          "fleet": "Default",
+          "points": 2.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 2.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Itajaí",
+          "fleet": "Default",
+          "points": 1.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 1.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Newport",
+          "fleet": "Default",
+          "points": 0.0,
+          "reason": "DNS",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Aarhus",
+          "fleet": "Default",
+          "points": 0.0,
+          "reason": "DNS",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "The Hague",
+          "fleet": "Default",
+          "points": 5.0,
+          "reason": "NONE",
+          "isCorrected": true,
+          "expectedNet": 5.0,
+          "expectedDiscard": false
+        },
+        {
+          "column": "Genova",
+          "fleet": "Default",
+          "points": 0.0,
+          "reason": "DNS",
+          "isCorrected": true,
+          "expectedNet": 0.0,
+          "expectedDiscard": false
+        }
+      ]
+    }
+  ]
+}
