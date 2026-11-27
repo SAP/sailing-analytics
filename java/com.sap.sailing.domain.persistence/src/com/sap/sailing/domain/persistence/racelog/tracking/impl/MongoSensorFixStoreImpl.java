@@ -22,6 +22,7 @@ import com.mongodb.WriteConcern;
 import com.mongodb.client.ClientSession;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 import com.mongodb.lang.Nullable;
 import com.sap.sailing.domain.common.DeviceIdentifier;
@@ -92,13 +93,22 @@ public class MongoSensorFixStoreImpl extends MongoFixHandler implements MongoSen
                 WriteConcern.UNACKNOWLEDGED, /* clientSession */ null, /* metadataCollectionClientSession */ null);
     }
     
-    public MongoSensorFixStoreImpl(MongoObjectFactory mongoObjectFactory, DomainObjectFactory domainObjectFactory,
-            TypeBasedServiceFinderFactory serviceFinderFactory, ReadConcern readConcern, WriteConcern writeConcern,
-            ClientSession clientSession, ClientSession metadataCollectionClientSession) {
+    /**
+     * Creates a store with optional sessions for causally-consistent fixes and metadata access. Operations using an
+     * explicit session are serialized on that session's monitor, including across background metadata updaters. The
+     * two sessions may be identical; passing {@code null} retains concurrent access without session locking.<p>
+     *
+     * The caller owns the sessions. Direct driver operations must synchronize on the same session, and pending metadata updates
+     * must finish before the caller drops their collections or closes a session. Callbacks execute outside the
+     * session monitor so they can wait for metadata updates safely.
+     */
+    public MongoSensorFixStoreImpl(final MongoObjectFactory mongoObjectFactory, final DomainObjectFactory domainObjectFactory,
+            final TypeBasedServiceFinderFactory serviceFinderFactory, final ReadConcern readConcern, final WriteConcern writeConcern,
+            final ClientSession clientSession, final ClientSession metadataCollectionClientSession) {
         super(serviceFinderFactory != null ? createFixServiceFinder(serviceFinderFactory) : null,
               serviceFinderFactory != null ? serviceFinderFactory.createServiceFinder(DeviceIdentifierMongoHandler.class) : null);
         mongoOF = (MongoObjectFactoryImpl) mongoObjectFactory;
-        fixesCollection = mongoOF.getGPSFixCollection(clientSession);
+        fixesCollection = withClientSessionLock(clientSession, () -> mongoOF.getGPSFixCollection(clientSession));
         metadataCollection = new MetadataCollection(mongoOF, fixServiceFinder, deviceServiceFinder, readConcern, writeConcern, metadataCollectionClientSession);
         this.writeConcern = writeConcern;
         this.readConcern = readConcern;
@@ -137,14 +147,14 @@ public class MongoSensorFixStoreImpl extends MongoFixHandler implements MongoSen
                 /* ascending */ true, /* only one result */ false);
     }
 
-    private <FixT extends Timed> boolean loadFixes(Consumer<FixT> consumer, DeviceIdentifier device, TimePoint from,
-            TimePoint to, boolean inclusive, BooleanSupplier isPreemptiveStopped, Consumer<Double> progressConsumer,
-            boolean ascending, boolean onlyOneResult)
+    private <FixT extends Timed> boolean loadFixes(final Consumer<FixT> consumer, final DeviceIdentifier device, final TimePoint from,
+            final TimePoint to, final boolean inclusive, final BooleanSupplier isPreemptiveStopped, final Consumer<Double> progressConsumer,
+            final boolean ascending, final boolean onlyOneResult)
             throws NoCorrespondingServiceRegisteredException, TransformationException {
-        progressConsumer.accept(0d);
+        progressConsumer.accept(/* progress */ 0d);
         final TimePoint loadFixesFrom = from == null ? TimePoint.BeginningOfTime : from;
         final TimePoint loadFixesTo = to == null ? TimePoint.EndOfTime : to;
-        Bson dbDeviceId = com.sap.sailing.shared.persistence.impl.MongoObjectFactoryImpl.getDeviceQuery(deviceServiceFinder, device);
+        final Bson dbDeviceId = com.sap.sailing.shared.persistence.impl.MongoObjectFactoryImpl.getDeviceQuery(deviceServiceFinder, device);
         final List<Bson> filters = new ArrayList<>();
         filters.add(dbDeviceId);
         filters.add(Filters.gte(FieldNames.TIME_AS_MILLIS.name(), loadFixesFrom.asMillis()));
@@ -153,47 +163,69 @@ public class MongoSensorFixStoreImpl extends MongoFixHandler implements MongoSen
         } else {
             filters.add(Filters.lt(FieldNames.TIME_AS_MILLIS.name(), loadFixesTo.asMillis()));
         }
-        Bson query = Filters.and(filters);
+        final Bson query = Filters.and(filters);
         final MongoCollection<Document> fixesCollectionWithReadConcern = fixesCollection.withReadConcern(readConcern);
-        FindIterable<Document> result = clientSession == null ? fixesCollectionWithReadConcern.find(query) : fixesCollectionWithReadConcern.find(clientSession, query);
+        final FindIterable<Document> result = clientSession == null ? fixesCollectionWithReadConcern.find(query) : fixesCollectionWithReadConcern.find(clientSession, query);
         result.batchSize(FIX_LOADING_BATCH_SIZE).sort(new Document(FieldNames.TIME_AS_MILLIS.name(), ascending ? 1 : -1));
         if (onlyOneResult) {
             result.limit(1);
         }
         boolean fixLoaded = false;
+        boolean preemptivelyStopped = false;
         final Duration totalDurationToLoad = loadFixesFrom.until(loadFixesTo);
         // Given that fixes are recorded with a rate of 10/s we update the progress every 10*60*5=3000 fixes.
         final Duration minimumDurationBetweenProgressUpdates = Util.max(totalDurationToLoad.divide(20), Duration.ONE_MINUTE.times(5));
         TimePoint nextProgressUpdateAt = ascending
                 ? loadFixesFrom.plus(minimumDurationBetweenProgressUpdates)
                 : loadFixesTo.minus(minimumDurationBetweenProgressUpdates);
-        for (Document fixObject : result) {
-            try {
-                FixT fix = loadFix(fixObject);
-                consumer.accept(fix);
-                fixLoaded = true;
-                TimePoint fixTimePoint = fix.getTimePoint();
-                if (ascending ? fixTimePoint.after(nextProgressUpdateAt) : fixTimePoint.before(nextProgressUpdateAt)) {
-                    final Duration durationAlreadyLoaded = ascending ? loadFixesFrom.until(fixTimePoint) : fixTimePoint.until(loadFixesTo);
-                    progressConsumer.accept(durationAlreadyLoaded.divide(totalDurationToLoad));
-                    nextProgressUpdateAt = ascending
-                            ? fixTimePoint.plus(minimumDurationBetweenProgressUpdates)
-                            : fixTimePoint.minus(minimumDurationBetweenProgressUpdates);
-                    if (isPreemptiveStopped.getAsBoolean()) {
-                        logger.log(Level.WARNING, "Exiting because of preemtive stop requested " + fixObject);
-                        return fixLoaded;
+        final MongoCursor<Document> cursor = withClientSessionLock(clientSession, result::iterator);
+        try {
+            for (Document fixObject = nextFix(cursor); fixObject != null;
+                    fixObject = preemptivelyStopped ? null : nextFix(cursor)) {
+                try {
+                    final FixT fix = loadFix(fixObject);
+                    consumer.accept(fix);
+                    fixLoaded = true;
+                    final TimePoint fixTimePoint = fix.getTimePoint();
+                    if (ascending ? fixTimePoint.after(nextProgressUpdateAt) : fixTimePoint.before(nextProgressUpdateAt)) {
+                        final Duration durationAlreadyLoaded = ascending ? loadFixesFrom.until(fixTimePoint) : fixTimePoint.until(loadFixesTo);
+                        progressConsumer.accept(durationAlreadyLoaded.divide(totalDurationToLoad));
+                        nextProgressUpdateAt = ascending
+                                ? fixTimePoint.plus(minimumDurationBetweenProgressUpdates)
+                                : fixTimePoint.minus(minimumDurationBetweenProgressUpdates);
+                        preemptivelyStopped = isPreemptiveStopped.getAsBoolean();
+                        if (preemptivelyStopped) {
+                            logger.log(Level.WARNING, "Exiting because of preemptive stop requested " + fixObject);
+                        }
                     }
+                } catch (final TransformationException e) {
+                    logger.log(Level.WARNING, "Could not read fix from MongoDB: " + fixObject);
+                } catch (final ClassCastException e) {
+                    final String type = (String) fixObject.get(FieldNames.GPSFIX_TYPE.name());
+                    logger.log(Level.WARNING,
+                            "Unexpected fix type (" + type + ") encountered when trying to load track for " + device);
                 }
-            } catch (TransformationException e) {
-                logger.log(Level.WARNING, "Could not read fix from MongoDB: " + fixObject);
-            } catch (ClassCastException e) {
-                String type = (String) fixObject.get(FieldNames.GPSFIX_TYPE.name());
-                logger.log(Level.WARNING,
-                        "Unexpected fix type (" + type + ") encountered when trying to load track for " + device);
             }
+        } finally {
+            withClientSessionLock(clientSession, () -> {
+                cursor.close();
+                return null;
+            });
         }
-        progressConsumer.accept(1d);
+        if (!preemptivelyStopped) {
+            progressConsumer.accept(/* progress */ 1d);
+        }
         return fixLoaded;
+    }
+
+    /**
+     * Fetches one document while holding the explicit session's monitor, including any cursor {@code getMore}.
+     * Releasing the monitor before delivering the document lets consumers wait for background metadata updates.
+     *
+     * @return the next document, or {@code null} when the cursor is exhausted
+     */
+    private Document nextFix(final MongoCursor<Document> cursor) {
+        return withClientSessionLock(clientSession, () -> cursor.hasNext() ? cursor.next() : null);
     }
 
     /**
@@ -230,7 +262,7 @@ public class MongoSensorFixStoreImpl extends MongoFixHandler implements MongoSen
                 if (clientSession == null) {
                     fixesCollectionWithWriteConcern.insertMany(dbFixes);
                 } else {
-                    fixesCollectionWithWriteConcern.insertMany(clientSession, dbFixes);
+                    withClientSessionLock(clientSession, () -> fixesCollectionWithWriteConcern.insertMany(clientSession, dbFixes));
                 }
                 metadataCollection.enqueueMetadataUpdate(device, dbDeviceId, nrOfTotalFixes, newTimeRange, latestFix);
             } catch (TransformationException e) {

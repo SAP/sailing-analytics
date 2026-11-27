@@ -7,14 +7,19 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.mockito.Mockito;
 
 import com.mongodb.ReadConcern;
@@ -51,15 +56,13 @@ public class SensorFixStoreTest {
     protected final DeviceIdentifier device = new SmartphoneImeiIdentifierImpl("a");
     protected final DeviceIdentifier device2 = new SmartphoneImeiIdentifierImpl("b");
     protected SensorFixStore store;
-    private static ClientSession clientSession;
-
-    @BeforeAll
-    public static void setUpClass() {
-        clientSession = MongoDBService.INSTANCE.startCausallyConsistentSession();
-    }
+    private ClientSession clientSession;
+    private ClientSession metadataCollectionClientSession;
     
     @BeforeEach
     public void setUp() throws Exception {
+        clientSession = MongoDBService.INSTANCE.startCausallyConsistentSession();
+        metadataCollectionClientSession = clientSession;
         dropPersistedData();
         newStore();
     }
@@ -67,15 +70,30 @@ public class SensorFixStoreTest {
     private void newStore() {
         store = new MongoSensorFixStoreImpl(PersistenceFactory.INSTANCE.getDefaultMongoObjectFactory(),
                 PersistenceFactory.INSTANCE.getDefaultDomainObjectFactory(), serviceFinderFactory, ReadConcern.MAJORITY,
-                WriteConcern.MAJORITY, clientSession, clientSession);
+                WriteConcern.MAJORITY, clientSession, metadataCollectionClientSession);
     }
 
+    /**
+     * Drains both devices before dropping collections and closing the caller-owned sessions. A session monitor
+     * protects individual operations, but does not stop a queued updater from writing after test cleanup.
+     */
     @AfterEach
     public void after() throws Exception {
-        store.getNumberOfFixes(device); // wait until all metadata updates have completed;
-        // this shall avoid that pending updates are written to the metadata collection after
-        // dropping it.
-        dropPersistedData();
+        try {
+            if (store != null) {
+                store.getNumberOfFixes(device);
+                store.getNumberOfFixes(device2);
+            }
+            dropPersistedData();
+        } finally {
+            try {
+                if (metadataCollectionClientSession != clientSession) {
+                    metadataCollectionClientSession.close();
+                }
+            } finally {
+                clientSession.close();
+            }
+        }
     }
 
     private void dropPersistedData() throws Exception {
@@ -135,6 +153,70 @@ public class SensorFixStoreTest {
     @Test
     public void testProgressMany() throws Exception {
         testProgress(2000);
+    }
+
+    @Test
+    @Timeout(value = 2, unit = TimeUnit.MINUTES)
+    public void testConcurrentFixesAndMetadataWithSharedSession() throws Exception {
+        testConcurrentFixesAndMetadata(/* shareSession */ true);
+    }
+
+    @Test
+    @Timeout(value = 2, unit = TimeUnit.MINUTES)
+    public void testConcurrentFixesAndMetadataWithSeparateSessions() throws Exception {
+        testConcurrentFixesAndMetadata(/* shareSession */ false);
+    }
+
+    /**
+     * Exercises competing writers and per-device metadata workers with either one shared session or separate
+     * fixes/metadata sessions. A fix consumer also waits for a metadata read on another thread; holding the
+     * session monitor while delivering fixes would deadlock that callback in the shared-session case.
+     */
+    private void testConcurrentFixesAndMetadata(final boolean shareSession) throws Exception {
+        if (!shareSession) {
+            metadataCollectionClientSession = MongoDBService.INSTANCE.startCausallyConsistentSession();
+            newStore();
+        }
+        final int fixesPerDevice = 100;
+        final ExecutorService executor = Executors.newFixedThreadPool(/* nThreads */ 2);
+        final CountDownLatch ready = new CountDownLatch(/* count */ 2);
+        final CountDownLatch start = new CountDownLatch(/* count */ 1);
+        try {
+            final List<Future<?>> writers = new ArrayList<>();
+            for (final DeviceIdentifier forDevice : Arrays.asList(device, device2)) {
+                writers.add(executor.submit(() -> {
+                    ready.countDown();
+                    start.await();
+                    for (int i = 0; i < fixesPerDevice; i++) {
+                        addBravoFix(forDevice, FIX_TIMESTAMP + i, FIX_RIDE_HEIGHT);
+                    }
+                    return null;
+                }));
+            }
+            Assertions.assertTrue(ready.await(/* timeout */ 10, TimeUnit.SECONDS));
+            start.countDown();
+            for (final Future<?> writer : writers) {
+                writer.get(/* timeout */ 60, TimeUnit.SECONDS);
+            }
+            for (final DeviceIdentifier forDevice : Arrays.asList(device, device2)) {
+                final List<DoubleVectorFix> loadedFixes = new ArrayList<>();
+                store.<DoubleVectorFix>loadFixes(fix -> {
+                    loadedFixes.add(fix);
+                    if (loadedFixes.size() == 1) {
+                        final Future<Long> metadataRead = executor.submit(() -> store.getNumberOfFixes(forDevice));
+                        assertEquals(fixesPerDevice, Assertions.assertDoesNotThrow(
+                                () -> metadataRead.get(/* timeout */ 10, TimeUnit.SECONDS)).longValue());
+                    }
+                }, forDevice, new MillisecondsTimePoint(FIX_TIMESTAMP),
+                        new MillisecondsTimePoint(FIX_TIMESTAMP + fixesPerDevice), /* inclusive */ false);
+                assertEquals(fixesPerDevice, loadedFixes.size());
+                assertEquals(fixesPerDevice, store.getNumberOfFixes(forDevice));
+            }
+        } finally {
+            start.countDown();
+            executor.shutdownNow();
+            Assertions.assertTrue(executor.awaitTermination(/* timeout */ 10, TimeUnit.SECONDS));
+        }
     }
 
     private void testProgress(int fixes) throws NoCorrespondingServiceRegisteredException, TransformationException {

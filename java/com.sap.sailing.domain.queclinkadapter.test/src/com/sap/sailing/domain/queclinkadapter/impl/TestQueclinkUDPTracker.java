@@ -1,6 +1,5 @@
 package com.sap.sailing.domain.queclinkadapter.impl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -29,12 +28,15 @@ public class TestQueclinkUDPTracker extends AbstractQueclinkTrackerTest {
     @Override
     @AfterEach
     public void after() throws IOException {
-        super.after();
-        tracker.stop();
+        try {
+            tracker.stop();
+        } finally {
+            super.after();
+        }
     }
 
     @Test
-    public void testSendingLogToSocket() throws IOException, InterruptedException {
+    public void testSendingLogToSocket() throws Exception {
         final int port = tracker.getPort();
         final int DATAGRAM_SIZE = 1400;
         final byte[] buf = new byte[DATAGRAM_SIZE];
@@ -55,8 +57,7 @@ public class TestQueclinkUDPTracker extends AbstractQueclinkTrackerTest {
         }
         socket.close();
         inputStreamForTestData.close();
-        Thread.sleep(5000); // wait for all data to have arrived...
-        assertEquals(807, store.getNumberOfFixes(deviceIdentifier));
+        assertNumberOfFixesEventually(/* expected */ 807);
     }
 
     private void send(byte[] buf, int length, int port, DatagramSocket socket) throws IOException {
