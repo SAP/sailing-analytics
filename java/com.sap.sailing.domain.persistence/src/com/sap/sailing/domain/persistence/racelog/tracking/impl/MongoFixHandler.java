@@ -1,7 +1,11 @@
 package com.sap.sailing.domain.persistence.racelog.tracking.impl;
 
+import java.util.function.Supplier;
+
 import org.bson.Document;
 
+import com.mongodb.client.ClientSession;
+import com.mongodb.lang.Nullable;
 import com.sap.sailing.domain.persistence.FieldNames;
 import com.sap.sailing.domain.persistence.racelog.tracking.FixMongoHandler;
 import com.sap.sailing.shared.persistence.device.DeviceIdentifierMongoHandler;
@@ -26,6 +30,27 @@ abstract class MongoFixHandler {
         super();
         this.fixServiceFinder = fixServiceFinder;
         this.deviceServiceFinder = deviceServiceFinder;
+    }
+
+    /**
+     * Executes one MongoDB operation under the explicit session's monitor. A {@link ClientSession} is not thread-safe;
+     * using the session itself as the lock also coordinates different stores and metadata updaters sharing it. With
+     * no explicit session, the operation runs without locking so independent production updates remain concurrent.<p>
+     *
+     * The operation must include any driver I/O, including cursor creation, fetching and closing. Application callbacks
+     * and waits for metadata updates must stay outside this lock: the background updater may need the same session.
+     * Callers using the session directly must follow the same locking convention.
+     */
+    protected static <T> T withClientSessionLock(@Nullable final ClientSession clientSession, final Supplier<T> operation) {
+        final T result;
+        if (clientSession == null) {
+            result = operation.get();
+        } else {
+            synchronized (clientSession) {
+                result = operation.get();
+            }
+        }
+        return result;
     }
 
     /**
