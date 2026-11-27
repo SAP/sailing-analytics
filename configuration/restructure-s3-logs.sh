@@ -44,6 +44,16 @@ JOBS = [
         # date follows the distribution id, so it can't be narrowed by a simple prefix:
         "date_prefix": lambda d: None,
     },
+    {   # legacy S3 access logs: sailinganalytics-mediaYYYY-MM-DD-... (2013–2014, old bucket name)
+        "name": "legacy",
+        "srcdir": os.path.join(BASE, "logs"),
+        "file_re": re.compile(r"^sailinganalytics-media(20\d\d)-([01]\d)-([0-3]\d)-"),
+        "strip": "sailinganalytics-media",
+        "s3_list_prefix": "logs/sailinganalytics-media20",
+        "s3_key_re": re.compile(r"^logs/sailinganalytics-media((20\d\d)-([01]\d)-([0-3]\d)-.*)$"),
+        "name_g": 1, "ymd_g": (2, 3, 4),
+        "date_prefix": lambda d: f"logs/sailinganalytics-media{d}",
+    },
 ]
 # ==========================================
 
@@ -59,12 +69,19 @@ def day_ok(y, mo, d, date): return (not date) or (f"{y}-{mo}-{d}" == date)
 def dest_name(job, name):
     s = job.get("strip")
     return name[len(s):] if s and name.startswith(s) else name
+EXPIRED_CODES = {"ExpiredToken", "ExpiredTokenException", "RequestExpired",
+                 "InvalidToken", "TokenRefreshRequired"}
+def _expired(e):
+    import botocore.exceptions
+    return isinstance(e, botocore.exceptions.ClientError) and \
+           e.response.get("Error", {}).get("Code") in EXPIRED_CODES
 
 # ---------------- PHASE 1: local renames ----------------
-def phase1(date):
+def phase1(date, only):
     log("=== PHASE 1: local restructure (rename, metadata-only) ===")
     plan = []
     for job in JOBS:
+        if only and job["name"] != only: continue
         src, fre = job["srcdir"], job["file_re"]
         if not os.path.isdir(src): log(f"[{job['name']}] {src} missing, skip"); continue
         lst = os.path.join("/var/tmp", f"logmig.{job['name']}.list")
@@ -147,7 +164,9 @@ def phase2(date, only, workers, dry):
                 for fut in as_completed(futs):
                     src_key = futs[fut]
                     try: fut.result(); done.append(src_key)
-                    except Exception as e: log(f"[{job['name']}] COPY FAIL {src_key}: {e}")
+                    except Exception as e:
+                        if _expired(e): raise
+                        log(f"[{job['name']}] COPY FAIL {src_key}: {e}")
                 copied += len(done)
                 for i in range(0, len(done), 1000):
                     chunk = done[i:i+1000]
@@ -158,8 +177,14 @@ def phase2(date, only, workers, dry):
                     log(f"[{job['name']}]   copied {copied:,} deleted {deleted:,} "
                         f"{copied/max(time.monotonic()-t0,1e-9):,.0f}/s")
                     next_rep += 50_000
+        except Exception as e:
+            if not _expired(e):
+                raise
+            log(f"[{job['name']}] CREDENTIALS EXPIRED after copied {copied:,} / deleted {deleted:,}"
+                f" — renew token and re-run:  ./restructure-s3-logs.sh --phase 2")
+            sys.exit(2)
         finally:
-            ex.shutdown(wait=True)
+            ex.shutdown(wait=True, cancel_futures=True)
         log(f"[{job['name']}] {'WOULD migrate' if dry else 'DONE'}: "
             f"copied {copied:,} deleted {deleted:,} skipped {skipped:,}")
 
@@ -180,7 +205,7 @@ def main():
     log(f"Scope: {'day '+args.date if args.date else 'ALL'} | phases {','.join(phases)} "
         f"| workers {args.workers} | {'DRY-RUN' if args.dry_run else 'LIVE'}")
     if "1" in phases:
-        phase1(args.date)
+        phase1(args.date, args.only)
     if "2" in phases and confirm("Proceed to PHASE 2 (server-side S3 copy+delete)? [y/N]"):
         if not args.dry_run and not confirm("This COPIES then DELETES in S3. Type GO to run live:", require="GO"):
             log("Phase 2 not executed (dry-run it with --dry-run)."); return
